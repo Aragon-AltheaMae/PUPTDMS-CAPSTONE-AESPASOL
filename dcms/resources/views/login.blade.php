@@ -1,29 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-container { padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        input { display: block; margin: 10px 0; padding: 8px; width: 100%; }
-        button { padding: 10px; width: 100%; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .error { color: red; }
-    </style>
+    <title>Login</title>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        @if(session('error'))
-            <p class="error">{{ session('error') }}</p>
-        @endif
-        <form method="POST" action="{{ url('/login') }}">
-            @csrf
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+    <h1>Login</h1>
+
+    @if (session('error'))
+        <div style="color:red;">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div style="color:green;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form method="POST" action="/login">
+        @csrf
+        <label>Email / Username:</label><br>
+        <input type="text" name="username" value="{{ old('username') }}" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="/register">Register here</a></p>
 </body>
 </html>

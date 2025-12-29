@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,14 +9,15 @@ class Appointment extends Model
 {
     protected $fillable = ['patient', 'datetime', 'service'];
 
-    public function dentalHistory()
+    // One appointment has many dental history records
+    public function dentalHistories()
     {
-         return $this->belongsTo(Appointment::class);
+        return $this->hasMany(DentalHistory::class);
     }
 
-    public function medicalHistory()
+    // One appointment has many medical history records
+    public function medicalHistories()
     {
-        return $this->belongsTo(Appointment::class);
+        return $this->hasMany(MedicalHistory::class);
     }
 }
-

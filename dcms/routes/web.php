@@ -10,83 +10,23 @@ use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Guest Routes
 |--------------------------------------------------------------------------
 */
 
-// Login Page
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
-
-// Login POST
-Route::post('/login', function (Request $request) {
-    $users = [
-        'admin' => 'admin123',
-        'staff' => 'staff123',
-    ];
-
-    $username = $request->username;
-    $password = $request->password;
-
-    if ($username === 'patient') {
-        // For demo, redirect patient to landing page
-        session(['username' => 'patient']);
-        return redirect('/patient/landing');
-    }
-
-    if (isset($users[$username]) && $users[$username] === $password) {
-        session(['username' => $username]);
-        if ($username === 'admin') return redirect('/admin/dashboard');
-        if ($username === 'staff') return redirect('/staff/dashboard');
-    }
-
-    return back()->with('error', 'Invalid credentials');
+// Patient Registration
+Route::get('/register', function () {
+    return view('register'); // resources/views/register.blade.php
 });
 
-// Logout
-Route::get('/logout', function () {
-    session()->flush();
-    return redirect('/login');
-});
-
-// Generic Dashboard
-Route::get('/dashboard', function () {
-    if (!session()->has('username')) return redirect('/login');
-    $username = session('username');
-    return "Welcome, $username! <br><a href='/logout'>Logout</a>";
-});
-
-/*
-|--------------------------------------------------------------------------
-| Patient Routes
-|--------------------------------------------------------------------------
-*/
-
-// Patient Landing Page (Input Personal Info)
-Route::get('/patient/landing', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    // Check if patient info already exists
-    $patient = Patient::where('email', session('email'))->first();
-    if ($patient) {
-        return redirect('/patient/dashboard');
-    }
-
-    return view('patient-landing');
-});
-
-// POST route to store patient info
-Route::post('/patient/landing', function (Request $request) {
-    if (session('username') !== 'patient') return redirect('/login');
-
+Route::post('/register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:patients,email',
         'phone' => 'nullable|string|max:20',
         'birthdate' => 'nullable|date',
         'gender' => 'nullable|string|max:10',
-        'password' => 'required|string|min:6',
+        'password' => 'required|string|min:6|confirmed',
     ]);
 
     Patient::create([
@@ -98,169 +38,43 @@ Route::post('/patient/landing', function (Request $request) {
         'password' => Hash::make($request->password),
     ]);
 
-    // Store actual email in session for future queries
-    session(['email' => $request->email]);
-
-    return redirect('/patient/dashboard')->with('success', 'Information saved successfully!');
+    return redirect('/login')->with('success', 'Account created successfully!');
 });
 
-// Patient Dashboard
-Route::get('/patient/dashboard', function () {
-    if (session('username') !== 'patient') return redirect('/login');
+// Login Page
+Route::get('/login', function () {
+    return view('login'); // resources/views/login.blade.php
+})->name('login');
 
-    // Fetch the patient model
-    $patient = Patient::where('email', session('username'))->first();
+Route::post('/login', function (Request $request) {
+    $username = $request->input('username');
+    $password = $request->input('password');
 
-    if (!$patient) {
-        return redirect('/patient/landing')->with('error', 'Please complete your information first.');
-    }
-
-    // Fetch all appointments for this patient with dental history
-    $appointments = Appointment::with('dentalHistory')
-        ->where('patient', $patient->email) // use email to match patient
-        ->orderBy('datetime', 'desc')
-        ->get();
-
-    // Prepare an array of records to use in Blade (keep your current table structure)
-    $dentalRecords = [];
-    foreach ($appointments as $appointment) {
-        foreach ($appointment->dentalHistory as $dh) {
-            $dentalRecords[] = [
-                'date' => $appointment->datetime,
-                'dentist' => 'Dr. Smith', // or store dentist name in appointment if you have it
-                'notes' => $dh->question . ': ' . $dh->answer,
-            ];
-        }
-    }
-
-    return view('patient-dashboard', ['dentalRecords' => $dentalRecords]);
-});
-
-
-// Step 1: Appointment Calendar
-Route::get('/patient/appointment/calendar', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-    return view('appointment-calendar');
-});
-
-Route::post('/patient/appointment/calendar', function (Request $request) {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    session(['appointment_datetime' => $request->date_time]);
-    return redirect('/patient/appointment/services');
-});
-
-// Step 2: Services Selection
-Route::get('/patient/appointment/services', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-    return view('appointment-services');
-});
-
-Route::post('/patient/appointment/services', function (Request $request) {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $appointment = Appointment::create([
-        'patient' => session('email'),
-        'datetime' => session('appointment_datetime'),
-        'service' => $request->service,
-    ]);
-
-    session(['appointment_id' => $appointment->id]);
-    return redirect('/patient/appointment/dental-history');
-});
-
-// Step 3: Dental History Survey
-Route::get('/patient/appointment/dental-history', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-    return view('appointment-dental-history');
-});
-
-Route::post('/patient/appointment/dental-history', function (Request $request) {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $appointment_id = session('appointment_id');
-
-    $dental_questions = [
-        'Tooth Sensitivity' => $request->has('question1') ? 'Yes' : 'No',
-        'Brush Twice a Day' => $request->has('question2') ? 'Yes' : 'No',
-        'Floss Regularly' => $request->has('question3') ? 'Yes' : 'No',
-        'Tooth Extractions' => $request->has('question4') ? 'Yes' : 'No',
-        'Gum Bleeding' => $request->has('question5') ? 'Yes' : 'No',
+    // Admin/Staff hard-coded
+    $users = [
+        'admin' => 'admin123',
+        'staff' => 'staff123',
     ];
 
-    foreach ($dental_questions as $question => $answer) {
-        DentalHistory::create([
-            'appointment_id' => $appointment_id,
-            'question' => $question,
-            'answer' => $answer,
-        ]);
+    if (isset($users[$username]) && $users[$username] === $password) {
+        session(['username' => $username]);
+        return $username === 'admin' ? redirect('/admin/dashboard') : redirect('/staff/dashboard');
     }
 
-    return redirect('/patient/appointment/medical-history');
-});
-
-// Step 4: Medical History Survey
-Route::get('/patient/appointment/medical-history', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-    return view('appointment-medical-history');
-});
-
-Route::post('/patient/appointment/medical-history', function (Request $request) {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $appointment_id = session('appointment_id');
-
-    $medical_questions = [
-        'Allergies' => $request->has('allergies') ? 'Yes' : 'No',
-        'Heart Condition' => $request->has('heart_condition') ? 'Yes' : 'No',
-        'Diabetes' => $request->has('diabetes') ? 'Yes' : 'No',
-        'Pregnant' => $request->has('pregnant') ? 'Yes' : 'No',
-        'Other Conditions' => $request->has('other_conditions') ? 'Yes' : 'No',
-    ];
-
-    foreach ($medical_questions as $question => $answer) {
-        MedicalHistory::create([
-            'appointment_id' => $appointment_id,
-            'question' => $question,
-            'answer' => $answer,
-        ]);
+    // Patient login
+    $patient = Patient::where('email', $username)->first();
+    if ($patient && Hash::check($password, $patient->password)) {
+        session(['username' => 'patient', 'patient_id' => $patient->id, 'email' => $patient->email]);
+        return redirect('/patient/dashboard');
     }
 
-    return redirect('/patient/appointment/final-confirmation');
+    return back()->with('error', 'Invalid credentials');
 });
 
-// Step 5: Final Confirmation
-Route::get('/patient/appointment/final-confirmation', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $appointment = Appointment::with(['dentalHistory', 'medicalHistory'])
-        ->find(session('appointment_id'));
-
-    if (!$appointment) return redirect('/patient/dashboard')->with('error', 'No appointment found.');
-
-    return view('appointment-final-confirmation', compact('appointment'));
-});
-
-// Request Dental Clearance
-Route::post('/patient/request-clearance', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $clearances = session('dental_clearance_requests', []);
-    $clearances[] = ['date' => date('Y-m-d'), 'status' => 'Pending'];
-    session(['dental_clearance_requests' => $clearances]);
-
-    return back()->with('success_clearance', 'Dental clearance requested successfully!');
-});
-
-// Request Dental Health Record
-Route::post('/patient/request-health-record', function () {
-    if (session('username') !== 'patient') return redirect('/login');
-
-    $healthRecords = session('dental_health_requests', []);
-    $healthRecords[] = ['date' => date('Y-m-d'), 'status' => 'Pending'];
-    session(['dental_health_requests' => $healthRecords]);
-
-    return back()->with('success_health', 'Dental health record requested successfully!');
+// Logout
+Route::post('/logout', function () {
+    session()->flush();
+    return redirect('/login');
 });
 
 /*
@@ -271,12 +85,151 @@ Route::post('/patient/request-health-record', function () {
 
 // Admin Dashboard
 Route::get('/admin/dashboard', function () {
-    if (session('username') !== 'admin') return redirect('/login');
-    return "Welcome Admin! <br><a href='/logout'>Logout</a>";
+    if (!session()->has('username') || session('username') !== 'admin') {
+        return redirect('/login');
+    }
+    return "Welcome Admin! <form method='POST' action='/logout'>@csrf<button type='submit'>Logout</button></form>";
 });
 
 // Staff Dashboard
 Route::get('/staff/dashboard', function () {
-    if (session('username') !== 'staff') return redirect('/login');
-    return "Welcome Staff! <br><a href='/logout'>Logout</a>";
+    if (!session()->has('username') || session('username') !== 'staff') {
+        return redirect('/login');
+    }
+    return "Welcome Staff! <form method='POST' action='/logout'>@csrf<button type='submit'>Logout</button></form>";
+});
+
+/*
+|--------------------------------------------------------------------------
+| Patient Routes
+|--------------------------------------------------------------------------
+*/
+
+// Patient Dashboard
+Route::get('/patient/dashboard', function () {
+    if (!session()->has('username') || session('username') !== 'patient') {
+        return redirect('/login');
+    }
+
+    $patient = Patient::find(session('patient_id'));
+    if (!$patient) return redirect('/register');
+
+    // Fetch appointments with dental and medical histories
+    $appointments = Appointment::with(['dentalHistories', 'medicalHistories'])
+        ->where('patient', $patient->email)
+        ->orderBy('datetime', 'desc')
+        ->get();
+
+    // Build dental records array for Blade
+    $dentalRecords = [];
+    foreach ($appointments as $appointment) {
+        foreach ($appointment->dentalHistories as $dh) {
+            $dentalRecords[] = [
+                'date' => $appointment->datetime,
+                'dentist' => 'Dr. Smith', // or store dentist name in appointment
+                'notes' => $dh->question . ': ' . $dh->answer,
+            ];
+        }
+    }
+
+    return view('patient-dashboard', [
+        'patient' => $patient,
+        'dentalRecords' => $dentalRecords,
+    ]);
+});
+
+
+// Appointment Steps
+Route::get('/patient/appointment/calendar', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+    return view('appointment-calendar');
+});
+Route::post('/patient/appointment/calendar', function (Request $request) {
+    session(['appointment_datetime' => $request->date_time]);
+    return redirect('/patient/appointment/services');
+});
+
+Route::get('/patient/appointment/services', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+    return view('appointment-services');
+});
+Route::post('/patient/appointment/services', function (Request $request) {
+    $appointment = Appointment::create([
+        'patient' => session('email'),
+        'datetime' => session('appointment_datetime'),
+        'service' => $request->service,
+    ]);
+    session(['appointment_id' => $appointment->id]);
+    return redirect('/patient/appointment/dental-history');
+});
+
+Route::get('/patient/appointment/dental-history', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+    return view('appointment-dental-history');
+});
+Route::post('/patient/appointment/dental-history', function (Request $request) {
+    $appointment_id = session('appointment_id');
+    $dental_questions = [
+        'Tooth Sensitivity' => $request->has('question1') ? 'Yes' : 'No',
+        'Brush Twice a Day' => $request->has('question2') ? 'Yes' : 'No',
+        'Floss Regularly' => $request->has('question3') ? 'Yes' : 'No',
+        'Tooth Extractions' => $request->has('question4') ? 'Yes' : 'No',
+        'Gum Bleeding' => $request->has('question5') ? 'Yes' : 'No',
+    ];
+    foreach ($dental_questions as $q => $a) {
+        DentalHistory::create(['appointment_id' => $appointment_id, 'question' => $q, 'answer' => $a]);
+    }
+    return redirect('/patient/appointment/medical-history');
+});
+
+Route::get('/patient/appointment/medical-history', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+    return view('appointment-medical-history');
+});
+Route::post('/patient/appointment/medical-history', function (Request $request) {
+    $appointment_id = session('appointment_id');
+    $medical_questions = [
+        'Allergies' => $request->has('allergies') ? 'Yes' : 'No',
+        'Heart Condition' => $request->has('heart_condition') ? 'Yes' : 'No',
+        'Diabetes' => $request->has('diabetes') ? 'Yes' : 'No',
+        'Pregnant' => $request->has('pregnant') ? 'Yes' : 'No',
+        'Other Conditions' => $request->has('other_conditions') ? 'Yes' : 'No',
+    ];
+    foreach ($medical_questions as $q => $a) {
+        MedicalHistory::create(['appointment_id' => $appointment_id, 'question' => $q, 'answer' => $a]);
+    }
+    return redirect('/patient/appointment/final-confirmation');
+});
+
+// Final Confirmation
+Route::get('/patient/appointment/final-confirmation', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+
+    $appointment = Appointment::with(['dentalHistories', 'medicalHistories'])
+        ->find(session('appointment_id'));
+
+    if (!$appointment) return redirect('/patient/dashboard')->with('error', 'No appointment found.');
+
+    return view('appointment-final-confirmation', compact('appointment'));
+});
+
+// Requests
+Route::post('/patient/request-clearance', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+
+    $clearances = session('dental_clearance_requests', []);
+    $clearances[] = ['date' => date('Y-m-d'), 'status' => 'Pending'];
+    session(['dental_clearance_requests' => $clearances]);
+
+    return back()->with('success_clearance', 'Dental clearance requested!');
+});
+
+Route::post('/patient/request-health-record', function () {
+    if (!session()->has('username') || session('username') !== 'patient') return redirect('/login');
+
+    $records = session('dental_health_requests', []);
+    $records[] = ['date' => date('Y-m-d'), 'status' => 'Pending'];
+    session(['dental_health_requests' => $records]);
+
+    return back()->with('success_health', 'Dental health record requested!');
 });

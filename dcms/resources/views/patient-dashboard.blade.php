@@ -9,44 +9,51 @@
         section { margin-top: 30px; }
         input, select { display: block; margin: 10px 0; padding: 8px; width: 300px; }
         button { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
-        table { border-collapse: collapse; width: 80%; margin-top: 10px; }
+        table { border-collapse: collapse; width: 90%; margin-top: 10px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
         .success { color: green; }
+        .logout { margin-top: 10px; display: inline-block; }
     </style>
 </head>
 <body>
-    <h1>Welcome, {{ session('username') }}</h1>
-    <a href="/logout">Logout</a>
+    <h1>Welcome, {{ $patient->name }}</h1>
+
+    <!-- Logout -->
+    <a class="logout" href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+    <form id="logout-form" method="POST" action="/logout">@csrf</form>
 
     <!-- Appointment Section -->
     <section>
-                <a href="{{ url('/patient/appointment/calendar') }}">
+        <a href="{{ url('/patient/appointment/calendar') }}">
             <button type="button">Set Appointment</button>
         </a>
-
-        <form method="POST" action="{{ url('/patient/appointment') }}">
+    </section>
 
     <!-- Dental Records Section -->
     <section>
         <h2>Dental Records</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Dentist</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($dentalRecords as $record)
-                <tr>
-                    <td>{{ $record['date'] }}</td>
-                    <td>{{ $record['dentist'] }}</td>
-                    <td>{{ $record['notes'] }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @if(!empty($dentalRecords))
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Dentist</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dentalRecords as $record)
+                        <tr>
+                            <td>{{ $record['date'] }}</td>
+                            <td>{{ $record['dentist'] }}</td>
+                            <td>{{ $record['notes'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>No dental records available.</p>
+        @endif
     </section>
 
     <!-- Request Dental Clearance -->
