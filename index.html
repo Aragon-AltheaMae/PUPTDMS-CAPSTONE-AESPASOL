@@ -23,12 +23,11 @@
 
   <!-- Segoe UI Font -->
   <style>
-    body {
-      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-                   "Helvetica Neue", Arial, sans-serif;
-    }
-  </style>
-</head>
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+                 "Helvetica Neue", Arial, sans-serif;
+  }
+</style>
 
 <body class="bg-white text-[#333333] font-normal">
 
@@ -149,26 +148,26 @@
       </div>
 
       <!-- CALENDAR -->
-      <div class="border rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-red-800 mb-4">Upcoming Schedule</h3>
+    <div class="border rounded-2xl p-6 h-[420px] flex flex-col">
+      <h3 class="text-lg font-bold text-red-800 mb-4">Upcoming Schedule</h3>
 
-        <calendar-date class="cally bg-white border border-gray-200 shadow-lg rounded-2xl w-full p-2">
+    <div class="flex justify-center">
+      <calendar-date
+      class="cally bg-white border shadow rounded-2xl w-full h-full flex flex-col p-2">
 
-          <svg aria-label="Previous" class="fill-current size-4" slot="previous"
-              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+      <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
+          <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
           </svg>
 
-          <svg aria-label="Next" class="fill-current size-4" slot="next"
-              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+      <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
+          <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
           </svg>
 
-          <calendar-month></calendar-month>
+          <calendar-month class="w-full"></calendar-month>
         </calendar-date>
       </div>
     </div>
-
+  </div>
 
     <!-- RECORDS -->
     <h2 class="text-2xl font-bold text-red-800 mb-4">My Dental Records</h2>
@@ -205,28 +204,43 @@
     <h2 class="text-3xl font-extrabold text-red-800 mb-6">Request Documents</h2>
 
     <div class="space-y-4">
-      <div class="flex border rounded-2xl overflow-hidden">
-        <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-          <img src="icons/dental-clearance.png"/>
-        </div>
-        <div class="p-4 text-3xl">
-          <p class="font-extrabold pb-4">Request Dental Clearance</p>
-          <p class="text-sm">Dental Clearance • Annual Dental Clearance</p>
-        </div>
-      </div>
+      <a href="#"
+      class="flex border rounded-2xl overflow-hidden
+            hover:border-red-800 hover:shadow-lg
+            transition cursor-pointer">
 
-      <div class="flex border rounded-2xl overflow-hidden">
-        <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-          <img src="icons/dental-health-record.png"/>
-        </div>
-        <div class="p-4 text-3xl">
-          <p class="font-extrabold pb-4">Request Dental Health Record</p>
-          <p class="text-sm">All Dental Records • Medical Record • Diagnosis & Treatments</p>
-        </div>
-      </div>
+    <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
+      <img src="icons/dental-clearance.png"/>
     </div>
 
-  </div>
+    <div class="p-4">
+      <p class="font-extrabold text-xl text-red-800 pb-2">
+        Request Dental Clearance
+      </p>
+      <p class="text-sm text-gray-600">
+        Dental Clearance • Annual Dental Clearance
+      </p>
+    </div>
+  </a>
+
+      <a href="#"
+      class="flex border rounded-2xl overflow-hidden
+          hover:border-red-800 hover:shadow-lg
+          transition cursor-pointer">
+
+      <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
+        <img src="icons/dental-health-record.png"/>
+      </div>
+
+    <div class="p-4">
+      <p class="font-extrabold text-xl text-red-800 pb-2">
+        Request Dental Health Record
+      </p>
+      <p class="text-sm text-gray-600">
+        All Dental Records • Medical Record • Diagnosis & Treatments
+      </p>
+    </div>
+  </a>
 
   <!-- FOOTER -->
   <footer class="bg-red-900 text-white mt-20">
