@@ -72,7 +72,9 @@
 
     <!-- STEP 1 -->
     <div class="step-content">
-      <h2 class="text-xl font-bold mb-4 text-[#660000] ">Select Date & Time</h2>
+      <h2 class="text-xl font-bold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
+      Select Date and Time</h2>
+
       <label>Date</label>
       <input type="text" id="datePicker" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
       
@@ -84,23 +86,356 @@
 
     <!-- STEP 2 -->
     <div class="step-content hidden">
-      <h2 class="text-xl font-bold mb-4 text-[#660000]">Select Service</h2>
-      <label><input type="radio" name="service_type" value="Oral Check-up" required> Oral Check-up</label><br>
-      <label><input type="radio" name="service_type" value="Dental Cleaning"> Dental Cleaning</label><br>
-      <label><input type="radio" name="service_type" value="Restoration & Prosthesis"> Restoration & Prosthesis</label><br>
-      <label><input type="radio" name="service_type" value="Dental Surgery"> Dental Surgery</label>
+    <h2 class="text-xl font-bold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
+    Select Service Type
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Card -->
+    <label class="cursor-pointer">
+      <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
+      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+                  peer-checked:border-[#8B0000] peer-checked:bg-white
+                  hover:border-[#8B0000] transition">
+        <div class="flex flex-col items-center text-center gap-3">
+          <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
+            🦷
+          </div>
+          <h3 class="font-bold text-[#660000]">Oral Check-Up</h3>
+          <p class="text-sm text-gray-600">
+            Routine oral examination & dental consultation
+          </p>
+        </div>
+      </div>
+    </label>
+
+    <!-- Card -->
+    <label class="cursor-pointer">
+      <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
+      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+                  peer-checked:border-[#8B0000] peer-checked:bg-white
+                  hover:border-[#8B0000] transition">
+        <div class="flex flex-col items-center text-center gap-3">
+          <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
+            🦷
+          </div>
+          <h3 class="font-bold text-[#660000]">Dental Cleaning</h3>
+          <p class="text-sm text-gray-600">
+            Oral hygiene treatment & plaque removal
+          </p>
+        </div>
+      </div>
+    </label>
+
+    <!-- Card -->
+    <label class="cursor-pointer">
+      <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
+      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+                  peer-checked:border-[#8B0000] peer-checked:bg-white
+                  hover:border-[#8B0000] transition">
+        <div class="flex flex-col items-center text-center gap-3">
+            <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
+            🦷
+            </div>
+            <h3 class="font-bold text-[#660000]">Restoration & Prosthesis</h3>
+            <p class="text-sm text-gray-600">
+            Fillings, crowns, bridges & repairs
+            </p>
+          </div>
+        </div>
+      </label>
+
+    <!-- Card -->
+    <label class="cursor-pointer">
+      <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
+      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+                  peer-checked:border-[#8B0000] peer-checked:bg-white
+                  hover:border-[#8B0000] transition">
+        <div class="flex flex-col items-center text-center gap-3">
+            <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
+            🦷
+            </div>
+            <h3 class="font-bold text-[#660000]">Dental Surgery</h3>
+            <p class="text-sm text-gray-600">
+            Tooth extraction & surgical procedures
+            </p>
+          </div>
+        </div>
+      </label>
+
     </div>
+  </div>
 
     <!-- STEP 3 -->
-    <div class="step-content hidden">
-      <h2 class="text-xl font-bold mb-4 text-[#660000]">Dental History</h2>
-      <label><input type="checkbox" name="dental_history[]" value="Tooth Pain"> Tooth Pain</label><br>
-      <label><input type="checkbox" name="dental_history[]" value="Bleeding Gums"> Bleeding Gums</label><br>
-      <label><input type="checkbox" name="dental_history[]" value="Previous Extraction"> Previous Extraction</label>
+<div class="step-content hidden">
+  <div class="bg-[#e6e6e6] rounded-xl p-8">
 
-      <label class="block mt-4">Additional Concern</label>
-      <input type="text" name="additional_concern" class="input input-bordered w-full">
+    <!-- TITLE -->
+    <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Dental History</h2>
+    <hr class="border-[#8B0000] border-2 w-full mb-4">
+
+    <p class="text-sm text-gray-600 mb-6">
+      Share your past dental records, treatments, or concerns for better assessment.
+    </p>
+
+    <!-- BASIC INFO -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div>
+        <label class="text-sm font-semibold block mb-1">Last Dental Visit</label>
+        <div class="flex gap-2">
+          <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
+          <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
+          <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold block mb-1">Previous Dentist Dr.</label>
+        <input type="text" class="input input-bordered w-full" placeholder="Name">
+      </div>
     </div>
+
+    <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
+      <span>
+        Please indicate <span class="font-bold">YES</span> or <span class="font-bold">NO</span> to the following:
+      </span>
+      <span class="text-center">YES</span>
+      <span class="text-center">NO</span>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div class="space-y-3 text-sm">
+
+      <!-- REUSABLE ROW -->
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Do your gums bleed while brushing/flossing?</span>
+        <input type="radio" name="bleeding_gums" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="bleeding_gums" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Are your teeth sensitive to hot or cold?</span>
+        <input type="radio" name="sensitive_temp" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="sensitive_temp" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Are your teeth sensitive to sweets or sour?</span>
+        <input type="radio" name="sensitive_taste" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="sensitive_taste" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Do you feel any pain in your teeth?</span>
+        <input type="radio" name="tooth_pain" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="tooth_pain" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Do you have any sores/lumps in or near your mouth?</span>
+        <input type="radio" name="sores" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="sores" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Have you had any head,neck, or jaw injuries?</span>
+        <input type="radio" name="injuries" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="injuries" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+    </div><!-- END QUESTIONS -->
+
+    <hr class="border-[#8B0000] border-2 my-8">
+
+    <!-- SECOND SECTION -->
+    <p class="font-semibold mb-3 text-sm">
+      Have you ever experienced any of the following?
+    </p>
+
+    <div class="space-y-3 text-sm">
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Clicking</span>
+        <input type="radio" name="click" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="click" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Pain (joint, side of the face)</span>
+        <input type="radio" name="joint" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="joint" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Difficulty in opening/closing</span>
+        <input type="radio" name="diff_moving" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="diff_moving" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Difficulty in chewing</span>
+        <input type="radio" name="diff_chew" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="diff_chew" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Frequent headaches</span>
+        <input type="radio" name="headaches" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="headaches" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Do you clench or grind your teeth?</span>
+        <input type="radio" name="clench_grind" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="clench_grind" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Frequent lips/cheek biting</span>
+        <input type="radio" name="biting" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="biting" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Have you noticed loosening your teeth?</span>
+        <input type="radio" name="teeth_loosening" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="teeth_loosening" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Does food get caught between your teeth?</span>
+        <input type="radio" name="food_teeth" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="food_teeth" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Have you ever had reaction to any kind of medicine or dental anesthetic?</span>
+        <input type="radio" name="med_reaction" value="Yes" 
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="med_reaction" value="No"  
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+    </div>
+
+    <p class="text-xs text-[#8B0000] mt-3 mb-6 italic"> 
+    <span class="font-bold">If YES, please provide details during consultation.</span>
+    </p>
+
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
+      <span class="text-sm">Have you had any periodontal (gum) treatment?</span>
+      <input type="radio" name="periodontal" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      <input type="radio" name="periodontal" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
+      <span class="text-sm">Have you had a difficult tooth extraction?</span>
+      <input type="radio" name="difficult_extraction" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      <input type="radio" name="difficult_extraction" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+<!-- DATE BOX - only shows if YES -->
+  <div class="mt-2 ml-8 hidden" id="extraction_date_box">
+    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">Date of extraction</label>
+    <div class="flex gap-2">
+      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    </div>
+  </div>
+
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
+      <span class="text-sm">Have you had prolonged bleeding following tooth extractions before?</span>
+      <input type="radio" name="prolonged_bleeding" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      <input type="radio" name="prolonged_bleeding" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
+      <span class="text-sm">Do you wear complete or partial dentures?</span>
+      <input type="radio" name="dentures" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      <input type="radio" name="dentures" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+    <div class="mt-2 ml-8 hidden" id="dentures_date_box">
+    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">If yes, date of placement:</label>
+    <div class="flex gap-2">
+      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    </div>
+  </div>
+
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
+      <span class="text-sm">Have you had orthodontic treatment?</span>
+      <input type="radio" name="ortho_treatment" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      <input type="radio" name="ortho_treatment" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+    <div class="mt-2 ml-8 hidden" id="ortho_date_box">
+    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">If yes, date of completion:</label>
+    <div class="flex gap-2">
+      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
+      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    </div>
+  </div>
+
+  <hr class="border-[#8B0000] border-2 my-8">
+
+<!-- THIRD SECTION -->
+  <p class="font-bold mb-3 text-sm">
+    Additional Concerns
+  </p>
+
+  <textarea 
+    name="additional_concerns" 
+    id="additional_concerns" 
+    placeholder="Write any additional concerns here..." 
+    class="w-full border border-gray-200 rounded-md p-2 text-sm resize-y"
+    rows="4">
+  </textarea>
+
+  </div><!-- END bg card -->
+</div><!-- END step-content -->
 
     <!-- STEP 4 -->
     <div class="step-content hidden">
@@ -362,7 +697,30 @@ document.getElementById("appointmentForm").onsubmit = function(e){
     })
     .catch(()=> alert("Something went wrong. Please try again."));
 };
-</script>
 
+/* -------- Date Dental History Boxes -------- */
+const questions = [
+    { name: 'difficult_extraction', boxId: 'extraction_date_box' },
+    { name: 'dentures', boxId: 'dentures_date_box' },
+    { name: 'ortho_treatment', boxId: 'ortho_date_box' }
+  ];
+
+  questions.forEach(q => {
+    const radios = Array.from(document.getElementsByName(q.name));
+    const box = document.getElementById(q.boxId);
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const selected = radios.find(r => r.checked);
+        if (selected && selected.value === 'Yes') {
+          box.classList.remove('hidden');
+        } else {
+          box.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+</script>
 </body>
 </html>
