@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PUP Taguig Dental Clinic | About Us</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- DaisyUI -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
+  <script type="module" src="https://unpkg.com/cally"></script>
+
+  <script>
+    tailwind.config = {
+      daisyui: {
+        themes: false,
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+                   "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Custom FAQ */
+    .faq-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+  }
+  .faq-item.open .faq-content {
+    max-height: 500px; /* adjust to content */
+    opacity: 1;
+  }
+  </style>
+</head>
+<body class="bg-white text-[#333333] font-normal">
+
+  <!-- HEADER -->
+  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-12 rounded-full">
+            <img src="dcms/public/images/PUP.png" alt="User Profile" />
+        </div>
+        <div class="w-12 rounded-full">
+            <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="User Profile" />
+        </div>
+        <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="indicator">
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">12</span>
+        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
+          <img src="dcms/public/images/notifications.png" alt="Notification" />
+        </button>
+        </div>
+        <div class="avatar">
+        <div class="w-8 rounded-full bg-white"></div>
+        </div>
+        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
+          <img src="dcms/public/images/Log out.png" alt="Log Out" />
+        </button>
+    </div>
+</div>
+
+  <!-- NAVIGATION -->
+  <div class="bg-red text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
+    
+    <a href="index.html"
+    class="relative pb-1
+              after:absolute after:left-0 after:bottom-0
+              after:h-[2px] after:w-full
+              after:bg-[#FFD700]
+              after:opacity-0
+              after:transition-opacity after:duration-300
+              hover:after:opacity-100">
+      Home
+    </a>
+
+    <a href="appointment.html" 
+    class="relative pb-1
+              after:absolute after:left-0 after:bottom-0
+              after:h-[2px] after:w-full
+              after:bg-[#FFD700]
+              after:opacity-0
+              after:transition-opacity after:duration-300
+              hover:after:opacity-100">
+      Appointment
+    </a>
+
+    <a href=""
+    class="relative pb-1
+              after:absolute after:left-0 after:bottom-0
+              after:h-[2px] after:w-full
+              after:bg-[#FFD700]
+              after:opacity-0
+              after:transition-opacity after:duration-300
+              hover:after:opacity-100">
+      Record
+    </a>
+
+    <a href="aboutus.html"
+    class=   "font-bold
+             relative pb-1
+              after:absolute after:left-0 after:bottom-0
+              after:h-[2px] after:w-full
+              after:bg-[#FFD700]
+              after:opacity-0
+              after:transition-opacity after:duration-300
+              hover:after:opacity-100">
+      About Us
+    </a>
+  </div>
+</div>
+
+  <!-- BANNER -->
+  <section class="relative bg-gray-50 py-24 text-center">
+    <img
+      src=""
+      class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+    />
+    <h2 class="relative z-10 font-extrabold text-4xl text-[#8B0000]">About Us</h2>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-5xl mx-auto px-6 mb-12 space-y-20">
+
+    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-8">
+      The Polytechnic University of the Philippines – Taguig Campus is committed to promoting the 
+      health and well-being of its academic community by providing free dental services to students, 
+      alumni, faculty, and staff. These services aim to support overall wellness and ensure access to 
+      basic dental care within the campus.
+    </p>
+
+    <!-- CARD -->
+    <div class="bg-gradient-to-br from-[#8B0000] to-[#660000] text-[#F4F4F4]
+    rounded-2xl pl-12 flex flex-col md:flex-row items-center gap-4 shadow-lg">
+        <div class="flex-1 font-normal text-2xl leading-relaxed">
+            The dental clinic is headed by <span class="font-bold text-2xl">Dr. Nelson P. Angeles</span>,
+            <br>the campus dentist, who delivers professional, safe, and reliable dental care.
+        </div>
+        <img src="dcms/public/images/Nelson Angeles.png" alt="Dr. Nelson P. Angeles" class="w-1/3 object-contain" />
+    </div>
+
+    <!-- FAQs Title -->
+    <h3 class="font-extrabold text-[#8B0000] text-center mt-8 mb-4 text-3xl">Frequently Asked Questions</h3>
+    <section class="max-w-3xl mx-auto mt-2 rounded-2xl bg-gradient-to-br from-[#660000] to-[#FFD700] p-1">
+    <div class="bg-white rounded-2xl p-4">
+
+    <!-- FAQ 1 -->
+    <div id="faq1" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+            aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+        <span class="text-yellow-500 mr-2">•</span>
+        <span class="text-[#8B0000]">Who can avail of the dental services at the University Dental Clinic?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+            stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <div id="faq1-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+        All students, alumni, faculty, and staff of the University are eligible for free dental services.
+    </div>
+    </div>
+
+    <!-- FAQ 2 -->
+    <div id="faq2" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">How do I book an appointment?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq2-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      You can book an appointment through the Dental Management System online portal.
+    </div>
+    </div>
+
+    <!-- FAQ 3 -->
+    <div id="faq3" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">Will the dentist prescribe medications during my visit?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq3-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      Yes, depending on your dental condition, the dentist may prescribe 
+      antibiotics, pain relievers, or other medications.
+    </div>
+    </div>
+
+    <!-- FAQ 4 -->
+    <div id="faq4" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">Can I make an appointment anytime?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq4-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      Appointments are subject to availability. Since the clinic has limited 
+      slots and only one dentist, early booking is recommended.
+    </div>
+    </div>
+
+    <!-- FAQ 5 -->
+     <div id="faq5" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">How can I cancel or reschedule my appointment?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq5-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      Appointments can be canceled or rescheduled through the Dental Management System 
+      or by contacting the clinic directly at least three (3) days before the scheduled appointment.
+    </div>
+    </div>
+
+    <!-- FAQ 6 -->
+    <div id="faq6" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">What happens if the University Dentist is unavailable on my scheduled day?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq6-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      If the dentist is unavailable, your confirmed schedule will be rescheduled to the next available slot.
+    </div>
+    </div>
+
+    <!-- FAQ 7 -->
+    <div id="faq7" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]"> What services are offered at the University Dental Clinic?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq7-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      The clinic provides basic dental check-ups, cleaning, fillings, extractions, 
+      oral health advice, and other preventive care services.
+    </div>
+    </div>
+
+    <!-- FAQ 8 -->
+    <div id="faq8" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">Is there a priority system for urgent dental cases?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq8-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      Yes, urgent cases may be given priority, but it depends on the daily schedule and the dentist’s discretion.
+    </div>
+    </div>
+
+    <!-- FAQ 9 -->
+    <div id="faq9" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">Are there any restrictions for certain treatments?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq9-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+      Some advanced dental procedures may not be available due to the clinic’s resources. 
+      The dentist will provide guidance on alternatives if needed.
+    </div>
+    </div>
+
+    <!-- FAQ 10 -->
+    <div id="faq10" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
+    <button class="w-full flex justify-between items-center p-4 bg-white font-semibold cursor-pointer
+                    text-left rounded-t-lg"
+        aria-expanded="false" onclick="toggleFAQ(this)">
+        <span>
+            <span class="text-yellow-500 mr-2">•</span>
+            <span class="text-[#8B0000]">Are follow-up appointments required?</span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8B0000]" fill="none" viewBox="0 0 24 24" 
+        stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        </button>
+    <div id="faq10-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-semibold rounded-b-lg">
+      Some treatments may require follow-up visits. The dentist will advise if a follow-up is necessary.
+    </div>
+    </div>
+</section>
+
+  <p class="text-[#8B0000] text-xl leading-relaxed text-justify text-wrap mt-10">
+      The PUPT Dental Management System was developed to manage records and appointments more effectively,
+      ensuring an efficient dental service while supporting the University's commitment to quality and accessible care.
+    </p>
+    
+    <!-- DEVELOPERS -->
+    <section class="text-center text-2xl mt-12">
+      <h3 class="font-extrabold text-[#8B0000] mb-4">The Developers</h3>
+      <div class="flex justify-center gap-6">
+        <img src="dcms/public/images/Althea Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="dcms/public/images/Grace Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
+        <img src="dcms/public/images/Hoshea Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="dcms/public/images/Rain Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+
+  <!-- ASIDE: CLINIC INFO -->
+  <aside class="space-y-4">
+    <div class="flex items-center gap-3">
+      
+      <!-- Logos -->
+      <div class="w-12">
+        <img src="dcms/public/images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
+      </div>
+
+      <div class="w-12">
+        <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+        <p class="text-sm whitespace-nowrap">
+          Polytechnic University of the Philippines – Taguig Campus
+        </p>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="flex items-start gap-3 text-sm">
+      <img src="dcms/public/images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    </div>
+
+    <!-- Email -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="dcms/public/images/footer-email.png" class="w-5 h-4" />
+      <p>pupdental@pup.edu.ph</p>
+    </div>
+
+    <!-- Phone -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="dcms/public/images/footer-phone.png" class="w-4 h-4" />
+      <p>(02) 123-4567</p>
+    </div>
+  </aside>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
+  </nav>
+
+  <!-- SERVICES -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
+    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
+    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
+  </nav>
+
+</footer>
+
+  <script>
+    function toggleFAQ(button) {
+    const item = button.parentElement;
+    const content = item.querySelector('.faq-content');
+
+    if (item.classList.contains('open')) {
+        content.style.maxHeight = 0;
+        content.style.opacity = 0;
+        item.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.style.opacity = 1;
+        item.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+    }
+    }
+  </script>
+
+</body>
+</html>
