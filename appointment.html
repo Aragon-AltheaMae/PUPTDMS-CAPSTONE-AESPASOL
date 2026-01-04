@@ -26,6 +26,17 @@
         },
         };
     </script>
+
+    <style>
+      /* Smooth underline animation */
+      .tabs-bordered .tab {
+        transition: color 0.5s ease, font-weight 0.5s ease;
+      }
+
+      .tabs-bordered .tab::after {
+        transition: width 0.5s ease, left 0.5s ease;
+      }
+    </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -170,28 +181,36 @@
     <div class="card-body">
 
       <!-- Tabs -->
-      <div class="tabs tabs-bordered mb-6">
-        <a class="tab tab-active text-pupred">Future Visits</a>
-        <a class="tab">Past Visits</a>
-      </div>
+    <div class="tabs tabs-bordered mb-6">
+      <a id="futureTab"
+        class="tab tab-active font-bold text-pupred cursor-pointer"
+        onclick="showFuture()">
+        Future Visits
+      </a>
+
+      <a id="pastTab"
+        class="tab cursor-pointer"
+        onclick="showPast()">
+        Past Visits
+      </a>
+    </div>
 
       <!-- ================= FUTURE VISITS ================= -->
 
       <!-- IF future_visits.count == 0 -->
-      <div class="text-center py-10 text-gray-500">
-        <p class="text-lg font-semibold">No Upcoming Visits</p>
-        <p class="text-sm">You currently have no scheduled appointments.</p>
-      </div>
+    <div id="futureContent" class="text-center py-10 text-gray-500">
+      <p class="text-lg font-semibold">No Upcoming Visits</p>
+      <p class="text-sm">You currently have no scheduled appointments.</p>
+    </div>
 
       <!-- ================= PAST VISITS ================= -->
       <!-- Show only when Past Visits tab is active -->
 
       <!-- IF past_visits.count == 0 -->
-      <div class="text-center py-10 text-gray-500">
-        <p class="text-lg font-semibold">No Past Visits Yet</p>
-        <p class="text-sm">Your completed appointments will appear here.</p>
-      </div>
-
+    <div id="pastContent" class="text-center py-10 text-gray-500 hidden">
+      <p class="text-lg font-semibold">No Past Visits Yet</p>
+      <p class="text-sm">Your completed appointments will appear here.</p>
+    </div>
     </div>
   </div>
 </section>
@@ -342,6 +361,24 @@
   </nav>
 
 </footer>
+
+<script>
+  function showFuture() {
+    document.getElementById("futureTab").classList.add("tab-active", "font-bold", "text-pupred");
+    document.getElementById("pastTab").classList.remove("tab-active", "font-bold", "text-pupred");
+
+    document.getElementById("futureContent").classList.remove("hidden");
+    document.getElementById("pastContent").classList.add("hidden");
+  }
+
+  function showPast() {
+    document.getElementById("pastTab").classList.add("tab-active", "font-bold", "text-pupred");
+    document.getElementById("futureTab").classList.remove("tab-active", "font-bold", "text-pupred");
+
+    document.getElementById("pastContent").classList.remove("hidden");
+    document.getElementById("futureContent").classList.add("hidden");
+  }
+</script>
 
 </body>
 </html>
