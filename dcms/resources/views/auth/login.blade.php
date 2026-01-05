@@ -18,8 +18,9 @@
         </div>
     @endif
 
-    <form method="POST" action="/login">
-        @csrf
+   <form method="POST" action="/login">
+    @csrf
+
         <label>Email / Username:</label><br>
         <input type="text" name="username" value="{{ old('username') }}" required><br><br>
 

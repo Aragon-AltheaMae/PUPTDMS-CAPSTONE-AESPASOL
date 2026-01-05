@@ -24,6 +24,7 @@
 
     <form method="POST" action="/register">
         @csrf
+        
         <label>Name:</label><br>
         <input type="text" name="name" value="{{ old('name') }}" required><br><br>
 

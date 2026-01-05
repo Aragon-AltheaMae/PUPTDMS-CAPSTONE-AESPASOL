@@ -2,22 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Patient;
+use App\Http\Controllers\PatientController;
 use App\Models\Appointment;
 use App\Models\DentalHistory;
 use App\Models\MedicalHistory;
-use App\Models\Patient;
-use Illuminate\Support\Facades\Hash;
+
+
+// Show login page
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+// Show register page
+Route::get('/register', function () {
+    return view('auth.register');
+});
 
 /*
 |--------------------------------------------------------------------------
-| Guest Routes
+| REGISTRATION (POST)
 |--------------------------------------------------------------------------
 */
-
-// Patient Registration
-Route::get('/register', function () {
-    return view('register'); // resources/views/register.blade.php
-});
 
 Route::post('/register', function (Request $request) {
     $request->validate([
@@ -41,40 +48,129 @@ Route::post('/register', function (Request $request) {
     return redirect('/login')->with('success', 'Account created successfully!');
 });
 
-// Login Page
-Route::get('/login', function () {
-    return view('login'); // resources/views/login.blade.php
-})->name('login');
+/*
+|--------------------------------------------------------------------------
+| LOGIN (POST)
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/login', function (Request $request) {
     $username = $request->input('username');
     $password = $request->input('password');
 
-    // Admin/Staff hard-coded
+    // Hard-coded admin / staff
     $users = [
         'admin' => 'admin123',
         'staff' => 'staff123',
     ];
 
     if (isset($users[$username]) && $users[$username] === $password) {
-        session(['username' => $username]);
-        return $username === 'admin' ? redirect('/admin/dashboard') : redirect('/staff/dashboard');
+        session([
+            'role' => $username
+        ]);
+
+        return redirect('/homepage');
     }
 
     // Patient login
     $patient = Patient::where('email', $username)->first();
+
     if ($patient && Hash::check($password, $patient->password)) {
-        session(['username' => 'patient', 'patient_id' => $patient->id, 'email' => $patient->email]);
-        return redirect('/patient/dashboard');
+        session([
+            'role' => 'patient',
+            'patient_id' => $patient->id,
+        ]);
+
+        return redirect('/homepage');
     }
 
     return back()->with('error', 'Invalid credentials');
 });
 
-// Logout
-Route::post('/logout', function () {
+/*
+|--------------------------------------------------------------------------
+| HOMEPAGE (INDEX.BLADE.PHP)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/homepage', function () {
+    if (!session()->has('patient_id')) {
+        return redirect('/login');
+    }
+
+    $patient = Patient::find(session('patient_id'));
+
+    return view('index', compact('patient'));
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/logout', function () {
     session()->flush();
     return redirect('/login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| BOOK APPOINTMENT PAGE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/appointment', function () {
+    return view('appointment');
+})->name('appointment');
+
+
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+
+Route::get('/book-appointment', function () {
+    return view('book-appointment');
+})->name('book.appointment');
+
+// -------------------
+// Patient Dashboard
+// -------------------
+Route::get('/patient/dashboard', function () {
+    if (!session()->has('patient_id')) {
+        return redirect('/login');
+    }
+
+    $patient = Patient::find(session('patient_id'));
+
+    return view('index', ['patient' => $patient]);
+});
+
+// -------------------
+// Admin & Staff Dashboards
+// -------------------
+Route::get('/admin/dashboard', function () {
+    if (!session()->has('username') || session('username') !== 'admin') {
+        return redirect('/login');
+    }
+    return view('admin.dashboard');
+});
+
+Route::get('/staff/dashboard', function () {
+    if (!session()->has('username') || session('username') !== 'staff') {
+        return redirect('/login');
+    }
+    return view('staff.dashboard');
+});
+
+// -------------------
+// Logout Route
+// -------------------
+Route::post('/logout', function () {
+    session()->flush();
+    return redirect('/login')->with('success', 'Logged out successfully!');
 });
 
 /*

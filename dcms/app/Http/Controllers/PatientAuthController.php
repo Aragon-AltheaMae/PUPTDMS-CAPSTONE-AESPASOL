@@ -5,25 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 
 class PatientAuthController extends Controller
 {
     // SHOW REGISTER FORM
     public function showRegister()
     {
-        return view('auth.register');
+        return view('register');
     }
 
     // SAVE ACCOUNT
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:patients',
-            'phone' => 'required',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:patients,email',
+            'phone' => 'required|string|max:20',
             'birthdate' => 'required|date',
-            'gender' => 'required',
+            'gender' => 'required|string',
             'password' => 'required|min:6|confirmed',
         ]);
 
@@ -48,22 +47,29 @@ class PatientAuthController extends Controller
     // LOGIN PROCESS
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        $patient = Patient::where('email', $credentials['email'])->first();
+        $patient = Patient::where('email', $request->email)->first();
 
-        if ($patient && Hash::check($credentials['password'], $patient->password)) {
+        if ($patient && Hash::check($request->password, $patient->password)) {
+            // Store patient ID in session
             session(['patient_id' => $patient->id]);
+
+            // Redirect to dashboard
             return redirect('/dashboard');
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials']);
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
     // LOGOUT
     public function logout()
     {
         session()->forget('patient_id');
-        return redirect('/login');
+
+        return redirect('/login')->with('success', 'Logged out successfully!');
     }
 }
