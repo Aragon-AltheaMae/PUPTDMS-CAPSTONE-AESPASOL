@@ -45,10 +45,10 @@
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
   <div class="flex items-center gap-3">
     <div class="w-12 rounded-full ml-5">
-      <img src="dcms/public/images/PUP.png" alt="PUP Logo" />
+      <img src="images/PUP.png" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" />
+      <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" />
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -57,14 +57,14 @@
     <div class="indicator">
       <span class="indicator-item badge bg-pupred text-[#F4F4F4] border-none">12</span>
       <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-        <img src="dcms/public/images/notifications.png" alt="Notification" />
+        <img src="images/notifications.png" alt="Notification" />
       </button>
     </div>
     <div class="avatar">
       <div class="w-8 rounded-full bg-[#F4F4F4]"></div>
     </div>
     <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-      <img src="dcms/public/images/Log out.png" alt="Log Out" />
+      <img src="images/Log out.png" alt="Log Out" />
     </button>
   </div>
 </div>
@@ -237,8 +237,7 @@
         </p>
 
         <!-- Icon -->
-        <img
-            src="dcms/public/images/oral-checkup.png"
+        <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-1 w-28" />
             alt=""
             class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
         />
@@ -254,8 +253,7 @@
         </p>
 
         <!-- Icon -->
-        <img
-            src="dcms/public/images/dental-cleaning.png"
+          <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-1 w-28" />
             alt=""
             class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
         />
@@ -274,7 +272,7 @@
 
         <!-- Icon -->
         <img
-            src="dcms/public/images/restoration-prosthesis.png"
+            src="images/restoration-prosthesis.png"
             alt=""
             class="absolute right-1 top-1/2 -translate-y-1/2 w-28"/>
         </div>
@@ -288,7 +286,7 @@
 
         <!-- Icon -->
         <img
-            src="dcms/public/images/dental-surgery.png"
+            src="images/dental-surgery.png"
             alt=""
             class="absolute right-1 top-1/2 -translate-y-1/2 w-28 "
         />
@@ -308,11 +306,11 @@
       
       <!-- Logos -->
       <div class="w-12">
-        <img src="dcms/public/images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
+        <img src="/images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
       </div>
 
       <div class="w-12">
-        <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
+        <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
       </div>
 
       <!-- Text -->
@@ -326,19 +324,19 @@
 
     <!-- Location -->
     <div class="flex items-start gap-3 text-sm">
-      <img src="dcms/public/images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <img src="images/footer-location.png" class="w-4 h-5 mt-0.5" />
       <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
     <!-- Email -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="dcms/public/images/footer-email.png" class="w-5 h-4" />
+      <img src="images/footer-email.png" class="w-5 h-4" />
       <p>pupdental@pup.edu.ph</p>
     </div>
 
     <!-- Phone -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="dcms/public/images/footer-phone.png" class="w-4 h-4" />
+      <img src="images/footer-phone.png" class="w-4 h-4" />
       <p>(02) 123-4567</p>
     </div>
   </aside>

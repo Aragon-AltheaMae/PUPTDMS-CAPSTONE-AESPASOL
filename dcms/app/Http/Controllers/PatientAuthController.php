@@ -11,31 +11,33 @@ class PatientAuthController extends Controller
     // SHOW REGISTER FORM
     public function showRegister()
     {
-        return view('register');
+        return view('auth.register'); // ✅ keep views consistent
     }
 
-    // SAVE ACCOUNT
+    // REGISTER PATIENT
     public function register(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'student_number' => 'required|string|unique:patients,student_number',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:patients,email',
             'phone' => 'required|string|max:20',
             'birthdate' => 'required|date',
-            'gender' => 'required|string',
-            'password' => 'required|min:6|confirmed',
+            'gender' => 'required|string|in:Male,Female',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         Patient::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'birthdate' => $request->birthdate,
-            'gender' => $request->gender,
-            'password' => Hash::make($request->password),
+            'student_number' => $validated['student_number'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'birthdate' => $validated['birthdate'],
+            'gender' => $validated['gender'],
+            'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect('/login')->with('success', 'Account created successfully!');
+        return redirect()->route('login')->with('success', 'Account created successfully!');
     }
 
     // SHOW LOGIN FORM
@@ -49,27 +51,30 @@ class PatientAuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string',
         ]);
 
         $patient = Patient::where('email', $request->email)->first();
 
-        if ($patient && Hash::check($request->password, $patient->password)) {
-            // Store patient ID in session
-            session(['patient_id' => $patient->id]);
-
-            // Redirect to dashboard
-            return redirect('/dashboard');
+        if (!$patient || !Hash::check($request->password, $patient->password)) {
+            return back()
+                ->withErrors(['email' => 'Invalid credentials'])
+                ->withInput();
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        session()->regenerate(); // ✅ prevent session fixation
+        session(['patient_id' => $patient->id]);
+
+        return redirect('/dashboard');
     }
 
     // LOGOUT
     public function logout()
     {
         session()->forget('patient_id');
+        session()->invalidate();
+        session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Logged out successfully!');
+        return redirect()->route('login')->with('success', 'Logged out successfully!');
     }
 }

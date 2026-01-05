@@ -46,10 +46,10 @@
   <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
         <div class="w-12 rounded-full">
-            <img src="dcms/public/images/PUP.png" alt="User Profile" />
+            <img src="images/PUP.png" alt="User Profile" />
         </div>
         <div class="w-12 rounded-full">
-            <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="User Profile" />
+            <img src="images/PUPT-DMS-Logo.png" alt="User Profile" />
         </div>
         <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
@@ -58,14 +58,14 @@
       <div class="indicator">
         <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">12</span>
         <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="dcms/public/images/notifications.png" alt="Notification" />
+          <img src="images/notifications.png" alt="Notification" />
         </button>
         </div>
         <div class="avatar">
         <div class="w-8 rounded-full bg-white"></div>
         </div>
         <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="dcms/public/images/Log out.png" alt="Log Out" />
+          <img src="images/Log-out.png" alt="Log Out" />
         </button>
     </div>
 </div>
@@ -147,7 +147,7 @@
             The dental clinic is headed by <span class="font-bold text-2xl">Dr. Nelson P. Angeles</span>,
             <br>the campus dentist, who delivers professional, safe, and reliable dental care.
         </div>
-        <img src="dcms/public/images/Nelson Angeles.png" alt="Dr. Nelson P. Angeles" class="w-1/3 object-contain" />
+        <img src="images/Nelson-Angeles.png" alt="Dr. Nelson P. Angeles" class="w-1/3 object-contain" />
     </div>
 
     <!-- FAQs Title -->
@@ -360,10 +360,10 @@
     <section class="text-center text-2xl mt-12">
       <h3 class="font-extrabold text-[#8B0000] mb-4">The Developers</h3>
       <div class="flex justify-center gap-6">
-        <img src="dcms/public/images/Althea Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
-        <img src="dcms/public/images/Grace Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
-        <img src="dcms/public/images/Hoshea Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
-        <img src="dcms/public/images/Rain Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Althea Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Grace Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
+        <img src="images/Hoshea Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Rain Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
       </div>
     </section>
 
@@ -377,11 +377,11 @@
       
       <!-- Logos -->
       <div class="w-12">
-        <img src="dcms/public/images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
+        <img src="images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
       </div>
 
       <div class="w-12">
-        <img src="dcms/public/images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
+        <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
       </div>
 
       <!-- Text -->
@@ -395,19 +395,19 @@
 
     <!-- Location -->
     <div class="flex items-start gap-3 text-sm">
-      <img src="dcms/public/images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <img src="images/footer-location.png" class="w-4 h-5 mt-0.5" />
       <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
     <!-- Email -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="dcms/public/images/footer-email.png" class="w-5 h-4" />
+      <img src="images/footer-email.png" class="w-5 h-4" />
       <p>pupdental@pup.edu.ph</p>
     </div>
 
     <!-- Phone -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="dcms/public/images/footer-phone.png" class="w-4 h-4" />
+      <img src="images/footer-phone.png" class="w-4 h-4" />
       <p>(02) 123-4567</p>
     </div>
   </aside>

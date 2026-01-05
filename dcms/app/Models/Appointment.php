@@ -1,23 +1,33 @@
 <?php
 
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    protected $fillable = ['patient', 'datetime', 'service'];
+    use HasFactory;
 
-    // One appointment has many dental history records
-    public function dentalHistories()
+    protected $fillable = [
+        'patient_id',
+        'appointment_date',
+        'appointment_time',
+        'status',
+    ];
+
+    public function service()
     {
-        return $this->hasMany(DentalHistory::class);
+        return $this->hasOne(AppointmentService::class);
     }
 
-    // One appointment has many medical history records
-    public function medicalHistories()
+    public function dentalHistory()
     {
-        return $this->hasMany(MedicalHistory::class);
+        return $this->hasOne(DentalHistory::class);
+    }
+
+    public function medicalHistory()
+    {
+        return $this->hasOne(MedicalHistory::class);
     }
 }

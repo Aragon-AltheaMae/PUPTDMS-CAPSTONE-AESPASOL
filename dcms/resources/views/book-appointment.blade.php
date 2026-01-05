@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <title>Book Appointment</title>
@@ -48,8 +48,8 @@
 <!-- HEADER -->
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
   <div class="flex items-center gap-3">
-    <div class="w-12 ml-5"><img src="dcms/public/images/PUP.png" alt="PUP Logo"></div>
-    <div class="w-12"><img src="dcms/public/images/PUPT-DMS-Logo.png" alt="Clinic Logo"></div>
+    <div class="w-12 ml-5"><img src="images/PUP.png" alt="PUP Logo"></div>
+    <div class="w-12"><img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo"></div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
 </div>
@@ -68,7 +68,8 @@
     <li class="step" id="s5">Confirmation</li>
   </ul>
 
-  <form id="appointmentForm">
+  <form id="appointmentForm" action="{{ route('appointment.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
 
     <!-- STEP 1 -->
     <div class="step-content">
@@ -580,7 +581,7 @@ function showStep(i) {
       ind.classList.add("step-success");
       const check = document.createElement("span");
       check.className = "check-icon text-green-600 ml-1";
-      check.innerHTML = '<img src="dcms/public/images/check-icon.png" class="check-icon w-5 h-5 mx-auto" alt="Check">'; // ✓ symbol
+      check.innerHTML = '<img src="images/check-icon.png" class="check-icon w-5 h-5 mx-auto" alt="Check">'; // ✓ symbol
       ind.appendChild(check);
     } else {
       ind.classList.remove("step-success");
