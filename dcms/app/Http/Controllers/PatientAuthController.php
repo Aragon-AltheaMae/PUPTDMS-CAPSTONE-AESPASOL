@@ -18,7 +18,6 @@ class PatientAuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'student_number' => 'required|string|unique:patients,student_number',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:patients,email',
             'phone' => 'required|string|max:20',
@@ -28,7 +27,6 @@ class PatientAuthController extends Controller
         ]);
 
         Patient::create([
-            'student_number' => $validated['student_number'],
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],

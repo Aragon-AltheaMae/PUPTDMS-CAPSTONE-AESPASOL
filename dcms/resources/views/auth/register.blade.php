@@ -27,16 +27,7 @@
     <form method="POST" action="/register">
         @csrf
 
-        {{-- STUDENT NUMBER (REQUIRED) --}}
-        <label>Student Number:</label><br>
-        <input
-            type="text"
-            name="student_number"
-            value="{{ old('student_number') }}"
-            required
-        >
-        <br><br>
-
+    
         {{-- NAME --}}
         <label>Full Name:</label><br>
         <input
