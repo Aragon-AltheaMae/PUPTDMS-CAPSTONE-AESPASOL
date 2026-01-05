@@ -68,7 +68,7 @@
     <li class="step" id="s5">Confirmation</li>
   </ul>
 
-  <form id="appointmentForm" action="{{ route('appointment.store') }}" method="POST" enctype="multipart/form-data">
+  <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <!-- STEP 1 -->
@@ -77,7 +77,7 @@
       Select Date and Time</h2>
 
       <label>Date</label>
-      <input type="text" id="datePicker" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
+      <input type="text" id="datePicker" name="appointment_date" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
       
       <label>Time Slot</label>
       <select name="appointment_time" id="timeSlot" required class="select select-bordered w-full">
@@ -269,33 +269,33 @@
     <div class="space-y-3 text-sm">
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Clicking</span>
-        <input type="radio" name="click" value="Yes" 
+        <input type="radio" name="clicking" value="Yes" 
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="click" value="No"  
+        <input type="radio" name="clicking" value="No"  
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Pain (joint, side of the face)</span>
-        <input type="radio" name="joint" value="Yes" 
+        <input type="radio" name="joint_pain" value="Yes" 
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="joint" value="No"  
+        <input type="radio" name="joint_pain" value="No"  
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in opening/closing</span>
-        <input type="radio" name="diff_moving" value="Yes" 
+        <input type="radio" name="difficulty_moving" value="Yes" 
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="diff_moving" value="No"  
+        <input type="radio" name="difficulty_moving" value="No"  
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in chewing</span>
-        <input type="radio" name="diff_chew" value="Yes" 
+        <input type="radio" name="difficulty_chewing" value="Yes" 
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="diff_chew" value="No"  
+        <input type="radio" name="difficulty_chewing" value="No"  
         class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
@@ -443,13 +443,13 @@
     <h2 class="font-semibold mb-2 text-[#660000] ">Medical History</h2>
 
     <!-- Medical History -->
-    <label><input type="checkbox" name="medical_history[]" value="Hypertension"> Hypertension</label><br>
-    <label><input type="checkbox" name="medical_history[]" value="Diabetes"> Diabetes</label><br>
-    <label><input type="checkbox" name="medical_history[]" value="Heart Condition"> Heart Condition</label>
+    <label><input type="checkbox" name="hypertension" value="1"> Hypertension</label><br>
+    <label><input type="checkbox" name="diabetes" value="1"> Diabetes</label><br>
+    <label><input type="checkbox" name="heart_condition" value="1"> Heart Condition</label>
 
     <hr class="my-4">
 
-    <label><input type="checkbox" name="allergy" value="Yes"> Allergies</label><br>
+    <label><input type="checkbox" name="allergy" value="1"> Allergies</label><br>
     <label><input type="checkbox" name="pregnant"> Pregnant</label><br>
     <label><input type="checkbox" name="nursing"> Nursing</label><br>
     <label><input type="checkbox" name="birth_control"> Taking Birth Control Pills</label>
@@ -651,8 +651,22 @@ function buildSummary() {
     ${grouped['additional_concern'] ? `<p><strong>Additional Concern:</strong> ${grouped['additional_concern'].join(", ")}</p>` : ""}
 
     <h3 class="font-semibold mt-4 mb-2">Medical History</h3>
-    <p>${grouped['medical_history[]'] ? grouped['medical_history[]'].join(", ") : "None"}</p>
-    <p>${grouped['allergy'] ? "Allergies" : ""} ${grouped['pregnant'] ? "Pregnant" : ""} ${grouped['nursing'] ? "Nursing" : ""} ${grouped['birth_control'] ? "Birth Control" : ""}</p>
+    <p>
+    ${
+      [
+        grouped['hypertension'],
+        grouped['diabetes'],
+        grouped['heart_condition'],
+        grouped['allergy'],
+        grouped['pregnant'],
+        grouped['nursing'],
+        grouped['birth_control'],
+      ]
+      .filter(Boolean)
+      .map(arr => arr.join(", "))
+      .join(", ") || "None"
+    }
+  </p>
 
     <h3 class="font-semibold mt-4 mb-2">Emergency Contact</h3>
     <p><strong>Person to contact:</strong> ${grouped['emergency_person'] ? grouped['emergency_person'].join(", ") : ""}</p>

@@ -38,12 +38,14 @@ class AppointmentController extends Controller
             'patient_signature' => 'required|image|max:2048',
         ]);
 
+          // dd($request->all());
+
         /* ================= SIGNATURE UPLOAD ================= */
-        $filename = null;
         if ($request->hasFile('patient_signature')) {
-            $file = $request->file('patient_signature');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->storeAs('public/signatures', $filename);
+            $signaturePath = $request->file('patient_signature')
+                                    ->store('signatures', 'public');
+        } else {
+            $signaturePath = null;
         }
 
         /* ================= APPOINTMENT ================= */
@@ -58,20 +60,39 @@ class AppointmentController extends Controller
         AppointmentService::create([
             'appointment_id' => $appointment->id,
             'service_type' => $request->service_type,
+            'patient_signature' => $signaturePath, // save path here
         ]);
 
         /* ================= DENTAL HISTORY ================= */
         DentalHistory::create([
-            'appointment_id' => $appointment->id,
+        'appointment_id' => $appointment->id,
 
-            'bleeding_gums' => $request->bleeding_gums,
-            'sensitive_temp' => $request->sensitive_temp,
-            'tooth_pain' => $request->tooth_pain,
-            'sores' => $request->sores,
-            'injuries' => $request->injuries,
-            'clench_grind' => $request->clench_grind,
-            'additional_concerns' => $request->additional_concerns,
-        ]);
+        'bleeding_gums' => $request->bleeding_gums,
+        'sensitive_temp' => $request->sensitive_temp,
+        'sensitive_taste' => $request->sensitive_taste,
+        'tooth_pain' => $request->tooth_pain,
+        'sores' => $request->sores,
+        'injuries' => $request->injuries,
+
+        'clicking' => $request->clicking,
+        'joint_pain' => $request->joint_pain,
+        'difficulty_moving' => $request->difficulty_moving,
+        'difficulty_chewing' => $request->difficulty_chewing,
+        'headaches' => $request->headaches,
+        'clench_grind' => $request->clench_grind,
+        'biting' => $request->biting,
+        'teeth_loosening' => $request->teeth_loosening,
+        'food_teeth' => $request->food_teeth,
+        'med_reaction' => $request->med_reaction,
+
+        'periodontal' => $request->periodontal,
+        'difficult_extraction' => $request->difficult_extraction,
+        'prolonged_bleeding' => $request->prolonged_bleeding,
+        'dentures' => $request->dentures,
+        'ortho_treatment' => $request->ortho_treatment,
+
+        'additional_concerns' => $request->additional_concerns,
+    ]);
 
         /* ================= MEDICAL HISTORY ================= */
         MedicalHistory::create([
@@ -89,11 +110,11 @@ class AppointmentController extends Controller
             'emergency_person' => $request->emergency_person,
             'emergency_number' => $request->emergency_number,
             'emergency_relation' => $request->emergency_relation,
-            'patient_signature' => $filename,
+            'patient_signature' => $signaturePath,
         ]);
 
         return redirect()
-            ->route('appointment.create')
+            ->back()
             ->with('success', 'Appointment booked successfully!');
     }
 }

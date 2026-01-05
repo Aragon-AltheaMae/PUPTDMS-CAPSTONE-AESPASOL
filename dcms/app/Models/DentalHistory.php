@@ -29,6 +29,7 @@ class DentalHistory extends Model
         'med_reaction',
         'periodontal',
         'difficult_extraction',
+        'prolonged_bleeding',
         'dentures',
         'ortho_treatment',
         'additional_concerns',

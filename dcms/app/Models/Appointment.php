@@ -14,6 +14,8 @@ class Appointment extends Model
         'appointment_date',
         'appointment_time',
         'status',
+        'patient_signature',
+        'service_type',
     ];
 
     public function service()
