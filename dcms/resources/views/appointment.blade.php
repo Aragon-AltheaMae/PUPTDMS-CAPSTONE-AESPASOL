@@ -52,10 +52,10 @@
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
   <div class="flex items-center gap-3">
     <div class="w-12 rounded-full ml-5">
-      <img src="images/PUP.png" alt="PUP Logo" />
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" />
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -64,14 +64,14 @@
     <div class="indicator">
       <span class="indicator-item badge bg-pupred text-[#F4F4F4] border-none">12</span>
       <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-        <img src="images/notifications.png" alt="Notification" />
+        <img src="{{ asset('images/notifications.png') }}" alt="Notification" />
       </button>
     </div>
     <div class="avatar">
       <div class="w-8 rounded-full bg-[#F4F4F4]"></div>
     </div>
     <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-      <img src="images/Log out.png" alt="Log Out" />
+      <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
     </button>
   </div>
 </div>
