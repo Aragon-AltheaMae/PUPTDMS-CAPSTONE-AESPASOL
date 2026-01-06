@@ -10,6 +10,9 @@
 
   <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script type="module" src="https://unpkg.com/cally"></script>
 
@@ -24,8 +27,59 @@
   <!-- Segoe UI Font -->
   <style>
   body {
-    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-                 "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Inter';
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  /* Subtle pulse for icon */
+  @keyframes softPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .pulse-icon {
+    animation: softPulse 2s ease-in-out infinite;
+  }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+    100% {
+      background-position: 400px 0;
+    }
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #e5e7eb 25%,
+      #f3f4f6 37%,
+      #e5e7eb 63%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 0.75rem;
   }
 </style>
 
@@ -201,15 +255,15 @@
         <div id="recordsContainer" class="space-y-4"></div>
 
         <!-- View All -->
-        <div class="text-center pt-2">
-          <button class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
-            transition-colors duration-300
-            border-none text-sm rounded-2xl text-[#F4F4F4]">
-            View Full Record
-          </button>
-        </div>
+        <div id="viewAllContainer" class="text-center pt-2">
+        <button class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
+          transition-colors duration-300
+          border-none text-sm rounded-2xl text-[#F4F4F4]">
+          View Full Record
+        </button>
       </div>
     </div>
+  </div>
 
     <!-- REQUEST DOCUMENTS -->
     <h2 class="text-3xl font-extrabold text-[#8B0000] mb-6">Request Documents</h2>
@@ -319,49 +373,122 @@
   <!-- FETCH DENTAL RECORDS -->
   <!-- ========================= -->
   <script>
+  function showSkeletonLoader() {
+    const container = document.getElementById("recordsContainer");
+    const viewAll = document.getElementById("viewAllContainer");
+    viewAll.style.display = "none";
+
+    container.innerHTML = `
+      <div class="space-y-4 animate-pulse">
+        ${[1,2,3].map(() => `
+          <div class="bg-white rounded-2xl p-5 space-y-3 shadow-sm">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 skeleton"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-1/2 skeleton"></div>
+                <div class="h-3 w-1/3 skeleton"></div>
+              </div>
+            </div>
+            <div class="h-3 w-full skeleton"></div>
+            <div class="h-3 w-5/6 skeleton"></div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    showSkeletonLoader();
+
+    // Wait 3 seconds before fetching and rendering records
+  setTimeout(() => {
     fetch("get_records.php")
       .then(response => response.json())
       .then(records => renderRecords(records))
       .catch(() => {
-        document.getElementById("recordsContainer").innerHTML =
-          `<p class="text-center text-[#333333]">Unable to load records.</p>`;
+        const container = document.getElementById("recordsContainer");
+        document.getElementById("viewAllContainer").style.display = "none";
+
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center
+                      py-14 text-center space-y-5 fade-in">
+
+            <!-- Icon -->
+            <img src="images/error-records.png"
+                 alt="Error"
+                 class="w-24 h-24">
+
+            <!-- Title -->
+            <p class="text-2xl font-extrabold text-[#8B0000]">
+              Oops! Something went wrong
+            </p>
+
+            <!-- Subtitle -->
+            <p class="text-sm text-gray-600 max-w-sm">
+              Something went wrong while fetching your records.
+            </p>
+
+          </div>
+        `;
       });
-  });
+  }, 2000);
+});
 
   function renderRecords(records) {
     const container = document.getElementById("recordsContainer");
     container.innerHTML = "";
+    const viewAll = document.getElementById("viewAllContainer");
+    viewAll.style.display = records && records.length ? "block" : "none";
 
     if (!records || records.length === 0) {
       container.innerHTML = `
-        <p class="text-[#333333] text-center">
-          No dental records available.
-        </p>`;
+        <div class="flex flex-col items-center justify-center
+                    py-14 text-center space-y-5 fade-in">
+
+          <div class="w-20 h-20 flex items-center justify-center
+                      rounded-full bg-gradient-to-r from-[#FFD700] to-[#8B0000]
+                      pulse-icon">
+            <img src="images/nodental-record.png"
+                 alt="No Records"
+                 class="w-10 h-10">
+          </div>
+
+          <p class="text-2xl font-extrabold text-[#8B0000]">
+            Nothing here yet…
+          </p>
+
+          <p class="text-sm text-gray-600 max-w-sm">
+            Time to book that first visit.
+          </p>
+
+          <a href="{{ route('book.appointment') }}"
+            class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
+                   transition-colors duration-300
+                   border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
+            Book Appointment
+          </a>
+        </div>
+      `;
       return;
     }
 
     records.forEach(record => {
       container.innerHTML += `
         <div class="flex justify-between items-center border rounded-xl p-4">
-          
           <div>
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full 
                 bg-gradient-to-r from-[#FFD700] to-[#8B0000]"></span>
               <p class="font-semibold">${record.procedure_name}</p>
             </div>
-
             <p class="text-sm">
               Last Visit: ${formatDate(record.visit_date)}
             </p>
           </div>
-
           <div class="text-right">
             <p class="text-sm mb-2">
               ${formatTime(record.time_start)} - ${formatTime(record.time_end)}
             </p>
-
             <button onclick="viewRecord(${record.record_id})"
               class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
               transition-colors duration-300
