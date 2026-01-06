@@ -100,7 +100,7 @@
 
 <body class="bg-white text-[#333333] font-normal">
 
-          <form method="POST" action="{{ url('/homepage') }}">
+          <!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
 
   <!-- HEADER (TOP BAR) -->
@@ -125,9 +125,13 @@
         <div class="avatar">
         <div class="w-8 rounded-full bg-white"></div>
         </div>
-        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="images/Log-out.png" alt="Log Out" />
+        <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit"
+            class="btn btn-ghost btn-circle text-[#F4F4F4]">
+            <img src="images/Log-out.png" alt="Log Out" />
         </button>
+        </form>
       </div>
   </div>
 
@@ -146,6 +150,7 @@
               hover:after:opacity-100">
       Home
     </a>
+
 <a href="{{ route('appointment') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
@@ -348,19 +353,19 @@
 
     <!-- Location -->
     <div class="flex items-start gap-3 text-sm">
-      <img src="images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
       <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
     <!-- Email -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-email.png" class="w-5 h-4" />
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
       <p>pupdental@pup.edu.ph</p>
     </div>
 
     <!-- Phone -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-phone.png" class="w-4 h-4" />
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
       <p>(02) 123-4567</p>
     </div>
   </aside>

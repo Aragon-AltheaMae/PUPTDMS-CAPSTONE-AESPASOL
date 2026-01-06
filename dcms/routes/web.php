@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Http\Controllers\AppointmentController;
+use Illuminate\Support\Facades\Auth;
 
 // -------------------
 // Guest Routes
@@ -77,10 +78,15 @@ Route::post('/login', function (Request $request) {
 });
 
 // Logout
-Route::get('/logout', function () {
-    session()->flush();
+// Route::get('/logout', function () {
+//     session()->flush();
+//     return redirect('/login');
+// });
+
+Route::post('/logout', function () {
+    Auth::logout();
     return redirect('/login');
-});
+})->name('logout');
 
 // -------------------
 // Homepage
