@@ -48,7 +48,7 @@ Route::post('/register', function (Request $request) {
 
 // Login POST
 Route::post('/login', function (Request $request) {
-    $username = $request->input('username');
+    $email = $request->input('email');
     $password = $request->input('password');
 
     // Hard-coded admin/staff
@@ -57,13 +57,13 @@ Route::post('/login', function (Request $request) {
         'staff' => 'staff123',
     ];
 
-    if (isset($users[$username]) && $users[$username] === $password) {
-        session(['role' => $username]);
-        return redirect('/homepage');
+    if (isset($users[$email]) && $users[$email] === $password) {
+        session(['role' => $email]);
+        return redirect()->route('homepage');
     }
 
     // Patient login
-    $patient = Patient::where('email', $username)->first();
+    $patient = Patient::where('email', $email)->first();
 
     if ($patient && Hash::check($password, $patient->password)) {
         session([
@@ -71,11 +71,12 @@ Route::post('/login', function (Request $request) {
             'patient_id' => $patient->id,
             'email' => $patient->email,
         ]);
-        return redirect('/homepage');
+        return redirect()->route('homepage');
     }
 
     return back()->with('error', 'Invalid credentials');
 });
+
 
 // Logout
 // Route::get('/logout', function () {
