@@ -14,6 +14,10 @@
         type="text/css"
     />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
         theme: {
@@ -27,7 +31,10 @@
         };
     </script>
 
-    <style>
+  <style>
+      body {
+      font-family: 'Inter';
+    }
       /* Smooth underline animation */
       .tabs-bordered .tab {
         transition: color 0.5s ease, font-weight 0.5s ease;
