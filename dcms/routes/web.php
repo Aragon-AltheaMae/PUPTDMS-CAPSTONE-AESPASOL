@@ -165,6 +165,12 @@ Route::get('/', function () {
 
 Route::get('/book-appointment', [AppointmentController::class, 'create'])->name('book.appointment');
 
+
+Route::get('/record', function () {
+    return view('record'); // points to resources/views/record.blade.php
+})->name('record');
+
+
 Route::get('/about-us', function () {
     return view('about-us');
 })->name('about.us');

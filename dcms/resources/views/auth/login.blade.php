@@ -58,7 +58,6 @@
             class="w-full px-4 py-3 rounded-lg bg-gray-100 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
 
           <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-            👁
           </button>
         </div>
 
