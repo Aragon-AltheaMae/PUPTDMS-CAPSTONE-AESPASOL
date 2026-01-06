@@ -94,7 +94,7 @@ Route::get('/homepage', function () {
     }
 
     return view('index', compact('patient')); // points to index.blade.php
-});
+})->name('homepage');
 
 
 // -------------------

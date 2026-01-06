@@ -119,8 +119,12 @@
   }
 
   .input-error {
-  border: 2px solid #dc2626 !important;
+  border: 2px solid #d10101ff !important;
   }
+
+  .input-valid {
+  border: 2px solid #16a34a !important; /* green */
+}
 
   @keyframes shake {
     0% { transform: translateX(0); }
@@ -139,11 +143,15 @@
 
 <!-- HEADER -->
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
-  <div class="flex items-center gap-3">
-    <div class="w-12 ml-5"><img src="images/PUP.png" alt="PUP Logo"></div>
-    <div class="w-12"><img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo"></div>
+  <a href="{{ route('homepage') }}" class="flex items-center gap-3">
+    <div class="w-12 ml-5">
+      <img src="images/PUP.png" alt="PUP Logo">
+    </div>
+    <div class="w-12">
+      <img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo">
+    </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
-  </div>
+  </a>
 </div>
 
 <h1 class="text-4xl font-extrabold m-12 text-[#660000] text-center">
@@ -1519,29 +1527,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!contactInput) return;
 
+  // INPUT EVENT
   contactInput.addEventListener("input", (e) => {
     const rawValue = e.target.value;
 
-    // ❌ Detect invalid characters FIRST
     if (/[^0-9]/.test(rawValue)) {
       showMiniTab("Contact number must contain digits only.");
       showInputError(contactInput);
+      contactInput.classList.remove("input-valid");
     }
 
-    // ✅ Clean input
     let value = rawValue.replace(/\D/g, "");
 
-    // ✅ Auto-format to 09XXXXXXXXX
-    if (value.startsWith("9")) {
-      value = "0" + value;
-    }
-    if (value.length === 1 && value !== "0") {
-      value = "09" + value;
-    }
+    if (value.startsWith("9")) value = "0" + value;
+    if (value.length === 1 && value !== "0") value = "09" + value;
 
-    // ✅ Limit to 11 digits
     value = value.slice(0, 11);
     contactInput.value = value;
+
+    if (/^09\d{9}$/.test(value)) {
+      contactInput.classList.remove("input-error");
+      contactInput.classList.add("input-valid");
+    } else {
+      contactInput.classList.remove("input-valid");
+    }
+  });
+
+  // BLUR EVENT
+  contactInput.addEventListener("blur", () => {
+    if (contactInput.value === "") {
+      contactInput.classList.remove("input-error", "input-valid");
+    }
   });
 });
 
