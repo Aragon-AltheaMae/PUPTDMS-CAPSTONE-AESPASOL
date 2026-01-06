@@ -180,7 +180,7 @@
                   transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
           <div class="w-20 h-20 bg-transparent flex items-center justify-center">
-            <img src="dcms/public/images/oral-checkup.png"/>
+            <img src="images/oral-checkup.png"/>
           </div>
           <h3 class="font-bold text-[#660000] text-current">Oral Check-Up</h3>
           <p class="text-sm text-current">
@@ -200,7 +200,7 @@
                   transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
           <div class="w-20 h-20 rounded-full flex items-center justify-center">
-            <img src="dcms/public/images/oral-checkup.png"/>
+            <img src="images/dental-cleaning.png"/>
           </div>
           <h3 class="font-bold text-[#660000] text-current">Dental Cleaning</h3>
           <p class="text-sm text-current">
@@ -220,7 +220,7 @@
                   transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
           <div class="w-20 h-20 rounded-full flex items-center justify-center">
-            <img src="dcms/public/images/oral-checkup.png"/>
+            <img src="images/restoration-prosthesis.png"/>
           </div>
           <h3 class="font-bold text-[#660000] text-current">Restoration & Prosthesis</h3>
           <p class="text-sm text-current">
@@ -240,7 +240,7 @@
                   transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
           <div class="w-20 h-20 rounded-full flex items-center justify-center">
-            <img src="dcms/public/images/oral-checkup.png"/>
+            <img src="images/dental-surgery.png"/>
           </div>
           <h3 class="font-bold text-[#660000] text-current">Dental Surgery</h3>
           <p class="text-sm text-current">
@@ -284,7 +284,7 @@
 
       <div>
         <label class="text-sm font-semibold block mb-1">Previous Dentist: Dr.</label>
-        <input type="text" class="input input-sm border-[#8B0000] w-full" placeholder="Name">
+        <input type="text" class="input input-sm border-[#8B0000] w-full" max-length="50" placeholder="Name">
       </div>
     </div>
 
@@ -376,17 +376,17 @@
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in opening/closing</span>
-        <input type="radio" name="diff_moving" value="Yes" 
+        <input type="radio" name="difficulty_moving" value="Yes" 
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-        <input type="radio" name="diff_moving" value="No"  
+        <input type="radio" name="difficulty_moving" value="No"  
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in chewing</span>
-        <input type="radio" name="diff_chew" value="Yes" 
+        <input type="radio" name="difficulty_chewing" value="Yes" 
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-        <input type="radio" name="diff_chew" value="No"  
+        <input type="radio" name="difficulty_chewing" value="No"  
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
@@ -936,46 +936,58 @@
   </div>
 
   <!-- RELATION -->
-  <div class="flex items-center gap-4">
-    <label class="w-64">Relation to Patient:</label>
-    <input
-      type="text"
+  <div class="flex items-center gap-4 relative">
+  <label class="w-64" for="emergency_relation">Relation to Patient:</label>
+  <div class="relative w-80">
+    <select
+      id="emergency_relation"
       name="emergency_relation"
-      maxlength="50"
-      class="input input-sm border-[#8B0000] w-80"
-      placeholder="Input here"
+      class="input input-sm border-[#8B0000] w-full appearance-none pr-8"
       required
     >
-  </div>
-
-  <!-- SIGNATURE -->
-<div class="flex items-start gap-4">
-  <label class="w-64 pt-2">Patient's Signature:</label>
-
-  <div class="border-2 border-dashed border-gray-400 rounded-md p-4 w-72 text-center text-xs space-y-2">
-
-    <p>Select your file or drag and drop</p>
-    <p class="text-gray-500">JPG, PNG or PDF, up to 25 MB</p>
-
-    <label
-      class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#8B0000] text-white text-xs 
-            rounded cursor-pointer hover:bg-[#6f0000]">
-      <span>Browse</span>
-
-      <input
-        type="file"
-        name="patient_signature"
-        id="patient_signature"
-        class="hidden"
-        accept=".jpg,.jpeg,.png,.pdf"
-        required
-      >
-    </label>
-
-    <p id="signature_filename" class="text-gray-600 text-xs truncate hidden"></p>
-
+      <option value="" disabled selected>Select relation</option>
+      <option value="Mother">Mother</option>
+      <option value="Father">Father</option>
+      <option value="Guardian">Guardian</option>
+      <option value="Spouse">Spouse</option>
+    </select>
+    <!-- Downward arrow -->
+    <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
   </div>
 </div>
+
+  <!-- SIGNATURE -->
+  <div class="flex items-start gap-4">
+    <label class="w-64 pt-2">Patient's Signature:</label>
+
+    <div class="border-2 border-dashed border-gray-400 rounded-md p-4 w-72 text-center text-xs space-y-2">
+
+      <p>Select your file or drag and drop</p>
+      <p class="text-gray-500">JPG, PNG or PDF, up to 25 MB</p>
+
+      <label
+        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#8B0000] text-white text-xs 
+              rounded cursor-pointer hover:bg-[#6f0000]">
+        <span>Browse</span>
+
+        <input
+          type="file"
+          name="patient_signature"
+          id="patient_signature"
+          class="hidden"
+          accept=".jpg,.jpeg,.png,.pdf"
+          required
+        >
+      </label>
+
+      <p id="signature_filename" class="text-gray-600 text-xs truncate hidden"></p>
+
+    </div>
+  </div>
 </div>
 
   </div>
@@ -992,9 +1004,9 @@
 
     <div id="summaryBox" class="bg-[#F4F4F4] p-4 rounded mb-4"></div>
 
-    <label class="block mt-3">
-      <input type="checkbox" required>
-      I confirm all information is correct
+    <label class="flex items-center gap-2 mt-3 cursor-pointer">
+      <input type="checkbox" required class="checkbox checkbox-sm border-[#8B0000]">
+      <span class="text-sm text-[#660000]">I confirm all information is correct.</span>
     </label>
 
   </div>
@@ -1026,6 +1038,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
+  
 /* -------- Data -------- */
 const holidays = ["2026-01-01","2026-04-09"];
 const allSlots = [
@@ -1106,7 +1119,6 @@ let completedSteps = [];
 
 // Initialize stepper on page load
 showStep(step);
-
 function showStep(i) {
   // Show step content
   steps.forEach((s, idx) => {
@@ -1174,17 +1186,23 @@ function showStep(i) {
 
 // CHECKER //
 function isStepComplete(currentStep) {
-  const inputs = steps[currentStep].querySelectorAll("input[required], select[required], textarea[required]");
+  const stepEl = steps[currentStep];
+  const inputs = stepEl.querySelectorAll("input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]");
   for (const input of inputs) {
     if (!input.value.trim()) return false;
   }
 
-  if (currentStep === 3) {
-    const radios = steps[currentStep].querySelectorAll("input[type='radio']");
+  const radios = stepEl.querySelectorAll("input[type='radio']");
+  if (radios.length > 0) {
     const groups = [...new Set([...radios].map(r => r.name))];
-    for (let name of groups) {
-      if (!steps[currentStep].querySelector(`input[name="${name}"]:checked`)) return false;
+    for (const name of groups) {
+      if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
     }
+  }
+
+  const checkboxes = stepEl.querySelectorAll("input[type='checkbox'][required]");
+  for (const checkbox of checkboxes) {
+    if (!checkbox.checked) return false;
   }
 
   return true;
@@ -1254,8 +1272,14 @@ function buildSummary() {
   const get = name => data.get(name) || "N/A";
   const getAll = name => data.getAll(name);
 
-  const signature = data.get("patient_signature");
-  const signatureName = signature && signature.name ? signature.name : "Not uploaded";
+  const signatureFile = data.get("patient_signature");
+  let signatureHTML = "Not uploaded";
+
+  if (signatureFile && signatureFile.size > 0) {
+    // Create a temporary URL for the uploaded image file
+    const imageUrl = URL.createObjectURL(signatureFile);
+    signatureHTML = `<img src="${imageUrl}" alt="Signature" style="max-width: 250px; max-height: 150px; border: 1px solid #8B0000; border-radius: 8px;">`;
+  }
 
   const card = (title, body) => `
     <div class="border-2 border-[#8B0000] rounded-xl p-4 bg-white">
@@ -1314,9 +1338,7 @@ function buildSummary() {
         <p><b>Relation:</b> ${get("emergency_relation")}</p>
       `)}
 
-      ${card("Signature", `
-        <p>${signatureName}</p>
-      `)}
+      ${card("Signature", signatureHTML)}
 
     </div>
   `;
