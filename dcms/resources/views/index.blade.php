@@ -274,7 +274,7 @@
         <button class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
           transition-colors duration-300
           border-none text-sm rounded-2xl text-[#F4F4F4]">
-          View Full Record
+          <a href="records.html">View Full Record </a>
         </button>
       </div>
     </div>
@@ -370,6 +370,7 @@
     <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
     <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
   </nav>
 

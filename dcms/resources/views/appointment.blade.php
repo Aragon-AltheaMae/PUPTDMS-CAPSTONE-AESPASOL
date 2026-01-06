@@ -353,6 +353,7 @@
     <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
     <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
   </nav>
 
