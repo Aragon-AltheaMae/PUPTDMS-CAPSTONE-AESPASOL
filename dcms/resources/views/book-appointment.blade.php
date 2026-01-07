@@ -594,7 +594,7 @@
 
     <!-- STEP 4 -->
 <div class="step-content hidden">
-  <div class="bg-[#e6e6e6] rounded-xl p-8">
+  <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
 
     <!-- TITLE -->
     <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Medical History</h2>
@@ -1044,7 +1044,7 @@
 
   <!-- STEP 5 -->
 <div class="step-content hidden">
-  <div class="rounded-xl p-8">
+  <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
 
     <!-- TITLE -->
     <h2 class="text-xl font-bold mb-2 text-[#660000]">
