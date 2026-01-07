@@ -149,6 +149,15 @@ Route::post('/book-appointment', [AppointmentController::class, 'store'])->name(
 Route::get('/appointments', [AppointmentController::class, 'index'])->name('book.appointment.index');
 });
 
+
+// Dentist routes
+Route::prefix('dentist')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dentist-dashboard'); // resources/views/dentist/dashboard.blade.php
+    });
+});
+
+
 // -------------------
 // Public Pages
 // -------------------
