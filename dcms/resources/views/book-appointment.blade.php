@@ -124,7 +124,28 @@
 
   .input-valid {
   border: 2px solid #16a34a !important; /* green */
-}
+  }
+  
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.5s ease-out both;
+  }
+
+  /* Optional stagger delay */
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
 
   @keyframes shake {
     0% { transform: translateX(0); }
@@ -159,9 +180,9 @@
 </h1>
 
 <!-- MAIN FORM -->
-<div class="max-w-4xl mx-auto p-8 bg-white rounded-xl mt-5 mb-5 shadow">
+<div class="max-w-4xl mx-auto p-8 bg-[#D9D9D9] rounded-xl mt-5 mb-5 shadow">
   <ul class="steps w-full mb-10">
-    <li class="step" id="s1">Date & Time</li>
+    <li class="step step-primary" id="s1">Date & Time</li>
     <li class="step" id="s2">Service</li>
     <li class="step" id="s3">Dental History</li>
     <li class="step" id="s4">Medical History</li>
@@ -173,39 +194,40 @@
 
     <!-- STEP 1 -->
     <div class="step-content">
-      <h2 class="text-xl font-bold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
+      <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2 mb-10">
       Select Date and Time</h2>
 
-      <label>Date</label>
-      <input type="text" id="datePicker" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
+      <label class="text-l font-bold text-[#8B0000]">Date</label>
+      <input type="text" id="datePicker" class="input input-bordered text-l w-full mt-2 mb-10" placeholder="Select date" readonly>
       
-      <label>Time Slot</label>
-      <select name="appointment_time" id="timeSlot" required class="select select-bordered w-full">
+      <label class="text-l font-bold text-[#8B0000]">Time Slot</label>
+      <select name="appointment_time" id="timeSlot" required class="select select-bordered text-l mt-2 w-full">
         <option value="">Select time</option>
       </select>
     </div>
 
     <!-- STEP 2 -->
     <div class="step-content hidden">
-    <h2 class="text-xl font-bold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
+    <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
     Select Service Type
   </h2>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 pt-6 gap-6">
 
     <!-- Card 1 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
-      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
-                  transition-all duration-200 ease-in">
+                  transition-all duration-200 ease-in
+                  animate-fade-up delay-1">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-20 h-20 bg-transparent flex items-center justify-center">
+          <div class="w-24 h-24 bg-transparent flex items-center justify-center">
             <img src="images/oral-checkup.png"/>
           </div>
-          <h3 class="font-bold text-[#660000] text-current">Oral Check-Up</h3>
+          <h3 class="font-bold text-xl text-[#660000] text-current">Oral Check-Up</h3>
           <p class="text-sm text-current">
             Routine oral examination • Dental Consultation
           </p>
@@ -216,16 +238,17 @@
     <!-- Card 2 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
-      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
-                  transition-all duration-200 ease-in">
+                  transition-all duration-200 ease-in
+                  animate-fade-up delay-2">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+          <div class="w-24 h-24 rounded-full flex items-center justify-center">
             <img src="images/dental-cleaning.png"/>
           </div>
-          <h3 class="font-bold text-[#660000] text-current">Dental Cleaning</h3>
+          <h3 class="font-bold text-xl text-[#660000] text-current">Dental Cleaning</h3>
           <p class="text-sm text-current">
             Oral hygiene treatment • Removing surface buildup
           </p>
@@ -236,18 +259,19 @@
     <!-- Card 3 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
-      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
-                  transition-all duration-200 ease-in">
+                  transition-all duration-200 ease-in
+                  animate-fade-up delay-3">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+          <div class="w-24 h-24 rounded-full flex items-center justify-center">
             <img src="images/restoration-prosthesis.png"/>
           </div>
-          <h3 class="font-bold text-[#660000] text-current">Restoration & Prosthesis</h3>
+          <h3 class="font-bold text-xl text-[#660000] text-current">Restoration & Prosthesis</h3>
           <p class="text-sm text-current">
-           Repairs/replaces damaged teeth • Fillings • Crowns • Bridges
+           Repairs/replaces damaged teeth • Fillings<br>• Crowns • Bridges
           </p>
         </div>
       </div>
@@ -256,18 +280,19 @@
     <!-- Card 4 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
-      <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
+      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
-                  transition-all duration-200 ease-in">
+                  transition-all duration-200 ease-in
+                  animate-fade-up delay-4">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+          <div class="w-24 h-24 rounded-full flex items-center justify-center">
             <img src="images/dental-surgery.png"/>
           </div>
-          <h3 class="font-bold text-[#660000] text-current">Dental Surgery</h3>
+          <h3 class="font-bold text-xl text-[#660000] text-current">Dental Surgery</h3>
           <p class="text-sm text-current">
-            Treating dental issues surgically • Extraction • Implants
+            Treating dental issues surgically<br>• Extraction • Implants
           </p>
         </div>
       </div>
