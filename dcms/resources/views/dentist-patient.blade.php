@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>PUP Taguig Dental Clinic | Dentist Dashboard</title>
+  <title>PUP Taguig Dental Clinic | Patient List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
@@ -79,10 +79,12 @@
 <!-- ================= NAV HEADER ================= -->
 <header class="bg-primaryMain text-white px-8 py-3">
   <nav class="flex justify-around text-sm">
-    <a class="flex flex-col items-center opacity-100">
+    <a href="{{ route('dentist.dashboard') }}"
+      class="flex flex-col items-center opacity-80 hover:opacity-100">
       <i class="fa-solid fa-chart-line text-lg"></i>
       <span>Dashboard</span>
     </a>
+
     <a href="{{ route('dentist.patients') }}"
       class="flex flex-col items-center opacity-80 hover:opacity-100">
       <i class="fa-solid fa-users text-lg"></i>
@@ -403,26 +405,68 @@
   </div>
 </main>
 
-<!-- Footer -->
-<footer class="bg-[#8B0000] text-white mt-16">
-  <div class="max-w-6xl mx-auto px-6 py-6 grid md:grid-cols-3 gap-6 text-sm">
-    <div>
-      <p class="font-semibold">PUP Taguig Dental Clinic</p>
-      <p class="opacity-80">Taguig City</p>
-    </div>
-    <div>
-      <p class="font-semibold">Navigation</p>
-      <p class="opacity-80">Dashboard · Appointments · Records</p>
-    </div>
-    <div>
-      <p class="font-semibold">Services</p>
-      <p class="opacity-80">Cleaning · Check-up · Surgery</p>
-    </div>
-  </div>
-</footer>
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
 
-</body>
-</html>
+  <!-- ASIDE: CLINIC INFO -->
+  <aside class="space-y-4">
+    <div class="flex items-center gap-3">
+      
+      <!-- Logos -->
+      <div class="w-12">
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+      </div>
+
+      <div class="w-12">
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+        <p class="text-sm whitespace-nowrap">
+          Polytechnic University of the Philippines – Taguig Campus
+        </p>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="flex items-start gap-3 text-sm">
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
+      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    </div>
+
+    <!-- Email -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
+      <p>pupdental@pup.edu.ph</p>
+    </div>
+
+    <!-- Phone -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
+      <p>(02) 123-4567</p>
+    </div>
+  </aside>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
+  </nav>
+
+  <!-- SERVICES -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
+    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
+    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
+  </nav>
+
+</footer>
 
 <script>
   const openFilter = document.getElementById("openFilter");

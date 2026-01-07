@@ -112,11 +112,11 @@
     <div class="mb-6 relative">
       <div class="absolute -left-[6px] top-1 w-4 h-4 bg-orange-400 rounded-full"></div>
       <p class="text-sm font-semibold text-gray-600 ml-6">
-        January 29
+        January 7
       </p>
     </div>
 
-    <!-- APPOINTMENT CARD -->
+    <!-- APPOINTMENT CARD 1-->
     <div class="bg-white rounded-xl shadow p-6 ml-6 mb-8 border border-red-200">
 
       <div class="grid grid-cols-5 gap-4 text-sm items-center">
@@ -134,7 +134,42 @@
 
         <div>
           <p class="font-semibold text-gray-500">Name</p>
-          <p>Alliah Gomez</p>
+          <p>Beyonce Capilitan</p>
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-500">Program</p>
+          <p>BSIT</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button class="btn btn-xs btn-success">Start Procedure</button>
+          <button class="btn btn-xs btn-warning">Reschedule</button>
+          <button class="btn btn-xs btn-error">Cancel</button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- APPOINTMENT CARD 2 -->
+    <div class="bg-white rounded-xl shadow p-6 ml-6 mb-8 border border-red-200">
+      <div class="grid grid-cols-5 gap-4 text-sm items-center">
+
+        <div>
+          <p class="font-semibold text-gray-500">Date</p>
+          <p>February 2, 2025</p>
+          <p class="text-xs text-gray-400">11:30 AM</p>
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-500">Service</p>
+          <p>Tooth Extraction</p>
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-500">Name</p>
+          <p>Britney Caculitan</p>
         </div>
 
         <div>
@@ -154,29 +189,67 @@
   </div>
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="bg-primaryDark text-white mt-12">
-  <div class="max-w-6xl mx-auto p-6 grid grid-cols-3 text-sm">
-    <div>
-      <p class="font-semibold mb-2">PUP Taguig Dental Clinic</p>
-      <p>Gen. Santos Ave, Upper Bicutan</p>
-      <p>Taguig City</p>
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+
+  <!-- ASIDE: CLINIC INFO -->
+  <aside class="space-y-4">
+    <div class="flex items-center gap-3">
+      
+      <!-- Logos -->
+      <div class="w-12">
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+      </div>
+
+      <div class="w-12">
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+        <p class="text-sm whitespace-nowrap">
+          Polytechnic University of the Philippines – Taguig Campus
+        </p>
+      </div>
     </div>
 
-    <div>
-      <p class="font-semibold mb-2">Navigation</p>
-      <p>Dashboard</p>
-      <p>Appointments</p>
-      <p>Patients</p>
+    <!-- Location -->
+    <div class="flex items-start gap-3 text-sm">
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
+      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
-    <div>
-      <p class="font-semibold mb-2">Services</p>
-      <p>Dental Check-up</p>
-      <p>Tooth Cleaning</p>
-      <p>Dental Restoration</p>
+    <!-- Email -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
+      <p>pupdental@pup.edu.ph</p>
     </div>
-  </div>
+
+    <!-- Phone -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
+      <p>(02) 123-4567</p>
+    </div>
+  </aside>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
+  </nav>
+
+  <!-- SERVICES -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
+    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
+    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
+  </nav>
+
 </footer>
 
 </body>
