@@ -73,6 +73,14 @@
         <a href="/register" class="text-[#F2B233] font-semibold hover:underline">Register here</a>
         </p>
 
+        <p class="mt-4 text-center text-sm text-gray-600">
+    Are you a dentist?
+    <a href="{{ route('dentist.login') }}"
+       class="text-[#8B0000] font-semibold hover:underline">
+        Log in as Dentist
+    </a>
+</p>
+
     </div>
 
     </div>
