@@ -115,7 +115,7 @@
 <div class="bg-red-800 text-[#F4F4F4] px-6">
   <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
     
-    <a href=""
+    <a href="{{ route('homepage') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -125,7 +125,7 @@
               hover:after:opacity-100">
       Home
     </a>
-<a href="{{ route('appointment') }}"
+    <a href="{{ route('appointment.index') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -136,7 +136,7 @@
       Appointment
     </a>
 
-    <a href=""
+    <a href="{{ route('record') }}"
     class="relative pb-1
                 font-bold
               after:absolute after:left-0 after:bottom-0
