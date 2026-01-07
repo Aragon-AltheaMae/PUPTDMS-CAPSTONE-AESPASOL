@@ -55,7 +55,7 @@
         <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
             <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
-</form>
+      </form>
 
     </div>
   </div>
@@ -128,16 +128,16 @@
     <!-- DENTAL CASES -->
     <div class="card bg-primaryMain text-white shadow flex-1">
         <div class="card-body p-6 text-center justify-center">
-        <p class="text-sm">Dental Cases</p>
+        <p class="text-s">Dental Cases</p>
         <p class="text-4xl font-bold">45</p>
         <p class="text-xs">December 2025</p>
         </div>
     </div>
 
     <!-- TOTAL APPOINTMENTS -->
-    <div class="card bg-primaryMain text-white shadow flex-1">
+    <div class="card bg-white text-red-700 shadow flex-1 border border-gray-200">
         <div class="card-body p-6 text-center justify-center">
-        <p class="text-sm">Total Appointments</p>
+        <p class="text-s">Total Appointments</p>
         <p class="text-4xl font-bold">62</p>
         <p class="text-xs">December 2025</p>
         </div>
@@ -164,61 +164,71 @@
     <div class="col-span-5 flex flex-col gap-6">
 
     <!-- MEDICAL SUPPLY INVENTORY -->
-    <div class="card bg-white shadow border border-red-200">
+    <div class="relative rounded-lg p-[2px]" style="background: linear-gradient(to bottom, #660000, #FFD700);">
+        <div class="card bg-white shadow border border-transparent rounded-lg">
         <div class="card-body">
-        <h3 class="font-semibold text-red-700 mb-2">Medical Supply Inventory</h3>
-        <table class="table table-sm">
+            <h3 class="font-semibold text-red-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-boxes"></i> Medical Supply Inventory
+            </h3>
+            <table class="table table-sm">
             <thead>
-            <tr class="text-red-700">
+                <tr class="text-red-700">
                 <th>Supplies</th><th>Units</th><th>Qty</th><th>Consumed</th><th>Balance</th>
-            </tr>
+                </tr>
             </thead>
             <tbody>
-            <tr>
+                <tr>
                 <td>Disposable Dental Needles Short</td>
                 <td>piece</td>
                 <td>42</td>
                 <td>8</td>
                 <td>34</td>
-            </tr>
+                </tr>
             </tbody>
-        </table>
-        <button class="btn btn-sm btn-error w-fit mt-3">Visit Inventory</button>
+            </table>
+            <button class="mt-3 px-6 py-2 rounded-lg font-semibold" style="background-color: #8B0000; color: white; width: fit;">Visit Inventory
+            </button>
+        </div>
         </div>
     </div>
 
     <!-- MEDICINE SUPPLY INVENTORY -->
-    <div class="card bg-white shadow border border-red-200">
+    <div class="relative rounded-lg p-[2px]" style="background: linear-gradient(to bottom, #660000, #FFD700);">
+        <div class="card bg-white shadow border border-transparent rounded-lg">
         <div class="card-body">
-        <h3 class="font-semibold text-red-700 mb-2">Medicine Supply Inventory</h3>
-        <table class="table table-sm">
+            <h3 class="font-semibold text-red-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-pills"></i> Medicine Supply Inventory
+            </h3>
+            <table class="table table-sm">
             <thead>
-            <tr class="text-red-700">
+                <tr class="text-red-700">
                 <th>Medicine</th><th>Form</th><th>Qty</th><th>Used</th><th>Balance</th>
-            </tr>
+                </tr>
             </thead>
             <tbody>
-            <tr>
+                <tr>
                 <td>Amoxicillin</td>
                 <td>Capsule</td>
                 <td>120</td>
                 <td>30</td>
                 <td>90</td>
-            </tr>
+                </tr>
             </tbody>
-        </table>
-        <button class="btn btn-sm btn-error w-fit mt-3">Visit Inventory</button>
+            </table>
+            <!-- CENTERED BUTTON -->
+            <button class="mt-3 px-6 py-2 rounded-lg font-semibold" style="background-color: #8B0000; color: white; width: fit;"> Visit Inventory
+            </button>
+        </div>
         </div>
     </div>
 
     </div>
 
 
-
     <!-- SCHEDULE -->
     <div class="col-span-7 card bg-primaryMain text-white shadow">
       <div class="card-body">
-        <h3 class="text-lg font-semibold mb-3">Scheduled Patients Today</h3>
+        <h1 class="text-lg font-semibold mb-3">Scheduled Patients Today</h1>
 
         <div class="space-y-3">
           <div class="flex items-center gap-4 bg-red-800 p-3 rounded-lg">
