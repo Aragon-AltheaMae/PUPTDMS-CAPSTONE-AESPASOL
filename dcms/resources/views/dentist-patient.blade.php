@@ -184,80 +184,79 @@
 
     <hr class="mb-4" />
 
-    <!-- Sort -->
-    <p class="text-sm text-gray-500 mb-2">Sort</p>
-    <div class="flex gap-6 mb-4">
-      <label class="flex items-center gap-2 text-sm">
-        <input type="radio" name="sort" class="accent-red-800">
-        A-Z
-      </label>
-      <label class="flex items-center gap-2 text-sm">
-        <input type="radio" name="sort" class="accent-red-800">
-        Z-A
-      </label>
-    </div>
+     <!-- Sort -->
+              <p class="text-sm text-gray-500 mb-2">Sort</p>
+              <div class="flex gap-6 mb-4">
+                <label class="flex items-center gap-2 text-sm">
+                  <input type="radio" name="sort" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" />
+                  A-Z
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                  <input type="radio" name="sort" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" />
+                  Z-A
+                </label>
+              </div>
 
-    <hr class="mb-4" />
+              <hr class="mb-4" />
 
-    <!-- Date Range -->
-    <p class="text-sm text-gray-500 mb-2">Date Range</p>
-    <div class="flex items-center gap-6 mb-4">
-      <div>
-        <label class="text-sm">From:</label>
-        <input type="date" class="border rounded-md px-3 py-1 w-[160px]" />
-      </div>
-      <div>
-        <label class="text-sm">To:</label>
-        <input type="date" class="border rounded-md px-3 py-1 w-[160px]" />
-      </div>
+              <!-- Date Range -->
+              <p class="text-sm text-gray-500 mb-2">Date Range</p>
+              <div class="flex items-center gap-6 mb-4">
+                <div>
+                  <label class="text-sm">From:</label>
+                  <input type="date" class="bg-transparent border border-red-800 text-gray-700 rounded-md px-3 py-1 w-[160px] focus:outline-none focus:ring-1 focus:ring-red-300"/>
+                </div>
+                <div>
+                  <label class="text-sm">To:</label>
+                  <input type="date" class="bg-transparent border border-red-800 text-gray-700 rounded-md px-3 py-1 w-[160px] focus:outline-none focus:ring-1 focus:ring-red-300"/>
+                </div>
+                <div class="ml-6">
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="radio" name="order" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" />
+                    Ascending
+                  </label>
+                  <label class="flex items-center gap-2 text-sm mt-1">
+                    <input type="radio" name="order" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" />
+                    Descending
+                  </label>
+                </div>
+              </div>
 
-      <div class="ml-6">
-        <label class="flex items-center gap-2 text-sm">
-          <input type="radio" name="order" class="accent-red-800">
-          Ascending
-        </label>
-        <label class="flex items-center gap-2 text-sm mt-1">
-          <input type="radio" name="order" class="accent-red-800">
-          Descending
-        </label>
-      </div>
-    </div>
+              <hr class="mb-4" />
 
-    <hr class="mb-4" />
+              <!-- Course -->
+              <p class="text-sm text-gray-500 mb-2">Course</p>
+              <div class="grid grid-cols-6 gap-3 mb-4 text-sm">
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSIT</label>
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSECE</label>
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSBA - HRM</label>
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSED - ENG</label>
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSOA</label>
+                <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> BSPSYCH</label>
+              </div>
 
-    <!-- Course -->
-    <p class="text-sm text-gray-500 mb-2">Course</p>
-    <div class="grid grid-cols-6 gap-3 mb-4 text-sm">
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSIT</label>
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSECE</label>
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSBA - HRM</label>
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSED - ENG</label>
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSOA</label>
-      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSPSYCH</label>
-    </div>
+              <hr class="mb-4" />
 
-    <hr class="mb-4" />
+              <!-- Year & Section -->
+              <div class="flex gap-20 mb-6">
+                <div>
+                  <p class="text-sm text-gray-500 mb-2">Year</p>
+                  <div class="space-y-2 text-sm">
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 1st Year</label>
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 2nd Year</label>
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 3rd Year</label>
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 4th Year</label>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 mb-2">Section</p>
+                  <div class="space-y-2 text-sm">
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 1</label>
+                    <label class="flex items-center gap-2"><input type="radio" class="w-4 h-4 rounded-full border-2 border-red-800 appearance-none checked:bg-red-800 checked:border-red-800" /> 2</label>
+                  </div>
+                </div>
+              </div>
 
-    <!-- Year & Section -->
-    <div class="flex gap-20 mb-6">
-      <div>
-        <p class="text-sm text-gray-500 mb-2">Year</p>
-        <div class="space-y-2 text-sm">
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 1st Year</label>
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 2nd Year</label>
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 3rd Year</label>
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 4th Year</label>
-        </div>
-      </div>
-
-      <div>
-        <p class="text-sm text-gray-500 mb-2">Section</p>
-        <div class="space-y-2 text-sm">
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 1</label>
-          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 2</label>
-        </div>
-      </div>
-    </div>
 
     <!-- Footer -->
     <div class="flex justify-between items-center">
@@ -297,38 +296,27 @@
 </div>
 
    <!-- Filter Stats -->
-<div class="flex gap-4 relative z-10 mb-[-20px]">
-  <!-- Scheduled Today -->
-  <button
-    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
-           hover:bg-[#750000] transition-colors duration-200
-           focus:outline-none focus:ring-0"
-  >
-    <h3 class="text-3xl font-medium leading-none mb-2">5</h3>
-    <p class="text-sm opacity-90">Scheduled Today</p>
-  </button>
+<!-- Scheduled Today -->
+<button class="filter-btn bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left"
+        data-filter="today">
+  <h3 class="text-3xl font-medium leading-none mb-2">5</h3>
+  <p class="text-sm opacity-90">Scheduled Today</p>
+</button>
 
-  <!-- Rescheduled -->
-  <button
-    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
-           hover:bg-[#750000] transition-colors duration-200
-           focus:outline-none focus:ring-0"
-  >
-    <h3 class="text-3xl font-medium leading-none mb-2">10</h3>
-    <p class="text-sm opacity-90">Rescheduled</p>
-  </button>
+<!-- Rescheduled -->
+<button class="filter-btn bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left"
+        data-filter="rescheduled">
+  <h3 class="text-3xl font-medium leading-none mb-2">10</h3>
+  <p class="text-sm opacity-90">Rescheduled</p>
+</button>
 
-  <!-- All -->
-  <button
-    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
-           hover:bg-[#750000] transition-colors duration-200
-           focus:outline-none focus:ring-0"
-  >
-    <h3 class="text-3xl font-medium leading-none mb-2">50</h3>
-    <p class="text-sm opacity-90">All</p>
-  </button>
-</div>
-
+<!-- All -->
+<button class="filter-btn bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left"
+        data-filter="all">
+  <h3 class="text-3xl font-medium leading-none mb-2">50</h3>
+  <p class="text-sm opacity-90">All</p>
+</button>
+    </div>
 
 
   <div class="bg-[#F5F5F5] rounded-xl px-6 pt-10 pb-6 shadow-sm">
@@ -337,68 +325,113 @@
     </p>
 
 
+    <!-- Patient Information Section -->
 
     <!-- Patient Rows -->
     <div class="space-y-4">
 
       <!-- Patient Item -->
-      <div class="flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
-        <div class="flex items-center gap-4">
-          <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full" />
-          <div>
-            <p class="font-semibold">Capilitan, Rhyne</p>
-            <p class="text-xs text-gray-500">2023-00001</p>
-          </div>
-        </div>
+<div class="patient-item today flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/51" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Romero, Dianna</p>
+      <p class="text-xs text-gray-500">2023-00010</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 20, 2025 · 9:00 AM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Dental Checkup</p>
+    <p class="text-xs text-green-600">Appointment Today</p>
+  </div>
+</div>
 
-        <div class="hidden md:block text-sm text-gray-600">
-          January 20, 2025 · 9:00 PM
-        </div>
+<div class="patient-item today flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/52" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Dela Cruz, Mark</p>
+      <p class="text-xs text-gray-500">2023-00011</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 20, 2025 · 11:30 AM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Tooth Cleaning</p>
+    <p class="text-xs text-green-600">Appointment Today</p>
+  </div>
+</div>
 
-        <div class="text-right">
-          <p class="font-medium text-[#8B0000]">Dental Cleaning</p>
-          <p class="text-xs text-green-600">Appointment Today</p>
-        </div>
-      </div>
+<div class="patient-item today flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/53" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Santos, Alyssa</p>
+      <p class="text-xs text-gray-500">2023-00012</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 20, 2025 · 3:00 PM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Dental Restoration</p>
+    <p class="text-xs text-green-600">Appointment Today</p>
+  </div>
+</div>
 
-      <!-- Repeat -->
-      <div class="flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
-        <div class="flex items-center gap-4">
-          <img src="https://i.pravatar.cc/41" class="w-10 h-10 rounded-full" />
-          <div>
-            <p class="font-semibold">Deala, Levi</p>
-            <p class="text-xs text-gray-500">2023-00002</p>
-          </div>
-        </div>
+<div class="patient-item rescheduled flex items-center justify-between bg-gray-50 hover:bg-[#FFF4E0] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/54" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Reyes, Joshua</p>
+      <p class="text-xs text-gray-500">2023-00013</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 22, 2025 · 10:00 AM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Tooth Extraction</p>
+    <p class="text-xs text-orange-600">Rescheduled</p>
+  </div>
+</div>
 
-        <div class="hidden md:block text-sm text-gray-600">
-          January 20, 2025 · 1:00 PM
-        </div>
+<div class="patient-item rescheduled flex items-center justify-between bg-gray-50 hover:bg-[#FFF4E0] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/55" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Garcia, Nicole</p>
+      <p class="text-xs text-gray-500">2023-00014</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 23, 2025 · 1:00 PM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Dental Surgery</p>
+    <p class="text-xs text-orange-600">Rescheduled</p>
+  </div>
+</div>
 
-        <div class="text-right">
-          <p class="font-medium text-[#8B0000]">Dental Restoration</p>
-          <p class="text-xs text-green-600">Appointment Today</p>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
-        <div class="flex items-center gap-4">
-          <img src="https://i.pravatar.cc/42" class="w-10 h-10 rounded-full" />
-          <div>
-            <p class="font-semibold">Sabe, Aiko</p>
-            <p class="text-xs text-gray-500">2023-00003</p>
-          </div>
-        </div>
-
-        <div class="hidden md:block text-sm text-gray-600">
-          January 29, 2025 · 4:00 PM
-        </div>
-
-        <div class="text-right">
-          <p class="font-medium text-[#8B0000]">Dental Surgery</p>
-          <p class="text-xs text-gray-500">Upcoming</p>
-        </div>
-      </div>
+<div class="patient-item rescheduled flex items-center justify-between bg-gray-50 hover:bg-[#FFF4E0] transition p-4 rounded-xl cursor-pointer">
+  <div class="flex items-center gap-4">
+    <img src="https://i.pravatar.cc/56" class="w-10 h-10 rounded-full" />
+    <div>
+      <p class="font-semibold">Lopez, Christian</p>
+      <p class="text-xs text-gray-500">2023-00015</p>
+    </div>
+  </div>
+  <div class="hidden md:block text-sm text-gray-600">
+    January 24, 2025 · 4:30 PM
+  </div>
+  <div class="text-right">
+    <p class="font-medium text-[#8B0000]">Dental Consultation</p>
+    <p class="text-xs text-orange-600">Rescheduled</p>
+  </div>
+</div>
 
     </div>
 
@@ -468,33 +501,152 @@
 
 </footer>
 
+
 <script>
+document.addEventListener("DOMContentLoaded", () => {
   const openFilter = document.getElementById("openFilter");
-  const closeFilter = document.getElementById("closeFilter");
   const filterModal = document.getElementById("filterModal");
+  const clearInsideForm = document.getElementById("closeFilter"); // Clear inside modal
+  const clearOutside = document.getElementById("clearFilters"); // Clear outside modal
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  const patientItems = document.querySelectorAll(".patient-item");
+  const scheduledBtnCount = document.querySelector('.filter-btn[data-filter="today"] h3');
+  const rescheduledBtnCount = document.querySelector('.filter-btn[data-filter="rescheduled"] h3');
+  const allBtnCount = document.querySelector('.filter-btn[data-filter="all"] h3');
 
-  openFilter.addEventListener("click", () => {
-    filterModal.classList.remove("hidden");
-  });
 
-  closeFilter.addEventListener("click", () => {
-    filterModal.classList.add("hidden");
-  });
 
-    document.getElementById("clearFilters").addEventListener("click", () => {
-      // Uncheck all radios & checkboxes
-      document.querySelectorAll(
-        '#filterModal input[type="radio"], #filterModal input[type="checkbox"]'
-      ).forEach(input => {
-        input.checked = false;
-      });
-
-      // Clear date & text inputs
-      document.querySelectorAll(
-        '#filterModal input[type="date"], #filterModal input[type="text"]'
-      ).forEach(input => {
-        input.value = "";
-      });
+  /* =====================
+     OPEN FILTER MODAL
+     ===================== */
+  if (openFilter && filterModal) {
+    openFilter.addEventListener("click", () => {
+      filterModal.classList.remove("hidden");
     });
-  </script>
+  }
+
+  /* =====================
+     CLEAR BUTTON (INSIDE MODAL)
+     ===================== */
+  if (clearInsideForm) {
+    clearInsideForm.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetFilters();
+    });
+  }
+
+  /* =====================
+     CLEAR BUTTON (OUTSIDE)
+     ===================== */
+  if (clearOutside) {
+    clearOutside.addEventListener("click", () => {
+      resetFilters();
+    });
+  }
+
+  /* =====================
+     CLICK OUTSIDE MODAL TO CLOSE
+     ===================== */
+  if (filterModal) {
+    filterModal.addEventListener("click", (e) => {
+      if (e.target === filterModal) {
+        filterModal.classList.add("hidden");
+      }
+    });
+  }
+
+  /* =====================
+     RESET FILTERS FUNCTION
+     ===================== */
+  function resetFilters() {
+
+    /* RADIO GROUP RESET
+       → Select FIRST option per group */
+    const radioGroups = {};
+
+    filterModal.querySelectorAll('input[type="radio"]').forEach(radio => {
+      if (!radioGroups[radio.name]) {
+        radioGroups[radio.name] = [];
+      }
+      radioGroups[radio.name].push(radio);
+    });
+
+    Object.values(radioGroups).forEach(group => {
+      group.forEach(r => r.checked = false);
+      if (group[0]) group[0].checked = true;
+    });
+
+    /* CHECKBOX RESET */
+    filterModal.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+    });
+
+    /* TEXT & DATE INPUTS */
+    filterModal.querySelectorAll('input[type="text"], input[type="date"]').forEach(input => {
+      input.value = "";
+    });
+
+    /* SELECT RESET */
+    filterModal.querySelectorAll("select").forEach(select => {
+      select.selectedIndex = 0;
+    });
+  }
+
+   /* =====================
+     FILTER PATIENTS
+     ===================== */
+  function filterPatients(type) {
+    patientItems.forEach(patient => {
+      if (type === "all") {
+        patient.style.display = "flex";
+      } else {
+        patient.style.display = patient.classList.contains(type)
+          ? "flex"
+          : "none";
+      }
+    });
+  }
+
+  /* =====================
+     FILTER BUTTON CLICK
+     ===================== */
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const filterType = button.dataset.filter;
+      filterPatients(filterType);
+    });
+      // Function to show patients based on filter
+  const showPatients = (filter) => {
+    patientItems.forEach(patient => {
+      if (filter === "all") {
+        patient.style.display = "flex";
+      } else {
+        patient.style.display = patient.classList.contains(filter) ? "flex" : "none";
+      }
+    });
+  };
+
+  // Function to update the numbers on the buttons
+  const updateCounts = () => {
+    scheduledBtnCount.textContent = document.querySelectorAll(".patient-item.today").length;
+    rescheduledBtnCount.textContent = document.querySelectorAll(".patient-item.rescheduled").length;
+    allBtnCount.textContent = patientItems.length;
+  };
+
+  // Add click events to filter buttons
+  filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const filter = btn.dataset.filter;
+      showPatients(filter);
+      updateCounts(); // optional: update counts in case you dynamically change patients
+    });
+  });
+
+  // Initialize counts on page load
+  updateCounts();
+});
+
+  });
+
+</script>
 
