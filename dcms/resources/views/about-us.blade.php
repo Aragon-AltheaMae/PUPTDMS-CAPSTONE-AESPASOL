@@ -34,9 +34,22 @@
     opacity: 0;
     transition: max-height 0.5s ease, opacity 0.5s ease;
   }
+
   .faq-item.open .faq-content {
     max-height: 500px; /* adjust to content */
     opacity: 1;
+  }
+
+  /* Fade-up animation */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-up.show {
+    opacity: 1;
+    transform: translateY(0);
   }
   </style>
 </head>
@@ -85,7 +98,7 @@
       Home
     </a>
 
-    <a href="{{ route('appointment') }}"
+    <a href="{{ route('appointment.index') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -96,7 +109,7 @@
       Appointment
     </a>
 
-    <a href=""
+    <a href="{{ route('record') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -122,18 +135,16 @@
 </div>
 
   <!-- BANNER -->
-  <section class="relative bg-gray-50 py-24 text-center">
-    <img
-      src=""
-      class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+  <section class="relative bg-gray-50 py-24 text-center fade-up">
+    <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
     />
-    <h2 class="relative z-10 font-extrabold text-4xl text-[#8B0000]">About Us</h2>
+    <h2 class="relative z-10 font-extrabold text-4xl text-[#8B0000] fade-up">About Us</h2>
   </section>
 
   <!-- MAIN CONTENT -->
-  <main class="max-w-5xl mx-auto px-6 mb-12 space-y-20">
+  <main class="max-w-5xl mx-auto px-6 mb-12 space-y-12">
 
-    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-8">
+    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-8 fade-up">
       The Polytechnic University of the Philippines – Taguig Campus is committed to promoting the 
       health and well-being of its academic community by providing free dental services to students, 
       alumni, faculty, and staff. These services aim to support overall wellness and ensure access to 
@@ -142,7 +153,7 @@
 
     <!-- CARD -->
     <div class="bg-gradient-to-br from-[#8B0000] to-[#660000] text-[#F4F4F4]
-    rounded-2xl pl-12 flex flex-col md:flex-row items-center gap-4 shadow-lg">
+    rounded-2xl pl-12 flex flex-col md:flex-row items-center gap-4 shadow-lg fade-up">
         <div class="flex-1 font-normal text-2xl leading-relaxed">
             The dental clinic is headed by <span class="font-bold text-2xl">Dr. Nelson P. Angeles</span>,
             <br>the campus dentist, who delivers professional, safe, and reliable dental care.
@@ -151,8 +162,8 @@
     </div>
 
     <!-- FAQs Title -->
-    <h3 class="font-extrabold text-[#8B0000] text-center mt-8 mb-4 text-3xl">Frequently Asked Questions</h3>
-    <section class="max-w-3xl mx-auto mt-2 rounded-2xl bg-gradient-to-br from-[#660000] to-[#FFD700] p-1">
+    <h3 class="font-extrabold text-[#8B0000] text-center mt-8 mb-4 text-3xl fade-up">Frequently Asked Questions</h3>
+    <section class="max-w-3xl mx-auto mt-2 rounded-2xl bg-gradient-to-br from-[#660000] to-[#FFD700] p-1 fade-up">
     <div class="bg-white rounded-2xl p-4">
 
     <!-- FAQ 1 -->
@@ -351,15 +362,15 @@
     </div>
 </section>
 
-  <p class="text-[#8B0000] text-xl leading-relaxed text-justify text-wrap mt-10">
+  <p class="text-[#8B0000] text-xl leading-relaxed text-justify text-wrap mt-10 fade-up">
       The PUPT Dental Management System was developed to manage records and appointments more effectively,
       ensuring an efficient dental service while supporting the University's commitment to quality and accessible care.
     </p>
     
     <!-- DEVELOPERS -->
     <section class="text-center text-2xl mt-12">
-      <h3 class="font-extrabold text-[#8B0000] mb-4">The Developers</h3>
-      <div class="flex justify-center gap-6">
+      <h3 class="font-extrabold text-[#8B0000] mb-4 fade-up">The Developers</h3>
+      <div class="flex justify-center gap-6 fade-up">
         <img src="images/Althea-Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
         <img src="images/Grace-Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
         <img src="images/Hoshea-Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
@@ -449,7 +460,22 @@
         button.setAttribute('aria-expanded', 'true');
     }
     }
-  </script>
+  
 
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  document.querySelectorAll('.fade-up').forEach(el => {
+    observer.observe(el);
+  });
+</script>
 </body>
 </html>

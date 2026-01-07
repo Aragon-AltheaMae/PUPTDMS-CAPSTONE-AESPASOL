@@ -43,6 +43,21 @@
       .tabs-bordered .tab::after {
         transition: width 0.5s ease, left 0.5s ease;
       }
+
+      @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.8s ease-out forwards;
+    }
     </style>
 </head>
 
@@ -91,7 +106,7 @@
       Home
     </a>
 
-    <a href="appointment.html"
+    <a href="{{ route('appointment.index') }}"
     class="relative pb-1
             font-bold
             after:absolute after:left-0 after:bottom-0
@@ -103,7 +118,7 @@
       Appointment
     </a>
 
-    <a href=""
+    <a href="{{ route('record') }}"
     class="relative pb-1
             after:absolute after:left-0 after:bottom-0
             after:h-[2px] after:w-full
@@ -129,11 +144,11 @@
 </div>
 
 <!-- ================= MAIN CONTENT ================= -->
-<main class="max-w-7xl mx-auto px-6 py-10 space-y-16">
+<main class="max-w-7xl mx-auto px-6 py-10 space-y-16 fade-up">
 
   <!-- ===== Dental Clinic Schedule ===== -->
   <!-- ===== CALENDAR ===== -->
-<section class="flex justify-center">
+<section class="flex justify-center fade-up">
   <div class="w-full max-w-3xl flex flex-col items-center gap-3">
 
     <h1 class="text-3xl font-bold text-pupred w-full text-left">
@@ -176,7 +191,7 @@
 
 
   <!-- ===== My Appointments ===== -->
-  <section class="max-w-5xl mx-auto">
+  <section class="max-w-5xl mx-auto fade-up">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-2xl font-bold text-pupred">My Appointments</h2>
     <button class="btn bg-red-400 hover:bg-red-500 text-[#F4F4F4]">
@@ -224,7 +239,7 @@
 
 
 <!-- ===== Services Offered ===== -->
-<section class="max-w-6xl mx-auto mt-16">
+<section class="max-w-6xl mx-auto mt-16 fade-up">
     <h2 class="text-3xl font-bold text-pupred mb-6">
     Services Offered
     </h2>

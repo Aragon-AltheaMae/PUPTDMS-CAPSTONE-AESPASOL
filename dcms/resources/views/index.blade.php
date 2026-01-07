@@ -139,7 +139,7 @@
 <div class="bg-red-800 text-[#F4F4F4] px-6">
   <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
     
-    <a href=""
+    <a href="{{ route('homepage') }}"
     class="relative pb-1
               font-bold
               after:absolute after:left-0 after:bottom-0
@@ -192,15 +192,15 @@
 
     <!-- WELCOME -->
         <h1 class="text-4xl font-extrabold mb-6 bg-gradient-to-r
-    from-[#660000] to-[#FFD700] bg-clip-text text-transparent inline-block">
+    from-[#660000] to-[#FFD700] bg-clip-text text-transparent inline-block fade-up">
       Welcome, {{ ucwords(strtolower($patient->name)) }}
     </h1>
 
 
     <!-- HERO CARD -->
-    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000] text-[#F4F4F4] rounded-2xl p-10 flex justify-between items-center mb-20">
+    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000] text-[#F4F4F4] rounded-2xl p-10 flex justify-between items-center mb-20 fade-up">
       <div>
-        <h2 class="text-4xl font-semibold mb-10 text-[#F4F4F4]">Book a dental appointment at your convenience</h2>
+        <h2 class="text-4xl font-semibold mb-10 text-[#F4F4F4] fade-up">Book a dental appointment at your convenience</h2>
         <button
         class="btn btn-soft bg-[#660000] hover:bg-[#333333]
               transition-colors duration-300
@@ -222,20 +222,7 @@
 
       <!-- PROFILE CARD -->
       <div id="profileSkeletonContainer" class="bg-gradient-to-t from-[#FFD700] to-[#660000] p-0.5 rounded-2xl md:w-1/3">
-        <div id="profileInnerContainer" class="bg-[#F4F4F4] rounded-2xl p-5 text-center">
-          <div class="avatar mb-2 flex justify-center">
-            <div class="w-[210px] rounded-full">
-              <img src="images/hsh.jpg" alt="Profile Image" />
-            </div>
-          </div>
-
-          <h3 class="font-bold text-2xl">Grace Anne Lim</h3>
-          <p class="text-sm italic mb-8">Patient</p>
-
-          <p class="text-[#8B0000] text-lg font-bold mt-4">2023-00112-TG-0</p>
-          <p class="text-sm font-bold mt-2">09162903429</p>
-          <p class="text-sm mt-2">limgraceanne@gmail.com</p>
-        </div>
+        <!-- content will be injected by JS -->
       </div>
 
         <!-- Calendar Section -->
@@ -279,7 +266,7 @@
         <button class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
           transition-colors duration-300
           border-none text-sm rounded-2xl text-[#F4F4F4]">
-          <a href="records.html">View Full Record </a>
+          <a href="{{ route('record') }}">View Full Record </a>
         </button>
       </div>
     </div>
@@ -403,20 +390,6 @@
     // Simulate fetching data after 2 seconds
     setTimeout(() => {
       // Profile
-      document.getElementById("profileInnerContainer").innerHTML = `
-        <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center fade-up">
-          <div class="avatar mb-2 flex justify-center">
-            <div class="w-[210px] rounded-full">
-              <img src="images/hsh.jpg" alt="Profile Image" />
-            </div>
-          </div>
-          <h3 class="font-bold text-2xl">Grace Anne Lim</h3>
-          <p class="text-sm italic mb-8">Patient</p>
-          <p class="text-[#8B0000] text-lg font-bold mt-4">2023-00112-TG-0</p>
-          <p class="text-sm font-bold mt-2">09162903429</p>
-          <p class="text-sm mt-2">limgraceanne@gmail.com</p>
-        </div>
-      `;
 
       // Calendar
       document.getElementById("calendarSkeletonContainer").innerHTML = `
@@ -472,15 +445,36 @@
     const viewAll = document.getElementById("viewAllContainer");
     if (viewAll) viewAll.style.display = "none";
 
-    // Profile Skeleton
-    document.getElementById("profileInnerContainer").innerHTML = `
-      <div class="animate-pulse bg-[#F4F4F4] rounded-2xl p-5 text-center">
-        <div class="w-[210px] h-[210px] rounded-full mx-auto skeleton mb-4"></div>
-        <div class="h-6 w-32 mx-auto skeleton mb-2"></div>
-        <div class="h-4 w-20 mx-auto skeleton mb-2"></div>
-        <div class="h-5 w-24 mx-auto skeleton"></div>
+    // Add skeleton animation to profile container
+    const profileContainer = document.getElementById("profileSkeletonContainer");
+    profileContainer.innerHTML = `
+    <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center animate-pulse">
+      <div class="w-[210px] h-[210px] rounded-full mx-auto skeleton mb-4"></div>
+      <div class="h-6 w-32 mx-auto skeleton mb-2"></div>
+      <div class="h-4 w-20 mx-auto skeleton mb-2"></div>
+      <div class="h-5 w-24 mx-auto skeleton"></div>
+    </div>
+  `;
+
+  // 2️replace skeleton with real profile after 2s
+  setTimeout(() => {
+    profileContainer.innerHTML = `
+      <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center fade-up">
+        <div class="avatar mb-4 flex justify-center">
+          <div class="w-[210px] rounded-full">
+            <img src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : asset('images/hsh.jpg') }}" alt="Profile Image" />
+          </div>
+        </div>
+        <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>
+        <p class="text-sm italic mb-4">Patient</p>
+        <p class="text-[#8B0000] text-lg font-bold mt-2">{{ $patient->patient_id ?? 'N/A' }}</p>
+        <p class="text-sm font-semibold mt-2">Email: {{ $patient->email ?? '-' }}</p>
+        <p class="text-sm font-semibold mt-1">Phone: {{ $patient->phone ?? '-' }}</p>
+        <p class="text-sm mt-2">Birthdate: {{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
+        <p class="text-sm mt-1">Gender: {{ $patient->gender ?? '-' }}</p>
       </div>
     `;
+  }, 2000);
 
     // Calendar Skeleton
     document.getElementById("calendarSkeletonContainer").innerHTML = `
@@ -588,7 +582,7 @@
   }
 
   // Helpers
-  function viewRecord(id) { window.location.href = `record-details.php?id=${id}`; }
+  function viewRecord(id) { window.location.href = `record.php?id=${id}`; }
   function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString(); }
   function formatTime(timeStr) { return timeStr.substring(0,5); }
 </script>

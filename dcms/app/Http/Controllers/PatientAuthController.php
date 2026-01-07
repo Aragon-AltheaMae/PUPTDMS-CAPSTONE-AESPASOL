@@ -75,4 +75,18 @@ class PatientAuthController extends Controller
 
         return redirect()->route('login')->with('success', 'Logged out successfully!');
     }
+
+    public function dashboard()
+{
+    // Check if patient is logged in
+    $patientId = session('patient_id');
+    if (!$patientId) {
+        return redirect()->route('login')->with('error', 'Please login first!');
+    }
+
+    // Fetch patient from DB
+    $patient = Patient::find($patientId);
+
+    return view('dashboard', compact('patient'));
+}
 }
