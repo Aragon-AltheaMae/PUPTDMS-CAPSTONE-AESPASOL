@@ -130,6 +130,13 @@ Route::prefix('dentist')->group(function () {
         }
         return view('dentist-appointments');
     })->name('dentist.appointments');
+
+    Route::get('/inventory', function () {
+    if (session('role') !== 'dentist') {
+        return redirect('/login');
+    }
+    return view('dentist-inventory');
+    })->name('dentist.inventory');
 });
 
 
