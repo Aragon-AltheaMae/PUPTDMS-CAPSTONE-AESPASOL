@@ -16,6 +16,7 @@
 
   <!-- Cally Calendar -->
   <script type="module" src="https://unpkg.com/cally"></script>
+  
 
   <!-- Tailwind config -->
   <script>
@@ -150,18 +151,38 @@
     </div>
 
 
-    <!-- CALENDAR -->
-    <div class="col-span-5 card bg-white shadow">
-    <div class="card-body">
-        <h3 class="font-semibold text-red-700 mb-3">December 2025</h3>
-        <cally-calendar class="min-h-[260px]"></cally-calendar>
-        <div class="flex justify-end gap-4 text-xs mt-4">
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded-full"></span>Full</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-400 rounded-full"></span>Not Available</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded-full"></span>Holiday</span>
+    <!-- Calendar Section -->
+    <div id="calendarSkeletonContainer" class="flex flex-col gap-2 col-span-5">
+
+        <!-- Calendar Card -->
+        <div class="bg-white border shadow rounded-2xl p-6 w-full">
+            <calendar-date class="cally w-full h-full flex flex-col p-2">
+            <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
+                <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
+
+            <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
+                <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+            </svg>
+
+            <calendar-month class="w-full flex-1"></calendar-month>
+            </calendar-date>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex gap-6 mt-3 text-sm justify-center">
+            <div class="flex items-center gap-2">
+            <span class="w-4 h-4 bg-red-500 rounded"></span> Full Schedule
+            </div>
+            <div class="flex items-center gap-2">
+            <span class="w-4 h-4 bg-orange-400 rounded"></span> Not Available
+            </div>
+            <div class="flex items-center gap-2">
+            <span class="w-4 h-4 bg-blue-500 rounded"></span> Holiday
+            </div>
         </div>
     </div>
-    </div>
+
 
 
     <!-- INVENTORY COLUMN -->
