@@ -16,6 +16,11 @@
 
   <!-- Cally Calendar -->
   <script type="module" src="https://unpkg.com/cally"></script>
+
+  <!-- Highcharts -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
   
 
   <!-- Tailwind config -->
@@ -100,8 +105,8 @@
     <div>
       <p id="currentDate" class="text-sm text-gray-500 mb-1"></p>
       <h1 class="text-3xl font-bold">
-        Good Morning,
         <span class="bg-gradient-to-r from-orange-400 to-red-700 bg-clip-text text-transparent">
+             Good Morning,
           <span id="dentistName"></span>
         </span>
       </h1>
@@ -119,11 +124,8 @@
     <!-- GAD ANALYTICS -->
     <div class="col-span-5 card bg-white shadow">
     <div class="card-body">
-        <h3 class="text-lg font-semibold text-red-700">GAD Analytics</h3>
-        <div class="h-60 bg-gray-100 rounded flex items-center justify-center text-gray-400">
-        Chart Area
-        </div>
-    </div>
+        <div id="gadChart" class="h-full w-full"></div>
+      </div>
     </div>
 
 
@@ -305,6 +307,49 @@
       statusBtn.textContent = "IN";
       statusBtn.classList.replace("btn-error", "btn-success");
     }
+  });
+
+
+  // ================= HIGHCHARTS BAR CHART =================
+  Highcharts.chart('gadChart', {
+    chart: {
+      type: 'column',
+      backgroundColor: '#ffffff'
+    },
+    title: {
+      text: 'GAD Analytics'
+    },
+    xAxis: {
+      categories: ['Student', 'Administrative', 'Faculty', 'Dependent'],
+      title: { text: 'Category' }
+    },
+    yAxis: {
+      min: 0,
+      title: { text: 'Number of Cases' }
+    },
+    series: [
+      {
+        name: 'Female',
+        data: [25, 10, 15, 8], // example data
+        color: '#FFC0CB' // baby pink
+      },
+      {
+        name: 'Male',
+        data: [20, 15, 12, 10], // example data
+        color: '#89CFF0' // baby blue
+      }
+    ],
+    tooltip: {
+      shared: true,
+      valueSuffix: ' cases'
+    },
+    plotOptions: {
+      column: {
+        pointPadding: 0.2,
+        borderWidth: 0
+      }
+    },
+    credits: { enabled: false }
   });
 </script>
 
