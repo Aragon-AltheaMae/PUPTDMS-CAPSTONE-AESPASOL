@@ -153,20 +153,138 @@
     />
 
     <!-- Divider -->
-    <div class="h-8 w-px bg-yellow-400 mx-4"></div>
+    <div class="relative z-20 flex items-center">
 
-    <!-- Filter -->
-    <button class="flex items-center gap-2 mr-5 text-red-800 font-medium text-sm">
+  <!-- Filter Button -->
+      <button
+        id="openFilter"
+        class="flex items-center gap-2 mr-5 text-red-800 font-medium text-sm"
+      >
+        <i class="fa-solid fa-sliders"></i>
+        Filter
+      </button>
+    </div>
+
+
+    <!-- Overlay -->
+<div
+  id="filterModal"
+  class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden"
+>
+  <!-- Modal Box -->
+  <div class="bg-white w-[680px] rounded-xl shadow-lg p-6 font-['Inter']">
+    
+    <!-- Header -->
+    <div class="flex items-center gap-2 mb-4 text-red-800">
       <i class="fa-solid fa-sliders"></i>
-      Filter
-    </button>
+      <h2 class="text-lg font-medium">Filter</h2>
+    </div>
+
+    <hr class="mb-4" />
+
+    <!-- Sort -->
+    <p class="text-sm text-gray-500 mb-2">Sort</p>
+    <div class="flex gap-6 mb-4">
+      <label class="flex items-center gap-2 text-sm">
+        <input type="radio" name="sort" class="accent-red-800">
+        A-Z
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="radio" name="sort" class="accent-red-800">
+        Z-A
+      </label>
+    </div>
+
+    <hr class="mb-4" />
+
+    <!-- Date Range -->
+    <p class="text-sm text-gray-500 mb-2">Date Range</p>
+    <div class="flex items-center gap-6 mb-4">
+      <div>
+        <label class="text-sm">From:</label>
+        <input type="date" class="border rounded-md px-3 py-1 w-[160px]" />
+      </div>
+      <div>
+        <label class="text-sm">To:</label>
+        <input type="date" class="border rounded-md px-3 py-1 w-[160px]" />
+      </div>
+
+      <div class="ml-6">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name="order" class="accent-red-800">
+          Ascending
+        </label>
+        <label class="flex items-center gap-2 text-sm mt-1">
+          <input type="radio" name="order" class="accent-red-800">
+          Descending
+        </label>
+      </div>
+    </div>
+
+    <hr class="mb-4" />
+
+    <!-- Course -->
+    <p class="text-sm text-gray-500 mb-2">Course</p>
+    <div class="grid grid-cols-6 gap-3 mb-4 text-sm">
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSIT</label>
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSECE</label>
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSBA - HRM</label>
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSED - ENG</label>
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSOA</label>
+      <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> BSPSYCH</label>
+    </div>
+
+    <hr class="mb-4" />
+
+    <!-- Year & Section -->
+    <div class="flex gap-20 mb-6">
+      <div>
+        <p class="text-sm text-gray-500 mb-2">Year</p>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 1st Year</label>
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 2nd Year</label>
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 3rd Year</label>
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 4th Year</label>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-500 mb-2">Section</p>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 1</label>
+          <label class="flex items-center gap-2"><input type="radio" class="accent-red-800"> 2</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-between items-center">
+      <button
+        id="closeFilter"
+        class="text-sm text-red-700 hover:underline"
+      >
+        Clear
+      </button>
+
+      <button
+        class="bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm"
+      >
+        Save
+      </button>
+    </div>
+
+  </div>
+</div>
+
 
   </div>
 </div>
 
 
   <!-- Clear -->
-  <button class="h-10 px-4 text-red-600 text-sm rounded-r-full hover:bg-red-50">
+  <button
+    id="clearFilters"
+   class="h-10 px-4 text-red-600 text-sm rounded-r-full hover:bg-red-50">
     Clear
   </button>
 
@@ -176,25 +294,47 @@
   </div>
 </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-      <div class="bg-[#8B0000] text-white rounded-xl p-4">
-        <p class="text-sm opacity-80">Scheduled</p>
-        <h3 class="text-3xl font-bold">5</h3>
-      </div>
-      <div class="bg-[#8B0000] text-white rounded-xl p-4">
-        <p class="text-sm opacity-80">Completed</p>
-        <h3 class="text-3xl font-bold">10</h3>
-      </div>
-      <div class="bg-[#8B0000] text-white rounded-xl p-4">
-        <p class="text-sm opacity-80">Cancelled</p>
-        <h3 class="text-3xl font-bold">50</h3>
-      </div>
-    </div>
+   <!-- Filter Stats -->
+<div class="flex gap-4 relative z-10 mb-[-20px]">
+  <!-- Scheduled Today -->
+  <button
+    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
+           hover:bg-[#750000] transition-colors duration-200
+           focus:outline-none focus:ring-0"
+  >
+    <h3 class="text-3xl font-medium leading-none mb-2">5</h3>
+    <p class="text-sm opacity-90">Scheduled Today</p>
+  </button>
 
-    <p class="text-sm text-gray-500 mb-4">
-      Click to access patient information
+  <!-- Rescheduled -->
+  <button
+    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
+           hover:bg-[#750000] transition-colors duration-200
+           focus:outline-none focus:ring-0"
+  >
+    <h3 class="text-3xl font-medium leading-none mb-2">10</h3>
+    <p class="text-sm opacity-90">Rescheduled</p>
+  </button>
+
+  <!-- All -->
+  <button
+    class="bg-[#8B0000] text-white rounded-t-xl px-6 py-5 w-[220px] text-left
+           hover:bg-[#750000] transition-colors duration-200
+           focus:outline-none focus:ring-0"
+  >
+    <h3 class="text-3xl font-medium leading-none mb-2">50</h3>
+    <p class="text-sm opacity-90">All</p>
+  </button>
+</div>
+
+
+
+  <div class="bg-[#F5F5F5] rounded-xl px-6 pt-10 pb-6 shadow-sm">
+    <p class="text-[18px] text-[#333333] font-['Inter'] mb-4">
+      Click to Access Patient Information
     </p>
+
+
 
     <!-- Patient Rows -->
     <div class="space-y-4">
@@ -283,3 +423,34 @@
 
 </body>
 </html>
+
+<script>
+  const openFilter = document.getElementById("openFilter");
+  const closeFilter = document.getElementById("closeFilter");
+  const filterModal = document.getElementById("filterModal");
+
+  openFilter.addEventListener("click", () => {
+    filterModal.classList.remove("hidden");
+  });
+
+  closeFilter.addEventListener("click", () => {
+    filterModal.classList.add("hidden");
+  });
+
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      // Uncheck all radios & checkboxes
+      document.querySelectorAll(
+        '#filterModal input[type="radio"], #filterModal input[type="checkbox"]'
+      ).forEach(input => {
+        input.checked = false;
+      });
+
+      // Clear date & text inputs
+      document.querySelectorAll(
+        '#filterModal input[type="date"], #filterModal input[type="text"]'
+      ).forEach(input => {
+        input.value = "";
+      });
+    });
+  </script>
+
