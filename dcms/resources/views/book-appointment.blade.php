@@ -173,6 +173,10 @@
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </a>
+
+  <a href="{{ route('homepage') }}" class="flex items-center gap-2 bg-white text-red-700 px-3 py-1 rounded-lg hover:bg-gray-100 transition">
+    <span class="font-semibold text-sm">Back to Home</span>
+  </a>
 </div>
 
 <h1 class="text-4xl font-extrabold m-12 text-[#660000] text-center">
