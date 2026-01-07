@@ -71,10 +71,10 @@
 </div>
 
   <!-- NAVIGATION -->
-  <div class="bg-red text-[#F4F4F4] px-6">
+  <div class="bg-red-800 text-[#F4F4F4] px-6">
   <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
     
-    <a href="index.html"
+    <a href="{{ route('homepage') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -85,7 +85,7 @@
       Home
     </a>
 
-    <a href="appointment.html" 
+    <a href="{{ route('appointment') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -107,7 +107,7 @@
       Record
     </a>
 
-    <a href="aboutus.html"
+    <a href="{{ route('about.us') }}"
     class=   "font-bold
              relative pb-1
               after:absolute after:left-0 after:bottom-0
@@ -360,16 +360,16 @@
     <section class="text-center text-2xl mt-12">
       <h3 class="font-extrabold text-[#8B0000] mb-4">The Developers</h3>
       <div class="flex justify-center gap-6">
-        <img src="images/Althea Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
-        <img src="images/Grace Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
-        <img src="images/Hoshea Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
-        <img src="images/Rain Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Althea-Aragon.png" alt="Althea Aragon" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Grace-Lim.png" alt="Grace Lim" class="h-32 w-32 rounded-md border shadow-lg border-yellow-400 object-cover" />
+        <img src="images/Hoshea-Lopez.png" alt="Hoshea Lopez" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
+        <img src="images/Rain-Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
       </div>
     </section>
 
   </main>
 
-  <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
 
   <!-- ASIDE: CLINIC INFO -->
   <aside class="space-y-4">
@@ -377,11 +377,11 @@
       
       <!-- Logos -->
       <div class="w-12">
-        <img src="images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
       </div>
 
       <div class="w-12">
-        <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
       </div>
 
       <!-- Text -->
@@ -395,19 +395,19 @@
 
     <!-- Location -->
     <div class="flex items-start gap-3 text-sm">
-      <img src="images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
       <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
     <!-- Email -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-email.png" class="w-5 h-4" />
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
       <p>pupdental@pup.edu.ph</p>
     </div>
 
     <!-- Phone -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-phone.png" class="w-4 h-4" />
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
       <p>(02) 123-4567</p>
     </div>
   </aside>
@@ -417,6 +417,7 @@
     <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
     <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
   </nav>
 

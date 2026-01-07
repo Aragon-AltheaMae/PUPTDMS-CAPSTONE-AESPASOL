@@ -14,6 +14,10 @@
         type="text/css"
     />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
         theme: {
@@ -27,7 +31,10 @@
         };
     </script>
 
-    <style>
+  <style>
+      body {
+      font-family: 'Inter';
+    }
       /* Smooth underline animation */
       .tabs-bordered .tab {
         transition: color 0.5s ease, font-weight 0.5s ease;
@@ -45,10 +52,10 @@
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
   <div class="flex items-center gap-3">
     <div class="w-12 rounded-full ml-5">
-      <img src="images/PUP.png" alt="PUP Logo" />
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" />
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -57,14 +64,14 @@
     <div class="indicator">
       <span class="indicator-item badge bg-pupred text-[#F4F4F4] border-none">12</span>
       <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-        <img src="images/notifications.png" alt="Notification" />
+        <img src="{{ asset('images/notifications.png') }}" alt="Notification" />
       </button>
     </div>
     <div class="avatar">
       <div class="w-8 rounded-full bg-[#F4F4F4]"></div>
     </div>
     <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-      <img src="images/Log out.png" alt="Log Out" />
+      <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
     </button>
   </div>
 </div>
@@ -73,7 +80,7 @@
 <div class="bg-red-800 text-[#F4F4F4] px-6">
   <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
     
-    <a href="index.html"
+    <a href="{{ route('homepage') }}"
     class="relative pb-1
             after:absolute after:left-0 after:bottom-0
             after:h-[2px] after:w-full
@@ -107,7 +114,7 @@
       Record
     </a>
 
-    <a href="aboutus.html"
+    <a href="{{ route('about.us') }}"
     class="relative pb-1
             after:absolute after:left-0 after:bottom-0
             after:h-[2px] after:w-full
@@ -173,7 +180,7 @@
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-2xl font-bold text-pupred">My Appointments</h2>
     <button class="btn bg-red-400 hover:bg-red-500 text-[#F4F4F4]">
-      + Book Appointment
+      <a href="{{ route('book.appointment') }}">+ Book Appointment</a>
     </button>
   </div>
 
@@ -216,7 +223,7 @@
 </section>
 
 
-  <!-- ===== Services Offered ===== -->
+<!-- ===== Services Offered ===== -->
 <section class="max-w-6xl mx-auto mt-16">
     <h2 class="text-3xl font-bold text-pupred mb-6">
     Services Offered
@@ -224,77 +231,60 @@
 
     <!-- Container -->
     <div
-        class="grid md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]"
-    >
+        class="grid md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
 
         <!-- Oral Check-Up -->
         <div
-        class="relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60"
-        >
-        <h3 class="text-2xl font-bold mb-2">Oral Check-Up</h3>
-        <p class="text-sm  max-w-xs">
-            Routine oral examination • Dental consultation
-        </p>
+          class="relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
+          <h3 class="text-2xl font-bold mb-2">Oral Check-Up</h3>
+          <p class="text-sm  max-w-xs">
+              Routine oral examination • Dental consultation
+          </p>
 
-        <!-- Icon -->
-        <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-1 w-28" />
-            alt=""
-            class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
-        />
+          <!-- Icon -->
+          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+              alt="Oral Checkup" />
         </div>
 
         <!-- Dental Cleaning -->
-        <div
-        class="relative p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60"
-        >
-        <h3 class="text-2xl font-bold mb-2">Dental Cleaning</h3>
-        <p class="text-sm  max-w-xs">
-            Oral hygiene treatment • Removing surface buildup
-        </p>
+        <div class="relative p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
+          <h3 class="text-2xl font-bold mb-2">Dental Cleaning</h3>
+          <p class="text-sm  max-w-xs">
+              Oral hygiene treatment • Removing surface buildup
+          </p>
 
-        <!-- Icon -->
-          <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-1 w-28" />
-            alt=""
-            class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
-        />
+          <!-- Icon -->
+            <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+              alt="Dental Cleaning" />
         </div>
 
         <!-- Dental Restoration -->
-        <div
-        class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60"
-        >
-        <h3 class="text-2xl font-bold mb-2">
-            Dental Restoration & Prosthesis
-        </h3>
-        <p class="text-sm  max-w-xs">
-            Repairs/replaces damaged teeth • Fillings • Crowns • Inlay • etc.
-        </p>
+        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+          <h3 class="text-2xl font-bold mb-2">
+              Dental Restoration & Prosthesis
+          </h3>
+          <p class="text-sm  max-w-xs">
+              Repairs/replaces damaged teeth • Fillings • Crowns • Inlay • etc.
+          </p>
 
-        <!-- Icon -->
-        <img
-            src="images/restoration-prosthesis.png"
-            alt=""
-            class="absolute right-1 top-1/2 -translate-y-1/2 w-28"/>
+          <!-- Icon -->
+          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+              alt="Restoration & Prosthesis" />
         </div>
 
         <!-- Dental Surgery -->
-        <div class="relative p-10 text-[#F4F4F4]">
-        <h3 class="text-2xl font-bold mb-2">Dental Surgery</h3>
-        <p class="text-sm  max-w-xs">
-            Treating dental issues surgically • Extraction • Supernumerary • etc.
-        </p>
+        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+          <h3 class="text-2xl font-bold mb-2">Dental Surgery</h3>
+          <p class="text-sm  max-w-xs">
+              Treating dental issues surgically • Extraction • Supernumerary • etc.
+          </p>
 
-        <!-- Icon -->
-        <img
-            src="images/dental-surgery.png"
-            alt=""
-            class="absolute right-1 top-1/2 -translate-y-1/2 w-28 "
-        />
+          <!-- Icon -->
+          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+              alt="Dental Surgery" />
         </div>
-
     </div>
-    </section>
-
+</section>
 
 </main>
 
@@ -306,17 +296,17 @@
       
       <!-- Logos -->
       <div class="w-12">
-        <img src="/images/PUP.png" alt="PUP Logo" class="w-full h-auto" />
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
       </div>
 
       <div class="w-12">
-        <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" class="w-full h-auto" />
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
       </div>
 
       <!-- Text -->
       <div>
         <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-        <p class="text-sm [#F4F4F4]space-nowrap">
+        <p class="text-sm whitespace-nowrap">
           Polytechnic University of the Philippines – Taguig Campus
         </p>
       </div>
@@ -324,19 +314,19 @@
 
     <!-- Location -->
     <div class="flex items-start gap-3 text-sm">
-      <img src="images/footer-location.png" class="w-4 h-5 mt-0.5" />
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
       <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
     </div>
 
     <!-- Email -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-email.png" class="w-5 h-4" />
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
       <p>pupdental@pup.edu.ph</p>
     </div>
 
     <!-- Phone -->
     <div class="flex items-center gap-3 text-sm">
-      <img src="images/footer-phone.png" class="w-4 h-4" />
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
       <p>(02) 123-4567</p>
     </div>
   </aside>
@@ -346,6 +336,7 @@
     <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
     <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
     <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
   </nav>
 

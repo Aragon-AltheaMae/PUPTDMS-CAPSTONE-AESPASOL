@@ -14,18 +14,18 @@
         type="text/css"
     />
 
-    <script>
-        tailwind.config = {
-        theme: {
-            extend: {
-            colors: {
-                pupred: "#660000",
-                pupgold: "#FFD700",
-            },
-            },
-        },
-        };
-    </script>
+  <script>
+    tailwind.config = {
+      theme: {
+          extend: {
+          colors: {
+              pupred: "#660000",
+              pupgold: "#FFD700",
+          },
+          },
+      },
+      };
+  </script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">

@@ -6,9 +6,14 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+  <!-- Import Inter from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       background-color: #F4F4F4;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 
+                 "Helvetica Neue", Arial, sans-serif;
     }
 
     /* Primary color scheme */
@@ -41,17 +46,112 @@
       background-color: #eee;
       color: #999;
     }
+
+    /* STEPPER COLORS */
+    .step.step-primary::before {
+      background-color: #2563eb; /* Blue */
+    }
+
+    .step.step-success::before {
+      background-color: #16a34a; /* Green */
+    }
+
+    /* Blue color for the current step */
+    .step.in-progress-step::before {
+      background-color: #2563eb !important; /* Blue circle */
+    }
+
+    /* Blue text for the current step */
+    .step.in-progress-step {
+      color: #2563eb !important;
+    }
+
+    .step-card {
+    background-color: #ffffff;
+    border: 2px solid #8B0000;
+    border-radius: 1rem;
+    padding: 2rem;
+  }
+
+    .completed-text {
+    opacity: 0;
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .completed-text.show {
+    opacity: 1;
+  }
+
+  /* Fade-in for in-progress text */
+  .in-progress {
+    opacity: 0;
+    display: block;
+    margin-top: 0.25rem;
+    font-weight: 600;
+    color: #2563eb;
+    transition: opacity 0.5s ease-in-out;
+  }
+  .in-progress.show {
+    opacity: 1;
+  }
+
+  /* Fade-in animation for step content */
+  .step-content {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  .step-content.show {
+    opacity: 1;
+  }
+
+  #miniTab {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #miniTab.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .input-error {
+  border: 2px solid #d10101ff !important;
+  }
+
+  .input-valid {
+  border: 2px solid #16a34a !important; /* green */
+}
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+  }
+
+  .shake {
+    animation: shake 0.3s ease-in-out;
+  }
   </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
-  <div class="flex items-center gap-3">
-    <div class="w-12 ml-5"><img src="images/PUP.png" alt="PUP Logo"></div>
-    <div class="w-12"><img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo"></div>
+  <a href="{{ route('homepage') }}" class="flex items-center gap-3">
+    <div class="w-12 ml-5">
+      <img src="images/PUP.png" alt="PUP Logo">
+    </div>
+    <div class="w-12">
+      <img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo">
+    </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
-  </div>
+  </a>
 </div>
 
 <h1 class="text-4xl font-extrabold m-12 text-[#660000] text-center">
@@ -59,7 +159,7 @@
 </h1>
 
 <!-- MAIN FORM -->
-<div class="max-w-4xl mx-auto p-8 bg-white rounded-xl mt-10 shadow">
+<div class="max-w-4xl mx-auto p-8 bg-white rounded-xl mt-5 mb-5 shadow">
   <ul class="steps w-full mb-10">
     <li class="step" id="s1">Date & Time</li>
     <li class="step" id="s2">Service</li>
@@ -77,7 +177,7 @@
       Select Date and Time</h2>
 
       <label>Date</label>
-      <input type="text" id="datePicker" name="appointment_date" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
+      <input type="text" id="datePicker" class="input input-bordered w-full mb-4" placeholder="Select date" readonly>
       
       <label>Time Slot</label>
       <select name="appointment_time" id="timeSlot" required class="select select-bordered w-full">
@@ -93,77 +193,85 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- Card -->
-    <label class="cursor-pointer">
+    <!-- Card 1 -->
+    <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
       <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
-                  peer-checked:border-[#8B0000] peer-checked:bg-white
-                  hover:border-[#8B0000] transition">
+                  peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
+                  hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                  shadow-md hover:shadow-xl
+                  transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
-            🦷
+          <div class="w-20 h-20 bg-transparent flex items-center justify-center">
+            <img src="images/oral-checkup.png"/>
           </div>
-          <h3 class="font-bold text-[#660000]">Oral Check-Up</h3>
-          <p class="text-sm text-gray-600">
-            Routine oral examination & dental consultation
+          <h3 class="font-bold text-[#660000] text-current">Oral Check-Up</h3>
+          <p class="text-sm text-current">
+            Routine oral examination • Dental Consultation
           </p>
         </div>
       </div>
     </label>
 
-    <!-- Card -->
-    <label class="cursor-pointer">
+    <!-- Card 2 -->
+    <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
       <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
-                  peer-checked:border-[#8B0000] peer-checked:bg-white
-                  hover:border-[#8B0000] transition">
+                  peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
+                  hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                  shadow-md hover:shadow-xl
+                  transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
-            🦷
+          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+            <img src="images/dental-cleaning.png"/>
           </div>
-          <h3 class="font-bold text-[#660000]">Dental Cleaning</h3>
-          <p class="text-sm text-gray-600">
-            Oral hygiene treatment & plaque removal
+          <h3 class="font-bold text-[#660000] text-current">Dental Cleaning</h3>
+          <p class="text-sm text-current">
+            Oral hygiene treatment • Removing surface buildup
           </p>
         </div>
       </div>
     </label>
 
-    <!-- Card -->
-    <label class="cursor-pointer">
+    <!-- Card 3 -->
+    <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
       <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
-                  peer-checked:border-[#8B0000] peer-checked:bg-white
-                  hover:border-[#8B0000] transition">
+                  peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
+                  hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                  shadow-md hover:shadow-xl
+                  transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
-            <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
-            🦷
-            </div>
-            <h3 class="font-bold text-[#660000]">Restoration & Prosthesis</h3>
-            <p class="text-sm text-gray-600">
-            Fillings, crowns, bridges & repairs
-            </p>
+          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+            <img src="images/restoration-prosthesis.png"/>
           </div>
+          <h3 class="font-bold text-[#660000] text-current">Restoration & Prosthesis</h3>
+          <p class="text-sm text-current">
+           Repairs/replaces damaged teeth • Fillings • Crowns • Bridges
+          </p>
         </div>
-      </label>
+      </div>
+    </label>
 
-    <!-- Card -->
-    <label class="cursor-pointer">
+    <!-- Card 4 -->
+    <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
       <div class="bg-gray-100 rounded-xl p-6 border-2 border-transparent
-                  peer-checked:border-[#8B0000] peer-checked:bg-white
-                  hover:border-[#8B0000] transition">
+                  peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
+                  hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                  shadow-md hover:shadow-xl
+                  transition-all duration-200 ease-in">
         <div class="flex flex-col items-center text-center gap-3">
-            <div class="w-14 h-14 bg-[#8B0000]/10 rounded-full flex items-center justify-center">
-            🦷
-            </div>
-            <h3 class="font-bold text-[#660000]">Dental Surgery</h3>
-            <p class="text-sm text-gray-600">
-            Tooth extraction & surgical procedures
-            </p>
+          <div class="w-20 h-20 rounded-full flex items-center justify-center">
+            <img src="images/dental-surgery.png"/>
           </div>
+          <h3 class="font-bold text-[#660000] text-current">Dental Surgery</h3>
+          <p class="text-sm text-current">
+            Treating dental issues surgically • Extraction • Implants
+          </p>
         </div>
-      </label>
+      </div>
+    </label>
 
     </div>
   </div>
@@ -183,17 +291,23 @@
     <!-- BASIC INFO -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <div>
-        <label class="text-sm font-semibold block mb-1">Last Dental Visit</label>
+        <label class="text-sm font-semibold block mb-1">Last Dental Visit:</label>
         <div class="flex gap-2">
-          <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
-          <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
-          <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+          <input
+            type="text"
+            id="lastDentalVisit"
+            name="last_dental_visit"
+            class="input input-sm border-[#8B0000] w-60"
+            placeholder="Select date"
+            readonly
+            required
+          >
         </div>
       </div>
 
       <div>
-        <label class="text-sm font-semibold block mb-1">Previous Dentist Dr.</label>
-        <input type="text" class="input input-bordered w-full" placeholder="Name">
+        <label class="text-sm font-semibold block mb-1">Previous Dentist: Dr.</label>
+        <input type="text" class="input input-sm border-[#8B0000] w-full" max-length="50" placeholder="Name">
       </div>
     </div>
 
@@ -208,11 +322,11 @@
     <!-- QUESTIONS -->
     <div class="space-y-3 text-sm">
 
-      <!-- REUSABLE ROW -->
+      <!-- REUSABLE FORMAT -->
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Do your gums bleed while brushing/flossing?</span>
         <input type="radio" name="bleeding_gums" value="Yes"
-          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="bleeding_gums" value="No"
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
@@ -220,15 +334,15 @@
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Are your teeth sensitive to hot or cold?</span>
         <input type="radio" name="sensitive_temp" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="sensitive_temp" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Are your teeth sensitive to sweets or sour?</span>
         <input type="radio" name="sensitive_taste" value="Yes"
-          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="sensitive_taste" value="No"
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
@@ -236,15 +350,15 @@
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Do you feel any pain in your teeth?</span>
         <input type="radio" name="tooth_pain" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="tooth_pain" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Do you have any sores/lumps in or near your mouth?</span>
         <input type="radio" name="sores" value="Yes"
-          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="sores" value="No"
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
@@ -252,7 +366,7 @@
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Have you had any head,neck, or jaw injuries?</span>
         <input type="radio" name="injuries" value="Yes"
-          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="injuries" value="No"
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
@@ -269,154 +383,169 @@
     <div class="space-y-3 text-sm">
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Clicking</span>
-        <input type="radio" name="clicking" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="clicking" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="click" value="Yes" 
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="click" value="No"  
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Pain (joint, side of the face)</span>
-        <input type="radio" name="joint_pain" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-        <input type="radio" name="joint_pain" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        <input type="radio" name="joint" value="Yes" 
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="joint" value="No"  
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in opening/closing</span>
         <input type="radio" name="difficulty_moving" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="difficulty_moving" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Difficulty in chewing</span>
         <input type="radio" name="difficulty_chewing" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="difficulty_chewing" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Frequent headaches</span>
         <input type="radio" name="headaches" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="headaches" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Do you clench or grind your teeth?</span>
         <input type="radio" name="clench_grind" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="clench_grind" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Frequent lips/cheek biting</span>
         <input type="radio" name="biting" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="biting" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Have you noticed loosening your teeth?</span>
         <input type="radio" name="teeth_loosening" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="teeth_loosening" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Does food get caught between your teeth?</span>
         <input type="radio" name="food_teeth" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="food_teeth" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Have you ever had reaction to any kind of medicine or dental anesthetic?</span>
         <input type="radio" name="med_reaction" value="Yes" 
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="med_reaction" value="No"  
-        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
     </div>
 
     <p class="text-xs text-[#8B0000] mt-3 mb-6 italic"> 
-    <span class="font-bold">If YES, please provide details during consultation.</span>
+    <span class="text-xs italic text-[#8B0000]">If <b>YES</b>, please provide details during consultation.</span>
     </p>
 
     <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
       <span class="text-sm">Have you had any periodontal (gum) treatment?</span>
       <input type="radio" name="periodontal" value="Yes"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
       <input type="radio" name="periodontal" value="No"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
     </div>
 
     <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
       <span class="text-sm">Have you had a difficult tooth extraction?</span>
       <input type="radio" name="difficult_extraction" value="Yes"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
       <input type="radio" name="difficult_extraction" value="No"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
     </div>
 
 <!-- DATE BOX - only shows if YES -->
   <div class="mt-2 ml-8 hidden" id="extraction_date_box">
-    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">Date of extraction</label>
+    <label class="text-xs italic text-[#8B0000]">Date of extraction:</label>
     <div class="flex gap-2">
-      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    <input
+      type="text"
+      id="extractionDate"
+      name="extraction_date"
+      class="input input-sm border-[#8B0000] w-60"
+      placeholder="Select date"
+      readonly
+    >
     </div>
   </div>
 
     <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
       <span class="text-sm">Have you had prolonged bleeding following tooth extractions before?</span>
       <input type="radio" name="prolonged_bleeding" value="Yes"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
       <input type="radio" name="prolonged_bleeding" value="No"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
     </div>
 
     <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
       <span class="text-sm">Do you wear complete or partial dentures?</span>
       <input type="radio" name="dentures" value="Yes"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
       <input type="radio" name="dentures" value="No"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
     </div>
 
     <div class="mt-2 ml-8 hidden" id="dentures_date_box">
-    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">If yes, date of placement:</label>
+    <label class="text-xs italic text-[#8B0000]">If yes, date of placement:</label>
     <div class="flex gap-2">
-      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    <input
+      type="text"
+      id="denturesDate"
+      name="dentures_date"
+      class="input input-sm border-[#8B0000] w-60"
+      placeholder="Select date"
+      readonly
+    >
     </div>
   </div>
 
     <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
       <span class="text-sm">Have you had orthodontic treatment?</span>
       <input type="radio" name="ortho_treatment" value="Yes"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
       <input type="radio" name="ortho_treatment" value="No"
-      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
     </div>
 
     <div class="mt-2 ml-8 hidden" id="ortho_date_box">
-    <label class="text-xs font-semibold text-[#8B0000] mt-2 mb-6 italic">If yes, date of completion:</label>
+    <label class="text-xs italic text-[#8B0000]">If yes, date of completion:</label>
     <div class="flex gap-2">
-      <input type="text" placeholder="DD" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="MM" class="input input-bordered w-16 text-center">
-      <input type="text" placeholder="YYYY" class="input input-bordered w-24 text-center">
+    <input
+      type="text"
+      id="orthoDate"
+      name="ortho_date"
+      class="input input-sm border-[#8B0000] w-60"
+      placeholder="Select date"
+      readonly
+    >
     </div>
   </div>
 
@@ -430,8 +559,8 @@
   <textarea 
     name="additional_concerns" 
     id="additional_concerns" 
+    class="w-full border-[#8B0000] rounded-md p-2 text-sm resize-none"
     placeholder="Write any additional concerns here..." 
-    class="w-full border border-gray-200 rounded-md p-2 text-sm resize-y"
     rows="4">
   </textarea>
 
@@ -439,56 +568,485 @@
 </div><!-- END step-content -->
 
     <!-- STEP 4 -->
-    <div class="step-content hidden">
-    <h2 class="font-semibold mb-2 text-[#660000] ">Medical History</h2>
+<div class="step-content hidden">
+  <div class="bg-[#e6e6e6] rounded-xl p-8">
 
-    <!-- Medical History -->
-    <label><input type="checkbox" name="hypertension" value="1"> Hypertension</label><br>
-    <label><input type="checkbox" name="diabetes" value="1"> Diabetes</label><br>
-    <label><input type="checkbox" name="heart_condition" value="1"> Heart Condition</label>
+    <!-- TITLE -->
+    <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Medical History</h2>
+    <hr class="border-[#8B0000] border-2 w-full mb-4">
 
-    <hr class="my-4">
+    <p class="text-sm text-gray-600 mb-6">
+      Provide important medical information to help the dentist ensure safe and proper care.
+    </p>
 
-    <label><input type="checkbox" name="allergy" value="1"> Allergies</label><br>
-    <label><input type="checkbox" name="pregnant"> Pregnant</label><br>
-    <label><input type="checkbox" name="nursing"> Nursing</label><br>
-    <label><input type="checkbox" name="birth_control"> Taking Birth Control Pills</label>
+    <!-- YES / NO HEADER -->
+    <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
+      <span>Please indicate <b>YES</b> or <b>NO</b>:</span>
+      <span class="text-center">YES</span>
+      <span class="text-center">NO</span>
+    </div>
 
-    <hr class="my-4">
+    <!-- QUESTIONS -->
+    <div class="space-y-4 text-sm">
 
-    <!-- Emergency Contact -->
-    <h2 class="font-semibold text-[#660000] mb-2">Emergency Contact</h2>
-    <label>Person to contact</label>
-    <input type="text" name="emergency_person" maxlength="50" required class="input input-bordered w-full mb-2">
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Are you in good health?</span>
+        <input type="radio" name="good_health" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="good_health" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
 
-    <label>Contact Number</label>
-    <input type="text" name="emergency_number" maxlength="15" required class="input input-bordered w-full mb-2">
+      <div class="ml-8 hidden" id="good_health_box">
+        <label class="text-xs italic text-[#8B0000]">If NO, please provide details:</label>
+        <input 
+          type="text" 
+          name="good_health_details" 
+          class="input input-sm border-[#8B0000] w-full" 
+          placeholder="Input here"
+      >
+      </div>
 
-    <label>Relation to Patient</label>
-    <input type="text" name="emergency_relation" maxlength="30" required class="input input-bordered w-full mb-2">
+      <div>
+        <label class="text-sm font-semibold block mt-4 mb-1">
+          When was your last medical examination?
+        </label>
+        <input 
+          type="text" 
+          id="medicalExamDate" 
+          name="medical_exam_date"
+          class="input input-sm border-[#8B0000] w-60" 
+          placeholder="Select date" 
+          readonly
+        >
+      </div>
 
-    <label>Patient's Signature</label>
-    <input type="file" name="patient_signature" accept="image/*" required class="input input-bordered w-full mb-2">
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
+        <span>Are you currently receiving treatment for any illness?</span>
+        <input type="radio" name="under_treatment" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="under_treatment" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="ml-8 hidden" id="treatment_box">
+        <label class="text-xs italic text-[#8B0000]">If YES, please specify:</label>
+        <input 
+          type="text" 
+          name="treatment_details" 
+          class="input input-sm border-[#8B0000] w-full"
+          placeholder="Input here"
+        >
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
+        <span>Have you ever been hospitalized?</span>
+        <input type="radio" name="hospitalized" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="hospitalized" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="ml-8 hidden" id="hospital_box">
+        <label class="text-xs italic text-[#8B0000]">If YES, please provide details:</label>
+        <input 
+          type="text" 
+          name="hospital_details" 
+          class="input input-sm border-[#8B0000] w-full" 
+          placeholder="Input here"
+        >
+      </div>
 
     </div>
 
-    <!-- STEP 5 -->
-    <div class="step-content hidden">
-    <h2 class="text-xl font-bold mb-4">Confirmation Summary</h2>
+    <hr class="border-[#8B0000] border-2 my-8">
+    <p class="font-semibold mb-3 text-sm">Are you allergic to any of the following?</p>
+
+    <div class="space-y-3 text-sm">
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Medicines</span>
+        <input type="radio" name="allergy_medicine" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="allergy_medicine" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+        <span>Food</span>
+        <input type="radio" name="allergy_food" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto"required>
+        <input type="radio" name="allergy_food" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <div class="ml-8">
+        <label class="text-xs italic text-[#8B0000]">Others (please specify):</label>
+        <input 
+          type="text" 
+          name="allergy_others" 
+          class="input input-sm border-[#8B0000] w-60"
+          placeholder="Input here"
+        >
+      </div>
+    </div>
+
+    <!-- MEDICATION -->
+    <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 text-sm mt-4">
+      <span>Are you taking any prescription or non-prescription medication?</span>
+      <input type="radio" name="medication" value="Yes"
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto"required>
+      <input type="radio" name="medication" value="No"
+        class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+    </div>
+
+    <div class="ml-8 hidden" id="medication_box">
+      <label class="text-xs italic text-[#8B0000]">If YES, please specify:</label>
+      <input 
+        type="text" 
+        name="medication_details" 
+        class="input input-sm border-[#8B0000] w-full"
+        placeholder="Input here" 
+      >
+    </div>
+
+    <hr class="border-[#8B0000] border-2 my-8">
+<p class="text-sm font-bold text-[#8B0000] mb-4">
+  For WOMEN only:
+</p>
+
+<div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
+  <span></span>
+  <span class="text-center">YES</span>
+  <span class="text-center">NO</span>
+</div>
+
+<div class="space-y-3 text-sm">
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Are you pregnant?</span>
+    <input type="radio" name="pregnant" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="pregnant" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Are you nursing?</span>
+    <input type="radio" name="nursing" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="nursing" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Are you taking birth control pills?</span>
+    <input type="radio" name="birth_control" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="birth_control" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+</div>
+
+<!-- MEDICAL CONDITIONS -->
+<hr class="border-[#8B0000] border-2 my-8">
+<p class="text-sm font-semibold mb-4">
+  Please indicate below if you presently have or have ever had any of the following:
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-10 text-sm">
+
+  <!-- LEFT COLUMN -->
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="AIDS/HIV" class="checkbox checkbox-sm border-[#8B0000]">
+    AIDS / HIV
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Fainting/Dizzy Spells" class="checkbox checkbox-sm border-[#8B0000]">
+    Fainting / Dizzy Spells
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Alcohol or Chemical Dependency" class="checkbox checkbox-sm border-[#8B0000]">
+    Alcohol or Chemical Dependency
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="High/Low Blood Pressure" class="checkbox checkbox-sm border-[#8B0000]">
+    High / Low Blood Pressure
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Arthritis/Rheumatism" class="checkbox checkbox-sm border-[#8B0000]">
+    Arthritis / Rheumatism
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Hyper/Hypoglycemia" class="checkbox checkbox-sm border-[#8B0000]">
+    Hyper / Hypoglycemia
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Artificial Joints or Valves" class="checkbox checkbox-sm border-[#8B0000]">
+    Artificial Joints or Valves
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Kidney Disease" class="checkbox checkbox-sm border-[#8B0000]">
+    Kidney Disease
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Asthma" class="checkbox checkbox-sm border-[#8B0000]">
+    Asthma
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Liver Disease" class="checkbox checkbox-sm border-[#8B0000]">
+    Liver Disease (Hepatitis / Jaundice)
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Blood Transfusion" class="checkbox checkbox-sm border-[#8B0000]">
+    Blood Transfusion
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Mental/Nervous Disorder" class="checkbox checkbox-sm border-[#8B0000]">
+    Mental / Nervous Disorder
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Cancer/Radiotherapy/Chemotherapy" class="checkbox checkbox-sm border-[#8B0000]">
+    Cancer / Radiotherapy / Chemotherapy
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Stomach Ulcers" class="checkbox checkbox-sm border-[#8B0000]">
+    Stomach Ulcers
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Diabetes" class="checkbox checkbox-sm border-[#8B0000]">
+    Diabetes
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Stroke" class="checkbox checkbox-sm border-[#8B0000]">
+    Stroke
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Eating Disorders" class="checkbox checkbox-sm border-[#8B0000]">
+    Eating Disorders
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Tuberculosis" class="checkbox checkbox-sm border-[#8B0000]">
+    Tuberculosis
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Epilepsy/Seizures" class="checkbox checkbox-sm border-[#8B0000]">
+    Epilepsy / Seizures
+  </label>
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" name="conditions[]" value="Venereal/Communicable Disease" class="checkbox checkbox-sm border-[#8B0000]">
+    Venereal / Communicable Disease
+  </label>
+</div>
+
+<hr class="border-[#8B0000] border-2 my-8">
+
+<div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
+  <span>Do use tobacco products or any derivatives?</span>
+  <span class="text-center">YES</span>
+  <span class="text-center">NO</span>
+</div>
+
+<div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4 text-sm">
+  <span></span>
+  <input type="radio" name="tobacco_use" value="Yes" 
+  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+  <input type="radio" name="tobacco_use" value="No"
+  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+</div>
+
+<div id="tobacco_details" class="ml-4 space-y-2 hidden text-sm">
+  <div class="flex items-center gap-2">
+    <span class="text-xs italic text-[#8B0000]">If yes, how much per day:</span>
+    <input type="text" name="tobacco_per_day" placeholder="Input here"
+      class="input input-sm border-[#8B0000] w-40">
+  </div>
+
+  <div class="flex items-center gap-2">
+    <span class="text-xs italic text-[#8B0000]">per week:</span>
+    <input type="text" name="tobacco_per_week" placeholder="Input here"
+      class="input input-sm border-[#8B0000] w-40">
+  </div>
+</div>
+
+<hr class="border-[#8B0000] border-2 my-8">
+
+<p class="text-sm font-semibold mb-4">Do you suffer from:</p>
+
+<div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
+  <span></span>
+  <span class="text-center">YES</span>
+  <span class="text-center">NO</span>
+</div>
+
+<div class="space-y-3 text-sm">
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Headaches</span>
+    <input type="radio" name="headaches" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="headaches" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Earaches</span>
+    <input type="radio" name="earaches" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="earaches" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+
+  <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
+    <span>Neck aches</span>
+    <input type="radio" name="neck_aches" value="Yes"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+    <input type="radio" name="neck_aches" value="No"
+      class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+  </div>
+</div>
+
+<!-- EMERGENCY CONTACT -->
+<hr class="border-[#8B0000] border-2 my-8">
+<p class="text-sm font-bold text-[#8B0000] mb-6">
+  Emergency Contact
+</p>
+
+<div class="space-y-4 text-sm">
+
+  <!-- NAME -->
+  <div class="flex items-center gap-4">
+    <label class="w-64">Person to contact in case of emergency:</label>
+    <input
+      type="text"
+      name="emergency_name"
+      maxlength="50"
+      class="input input-sm border-[#8B0000] w-80"
+      placeholder="Name"
+      required
+    >
+  </div>
+
+  <!-- CONTACT NUMBER -->
+  <div class="flex items-center gap-4">
+    <label class="w-64">Contact Number:</label>
+    <input
+      type="tel"
+      id="emergency_contact"
+      name="emergency_contact"
+      maxlength="11"
+      class="input input-sm border-[#8B0000] w-80 transition-all"
+      placeholder="09XXXXXXXXX"
+      required
+    >
+  </div>
+
+  <!-- RELATION -->
+  <div class="flex items-center gap-4 relative">
+  <label class="w-64" for="emergency_relation">Relation to Patient:</label>
+  <div class="relative w-80">
+    <select
+      id="emergency_relation"
+      name="emergency_relation"
+      class="input input-sm border-[#8B0000] w-full appearance-none pr-8"
+      required
+    >
+      <option value="" disabled selected>Select relation</option>
+      <option value="Mother">Mother</option>
+      <option value="Father">Father</option>
+      <option value="Guardian">Guardian</option>
+      <option value="Spouse">Spouse</option>
+    </select>
+    <!-- Downward arrow -->
+    <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+  <!-- SIGNATURE -->
+  <div class="flex items-start gap-4">
+    <label class="w-64 pt-2">Patient's Signature:</label>
+
+    <div class="border-2 border-dashed border-gray-400 rounded-md p-4 w-72 text-center text-xs space-y-2">
+
+      <p>Select your file or drag and drop</p>
+      <p class="text-gray-500">JPG, PNG or PDF, up to 25 MB</p>
+
+      <label
+        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#8B0000] text-white text-xs 
+              rounded cursor-pointer hover:bg-[#6f0000]">
+        <span>Browse</span>
+
+        <input
+          type="file"
+          name="patient_signature"
+          id="patient_signature"
+          class="hidden"
+          accept=".jpg,.jpeg,.png,.pdf"
+          required
+        >
+      </label>
+
+      <p id="signature_filename" class="text-gray-600 text-xs truncate hidden"></p>
+
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  <!-- STEP 5 -->
+<div class="step-content hidden">
+  <div class="rounded-xl p-8">
+
+    <!-- TITLE -->
+    <h2 class="text-xl font-bold mb-2 text-[#660000]">
+      Confirmation Summary
+    </h2>
 
     <div id="summaryBox" class="bg-[#F4F4F4] p-4 rounded mb-4"></div>
-    <label class="block mt-3">
-        <input type="checkbox" required> I confirm all information is correct
+
+    <label class="flex items-center gap-2 mt-3 cursor-pointer">
+      <input type="checkbox" required class="checkbox checkbox-sm border-[#8B0000]">
+      <span class="text-sm text-[#660000]">I confirm all information is correct.</span>
     </label>
-    </div>
 
-    <div class="flex justify-between mt-8">
-      <button type="button" class="btn" id="prevBtn">Previous</button>
-      <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
-      <button type="submit" class="btn btn-success hidden" id="submitBtn">Submit</button>
-    </div>
+  </div>
+</div>
 
-  </form>
+<!-- MINI TAB WARNING -->
+<div id="miniTab" 
+  class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-md text-sm z-50">
+  Please complete all required fields before proceeding.
+</div>
+
+<!-- NAVIGATION BUTTONS -->
+<div class="flex justify-between mt-8">
+  <button type="button" class="btn" id="prevBtn">Previous</button>
+  <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+  <button type="submit" class="btn btn-success hidden" id="submitBtn">Submit</button>
 </div>
 
 <!-- CONFIRMATION MODAL -->
@@ -504,6 +1062,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
+
+const miniTab = document.getElementById("miniTab");
+
 /* -------- Data -------- */
 const holidays = ["2026-01-01","2026-04-09"];
 const allSlots = [
@@ -534,6 +1095,26 @@ const picker = new Pikaday({
   }
 });
 
+function initMiniDatePicker(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  new Pikaday({
+    field: el,
+    format: 'YYYY-MM-DD',        
+    maxDate: new Date(),          
+    yearRange: [1950, new Date().getFullYear()],
+    showMonthAfterYear: true,
+    firstDay: 1,                  
+  });
+}
+
+initMiniDatePicker('lastDentalVisit');
+initMiniDatePicker('extractionDate');
+initMiniDatePicker('denturesDate');
+initMiniDatePicker('orthoDate');
+initMiniDatePicker('medicalExamDate');
+
 /* -------- Load 5 slots per date -------- */
 function loadTimeSlots(date) {
   timeSlot.innerHTML = '<option value="">Select time</option>';
@@ -560,60 +1141,166 @@ const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const submitBtn = document.getElementById("submitBtn");
 
+let completedSteps = [];
+
 // Initialize stepper on page load
 showStep(step);
-
 function showStep(i) {
-  // Show the current step content
-  steps.forEach((s, idx) => s.classList.toggle("hidden", idx !== i));
-
-  indicators.forEach((ind, idx) => {
-    // Remove previous in-progress text
-    const existing = ind.querySelector(".in-progress");
-    if (existing) existing.remove();
-
-    // Remove previous checkmark icon
-    const iconExisting = ind.querySelector(".check-icon");
-    if (iconExisting) iconExisting.remove();
-
-    if(idx < i) {
-      // Completed steps → green checkmark
-      ind.classList.add("step-success");
-      const check = document.createElement("span");
-      check.className = "check-icon text-green-600 ml-1";
-      check.innerHTML = '<img src="images/check-icon.png" class="check-icon w-5 h-5 mx-auto" alt="Check">'; // ✓ symbol
-      ind.appendChild(check);
+  // Show step content
+  steps.forEach((s, idx) => {
+    s.classList.toggle("hidden", idx !== i);
+    if(idx === i){
+      s.classList.add("show");
     } else {
-      ind.classList.remove("step-success");
-    }
-
-    if(idx === i) {
-      // Current step → "In Progress" text
-      const span = document.createElement("span");
-      span.className = "in-progress text-sm text-gray-500 block mt-1";
-      span.textContent = "In Progress";
-      ind.appendChild(span);
+      s.classList.remove("show");
     }
   });
 
-  // Show/hide buttons
+  indicators.forEach((ind, idx) => {
+    // Remove old in-progress text
+    ind.querySelectorAll(".in-progress").forEach(el => el.remove());
+
+    // Remove completed text if step is not completed
+    if(idx >= i) {
+      const completedText = ind.querySelector(".completed-text");
+      if(completedText) completedText.remove();
+    }
+
+    // Reset styles
+    ind.classList.remove("step-success", "step-primary", "in-progress-step");
+    ind.style.color = "";
+    ind.style.fontWeight = "";
+
+    if(idx < i && completedSteps.includes(idx)){
+      // Completed → green, bold
+      ind.classList.add("step-success");
+      ind.style.color = "#16a34a";
+      ind.style.fontWeight = "700";
+
+      if(!ind.querySelector(".completed-text")){
+        const completedText = document.createElement("span");
+        completedText.className = "completed-text";
+        completedText.textContent = "Completed";
+        ind.appendChild(completedText);
+        setTimeout(() => completedText.classList.add("show"), 50);
+      }
+    }
+
+    if(idx === i){
+      // Current → blue, bold
+      ind.classList.add("step-primary", "in-progress-step");
+      ind.style.color = "#2563eb";
+      ind.style.fontWeight = "700";
+
+      const span = document.createElement("span");
+      span.className = "in-progress";
+      span.textContent = "In Progress";
+      ind.appendChild(span);
+      setTimeout(() => span.classList.add("show"), 50); // fade-in animation
+    }
+  });
+
   prevBtn.style.display = i === 0 ? "none" : "inline-flex";
   nextBtn.style.display = i === steps.length - 1 ? "none" : "inline-flex";
   submitBtn.style.display = i === steps.length - 1 ? "inline-flex" : "none";
 
-  if(i===4) buildSummary();
+  if(i === steps.length - 1) buildSummary();
+
+  // Scroll to top of form with fade
+  document.querySelector(".max-w-4xl").scrollIntoView({ behavior: "smooth" });
+}
+
+// CHECKER //
+function isStepComplete(currentStep) {
+  const stepEl = steps[currentStep];
+
+  // Required fields check
+  const inputs = stepEl.querySelectorAll(
+    "input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]"
+  );
+
+  for (const input of inputs) {
+    if (!input.value.trim()) return false;
+  }
+
+  // Emergency Contact validation
+  const contactInput = stepEl.querySelector("#emergency_contact");
+  if (contactInput) {
+    const value = contactInput.value.trim();
+    if (!/^\d{1,11}$/.test(value)) {
+      showMiniTab("Emergency Contact must be 1–11 digits only!");
+      contactInput.focus();
+      return false;
+    }
+  }
+
+  // Radio validation
+  const radios = stepEl.querySelectorAll("input[type='radio']");
+  if (radios.length) {
+    const groups = [...new Set([...radios].map(r => r.name))];
+    for (const name of groups) {
+      if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
+    }
+  }
+
+  return true;
+}
+
+
+function showMiniTab(message) {
+  miniTab.textContent = message;
+  miniTab.classList.remove("hidden");
+  miniTab.classList.add("show");
+
+  setTimeout(() => {
+    miniTab.classList.add("hidden");
+    miniTab.classList.remove("show");
+  }, 3000);
+}
+
+function showInputError(input) {
+  input.classList.add("input-error", "shake");
+  setTimeout(() => input.classList.remove("shake"), 300);
 }
 
 // Next button
 nextBtn.onclick = () => {
-  if(step === 0) {
-    const date = document.getElementById("datePicker").value;
-    const time = timeSlot.value;
-    if(!date || !time) { alert("Please select both a date and a time slot."); return; }
+  if (!isStepComplete(step)) {
+    // Show mini tab notification
+    miniTab.classList.remove("hidden");
+    miniTab.classList.add("show");
+
+    // Hide after 3 seconds
+    setTimeout(() => {
+      miniTab.classList.add("hidden");
+      miniTab.classList.remove("show");
+    }, 3000);
+
+    const firstEmpty = steps[step].querySelector("input[required]:invalid, select[required]:invalid, textarea[required]:invalid");
+    if (firstEmpty) {
+      firstEmpty.focus();
+      return;
+    }
+
+    // For radios, focus first unanswered group
+    if (step === 3) {
+      const radios = steps[step].querySelectorAll("input[type='radio']");
+      const groups = [...new Set([...radios].map(r => r.name))];
+      for (let name of groups) {
+        if (!steps[step].querySelector(`input[name="${name}"]:checked`)) {
+          // Focus first radio in that group
+          const firstRadio = steps[step].querySelector(`input[name="${name}"]`);
+          if (firstRadio) firstRadio.focus();
+          break;
+        }
+      }
+    }
+
+    return; 
   }
 
-  const invalidField = steps[step].querySelector(":invalid");
-  if(invalidField) { invalidField.focus(); return; }
+  // Mark current step as completed
+  if (!completedSteps.includes(step)) completedSteps.push(step);
 
   step++;
   showStep(step);
@@ -621,58 +1308,94 @@ nextBtn.onclick = () => {
 
 // Previous button
 prevBtn.onclick = () => {
-  step--;
+  if(step > 0) step--;
   showStep(step);
 };
 
 /* -------- Build Summary (Polished) -------- */
-function buildSummary() {
-  const data = new FormData(document.getElementById("appointmentForm"));
-  const grouped = {};
+function yn(val) {
+  return val ? val : "N/A";
+}
 
-  for(let [k,v] of data.entries()) {
-    if(grouped[k]) grouped[k].push(v);
-    else grouped[k] = [v];
-  }
+function buildSummary() {
+  const form = document.getElementById("appointmentForm");
+  const data = new FormData(form);
 
   const date = document.getElementById("datePicker").value;
-  const time = timeSlot.value;
+  const time = document.getElementById("timeSlot").value;
+
+  const get = name => data.get(name) || "N/A";
+  const getAll = name => data.getAll(name);
+
+  const signatureFile = data.get("patient_signature");
+  let signatureHTML = "Not uploaded";
+
+  if (signatureFile && signatureFile.size > 0) {
+    // Create a temporary URL for the uploaded image file
+    const imageUrl = URL.createObjectURL(signatureFile);
+    signatureHTML = `<img src="${imageUrl}" alt="Signature" style="max-width: 250px; max-height: 150px; border: 1px solid #8B0000; border-radius: 8px;">`;
+  }
+
+  const card = (title, body) => `
+    <div class="border-2 border-[#8B0000] rounded-xl p-4 bg-white">
+      <h3 class="font-bold text-[#8B0000] mb-3">${title}</h3>
+      <div class="space-y-1 text-sm">${body}</div>
+    </div>
+  `;
 
   let html = `
-    <h3 class="font-semibold mb-2">Appointment Details</h3>
-    <p><strong>Date:</strong> ${date}</p>
-    <p><strong>Time:</strong> ${time}</p>
-    
-    <h3 class="font-semibold mt-4 mb-2">Service</h3>
-    <p>${grouped['service_type'] ? grouped['service_type'].join(", ") : "N/A"}</p>
-    
-    <h3 class="font-semibold mt-4 mb-2">Dental History</h3>
-    <p>${grouped['dental_history[]'] ? grouped['dental_history[]'].join(", ") : "None"}</p>
-    ${grouped['additional_concern'] ? `<p><strong>Additional Concern:</strong> ${grouped['additional_concern'].join(", ")}</p>` : ""}
+    <div class="space-y-6">
 
-    <h3 class="font-semibold mt-4 mb-2">Medical History</h3>
-    <p>
-    ${
-      [
-        grouped['hypertension'],
-        grouped['diabetes'],
-        grouped['heart_condition'],
-        grouped['allergy'],
-        grouped['pregnant'],
-        grouped['nursing'],
-        grouped['birth_control'],
-      ]
-      .filter(Boolean)
-      .map(arr => arr.join(", "))
-      .join(", ") || "None"
-    }
-  </p>
+      ${card("Appointment Details", `
+        <p><b>Date:</b> ${date}</p>
+        <p><b>Time:</b> ${time}</p>
+      `)}
 
-    <h3 class="font-semibold mt-4 mb-2">Emergency Contact</h3>
-    <p><strong>Person to contact:</strong> ${grouped['emergency_person'] ? grouped['emergency_person'].join(", ") : ""}</p>
-    <p><strong>Contact Number:</strong> ${grouped['emergency_number'] ? grouped['emergency_number'].join(", ") : ""}</p>
-    <p><strong>Relation to Patient:</strong> ${grouped['emergency_relation'] ? grouped['emergency_relation'].join(", ") : ""}</p>
-    <p><strong>Patient's Signature:</strong> ${grouped['patient_signature'] ? grouped['patient_signature'].join(", ") : ""}</p>
+      ${card("Service", `
+        <p>${get("service_type")}</p>
+      `)}
+
+      ${card("Dental History", `
+        <p><b>Last Dental Visit:</b> ${get("last_dental_visit")}</p>
+        <p><b>Bleeding Gums:</b> ${get("bleeding_gums")}</p>
+        <p><b>Sensitive to Hot/Cold:</b> ${get("sensitive_temp")}</p>
+        <p><b>Sensitive to Sweets:</b> ${get("sensitive_taste")}</p>
+        <p><b>Tooth Pain:</b> ${get("tooth_pain")}</p>
+        <p><b>Sores/Lumps:</b> ${get("sores")}</p>
+        <p><b>Jaw Injuries:</b> ${get("injuries")}</p>
+        <p><b>Clicking Jaw:</b> ${get("click")}</p>
+        <p><b>Joint Pain:</b> ${get("joint")}</p>
+        <p><b>Difficulty Chewing:</b> ${get("diff_chew")}</p>
+        <p><b>Headaches:</b> ${get("headaches")}</p>
+        <p><b>Grinding/Clenching:</b> ${get("clench_grind")}</p>
+        <p><b>Food Caught Between Teeth:</b> ${get("food_teeth")}</p>
+        <p><b>Medicine Reaction:</b> ${get("med_reaction")}</p>
+        <p><b>Additional Concerns:</b><br>${get("additional_concerns")}</p>
+      `)}
+
+      ${card("Medical History", `
+        <p><b>Good Health:</b> ${get("good_health")}</p>
+        <p><b>Last Medical Exam Date:</b> ${get("medical_exam_date")}</p>
+        <p><b>Under Treatment:</b> ${get("under_treatment")}</p>
+        <p><b>Hospitalized:</b> ${get("hospitalized")}</p>
+        <p><b>Allergy (Medicine):</b> ${get("allergy_medicine")}</p>
+        <p><b>Allergy (Food):</b> ${get("allergy_food")}</p>
+        <p><b>Medication:</b> ${get("medication")}</p>
+        <p><b>Medical Conditions:</b><br>
+          ${getAll("conditions[]").length ? getAll("conditions[]").join(", ") : "None"}
+        </p>
+        <p><b>Tobacco Use:</b> ${get("tobacco_use")}</p>
+      `)}
+
+      ${card("Emergency Contact", `
+        <p><b>Name:</b> ${get("emergency_name")}</p>
+        <p><b>Contact:</b> ${get("emergency_contact")}</p>
+        <p><b>Relation:</b> ${get("emergency_relation")}</p>
+      `)}
+
+      ${card("Signature", signatureHTML)}
+
+    </div>
   `;
 
   document.getElementById("summaryBox").innerHTML = html;
@@ -720,21 +1443,123 @@ const questions = [
     { name: 'ortho_treatment', boxId: 'ortho_date_box' }
   ];
 
-  questions.forEach(q => {
-    const radios = Array.from(document.getElementsByName(q.name));
-    const box = document.getElementById(q.boxId);
+questions.forEach(q => {
+  const radios = document.getElementsByName(q.name);
+  const box = document.getElementById(q.boxId);
+  const input = box.querySelector("input");
 
-    radios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        const selected = radios.find(r => r.checked);
-        if (selected && selected.value === 'Yes') {
-          box.classList.remove('hidden');
-        } else {
-          box.classList.add('hidden');
-        }
-      });
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked && radio.value === "Yes") {
+        box.classList.remove("hidden");
+        input.required = true;
+      } else if (radio.checked) {
+        box.classList.add("hidden");
+        input.required = false;
+        input.value = "";
+      }
     });
   });
+});
+
+const medicalToggles = [
+  { name: 'good_health', boxId: 'good_health_box', showOn: 'No' }, 
+  { name: 'under_treatment', boxId: 'treatment_box', showOn: 'Yes' },
+  { name: 'hospitalized', boxId: 'hospital_box', showOn: 'Yes' },
+  { name: 'medication', boxId: 'medication_box', showOn: 'Yes' }
+];
+
+medicalToggles.forEach(item => {
+  const radios = document.getElementsByName(item.name);
+  const box = document.getElementById(item.boxId);
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      const selected = [...radios].find(r => r.checked);
+      const inputs = box.querySelectorAll("input");
+
+      if (selected && selected.value === item.showOn) {
+        box.classList.remove('hidden');
+        inputs.forEach(i => i.required = true);
+      } else {
+        box.classList.add('hidden');
+        inputs.forEach(i => {
+          i.required = false;
+          i.value = "";
+        });
+      }
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tobaccoRadios = document.getElementsByName("tobacco_use");
+  const details = document.getElementById("tobacco_details");
+
+  tobaccoRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (radio.checked && radio.value === "Yes") {
+        details.classList.remove("hidden");
+      } else {
+        details.classList.add("hidden");
+      }
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("patient_signature");
+  const fileNameDisplay = document.getElementById("signature_filename");
+
+  input.addEventListener("change", () => {
+    if (input.files.length > 0) {
+      fileNameDisplay.textContent = input.files[0].name;
+      fileNameDisplay.classList.remove("hidden");
+    } else {
+      fileNameDisplay.textContent = "";
+      fileNameDisplay.classList.add("hidden");
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const contactInput = document.getElementById("emergency_contact");
+
+  if (!contactInput) return;
+
+  // INPUT EVENT
+  contactInput.addEventListener("input", (e) => {
+    const rawValue = e.target.value;
+
+    if (/[^0-9]/.test(rawValue)) {
+      showMiniTab("Contact number must contain digits only.");
+      showInputError(contactInput);
+      contactInput.classList.remove("input-valid");
+    }
+
+    let value = rawValue.replace(/\D/g, "");
+
+    if (value.startsWith("9")) value = "0" + value;
+    if (value.length === 1 && value !== "0") value = "09" + value;
+
+    value = value.slice(0, 11);
+    contactInput.value = value;
+
+    if (/^09\d{9}$/.test(value)) {
+      contactInput.classList.remove("input-error");
+      contactInput.classList.add("input-valid");
+    } else {
+      contactInput.classList.remove("input-valid");
+    }
+  });
+
+  // BLUR EVENT
+  contactInput.addEventListener("blur", () => {
+    if (contactInput.value === "") {
+      contactInput.classList.remove("input-error", "input-valid");
+    }
+  });
+});
 
 </script>
 </body>

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Http\Controllers\AppointmentController;
+use Illuminate\Support\Facades\Auth;
 
 // -------------------
 // Guest Routes
@@ -47,7 +48,7 @@ Route::post('/register', function (Request $request) {
 
 // Login POST
 Route::post('/login', function (Request $request) {
-    $username = $request->input('username');
+    $email = $request->input('email');
     $password = $request->input('password');
 
     // Hard-coded admin/staff
@@ -56,13 +57,13 @@ Route::post('/login', function (Request $request) {
         'staff' => 'staff123',
     ];
 
-    if (isset($users[$username]) && $users[$username] === $password) {
-        session(['role' => $username]);
-        return redirect('/homepage');
+    if (isset($users[$email]) && $users[$email] === $password) {
+        session(['role' => $email]);
+        return redirect()->route('homepage');
     }
 
     // Patient login
-    $patient = Patient::where('email', $username)->first();
+    $patient = Patient::where('email', $email)->first();
 
     if ($patient && Hash::check($password, $patient->password)) {
         session([
@@ -70,17 +71,23 @@ Route::post('/login', function (Request $request) {
             'patient_id' => $patient->id,
             'email' => $patient->email,
         ]);
-        return redirect('/homepage');
+        return redirect()->route('homepage');
     }
 
     return back()->with('error', 'Invalid credentials');
 });
 
+
 // Logout
-Route::get('/logout', function () {
-    session()->flush();
+// Route::get('/logout', function () {
+//     session()->flush();
+//     return redirect('/login');
+// });
+
+Route::post('/logout', function () {
+    Auth::logout();
     return redirect('/login');
-});
+})->name('logout');
 
 // -------------------
 // Homepage
@@ -94,7 +101,7 @@ Route::get('/homepage', function () {
     }
 
     return view('index', compact('patient')); // points to index.blade.php
-});
+})->name('homepage');
 
 
 // -------------------
