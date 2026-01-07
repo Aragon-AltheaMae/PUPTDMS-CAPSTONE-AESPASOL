@@ -268,6 +268,8 @@
       </button>
 
       <button
+        id="saveFilter"
+
         class="bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm"
       >
         Save
@@ -327,21 +329,16 @@
 
     <!-- Patient Information Section -->
 
-    <!-- Patient Rows -->
-    <div class="space-y-4">
-
-      <!-- Patient Item -->
+    <!-- Scheduled Today Patients -->
 <div class="patient-item today flex items-center justify-between bg-gray-50 hover:bg-[#FDF1D6] transition p-4 rounded-xl cursor-pointer">
   <div class="flex items-center gap-4">
     <img src="https://i.pravatar.cc/51" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Romero, Dianna</p>
-      <p class="text-xs text-gray-500">2023-00010</p>
+      <p class="text-xs text-gray-500">2023-00010 · BSIT · 2nd Year · Section 1</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 20, 2025 · 9:00 AM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 20, 2025 · 9:00 AM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Dental Checkup</p>
     <p class="text-xs text-green-600">Appointment Today</p>
@@ -353,12 +350,10 @@
     <img src="https://i.pravatar.cc/52" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Dela Cruz, Mark</p>
-      <p class="text-xs text-gray-500">2023-00011</p>
+      <p class="text-xs text-gray-500">2023-00011 · BSECE · 1st Year · Section 2</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 20, 2025 · 11:30 AM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 20, 2025 · 11:30 AM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Tooth Cleaning</p>
     <p class="text-xs text-green-600">Appointment Today</p>
@@ -370,29 +365,26 @@
     <img src="https://i.pravatar.cc/53" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Santos, Alyssa</p>
-      <p class="text-xs text-gray-500">2023-00012</p>
+      <p class="text-xs text-gray-500">2023-00012 · BSBA - HRM · 3rd Year · Section 1</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 20, 2025 · 3:00 PM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 20, 2025 · 3:00 PM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Dental Restoration</p>
     <p class="text-xs text-green-600">Appointment Today</p>
   </div>
 </div>
 
+<!-- Rescheduled Patients -->
 <div class="patient-item rescheduled flex items-center justify-between bg-gray-50 hover:bg-[#FFF4E0] transition p-4 rounded-xl cursor-pointer">
   <div class="flex items-center gap-4">
     <img src="https://i.pravatar.cc/54" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Reyes, Joshua</p>
-      <p class="text-xs text-gray-500">2023-00013</p>
+      <p class="text-xs text-gray-500">2023-00013 · BSED - ENG · 2nd Year · Section 1</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 22, 2025 · 10:00 AM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 22, 2025 · 10:00 AM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Tooth Extraction</p>
     <p class="text-xs text-orange-600">Rescheduled</p>
@@ -404,12 +396,10 @@
     <img src="https://i.pravatar.cc/55" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Garcia, Nicole</p>
-      <p class="text-xs text-gray-500">2023-00014</p>
+      <p class="text-xs text-gray-500">2023-00014 · BSOA · 1st Year · Section 2</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 23, 2025 · 1:00 PM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 23, 2025 · 1:00 PM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Dental Surgery</p>
     <p class="text-xs text-orange-600">Rescheduled</p>
@@ -421,17 +411,16 @@
     <img src="https://i.pravatar.cc/56" class="w-10 h-10 rounded-full" />
     <div>
       <p class="font-semibold">Lopez, Christian</p>
-      <p class="text-xs text-gray-500">2023-00015</p>
+      <p class="text-xs text-gray-500">2023-00015 · BSPSYCH · 3rd Year · Section 1</p>
     </div>
   </div>
-  <div class="hidden md:block text-sm text-gray-600">
-    January 24, 2025 · 4:30 PM
-  </div>
+  <div class="hidden md:block text-sm text-gray-600">January 24, 2025 · 4:30 PM</div>
   <div class="text-right">
     <p class="font-medium text-[#8B0000]">Dental Consultation</p>
     <p class="text-xs text-orange-600">Rescheduled</p>
   </div>
 </div>
+
 
     </div>
 
@@ -513,7 +502,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const scheduledBtnCount = document.querySelector('.filter-btn[data-filter="today"] h3');
   const rescheduledBtnCount = document.querySelector('.filter-btn[data-filter="rescheduled"] h3');
   const allBtnCount = document.querySelector('.filter-btn[data-filter="all"] h3');
-
+  const saveFilter = document.getElementById("saveFilter");
+  const patientContainer = document.querySelector(".space-y-4");
+  const patients = Array.from(patientContainer.querySelectorAll(".patient-item"));
 
 
   /* =====================
@@ -555,42 +546,71 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* =====================
-     RESET FILTERS FUNCTION
-     ===================== */
+   /* ===================== RESET FILTERS FUNCTION ===================== */
   function resetFilters() {
-
-    /* RADIO GROUP RESET
-       → Select FIRST option per group */
-    const radioGroups = {};
-
-    filterModal.querySelectorAll('input[type="radio"]').forEach(radio => {
-      if (!radioGroups[radio.name]) {
-        radioGroups[radio.name] = [];
-      }
-      radioGroups[radio.name].push(radio);
-    });
-
-    Object.values(radioGroups).forEach(group => {
-      group.forEach(r => r.checked = false);
-      if (group[0]) group[0].checked = true;
-    });
-
-    /* CHECKBOX RESET */
-    filterModal.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.checked = false;
-    });
-
-    /* TEXT & DATE INPUTS */
-    filterModal.querySelectorAll('input[type="text"], input[type="date"]').forEach(input => {
-      input.value = "";
-    });
-
-    /* SELECT RESET */
-    filterModal.querySelectorAll("select").forEach(select => {
-      select.selectedIndex = 0;
-    });
+    filterModal.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => input.checked = false);
+    filterModal.querySelectorAll('input[type="text"], input[type="date"]').forEach(input => input.value = "");
+    filterModal.querySelectorAll("select").forEach(select => select.selectedIndex = 0);
   }
+
+  /* ===================== SAVE FILTER FUNCTION ===================== */
+  saveFilter.addEventListener("click", () => {
+    // Get selected sort
+    const sortOption = filterModal.querySelector('input[name="sort"]:checked')?.nextSibling?.textContent?.trim();
+    const orderOption = filterModal.querySelector('input[name="order"]:checked')?.nextSibling?.textContent?.trim();
+
+    // Get selected course
+    const selectedCourse = filterModal.querySelector('input[type="radio"][name="course"]:checked')?.nextSibling?.textContent?.trim();
+    const selectedYear = filterModal.querySelector('input[type="radio"][name="year"]:checked')?.nextSibling?.textContent?.trim();
+    const selectedSection = filterModal.querySelector('input[type="radio"][name="section"]:checked')?.nextSibling?.textContent?.trim();
+
+    // Get date range
+    const fromDate = filterModal.querySelector('input[type="date"]:nth-of-type(1)')?.value;
+    const toDate = filterModal.querySelector('input[type="date"]:nth-of-type(2)')?.value;
+
+    let filteredPatients = patients.slice(); // Copy all patients
+
+    // Filter by Course / Year / Section
+    filteredPatients = filteredPatients.filter(p => {
+      const info = p.querySelector(".text-xs").textContent; // e.g., "2023-00010 · BSIT · 2nd Year · Section 1"
+      if (selectedCourse && !info.includes(selectedCourse)) return false;
+      if (selectedYear && !info.includes(selectedYear)) return false;
+      if (selectedSection && !info.includes(`Section ${selectedSection}`)) return false;
+      return true;
+    });
+
+    // Filter by date
+    filteredPatients = filteredPatients.filter(p => {
+      if (!fromDate && !toDate) return true;
+      const dateText = p.querySelector(".md\\:block")?.textContent.split("·")[0].trim(); // "January 20, 2025"
+      if (!dateText) return true;
+      const patientDate = new Date(dateText);
+      if (fromDate && patientDate < new Date(fromDate)) return false;
+      if (toDate && patientDate > new Date(toDate)) return false;
+      return true;
+    });
+
+    // Sort
+    if (sortOption) {
+      filteredPatients.sort((a, b) => {
+        const nameA = a.querySelector(".font-semibold").textContent.trim().toUpperCase();
+        const nameB = b.querySelector(".font-semibold").textContent.trim().toUpperCase();
+        if (sortOption === "A-Z") return nameA.localeCompare(nameB);
+        if (sortOption === "Z-A") return nameB.localeCompare(nameA);
+        return 0;
+      });
+
+      // Reverse if descending
+      if (orderOption === "Descending") filteredPatients.reverse();
+    }
+
+    // Clear container and append filtered patients
+    patientContainer.innerHTML = "";
+    filteredPatients.forEach(p => patientContainer.appendChild(p));
+
+    // Close modal
+    filterModal.classList.add("hidden");
+  });
 
    /* =====================
      FILTER PATIENTS
