@@ -3,27 +3,35 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Patient;
-use App\Models\Appointment;
-use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Patient;
+use App\Http\Controllers\AppointmentController;
+
 // -------------------
-// Guest Routes
+// AUTH PAGES
 // -------------------
 
-// Show login page
+// Patient Login
 Route::get('/login', function () {
-    return view('auth.login'); // points to resources/views/auth/login.blade.php
+    return view('auth.login');
 })->name('login');
 
-// Show register page
+// Patient Register
 Route::get('/register', function () {
-    return view('auth.register'); // points to resources/views/auth/register.blade.php
+    return view('auth.register');
 });
 
+// Dentist Login
+Route::get('/dentist/login', function () {
+    return view('auth.dentist-login');
+})->name('dentist.login');
 
-// Registration POST
+// -------------------
+// AUTH ACTIONS
+// -------------------
+
+// Patient Registration
 Route::post('/register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
@@ -46,134 +54,115 @@ Route::post('/register', function (Request $request) {
     return redirect('/login')->with('success', 'Account created successfully!');
 });
 
-// Login POST
+// Patient Login POST
 Route::post('/login', function (Request $request) {
-    $email = $request->input('email');
-    $password = $request->input('password');
+    $patient = Patient::where('email', $request->email)->first();
 
-    // Hard-coded admin/staff
-    $users = [
-        'admin' => 'admin123',
-        'staff' => 'staff123',
-    ];
-
-    if (isset($users[$email]) && $users[$email] === $password) {
-        session(['role' => $email]);
-        return redirect()->route('homepage');
-    }
-
-    // Patient login
-    $patient = Patient::where('email', $email)->first();
-
-    if ($patient && Hash::check($password, $patient->password)) {
+    if ($patient && Hash::check($request->password, $patient->password)) {
         session([
             'role' => 'patient',
             'patient_id' => $patient->id,
             'email' => $patient->email,
         ]);
-        return redirect()->route('homepage');
+
+        return redirect('/homepage');
     }
 
     return back()->with('error', 'Invalid credentials');
 });
 
+// Dentist Login POST (Hard-coded)
+Route::post('/dentist/login', function (Request $request) {
 
-// Logout
-// Route::get('/logout', function () {
-//     session()->flush();
-//     return redirect('/login');
-// });
+    if ($request->email === 'dentist' && $request->password === 'dentist123') {
+        session([
+            'role' => 'dentist',
+            'dentist_email' => 'dentist',
+        ]);
 
+    return view('dentist-dashboard');
+    }
+
+    return back()->with('error', 'Invalid dentist credentials');
+})->name('dentist.login.submit');
+
+// Logout (all roles)
 Route::post('/logout', function () {
+    session()->flush();
     Auth::logout();
     return redirect('/login');
 })->name('logout');
 
 // -------------------
-// Homepage
+// HOMEPAGE
 // -------------------
+
 Route::get('/homepage', function () {
-    $patient = null;
+    $patient = session()->has('patient_id')
+        ? Patient::find(session('patient_id'))
+        : null;
 
-    // Optional: load patient if logged in
-    if (session()->has('patient_id')) {
-        $patient = Patient::find(session('patient_id'));
-    }
-
-    return view('index', compact('patient')); // points to index.blade.php
+    return view('index', compact('patient'));
 })->name('homepage');
 
+// -------------------
+// DENTIST ROUTES
+// -------------------
 
-// -------------------
-// Admin Routes
-// -------------------
-Route::prefix('admin')->group(function () {
+Route::prefix('dentist')->group(function () {
+
     Route::get('/dashboard', function () {
-        if (session('role') !== 'admin') {
+        if (session('role') !== 'dentist') {
             return redirect('/login');
         }
-        return view('admin.dashboard');
+
+        return view('dentist.dashboard');
     });
 });
 
 // -------------------
-// Staff Routes
+// PATIENT ROUTES
 // -------------------
-Route::prefix('staff')->group(function () {
-    Route::get('/dashboard', function () {
-        if (session('role') !== 'staff') {
-            return redirect('/login');
-        }
-        return view('staff.dashboard');
-    });
-});
 
-// -------------------
-// Patient Routes
-// -------------------
 Route::prefix('patient')->group(function () {
+
     Route::get('/dashboard', function () {
         if (!session()->has('patient_id')) {
             return redirect('/login');
         }
 
-        $patient = \App\Models\Patient::find(session('patient_id'));
+        $patient = Patient::find(session('patient_id'));
         return view('patient-dashboard', compact('patient'));
     });
 
+    Route::get('/appointment', [AppointmentController::class, 'index'])
+        ->name('appointment.index');
 
-    // Appointments
-    Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment');
-    Route::get('/appointment/create', [AppointmentController::class, 'create'])->name('appointment.create');
-    Route::post('/appointment', [AppointmentController::class, 'store'])->name('appointment.store');
-    // Show the booking form
-Route::get('/book-appointment', [AppointmentController::class, 'create'])->name('book.appointment.create');
+    Route::get('/appointment/create', [AppointmentController::class, 'create'])
+        ->name('appointment.create');
 
-// Store the form submission
-Route::post('/book-appointment', [AppointmentController::class, 'store'])->name('book.appointment.store');
+    Route::post('/appointment', [AppointmentController::class, 'store'])
+        ->name('appointment.store');
 
-// Show all appointments (optional dashboard)
-Route::get('/appointments', [AppointmentController::class, 'index'])->name('book.appointment.index');
+    Route::get('/book-appointment', [AppointmentController::class, 'create'])
+        ->name('book.appointment.create');
+
+    Route::post('/book-appointment', [AppointmentController::class, 'store'])
+        ->name('book.appointment.store');
+
+    Route::get('/appointments', [AppointmentController::class, 'index'])
+        ->name('book.appointment.index');
 });
-
-
-// Dentist routes
-Route::prefix('dentist')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dentist-dashboard'); // resources/views/dentist/dashboard.blade.php
-    });
-});
-
 
 // -------------------
-// Public Pages
+// PUBLIC PAGES
 // -------------------
-Route::get('/', function () {
-    return redirect('/login');
-});
 
-Route::get('/book-appointment', [AppointmentController::class, 'create'])->name('book.appointment');
+Route::get('/', fn () => redirect('/login'));
 
-Route::get('/about-us', function () {
-    return view('about-us');
-})->name('about.us');
+Route::get('/book-appointment', [AppointmentController::class, 'create'])
+    ->name('book.appointment');
+
+Route::get('/record', fn () => view('record'))->name('record');
+
+Route::get('/about-us', fn () => view('about-us'))->name('about.us');

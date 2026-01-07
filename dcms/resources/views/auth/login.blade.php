@@ -58,7 +58,6 @@
             class="w-full px-4 py-3 rounded-lg bg-gray-100 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
 
           <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-            👁
           </button>
         </div>
 
@@ -73,6 +72,14 @@
         Don't have an account?
         <a href="/register" class="text-[#F2B233] font-semibold hover:underline">Register here</a>
         </p>
+
+        <p class="mt-4 text-center text-sm text-gray-600">
+    Are you a dentist?
+    <a href="{{ route('dentist.login') }}"
+       class="text-[#8B0000] font-semibold hover:underline">
+        Log in as Dentist
+    </a>
+</p>
 
     </div>
 

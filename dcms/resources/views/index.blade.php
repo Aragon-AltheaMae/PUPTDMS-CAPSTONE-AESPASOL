@@ -151,7 +151,7 @@
       Home
     </a>
 
-<a href="{{ route('appointment') }}"
+<a href="{{ route('appointment.index') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
@@ -162,7 +162,7 @@
       Appointment
     </a>
 
-    <a href=""
+  <a href="{{ route('record') }}"
     class="relative pb-1
               after:absolute after:left-0 after:bottom-0
               after:h-[2px] after:w-full
