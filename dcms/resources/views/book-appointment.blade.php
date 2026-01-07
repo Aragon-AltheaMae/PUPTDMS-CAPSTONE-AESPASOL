@@ -303,7 +303,7 @@
 
     <!-- STEP 3 -->
 <div class="step-content hidden">
-  <div class="bg-[#e6e6e6] rounded-xl p-8">
+  <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
 
     <!-- TITLE -->
     <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Dental History</h2>
@@ -1068,9 +1068,33 @@
 </div>
 
 <!-- NAVIGATION BUTTONS -->
-<div class="flex justify-between mt-8">
-  <button type="button" class="btn" id="prevBtn">Previous</button>
-  <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+<div class="flex justify-center mt-8 gap-6">
+  <button
+  type="button"
+  id="prevBtn"
+  class="flex items-center gap-2 px-6 py-2
+         rounded-lg
+         border border-gray-400
+         bg-[#F4F4F4]
+         text-[#660000]
+         font-medium
+         hover:bg-[#ECECEC]
+         shadow
+         transition">
+    <span class="text-xl leading-none">&lsaquo;</span>
+    <span>Previous</span>
+  </button>
+
+  <button
+  type="button"
+  id="nextBtn"
+  class="btn btn-primary
+        shadow
+        pr-10
+        pl-10">
+  <span>Next</span>
+  <span class="text-xl leading-none">&rsaquo;</span>
+  </button>
   <button type="submit" class="btn btn-success hidden" id="submitBtn">Submit</button>
 </div>
 
