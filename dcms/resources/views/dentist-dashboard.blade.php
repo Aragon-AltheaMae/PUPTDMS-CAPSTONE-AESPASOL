@@ -68,14 +68,18 @@
       <i class="fa-solid fa-chart-line text-lg"></i>
       <span>Dashboard</span>
     </a>
-    <a class="flex flex-col items-center opacity-80 hover:opacity-100">
+    <a href="{{ route('dentist.patients') }}"
+      class="flex flex-col items-center opacity-80 hover:opacity-100">
       <i class="fa-solid fa-users text-lg"></i>
       <span>Patients</span>
     </a>
-    <a class="flex flex-col items-center opacity-80 hover:opacity-100">
+
+    <a href="{{ route('dentist.appointments') }}"
+      class="flex flex-col items-center opacity-80 hover:opacity-100">
       <i class="fa-solid fa-calendar-check text-lg"></i>
       <span>Appointments</span>
     </a>
+
     <a class="flex flex-col items-center opacity-80 hover:opacity-100">
       <i class="fa-solid fa-box text-lg"></i>
       <span>Inventory</span>
