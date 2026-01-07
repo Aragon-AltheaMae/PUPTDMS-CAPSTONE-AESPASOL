@@ -224,26 +224,19 @@
       <div id="profileSkeletonContainer" class="bg-gradient-to-t from-[#FFD700] to-[#660000] p-0.5 rounded-2xl md:w-1/3">
         <!-- content will be injected by JS -->
       </div>
+      
+      <!-- Calendar Section -->
+      <div class="md:w-2/3 flex flex-col gap-2">
 
-        <!-- Calendar Section -->
-        <div id="calendarSkeletonContainer" class="flex flex-col gap-2 md:w-2/3">
-          <!-- Title outside the card -->
-          <h2 class="text-2xl font-extrabold text-[#8B0000]">Upcoming Schedule</h2>
+        <!-- Title outside the card -->
+        <h2 class="text-3xl font-extrabold text-[#8B0000] mb-6">Upcoming Schedule</h2>
 
-          <!-- Calendar Card -->
-          <div class="bg-white border shadow rounded-2xl p-6 h-[390px] w-full">
-            <calendar-date class="cally w-full h-full flex flex-col p-2 ">
-              <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-                <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-              </svg>
-
-              <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-                <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-              </svg>
-
-              <calendar-month class="w-full flex-1"></calendar-month>
-            </calendar-date>
-          </div>
+        <!-- Calendar Card (content injected by JS) -->
+        <div
+          id="calendarSkeletonContainer"
+          class="bg-white border shadow rounded-2xl p-6 h-[390px] w-full">
+          <!-- Skeleton OR real calendar goes here -->
+        </div>
         </div>
       </div>
     </section>
@@ -392,19 +385,19 @@
       // Profile
 
       // Calendar
-      document.getElementById("calendarSkeletonContainer").innerHTML = `
-        <div class="bg-white border shadow rounded-2xl p-6 h-[390px] w-full fade-up">
-          <calendar-date class="cally w-full h-full flex flex-col p-2">
-            <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-              <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-            </svg>
-            <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-              <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-            </svg>
-            <calendar-month class="w-full flex-1"></calendar-month>
-          </calendar-date>
-        </div>
-      `;
+     document.getElementById("calendarSkeletonContainer").innerHTML = `
+      <calendar-date class="cally w-full h-full flex flex-col p-2 fade-up">
+        <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
+          <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
+        </svg>
+
+        <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
+          <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+        </svg>
+
+        <calendar-month class="w-full flex-1"></calendar-month>
+      </calendar-date>
+    `;
 
       // Dental Records
       fetch("get_records.php")
@@ -477,14 +470,9 @@
   }, 2000);
 
     // Calendar Skeleton
-    document.getElementById("calendarSkeletonContainer").innerHTML = `
-      <div class="bg-white border shadow rounded-2xl p-6 h-[390px] w-full animate-pulse">
-        <div class="h-6 w-24 skeleton mb-4"></div>
-        <div class="grid grid-cols-7 gap-2">
-          ${Array(35).fill('<div class="h-8 w-8 skeleton"></div>').join('')}
-        </div>
-      </div>
-    `;
+     setTimeout(() => {
+    loadCalendar();
+  }, 2000);
 
     // Dental Records Skeleton
     document.getElementById("recordsInnerContainer").innerHTML = `
@@ -518,6 +506,30 @@
       `).join("")}
     `;
   }
+
+  function showCalendarSkeleton() {
+  document.getElementById("calendarSkeletonContainer").innerHTML = `
+    <div class="grid grid-cols-7 gap-2 animate-pulse">
+      ${Array(35).fill('<div class="h-8 w-8 skeleton rounded"></div>').join("")}
+    </div>
+  `;
+}
+
+function loadCalendar() {
+  document.getElementById("calendarSkeletonContainer").innerHTML = `
+    <calendar-date class="cally w-full h-full flex flex-col p-2 fade-up">
+      <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
+        <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
+      </svg>
+
+      <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
+        <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+      </svg>
+
+      <calendar-month class="w-full flex-1"></calendar-month>
+    </calendar-date>
+  `;
+}
 
   // Dental Records Rendering
   function renderRecords(records) {

@@ -42,6 +42,8 @@
 <!-- ================= TOP HEADER ================= -->
 <header class="bg-gradient-to-r from-primaryDark to-primaryMain text-white px-8 py-4 flex justify-between items-center">
   <div class="flex items-center gap-3 font-bold">
+    <!-- University Logo -->
+    <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
     <i class="fa-solid fa-tooth text-xl"></i>
     <span>PUP TAGUIG DENTAL CLINIC</span>
   </div>
