@@ -50,7 +50,13 @@
         <p class="font-semibold">Dr. Nelson Angeles</p>
         <p class="text-xs opacity-80">Dentist</p>
       </div>
-      <i class="fa-solid fa-right-from-bracket cursor-pointer"></i>
+      <form action="{{ route('logout') }}" method="POST" class="inline">
+        @csrf
+        <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+        </button>
+</form>
+
     </div>
   </div>
 </header>
@@ -107,59 +113,107 @@
 
     <!-- GAD ANALYTICS -->
     <div class="col-span-5 card bg-white shadow">
-      <div class="card-body">
+    <div class="card-body">
         <h3 class="text-lg font-semibold text-red-700">GAD Analytics</h3>
-        <div class="h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
-          Chart Area
+        <div class="h-60 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+        Chart Area
         </div>
-      </div>
+    </div>
     </div>
 
+
+    <!-- DENTAL STATS COLUMN -->
+    <div class="col-span-2 flex flex-col gap-4 h-full">
+
     <!-- DENTAL CASES -->
-    <div class="col-span-2 card bg-primaryMain text-white shadow">
-      <div class="card-body text-center">
+    <div class="card bg-primaryMain text-white shadow flex-1">
+        <div class="card-body p-6 text-center justify-center">
         <p class="text-sm">Dental Cases</p>
         <p class="text-4xl font-bold">45</p>
         <p class="text-xs">December 2025</p>
-      </div>
+        </div>
     </div>
+
+    <!-- TOTAL APPOINTMENTS -->
+    <div class="card bg-primaryMain text-white shadow flex-1">
+        <div class="card-body p-6 text-center justify-center">
+        <p class="text-sm">Total Appointments</p>
+        <p class="text-4xl font-bold">62</p>
+        <p class="text-xs">December 2025</p>
+        </div>
+    </div>
+
+    </div>
+
 
     <!-- CALENDAR -->
     <div class="col-span-5 card bg-white shadow">
-      <div class="card-body">
+    <div class="card-body">
         <h3 class="font-semibold text-red-700 mb-3">December 2025</h3>
-        <cally-calendar></cally-calendar>
-        <div class="flex justify-end gap-4 text-xs mt-3">
-          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded-full"></span>Full</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-400 rounded-full"></span>Not Available</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded-full"></span>Holiday</span>
+        <cally-calendar class="min-h-[260px]"></cally-calendar>
+        <div class="flex justify-end gap-4 text-xs mt-4">
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded-full"></span>Full</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-400 rounded-full"></span>Not Available</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded-full"></span>Holiday</span>
         </div>
-      </div>
+    </div>
     </div>
 
-    <!-- INVENTORY -->
-    <div class="col-span-5 card bg-white shadow border border-red-200">
-      <div class="card-body">
+
+    <!-- INVENTORY COLUMN -->
+    <div class="col-span-5 flex flex-col gap-6">
+
+    <!-- MEDICAL SUPPLY INVENTORY -->
+    <div class="card bg-white shadow border border-red-200">
+        <div class="card-body">
         <h3 class="font-semibold text-red-700 mb-2">Medical Supply Inventory</h3>
         <table class="table table-sm">
-          <thead>
+            <thead>
             <tr class="text-red-700">
-              <th>Supplies</th><th>Units</th><th>Qty</th><th>Consumed</th><th>Balance</th>
+                <th>Supplies</th><th>Units</th><th>Qty</th><th>Consumed</th><th>Balance</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             <tr>
-              <td>Disposable Dental Needles Short</td>
-              <td>piece</td>
-              <td>42</td>
-              <td>8</td>
-              <td>34</td>
+                <td>Disposable Dental Needles Short</td>
+                <td>piece</td>
+                <td>42</td>
+                <td>8</td>
+                <td>34</td>
             </tr>
-          </tbody>
+            </tbody>
         </table>
         <button class="btn btn-sm btn-error w-fit mt-3">Visit Inventory</button>
-      </div>
+        </div>
     </div>
+
+    <!-- MEDICINE SUPPLY INVENTORY -->
+    <div class="card bg-white shadow border border-red-200">
+        <div class="card-body">
+        <h3 class="font-semibold text-red-700 mb-2">Medicine Supply Inventory</h3>
+        <table class="table table-sm">
+            <thead>
+            <tr class="text-red-700">
+                <th>Medicine</th><th>Form</th><th>Qty</th><th>Used</th><th>Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Amoxicillin</td>
+                <td>Capsule</td>
+                <td>120</td>
+                <td>30</td>
+                <td>90</td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-sm btn-error w-fit mt-3">Visit Inventory</button>
+        </div>
+    </div>
+
+    </div>
+
+
 
     <!-- SCHEDULE -->
     <div class="col-span-7 card bg-primaryMain text-white shadow">
