@@ -269,10 +269,10 @@
     <h2 class="text-3xl font-extrabold text-[#8B0000] mb-6">Request Documents</h2>
 
     <div id="requestDocsContainer" class="space-y-4">
-      <a href="#"
-      class="flex border rounded-2xl overflow-hidden
-            hover:border-red-800 hover:shadow-lg
-            transition cursor-pointer">
+      <a onclick="dentalClearanceModal.showModal()"
+          class="flex border rounded-2xl overflow-hidden
+          hover:border-red-800 hover:shadow-lg
+          transition cursor-pointer">
 
     <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
       <img src="images/dental-clearance.png"/>
@@ -288,7 +288,8 @@
     </div>
   </a>
 
-  <a href="#" class="flex border rounded-2xl overflow-hidden
+  <a onclick="dentalHealthRecordModal.showModal()"
+      class="flex border rounded-2xl overflow-hidden
           hover:border-red-800 hover:shadow-lg
           transition cursor-pointer">
           
@@ -303,11 +304,124 @@
                   All Dental Records • Medical Record • Diagnosis & Treatments
                 </p>
               </div>
-    </a>
+            </a>
           </div>
         </div>
 
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+
+<!-- REQUEST CLEARANCE MODAL -->
+<dialog id="dentalClearanceModal" class="modal">
+  <div class="modal-box rounded-2xl">
+    
+    <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+      Request Clearance
+    </h3>
+
+    <p class="text-sm text-gray-600 mb-5">
+      Please allow a processing period of up to three (3) working days upon submission of your request.
+    </p>
+
+  <!-- Type Dropdown -->
+    <div class="mb-5">
+    <label class="block text-sm font-semibold text-black mb-2">
+      Type of Clearance
+    </label>
+    <select class="select select-bordered w-full rounded-xl text-black">
+      <option disabled selected>Select type of clearance</option>
+      <option>Dental Clearance</option>
+      <option>Annual Dental Clearance</option>
+    </select>
+  </div>
+
+    <!-- Purpose Dropdown -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-black mb-2">
+        Purpose
+      </label>
+      <select class="select select-bordered w-full rounded-xl text-black">
+        <option disabled selected>Select purpose</option>
+        <option>On-the-Job Training (OJT)</option>
+        <option>Employment Requirement</option>
+        <option>Academic Requirement</option>
+        <option>Internship</option>
+        <option>Personal Record</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="modal-action flex justify-between">
+      <form method="dialog">
+        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
+          font-semibold hover:bg-gray-300 transition">
+          Back
+        </button>
+      </form>
+
+      <button class="px-6 py-2 rounded-xl bg-[#8B0000] text-white
+        font-semibold hover:bg-[#660000] transition">
+        Save
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<!-- REQUEST DENTAL HEALTH RECORD MODAL -->
+<dialog id="dentalHealthRecordModal" class="modal">
+  <div class="modal-box rounded-2xl">
+
+    <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+      Request Dental Health Record
+    </h3>
+
+    <p class="text-sm text-black mb-5">
+      Please allow a processing period of up to three (3) working days upon submission of your request.
+    </p>
+
+    <!-- Type Dropdown -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-black mb-2">
+        Type
+      </label>
+      <select class="select select-bordered w-full rounded-xl text-black">
+        <option disabled selected>Select type</option>
+        <option>All Dental Records</option>
+        <option>Medical Records</option>
+        <option>Diagnosis and Treatment</option>
+      </select>
+    </div>
+
+    <!-- Purpose Dropdown -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-black mb-2">
+        Purpose
+      </label>
+      <select class="select select-bordered w-full rounded-xl text-black">
+        <option disabled selected>Select purpose</option>
+        <option>Personal Record</option>
+        <option>Academic Requirement</option>
+        <option>Employment Requirement</option>
+        <option>Reference</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="modal-action flex justify-between">
+      <form method="dialog">
+        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
+          font-semibold hover:bg-gray-300 transition">
+          Back
+        </button>
+      </form>
+
+      <button class="px-6 py-2 rounded-xl bg-[#8B0000] text-white
+        font-semibold hover:bg-[#660000] transition">
+        Save
+      </button>
+    </div>
+
+  </div>
+</dialog>
 
   <!-- ASIDE: CLINIC INFO -->
   <aside class="space-y-4">
@@ -407,7 +521,7 @@
 
       // Request Documents
       document.getElementById("requestDocsContainer").innerHTML = `
-        <a href="#" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
+        <a onclick="dentalClearanceModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
           <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
             <img src="images/dental-clearance.png"/>
           </div>
@@ -416,7 +530,7 @@
             <p class="text-sm text-gray-600">Dental Clearance • Annual Dental Clearance</p>
           </div>
         </a>
-        <a href="#" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
+        <a onclick="dentalHealthRecordModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
           <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
             <img src="images/dental-health-record.png"/>
           </div>
