@@ -262,34 +262,35 @@
 
 
     <!-- SCHEDULE -->
-    <div class="col-span-7 card bg-primaryMain text-white shadow">
-    <div class="card-body">
+    <div class="col-span-7 card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow">
+      <div class="card-body">
         <h1 class="text-lg font-bold">Scheduled Patients Today</h1>
 
         <div class="space-y-3">
-        <!-- Patient Card -->
-        <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
+
+          <!-- Patient Card -->
+          <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
             <img src="https://i.pravatar.cc/40" class="rounded-full">
             <div class="flex-1 text-left">
-                <p class="font-semibold">Capilitan, Beyonce</p>
-                <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
+              <p class="font-semibold">Capilitan, Beyonce</p>
+              <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
             </div>
             <i class="fa-solid fa-arrow-right"></i>
-        </button>
+          </button>
 
-        <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
+          <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
             <img src="https://i.pravatar.cc/40" class="rounded-full">
             <div class="flex-1 text-left">
-                <p class="font-semibold">Caculitan, Britney</p>
-                <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
+              <p class="font-semibold">Caculitan, Britney</p>
+              <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
             </div>
             <i class="fa-solid fa-arrow-right"></i>
-        </button>
-        </div>  
+          </button>
 
+        </div>
+      </div>
+    </div>
 
-    </div>
-    </div>
 
 
   </div>
