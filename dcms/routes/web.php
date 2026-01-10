@@ -132,11 +132,18 @@ Route::prefix('dentist')->group(function () {
     })->name('dentist.appointments');
 
     Route::get('/inventory', function () {
-    if (session('role') !== 'dentist') {
-        return redirect('/login');
-    }
-    return view('dentist-inventory');
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-inventory');
     })->name('dentist.inventory');
+
+    Route::get('/report', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-report');
+    })->name('dentist.report');
 });
 
 

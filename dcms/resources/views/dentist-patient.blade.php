@@ -83,23 +83,23 @@
 <!-- ================= NAV HEADER ================= -->
 <header class="bg-primaryMain text-white px-8 py-3">
   <nav class="flex justify-around text-sm">
-    <a href="#" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-chart-line text-lg"></i>
       <span>Dashboard</span>
     </a>
-    <a href="#" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-users text-lg"></i>
       <span>Patients</span>
     </a>
-    <a href="#" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-calendar-check text-lg"></i>
       <span>Appointments</span>
     </a>
-    <a href="#" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-box text-lg"></i>
       <span>Inventory</span>
     </a>
-    <a class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
