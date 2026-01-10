@@ -378,117 +378,143 @@
 
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
-  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    
+  <form
+    id="clearanceRequestForm"
+    class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+    novalidate
+  >
+
+    <!-- MINI WARNING -->
+    <div
+      id="clearanceWarning"
+      class="hidden absolute top-4 left-1/2 -translate-x-1/2
+            px-4 py-1.5 rounded-full bg-red-600 text-white
+            text-xs font-semibold shadow-lg">
+      Please complete all required fields
+    </div>
+
+
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Clearance
     </h3>
 
     <p class="text-sm text-gray-600 mb-5">
-      Please allow a processing period of up to three (3) working days upon submission of your request.
+      Please allow up to three (3) working days for processing.
     </p>
 
-  <!-- Type Dropdown -->
+    <!-- TYPE -->
     <div class="mb-5">
-    <label class="block text-sm font-semibold text-[#333333] mb-2">
-      Type of Clearance
-    </label>
-    <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-      <option disabled selected>Select type of clearance</option>
-      <option>Dental Clearance</option>
-      <option>Annual Dental Clearance</option>
-    </select>
-  </div>
-
-    <!-- Purpose Dropdown -->
-    <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Purpose
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select purpose</option>
-        <option>On-the-Job Training (OJT)</option>
-        <option>Employment Requirement</option>
-        <option>Academic Requirement</option>
-        <option>Internship</option>
-        <option>Personal Record</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type of Clearance</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select type of clearance</option>
+        <option>Dental Clearance</option>
+        <option>Annual Dental Clearance</option>
       </select>
     </div>
 
-    <!-- Buttons -->
+    <!-- PURPOSE -->
+    <div class="mb-5">
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select purpose</option>
+        <option>On-the-Job Training (OJT)</option>
+        <option>Employment Requirement</option>
+        <option>Academic Requirement</option>
+      </select>
+    </div>
+
+    <!-- ACTIONS -->
     <div class="modal-action flex justify-between">
-      <form method="dialog">
-        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
-          font-semibold hover:bg-gray-300 transition">
-          Back
-        </button>
-      </form>
+      <button type="button"
+        onclick="dentalClearanceModal.close()"
+        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+        Back
+      </button>
 
       <button type="button"
-      onclick="openConfirm('clearanceRequestForm', 'Submit Dental Clearance request?', 'dentalClearanceModal')"
-      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-      Save
-    </button>
+        onclick="validateAndConfirm('clearanceRequestForm','Submit Dental Clearance request?','dentalClearanceModal')"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold">
+        Save
+      </button>
     </div>
-  </div>
+  </form>
 </dialog>
 
 <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
 <dialog id="dentalHealthRecordModal" class="modal">
-  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+  <form
+    id="healthRecordRequestForm"
+    class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+    novalidate
+  >
+
+    <!-- MINI WARNING -->
+      <div
+      id="healthRecordWarning"
+      class="hidden absolute top-4 left-1/2 -translate-x-1/2
+            px-4 py-1.5 rounded-full bg-red-600 text-white
+            text-xs font-semibold shadow-lg">
+      Please complete all required fields
+    </div>
+
 
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Dental Health Record
     </h3>
 
-    <p class="text-sm text-[#333333] mb-5">
-      Please allow a processing period of up to three (3) working days upon submission of your request.
+    <p class="text-sm mb-5">
+      Please allow up to three (3) working days for processing.
     </p>
 
-    <!-- Type Dropdown -->
+    <!-- TYPE -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Type
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select type</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select type</option>
         <option>All Dental Records</option>
         <option>Medical Records</option>
         <option>Diagnosis and Treatment</option>
       </select>
     </div>
 
-    <!-- Purpose Dropdown -->
+    <!-- PURPOSE -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Purpose
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select purpose</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select purpose</option>
         <option>Personal Record</option>
         <option>Academic Requirement</option>
         <option>Employment Requirement</option>
-        <option>Reference</option>
       </select>
     </div>
 
-    <!-- Buttons -->
+    <!-- ACTIONS -->
     <div class="modal-action flex justify-between">
-      <form method="dialog">
-        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
-          font-semibold hover:bg-gray-300 transition">
-          Back
-        </button>
-      </form>
+      <button type="button"
+        onclick="dentalHealthRecordModal.close()"
+        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+        Back
+      </button>
 
       <button type="button"
-      onclick="openConfirm('healthRecordRequestForm', 'Submit Dental Health Record request?', 'dentalHealthRecordModal')"
-      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-      Save
-    </button>
+        onclick="validateHealthRecord('healthRecordRequestForm','Submit Dental Health Record request?','dentalHealthRecordModal')"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold">
+        Save
+      </button>
     </div>
-
-  </div>
+  </form>
 </dialog>
 
   <!-- ASIDE: CLINIC INFO -->
@@ -555,21 +581,11 @@
 <!-- CONFIRM SAVE MODAL -->
 <dialog id="confirmSaveModal" class="modal">
   <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Confirm</h3>
-    <p id="confirmSaveText" class="text-sm text-gray-700 mb-6">Are you sure?</p>
-
+    <h3 class="font-bold text-lg mb-2">Confirm</h3>
+    <p id="confirmSaveText" class="mb-6">Are you sure?</p>
     <div class="modal-action flex justify-between">
-      <button type="button"
-        onclick="confirmSaveModal.close()"
-        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">
-        Cancel
-      </button>
-
-      <button type="button"
-        onclick="submitConfirmedForm()"
-        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-        Yes, Submit
-      </button>
+      <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
+      <button onclick="submitConfirmedForm()" class="btn btn-error text-white">Yes, Submit</button>
     </div>
   </div>
 </dialog>
@@ -577,17 +593,10 @@
 <!-- SUBMITTED INFO MODAL -->
 <dialog id="submittedInfoModal" class="modal">
   <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Submitted!</h3>
-    <p id="submittedInfoText" class="text-sm text-gray-700 mb-6">
-      Your request has been submitted. Please allow up to three (3) working days for processing.
-    </p>
-
+    <h3 class="font-bold text-lg mb-2">Submitted!</h3>
+    <p>Your request has been submitted.</p>
     <div class="modal-action">
-      <button type="button"
-        onclick="submittedInfoModal.close()"
-        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-        OK
-      </button>
+      <button onclick="submittedInfoModal.close()" class="btn btn-error text-white">OK</button>
     </div>
   </div>
 </dialog>
@@ -619,6 +628,9 @@
     if (_pendingModalIdToClose) {
       const reqModal = document.getElementById(_pendingModalIdToClose);
       if (reqModal) reqModal.close();
+      
+    _pendingFormId = null;
+    _pendingModalIdToClose = null;
     }
 
     // show submitted modal
@@ -630,8 +642,39 @@
     }
   }
 
+    // validate submit request
+function validateAndConfirm(formId, message, modalId) {
+  const form = document.getElementById(formId);
+  const warn = document.getElementById('clearanceWarning');
+  warn.classList.add('hidden');
+  if (!form.checkValidity()) { warn.classList.remove('hidden'); return; }
+  openConfirm(formId, message, modalId);
+}
+
+function validateHealthRecord(formId, message, modalId) {
+  const form = document.getElementById(formId);
+  const warn = document.getElementById('healthRecordWarning');
+  warn.classList.add('hidden');
+  if (!form.checkValidity()) { warn.classList.remove('hidden'); return; }
+  openConfirm(formId, message, modalId);
+}
+
   // Skeleton Loading
   document.addEventListener("DOMContentLoaded", () => {
+    
+     document.querySelectorAll('#clearanceRequestForm select')
+    .forEach(select => {
+      select.addEventListener('change', () => {
+        document.getElementById('clearanceWarning').classList.add('hidden');
+      });
+    });
+
+  document.querySelectorAll('#healthRecordRequestForm select')
+    .forEach(select => {
+      select.addEventListener('change', () => {
+        document.getElementById('healthRecordWarning').classList.add('hidden');
+      });
+    });
 
     // Show all skeletons first
     showSkeletons();
