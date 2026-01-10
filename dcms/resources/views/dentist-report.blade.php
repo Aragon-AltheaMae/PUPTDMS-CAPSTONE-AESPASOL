@@ -35,19 +35,31 @@
 <body class="bg-gray-100">
 
 <!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-primaryDark to-primaryMain text-white px-8 py-4 flex justify-between items-center">
+<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
   <div class="flex items-center gap-3 font-bold">
+    <!-- University Logo -->
+    <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
     <i class="fa-solid fa-tooth text-xl"></i>
     <span>PUP TAGUIG DENTAL CLINIC</span>
   </div>
 
-  <div class="flex items-center gap-4">
-    <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-    <div class="text-sm">
-      <p class="font-semibold">Dr. Nelson Angeles</p>
-      <p class="text-xs opacity-80">Dentist</p>
+  <div class="flex items-center gap-6">
+    <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="text-sm">
+        <p class="font-semibold">Dr. Nelson Angeles</p>
+        <p class="text-xs opacity-80">Dentist</p>
+      </div>
+      <form action="{{ route('logout') }}" method="POST" class="inline">
+        @csrf
+        <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+        </button>
+      </form>
+
     </div>
-    <i class="fa-solid fa-right-from-bracket cursor-pointer"></i>
   </div>
 </header>
 
@@ -72,7 +84,7 @@
     </a>
     <a class="flex flex-col items-center opacity-100">
       <i class="fa-solid fa-file"></i>
-      <span>Reports</span>
+      <span class="font-bold">Reports</span>
     </a>
   </nav>
 </header>

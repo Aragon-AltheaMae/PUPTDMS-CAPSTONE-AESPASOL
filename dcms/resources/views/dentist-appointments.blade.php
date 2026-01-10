@@ -43,54 +43,66 @@
 </head>
 
 <body class="bg-white font-sans">
-  <div class="ui-scale">
 
-    <!-- ================= TOP HEADER ================= -->
-    <header class="bg-gradient-to-r from-primaryDark to-primaryMain text-white px-8 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3 font-bold text-sm">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-8 h-8 object-contain">
-        <i class="fa-solid fa-tooth text-base"></i>
-        <span class="tracking-wide">PUP TAGUIG DENTAL CLINIC</span>
+<!-- ================= TOP HEADER ================= -->
+<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
+  <div class="flex items-center gap-3 font-bold">
+    <!-- University Logo -->
+    <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
+    <i class="fa-solid fa-tooth text-xl"></i>
+    <span>PUP TAGUIG DENTAL CLINIC</span>
+  </div>
+
+  <div class="flex items-center gap-6">
+    <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="text-sm">
+        <p class="font-semibold">Dr. Nelson Angeles</p>
+        <p class="text-xs opacity-80">Dentist</p>
       </div>
+      <form action="{{ route('logout') }}" method="POST" class="inline">
+        @csrf
+        <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+        </button>
+      </form>
 
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-8 h-8">
-        <div class="text-xs leading-tight">
-          <p class="font-semibold">Dr. Nelson Angeles</p>
-          <p class="opacity-80">Dentist</p>
-        </div>
-      </div>
-    </header>
+    </div>
+  </div>
+</header>
 
-    <!-- ================= NAV ================= -->
-    <header class="bg-primaryMain text-white px-8 py-3">
-      <nav class="flex justify-center gap-24 text-[11px]">
-        <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center opacity-70 hover:opacity-100">
-          <i class="fa-solid fa-chart-line text-base mb-1"></i>
-          <span>Dashboard</span>
-        </a>
+<!-- ================= NAV HEADER ================= -->
+<header class="bg-primaryMain text-white px-8 py-3">
+  <nav class="flex justify-around text-sm">
+    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center ">
+      <i class="fa-solid fa-chart-line text-lg"></i>
+      <span>Dashboard</span>
+    </a>
 
-        <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center opacity-70 hover:opacity-100">
-          <i class="fa-solid fa-users text-base mb-1"></i>
-          <span>Patients</span>
-        </a>
+    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center ">
+      <i class="fa-solid fa-users text-lg"></i>
+      <span>Patients</span>
+    </a>
 
-        <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center opacity-100">
-          <i class="fa-solid fa-calendar-check text-base mb-1"></i>
-          <span>Appointments</span>
-        </a>
+    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center ">
+      <i class="fa-solid fa-calendar-check text-lg font-bold"></i>
+      <span class="font-bold">Appointments</span>
+    </a>
+    
+    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center ">
+      <i class="fa-solid fa-box text-lg"></i>
+      <span>Inventory</span>
+    </a>
 
-        <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center opacity-70 hover:opacity-100">
-          <i class="fa-solid fa-box text-base mb-1"></i>
-          <span>Inventory</span>
-        </a>
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center ">
+      <i class="fa-solid fa-file text-lg"></i>
+      <span>Reports</span>
+    </a>
 
-        <a href="#" class="flex flex-col items-center opacity-70 hover:opacity-100">
-          <i class="fa-solid fa-file text-base mb-1"></i>
-          <span>Reports</span>
-        </a>
-      </nav>
-    </header>
+  </nav>
+</header>
 
     <!-- ================= MAIN ================= -->
     <main class="max-w-6xl mx-auto px-6">

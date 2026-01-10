@@ -35,7 +35,7 @@
 <body class="bg-gray-200">
 
 <!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-primaryDark to-primaryMain text-white px-8 py-4 flex justify-between items-center">
+<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
   <div class="flex items-center gap-3 font-bold">
     <!-- University Logo -->
     <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
@@ -66,27 +66,27 @@
 <!-- ================= NAV HEADER ================= -->
 <header class="bg-primaryMain text-white px-8 py-3">
   <nav class="flex justify-around text-sm">
-    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-chart-line text-lg"></i>
       <span>Dashboard</span>
     </a>
 
-    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-users text-lg"></i>
       <span>Patients</span>
     </a>
 
-    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-calendar-check text-lg"></i>
       <span>Appointments</span>
     </a>
     
-    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-box text-lg"></i>
-      <span>Inventory</span>
+      <span class="font-bold">Inventory</span>
     </a>
 
-    <a class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a class="flex flex-col items-center ">
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
