@@ -123,7 +123,11 @@
         </button>
         </div>
         <div class="avatar">
-        <div class="w-8 rounded-full bg-white"></div>
+          <div class="w-8 rounded-full overflow-hidden">
+            <img
+              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
+              alt="Profile" />
+          </div>
         </div>
         <form method="POST" action="{{ route('logout') }}">
         @csrf
@@ -312,7 +316,7 @@
 
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
-  <div class="modal-box rounded-2xl">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
     
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Clearance
@@ -324,10 +328,10 @@
 
   <!-- Type Dropdown -->
     <div class="mb-5">
-    <label class="block text-sm font-semibold text-black mb-2">
+    <label class="block text-sm font-semibold text-[#333333] mb-2">
       Type of Clearance
     </label>
-    <select class="select select-bordered w-full rounded-xl text-black">
+    <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
       <option disabled selected>Select type of clearance</option>
       <option>Dental Clearance</option>
       <option>Annual Dental Clearance</option>
@@ -336,10 +340,10 @@
 
     <!-- Purpose Dropdown -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-black mb-2">
+      <label class="block text-sm font-semibold text-[#333333] mb-2">
         Purpose
       </label>
-      <select class="select select-bordered w-full rounded-xl text-black">
+      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
         <option disabled selected>Select purpose</option>
         <option>On-the-Job Training (OJT)</option>
         <option>Employment Requirement</option>
@@ -358,32 +362,33 @@
         </button>
       </form>
 
-      <button class="px-6 py-2 rounded-xl bg-[#8B0000] text-white
-        font-semibold hover:bg-[#660000] transition">
-        Save
-      </button>
+      <button type="button"
+      onclick="openConfirm('clearanceRequestForm', 'Submit Dental Clearance request?', 'dentalClearanceModal')"
+      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
+      Save
+    </button>
     </div>
   </div>
 </dialog>
 
 <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
 <dialog id="dentalHealthRecordModal" class="modal">
-  <div class="modal-box rounded-2xl">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
 
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Dental Health Record
     </h3>
 
-    <p class="text-sm text-black mb-5">
+    <p class="text-sm text-[#333333] mb-5">
       Please allow a processing period of up to three (3) working days upon submission of your request.
     </p>
 
     <!-- Type Dropdown -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-black mb-2">
+      <label class="block text-sm font-semibold text-[#333333] mb-2">
         Type
       </label>
-      <select class="select select-bordered w-full rounded-xl text-black">
+      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
         <option disabled selected>Select type</option>
         <option>All Dental Records</option>
         <option>Medical Records</option>
@@ -393,10 +398,10 @@
 
     <!-- Purpose Dropdown -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-black mb-2">
+      <label class="block text-sm font-semibold text-[#333333] mb-2">
         Purpose
       </label>
-      <select class="select select-bordered w-full rounded-xl text-black">
+      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
         <option disabled selected>Select purpose</option>
         <option>Personal Record</option>
         <option>Academic Requirement</option>
@@ -414,10 +419,11 @@
         </button>
       </form>
 
-      <button class="px-6 py-2 rounded-xl bg-[#8B0000] text-white
-        font-semibold hover:bg-[#660000] transition">
-        Save
-      </button>
+      <button type="button"
+      onclick="openConfirm('healthRecordRequestForm', 'Submit Dental Health Record request?', 'dentalHealthRecordModal')"
+      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
+      Save
+    </button>
     </div>
 
   </div>
@@ -484,11 +490,85 @@
 
 </footer>
 
+<!-- CONFIRM SAVE MODAL -->
+<dialog id="confirmSaveModal" class="modal">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Confirm</h3>
+    <p id="confirmSaveText" class="text-sm text-gray-700 mb-6">Are you sure?</p>
+
+    <div class="modal-action flex justify-between">
+      <button type="button"
+        onclick="confirmSaveModal.close()"
+        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">
+        Cancel
+      </button>
+
+      <button type="button"
+        onclick="submitConfirmedForm()"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
+        Yes, Submit
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<!-- SUBMITTED INFO MODAL -->
+<dialog id="submittedInfoModal" class="modal">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Submitted!</h3>
+    <p id="submittedInfoText" class="text-sm text-gray-700 mb-6">
+      Your request has been submitted. Please allow up to three (3) working days for processing.
+    </p>
+
+    <div class="modal-action">
+      <button type="button"
+        onclick="submittedInfoModal.close()"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
+        OK
+      </button>
+    </div>
+  </div>
+</dialog>
+
   <!-- ========================= -->
   <!-- FETCH DENTAL RECORDS -->
   <!-- ========================= -->
 
 <script>
+
+  // Request Clearance Confirmation
+    let _pendingFormId = null;
+  let _pendingModalIdToClose = null;
+
+  // Call this from Save buttons
+  function openConfirm(formId, message, modalIdToClose) {
+    _pendingFormId = formId;
+    _pendingModalIdToClose = modalIdToClose || null;
+
+    document.getElementById('confirmSaveText').textContent = message;
+    confirmSaveModal.showModal();
+  }
+
+  function submitConfirmedForm() {
+    // close confirm modal
+    confirmSaveModal.close();
+
+    // close the request modal (clearance/record)
+    if (_pendingModalIdToClose) {
+      const reqModal = document.getElementById(_pendingModalIdToClose);
+      if (reqModal) reqModal.close();
+    }
+
+    // show submitted modal
+    submittedInfoModal.showModal();
+
+    // actually submit
+    if (_pendingFormId) {
+      document.getElementById(_pendingFormId).submit();
+    }
+  }
+
+  // Skeleton Loading
   document.addEventListener("DOMContentLoaded", () => {
 
     // Show all skeletons first
@@ -569,7 +649,9 @@
       <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center fade-up">
         <div class="avatar mb-4 flex justify-center">
           <div class="w-[210px] rounded-full">
-            <img src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : asset('images/hsh.jpg') }}" alt="Profile Image" />
+            <img
+              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
+              alt="Profile" />
           </div>
         </div>
         <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>

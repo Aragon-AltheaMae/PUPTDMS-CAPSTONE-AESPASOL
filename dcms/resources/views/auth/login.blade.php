@@ -21,7 +21,7 @@
 
 <body class="font-inter min-h-screen bg-gradient-to-r from-[#8B0000] to-[#F2B233] flex items-center justify-center">
 
-<div class="bg-[#8B0000] p-5 rounded-[1.75rem] shadow-2xl">
+<div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl">
   <div class="flex w-[1100px] h-[600px] bg-white rounded-[1.5rem] overflow-hidden max-w-[95vw] max-h-[95vh] flex-col lg:flex-row">
 
     <!-- Left Image -->
@@ -50,22 +50,28 @@
 
         <label class="text-sm font-medium mb-1">Email</label>
         <input type="email" name="email" required
-          class="w-full px-4 py-3 rounded-lg bg-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
+          class="w-full px-4 py-3 rounded-lg bg-[#ECECEC] mb-6 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
 
         <label class="text-sm font-medium mb-1">Password</label>
         <div class="relative mb-6">
           <input id="password" type="password" name="password" required
-            class="w-full px-4 py-3 rounded-lg bg-gray-100 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
+            class="w-full px-4 py-3 rounded-lg bg-[#ECECEC] pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
 
           <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
           </button>
         </div>
 
         <button type="submit"
-          class="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-[#FFD166] to-[#8B0000] text-white font-semibold hover:opacity-90 transition">
+          class="mt-2 w-full py-3 rounded-xl bg-[#8B0000] text-white font-semibold hover:opacity-90 transition">
           Log In
         </button>
       </form>
+
+      <a href="{{ route('dentist.login') }}"
+        class="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-[#FFD166] to-[#8B0000] text-[#F4F4F4] font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
+        <img src="{{ asset('images/dentist-login.png') }}" alt="Dentist" class="w-7 h-7">
+        <span>Log in as Dentist</span>
+      </a>
 
         <!-- New: Redirect to Registration -->
         <p class="mt-6 text-center text-sm text-gray-600">
@@ -73,12 +79,6 @@
         <a href="/register" class="text-[#F2B233] font-semibold hover:underline">Register here</a>
         </p>
 
-        <p class="mt-4 text-center text-sm text-gray-600">
-    Are you a dentist?
-    <a href="{{ route('dentist.login') }}"
-       class="text-[#8B0000] font-semibold hover:underline">
-        Log in as Dentist
-    </a>
 </p>
 
     </div>
