@@ -123,7 +123,11 @@
         </button>
         </div>
         <div class="avatar">
-        <div class="w-8 rounded-full bg-white"></div>
+          <div class="w-8 rounded-full overflow-hidden">
+            <img
+              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
+              alt="Profile" />
+          </div>
         </div>
         <form method="POST" action="{{ route('logout') }}">
         @csrf
@@ -569,7 +573,9 @@
       <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center fade-up">
         <div class="avatar mb-4 flex justify-center">
           <div class="w-[210px] rounded-full">
-            <img src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : asset('images/hsh.jpg') }}" alt="Profile Image" />
+            <img
+              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
+              alt="Profile" />
           </div>
         </div>
         <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>
