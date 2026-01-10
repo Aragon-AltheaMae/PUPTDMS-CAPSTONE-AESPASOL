@@ -145,35 +145,23 @@ Route::prefix('dentist')->group(function () {
 // PATIENT ROUTES
 // -------------------
 
-Route::prefix('patient')->group(function () {
+Route::prefix('patient')->middleware('role:patient')->group(function () {
 
     Route::get('/dashboard', function () {
-        if (!session()->has('patient_id')) {
-            return redirect('/login');
-        }
-
         $patient = Patient::find(session('patient_id'));
         return view('patient-dashboard', compact('patient'));
     });
 
-    Route::get('/appointment', [AppointmentController::class, 'index'])
-        ->name('appointment.index');
+    Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment.index');
+    Route::get('/appointment/create', [AppointmentController::class, 'create'])->name('appointment.create');
+    Route::post('/appointment', [AppointmentController::class, 'store'])->name('appointment.store');
 
-    Route::get('/appointment/create', [AppointmentController::class, 'create'])
-        ->name('appointment.create');
+    Route::get('/book-appointment', [AppointmentController::class, 'create'])->name('book.appointment.create');
+    Route::post('/book-appointment', [AppointmentController::class, 'store'])->name('book.appointment.store');
 
-    Route::post('/appointment', [AppointmentController::class, 'store'])
-        ->name('appointment.store');
-
-    Route::get('/book-appointment', [AppointmentController::class, 'create'])
-        ->name('book.appointment.create');
-
-    Route::post('/book-appointment', [AppointmentController::class, 'store'])
-        ->name('book.appointment.store');
-
-    Route::get('/appointments', [AppointmentController::class, 'index'])
-        ->name('book.appointment.index');
+    Route::get('/appointments', [AppointmentController::class, 'index'])->name('book.appointment.index');
 });
+
 
 // -------------------
 // PUBLIC PAGES
@@ -184,6 +172,10 @@ Route::get('/', fn () => redirect('/login'));
 Route::get('/book-appointment', [AppointmentController::class, 'create'])
     ->name('book.appointment');
 
-Route::get('/record', fn () => view('record'))->name('record');
+Route::get('/record', fn () => view('record'))
+    ->name('record')
+    ->middleware('role:patient');
 
-Route::get('/about-us', fn () => view('about-us'))->name('about.us');
+Route::get('/about-us', fn () => view('about-us'))
+    ->name('about.us')
+    ->middleware('role:patient');
