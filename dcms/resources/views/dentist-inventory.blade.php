@@ -86,7 +86,7 @@
       <span>Inventory</span>
     </a>
 
-    <a class="flex flex-col items-center opacity-60 hover:opacity-100">
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center opacity-60 hover:opacity-100">
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
