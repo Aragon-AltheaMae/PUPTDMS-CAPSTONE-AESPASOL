@@ -7,16 +7,27 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Models\DentalHistory;
 use App\Models\MedicalHistory;
+use App\Models\Patient;
+
 
 class AppointmentController extends Controller
 {
     // Show all appointments
     public function index()
-    {
-        $appointments = Appointment::with(['service', 'dentalHistory', 'medicalHistory'])->get();
-        return view('appointment', compact('appointments'));
+{
+    $patientId = session('patient_id');
+    if (!$patientId) {
+        return redirect()->route('login')->with('error', 'Please login first!');
     }
 
+    $patient = Patient::findOrFail($patientId);
+
+    $appointments = Appointment::with(['service', 'dentalHistory', 'medicalHistory'])
+        ->where('patient_id', $patient->id)   // ✅ only this patient’s appointments
+        ->get();
+
+    return view('appointment', compact('appointments', 'patient'));
+}
     // Show booking form
     public function create()
     {

@@ -100,40 +100,102 @@
 
 <body class="bg-white text-[#333333] font-normal">
 
-          <!-- <form method="POST" action="{{ url('/homepage') }}"> -->
+<!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
-
-  <!-- HEADER (TOP BAR) -->
+<!-- HEADER (TOP BAR) -->
   <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
-          <img src="images/PUP.png" alt="PUP Logo" />
+          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
       </div>
       <div class="w-12 rounded-full">
-          <img src="images/PUPT-DMS-Logo.png" alt="PUPT DMS Logo" />
+          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
       </div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
 
-  <div class="flex items-center gap-4">
-      <div class="indicator">
-        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">12</span>
-        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="images/notifications.png" alt="Notification" />
-        </button>
-        </div>
+  <div class="flex items-center gap-8">
+      @php
+  // Pass $notifications from controller, or leave it empty for now
+  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+  @endphp
+
+  <div class="dropdown dropdown-end">
+    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+      @endif
+
+      <img src="{{ asset('images/notifications.png') }}" alt="Notification" class="w-7 h-7" />
+    </label>
+
+    <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+      <div class="p-4 border-b flex items-center justify-between">
+        <span class="font-bold text-[#8B0000]">Notifications</span>
+
+        {{-- Optional "View all" (only if you have this route) --}}
+        {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+      </div>
+
+      <div class="max-h-80 overflow-y-auto">
+        @forelse($notifications as $n)
+          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+            <div class="text-sm font-semibold text-gray-900">
+              {{ $n['title'] ?? 'Notification' }}
+            </div>
+            @if(!empty($n['message']))
+              <div class="text-xs text-gray-600 mt-0.5">
+                {{ $n['message'] }}
+              </div>
+            @endif
+            @if(!empty($n['time']))
+              <div class="text-[11px] text-gray-400 mt-1">
+                {{ $n['time'] }}
+              </div>
+            @endif
+          </a>
+        @empty
+          <div class="px-4 py-10 text-center justify-items-center">
+            <img src="images/no-notifications.png" alt="No Notification">
+            <div class="text-sm font-semibold text-gray-800">No notifications</div>
+            <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+          </div>
+        @endforelse
+      </div>
+    </div>
+  </div>
+        <div class="flex items-center gap-3">
+        {{-- Avatar --}}
         <div class="avatar">
-          <div class="w-8 rounded-full overflow-hidden">
+          <div class="w-10 rounded-full overflow-hidden">
             <img
-              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
-              alt="Profile" />
+              src="{{ $patient->profile_image
+                    ? asset('storage/'.$patient->profile_image)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+              alt="Profile"
+            />
           </div>
         </div>
+
+        {{-- Name + Role --}}
+        <div class="leading-tight">
+          <div class="text-l font-semibold text-[#F4F4F4]">
+            {{ $patient->name }}
+          </div>
+          <div class="italic text-xs text-[#F4F4F4]/80">
+            Patient
+          </div>
+        </div>
+      </div>
         <form method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit"
             class="btn btn-ghost btn-circle text-[#F4F4F4]">
-            <img src="images/Log-out.png" alt="Log Out" />
+            <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
         </button>
         </form>
       </div>
@@ -197,7 +259,7 @@
     <!-- WELCOME -->
         <h1 class="text-4xl font-extrabold mb-6 bg-gradient-to-r
     from-[#660000] to-[#FFD700] bg-clip-text text-transparent inline-block fade-up">
-      Welcome, {{ ucwords(strtolower($patient->name)) }}
+      Welcome, {{ ucwords(strtolower($patient->name)) }}!
     </h1>
 
 
@@ -316,117 +378,143 @@
 
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
-  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    
+  <form
+    id="clearanceRequestForm"
+    class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+    novalidate
+  >
+
+    <!-- MINI WARNING -->
+    <div
+      id="clearanceWarning"
+      class="hidden absolute top-4 left-1/2 -translate-x-1/2
+            px-4 py-1.5 rounded-full bg-red-600 text-white
+            text-xs font-semibold shadow-lg">
+      Please complete all required fields
+    </div>
+
+
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Clearance
     </h3>
 
     <p class="text-sm text-gray-600 mb-5">
-      Please allow a processing period of up to three (3) working days upon submission of your request.
+      Please allow up to three (3) working days for processing.
     </p>
 
-  <!-- Type Dropdown -->
+    <!-- TYPE -->
     <div class="mb-5">
-    <label class="block text-sm font-semibold text-[#333333] mb-2">
-      Type of Clearance
-    </label>
-    <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-      <option disabled selected>Select type of clearance</option>
-      <option>Dental Clearance</option>
-      <option>Annual Dental Clearance</option>
-    </select>
-  </div>
-
-    <!-- Purpose Dropdown -->
-    <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Purpose
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select purpose</option>
-        <option>On-the-Job Training (OJT)</option>
-        <option>Employment Requirement</option>
-        <option>Academic Requirement</option>
-        <option>Internship</option>
-        <option>Personal Record</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type of Clearance</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select type of clearance</option>
+        <option>Dental Clearance</option>
+        <option>Annual Dental Clearance</option>
       </select>
     </div>
 
-    <!-- Buttons -->
+    <!-- PURPOSE -->
+    <div class="mb-5">
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select purpose</option>
+        <option>On-the-Job Training (OJT)</option>
+        <option>Employment Requirement</option>
+        <option>Academic Requirement</option>
+      </select>
+    </div>
+
+    <!-- ACTIONS -->
     <div class="modal-action flex justify-between">
-      <form method="dialog">
-        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
-          font-semibold hover:bg-gray-300 transition">
-          Back
-        </button>
-      </form>
+      <button type="button"
+        onclick="dentalClearanceModal.close()"
+        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+        Back
+      </button>
 
       <button type="button"
-      onclick="openConfirm('clearanceRequestForm', 'Submit Dental Clearance request?', 'dentalClearanceModal')"
-      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-      Save
-    </button>
+        onclick="validateAndConfirm('clearanceRequestForm','Submit Dental Clearance request?','dentalClearanceModal')"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold">
+        Save
+      </button>
     </div>
-  </div>
+  </form>
 </dialog>
 
 <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
 <dialog id="dentalHealthRecordModal" class="modal">
-  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+  <form
+    id="healthRecordRequestForm"
+    class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+    novalidate
+  >
+
+    <!-- MINI WARNING -->
+      <div
+      id="healthRecordWarning"
+      class="hidden absolute top-4 left-1/2 -translate-x-1/2
+            px-4 py-1.5 rounded-full bg-red-600 text-white
+            text-xs font-semibold shadow-lg">
+      Please complete all required fields
+    </div>
+
 
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Dental Health Record
     </h3>
 
-    <p class="text-sm text-[#333333] mb-5">
-      Please allow a processing period of up to three (3) working days upon submission of your request.
+    <p class="text-sm mb-5">
+      Please allow up to three (3) working days for processing.
     </p>
 
-    <!-- Type Dropdown -->
+    <!-- TYPE -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Type
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select type</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select type</option>
         <option>All Dental Records</option>
         <option>Medical Records</option>
         <option>Diagnosis and Treatment</option>
       </select>
     </div>
 
-    <!-- Purpose Dropdown -->
+    <!-- PURPOSE -->
     <div class="mb-5">
-      <label class="block text-sm font-semibold text-[#333333] mb-2">
-        Purpose
-      </label>
-      <select class="select select-bordered w-full rounded-xl text-[#333333] bg-[#F4F4F4]">
-        <option disabled selected>Select purpose</option>
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
+      <select required
+        class="select select-bordered w-full rounded-xl
+               bg-[#F4F4F4] text-[#333333]
+               focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+        <option value="" disabled selected>Select purpose</option>
         <option>Personal Record</option>
         <option>Academic Requirement</option>
         <option>Employment Requirement</option>
-        <option>Reference</option>
       </select>
     </div>
 
-    <!-- Buttons -->
+    <!-- ACTIONS -->
     <div class="modal-action flex justify-between">
-      <form method="dialog">
-        <button class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700
-          font-semibold hover:bg-gray-300 transition">
-          Back
-        </button>
-      </form>
+      <button type="button"
+        onclick="dentalHealthRecordModal.close()"
+        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+        Back
+      </button>
 
       <button type="button"
-      onclick="openConfirm('healthRecordRequestForm', 'Submit Dental Health Record request?', 'dentalHealthRecordModal')"
-      class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-      Save
-    </button>
+        onclick="validateHealthRecord('healthRecordRequestForm','Submit Dental Health Record request?','dentalHealthRecordModal')"
+        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold">
+        Save
+      </button>
     </div>
-
-  </div>
+  </form>
 </dialog>
 
   <!-- ASIDE: CLINIC INFO -->
@@ -493,21 +581,11 @@
 <!-- CONFIRM SAVE MODAL -->
 <dialog id="confirmSaveModal" class="modal">
   <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Confirm</h3>
-    <p id="confirmSaveText" class="text-sm text-gray-700 mb-6">Are you sure?</p>
-
+    <h3 class="font-bold text-lg mb-2">Confirm</h3>
+    <p id="confirmSaveText" class="mb-6">Are you sure?</p>
     <div class="modal-action flex justify-between">
-      <button type="button"
-        onclick="confirmSaveModal.close()"
-        class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">
-        Cancel
-      </button>
-
-      <button type="button"
-        onclick="submitConfirmedForm()"
-        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-        Yes, Submit
-      </button>
+      <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
+      <button onclick="submitConfirmedForm()" class="btn btn-error text-white">Yes, Submit</button>
     </div>
   </div>
 </dialog>
@@ -515,17 +593,10 @@
 <!-- SUBMITTED INFO MODAL -->
 <dialog id="submittedInfoModal" class="modal">
   <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-    <h3 class="font-extrabold text-xl text-[#8B0000] mb-2">Submitted!</h3>
-    <p id="submittedInfoText" class="text-sm text-gray-700 mb-6">
-      Your request has been submitted. Please allow up to three (3) working days for processing.
-    </p>
-
+    <h3 class="font-bold text-lg mb-2">Submitted!</h3>
+    <p>Your request has been submitted.</p>
     <div class="modal-action">
-      <button type="button"
-        onclick="submittedInfoModal.close()"
-        class="px-6 py-2 rounded-xl bg-[#8B0000] text-white font-semibold hover:bg-[#660000] transition">
-        OK
-      </button>
+      <button onclick="submittedInfoModal.close()" class="btn btn-error text-white">OK</button>
     </div>
   </div>
 </dialog>
@@ -557,6 +628,9 @@
     if (_pendingModalIdToClose) {
       const reqModal = document.getElementById(_pendingModalIdToClose);
       if (reqModal) reqModal.close();
+      
+    _pendingFormId = null;
+    _pendingModalIdToClose = null;
     }
 
     // show submitted modal
@@ -568,8 +642,39 @@
     }
   }
 
+    // validate submit request
+function validateAndConfirm(formId, message, modalId) {
+  const form = document.getElementById(formId);
+  const warn = document.getElementById('clearanceWarning');
+  warn.classList.add('hidden');
+  if (!form.checkValidity()) { warn.classList.remove('hidden'); return; }
+  openConfirm(formId, message, modalId);
+}
+
+function validateHealthRecord(formId, message, modalId) {
+  const form = document.getElementById(formId);
+  const warn = document.getElementById('healthRecordWarning');
+  warn.classList.add('hidden');
+  if (!form.checkValidity()) { warn.classList.remove('hidden'); return; }
+  openConfirm(formId, message, modalId);
+}
+
   // Skeleton Loading
   document.addEventListener("DOMContentLoaded", () => {
+    
+     document.querySelectorAll('#clearanceRequestForm select')
+    .forEach(select => {
+      select.addEventListener('change', () => {
+        document.getElementById('clearanceWarning').classList.add('hidden');
+      });
+    });
+
+  document.querySelectorAll('#healthRecordRequestForm select')
+    .forEach(select => {
+      select.addEventListener('change', () => {
+        document.getElementById('healthRecordWarning').classList.add('hidden');
+      });
+    });
 
     // Show all skeletons first
     showSkeletons();

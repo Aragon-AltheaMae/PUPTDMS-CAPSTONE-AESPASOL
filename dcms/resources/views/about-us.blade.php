@@ -23,8 +23,7 @@
 
   <style>
     body {
-      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-                   "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Inter';
     }
 
     /* Custom FAQ */
@@ -55,33 +54,104 @@
 </head>
 <body class="bg-white text-[#333333] font-normal">
 
-  <!-- HEADER -->
+  <!-- HEADER (TOP BAR) -->
   <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <div class="w-12 rounded-full">
-            <img src="images/PUP.png" alt="User Profile" />
-        </div>
-        <div class="w-12 rounded-full">
-            <img src="images/PUPT-DMS-Logo.png" alt="User Profile" />
-        </div>
-        <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
-    </div>
+      <div class="w-12 rounded-full ml-5">
+          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+      </div>
+      <div class="w-12 rounded-full">
+          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      </div>
+      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  </div>
 
-    <div class="flex items-center gap-4">
-      <div class="indicator">
-        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">12</span>
-        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="images/notifications.png" alt="Notification" />
-        </button>
-        </div>
-        <div class="avatar">
-        <div class="w-8 rounded-full bg-white"></div>
-        </div>
-        <button class="btn btn-ghost btn-circle text-[#F4F4F4]">
-          <img src="images/Log-out.png" alt="Log Out" />
-        </button>
+  <div class="flex items-center gap-8">
+      @php
+  // Pass $notifications from controller, or leave it empty for now
+  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+  @endphp
+
+  <div class="dropdown dropdown-end">
+    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+      @endif
+
+      <img src="{{ asset('images/notifications.png') }}" alt="Notification" class="w-7 h-7" />
+    </label>
+
+    <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+      <div class="p-4 border-b flex items-center justify-between">
+        <span class="font-bold text-[#8B0000]">Notifications</span>
+
+        {{-- Optional "View all" (only if you have this route) --}}
+        {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+      </div>
+
+      <div class="max-h-80 overflow-y-auto">
+        @forelse($notifications as $n)
+          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+            <div class="text-sm font-semibold text-gray-900">
+              {{ $n['title'] ?? 'Notification' }}
+            </div>
+            @if(!empty($n['message']))
+              <div class="text-xs text-gray-600 mt-0.5">
+                {{ $n['message'] }}
+              </div>
+            @endif
+            @if(!empty($n['time']))
+              <div class="text-[11px] text-gray-400 mt-1">
+                {{ $n['time'] }}
+              </div>
+            @endif
+          </a>
+        @empty
+          <div class="px-4 py-10 text-center justify-items-center">
+            <img src="images/no-notifications.png" alt="No Notification">
+            <div class="text-sm font-semibold text-gray-800">No notifications</div>
+            <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+          </div>
+        @endforelse
+      </div>
     </div>
-</div>
+  </div>
+        <div class="flex items-center gap-3">
+        {{-- Avatar --}}
+        <div class="avatar">
+          <div class="w-10 rounded-full overflow-hidden">
+            <img
+              src="{{ $patient->profile_image
+                    ? asset('storage/'.$patient->profile_image)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+              alt="Profile"
+            />
+          </div>
+        </div>
+
+        {{-- Name + Role --}}
+        <div class="leading-tight">
+          <div class="text-l font-semibold text-[#F4F4F4]">
+            {{ $patient->name }}
+          </div>
+          <div class="italic text-xs text-[#F4F4F4]/80">
+            Patient
+          </div>
+        </div>
+      </div>
+        <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit"
+            class="btn btn-ghost btn-circle text-[#F4F4F4]">
+            <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
+        </button>
+        </form>
+      </div>
+  </div>
 
   <!-- NAVIGATION -->
   <div class="bg-red-800 text-[#F4F4F4] px-6">
