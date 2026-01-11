@@ -1,29 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>PUP Taguig Dental Clinic | Inventory</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>PUP Taguig Dental Clinic | Inventory</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-
-  <!-- Tailwind config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-        }
-      }
-    }
-  </script>
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter';
     }
   </style>
 </head>
@@ -31,16 +26,68 @@
 <body class="bg-gray-200">
 
 <!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
+<header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
   <div class="flex items-center gap-3 font-bold">
     <!-- University Logo -->
     <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <i class="fa-solid fa-tooth text-xl"></i>
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
     <span>PUP TAGUIG DENTAL CLINIC</span>
   </div>
 
-  <div class="flex items-center gap-6">
-    <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+  <div class="flex items-center gap-8">
+      @php
+  // Pass $notifications from controller, or leave it empty for now
+  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+  @endphp
+
+  <div class="dropdown dropdown-end">
+    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+      @endif
+
+      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+      </label>
+
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
+
+          {{-- Optional "View all" (only if you have this route) --}}
+          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+        </div>
+
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+            </div>
+          @endforelse
+        </div>
+      </div>
+    </div>
 
     <div class="flex items-center gap-3">
       <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
@@ -48,9 +95,10 @@
         <p class="font-semibold">Dr. Nelson Angeles</p>
         <p class="text-xs opacity-80">Dentist</p>
       </div>
+
       <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
+        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
             <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
       </form>
@@ -60,7 +108,7 @@
 </header>
 
 <!-- ================= NAV HEADER ================= -->
-<header class="bg-primaryMain text-white px-8 py-3">
+<header class="bg-[#8B0000] text-white px-8 py-3">
   <nav class="flex justify-around text-sm">
     <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-chart-line text-lg"></i>
@@ -82,7 +130,7 @@
       <span class="font-bold">Inventory</span>
     </a>
 
-    <a href="{{ route('dentist.report') }}" flex flex-col items-center">
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
@@ -143,7 +191,7 @@
 
 
     <button onclick="addModal.showModal()"
-      class="btn btn-sm rounded-full bg-primaryMain text-white">
+      class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
       <i class="fa fa-plus mr-1"></i> Add Item
     </button>
 
@@ -154,7 +202,7 @@
 <div class="overflow-x-auto">
 <table class="table table-sm w-full">
 <thead>
-<tr class="text-primaryMain text-xs uppercase">
+<tr class="text-[#8B0000] text-xs uppercase">
   <th>Date</th>
   <th>Stock No.</th>
   <th>Supplies</th>
@@ -176,65 +224,65 @@
 <dialog id="addModal" class="modal">
   <div class="modal-box max-w-xl bg-white rounded-lg">
 
-    <h3 class="font-bold text-lg text-primaryMain mb-6">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
       Add Inventory Item
     </h3>
 
     <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
     
       <!-- CATEGORY -->
-      <label class="text-sm">Category</label>
-      <select id="addCategory" class="select select-bordered w-48 bg-white">
+      <label class="text-sm text-[#8B0000]">Category</label>
+      <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
         <option disabled selected>Select Category</option>
         <option value="Medicine">Medicine</option>
         <option value="Supplies">Supplies</option>
       </select>
 
       <!-- DATE (AUTO / DROPDOWN) -->
-      <label class="text-sm">Date Received</label>
+      <label class="text-sm text-[#8B0000]">Date Received</label>
       <input
         id="addDate"
         type="date"
-        class="input input-bordered w-40 bg-white"
+        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
       />
 
       <!-- STOCK -->
-      <label class="text-sm">Stock Number</label>
-      <input id="addStock" class="input input-bordered w-40 bg-white" placeholder="00 - 000">
+      <label class="text-sm text-[#8B0000]">Stock Number</label>
+      <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
 
       <!-- NAME -->
-      <label class="text-sm">Supply Name</label>
-      <input id="addName" class="input input-bordered w-100 bg-white"
+      <label class="text-sm text-[#8B0000]">Supply Name</label>
+      <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
         placeholder="ex. Nitrile Gloves Large">
 
       <!-- UNIT -->
-      <label class="text-sm">Units</label>
-      <input id="addUnit" class="input input-bordered w-40 bg-white"
+      <label class="text-sm text-[#8B0000]">Units</label>
+      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
         placeholder="ex. pack">
 
       <!-- QTY -->
-      <label class="text-sm">Quantity</label>
+      <label class="text-sm text-[#8B0000]">Quantity</label>
       <input id="addQty" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeAddBalance()">
 
       <!-- USED -->
-      <label class="text-sm">Consumed</label>
+      <label class="text-sm text-[#8B0000]">Consumed</label>
       <input id="addUsed" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeAddBalance()">
 
       <!-- BALANCE -->
-      <label class="text-sm">Balance</label>
+      <label class="text-sm text-[#8B0000]">Balance</label>
       <input id="addBalance"
-        class="input input-bordered w-28 bg-gray-100 text-black"
+        class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
         readonly>
 
     </div>
 
     <div class="modal-action mt-6">
-      <button class="btn bg-gray-200 hover:bg-gray-300 text-gray-700" onclick="addModal.close()">Back</button>
-      <button class="btn bg-primaryMain text-white" onclick="addItem()">Save</button>
+      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="addModal.close()">Back</button>
+      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="addItem()">Save</button>
     </div>
 
   </div>
@@ -244,50 +292,50 @@
 <dialog id="editModal" class="modal">
   <div class="modal-box max-w-xl bg-white rounded-lg">
 
-    <h3 class="font-bold text-lg text-primaryMain mb-6">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
       Edit Inventory Item
     </h3>
 
-    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
+    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center text-[#8B0000]">
       <label>Category</label>
-      <select id="editCategory" class="select select-bordered w-48 bg-white">
+      <select id="editCategory" class="select select-bordered w-48 bg-white text-[#333333]">
         <option value="Medicine">Medicine</option>
         <option value="Supplies">Supplies</option>
       </select>
 
       <label>Date Received</label>
       <input id="editDate" type="date"
-        class="input input-bordered w-40 bg-white">
+        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Stock Number</label>
-      <input id="editStock" class="input input-bordered bg-white">
+      <input id="editStock" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Supply Name</label>
-      <input id="editName" class="input input-bordered bg-white">
+      <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Units</label>
-      <input id="editUnit" class="input input-bordered w-40 bg-white">
+      <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Quantity</label>
       <input id="editQty" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeEditBalance()">
 
       <label>Consumed</label>
       <input id="editUsed" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeEditBalance()">
 
       <label>Balance</label>
       <input id="editBalance"
-        class="input input-bordered w-28 bg-gray-100 text-black"
+        class="input input-bordered w-28 bg-[#F4F4F4] border-[#D9D9D9] text-[#333333]"
         readonly>
 
     </div>
 
     <div class="modal-action mt-6">
-      <button class="btn bg-gray-200 hover:bg-gray-300 text-gray-700" onclick="editModal.close()">Back</button>
-      <button class="btn bg-primaryMain text-white" onclick="saveEdit()">Save</button>
+      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="editModal.close()">Back</button>
+      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="saveEdit()">Save</button>
     </div>
 
   </div>
@@ -297,12 +345,12 @@
 <dialog id="deleteModal" class="modal">
     <div class="modal-box max-w-md bg-white rounded-lg text-center">
 
-      <h3 class="font-bold text-lg text-primaryMain mb-4">Confirm Deletion</h3>
+      <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
       <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
 
       <div class="modal-action justify-center gap-4">
         <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
-        <button id="confirmDeleteBtn" class="btn bg-primaryMain text-white">Delete</button>
+        <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
       </div>
 
     </div>
@@ -537,19 +585,19 @@ function renderTable() {
     const balance = item.qty - item.used;
     tbody.innerHTML += `
     <tr class="text-gray-800"> <!-- sets the font color -->
-        <td class="text-000000">${item.date}</td>
-        <td class="text-000000">${item.stock}</td>
-        <td class="text-000000">${item.name}</td>
-        <td class="text-000000">${item.unit}</td>
-        <td class="text-000000">${item.qty}</td>
-        <td class="text-000000">${item.used}</td>
-        <td class="text-000000">${balance}</td>
+        <td class="text-[#333333]">${item.date}</td>
+        <td class="text-[#333333]">${item.stock}</td>
+        <td class="text-[#333333]">${item.name}</td>
+        <td class="text-[#333333]">${item.unit}</td>
+        <td class="text-[#333333]">${item.qty}</td>
+        <td class="text-[#333333]">${item.used}</td>
+        <td class="text-[#333333]">${balance}</td>
         <td class="flex justify-center gap-2">
-          <button class="btn btn-xs bg-primaryMain text-white"
+          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
             onclick="openEdit(${index})">
             <i class="fa fa-pen"></i>
           </button>
-          <button class="btn btn-xs bg-primaryMain text-white"
+          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
             onclick="deleteItem(${index})">
             <i class="fa fa-trash"></i>
           </button>

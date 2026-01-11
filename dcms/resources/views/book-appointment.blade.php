@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Book Appointment</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-  <!-- Import Inter from Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     body {
       background-color: #F4F4F4;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 
-                 "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Inter';
     }
 
     /* Primary color scheme */
@@ -160,7 +163,7 @@
   }
   </style>
 </head>
-<body>
+<body class="bg-white">
 
 <!-- HEADER -->
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
@@ -184,7 +187,7 @@
 </h1>
 
 <!-- MAIN FORM -->
-<div class="max-w-4xl mx-auto p-8 bg-[#D9D9D9] rounded-xl mt-5 mb-5 shadow">
+<div class="max-w-4xl mx-auto p-8 bg-[#ECECEC] rounded-xl mt-5 mb-12 shadow-xl">
   <ul class="steps w-full mb-10">
     <li class="step step-primary" id="s1">Date & Time</li>
     <li class="step" id="s2">Service</li>
@@ -221,7 +224,7 @@
     <!-- Card 1 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -242,7 +245,7 @@
     <!-- Card 2 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -263,7 +266,7 @@
     <!-- Card 3 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -284,7 +287,7 @@
     <!-- Card 4 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
