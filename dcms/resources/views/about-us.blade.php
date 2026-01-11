@@ -11,6 +11,11 @@
   <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
 
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <script type="module" src="https://unpkg.com/cally"></script>
 
   <script>
@@ -81,7 +86,7 @@
 }
   </style>
 </head>
-<body class="bg-white text-[#333333] font-normal">
+<body class="bg-white text-[#333333]">
 
   <!-- HEADER (TOP BAR) -->
   <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
