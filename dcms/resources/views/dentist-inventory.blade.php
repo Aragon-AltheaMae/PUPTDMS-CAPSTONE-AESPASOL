@@ -191,7 +191,7 @@
 
 
     <button onclick="addModal.showModal()"
-      class="btn btn-sm rounded-full bg-primaryMain text-white">
+      class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
       <i class="fa fa-plus mr-1"></i> Add Item
     </button>
 
@@ -202,7 +202,7 @@
 <div class="overflow-x-auto">
 <table class="table table-sm w-full">
 <thead>
-<tr class="text-primaryMain text-xs uppercase">
+<tr class="text-[#8B0000] text-xs uppercase">
   <th>Date</th>
   <th>Stock No.</th>
   <th>Supplies</th>
@@ -224,65 +224,65 @@
 <dialog id="addModal" class="modal">
   <div class="modal-box max-w-xl bg-white rounded-lg">
 
-    <h3 class="font-bold text-lg text-primaryMain mb-6">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
       Add Inventory Item
     </h3>
 
     <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
     
       <!-- CATEGORY -->
-      <label class="text-sm">Category</label>
-      <select id="addCategory" class="select select-bordered w-48 bg-white">
+      <label class="text-sm text-[#8B0000]">Category</label>
+      <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
         <option disabled selected>Select Category</option>
         <option value="Medicine">Medicine</option>
         <option value="Supplies">Supplies</option>
       </select>
 
       <!-- DATE (AUTO / DROPDOWN) -->
-      <label class="text-sm">Date Received</label>
+      <label class="text-sm text-[#8B0000]">Date Received</label>
       <input
         id="addDate"
         type="date"
-        class="input input-bordered w-40 bg-white"
+        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
       />
 
       <!-- STOCK -->
-      <label class="text-sm">Stock Number</label>
-      <input id="addStock" class="input input-bordered w-40 bg-white" placeholder="00 - 000">
+      <label class="text-sm text-[#8B0000]">Stock Number</label>
+      <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
 
       <!-- NAME -->
-      <label class="text-sm">Supply Name</label>
-      <input id="addName" class="input input-bordered w-100 bg-white"
+      <label class="text-sm text-[#8B0000]">Supply Name</label>
+      <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
         placeholder="ex. Nitrile Gloves Large">
 
       <!-- UNIT -->
-      <label class="text-sm">Units</label>
-      <input id="addUnit" class="input input-bordered w-40 bg-white"
+      <label class="text-sm text-[#8B0000]">Units</label>
+      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
         placeholder="ex. pack">
 
       <!-- QTY -->
-      <label class="text-sm">Quantity</label>
+      <label class="text-sm text-[#8B0000]">Quantity</label>
       <input id="addQty" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeAddBalance()">
 
       <!-- USED -->
-      <label class="text-sm">Consumed</label>
+      <label class="text-sm text-[#8B0000]">Consumed</label>
       <input id="addUsed" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeAddBalance()">
 
       <!-- BALANCE -->
-      <label class="text-sm">Balance</label>
+      <label class="text-sm text-[#8B0000]">Balance</label>
       <input id="addBalance"
-        class="input input-bordered w-28 bg-gray-100 text-black"
+        class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
         readonly>
 
     </div>
 
     <div class="modal-action mt-6">
-      <button class="btn bg-gray-200 hover:bg-gray-300 text-gray-700" onclick="addModal.close()">Back</button>
-      <button class="btn bg-primaryMain text-white" onclick="addItem()">Save</button>
+      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="addModal.close()">Back</button>
+      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="addItem()">Save</button>
     </div>
 
   </div>
@@ -292,50 +292,50 @@
 <dialog id="editModal" class="modal">
   <div class="modal-box max-w-xl bg-white rounded-lg">
 
-    <h3 class="font-bold text-lg text-primaryMain mb-6">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
       Edit Inventory Item
     </h3>
 
-    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
+    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center text-[#8B0000]">
       <label>Category</label>
-      <select id="editCategory" class="select select-bordered w-48 bg-white">
+      <select id="editCategory" class="select select-bordered w-48 bg-white text-[#333333]">
         <option value="Medicine">Medicine</option>
         <option value="Supplies">Supplies</option>
       </select>
 
       <label>Date Received</label>
       <input id="editDate" type="date"
-        class="input input-bordered w-40 bg-white">
+        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Stock Number</label>
-      <input id="editStock" class="input input-bordered bg-white">
+      <input id="editStock" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Supply Name</label>
-      <input id="editName" class="input input-bordered bg-white">
+      <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Units</label>
-      <input id="editUnit" class="input input-bordered w-40 bg-white">
+      <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Quantity</label>
       <input id="editQty" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeEditBalance()">
 
       <label>Consumed</label>
       <input id="editUsed" type="number"
-        class="input input-bordered w-28 bg-white"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
         oninput="computeEditBalance()">
 
       <label>Balance</label>
       <input id="editBalance"
-        class="input input-bordered w-28 bg-gray-100 text-black"
+        class="input input-bordered w-28 bg-[#F4F4F4] border-[#D9D9D9] text-[#333333]"
         readonly>
 
     </div>
 
     <div class="modal-action mt-6">
-      <button class="btn bg-gray-200 hover:bg-gray-300 text-gray-700" onclick="editModal.close()">Back</button>
-      <button class="btn bg-primaryMain text-white" onclick="saveEdit()">Save</button>
+      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="editModal.close()">Back</button>
+      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="saveEdit()">Save</button>
     </div>
 
   </div>
@@ -345,12 +345,12 @@
 <dialog id="deleteModal" class="modal">
     <div class="modal-box max-w-md bg-white rounded-lg text-center">
 
-      <h3 class="font-bold text-lg text-primaryMain mb-4">Confirm Deletion</h3>
+      <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
       <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
 
       <div class="modal-action justify-center gap-4">
         <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
-        <button id="confirmDeleteBtn" class="btn bg-primaryMain text-white">Delete</button>
+        <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
       </div>
 
     </div>
@@ -585,19 +585,19 @@ function renderTable() {
     const balance = item.qty - item.used;
     tbody.innerHTML += `
     <tr class="text-gray-800"> <!-- sets the font color -->
-        <td class="text-000000">${item.date}</td>
-        <td class="text-000000">${item.stock}</td>
-        <td class="text-000000">${item.name}</td>
-        <td class="text-000000">${item.unit}</td>
-        <td class="text-000000">${item.qty}</td>
-        <td class="text-000000">${item.used}</td>
-        <td class="text-000000">${balance}</td>
+        <td class="text-[#333333]">${item.date}</td>
+        <td class="text-[#333333]">${item.stock}</td>
+        <td class="text-[#333333]">${item.name}</td>
+        <td class="text-[#333333]">${item.unit}</td>
+        <td class="text-[#333333]">${item.qty}</td>
+        <td class="text-[#333333]">${item.used}</td>
+        <td class="text-[#333333]">${balance}</td>
         <td class="flex justify-center gap-2">
-          <button class="btn btn-xs bg-primaryMain text-white"
+          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
             onclick="openEdit(${index})">
             <i class="fa fa-pen"></i>
           </button>
-          <button class="btn btn-xs bg-primaryMain text-white"
+          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
             onclick="deleteItem(${index})">
             <i class="fa fa-trash"></i>
           </button>
