@@ -43,9 +43,11 @@
 <!-- Page Title with Back Arrow -->
 <div class="flex items-center gap-4 mb-6">
   <!-- Back Arrow Button -->
-<a href="{{ route('dentists/patient') }}" class="w-10 h-10 flex items-center justify-center rounded-full border border-orange-400 text-orange-500 hover:bg-orange-100 transition">
+<a href="/dentist/patients" class="w-10 h-10 flex items-center justify-center rounded-full border border-orange-400 text-orange-500 hover:bg-orange-100 transition">
     <i class="fa-solid fa-arrow-left"></i>
 </a>
+
+
 
 
   <!-- Page Title -->
