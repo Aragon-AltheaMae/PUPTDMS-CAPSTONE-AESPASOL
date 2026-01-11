@@ -28,7 +28,7 @@
   </script>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100">
 
 <!-- ================= HEADER ================= -->
 <header class="bg-[#8B0000] h-16 shadow">
@@ -342,9 +342,8 @@
 
   </div>
 </section>
+</main>
 
-
-<!-- FOOTER -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
 
   <!-- ASIDE: CLINIC INFO -->
