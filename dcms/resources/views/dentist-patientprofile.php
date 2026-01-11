@@ -63,37 +63,37 @@
               rounded-2xl text-white
               px-14 py-10 shadow-xl">
 
-    <div class="flex items-center gap-12">
+    <div class="flex items-center gap-2">
 
       <!-- Avatar -->
       <img src="https://i.pravatar.cc/180"
-           class="w-36 h-36 rounded-full object-cover border-4 border-[#7a0000]" />
+           class="w-36 h-36 rounded-full object-cover border-4 border-[#7a0000] mt-3" />
 
       <!-- LEFT INFO -->
-      <div class="flex-1">
-        <p class="text-3xl font-semibold leading-tight">
+      <div class="shrink-0 w-[400px] mt-2 pl-4">
+        <p class="text-3xl font-bold leading-tight mt-1">
           Capilitan, Beyonce
         </p>
 
-        <p class="text-base opacity-90 mt-1">
-          2023-00099- TG-0
+        <p class="text-base font-semibold mt-2">
+          2023-00099-TG-0
         </p>
 
-        <p class="text-base mt-4 leading-tight">
+        <p class="text-base font-semibold mt-0.5 leading-tight">
           BSIT 3-1
         </p>
       </div>
 
       <!-- RIGHT INFO -->
-      <div class="grid grid-cols-2 gap-x-10 gap-y-4 text-base">
-        <span class="opacity-80">Age</span>
-        <span>18</span>
+      <div class="grid grid-cols-[auto,1fr] gap-x-3 gap-y-2 text-sm mt-14">
+        <span class="font-semibold">Age:</span>
+        <span class="font-semibold">18</span>
 
-        <span class="opacity-80">Birthdate</span>
-        <span>January 01, 2004</span>
+        <span class="font-semibold">Birthdate:</span>
+        <span class="font-semibold">January 01, 2004</span>
 
-        <span class="opacity-80">Sex</span>
-        <span>F</span>
+        <span class="font-semibold">Sex:</span>
+        <span class="font-semibold">Female</span>
       </div>
     </div>
 
