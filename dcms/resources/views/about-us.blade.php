@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PUP Taguig Dental Clinic | About Us</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
