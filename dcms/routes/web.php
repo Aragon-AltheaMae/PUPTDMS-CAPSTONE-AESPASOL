@@ -105,11 +105,8 @@ Route::get('/homepage', function () {
     return view('index', compact('patient'));
 })->name('homepage');
 
-// -------------------
-// Dentist Routes
-// -------------------
 Route::prefix('dentist')->group(function () {
-
+    // Dashboard Route
     Route::get('/dashboard', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -117,6 +114,7 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-dashboard');
     })->name('dentist.dashboard');
 
+    // Patients Route
     Route::get('/patients', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -124,6 +122,7 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-patient');
     })->name('dentist.patients');
 
+    // Appointments Route
     Route::get('/appointments', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -131,13 +130,14 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-appointments');
     })->name('dentist.appointments');
 
-    // ✅ PATIENT PROFILE (FIXED)
+    // Patient Profile Route
     Route::get('/patient', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
         return view('dentist-patientprofile');
     })->name('dentist.patient.profile');
+
 
     Route::get('/inventory', function () {
         if (session('role') !== 'dentist') {
