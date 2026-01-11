@@ -57,6 +57,48 @@
     .tabs-bordered .tab-active {
       border-bottom-color: #660000 !important;
     }
+
+    .service-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      inset: -12px; /* THIS is the “umuusbong” part */
+      background: linear-gradient(135deg, #8B0000, #660000);
+      opacity: 0;
+      border-radius: 1.25rem;
+      transition: opacity 0.45s ease;
+      z-index: 0;
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-card:hover {
+      transform: scale(1.06);
+      z-index: 20;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.35);
+    }
+
+    /* Keep content above */
+    .service-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Icon motion */
+    .service-card img {
+      transition: transform 0.45s ease;
+    }
+
+    .service-card:hover img {
+      transform: translateX(-6px) scale(1.08);
+    }
     </style>
 </head>
 
@@ -187,7 +229,7 @@
              hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
              text-[#F4F4F4]">
       <i class="fa-solid fa-calendar-check text-xl"></i>
-      <span>Appointment</span>
+      <span class="font-bold">Appointment</span>
     </a>
 
     <!-- Record -->
@@ -331,32 +373,34 @@
         class="grid md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
 
         <!-- Oral Check-Up -->
-        <div
-          class="relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
+          <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Oral Check-Up</h3>
           <p class="text-sm  max-w-xs">
               Routine oral examination • Dental consultation
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Oral Checkup" />
         </div>
 
         <!-- Dental Cleaning -->
-        <div class="relative p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
+         <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Dental Cleaning</h3>
           <p class="text-sm  max-w-xs">
               Oral hygiene treatment • Removing surface buildup
           </p>
 
           <!-- Icon -->
-            <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+            <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Dental Cleaning" />
         </div>
 
         <!-- Dental Restoration -->
-        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+         <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">
               Dental Restoration & Prosthesis
           </h3>
@@ -365,19 +409,20 @@
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Restoration & Prosthesis" />
         </div>
 
         <!-- Dental Surgery -->
-        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+        <div class="service-card relative p-10 text-[#F4F4F4]
+          border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Dental Surgery</h3>
           <p class="text-sm  max-w-xs">
               Treating dental issues surgically • Extraction • Supernumerary • etc.
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Dental Surgery" />
         </div>
     </div>

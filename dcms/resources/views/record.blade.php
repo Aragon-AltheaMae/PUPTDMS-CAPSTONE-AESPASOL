@@ -226,7 +226,7 @@
              hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
              text-[#F4F4F4]">
       <i class="fa-solid fa-folder-open text-xl"></i>
-      <span>Record</span>
+      <span class="font-bold">Record</span>
     </a>
 
     <!-- About Us -->
