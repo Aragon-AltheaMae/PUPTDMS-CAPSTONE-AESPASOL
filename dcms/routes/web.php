@@ -131,6 +131,14 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-appointments');
     })->name('dentist.appointments');
 
+    // ✅ PATIENT PROFILE (FIXED)
+    Route::get('/patient', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-patientprofile');
+    })->name('dentist.patient.profile');
+
     Route::get('/inventory', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -174,6 +182,7 @@ Route::prefix('dentist')->group(function () {
     });
     
 });
+
 
 
 

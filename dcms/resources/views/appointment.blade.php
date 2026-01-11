@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>PUP Taguig Dental Clinic | Appointment</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind + daisyUI CDN -->
@@ -14,22 +15,12 @@
         type="text/css"
     />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-    <script>
-        tailwind.config = {
-        theme: {
-            extend: {
-            colors: {
-                pupred: "#660000",
-                pupgold: "#FFD700",
-            },
-            },
-        },
-        };
-    </script>
+    <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
       body {
@@ -58,13 +49,63 @@
     .fade-up {
       animation: fadeUp 0.8s ease-out forwards;
     }
+
+    .tabs-bordered .tab {
+      border-bottom-color: #ADADAD !important;
+    }
+
+    .tabs-bordered .tab-active {
+      border-bottom-color: #660000 !important;
+    }
+
+    .service-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      inset: -12px; /* THIS is the “umuusbong” part */
+      background: linear-gradient(135deg, #8B0000, #660000);
+      opacity: 0;
+      border-radius: 1.25rem;
+      transition: opacity 0.45s ease;
+      z-index: 0;
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-card:hover {
+      transform: scale(1.06);
+      z-index: 20;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.35);
+    }
+
+    /* Keep content above */
+    .service-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Icon motion */
+    .service-card img {
+      transition: transform 0.45s ease;
+    }
+
+    .service-card:hover img {
+      transform: translateX(-6px) scale(1.08);
+    }
     </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
 
 <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -91,44 +132,44 @@
         </span>
       @endif
 
-      <img src="{{ asset('images/notifications.png') }}" alt="Notification" class="w-7 h-7" />
-    </label>
+      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+      </label>
 
-    <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-      <div class="p-4 border-b flex items-center justify-between">
-        <span class="font-bold text-[#8B0000]">Notifications</span>
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
 
-        {{-- Optional "View all" (only if you have this route) --}}
-        {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-      </div>
+          {{-- Optional "View all" (only if you have this route) --}}
+          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+        </div>
 
-      <div class="max-h-80 overflow-y-auto">
-        @forelse($notifications as $n)
-          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-            <div class="text-sm font-semibold text-gray-900">
-              {{ $n['title'] ?? 'Notification' }}
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
             </div>
-            @if(!empty($n['message']))
-              <div class="text-xs text-gray-600 mt-0.5">
-                {{ $n['message'] }}
-              </div>
-            @endif
-            @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
-            @endif
-          </a>
-        @empty
-          <div class="px-4 py-10 text-center justify-items-center">
-            <img src="images/no-notifications.png" alt="No Notification">
-            <div class="text-sm font-semibold text-gray-800">No notifications</div>
-            <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
-          </div>
-        @endforelse
+          @endforelse
+        </div>
       </div>
     </div>
-  </div>
         <div class="flex items-center gap-3">
         {{-- Avatar --}}
         <div class="avatar">
@@ -145,72 +186,75 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
           </div>
         </div>
       </div>
-        <form method="POST" action="{{ route('logout') }}">
+      
+      <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit"
-            class="btn btn-ghost btn-circle text-[#F4F4F4]">
-            <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
+        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
-        </form>
+      </form>
+
       </div>
   </div>
 
 <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
-    
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-14 py-3 text-sm">
+
+    <!-- Home -->
     <a href="{{ route('homepage') }}"
-    class="relative pb-1
-            after:absolute after:left-0 after:bottom-0
-            after:h-[2px] after:w-full
-            after:bg-[#FFD700]
-            after:opacity-0
-            after:transition-opacity after:duration-300
-            hover:after:opacity-100">
-      Home
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-house text-xl"></i>
+      <span>Home</span>
     </a>
 
+    <!-- Appointment -->
     <a href="{{ route('appointment.index') }}"
-    class="relative pb-1
-            font-bold
-            after:absolute after:left-0 after:bottom-0
-            after:h-[2px] after:w-full
-            after:bg-[#FFD700]
-            after:opacity-0
-            after:transition-opacity after:duration-300
-            hover:after:opacity-100">
-      Appointment
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-calendar-check text-xl"></i>
+      <span class="font-bold">Appointment</span>
     </a>
 
+    <!-- Record -->
     <a href="{{ route('record') }}"
-    class="relative pb-1
-            after:absolute after:left-0 after:bottom-0
-            after:h-[2px] after:w-full
-            after:bg-[#FFD700]
-            after:opacity-0
-            after:transition-opacity after:duration-300
-            hover:after:opacity-100">
-      Record
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-folder-open text-xl"></i>
+      <span>Record</span>
     </a>
 
+    <!-- About Us -->
     <a href="{{ route('about.us') }}"
-    class="relative pb-1
-            after:absolute after:left-0 after:bottom-0
-            after:h-[2px] after:w-full
-            after:bg-[#FFD700]
-            after:opacity-0
-            after:transition-opacity after:duration-300
-            hover:after:opacity-100">
-      About Us
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-circle-info text-xl"></i>
+      <span>About Us</span>
     </a>
-    
   </div>
 </div>
 
@@ -222,11 +266,11 @@
 <section class="flex justify-center fade-up">
   <div class="w-full max-w-3xl flex flex-col items-center gap-3">
 
-    <h1 class="text-3xl font-bold text-pupred w-full text-left">
+    <h1 class="text-3xl font-extrabold text-[#660000] w-full text-center mt-8 mb-4">
       Dental Clinic Schedule
     </h1>
 
-    <div class="bg-[#F4F4F4] border shadow rounded-2xl p-6 h-[390px] w-full">
+    <div class="bg-[#F4F4F4] border shadow rounded-2xl p-6 h-[390px] w-[990px]">
       <!-- Appointment date from DB -->
       <calendar-date
         class="cally w-full h-full flex flex-col p-2"
@@ -264,25 +308,25 @@
   <!-- ===== My Appointments ===== -->
   <section class="max-w-5xl mx-auto fade-up">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-pupred">My Appointments</h2>
+    <h2 class="text-3xl font-bold text-[#660000]">My Appointments</h2>
     <button class="btn bg-red-400 hover:bg-red-500 text-[#F4F4F4]">
       <a href="{{ route('book.appointment') }}">+ Book Appointment</a>
     </button>
   </div>
 
-  <div class="card bg-red-50 shadow-sm">
+  <div class="card bg-[#F4F4F4] shadow-sm">
     <div class="card-body">
 
       <!-- Tabs -->
     <div class="tabs tabs-bordered mb-6">
       <a id="futureTab"
-        class="tab tab-active font-bold text-pupred cursor-pointer"
+        class="tab tab-active font-bold text-[#660000] cursor-pointer"
         onclick="showFuture()">
         Future Visits
       </a>
 
       <a id="pastTab"
-        class="tab cursor-pointer"
+        class="tab text-[#660000] cursor-pointer"
         onclick="showPast()">
         Past Visits
       </a>
@@ -291,18 +335,26 @@
       <!-- ================= FUTURE VISITS ================= -->
 
       <!-- IF future_visits.count == 0 -->
-    <div id="futureContent" class="text-center py-10 text-gray-500">
-      <p class="text-lg font-semibold">No Upcoming Visits</p>
-      <p class="text-sm">You currently have no scheduled appointments.</p>
+    <div id="futureContent" class="text-center py-10 text-[#333333]">
+      <img src="{{ asset('images/future-visit.png') }}"
+          class="w-24 h-24 mx-auto mb-4"
+          alt="No Upcoming Visits">
+
+      <p class="text-lg font-semibold text-[#660000]">No Upcoming Visits</p>
+      <p class="text-sm text-[#ADADAD]">You currently have no scheduled appointments.</p>
     </div>
 
       <!-- ================= PAST VISITS ================= -->
       <!-- Show only when Past Visits tab is active -->
 
       <!-- IF past_visits.count == 0 -->
-    <div id="pastContent" class="text-center py-10 text-gray-500 hidden">
-      <p class="text-lg font-semibold">No Past Visits Yet</p>
-      <p class="text-sm">Your completed appointments will appear here.</p>
+    <div id="pastContent" class="text-center py-10 text-[#333333] hidden">
+      <img src="{{ asset('images/past-visit.png') }}"
+          class="w-24 h-24 mx-auto mb-4"
+          alt="No Past Visits">
+
+      <p class="text-lg font-semibold text-[#660000]">No Past Visits Yet</p>
+      <p class="text-sm text-[#ADADAD]">Your completed appointments will appear here.</p>
     </div>
     </div>
   </div>
@@ -311,7 +363,8 @@
 
 <!-- ===== Services Offered ===== -->
 <section class="max-w-6xl mx-auto mt-16 fade-up">
-    <h2 class="text-3xl font-bold text-pupred mb-6">
+    <h2 class="text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700]
+                bg-clip-text text-transparent mb-6">
     Services Offered
     </h2>
 
@@ -320,32 +373,34 @@
         class="grid md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
 
         <!-- Oral Check-Up -->
-        <div
-          class="relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
+          <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Oral Check-Up</h3>
           <p class="text-sm  max-w-xs">
               Routine oral examination • Dental consultation
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Oral Checkup" />
         </div>
 
         <!-- Dental Cleaning -->
-        <div class="relative p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
+         <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Dental Cleaning</h3>
           <p class="text-sm  max-w-xs">
               Oral hygiene treatment • Removing surface buildup
           </p>
 
           <!-- Icon -->
-            <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+            <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Dental Cleaning" />
         </div>
 
         <!-- Dental Restoration -->
-        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+         <div class="service-card relative p-10 text-[#F4F4F4]
+            border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">
               Dental Restoration & Prosthesis
           </h3>
@@ -354,19 +409,20 @@
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Restoration & Prosthesis" />
         </div>
 
         <!-- Dental Surgery -->
-        <div class="relative p-10 text-[#F4F4F4] border-r border-[#F4F4F4]/60">
+        <div class="service-card relative p-10 text-[#F4F4F4]
+          border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-2xl font-bold mb-2">Dental Surgery</h3>
           <p class="text-sm  max-w-xs">
               Treating dental issues surgically • Extraction • Supernumerary • etc.
           </p>
 
           <!-- Icon -->
-          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-1 top-1/2 -translate-y-1/2 w-28"
+          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-6 inset-y-0 my-auto w-28"
               alt="Dental Surgery" />
         </div>
     </div>
@@ -439,16 +495,16 @@
 
 <script>
   function showFuture() {
-    document.getElementById("futureTab").classList.add("tab-active", "font-bold", "text-pupred");
-    document.getElementById("pastTab").classList.remove("tab-active", "font-bold", "text-pupred");
+    document.getElementById("futureTab").classList.add("tab-active", "font-bold", "text-[#8B0000]");
+    document.getElementById("pastTab").classList.remove("tab-active", "font-bold", "text-[#8B0000]");
 
     document.getElementById("futureContent").classList.remove("hidden");
     document.getElementById("pastContent").classList.add("hidden");
   }
 
   function showPast() {
-    document.getElementById("pastTab").classList.add("tab-active", "font-bold", "text-pupred");
-    document.getElementById("futureTab").classList.remove("tab-active", "font-bold", "text-pupred");
+    document.getElementById("pastTab").classList.add("tab-active", "font-bold", "text-[#8B0000]");
+    document.getElementById("futureTab").classList.remove("tab-active", "font-bold", "text-[#8B0000]");
 
     document.getElementById("pastContent").classList.remove("hidden");
     document.getElementById("futureContent").classList.add("hidden");

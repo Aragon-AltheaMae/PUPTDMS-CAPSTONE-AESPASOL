@@ -4,12 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PUP Taguig Dental Clinic | About Us</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script type="module" src="https://unpkg.com/cally"></script>
 
@@ -50,12 +58,111 @@
     opacity: 1;
     transform: translateY(0);
   }
+  
+  @keyframes floatVerySlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.float-bg {
+  animation: floatVerySlow 14s ease-in-out infinite;
+}
+.float-delay {
+  animation-delay: 4s;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.22) 37%,
+    rgba(255,255,255,0.05) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 10s linear infinite;
+}
+
+/* === BACKGROUND BLOOBS === */
+@keyframes blobFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(40px, -30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes blobPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px); 
+  animation:
+    blobFloat 28s ease-in-out infinite,
+    blobPulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
   </style>
 </head>
-<body class="bg-white text-[#333333] font-normal">
 
+<body class="relative text-[#333333] bg-[#F8F8F8] overflow-x-hidden">
+<div id="bg-blobs" class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+
+  <div class="blob blob-slow
+    w-[460px] h-[460px]
+    top-[-120px] left-[-120px]"
+    style="background: radial-gradient(circle,
+      rgba(139,0,0,0.45) 0%,
+      rgba(139,0,0,0.25) 45%,
+      rgba(139,0,0,0.08) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob blob-fast
+    w-[380px] h-[380px]
+    top-[35%] right-[-140px]"
+    style="background: radial-gradient(circle,
+      rgba(255,215,0,0.4) 0%,
+      rgba(255,215,0,0.22) 45%,
+      rgba(255,215,0,0.07) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob
+    w-[340px] h-[340px]
+    bottom-[15%] left-[10%]"
+    style="background: radial-gradient(circle,
+      rgba(102,0,0,0.45) 0%,
+      rgba(102,0,0,0.25) 45%,
+      rgba(102,0,0,0.07) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob blob-slow
+    w-[280px] h-[280px]
+    bottom-[-120px] right-[20%]"
+    style="background: radial-gradient(circle,
+      rgba(255,215,0,0.65) 0%,
+      rgba(255,215,0,0.4) 45%,
+      rgba(255,215,0,0.1) 65%,
+      transparent 75%);
+    ">
+  </div>
+</div>
+
+<div class="relative z-10">
   <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -82,44 +189,44 @@
         </span>
       @endif
 
-      <img src="{{ asset('images/notifications.png') }}" alt="Notification" class="w-7 h-7" />
-    </label>
+      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+      </label>
 
-    <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-      <div class="p-4 border-b flex items-center justify-between">
-        <span class="font-bold text-[#8B0000]">Notifications</span>
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
 
-        {{-- Optional "View all" (only if you have this route) --}}
-        {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-      </div>
+          {{-- Optional "View all" (only if you have this route) --}}
+          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+        </div>
 
-      <div class="max-h-80 overflow-y-auto">
-        @forelse($notifications as $n)
-          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-            <div class="text-sm font-semibold text-gray-900">
-              {{ $n['title'] ?? 'Notification' }}
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
             </div>
-            @if(!empty($n['message']))
-              <div class="text-xs text-gray-600 mt-0.5">
-                {{ $n['message'] }}
-              </div>
-            @endif
-            @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
-            @endif
-          </a>
-        @empty
-          <div class="px-4 py-10 text-center justify-items-center">
-            <img src="images/no-notifications.png" alt="No Notification">
-            <div class="text-sm font-semibold text-gray-800">No notifications</div>
-            <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
-          </div>
-        @endforelse
+          @endforelse
+        </div>
       </div>
     </div>
-  </div>
         <div class="flex items-center gap-3">
         {{-- Avatar --}}
         <div class="avatar">
@@ -136,70 +243,74 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
           </div>
         </div>
       </div>
-        <form method="POST" action="{{ route('logout') }}">
+      
+      <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit"
-            class="btn btn-ghost btn-circle text-[#F4F4F4]">
-            <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
+        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
-        </form>
+      </form>
+
       </div>
   </div>
 
-  <!-- NAVIGATION -->
-  <div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
-    
+  <!-- NAVIGATION (BELOW HEADER) -->
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-14 py-3 text-sm">
+
+    <!-- Home -->
     <a href="{{ route('homepage') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Home
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-house text-xl"></i>
+      <span>Home</span>
     </a>
 
+    <!-- Appointment -->
     <a href="{{ route('appointment.index') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Appointment
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-calendar-check text-xl"></i>
+      <span>Appointment</span>
     </a>
 
+    <!-- Record -->
     <a href="{{ route('record') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Record
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-folder-open text-xl"></i>
+      <span>Record</span>
     </a>
 
+    <!-- About Us -->
     <a href="{{ route('about.us') }}"
-    class=   "font-bold
-             relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      About Us
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-circle-info text-xl"></i>
+      <span class="font-bold">About Us</span>
     </a>
   </div>
 </div>
@@ -208,13 +319,13 @@
   <section class="relative bg-gray-50 py-24 text-center fade-up">
     <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
     />
-    <h2 class="relative z-10 font-extrabold text-4xl text-[#8B0000] fade-up">About Us</h2>
+    <h2 class="relative z-10 font-extrabold text-6xl text-[#8B0000] fade-up">About Us</h2>
   </section>
 
   <!-- MAIN CONTENT -->
-  <main class="max-w-5xl mx-auto px-6 mb-12 space-y-12">
+  <main class="max-w-5xl mx-auto px-6 mb-12">
 
-    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-8 fade-up">
+    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-12 mb-24 fade-up">
       The Polytechnic University of the Philippines – Taguig Campus is committed to promoting the 
       health and well-being of its academic community by providing free dental services to students, 
       alumni, faculty, and staff. These services aim to support overall wellness and ensure access to 
@@ -222,19 +333,74 @@
     </p>
 
     <!-- CARD -->
-    <div class="bg-gradient-to-br from-[#8B0000] to-[#660000] text-[#F4F4F4]
-    rounded-2xl pl-12 flex flex-col md:flex-row items-center gap-4 shadow-lg fade-up">
-        <div class="flex-1 font-normal text-2xl leading-relaxed">
-            The dental clinic is headed by <span class="font-bold text-2xl">Dr. Nelson P. Angeles</span>,
-            <br>the campus dentist, who delivers professional, safe, and reliable dental care.
+    <div class="relative overflow-hidden
+        bg-gradient-to-br from-[#8B0000] to-[#660000]
+        text-[#F4F4F4]
+        rounded-2xl pl-6
+        flex flex-col md:flex-row items-center gap-4
+        shadow-lg shadow-red-300
+        fade-up">
+
+        <!-- BACKGROUND CIRCLES (SOFT, AMBIENT) -->
+        <div class="absolute -left-24 -top-20
+            w-[300px] h-[300px]
+            bg-[#FFD700]/15
+            rounded-full blur-3xl
+            float-bg pointer-events-none"></div>
+
+        <div class="absolute left-1/3 top-6
+            w-[220px] h-[220px]
+            bg-white/10
+            rounded-full blur-3xl
+            float-bg float-delay pointer-events-none"></div>
+
+        <div class="absolute right-10 -bottom-16
+            w-[260px] h-[260px]
+            bg-[#FFD700]/10
+            rounded-full blur-3xl
+            pointer-events-none"></div>
+
+        <div class="absolute -right-20 top-1/2
+            w-[340px] h-[340px]
+            bg-white/10
+            rounded-full blur-3xl
+            pointer-events-none"></div>
+
+        <!-- GLASS TEXT WITH SHIMMER -->
+        <div class="relative z-10 shimmer
+            bg-white/15 backdrop-blur-md
+            rounded-xl p-6 ml-5 pl-12 pr-12
+            border border-white/20
+            shadow-lg
+            font-normal text-xl leading-relaxed
+            max-w-2xl">
+
+            The dental clinic is headed by
+            <span class="font-bold">Dr. Nelson P. Angeles</span>
+            the campus dentist, who delivers professional, safe, and reliable dental care.
         </div>
-        <img src="images/Nelson-Angeles.png" alt="Dr. Nelson P. Angeles" class="w-1/3 object-contain" />
+
+        <!-- IMAGE -->
+        <img src="images/Nelson-Angeles.png"
+            alt="Dr. Nelson P. Angeles"
+            class="relative z-10 w-1/3 object-contain drop-shadow-xl" />
     </div>
 
     <!-- FAQs Title -->
-    <h3 class="font-extrabold text-[#8B0000] text-center mt-8 mb-4 text-3xl fade-up">Frequently Asked Questions</h3>
-    <section class="max-w-3xl mx-auto mt-2 rounded-2xl bg-gradient-to-br from-[#660000] to-[#FFD700] p-1 fade-up">
-    <div class="bg-white rounded-2xl p-4">
+    <div class="text-center mt-36 mb-12 fade-up">
+      <h3 class="font-extrabold text-5xl
+                bg-gradient-to-r from-[#8B0000] to-[#FFD700]
+                bg-clip-text text-transparent">
+        Frequently Asked Questions
+      </h3>
+
+      <p class="font-normal mt-4 text-[#660000] text-lg">
+        Got questions? Here are quick answers about the PUP Taguig Dental Management System.
+      </p>
+    </div>
+
+    <section class="max-w-5xl mx-auto mt-2 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#FFD700] p-1 fade-up">
+    <div class="bg-white rounded-xl p-4">
 
     <!-- FAQ 1 -->
     <div id="faq1" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
@@ -250,7 +416,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
-    <div id="faq1-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq1-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
         All students, alumni, faculty, and staff of the University are eligible for free dental services.
     </div>
     </div>
@@ -269,7 +435,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq2-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq2-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       You can book an appointment through the Dental Management System online portal.
     </div>
     </div>
@@ -288,7 +454,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq3-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq3-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Yes, depending on your dental condition, the dentist may prescribe 
       antibiotics, pain relievers, or other medications.
     </div>
@@ -308,7 +474,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq4-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq4-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Appointments are subject to availability. Since the clinic has limited 
       slots and only one dentist, early booking is recommended.
     </div>
@@ -328,7 +494,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq5-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq5-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Appointments can be canceled or rescheduled through the Dental Management System 
       or by contacting the clinic directly at least three (3) days before the scheduled appointment.
     </div>
@@ -348,7 +514,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq6-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq6-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       If the dentist is unavailable, your confirmed schedule will be rescheduled to the next available slot.
     </div>
     </div>
@@ -367,7 +533,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq7-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq7-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       The clinic provides basic dental check-ups, cleaning, fillings, extractions, 
       oral health advice, and other preventive care services.
     </div>
@@ -387,7 +553,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq8-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq8-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Yes, urgent cases may be given priority, but it depends on the daily schedule and the dentist’s discretion.
     </div>
     </div>
@@ -406,7 +572,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq9-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq9-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Some advanced dental procedures may not be available due to the clinic’s resources. 
       The dentist will provide guidance on alternatives if needed.
     </div>
@@ -426,7 +592,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq10-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-semibold rounded-b-lg">
+    <div id="faq10-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Some treatments may require follow-up visits. The dentist will advise if a follow-up is necessary.
     </div>
     </div>
@@ -530,13 +696,15 @@
         button.setAttribute('aria-expanded', 'true');
     }
     }
-  
-
-  const observer = new IntersectionObserver(
+  /* ===============================
+     FADE-UP ANIMATION OBSERVER
+  =============================== */
+  const fadeObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('show');
+          fadeObserver.unobserve(entry.target); // optional: animate once
         }
       });
     },
@@ -544,8 +712,25 @@
   );
 
   document.querySelectorAll('.fade-up').forEach(el => {
-    observer.observe(el);
+    fadeObserver.observe(el);
   });
+
+
+  /* ===============================
+     BLOB VISIBILITY OBSERVER
+  =============================== */
+  const blobs = document.getElementById('bg-blobs');
+  const footer = document.querySelector('footer');
+
+  const blobObserver = new IntersectionObserver(
+    ([entry]) => {
+      blobs.style.opacity = entry.isIntersecting ? '0' : '1';
+    },
+    { threshold: 0.1 }
+  );
+  blobObserver.observe(footer);
+
 </script>
+</div>
 </body>
 </html>

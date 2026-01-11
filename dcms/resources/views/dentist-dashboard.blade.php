@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>PUP Taguig Dental Clinic | Dentist Dashboard</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
@@ -11,8 +12,12 @@
   <!-- daisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Cally Calendar -->
   <script type="module" src="https://unpkg.com/cally"></script>
@@ -21,25 +26,10 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
   <script src="https://code.highcharts.com/modules/export-data.js"></script>
-  
-
-  <!-- Tailwind config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primaryDark: "#7a0000",
-            primaryMain: "#8b0000"
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter';
     }
   </style>
 </head>
@@ -47,16 +37,68 @@
 <body class="bg-gray-100">
 
 <!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
+<header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
   <div class="flex items-center gap-3 font-bold">
     <!-- University Logo -->
     <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <i class="fa-solid fa-tooth text-xl"></i>
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
     <span>PUP TAGUIG DENTAL CLINIC</span>
   </div>
 
-  <div class="flex items-center gap-6">
-    <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+  <div class="flex items-center gap-8">
+      @php
+  // Pass $notifications from controller, or leave it empty for now
+  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+  @endphp
+
+  <div class="dropdown dropdown-end">
+    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+      @endif
+
+      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+      </label>
+
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
+
+          {{-- Optional "View all" (only if you have this route) --}}
+          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+        </div>
+
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+            </div>
+          @endforelse
+        </div>
+      </div>
+    </div>
 
     <div class="flex items-center gap-3">
       <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
@@ -64,9 +106,10 @@
         <p class="font-semibold">Dr. Nelson Angeles</p>
         <p class="text-xs opacity-80">Dentist</p>
       </div>
+
       <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit" class="cursor-pointer text-red-600 hover:text-red-800">
+        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
             <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
       </form>
@@ -102,7 +145,6 @@
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
-
   </nav>
 </header>
 
@@ -142,7 +184,7 @@
     <div class="col-span-2 flex flex-col gap-4 h-full">
 
     <!-- DENTAL CASES -->
-    <div class="card bg-primaryMain text-white shadow flex-1">
+    <div class="card bg-[#8B0000] text-white shadow flex-1">
         <div class="card-body p-6 text-center justify-center">
         <p class="text-s">Dental Cases</p>
         <p class="text-4xl font-bold">45</p>
@@ -163,7 +205,7 @@
 
 
     <!-- Calendar Section -->
-    <div id="calendarSkeletonContainer" class="flex flex-col gap-2 col-span-5">
+    <div id="calendarSkeletonContainer" class="flex flex-col text-[#333333] gap-2 col-span-5">
 
         <!-- Calendar Card -->
         <div class="bg-white border shadow rounded-2xl p-6 w-full">
@@ -213,7 +255,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr class="text-[#333333]">
                 <td>Disposable Dental Needles Short</td>
                 <td>piece</td>
                 <td>42</td>
@@ -242,7 +284,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr class="text-[#333333]">
                 <td>Amoxicillin</td>
                 <td>Capsule</td>
                 <td>120</td>

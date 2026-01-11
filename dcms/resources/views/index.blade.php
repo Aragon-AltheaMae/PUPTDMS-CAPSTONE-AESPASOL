@@ -4,12 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PUP Taguig Dental Clinic</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -96,6 +101,55 @@
     .fade-up {
       animation: fadeUp 0.6s ease-out forwards;
   }
+
+  @keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+.float-slow {
+  animation: float 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+  /* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+  .shimmer-btn {
+    background: linear-gradient(
+      110deg,
+      #660000 25%,
+      rgba(255, 80, 80, 0.87) 37%,
+      #660000 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 10s linear infinite;
+  }
+
+  @keyframes wave {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(14deg); }
+  80% { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.wave-hand {
+  transform-origin: 70% 70%;
+  animation: wave 2.5s ease-in-out infinite;
+}
 </style>
 
 <body class="bg-white text-[#333333] font-normal">
@@ -103,7 +157,7 @@
 <!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
 <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -130,44 +184,44 @@
         </span>
       @endif
 
-      <img src="{{ asset('images/notifications.png') }}" alt="Notification" class="w-7 h-7" />
-    </label>
+      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
+      </label>
 
-    <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-      <div class="p-4 border-b flex items-center justify-between">
-        <span class="font-bold text-[#8B0000]">Notifications</span>
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
 
-        {{-- Optional "View all" (only if you have this route) --}}
-        {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-      </div>
+          {{-- Optional "View all" (only if you have this route) --}}
+          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
+        </div>
 
-      <div class="max-h-80 overflow-y-auto">
-        @forelse($notifications as $n)
-          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-            <div class="text-sm font-semibold text-gray-900">
-              {{ $n['title'] ?? 'Notification' }}
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
             </div>
-            @if(!empty($n['message']))
-              <div class="text-xs text-gray-600 mt-0.5">
-                {{ $n['message'] }}
-              </div>
-            @endif
-            @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
-            @endif
-          </a>
-        @empty
-          <div class="px-4 py-10 text-center justify-items-center">
-            <img src="images/no-notifications.png" alt="No Notification">
-            <div class="text-sm font-semibold text-gray-800">No notifications</div>
-            <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
-          </div>
-        @endforelse
+          @endforelse
+        </div>
       </div>
     </div>
-  </div>
         <div class="flex items-center gap-3">
         {{-- Avatar --}}
         <div class="avatar">
@@ -184,72 +238,75 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
           </div>
         </div>
       </div>
-        <form method="POST" action="{{ route('logout') }}">
+      
+      <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit"
-            class="btn btn-ghost btn-circle text-[#F4F4F4]">
-            <img src="{{ asset('images/Log-out.png') }}" alt="Log Out" />
+        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
         </button>
-        </form>
+      </form>
+      
       </div>
   </div>
 
 <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
-    
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-14 py-3 text-sm">
+
+    <!-- Home -->
     <a href="{{ route('homepage') }}"
-    class="relative pb-1
-              font-bold
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Home
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-house text-xl"></i>
+      <span class="font-bold">Home</span>
     </a>
 
-<a href="{{ route('appointment.index') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Appointment
+    <!-- Appointment -->
+    <a href="{{ route('appointment.index') }}"
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-calendar-check text-xl"></i>
+      <span>Appointment</span>
     </a>
 
-  <a href="{{ route('record') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Record
+    <!-- Record -->
+    <a href="{{ route('record') }}"
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-folder-open text-xl"></i>
+      <span>Record</span>
     </a>
 
+    <!-- About Us -->
     <a href="{{ route('about.us') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      About Us
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-circle-info text-xl"></i>
+      <span>About Us</span>
     </a>
-    
   </div>
 </div>
 
@@ -257,29 +314,55 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- WELCOME -->
-        <h1 class="text-4xl font-extrabold mb-6 bg-gradient-to-r
-    from-[#660000] to-[#FFD700] bg-clip-text text-transparent inline-block fade-up">
-      Welcome, {{ ucwords(strtolower($patient->name)) }}!
+    <h1 class="text-4xl font-extrabold mb-6 flex items-center gap-3 fade-up">
+      <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
+        Welcome, {{ ucwords(strtolower($patient->name)) }}!
+      </span>
+
+      <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
     </h1>
 
 
     <!-- HERO CARD -->
-    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000] text-[#F4F4F4] rounded-2xl p-10 flex justify-between items-center mb-20 fade-up">
-      <div>
-        <h2 class="text-4xl font-semibold mb-10 text-[#F4F4F4] fade-up">Book a dental appointment at your convenience</h2>
-        <button
-        class="btn btn-soft bg-[#660000] hover:bg-[#333333]
-              transition-colors duration-300
-              border-none text-base rounded-2xl text-[#F4F4F4]">
-              <a href="{{ route('book.appointment') }}">
-        Book Appointment
-        </a>
-      </button>
+    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000]
+            text-[#F4F4F4] rounded-2xl p-20
+            flex justify-between items-center
+            mb-20 fade-up relative overflow-visible">
 
+      <div>
+        <h1 class="text-5xl font-bold mb-4 text-[#F4F4F4] fade-up">
+          Your smile starts here!
+        </h1>
+        <h2 class="text-xl font-normal mb-10 text-[#F4F4F4] fade-up">
+          Book a dental appointment at your convenience.
+        </h2>
+
+        <button
+          class="btn btn-soft shimmer-btn
+                px-6 py-3 rounded-2xl
+                border-none text-base font-semibold
+                text-[#F4F4F4]
+                transition-transform duration-300
+                hover:-translate-y-0.5
+                hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+
+          <a href="{{ route('book.appointment') }}" class="flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            Book Appointment
+          </a>
+        </button>
       </div>
-      <div class="w-1/5">
-        <img src="images/home-tooth.png" alt="Tooth Icon" />
+
+      <!-- IMAGE (ABSOLUTE) -->
+      <div class="absolute right-7 top-1/2 -translate-y-1/2 pointer-events-none">
+        <img
+          src="images/home-tooth.png"
+          alt="Tooth Icon"
+          class="float-slow w-[360px] max-w-none
+                drop-shadow-[0_14px_26px_rgba(255,255,255,0.25)]"
+        />
       </div>
+
     </div>
 
     <!-- PROFILE + CALENDAR SECTION -->
@@ -348,7 +431,7 @@
       <p class="font-extrabold text-xl text-[#8B0000] pb-2">
         Request Dental Clearance
       </p>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-[#333333]">
         Dental Clearance • Annual Dental Clearance
       </p>
     </div>
@@ -366,16 +449,13 @@
               <p class="font-extrabold text-xl text-[#8B0000] pb-2">
                 Request Dental Health Record </p>
                 
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-[#333333]">
                   All Dental Records • Medical Record • Diagnosis & Treatments
                 </p>
               </div>
             </a>
           </div>
         </div>
-
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
   <form
@@ -398,7 +478,7 @@
       Request Clearance
     </h3>
 
-    <p class="text-sm text-gray-600 mb-5">
+    <p class="text-sm text-[#333333] mb-5">
       Please allow up to three (3) working days for processing.
     </p>
 
@@ -468,7 +548,7 @@
       Request Dental Health Record
     </h3>
 
-    <p class="text-sm mb-5">
+    <p class="text-sm mb-5 text-[#333333]">
       Please allow up to three (3) working days for processing.
     </p>
 
@@ -516,6 +596,9 @@
     </div>
   </form>
 </dialog>
+
+<!-- FOOTER -->
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
 
   <!-- ASIDE: CLINIC INFO -->
   <aside class="space-y-4">
@@ -712,7 +795,7 @@ function validateHealthRecord(formId, message, modalId) {
           </div>
           <div class="p-4">
             <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Clearance</p>
-            <p class="text-sm text-gray-600">Dental Clearance • Annual Dental Clearance</p>
+            <p class="text-sm text-[#333333]">Dental Clearance • Annual Dental Clearance</p>
           </div>
         </a>
         <a onclick="dentalHealthRecordModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
@@ -721,7 +804,7 @@ function validateHealthRecord(formId, message, modalId) {
           </div>
           <div class="p-4">
             <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Health Record</p>
-            <p class="text-sm text-gray-600">All Dental Records • Medical Record • Diagnosis & Treatments</p>
+            <p class="text-sm text-[#333333]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
           </div>
         </a>
       `;
@@ -740,7 +823,7 @@ function validateHealthRecord(formId, message, modalId) {
     // Add skeleton animation to profile container
     const profileContainer = document.getElementById("profileSkeletonContainer");
     profileContainer.innerHTML = `
-    <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center animate-pulse">
+    <div class="bg-[#FAFAFA] rounded-2xl p-5 text-center animate-pulse">
       <div class="w-[210px] h-[210px] rounded-full mx-auto skeleton mb-4"></div>
       <div class="h-6 w-32 mx-auto skeleton mb-2"></div>
       <div class="h-4 w-20 mx-auto skeleton mb-2"></div>
@@ -762,10 +845,10 @@ function validateHealthRecord(formId, message, modalId) {
         <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>
         <p class="text-sm italic mb-4">Patient</p>
         <p class="text-[#8B0000] text-lg font-bold mt-2">{{ $patient->patient_id ?? 'N/A' }}</p>
-        <p class="text-sm font-semibold mt-2">Email: {{ $patient->email ?? '-' }}</p>
-        <p class="text-sm font-semibold mt-1">Phone: {{ $patient->phone ?? '-' }}</p>
-        <p class="text-sm mt-2">Birthdate: {{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
-        <p class="text-sm mt-1">Gender: {{ $patient->gender ?? '-' }}</p>
+        <p class="text-sm font-semibold mt-2">{{ $patient->email ?? '-' }}</p>
+        <p class="text-sm font-semibold mt-1">{{ $patient->phone ?? '-' }}</p>
+        <p class="text-sm mt-2">{{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
+        <p class="text-sm mt-1">{{ $patient->gender ?? '-' }}</p>
       </div>
     `;
   }, 2000);
@@ -845,7 +928,7 @@ function loadCalendar() {
             <img src="images/nodental-record.png" class="w-10 h-10">
           </div>
           <p class="text-2xl font-extrabold text-[#8B0000]">Nothing here yet…</p>
-          <p class="text-sm text-gray-600 max-w-sm">Time to book that first visit.</p>
+          <p class="text-sm text-[#ADADAD] max-w-sm">Time to book that first visit.</p>
           <a href="{{ route('book.appointment') }}" class="btn btn-soft bg-[#8B0000] hover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
             Book Appointment
           </a>
@@ -889,7 +972,7 @@ function loadCalendar() {
       <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
         <img src="images/error-records.png" alt="Error" class="w-24 h-24">
         <p class="text-2xl font-extrabold text-[#8B0000]">Oops! Something went wrong</p>
-        <p class="text-sm text-gray-600 max-w-sm">Unable to fetch your records.</p>
+        <p class="text-sm text-[#ADADAD] max-w-sm">Unable to fetch your records.</p>
       </div>
     `;
   }
