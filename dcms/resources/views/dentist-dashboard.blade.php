@@ -21,21 +21,6 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
   <script src="https://code.highcharts.com/modules/export-data.js"></script>
-  
-
-  <!-- Tailwind config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primaryDark: "#7a0000",
-            primaryMain: "#8b0000"
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
     body {

@@ -103,7 +103,7 @@
 <!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
 <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -148,7 +148,7 @@
               {{ $n['title'] ?? 'Notification' }}
             </div>
             @if(!empty($n['message']))
-              <div class="text-xs text-gray-600 mt-0.5">
+              <div class="text-xs text-[#ADADAD] mt-0.5">
                 {{ $n['message'] }}
               </div>
             @endif
@@ -184,7 +184,7 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
@@ -202,8 +202,8 @@
   </div>
 
 <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-12 py-3">
     
     <a href="{{ route('homepage') }}"
     class="relative pb-1
@@ -348,7 +348,7 @@
       <p class="font-extrabold text-xl text-[#8B0000] pb-2">
         Request Dental Clearance
       </p>
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-[#333333]">
         Dental Clearance • Annual Dental Clearance
       </p>
     </div>
@@ -366,7 +366,7 @@
               <p class="font-extrabold text-xl text-[#8B0000] pb-2">
                 Request Dental Health Record </p>
                 
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-[#333333]">
                   All Dental Records • Medical Record • Diagnosis & Treatments
                 </p>
               </div>
@@ -398,7 +398,7 @@
       Request Clearance
     </h3>
 
-    <p class="text-sm text-gray-600 mb-5">
+    <p class="text-sm text-[#ADADAD] mb-5">
       Please allow up to three (3) working days for processing.
     </p>
 
@@ -712,7 +712,7 @@ function validateHealthRecord(formId, message, modalId) {
           </div>
           <div class="p-4">
             <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Clearance</p>
-            <p class="text-sm text-gray-600">Dental Clearance • Annual Dental Clearance</p>
+            <p class="text-sm text-[#333333]">Dental Clearance • Annual Dental Clearance</p>
           </div>
         </a>
         <a onclick="dentalHealthRecordModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
@@ -721,7 +721,7 @@ function validateHealthRecord(formId, message, modalId) {
           </div>
           <div class="p-4">
             <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Health Record</p>
-            <p class="text-sm text-gray-600">All Dental Records • Medical Record • Diagnosis & Treatments</p>
+            <p class="text-sm text-[#333333]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
           </div>
         </a>
       `;
@@ -740,7 +740,7 @@ function validateHealthRecord(formId, message, modalId) {
     // Add skeleton animation to profile container
     const profileContainer = document.getElementById("profileSkeletonContainer");
     profileContainer.innerHTML = `
-    <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center animate-pulse">
+    <div class="bg-[#FAFAFA] rounded-2xl p-5 text-center animate-pulse">
       <div class="w-[210px] h-[210px] rounded-full mx-auto skeleton mb-4"></div>
       <div class="h-6 w-32 mx-auto skeleton mb-2"></div>
       <div class="h-4 w-20 mx-auto skeleton mb-2"></div>
@@ -762,10 +762,10 @@ function validateHealthRecord(formId, message, modalId) {
         <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>
         <p class="text-sm italic mb-4">Patient</p>
         <p class="text-[#8B0000] text-lg font-bold mt-2">{{ $patient->patient_id ?? 'N/A' }}</p>
-        <p class="text-sm font-semibold mt-2">Email: {{ $patient->email ?? '-' }}</p>
-        <p class="text-sm font-semibold mt-1">Phone: {{ $patient->phone ?? '-' }}</p>
-        <p class="text-sm mt-2">Birthdate: {{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
-        <p class="text-sm mt-1">Gender: {{ $patient->gender ?? '-' }}</p>
+        <p class="text-sm font-semibold mt-2">{{ $patient->email ?? '-' }}</p>
+        <p class="text-sm font-semibold mt-1">{{ $patient->phone ?? '-' }}</p>
+        <p class="text-sm mt-2">{{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
+        <p class="text-sm mt-1">{{ $patient->gender ?? '-' }}</p>
       </div>
     `;
   }, 2000);
@@ -845,7 +845,7 @@ function loadCalendar() {
             <img src="images/nodental-record.png" class="w-10 h-10">
           </div>
           <p class="text-2xl font-extrabold text-[#8B0000]">Nothing here yet…</p>
-          <p class="text-sm text-gray-600 max-w-sm">Time to book that first visit.</p>
+          <p class="text-sm text-[#ADADAD] max-w-sm">Time to book that first visit.</p>
           <a href="{{ route('book.appointment') }}" class="btn btn-soft bg-[#8B0000] hover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
             Book Appointment
           </a>
@@ -889,7 +889,7 @@ function loadCalendar() {
       <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
         <img src="images/error-records.png" alt="Error" class="w-24 h-24">
         <p class="text-2xl font-extrabold text-[#8B0000]">Oops! Something went wrong</p>
-        <p class="text-sm text-gray-600 max-w-sm">Unable to fetch your records.</p>
+        <p class="text-sm text-[#ADADAD] max-w-sm">Unable to fetch your records.</p>
       </div>
     `;
   }

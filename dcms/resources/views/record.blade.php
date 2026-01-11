@@ -84,7 +84,7 @@
 <body class="bg-white text-[#333333] font-normal">
 
 <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -165,7 +165,7 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
@@ -183,8 +183,8 @@
   </div>
 
 <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-12 py-3">
     
     <a href="{{ route('homepage') }}"
     class="relative pb-1
@@ -237,14 +237,14 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- TITLE -->
-    <h2 class="text-3xl font-extrabold flex justify-center mt-10 mb-5 
+    <h2 class="text-3xl font-extrabold flex justify-center mt-2 mb-10 
            bg-gradient-to-r from-[#660000] to-[#FFD700] 
-           bg-clip-text text-transparent">
+           bg-clip-text text-transparent fade-up">
             My Dental Records
     </h2>
 
     <!-- RECORDS CONTAINER -->
-    <div id="recordsContainer" class="bg-gradient-to-l from-[#FFD700] to-[#660000] p-0.5 rounded-2xl mb-10">
+    <div id="recordsContainer" class="bg-gradient-to-l from-[#FFD700] to-[#660000] p-0.5 rounded-2xl mb-10 fade-up">
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <div id="recordsInnerContainer" class="space-y-4"></div>
       </div>

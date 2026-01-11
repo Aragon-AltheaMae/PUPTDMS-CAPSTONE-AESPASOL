@@ -18,19 +18,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-        theme: {
-            extend: {
-            colors: {
-                pupred: "#660000",
-                pupgold: "#FFD700",
-            },
-            },
-        },
-        };
-    </script>
-
   <style>
       body {
       font-family: 'Inter';
@@ -58,13 +45,21 @@
     .fade-up {
       animation: fadeUp 0.8s ease-out forwards;
     }
+
+    .tabs-bordered .tab {
+      border-bottom-color: #ADADAD !important;
+    }
+
+    .tabs-bordered .tab-active {
+      border-bottom-color: #660000 !important;
+    }
     </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
 
 <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -145,7 +140,7 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
@@ -163,8 +158,8 @@
   </div>
 
 <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-12 py-3">
     
     <a href="{{ route('homepage') }}"
     class="relative pb-1
@@ -222,11 +217,11 @@
 <section class="flex justify-center fade-up">
   <div class="w-full max-w-3xl flex flex-col items-center gap-3">
 
-    <h1 class="text-3xl font-bold text-pupred w-full text-left">
+    <h1 class="text-3xl font-extrabold text-[#660000] w-full text-center mt-8 mb-4">
       Dental Clinic Schedule
     </h1>
 
-    <div class="bg-[#F4F4F4] border shadow rounded-2xl p-6 h-[390px] w-full">
+    <div class="bg-[#F4F4F4] border shadow rounded-2xl p-6 h-[390px] w-[990px]">
       <!-- Appointment date from DB -->
       <calendar-date
         class="cally w-full h-full flex flex-col p-2"
@@ -264,25 +259,25 @@
   <!-- ===== My Appointments ===== -->
   <section class="max-w-5xl mx-auto fade-up">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-pupred">My Appointments</h2>
+    <h2 class="text-3xl font-bold text-[#660000]">My Appointments</h2>
     <button class="btn bg-red-400 hover:bg-red-500 text-[#F4F4F4]">
       <a href="{{ route('book.appointment') }}">+ Book Appointment</a>
     </button>
   </div>
 
-  <div class="card bg-red-50 shadow-sm">
+  <div class="card bg-[#F4F4F4] shadow-sm">
     <div class="card-body">
 
       <!-- Tabs -->
     <div class="tabs tabs-bordered mb-6">
       <a id="futureTab"
-        class="tab tab-active font-bold text-pupred cursor-pointer"
+        class="tab tab-active font-bold text-[#660000] cursor-pointer"
         onclick="showFuture()">
         Future Visits
       </a>
 
       <a id="pastTab"
-        class="tab cursor-pointer"
+        class="tab text-[#660000] cursor-pointer"
         onclick="showPast()">
         Past Visits
       </a>
@@ -291,18 +286,26 @@
       <!-- ================= FUTURE VISITS ================= -->
 
       <!-- IF future_visits.count == 0 -->
-    <div id="futureContent" class="text-center py-10 text-gray-500">
-      <p class="text-lg font-semibold">No Upcoming Visits</p>
-      <p class="text-sm">You currently have no scheduled appointments.</p>
+    <div id="futureContent" class="text-center py-10 text-[#333333]">
+      <img src="{{ asset('images/future-visit.png') }}"
+          class="w-24 h-24 mx-auto mb-4"
+          alt="No Upcoming Visits">
+
+      <p class="text-lg font-semibold text-[#660000]">No Upcoming Visits</p>
+      <p class="text-sm text-[#ADADAD]">You currently have no scheduled appointments.</p>
     </div>
 
       <!-- ================= PAST VISITS ================= -->
       <!-- Show only when Past Visits tab is active -->
 
       <!-- IF past_visits.count == 0 -->
-    <div id="pastContent" class="text-center py-10 text-gray-500 hidden">
-      <p class="text-lg font-semibold">No Past Visits Yet</p>
-      <p class="text-sm">Your completed appointments will appear here.</p>
+    <div id="pastContent" class="text-center py-10 text-[#333333] hidden">
+      <img src="{{ asset('images/past-visit.png') }}"
+          class="w-24 h-24 mx-auto mb-4"
+          alt="No Past Visits">
+
+      <p class="text-lg font-semibold text-[#660000]">No Past Visits Yet</p>
+      <p class="text-sm text-[#ADADAD]">Your completed appointments will appear here.</p>
     </div>
     </div>
   </div>
@@ -311,7 +314,8 @@
 
 <!-- ===== Services Offered ===== -->
 <section class="max-w-6xl mx-auto mt-16 fade-up">
-    <h2 class="text-3xl font-bold text-pupred mb-6">
+    <h2 class="text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700]
+                bg-clip-text text-transparent mb-6">
     Services Offered
     </h2>
 
@@ -439,16 +443,16 @@
 
 <script>
   function showFuture() {
-    document.getElementById("futureTab").classList.add("tab-active", "font-bold", "text-pupred");
-    document.getElementById("pastTab").classList.remove("tab-active", "font-bold", "text-pupred");
+    document.getElementById("futureTab").classList.add("tab-active", "font-bold", "text-[#8B0000]");
+    document.getElementById("pastTab").classList.remove("tab-active", "font-bold", "text-[#8B0000]");
 
     document.getElementById("futureContent").classList.remove("hidden");
     document.getElementById("pastContent").classList.add("hidden");
   }
 
   function showPast() {
-    document.getElementById("pastTab").classList.add("tab-active", "font-bold", "text-pupred");
-    document.getElementById("futureTab").classList.remove("tab-active", "font-bold", "text-pupred");
+    document.getElementById("pastTab").classList.add("tab-active", "font-bold", "text-[#8B0000]");
+    document.getElementById("futureTab").classList.remove("tab-active", "font-bold", "text-[#8B0000]");
 
     document.getElementById("pastContent").classList.remove("hidden");
     document.getElementById("futureContent").classList.add("hidden");

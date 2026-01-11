@@ -50,12 +50,41 @@
     opacity: 1;
     transform: translateY(0);
   }
+  
+  @keyframes floatVerySlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.float-bg {
+  animation: floatVerySlow 14s ease-in-out infinite;
+}
+.float-delay {
+  animation-delay: 4s;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.22) 37%,
+    rgba(255,255,255,0.05) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 10s linear infinite;
+}
   </style>
 </head>
 <body class="bg-white text-[#333333] font-normal">
 
   <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-red-900 to-red-700 text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -136,7 +165,7 @@
         {{-- Name + Role --}}
         <div class="leading-tight">
           <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ $patient->name }}
+            {{ ucwords(strtolower($patient->name)) }}
           </div>
           <div class="italic text-xs text-[#F4F4F4]/80">
             Patient
@@ -154,8 +183,8 @@
   </div>
 
   <!-- NAVIGATION -->
-  <div class="bg-red-800 text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-8 py-3">
+  <div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-12 py-3">
     
     <a href="{{ route('homepage') }}"
     class="relative pb-1
@@ -208,13 +237,13 @@
   <section class="relative bg-gray-50 py-24 text-center fade-up">
     <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
     />
-    <h2 class="relative z-10 font-extrabold text-4xl text-[#8B0000] fade-up">About Us</h2>
+    <h2 class="relative z-10 font-extrabold text-6xl text-[#8B0000] fade-up">About Us</h2>
   </section>
 
   <!-- MAIN CONTENT -->
-  <main class="max-w-5xl mx-auto px-6 mb-12 space-y-12">
+  <main class="max-w-5xl mx-auto px-6 mb-12">
 
-    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-8 fade-up">
+    <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-12 mb-24 fade-up">
       The Polytechnic University of the Philippines – Taguig Campus is committed to promoting the 
       health and well-being of its academic community by providing free dental services to students, 
       alumni, faculty, and staff. These services aim to support overall wellness and ensure access to 
@@ -222,19 +251,74 @@
     </p>
 
     <!-- CARD -->
-    <div class="bg-gradient-to-br from-[#8B0000] to-[#660000] text-[#F4F4F4]
-    rounded-2xl pl-12 flex flex-col md:flex-row items-center gap-4 shadow-lg fade-up">
-        <div class="flex-1 font-normal text-2xl leading-relaxed">
-            The dental clinic is headed by <span class="font-bold text-2xl">Dr. Nelson P. Angeles</span>,
+    <div class="relative overflow-hidden
+        bg-gradient-to-br from-[#8B0000] to-[#660000]
+        text-[#F4F4F4]
+        rounded-2xl pl-6
+        flex flex-col md:flex-row items-center gap-4
+        shadow-lg shadow-red-300
+        fade-up">
+
+        <!-- BACKGROUND CIRCLES (SOFT, AMBIENT) -->
+        <div class="absolute -left-24 -top-20
+            w-[300px] h-[300px]
+            bg-[#FFD700]/15
+            rounded-full blur-3xl
+            float-bg pointer-events-none"></div>
+
+        <div class="absolute left-1/3 top-6
+            w-[220px] h-[220px]
+            bg-white/10
+            rounded-full blur-3xl
+            float-bg float-delay pointer-events-none"></div>
+
+        <div class="absolute right-10 -bottom-16
+            w-[260px] h-[260px]
+            bg-[#FFD700]/10
+            rounded-full blur-3xl
+            pointer-events-none"></div>
+
+        <div class="absolute -right-20 top-1/2
+            w-[340px] h-[340px]
+            bg-white/10
+            rounded-full blur-3xl
+            pointer-events-none"></div>
+
+        <!-- GLASS TEXT WITH SHIMMER -->
+        <div class="relative z-10 shimmer
+            bg-white/15 backdrop-blur-md
+            rounded-xl p-6 ml-5 pl-12 pr-12
+            border border-white/20
+            shadow-lg
+            font-normal text-xl leading-relaxed
+            max-w-2xl">
+
+            The dental clinic is headed by
+            <span class="font-bold">Dr. Nelson P. Angeles</span>,
             <br>the campus dentist, who delivers professional, safe, and reliable dental care.
         </div>
-        <img src="images/Nelson-Angeles.png" alt="Dr. Nelson P. Angeles" class="w-1/3 object-contain" />
+
+        <!-- IMAGE -->
+        <img src="images/Nelson-Angeles.png"
+            alt="Dr. Nelson P. Angeles"
+            class="relative z-10 w-1/3 object-contain drop-shadow-xl" />
     </div>
 
     <!-- FAQs Title -->
-    <h3 class="font-extrabold text-[#8B0000] text-center mt-8 mb-4 text-3xl fade-up">Frequently Asked Questions</h3>
-    <section class="max-w-3xl mx-auto mt-2 rounded-2xl bg-gradient-to-br from-[#660000] to-[#FFD700] p-1 fade-up">
-    <div class="bg-white rounded-2xl p-4">
+    <div class="text-center mt-36 mb-12 fade-up">
+      <h3 class="font-extrabold text-5xl
+                bg-gradient-to-r from-[#8B0000] to-[#FFD700]
+                bg-clip-text text-transparent">
+        Frequently Asked Questions
+      </h3>
+
+      <p class="font-normal mt-4 text-[#660000] text-lg">
+        Got questions? Here are quick answers about the PUP Taguig Dental Management System.
+      </p>
+    </div>
+
+    <section class="max-w-5xl mx-auto mt-2 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#FFD700] p-1 fade-up">
+    <div class="bg-white rounded-xl p-4">
 
     <!-- FAQ 1 -->
     <div id="faq1" class="faq-item rounded-lg mb-3 shadow-lg overflow-hidden border border-gray-300">
@@ -250,7 +334,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
-    <div id="faq1-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq1-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
         All students, alumni, faculty, and staff of the University are eligible for free dental services.
     </div>
     </div>
@@ -269,7 +353,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq2-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq2-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       You can book an appointment through the Dental Management System online portal.
     </div>
     </div>
@@ -288,7 +372,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq3-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq3-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Yes, depending on your dental condition, the dentist may prescribe 
       antibiotics, pain relievers, or other medications.
     </div>
@@ -308,7 +392,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq4-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq4-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Appointments are subject to availability. Since the clinic has limited 
       slots and only one dentist, early booking is recommended.
     </div>
@@ -328,7 +412,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq5-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq5-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Appointments can be canceled or rescheduled through the Dental Management System 
       or by contacting the clinic directly at least three (3) days before the scheduled appointment.
     </div>
@@ -348,7 +432,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq6-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq6-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       If the dentist is unavailable, your confirmed schedule will be rescheduled to the next available slot.
     </div>
     </div>
@@ -367,7 +451,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq7-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq7-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       The clinic provides basic dental check-ups, cleaning, fillings, extractions, 
       oral health advice, and other preventive care services.
     </div>
@@ -387,7 +471,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq8-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq8-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Yes, urgent cases may be given priority, but it depends on the daily schedule and the dentist’s discretion.
     </div>
     </div>
@@ -406,7 +490,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq9-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-regular rounded-b-lg">
+    <div id="faq9-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Some advanced dental procedures may not be available due to the clinic’s resources. 
       The dentist will provide guidance on alternatives if needed.
     </div>
@@ -426,7 +510,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
         </button>
-    <div id="faq10-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-semibold rounded-b-lg">
+    <div id="faq10-content" class="faq-content bg-red-900 text-[#F4F4F4] p-3 font-normal rounded-b-lg">
       Some treatments may require follow-up visits. The dentist will advise if a follow-up is necessary.
     </div>
     </div>
