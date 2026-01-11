@@ -39,15 +39,18 @@
 
 <!-- Page Title with Back Arrow -->
 <div class="flex items-center gap-4 mb-6">
-  <a href="{{ route('dentist.patients') }}" class="w-10 h-10 flex items-center justify-center
-       rounded-full border border-orange-400 text-orange-500 hover:bg-orange-100 transition">
+  <!-- Back Arrow Button -->
+<a href="{{ route('dentists/patient') }}" class="w-10 h-10 flex items-center justify-center rounded-full border border-orange-400 text-orange-500 hover:bg-orange-100 transition">
     <i class="fa-solid fa-arrow-left"></i>
-  </a>
+</a>
 
-  <h1 class="text-2xl font-medium text-primary">
+
+  <!-- Page Title -->
+  <h1 class="text-2xl font-medium text-primary ml-4">  <!-- Added ml-4 to provide a little margin between the arrow and the title -->
     Patient Profile
   </h1>
 </div>
+
 
 <!-- ================= PATIENT PROFILE ================= -->
 <section>
@@ -68,11 +71,10 @@
         </p>
 
         <p class="text-base opacity-90 mt-1">
-          2023-00099
+          2023-00099- TG-0
         </p>
 
         <p class="text-base mt-4 leading-tight">
-          TG-0<br>
           BSIT 3-1
         </p>
       </div>
@@ -268,15 +270,54 @@
           </div>
         </div>
 
-        <!-- Button (aligned to the bottom-right of the container) -->
-        <div class="absolute bottom-2 right-5">
-          <button
-            class="bg-green-600 text-white text-xs px-4 py-1.5 rounded-md hover:bg-green-700 transition">
-            Start Procedure
-          </button>
-        </div>
+     <!-- Button to trigger the modal -->
+<div class="absolute bottom-2 right-5 z-50">  <!-- Added z-50 here -->
+  <button
+    id="startButton"
+    class="bg-green-600 text-white text-xs px-4 py-1.5 rounded-md hover:bg-green-700 transition"
+    onclick="showModal()">
+    Start Procedure
+  </button>
+</div>
+
+<!-- Modal Structure -->
+<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-40">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-[500px] h-[300px] flex">  <!-- Slightly smaller size -->
+    
+    <!-- Modal Content -->
+    <div class="flex-1 pr-6">
+      <!-- Header with Title -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Confirm the start of procedure?</h3>
+      </div>
+
+      <!-- Patient Input -->
+      <div class="mt-4 flex items-center">
+        <label class="block text-sm text-red-600 mr-2">Patient:</label>
+        <input type="text" class="w-full p-2 border-2 border-[#8B0000] bg-[#8B0000] text-white rounded-md" placeholder="Enter patient name">
+      </div>
+
+      <!-- Buttons: Start and Back -->
+      <div class="mt-6 flex gap-4">
+        <button id="startButtonModal" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 w-1/2">
+          START
+        </button>
+        <button id="backButton" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 w-1/2">
+          BACK
+        </button>
       </div>
     </div>
+
+    <!-- Image on the Right -->
+    <div class="flex-shrink-0 w-1/3 h-full bg-cover bg-center rounded-r-lg"
+         style="background-image: url('/images/teeth-minitab.png'); background-position: center; background-size: cover;">
+    </div>
+
+  </div>
+</div>
+
+
+
 
     <!-- Past Visits Tab Content (hidden by default) -->
     <div id="pastVisitsTab" class="tab-content hidden">
@@ -436,6 +477,10 @@
 <script>
   function showHistoryTab(tab) {
   // Get references to the history tabs and buttons
+  const modal = document.getElementById('modal');
+  const startButton = document.getElementById('startButton');
+  const closeButton = document.getElementById('closeButton');
+  const backButton = document.getElementById('backButton');
   const dentalTab = document.getElementById("dentalTab");
   const medicalTab = document.getElementById("medicalTab");
 
@@ -495,8 +540,24 @@ function showVisitTab(tab) {
     futureVisitsBtn.classList.remove("text-[#8B0000]", "border-b-2", "border-[#8B0000]");
     futureVisitsBtn.classList.add("text-gray-400");
   }
+  
 }
-</script>
+
+        // Show the modal when the "Start Procedure" button is clicked
+        startButton.addEventListener('click', () => {
+            modal.classList.remove('hidden');  // Show the modal
+        });
+
+        // Close the modal when the "Back" button is clicked
+        backButton.addEventListener('click', () => {
+            modal.classList.add('hidden');  // Hide the modal
+        });
+
+        // Close the modal when the "X" button is clicked
+        closeButton.addEventListener('click', () => {
+            modal.classList.add('hidden');  // Hide the modal
+        });
+        </script>
 
 </body>
 </html>
