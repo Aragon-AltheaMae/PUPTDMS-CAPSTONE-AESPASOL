@@ -261,53 +261,56 @@
       </div>
   </div>
 
-  <!-- NAVIGATION -->
-  <div class="bg-[#8B0000] text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-12 py-3">
-    
+  <!-- NAVIGATION (BELOW HEADER) -->
+<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
+  <div class="max-w-7xl mx-auto flex justify-center gap-14 py-3 text-sm">
+
+    <!-- Home -->
     <a href="{{ route('homepage') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Home
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-house text-xl"></i>
+      <span>Home</span>
     </a>
 
+    <!-- Appointment -->
     <a href="{{ route('appointment.index') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Appointment
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-calendar-check text-xl"></i>
+      <span>Appointment</span>
     </a>
 
+    <!-- Record -->
     <a href="{{ route('record') }}"
-    class="relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      Record
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-folder-open text-xl"></i>
+      <span>Record</span>
     </a>
 
+    <!-- About Us -->
     <a href="{{ route('about.us') }}"
-    class=   "font-bold
-             relative pb-1
-              after:absolute after:left-0 after:bottom-0
-              after:h-[2px] after:w-full
-              after:bg-[#FFD700]
-              after:opacity-0
-              after:transition-opacity after:duration-300
-              hover:after:opacity-100">
-      About Us
+      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
+             transition-all duration-500 ease-out
+             hover:scale-[1.08]
+             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
+             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
+             text-[#F4F4F4]">
+      <i class="fa-solid fa-circle-info text-xl"></i>
+      <span>About Us</span>
     </a>
   </div>
 </div>

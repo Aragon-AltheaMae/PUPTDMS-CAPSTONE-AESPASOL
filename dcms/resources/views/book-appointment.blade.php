@@ -163,7 +163,7 @@
   }
   </style>
 </head>
-<body>
+<body class="bg-white">
 
 <!-- HEADER -->
 <div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
@@ -187,7 +187,7 @@
 </h1>
 
 <!-- MAIN FORM -->
-<div class="max-w-4xl mx-auto p-8 bg-[#D9D9D9] rounded-xl mt-5 mb-5 shadow">
+<div class="max-w-4xl mx-auto p-8 bg-[#ECECEC] rounded-xl mt-5 mb-12 shadow-xl">
   <ul class="steps w-full mb-10">
     <li class="step step-primary" id="s1">Date & Time</li>
     <li class="step" id="s2">Service</li>
@@ -224,7 +224,7 @@
     <!-- Card 1 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -245,7 +245,7 @@
     <!-- Card 2 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -266,7 +266,7 @@
     <!-- Card 3 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
@@ -287,7 +287,7 @@
     <!-- Card 4 -->
     <label class="cursor-pointer group">
       <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
-      <div class="bg-[#D9D9D9] rounded-xl p-6 border-2 border-[#8B0000]
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
                   peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
                   hover:bg-[#8B0000] hover:text-[#F4F4F4]
                   shadow-md hover:shadow-xl
