@@ -134,11 +134,11 @@
         <span>Inventory</span>
       </a>
 
-          <a href="#" class="flex flex-col items-center opacity-70 hover:opacity-100">
-            <i class="fa-solid fa-file text-base mb-1"></i>
-            <span>Reports</span>
-          </a>
-        </nav>
+        <a href="{{ route('dentist.report') }}" class="flex flex-col items-center opacity-70 hover:opacity-100">
+          <i class="fa-solid fa-file text-base mb-1"></i>
+          <span>Reports</span>
+        </a>
+      </nav>
     </header>
 
     <!-- ================= MAIN ================= -->

@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dentist – Patient Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Dentist – Patient Profile</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
+  
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-  <!-- Inter Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -28,7 +31,7 @@
   </script>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100">
 
 <!-- ================= HEADER ================= -->
 <header class="bg-[#8B0000] h-16 shadow">
@@ -383,7 +386,7 @@
 
   </div>
 </section>
-
+</main>
 
 <!-- FOOTER -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">

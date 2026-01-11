@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PUP Taguig Dental Clinic | Dental Services Record</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Tailwind & DaisyUI -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primaryDark: "#7a0000",
+        primaryMain: "#8b0000",
+        gold: "#FFD700"
+      }
+    }
+  }
+}
+</script>
+
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+}
+</style>
+</head>
+
+<body class="bg-gray-200">
+
+<!-- ================= TOP HEADER ================= -->
+<header class="bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-4 flex justify-between items-center">
+  <div class="flex items-center gap-3 font-bold">
+    <img src="{{ asset('images/PUP.png') }}" class="w-10 h-10">
+    <i class="fa-solid fa-tooth text-xl"></i>
+    <span>PUP TAGUIG DENTAL CLINIC</span>
+  </div>
+
+  <div class="flex items-center gap-6">
+    <i class="fa-regular fa-bell text-lg"></i>
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="text-sm">
+        <p class="font-semibold">Dr. Nelson Angeles</p>
+        <p class="text-xs opacity-80">Dentist</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<header class="bg-primaryMain text-white px-8 py-3">
+  <nav class="flex justify-end">
+    <a href="{{ route('dentist.report') }}"
+       class="bg-white text-[#8B0000] px-5 py-2 rounded-lg text-sm font-semibold shadow hover:bg-gray-100">
+      ← Back to Report Dashboard
+    </a>
+  </nav>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="p-8">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent">
+      Dental Services Record
+    </h1>
+    <p class="text-red-700 mt-1">December 2025</p>
+  </div>
+
+  <button class="flex items-center gap-4 px-6 py-3 rounded-xl
+                 bg-gradient-to-r from-[#8B0000] to-[#660000]
+                 text-white font-semibold shadow hover:opacity-90">
+    <span>Create New Report</span>
+    <span class="w-8 h-8 rounded-full bg-white text-[#8B0000]
+                 flex items-center justify-center text-xl font-bold">+</span>
+  </button>
+</div>
+
+<!-- ================= TABLE CARD ================= -->
+<div class="bg-white rounded-2xl shadow border-1 border-red-300 p-6">
+
+        <!-- SEARCH BAR CONTAINER (RIGHTMOST) -->
+        <div class="w-full flex justify-end mb-4">
+
+          <!-- SEARCH BAR + CLEAR -->
+          <div class="flex items-center gap-6">
+
+            <!-- Search + Filter -->
+            <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full">
+              <div class="flex items-center bg-white rounded-full overflow-hidden">
+
+                <!-- Left: Search -->
+                <div class="flex items-center gap-2 pl-3 pr-5 py-2 w-[320px]">
+                  <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass text-white text-[11px]"></i>
+                  </span>
+
+                  <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search"
+                    class="w-full bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none"
+                  />
+                </div>
+
+                <!-- Divider -->
+                <div class="w-[2px] self-stretch bg-[#D9D9D9]"></div>
+
+                <!-- Right: Filter -->
+                <button
+                  id="openFilter"
+                  type="button"
+                  class="flex items-center gap-2 px-6 py-2 text-sm font-medium text-[#8B0000] bg-white hover:bg-[#FFF7E6] active:bg-[#FFEFC8]"
+                >
+                  <i class="fa-solid fa-sliders text-[13px]"></i>
+                  <span>Filter</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Clear -->
+            <button
+              id="clearBtn"
+              type="button"
+              class="text-[#8B0000] text-sm font-medium hover:underline"
+            >
+              Clear
+            </button>
+
+          </div>
+        </div>
+
+<!-- TABLE -->
+<div class="border-2 border-gray-300 rounded-xl p-4 overflow-x-auto">
+<table class="table table-sm w-full">
+<thead>
+<tr class="text-xs uppercase text-red-700 border-b text-center">
+  <th>Date</th>
+  <th>Time In</th>
+  <th>Name of Patient</th>
+  <th>Course / Yr & Section / Dept</th>
+  <th>Age</th>
+  <th>Male</th>
+  <th>Female</th>
+  <th>Senior</th>
+  <th>PWD</th>
+  <th>Email</th>
+  <th>Contact</th>
+  <th>Time Processed</th>
+  <th>Processing Time</th>
+  <th>Emergency</th>
+  <th>Non-Emergency</th>
+  <th>Signature</th>
+</tr>
+</thead>
+
+<tbody id="dentalServicesTableBody"></tbody>
+</table>
+</div>
+
+</div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+  <aside>
+    <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+    <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    <p>pupdental@pup.edu.ph</p>
+    <p>(02) 123-4567</p>
+  </aside>
+</footer>
+
+<!-- ================= JS DATA ================= -->
+<script>
+const records = [
+  ["12/01/25","08:30 AM","Dela Cruz, Juan M.","BSIT 3-1",21,1,0,0,0,"juan@gmail.com","0917-123-4567","09:00 AM","30 mins",0,1],
+  ["12/01/25","09:10 AM","Santos, Maria L.","Faculty",45,0,1,0,0,"maria@gmail.com","0998-456-7890","10:00 AM","50 mins",1,0],
+  ["12/02/25","08:45 AM","Reyes, Paul A.","Administrative",38,1,0,0,0,"paul@gmail.com","0920-888-1234","09:15 AM","30 mins",0,1],
+  ["12/02/25","10:30 AM","Lopez, Ana C.","BSBA 2-2",20,0,1,0,0,"ana@gmail.com","0916-555-7891","11:05 AM","35 mins",0,1],
+  ["12/03/25","09:00 AM","Torres, Elaine C.","Dependent",62,0,1,1,0,"elaine@gmail.com","0999-332-4488","09:50 AM","50 mins",0,1],
+  ["12/03/25","10:40 AM","Castillo, Brian R.","BSCE 2-2",20,1,0,0,1,"brian@gmail.com","0908-777-5566","11:15 AM","35 mins",0,1],
+  ["12/04/25","08:20 AM","Mendoza, Joshua P.","BSCS 3-1",21,1,0,0,0,"josh@gmail.com","0917-889-3342","08:50 AM","30 mins",0,1],
+  ["12/04/25","09:45 AM","Navarro, Rhea T.","Faculty",41,0,1,0,0,"rhea@gmail.com","0995-441-2098","10:30 AM","45 mins",1,0],
+  ["12/05/25","08:10 AM","Cruz, Daniel S.","BSIT 4-1",22,1,0,0,0,"daniel@gmail.com","0928-334-8899","08:40 AM","30 mins",0,1],
+  ["12/05/25","09:30 AM","Ramos, Angela D.","BSED 2-1",19,0,1,0,0,"angela@gmail.com","0915-223-7781","10:00 AM","30 mins",0,1],
+  ["12/06/25","10:15 AM","Tan, Michael K.","Administrative",36,1,0,0,0,"mike@gmail.com","0991-667-9900","10:55 AM","40 mins",0,1],
+  ["12/06/25","01:20 PM","Lim, Samantha J.","BSHM 1-2",18,0,1,0,0,"sam@gmail.com","0922-889-4455","01:45 PM","25 mins",0,1],
+  ["12/07/25","08:40 AM","Bautista, Kevin A.","BSME 3-1",21,1,0,0,0,"kevin@gmail.com","0919-556-1123","09:10 AM","30 mins",0,1],
+  ["12/07/25","10:05 AM","Flores, Christine M.","BSA 4-1",22,0,1,0,0,"cflores@gmail.com","0918-774-9921","10:50 AM","45 mins",0,1],
+  ["12/08/25","09:00 AM","Villanueva, Mark L.","Dependent",58,1,0,0,0,"mark@gmail.com","0909-222-3344","09:40 AM","40 mins",1,0],
+  ["12/09/25","08:25 AM","Perez, John R.","BSIT 2-1",19,1,0,0,0,"john@gmail.com","0927-888-1122","08:55 AM","30 mins",0,1],
+  ["12/09/25","10:10 AM","Garcia, Alyssa B.","BSBA 1-3",18,0,1,0,0,"alyssa@gmail.com","0917-333-8899","10:45 AM","35 mins",0,1],
+  ["12/10/25","09:35 AM","Domingo, Leo P.","Faculty",50,1,0,1,0,"leo@gmail.com","0918-777-9999","10:25 AM","50 mins",1,0],
+  ["12/11/25","08:50 AM","Ortega, Nina S.","Dependent",65,0,1,1,0,"nina@gmail.com","0998-666-5555","09:40 AM","50 mins",0,1],
+  ["12/12/25","10:00 AM","Salazar, Eric M.","BSCE 4-1",23,1,0,0,0,"eric@gmail.com","0916-123-0000","10:30 AM","30 mins",0,1]
+];
+
+const tbody = document.getElementById("dentalServicesTableBody");
+tbody.innerHTML = "";
+
+records.forEach(r => {
+  tbody.innerHTML += `
+    <tr class="text-center leading-tight" style="font-size: 11px; color: black;">
+      <td>${r[0]}</td>
+      <td>${r[1]}</td>
+      <td class="text-left">${r[2]}</td>
+      <td>${r[3]}</td>
+      <td>${r[4]}</td>
+      <td>${r[5] ? "✔" : ""}</td>
+      <td>${r[6] ? "✔" : ""}</td>
+      <td>${r[7] ? "✔" : ""}</td>
+      <td>${r[8] ? "✔" : ""}</td>
+      <td>${r[9]}</td>
+      <td>${r[10]}</td>
+      <td>${r[11]}</td>
+      <td>${r[12]}</td>
+      <td>${r[13] ? "✔" : ""}</td>
+      <td>${r[14] ? "✔" : ""}</td>
+      <td>✔</td>
+    </tr>
+  `;
+});
+</script>
+
+
+</body>
+</html>

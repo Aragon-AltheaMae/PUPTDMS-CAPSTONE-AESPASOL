@@ -30,6 +30,12 @@
       }
     }
   </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 
 <body class="bg-gray-100">
@@ -85,8 +91,9 @@
       <i class="fa-solid fa-box text-lg"></i>
       <span>Inventory</span>
     </a>
-    <a class="flex flex-col items-center opacity-100">
-      <i class="fa-solid fa-file"></i>
+
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center">
+      <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>
 
@@ -118,62 +125,86 @@
   <div class="grid grid-cols-12 gap-6">
 
     <!-- GAD REPORT -->
-    <div class="col-span-8 bg-white rounded-xl shadow border border-orange-400 p-4">
+    <div class="col-span-5 bg-white rounded-xl shadow border-2 border-orange-400 p-4 h-[380px] flex flex-col">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-sm font-semibold text-red-700">GAD Report</h2>
         <span class="text-xs bg-red-700 text-white px-3 py-1 rounded-full">Dec 2025</span>
       </div>
-      <div id="gadChart" class="h-[320px]"></div>
+      <div id="gadChart" class="flex-1"></div>
     </div>
 
-    <!-- DENTAL CASES STATISTICS (NO WRAPPER CARD) -->
-    <div class="col-span-4">
+    <!-- WEEKLY DENTAL CASES ANALYTICS -->
+    <div class="col-span-5 bg-white rounded-xl shadow border-2 border-orange-400 p-4 h-[380px] flex flex-col">
 
-    <!-- TITLE ROW -->
-    <div class="flex justify-between items-center mb-3">
+      <!-- TITLE ROW -->
+      <div class="flex justify-between items-center mb-2">
         <h2 class="text-sm font-semibold text-red-700">
-        Dental Cases Statistics
+          Weekly Dental Cases
         </h2>
-        <span class="bg-red-700 text-white text-xs px-4 py-1 rounded-full">
-        Dec
+        <span class="bg-red-700 text-white text-xs px-3 py-1 rounded-full">
+          Dec 2025
         </span>
-    </div>
+      </div>
 
-    <!-- STAT CARDS -->
-    <div class="grid grid-cols-2 gap-4">
-
-        <!-- STUDENT -->
-        <div class="bg-white rounded-xl shadow border-2 border-orange-400 p-3">
-        <p class="text-xs text-[#8B0000] mb-1">Student</p>
-        <div id="studentChart" class="h-32"></div>
-        </div>
-
-        <!-- FACULTY -->
-        <div class="bg-white rounded-xl shadow border-2 border-orange-400 p-3">
-        <p class="text-xs text-[#8B0000] mb-1">Faculty</p>
-        <div id="facultyChart" class="h-32"></div>
-        </div>
-
-        <!-- ADMINISTRATIVE -->
-        <div class="bg-white rounded-xl shadow border-2 border-orange-400 p-3">
-        <p class="text-xs text-[#8B0000] mb-1">Administrative</p>
-        <div id="adminChart" class="h-32"></div>
-        </div>
-
-        <!-- DEPENDENT -->
-        <div class="bg-white rounded-xl shadow border-2 border-orange-400 p-3">
-        <p class="text-xs text-[#8B0000] mb-1">Dependent</p>
-        <div id="dependentChart" class="h-32"></div>
-        </div>
+      <!-- LINE CHART -->
+      <div id="weeklyDentalCasesChart" class="flex-1"></div>
 
     </div>
-    </div>
+
+
+    <!-- QUICK REPORT BUTTONS -->
+      <div class="col-span-2 flex flex-col gap-6 h-[380px]">
+
+        <!-- DENTAL SERVICES -->
+        <a
+          href="{{ route('dentist.report.dental-services') }}"
+          class="relative flex-1 rounded-xl overflow-hidden
+                text-white font-semibold text-lg shadow
+                bg-gradient-to-r from-[#8B0000] to-[#660000]
+                flex items-center justify-center
+                hover:opacity-80 transition">
+
+          <!-- BACKGROUND IMAGE ICON -->
+          <img
+            src="{{ asset('images/services.png') }}"
+            alt="Dental Services Icon"
+            class="absolute opacity-10 w-40 h-40 object-contain pointer-events-none" />
+
+          <!-- BUTTON TEXT -->
+          <span class="relative z-10">
+            Dental Services
+          </span>
+        </a>
+
+        <!-- DAILY TREATMENT RECORD -->
+        <a
+          href="{{ route('dentist.report.daily-treatment') }}"
+          class="relative flex-1 rounded-xl overflow-hidden
+                text-white font-semibold text-lg shadow
+                bg-gradient-to-r from-[#8B0000] to-[#660000]
+                flex items-center justify-center
+                hover:opacity-80 transition">
+
+          <!-- BACKGROUND IMAGE ICON -->
+          <img
+            src="{{ asset('images/services.png') }}"
+            alt="Daily Treatment Icon"
+            class="absolute opacity-10 w-40 h-40 object-contain pointer-events-none" />
+
+          <!-- BUTTON TEXT -->
+          <span class="relative z-10 text-center leading-tight">
+            Daily Treatment<br> Record
+          </span>
+        </a>
+
+      </div>
+
 
     
     <!-- INVENTORY ANALYTICS -->
     <div class="col-span-12 bg-white rounded-xl shadow border-2 border-orange-400 p-6">
 
-    <h2 class="text-lg font-semibold text-red-700 underline mb-4">
+    <h2 class="text-lg font-semibold text-red-700 mb-4">
         Inventory Analytics
     </h2>
 
@@ -247,6 +278,17 @@
         </div>
 
         </div>
+
+        <!-- VIEW INVENTORY BUTTON (CENTERED) -->
+          <div class="flex justify-center">
+            <a href="{{ route('dentist.inventory') }}"
+              class="px-2 py-3 rounded-lg text-white text-sm font-semibold shadow
+                      bg-gradient-to-r from-[#8B0000] to-[#660000]
+                      hover:opacity-90 transition">
+              View Inventory
+            </a>
+          </div>
+
     </div>
     </div>
 
@@ -330,9 +372,6 @@
 
   </div>
 </dialog>
-
-
-
 
 
 
@@ -443,31 +482,58 @@
     credits: { enabled: false }
   });
 
-  // DONUT TEMPLATE
-  function donut(id, value) {
-    Highcharts.chart(id, {
-      chart: { type: 'pie' },
-      title: { text: null },
-      plotOptions: {
-        pie: {
-          innerSize: '70%',
-          dataLabels: { enabled: false }
-        }
+  Highcharts.chart('weeklyDentalCasesChart', {
+    chart: {
+      type: 'line'
+    },
+    title: {
+      text: null
+    },
+    xAxis: {
+      categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      title: {
+        text: 'Weeks'
+      }
+    },
+    yAxis: {
+      title: {
+        text: 'Number of Dental Cases'
       },
-      series: [{
-        data: [
-          { y: value, color: '#7a0000' },
-          { y: 100 - value, color: '#f3f3f3' }
-        ]
-      }],
-      credits: { enabled: false }
-    });
-  }
+      allowDecimals: false
+    },
+    tooltip: {
+      shared: true,
+      valueSuffix: ' cases'
+    },
+    plotOptions: {
+      line: {
+        marker: {
+          enabled: true
+        }
+      }
+    },
+    series: [
+      {
+        name: 'Dental Cleaning',
+        data: [12, 15, 9, 14],
+        color: '#8B0000'
+      },
+      {
+        name: 'Tooth Extraction',
+        data: [5, 7, 6, 8],
+        color: '#F59E0B'
+      },
+      {
+        name: 'Consultation',
+        data: [8, 10, 11, 13],
+        color: '#3B82F6'
+      }
+    ],
+    credits: {
+      enabled: false
+    }
+  });
 
-  donut('studentChart', 65);
-  donut('facultyChart', 55);
-  donut('adminChart', 70);
-  donut('dependentChart', 60);
 
   const inventory = [
     { category: "Supplies", name: "Disposable Dental Needles", qty: 42, used: 8 },

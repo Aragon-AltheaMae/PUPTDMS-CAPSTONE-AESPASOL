@@ -101,6 +101,55 @@
     .fade-up {
       animation: fadeUp 0.6s ease-out forwards;
   }
+
+  @keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+.float-slow {
+  animation: float 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+  /* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+  .shimmer-btn {
+    background: linear-gradient(
+      110deg,
+      #660000 25%,
+      rgba(255, 80, 80, 0.87) 37%,
+      #660000 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 10s linear infinite;
+  }
+
+  @keyframes wave {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(14deg); }
+  80% { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.wave-hand {
+  transform-origin: 70% 70%;
+  animation: wave 2.5s ease-in-out infinite;
+}
 </style>
 
 <body class="bg-white text-[#333333] font-normal">
@@ -265,29 +314,55 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- WELCOME -->
-        <h1 class="text-4xl font-extrabold mb-6 bg-gradient-to-r
-    from-[#660000] to-[#FFD700] bg-clip-text text-transparent inline-block fade-up">
-      Welcome, {{ ucwords(strtolower($patient->name)) }}!
+    <h1 class="text-4xl font-extrabold mb-6 flex items-center gap-3 fade-up">
+      <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
+        Welcome, {{ ucwords(strtolower($patient->name)) }}!
+      </span>
+
+      <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
     </h1>
 
 
     <!-- HERO CARD -->
-    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000] text-[#F4F4F4] rounded-2xl p-10 flex justify-between items-center mb-20 fade-up">
-      <div>
-        <h2 class="text-4xl font-semibold mb-10 text-[#F4F4F4] fade-up">Book a dental appointment at your convenience</h2>
-        <button
-        class="btn btn-soft bg-[#660000] hover:bg-[#333333]
-              transition-colors duration-300
-              border-none text-base rounded-2xl text-[#F4F4F4]">
-              <a href="{{ route('book.appointment') }}">
-        Book Appointment
-        </a>
-      </button>
+    <div class="bg-gradient-to-r from-[#8B0000] to-[#660000]
+            text-[#F4F4F4] rounded-2xl p-20
+            flex justify-between items-center
+            mb-20 fade-up relative overflow-visible">
 
+      <div>
+        <h1 class="text-5xl font-bold mb-4 text-[#F4F4F4] fade-up">
+          Your smile starts here!
+        </h1>
+        <h2 class="text-xl font-normal mb-10 text-[#F4F4F4] fade-up">
+          Book a dental appointment at your convenience.
+        </h2>
+
+        <button
+          class="btn btn-soft shimmer-btn
+                px-6 py-3 rounded-2xl
+                border-none text-base font-semibold
+                text-[#F4F4F4]
+                transition-transform duration-300
+                hover:-translate-y-0.5
+                hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+
+          <a href="{{ route('book.appointment') }}" class="flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            Book Appointment
+          </a>
+        </button>
       </div>
-      <div class="w-1/5">
-        <img src="images/home-tooth.png" alt="Tooth Icon" />
+
+      <!-- IMAGE (ABSOLUTE) -->
+      <div class="absolute right-7 top-1/2 -translate-y-1/2 pointer-events-none">
+        <img
+          src="images/home-tooth.png"
+          alt="Tooth Icon"
+          class="float-slow w-[360px] max-w-none
+                drop-shadow-[0_14px_26px_rgba(255,255,255,0.25)]"
+        />
       </div>
+
     </div>
 
     <!-- PROFILE + CALENDAR SECTION -->
