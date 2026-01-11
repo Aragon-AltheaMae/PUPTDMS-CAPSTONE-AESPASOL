@@ -373,9 +373,6 @@
             </a>
           </div>
         </div>
-
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
   <form
@@ -516,6 +513,9 @@
     </div>
   </form>
 </dialog>
+
+<!-- FOOTER -->
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
 
   <!-- ASIDE: CLINIC INFO -->
   <aside class="space-y-4">
