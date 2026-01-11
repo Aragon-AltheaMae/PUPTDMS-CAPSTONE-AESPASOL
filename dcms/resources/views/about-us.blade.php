@@ -87,10 +87,80 @@
   background-size: 200% 100%;
   animation: shimmer 10s linear infinite;
 }
+
+/* === BACKGROUND BLOOBS === */
+@keyframes blobFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(40px, -30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes blobPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px); 
+  animation:
+    blobFloat 28s ease-in-out infinite,
+    blobPulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
   </style>
 </head>
-<body class="bg-white text-[#333333]">
 
+<body class="relative text-[#333333] bg-[#F8F8F8] overflow-x-hidden">
+<div id="bg-blobs" class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+
+  <div class="blob blob-slow
+    w-[460px] h-[460px]
+    top-[-120px] left-[-120px]"
+    style="background: radial-gradient(circle,
+      rgba(139,0,0,0.45) 0%,
+      rgba(139,0,0,0.25) 45%,
+      rgba(139,0,0,0.08) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob blob-fast
+    w-[380px] h-[380px]
+    top-[35%] right-[-140px]"
+    style="background: radial-gradient(circle,
+      rgba(255,215,0,0.4) 0%,
+      rgba(255,215,0,0.22) 45%,
+      rgba(255,215,0,0.07) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob
+    w-[340px] h-[340px]
+    bottom-[15%] left-[10%]"
+    style="background: radial-gradient(circle,
+      rgba(102,0,0,0.45) 0%,
+      rgba(102,0,0,0.25) 45%,
+      rgba(102,0,0,0.07) 65%,
+      transparent 75%);
+    ">
+  </div>
+
+  <div class="blob blob-slow
+    w-[280px] h-[280px]
+    bottom-[-120px] right-[20%]"
+    style="background: radial-gradient(circle,
+      rgba(255,215,0,0.65) 0%,
+      rgba(255,215,0,0.4) 45%,
+      rgba(255,215,0,0.1) 65%,
+      transparent 75%);
+    ">
+  </div>
+</div>
+
+<div class="relative z-10">
   <!-- HEADER (TOP BAR) -->
   <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -303,8 +373,8 @@
             max-w-2xl">
 
             The dental clinic is headed by
-            <span class="font-bold">Dr. Nelson P. Angeles</span>,
-            <br>the campus dentist, who delivers professional, safe, and reliable dental care.
+            <span class="font-bold">Dr. Nelson P. Angeles</span>
+            the campus dentist, who delivers professional, safe, and reliable dental care.
         </div>
 
         <!-- IMAGE -->
@@ -623,13 +693,15 @@
         button.setAttribute('aria-expanded', 'true');
     }
     }
-  
-
-  const observer = new IntersectionObserver(
+  /* ===============================
+     FADE-UP ANIMATION OBSERVER
+  =============================== */
+  const fadeObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('show');
+          fadeObserver.unobserve(entry.target); // optional: animate once
         }
       });
     },
@@ -637,8 +709,25 @@
   );
 
   document.querySelectorAll('.fade-up').forEach(el => {
-    observer.observe(el);
+    fadeObserver.observe(el);
   });
+
+
+  /* ===============================
+     BLOB VISIBILITY OBSERVER
+  =============================== */
+  const blobs = document.getElementById('bg-blobs');
+  const footer = document.querySelector('footer');
+
+  const blobObserver = new IntersectionObserver(
+    ([entry]) => {
+      blobs.style.opacity = entry.isIntersecting ? '0' : '1';
+    },
+    { threshold: 0.1 }
+  );
+  blobObserver.observe(footer);
+
 </script>
+</div>
 </body>
 </html>
