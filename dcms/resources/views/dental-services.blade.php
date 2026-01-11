@@ -77,7 +77,9 @@ body {
     <p class="text-red-700 mt-1">December 2025</p>
   </div>
 
-  <button class="flex items-center gap-4 px-6 py-3 rounded-xl
+  <button 
+  onclick="createReportModal.showModal()"
+  class="flex items-center gap-4 px-6 py-3 rounded-xl
                  bg-gradient-to-r from-[#8B0000] to-[#660000]
                  text-white font-semibold shadow hover:opacity-90">
     <span>Create New Report</span>
@@ -172,14 +174,146 @@ body {
 </div>
 </main>
 
+<dialog id="createReportModal" class="modal">
+  <div class="modal-box max-w-4xl border-2 border-blue-400 bg-white">
+
+    <h2 class="text-2xl font-semibold text-[#8B0000] mb-8">
+      Create New Report
+    </h2>
+
+    <form class="space-y-6" id="reportForm">
+
+      <!-- REPORT NAME -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Report Name</label>
+        <input
+          type="text"
+          placeholder="Enter Report Name"
+          class="col-span-3 input input-bordered w-full border-yellow-400 bg-white focus:outline-none" />
+      </div>
+
+      <!-- REPORT TYPE -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Report Type</label>
+        <select
+          class="col-span-3 select select-bordered w-full border-yellow-400 bg-white focus:outline-none">
+          <option disabled selected>Select Report Type</option>
+          <option>Dental Services Report</option>
+        </select>
+      </div>
+
+      <!-- DATE RANGE -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Date Range</label>
+        <div class="col-span-3 flex gap-4">
+          <input
+            type="date"
+            class="input input-bordered border-yellow-400 bg-white w-full" />
+          <input
+            type="date"
+            class="input input-bordered border-yellow-400 bg-white w-full" />
+        </div>
+      </div>
+
+      <!-- QUANTITY -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Quantity</label>
+        <input
+          type="number"
+          value="0"
+          class="col-span-1 input input-bordered border-yellow-400 bg-white w-full" />
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex justify-end gap-4 pt-6">
+        <button
+          type="button"
+          id="downloadReportBtn"
+          class="btn bg-[#8B0000] text-white px-8">
+          Download Report
+        </button>
+
+        <button
+          type="button"
+          onclick="createReportModal.close()"
+          class="btn bg-gray-700 text-white px-8">
+          Back
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Mini Tab: Download Complete Notification -->
+    <div id="downloadCompleteTab" class="hidden fixed top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-green-600 text-white py-2 px-8 rounded-lg shadow-lg">
+      Download Complete
+    </div>
+
+
+  </div>
+</dialog>
+
 <!-- ================= FOOTER ================= -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-  <aside>
-    <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-    <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
-    <p>pupdental@pup.edu.ph</p>
-    <p>(02) 123-4567</p>
+
+  <!-- ASIDE: CLINIC INFO -->
+  <aside class="space-y-4">
+    <div class="flex items-center gap-3">
+      
+      <!-- Logos -->
+      <div class="w-12">
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+      </div>
+
+      <div class="w-12">
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+        <p class="text-sm whitespace-nowrap">
+          Polytechnic University of the Philippines – Taguig Campus
+        </p>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="flex items-start gap-3 text-sm">
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
+      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    </div>
+
+    <!-- Email -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
+      <p>pupdental@pup.edu.ph</p>
+    </div>
+
+    <!-- Phone -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
+      <p>(02) 123-4567</p>
+    </div>
   </aside>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
+  </nav>
+
+  <!-- SERVICES -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
+    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
+    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
+  </nav>
+
 </footer>
 
 <!-- ================= JS DATA ================= -->
@@ -232,6 +366,26 @@ records.forEach(r => {
     </tr>
   `;
 });
+
+
+document.getElementById('downloadReportBtn').addEventListener('click', function() {
+    // Simulate download (You can replace this with actual download logic)
+    setTimeout(function() {
+        // Show the "Download Complete" mini tab
+        const downloadCompleteTab = document.getElementById('downloadCompleteTab');
+        downloadCompleteTab.classList.remove('hidden');
+
+        // Reset the form fields
+        const form = document.getElementById('reportForm');
+        form.reset(); // This will reset all input fields within the form
+
+        // Hide the "Download Complete" mini tab after 3 seconds
+        setTimeout(function() {
+            downloadCompleteTab.classList.add('hidden');
+        }, 3000); // Hide after 3 seconds
+    }, 1000); // Simulating a 1-second download delay
+});
+
 </script>
 
 

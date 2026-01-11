@@ -87,7 +87,7 @@
 
         <!-- RIGHT: CREATE NEW REPORT BUTTON -->
         <button
-            type="button"
+            onclick="createReportModal.showModal()" type="button"
             class="flex items-center gap-4 px-6 py-3 rounded-xl
                   bg-gradient-to-r from-[#8B0000] to-[#660000]
                   text-white font-semibold shadow
@@ -188,6 +188,85 @@
     </div>
 
 </main>
+
+
+<dialog id="createReportModal" class="modal">
+  <div class="modal-box max-w-4xl border-2 border-blue-400 bg-white">
+
+    <h2 class="text-2xl font-semibold text-[#8B0000] mb-8">
+      Create New Report
+    </h2>
+
+    <form class="space-y-6" id="reportForm">
+
+      <!-- REPORT NAME -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Report Name</label>
+        <input
+          type="text"
+          placeholder="Enter Report Name"
+          class="col-span-3 input input-bordered w-full border-yellow-400 bg-white focus:outline-none" />
+      </div>
+
+      <!-- REPORT TYPE -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Report Type</label>
+        <select
+          class="col-span-3 select select-bordered w-full border-yellow-400 bg-white focus:outline-none">
+          <option disabled selected>Select Report Type</option>
+          <option>Daily Treatment Record</option>
+        </select>
+      </div>
+
+      <!-- DATE RANGE -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Date Range</label>
+        <div class="col-span-3 flex gap-4">
+          <input
+            type="date"
+            class="input input-bordered border-yellow-400 bg-white w-full" />
+          <input
+            type="date"
+            class="input input-bordered border-yellow-400 bg-white w-full" />
+        </div>
+      </div>
+
+      <!-- QUANTITY -->
+      <div class="grid grid-cols-4 items-center gap-4">
+        <label class="col-span-1 text-[#8B0000]">Quantity</label>
+        <input
+          type="number"
+          value="0"
+          class="col-span-1 input input-bordered border-yellow-400 bg-white w-full" />
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex justify-end gap-4 pt-6">
+        <button
+          type="button"
+          id="downloadReportBtn"
+          class="btn bg-[#8B0000] text-white px-8">
+          Download Report
+        </button>
+
+        <button
+          type="button"
+          onclick="createReportModal.close()"
+          class="btn bg-gray-700 text-white px-8">
+          Back
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Mini Tab: Download Complete Notification -->
+    <div id="downloadCompleteTab" class="hidden fixed top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-green-600 text-white py-2 px-8 rounded-lg shadow-lg">
+      Download Complete
+    </div>
+
+
+  </div>
+</dialog>
 
 <!-- ================= FOOTER ================= -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
@@ -414,6 +493,25 @@ function renderDailyRecords() {
 }
 
 renderDailyRecords();
+
+document.getElementById('downloadReportBtn').addEventListener('click', function() {
+    // Simulate download (You can replace this with actual download logic)
+    setTimeout(function() {
+        // Show the "Download Complete" mini tab
+        const downloadCompleteTab = document.getElementById('downloadCompleteTab');
+        downloadCompleteTab.classList.remove('hidden');
+
+        // Reset the form fields
+        const form = document.getElementById('reportForm');
+        form.reset(); // This will reset all input fields within the form
+
+        // Hide the "Download Complete" mini tab after 3 seconds
+        setTimeout(function() {
+            downloadCompleteTab.classList.add('hidden');
+        }, 3000); // Hide after 3 seconds
+    }, 1000); // Simulating a 1-second download delay
+});
+
 </script>
 
 
