@@ -86,7 +86,7 @@
       <span class="font-bold">Inventory</span>
     </a>
 
-    <a href="{{ route('dentist.report') }}" flex flex-col items-center">
+    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center">
       <i class="fa-solid fa-file text-lg"></i>
       <span>Reports</span>
     </a>

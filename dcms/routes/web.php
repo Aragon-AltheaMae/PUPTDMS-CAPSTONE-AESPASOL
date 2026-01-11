@@ -144,6 +144,35 @@ Route::prefix('dentist')->group(function () {
         }
         return view('dentist-report');
     })->name('dentist.report');
+
+    // ================= REPORTS =================
+    Route::prefix('report')->group(function () {
+
+        Route::get('/', function () {
+            if (session('role') !== 'dentist') {
+                return redirect('/login');
+            }
+            return view('dentist-report');
+        })->name('dentist.report');
+
+        // ✅ DAILY TREATMENT RECORD
+        Route::get('/daily-treatment-record', function () {
+            if (session('role') !== 'dentist') {
+                return redirect('/login');
+            }
+            return view('daily-treatment');
+        })->name('dentist.report.daily-treatment');
+
+        // ✅ DENTAL SERVICES
+        Route::get('/dental-services', function () {
+            if (session('role') !== 'dentist') {
+                return redirect('/login');
+            }
+            return view('dental-services');
+        })->name('dentist.report.dental-services');
+
+    });
+    
 });
 
 
