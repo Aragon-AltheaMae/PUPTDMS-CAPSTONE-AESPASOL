@@ -219,7 +219,7 @@
         id="pastVisitsBtn"
         class="text-gray-400 font-medium"
         onclick="showVisitTab('past')">
-        Past Visits (0)
+        Past Visits (1)
       </button>
     </div>
 
@@ -275,54 +275,17 @@
           </div>
         </div>
 
-     <!-- Button to trigger the modal -->
-<div class="absolute bottom-2 right-5 z-50">  <!-- Added z-50 here -->
-  <button
-    id="startButton"
-    class="bg-green-600 text-white text-xs px-4 py-1.5 rounded-md hover:bg-green-700 transition"
-    onclick="showModal()">
-    Start Procedure
-  </button>
-</div>
-
-<!-- Modal Structure -->
-<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-40">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-[500px] h-[300px] flex">  <!-- Slightly smaller size -->
-    
-    <!-- Modal Content -->
-    <div class="flex-1 pr-6">
-      <!-- Header with Title -->
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Confirm the start of procedure?</h3>
-      </div>
-
-      <!-- Patient Input -->
-      <div class="mt-4 flex items-center">
-        <label class="block text-sm text-red-600 mr-2">Patient:</label>
-        <input type="text" class="w-full p-2 border-2 border-[#8B0000] bg-[#8B0000] text-white rounded-md" placeholder="Enter patient name">
-      </div>
-
-      <!-- Buttons: Start and Back -->
-      <div class="mt-6 flex gap-4">
-        <button id="startButtonModal" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 w-1/2">
-          START
-        </button>
-        <button id="backButton" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 w-1/2">
-          BACK
-        </button>
+        <!-- Button to trigger the modal (only in future visits) -->
+        <div class="absolute bottom-2 right-5 z-50">
+          <button
+            id="startButton"
+            class="bg-green-600 text-white text-xs px-4 py-1.5 rounded-md hover:bg-green-700 transition"
+            onclick="showModal()">
+            Start Procedure
+          </button>
+        </div>
       </div>
     </div>
-
-    <!-- Image on the Right -->
-    <div class="flex-shrink-0 w-1/3 h-full bg-cover bg-center rounded-r-lg"
-         style="background-image: url('/images/teeth-minitab.png'); background-position: center; background-size: cover;">
-    </div>
-
-  </div>
-</div>
-
-
-
 
     <!-- Past Visits Tab Content (hidden by default) -->
     <div id="pastVisitsTab" class="tab-content hidden">
@@ -388,6 +351,36 @@
 
   </div>
 </section>
+
+<!-- Modal Structure -->
+<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-40">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-[500px] h-[300px] flex flex-col">
+    
+    <!-- Modal Content -->
+    <div class="flex flex-col justify-center items-center flex-1 pr-6"> <!-- Centered content -->
+      <!-- Header with Title -->
+      <div class="mb-4 text-left">  <!-- Left aligned text -->
+        <h3 class="text-lg font-semibold">Confirm the start of procedure?</h3>
+      </div>
+
+      <!-- Patient Input -->
+      <div class="mt-8 flex items-center w-full justify-center">  <!-- Left-aligned input -->
+        <label class="block text-lg text-[#8B0000] mr-2">Patient:</label>
+        <span class="w-[80%] p-2 border-2 border-[#8B0000] bg-[#8B0000] text-white rounded-md">Capilitan, Beyonce</span>
+      </div>
+    </div>
+
+    <!-- Buttons: Start and Back -->
+    <div class="flex gap-2 mt-auto justify-center"> <!-- Centered the buttons -->
+      <button id="startButtonModal" class="bg-green-600 text-white px-4 py-1 rounded-md hover:bg-green-700 text-sm">
+        START
+      </button>
+      <button id="backButton" class="bg-gray-300 text-gray-700 px-4 py-1 rounded-md hover:bg-gray-400 text-sm">
+        BACK
+      </button>
+    </div>
+  </div>
+</div>
 </main>
 
 <!-- FOOTER -->
@@ -435,8 +428,6 @@
 </footer>
 
 
-
-
 <!-- CONFIRM SAVE MODAL -->
 <dialog id="confirmSaveModal" class="modal">
   <div class="modal-box rounded-2xl bg-[#F4F4F4]">
@@ -463,6 +454,18 @@
 
 
 <script>
+  // Show the modal when the "Start Procedure" button is clicked
+  function showModal() {
+    const modal = document.getElementById("modal");
+    modal.classList.remove("hidden");  // Show the modal
+  }
+
+  // Close the modal when the "Back" button is clicked
+  document.getElementById("backButton").addEventListener("click", function() {
+    const modal = document.getElementById("modal");
+    modal.classList.add("hidden");  // Hide the modal
+  });
+  
   function showHistoryTab(tab) {
   // Get references to the history tabs and buttons
   const modal = document.getElementById('modal');
@@ -508,15 +511,19 @@ function showVisitTab(tab) {
   const futureVisitsBtn = document.getElementById("futureVisitsBtn");
   const pastVisitsBtn = document.getElementById("pastVisitsBtn");
 
+  // Reset the active styles for the buttons
   futureVisitsBtn.classList.remove("text-[#8B0000]", "border-b-2", "border-[#8B0000]");
   pastVisitsBtn.classList.remove("text-[#8B0000]", "border-b-2", "border-[#8B0000]");
 
+  // Set the default styles (inactive buttons)
   futureVisitsBtn.classList.add("text-gray-400");
   pastVisitsBtn.classList.add("text-gray-400");
 
+  // Hide both tabs by default
   futureVisitsTab.classList.add("hidden");
   pastVisitsTab.classList.add("hidden");
 
+  // Show the selected tab and highlight the active button
   if (tab === "future") {
     futureVisitsTab.classList.remove("hidden");
     futureVisitsBtn.classList.add("text-[#8B0000]", "border-b-2", "border-[#8B0000]");
@@ -528,7 +535,6 @@ function showVisitTab(tab) {
     futureVisitsBtn.classList.remove("text-[#8B0000]", "border-b-2", "border-[#8B0000]");
     futureVisitsBtn.classList.add("text-gray-400");
   }
-  
 }
 
         // Show the modal when the "Start Procedure" button is clicked
