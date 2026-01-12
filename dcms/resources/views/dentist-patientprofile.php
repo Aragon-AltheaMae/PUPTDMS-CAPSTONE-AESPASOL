@@ -383,6 +383,76 @@
 </div>
 </main>
 
+<!-- FOOTER -->
+<footer class="bg-[#660000] text-[#F4F4F4] p-8">
+  <div class="flex justify-between items-center">
+    <!-- LOGO AND CLINIC INFO -->
+    <div class="flex items-center space-x-4">
+      <!-- Logo Section -->
+      <div class="flex items-center">
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-12 h-auto ml-2">
+      </div>
+
+      <!-- Clinic Details -->
+      <div class="text-sm">
+        <p class="font-bold">PUP TAGUIG DENTAL CLINIC</p>
+        <p>Polytechnic University of the Philippines – Taguig Campus</p>
+        <p class="mt-2">Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+        <p class="mt-2">pupdental@pup.edu.ph</p>
+        <p>(02) 123-4567</p>
+      </div>
+    </div>
+
+    <!-- NAVIGATION AND SERVICES -->
+    <div class="flex space-x-12">
+      <!-- Navigation Links -->
+      <nav class="text-sm">
+        <p class="font-semibold">NAVIGATION</p>
+        <a href="#" class="block py-1">Home</a>
+        <a href="#" class="block py-1">Appointment</a>
+        <a href="#" class="block py-1">Record</a>
+        <a href="#" class="block py-1">About Us</a>
+      </nav>
+
+      <!-- Services Links -->
+      <nav class="text-sm">
+        <p class="font-semibold">SERVICES</p>
+        <a href="#" class="block py-1">Oral Check-up</a>
+        <a href="#" class="block py-1">Tooth Cleaning</a>
+        <a href="#" class="block py-1">Tooth Extraction</a>
+        <a href="#" class="block py-1">Dental Consultation</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+
+<!-- CONFIRM SAVE MODAL -->
+<dialog id="confirmSaveModal" class="modal">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+    <h3 class="font-bold text-lg mb-2">Confirm</h3>
+    <p id="confirmSaveText" class="mb-6">Are you sure?</p>
+    <div class="modal-action flex justify-between">
+      <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
+      <button onclick="submitConfirmedForm()" class="btn btn-error text-white">Yes, Submit</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- SUBMITTED INFO MODAL -->
+<dialog id="submittedInfoModal" class="modal">
+  <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+    <h3 class="font-bold text-lg mb-2">Submitted!</h3>
+    <p>Your request has been submitted.</p>
+    <div class="modal-action">
+      <button onclick="submittedInfoModal.close()" class="btn btn-error text-white">OK</button>
+    </div>
+  </div>
+</dialog>
+
+
+
 <script>
   // Show the modal when the "Start Procedure" button is clicked
   function showModal() {
