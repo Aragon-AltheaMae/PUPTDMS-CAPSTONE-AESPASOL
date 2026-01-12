@@ -34,7 +34,7 @@
 <body class="bg-gray-100">
 
 <!-- ================= HEADER ================= -->
-<header class="bg-[#8B0000] h-16 shadow">
+<header class="bg-[#8B0000] h-16">
 </header>
 
 <!-- ================= MAIN ================= -->
@@ -353,8 +353,8 @@
 </section>
 
 <!-- Modal Structure -->
-<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-40">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-[500px] h-[300px] flex flex-col">
+<div id="modal" class="fixed inset-0 flex items-center justify-center hidden z-40">
+  <div class="bg-white p-8 rounded-lg shadow-lg border border-[#8B0000] w-[500px] h-[300px] flex flex-col">
     
     <!-- Modal Content -->
     <div class="flex flex-col justify-center items-center flex-1 pr-6"> <!-- Centered content -->
