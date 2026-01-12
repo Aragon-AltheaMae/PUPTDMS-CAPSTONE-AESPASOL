@@ -391,68 +391,51 @@
 </main>
 
 <!-- FOOTER -->
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-
-  <!-- ASIDE: CLINIC INFO -->
-  <aside class="space-y-4">
-    <div class="flex items-center gap-3">
-      
-      <!-- Logos -->
-      <div class="w-12">
+<footer class="bg-[#660000] text-[#F4F4F4] p-8">
+  <div class="flex justify-between items-center">
+    <!-- LOGO AND CLINIC INFO -->
+    <div class="flex items-center space-x-4">
+      <!-- Logo Section -->
+      <div class="flex items-center">
         <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-12 h-auto ml-2">
       </div>
 
-      <div class="w-12">
-    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
-      </div>
-
-      <!-- Text -->
-      <div>
-        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-        <p class="text-sm whitespace-nowrap">
-          Polytechnic University of the Philippines – Taguig Campus
-        </p>
+      <!-- Clinic Details -->
+      <div class="text-sm">
+        <p class="font-bold">PUP TAGUIG DENTAL CLINIC</p>
+        <p>Polytechnic University of the Philippines – Taguig Campus</p>
+        <p class="mt-2">Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+        <p class="mt-2">pupdental@pup.edu.ph</p>
+        <p>(02) 123-4567</p>
       </div>
     </div>
 
-    <!-- Location -->
-    <div class="flex items-start gap-3 text-sm">
-      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
-      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    <!-- NAVIGATION AND SERVICES -->
+    <div class="flex space-x-12">
+      <!-- Navigation Links -->
+      <nav class="text-sm">
+        <p class="font-semibold">NAVIGATION</p>
+        <a href="#" class="block py-1">Home</a>
+        <a href="#" class="block py-1">Appointment</a>
+        <a href="#" class="block py-1">Record</a>
+        <a href="#" class="block py-1">About Us</a>
+      </nav>
+
+      <!-- Services Links -->
+      <nav class="text-sm">
+        <p class="font-semibold">SERVICES</p>
+        <a href="#" class="block py-1">Oral Check-up</a>
+        <a href="#" class="block py-1">Tooth Cleaning</a>
+        <a href="#" class="block py-1">Tooth Extraction</a>
+        <a href="#" class="block py-1">Dental Consultation</a>
+      </nav>
     </div>
-
-    <!-- Email -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
-      <p>pupdental@pup.edu.ph</p>
-    </div>
-
-    <!-- Phone -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
-      <p>(02) 123-4567</p>
-    </div>
-  </aside>
-
-  <!-- NAVIGATION -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
-  </nav>
-
-  <!-- SERVICES -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
-    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
-    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
-  </nav>
-
+  </div>
 </footer>
+
+
+
 
 <!-- CONFIRM SAVE MODAL -->
 <dialog id="confirmSaveModal" class="modal">

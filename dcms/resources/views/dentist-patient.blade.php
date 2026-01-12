@@ -256,7 +256,7 @@
 
                     <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
                       <div class="col-span-4 leading-tight">
-                        <p class="text-[#8B0000] font-semibold text-[16px]">Romero, Dianna</p>
+                        <p class="text-[#8B0000] font-semibold text-[16px]">Capilitan, Beyonce</p>
                         <p class="text-[#8B0000] text-[13px]">2023-00010 · BSIT · 2nd Year · Section 1</p>
                         <span class="patient-info hidden">BSIT|2nd Year|1|2025-01-20</span>
                       </div>
