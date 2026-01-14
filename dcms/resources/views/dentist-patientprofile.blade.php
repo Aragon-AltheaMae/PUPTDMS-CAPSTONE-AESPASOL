@@ -232,46 +232,239 @@
               <p class="text-gray-700 text-lg">None reported</p>
             </div>
           </div>
-        </div>
-      </div>
     </section>
   </main>
 
 <!-- ================= CLINIC VISITS ================= -->
-<section class="max-w-5xl mx-auto fade-up mt-16">
-  <div class="flex justify-center items-center mb-4 mt-28">
-    <h2 class="text-3xl font-bold text-[#660000]">Clinic Visits</h2>
-  </div>
+<section class="max-w-6xl mx-auto mt-8 mb-24">
+  <h2 class="text-center text-3xl font-semibold text-[#8B0000] mb-8">
+    Clinic Visits
+  </h2>
 
-  <!-- Add a div to wrap the whole section and apply the background -->
-  <div class="bg-gray-200 p-10 rounded-2xl">
-    <!-- Tabs for History -->
-    <div class="tabs tabs-bordered mb-6">
-      <a id="futureTab" class="tab tab-active font-bold text-[#660000] cursor-pointer" onclick="showFuture()">Future Visits</a>
-      <a id="pastTab" class="tab text-[#660000] cursor-pointer" onclick="showPast()">Past Visits</a>
+  <!-- Gray Container -->
+  <div class="bg-gray-200 rounded-2xl p-10 max-w-5xl mx-auto min-h-[420px]">
+
+    <!-- Tabs -->
+    <div class="flex justify-center gap-20 mb-8 relative">
+      <button
+        id="futureTab"
+        onclick="showFuture()"
+        class="text-[#8B0000] font-semibold"
+      >
+        Future Visits (1)
+        <div id="futureUnderline" class="h-[2px] bg-transparent w-full mt-2"></div>
+      </button>
+
+      <button
+        id="pastTab"
+        onclick="showPast()"
+        class="text-gray-600 font-semibold"
+      >
+        Past Visits (0)
+        <div id="pastUnderline" class="h-[2px] bg-transparent w-full mt-2"></div>
+      </button>
     </div>
 
-<!-- ================= FUTURE VISITS ================= -->
-<div id="futureContent" class="text-center py-10 text-[#333333]">
-  <div class="border-l-4 border-[#8B0000] bg-[#FFECEC] p-6 rounded-2xl"> <!-- Left border set to #8B0000 -->
-    <img src="{{ asset('images/future-visit.png') }}" class="w-24 h-24 mx-auto mb-4" alt="No Upcoming Visits">
-    <p class="text-lg font-semibold text-[#660000]">No Upcoming Visits</p>
-    <p class="text-sm text-[#ADADAD]">You currently have no scheduled appointments.</p>
+    <!-- ================= FUTURE VISITS ================= -->
+    <div id="futureContent">
+      <div class="bg-[#FFECEC] rounded-xl p-6 flex items-center gap-6 relative max-w-4xl mx-auto min-h-[220px]">
+
+        <!-- Red Accent Bar -->
+          <span class="absolute left-0 top-0 h-full w-[5px] bg-[#8B0000] rounded-l-xl"></span>
+        <!-- Date -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">29 Dec 2025</p>
+          <p class="text-sm text-gray-700">1:30 PM - 2:30 PM</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Service -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Service</p>
+          <p class="text-sm text-gray-700">Dental Surgery</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Dentist -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Dentist</p>
+          <p class="text-sm text-gray-700">Dr. Nelson Angeles</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Status -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Status</p>
+          <span class="text-blue-600 text-sm font-semibold">SCHEDULED</span>
+        </div>
+
+       <button
+        onclick="openStartModal()"
+        class="absolute bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white text-sm px-6 py-2 rounded-md">
+        Start Procedure
+      </button>
+
+
+      </div>
+    </div>
+
+    <!-- ================= PAST VISITS ================= -->
+    <div id="pastContent" class="hidden">
+      <div class="bg-[#FFECEC] rounded-xl p-6 flex items-center gap-6 relative max-w-4xl mx-auto min-h-[220px]">
+
+        <!-- Red Accent Bar -->
+        <span class="absolute left-0 top-0 h-full w-[5px] bg-[#8B0000] rounded-l-xl"></span>
+        <!-- Date -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">10 Nov 2025</p>
+          <p class="text-sm text-gray-700">9:00 AM - 10:00 AM</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Service -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Service</p>
+          <p class="text-sm text-gray-700">Tooth Extraction</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Dentist -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Dentist</p>
+          <p class="text-sm text-gray-700">Dr. Abby Salle</p>
+        </div>
+
+        <div class="h-16 w-px bg-red-300"></div>
+
+        <!-- Status -->
+        <div class="w-1/5">
+          <p class="font-semibold text-gray-900">Status</p>
+          <span class="text-gray-600 text-sm font-semibold">COMPLETED</span>
+        </div>
+
+        <!-- Button -->
+        <button
+          class="absolute bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2 rounded-md">
+          View Details
+        </button>
+      </div>
+    </div>
   </div>
+
+
+  <!-- ================= START PROCEDURE MODAL ================= -->
+<div id="startModal"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+
+<div class="bg-white w-[520px] min-h-[300px] rounded-2xl p-10 relative
+            flex flex-col justify-center">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold mb-6">
+      Confirm the start of procedure?
+    </h2>
+
+    <!-- Patient Row -->
+    <div class="flex items-center gap-4 mb-8">
+  <span class="text-[#8B0000] font-medium w-[80px]">
+    Patient:
+  </span>
+
+  <div class="bg-[#8B0000] h-9 w-[260px] rounded-md"></div>
 </div>
 
 
+    <!-- Buttons -->
+    <div class="flex gap-4">
+      <button
+        class="bg-green-500 hover:bg-green-600 text-white px-10 py-2 rounded-md"
+        onclick="confirmStart()">
+        START
+      </button>
 
-    <!-- ================= PAST VISITS ================= -->
-    <div id="pastContent" class="text-center py-10 text-[#333333] hidden">
-  <div class="border-l-4 border-[#8B0000] bg-[#FFECEC] p-6 rounded-2xl"> <!-- Left border set to #8B0000 -->
-      <img src="{{ asset('images/past-visit.png') }}" class="w-24 h-24 mx-auto mb-4" alt="No Past Visits">
-      <p class="text-lg font-semibold text-[#660000]">No Past Visits Yet</p>
-      <p class="text-sm text-[#ADADAD]">Your completed appointments will appear here.</p>
+      <button
+        class="bg-gray-300 hover:bg-gray-400 text-white px-10 py-2 rounded-md"
+        onclick="closeStartModal()">
+        BACK
+      </button>
     </div>
   </div>
+</div>
+
+  
 </section>
 
+
+
+
+<!-- FOOTER -->
+<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+
+  <!-- ASIDE: CLINIC INFO -->
+  <aside class="space-y-4">
+    <div class="flex items-center gap-3">
+      
+      <!-- Logos -->
+      <div class="w-12">
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
+      </div>
+
+      <div class="w-12">
+    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
+        <p class="text-sm whitespace-nowrap">
+          Polytechnic University of the Philippines – Taguig Campus
+        </p>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="flex items-start gap-3 text-sm">
+      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
+      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
+    </div>
+
+    <!-- Email -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
+      <p>pupdental@pup.edu.ph</p>
+    </div>
+
+    <!-- Phone -->
+    <div class="flex items-center gap-3 text-sm">
+      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
+      <p>(02) 123-4567</p>
+    </div>
+  </aside>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
+    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
+  </nav>
+
+  <!-- SERVICES -->
+  <nav>
+    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
+    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
+    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
+    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
+  </nav>
+
+</footer>
 
 
 <script>
@@ -323,4 +516,18 @@
   // Initialize the view to show future visits by default
   showFuture(); // By default, it will show future visits.
   showDental(); // By default, it will show the dental tab.
+
+   function openStartModal() {
+    document.getElementById('startModal').classList.remove('hidden');
+  }
+
+  function closeStartModal() {
+    document.getElementById('startModal').classList.add('hidden');
+  }
+
+  function confirmStart() {
+    // 👉 dito mo ilalagay ang logic (redirect / submit / ajax)
+    alert('Procedure started!');
+    closeStartModal();
+  }
   </script>
