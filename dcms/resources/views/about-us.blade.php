@@ -40,75 +40,130 @@
     overflow: hidden;
     opacity: 0;
     transition: max-height 0.5s ease, opacity 0.5s ease;
+    }
+
+    .faq-item.open .faq-content {
+      max-height: 500px; /* adjust to content */
+      opacity: 1;
+    }
+
+    /* Fade-up animation */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-up.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @keyframes floatVerySlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
   }
 
-  .faq-item.open .faq-content {
-    max-height: 500px; /* adjust to content */
+  .float-bg {
+    animation: floatVerySlow 14s ease-in-out infinite;
+  }
+  .float-delay {
+    animation-delay: 4s;
+  }
+
+  /* Shimmer effect */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      110deg,
+      rgba(255,255,255,0.05) 25%,
+      rgba(255,255,255,0.22) 37%,
+      rgba(255,255,255,0.05) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 10s linear infinite;
+  }
+
+  /* === BACKGROUND BLOOBS === */
+  @keyframes blobFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(40px, -30px) scale(1.08); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes blobPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px); 
+    animation:
+      blobFloat 28s ease-in-out infinite,
+      blobPulse 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(2deg);
+      }
+    }
+
+    .float-slow {
+      animation: float 4.5s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    /* Sidebar icon centering fix */
+  .sidebar-link {
+    justify-content: center;
+    transition: background-color 0.2s ease,
+              transform 0.2s ease;
+  }
+
+  /* Tooltip appears ONLY when collapsed */
+  .sidebar-link:hover .sidebar-tooltip {
     opacity: 1;
+    transform: scale(1);
   }
 
-  /* Fade-up animation */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+  /* Hide tooltip when expanded */
+  #sidebar[style*="16rem"] .sidebar-tooltip {
+  display: none;
   }
 
-  .fade-up.show {
-    opacity: 1;
-    transform: translateY(0);
+  #sidebar[style*="16rem"] .sidebar-link {
+    justify-content: flex-start;
   }
-  
-  @keyframes floatVerySlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
 
-.float-bg {
-  animation: floatVerySlow 14s ease-in-out infinite;
-}
-.float-delay {
-  animation-delay: 4s;
-}
+  /* Icon spacing only when expanded */
+  #sidebar[style*="16rem"] .sidebar-link i {
+    margin-right: 1rem;
+  }
 
-/* Shimmer effect */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+  #sidebar[style*="16rem"] .sidebar-link:hover {
+  transform: translateX(4px);
+  }
 
-.shimmer {
-  background: linear-gradient(
-    110deg,
-    rgba(255,255,255,0.05) 25%,
-    rgba(255,255,255,0.22) 37%,
-    rgba(255,255,255,0.05) 63%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 10s linear infinite;
-}
+  .sidebar-link:hover .sidebar-text {
+  opacity: 1;
+  transform: scale(1);
+  }
 
-/* === BACKGROUND BLOOBS === */
-@keyframes blobFloat {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(40px, -30px) scale(1.08); }
-  100% { transform: translate(0, 0) scale(1); }
-}
+  .sidebar-text {
+    transform-origin: left center;
+  }
 
-@keyframes blobPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(40px); 
-  animation:
-    blobFloat 28s ease-in-out infinite,
-    blobPulse 6s ease-in-out infinite;
-  pointer-events: none;
-}
   </style>
 </head>
 
@@ -160,9 +215,13 @@
   </div>
 </div>
 
-<div class="relative z-10">
-  <!-- HEADER (TOP BAR) -->
-  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+<!-- <div class="relative z-10"> -->
+<!-- HEADER (TOP BAR) -->
+<div class="fixed top-0 left-0 right-0 z-50
+            bg-gradient-to-r from-[#660000] to-[#8B0000]
+            text-[#F4F4F4] px-6 py-4
+            flex items-center justify-between">
+
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
           <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
@@ -250,80 +309,291 @@
           </div>
         </div>
       </div>
-      
-      <form action="{{ route('logout') }}" method="POST" class="inline">
-        @csrf
-        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
-            <i class="fa-solid fa-right-from-bracket text-lg"></i>
-        </button>
-      </form>
-
-      </div>
+    </div>
   </div>
 
-  <!-- NAVIGATION (BELOW HEADER) -->
-<div class="bg-[#8B0000] text-[#F4F4F4] px-6">
-  <div class="max-w-7xl mx-auto flex justify-center gap-14 py-3 text-sm">
+<aside id="sidebar"
+  class="fixed left-0 top-[80px]
+         h-[calc(100vh-80px)]
+         w-[72px]
+         bg-[#FAFAFA]
+         drop-shadow-xl
+         transition-all duration-300
+         flex flex-col justify-between z-40">
 
-    <!-- Home -->
-    <a href="{{ route('homepage') }}"
-      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
-             transition-all duration-500 ease-out
-             hover:scale-[1.08]
-             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
-             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
-             text-[#F4F4F4]">
-      <i class="fa-solid fa-house text-xl"></i>
-      <span>Home</span>
-    </a>
+  <!-- TOP -->
+  <div>
+    <div id="sidebarToggleWrapper"
+     class="flex items-center justify-center px-4 py-6 transition-all duration-300">
+      <button onclick="toggleSidebar()"
+        id="sidebarToggleBtn"
+        class="w-10 h-10 flex items-center justify-center
+              rounded-full text-gray-500 hover:text-[#8B0000]
+              hover:bg-[#D9D9D9] transition-all duration-300">
+        <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
 
-    <!-- Appointment -->
+  <!-- DIVIDER -->
+  <hr class="my-3 border-t border-[#DADADA]">
+  <!-- MENU -->
+  <nav class="space-y-1 px-3 text-gray-600">
+
+      <!-- HOME DASHBOARD -->
+      <a href="{{ route('homepage') }}"
+        class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('homepage')
+                  ? 'bg-[#8B0000] text-[#F4F4F4]'
+                  : '' }}">
+        
+        <!-- ACTIVE INDICATOR -->
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('homepage') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
+
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+          Home
+        </span>
+        <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Home
+        </span>
+      </a>
+
+    <!-- APPOINTMENT -->
     <a href="{{ route('appointment.index') }}"
-      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
-             transition-all duration-500 ease-out
-             hover:scale-[1.08]
-             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
-             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
-             text-[#F4F4F4]">
-      <i class="fa-solid fa-calendar-check text-xl"></i>
-      <span>Appointment</span>
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+              transition-all duration-200
+              hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('appointment.index*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('appointment.index*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
+      <i class="fa-solid fa-calendar-check text-lg"></i>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+        Appointment
+      </span>
+      <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Appointment
+        </span>
     </a>
 
-    <!-- Record -->
+    <!-- RECORD -->
     <a href="{{ route('record') }}"
-      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
-             transition-all duration-500 ease-out
-             hover:scale-[1.08]
-             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
-             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
-             text-[#F4F4F4]">
-      <i class="fa-solid fa-folder-open text-xl"></i>
-      <span>Record</span>
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+              transition-all duration-200
+              hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('record*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('record*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
+      <i class="fa-solid fa-folder-open text-lg"></i>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+        Record
+      </span>
+      <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Record
+        </span>
     </a>
 
-    <!-- About Us -->
+    <!-- ABOUT US -->
     <a href="{{ route('about.us') }}"
-      class="group flex flex-col items-center gap-1 px-4 py-2 rounded-lg
-             transition-all duration-500 ease-out
-             hover:scale-[1.08]
-             hover:bg-gradient-to-br hover:from-[#8B0000] hover:to-[#660000]
-             hover:shadow-[0_0_8px_rgba(255,60,60,0.9),_0_0_18px_rgba(139,0,0,0.85)]
-             text-[#F4F4F4]">
-      <i class="fa-solid fa-circle-info text-xl"></i>
-      <span class="font-bold">About Us</span>
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+              transition-all duration-200
+              hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('about.us*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('about.us*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
+      <i class="fa-solid fa-circle-info text-lg"></i>
+      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+        About Us
+      </span>
+      <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          About Us
+        </span>
     </a>
-  </div>
+  </nav>
 </div>
 
-  <!-- BANNER -->
-  <section class="relative bg-gray-50 py-24 text-center fade-up">
-    <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+  <!-- BOTTOM -->
+  <div class="px-3 pb-5 space-y-2">
+
+    <a href="#"
+       class="sidebar-link relative flex items-center px-3 py-3 rounded-xl hover:bg-gray-100
+       transition-all duration-200">
+      <i class="fa-regular fa-circle-question"></i>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+        Help
+      </span>
+      <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Help
+        </span>
+    </a>
+
+  <!-- DARK MODE TOGGLE -->
+  <button
+    id="themeToggle"
+    class="sidebar-link relative flex items-center justify-center
+          w-full px-2 py-2 rounded-full
+          bg-[#7B6CF6] text-[#F4F4F4]
+          transition-all duration-200
+          hover:scale-105"
+    aria-label="Toggle dark mode">
+
+    <i id="themeIcon" class="fa-regular fa-moon text-lg"></i>
+    <span class="sidebar-text opacity-0 w-0 overflow-hidden
+               transition-all duration-300 delay-150">
+      Dark Mode
+    </span>
+
+    <!-- Tooltip (collapsed only) -->
+    <span
+      class="sidebar-tooltip
+            absolute left-full ml-8
+            px-3 py-1
+            rounded-full
+            bg-[#8B0000]
+            text-[#F4F4F4] text-sm font-semibold
+            whitespace-nowrap
+            opacity-0 scale-95
+            pointer-events-none
+            transition-all duration-200">
+      Dark Mode
+    </span>
+  </button>
+    
+    <form action="{{ route('logout') }}" method="POST">
+      @csrf
+      <button
+        class="sidebar-link w-full relative flex items-center px-3 py-3 rounded-xl
+               text-red-600 hover:bg-red-50 transition-all duration-200">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+          Log out
+        </span>
+        <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Log out
+        </span>
+      </button>
+    </form>
+
+  </div>
+</aside>
+
+<!-- MAIN LAYOUT -->
+<main
+  id="mainContent"
+  class="pt-[80px]
+         transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+         min-h-screen"
+>
+
+  <!-- FULL-WIDTH BANNER (NOT padded) -->
+  <section class="relative w-full py-24 text-center fade-up">
+    <img
+      src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}"
+      class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
     />
-    <h2 class="relative z-10 font-extrabold text-6xl text-[#8B0000] fade-up">About Us</h2>
+    <h2 class="relative z-10 font-extrabold text-6xl text-[#8B0000]">
+      About Us
+    </h2>
   </section>
 
-  <!-- MAIN CONTENT -->
-  <main class="max-w-5xl mx-auto px-6 mb-12">
+  <!-- CENTERED CONTENT -->
+  <div class="max-w-5xl mx-auto w-full px-6 py-10">
 
     <p class="text-[#8B0000] text-lg leading-relaxed text-justify text-wrap mt-12 mb-24 fade-up">
       The Polytechnic University of the Philippines – Taguig Campus is committed to promoting the 
@@ -337,7 +607,7 @@
         bg-gradient-to-br from-[#8B0000] to-[#660000]
         text-[#F4F4F4]
         rounded-2xl pl-6
-        flex flex-col md:flex-row items-center gap-4
+        flex flex-wrap md:flex-nowrap items-center gap-4
         shadow-lg shadow-red-300
         fade-up">
 
@@ -381,9 +651,15 @@
         </div>
 
         <!-- IMAGE -->
-        <img src="images/Nelson-Angeles.png"
-            alt="Dr. Nelson P. Angeles"
-            class="relative z-10 w-1/3 object-contain drop-shadow-xl" />
+        <img
+        src="images/Nelson-Angeles.png"
+        alt="Dr. Nelson P. Angeles"
+        class="relative z-10
+               w-full max-w-sm
+               h-auto
+               object-contain
+               drop-shadow-xl"
+      />
     </div>
 
     <!-- FAQs Title -->
@@ -613,73 +889,67 @@
         <img src="images/Rain-Romero.png" alt="Rain Romero" class="h-32 w-32 rounded-md shadow-lg border border-yellow-400 object-cover" />
       </div>
     </section>
+  </div>
+</main>
 
-  </main>
+<script>
+  let sidebarOpen = false;
 
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+function applyLayout(sidebarWidth) {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
 
-  <!-- ASIDE: CLINIC INFO -->
-  <aside class="space-y-4">
-    <div class="flex items-center gap-3">
-      
-      <!-- Logos -->
-      <div class="w-12">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
-      </div>
+  sidebar.style.width = sidebarWidth;
+  main.style.marginLeft = sidebarWidth;
+  main.style.width = `auto`;
+}
 
-      <div class="w-12">
-    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
-      </div>
+function toggleSidebar() {
+  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const texts = document.querySelectorAll('.sidebar-text');
+  const icon = document.getElementById('sidebarIcon');
 
-      <!-- Text -->
-      <div>
-        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-        <p class="text-sm whitespace-nowrap">
-          Polytechnic University of the Philippines – Taguig Campus
-        </p>
-      </div>
-    </div>
+  sidebarOpen = !sidebarOpen;
 
-    <!-- Location -->
-    <div class="flex items-start gap-3 text-sm">
-      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
-      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
-    </div>
+  if (sidebarOpen) {
+    // EXPAND
+    applyLayout('16rem');
 
-    <!-- Email -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
-      <p>pupdental@pup.edu.ph</p>
-    </div>
+    texts.forEach(t => {
+      t.classList.remove('opacity-0', 'w-0');
+      t.classList.add('opacity-100', 'w-auto');
+    });
 
-    <!-- Phone -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
-      <p>(02) 123-4567</p>
-    </div>
-  </aside>
+    toggleWrapper.classList.remove('justify-center');
+    toggleWrapper.classList.add('justify-end');
 
-  <!-- NAVIGATION -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
-  </nav>
+    toggleBtn.classList.add('translate-x-2');
+    icon.classList.replace('fa-bars', 'fa-xmark');
 
-  <!-- SERVICES -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
-    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
-    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
-  </nav>
+  } else {
+    // COLLAPSE
+    applyLayout('72px');
 
-</footer>
+    texts.forEach(t => {
+      t.classList.add('opacity-0', 'w-0');
+      t.classList.remove('opacity-100', 'w-auto');
+    });
 
-  <script>
+    toggleWrapper.classList.remove('justify-end');
+    toggleWrapper.classList.add('justify-center');
+
+    toggleBtn.classList.remove('translate-x-2');
+    icon.classList.replace('fa-xmark', 'fa-bars');
+  }
+}
+
+  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
+  document.addEventListener('DOMContentLoaded', () => {
+    sidebarOpen = false;        // ensure state is correct
+    applyLayout('72px');        // collapsed layout on load
+  });
+
     function toggleFAQ(button) {
     const item = button.parentElement;
     const content = item.querySelector('.faq-content');
