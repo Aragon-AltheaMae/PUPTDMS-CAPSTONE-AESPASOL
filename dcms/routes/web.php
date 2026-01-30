@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\Patient;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Dentist\InventoryController;
 
 // -------------------
 // AUTH PAGES
@@ -139,12 +140,12 @@ Route::prefix('dentist')->group(function () {
     })->name('dentist.patient.profile');
 
 
-    Route::get('/inventory', function () {
+    /*Route::get('/inventory', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
         return view('dentist-inventory');
-    })->name('dentist.inventory');
+    })->name('dentist.inventory');*/
 
     Route::get('/report', function () {
         if (session('role') !== 'dentist') {
@@ -182,9 +183,6 @@ Route::prefix('dentist')->group(function () {
     });
     
 });
-
-
-
 
 // -------------------
 // PATIENT ROUTES
@@ -224,3 +222,15 @@ Route::get('/record', fn () => view('record'))
 Route::get('/about-us', fn () => view('about-us'))
     ->name('about.us')
     ->middleware('role:patient');
+
+// -------------------
+// INVENTORY
+// -------------------
+Route::prefix('dentist')->group(function () {
+    Route::get('/inventory', [InventoryController::class, 'index'])
+        ->name('dentist.inventory');
+    Route::get('/inventory/data', [InventoryController::class, 'fetch']);
+    Route::post('/inventory', [InventoryController::class, 'store']);
+    Route::put('/inventory/{inventory}', [InventoryController::class, 'update']);
+    Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy']);
+});

@@ -5,6 +5,7 @@
   <title>PUP Taguig Dental Clinic | Inventory</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
@@ -257,8 +258,14 @@
 
       <!-- UNIT -->
       <label class="text-sm text-[#8B0000]">Units</label>
-      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="ex. pack">
+      <select id="addUnit"
+        class="select select-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
+        <option disabled selected>Select unit</option>
+        <option value="Box">Box</option>
+        <option value="Pack">Pack</option>
+        <option value="Bottle">Bottle</option>
+        <option value="Piece">Piece</option>
+      </select>
 
       <!-- QTY -->
       <label class="text-sm text-[#8B0000]">Quantity</label>
@@ -314,7 +321,14 @@
       <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
       <label>Units</label>
-      <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
+      <select id="editUnit"
+        class="select select-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
+        <option value="Box">Box</option>
+        <option value="Pack">Pack</option>
+        <option value="Bottle">Bottle</option>
+        <option value="Piece">Piece</option>
+      </select>
+
 
       <label>Quantity</label>
       <input id="editQty" type="number"
@@ -422,7 +436,7 @@
 </footer>
 
 <script>
-let inventory = [
+/*let inventory = [
   {
     category: "Supplies",
     date: "01/20/25",
@@ -513,25 +527,40 @@ let inventory = [
     qty: 50,
     used: 10
   }
-];
+];*/
 
-let deleteIndex = null; // track which item to delete
+let inventory = [];
 
-function deleteItem(index) {
-  deleteIndex = index; // store the index of the item
-  deleteModal.showModal(); // open the modal
+async function loadInventory() {
+  const res = await fetch('/dentist/inventory/data');
+  inventory = await res.json();
+  renderTable();
+}
+loadInventory();
+
+let deleteId = null;
+
+function deleteItem(id) {
+  deleteId = id;
+  deleteModal.showModal();
 }
 
-// confirm deletion
-document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
-  if (deleteIndex !== null) {
-    inventory.splice(deleteIndex, 1);
-    renderTable();
-    deleteIndex = null;
-  }
-  deleteModal.close();
-});
+document.getElementById("confirmDeleteBtn").onclick = async () => {
+  if (!deleteId) return;
 
+  await fetch(`/dentist/inventory/${deleteId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRF-TOKEN': document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute('content')
+    }
+  });
+
+  deleteModal.close();
+  deleteId = null;
+  loadInventory();
+};
 
 let editIndex = null;
 
@@ -554,7 +583,7 @@ function renderTable() {
   const search = searchInput.value.toLowerCase();
   if (search) {
     data = data.filter(i =>
-      i.stock.toLowerCase().includes(search) ||
+      i.stock_no.toLowerCase().includes(search) ||
       i.name.toLowerCase().includes(search)
     );
   }
@@ -573,7 +602,7 @@ function renderTable() {
 
     case "date_received":
         // Date received (oldest → newest)
-        data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        data.sort((a, b) => new Date(a.date_received) - new Date(b.date_received));
         break;
 
     default:
@@ -585,8 +614,8 @@ function renderTable() {
     const balance = item.qty - item.used;
     tbody.innerHTML += `
     <tr class="text-gray-800"> <!-- sets the font color -->
-        <td class="text-[#333333]">${item.date}</td>
-        <td class="text-[#333333]">${item.stock}</td>
+        <td class="text-[#333333]">${item.formatted_date}</td>
+        <td class="text-[#333333]">${item.stock_no}</td>
         <td class="text-[#333333]">${item.name}</td>
         <td class="text-[#333333]">${item.unit}</td>
         <td class="text-[#333333]">${item.qty}</td>
@@ -594,11 +623,11 @@ function renderTable() {
         <td class="text-[#333333]">${balance}</td>
         <td class="flex justify-center gap-2">
           <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
-            onclick="openEdit(${index})">
+            onclick="openEdit(${item.id})">
             <i class="fa fa-pen"></i>
           </button>
           <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
-            onclick="deleteItem(${index})">
+            onclick="deleteItem(${item.id})">
             <i class="fa fa-trash"></i>
           </button>
         </td>
@@ -606,61 +635,80 @@ function renderTable() {
   });
 }
 
-function addItem() {
-  if (!addCategory.value || !addDate.value) {
-    alert("Please complete required fields.");
-    return;
-  }
-
-  inventory.push({
-    category: addCategory.value,
-    date: formatDateMMDDYY(addDate.value),
-    stock: addStock.value,
-    name: addName.value,
-    unit: addUnit.value,
-    qty: Number(addQty.value),
-    used: Number(addUsed.value)
+async function addItem() {
+  await fetch('/dentist/inventory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    },
+    body: JSON.stringify({
+      category: addCategory.value,
+      date_received: addDate.value,
+      stock_no: addStock.value,
+      name: addName.value,
+      unit: addUnit.value,
+      qty: Number(addQty.value),
+      used: Number(addUsed.value)
+    })
   });
 
   addModal.close();
-  renderTable();
+  loadInventory();
 }
 
-function openEdit(index) {
-  editIndex = index;
-  const i = inventory[index];
+let editId = null;
 
-  const [mm, dd, yy] = i.date.split("/");
-  editDate.value = `20${yy}-${mm}-${dd}`;
+function openEdit(id) {
+  editId = id;
+  const i = inventory.find(item => item.id === id);
+  if (!i) return;
 
   editCategory.value = i.category;
-  editStock.value = i.stock;
+  editStock.value = i.stock_no;
   editName.value = i.name;
   editUnit.value = i.unit;
   editQty.value = i.qty;
   editUsed.value = i.used;
+  editDate.value = i.date_received?.slice(0, 10);
 
   computeEditBalance();
   editModal.showModal();
 }
 
-function saveEdit() {
-  inventory[editIndex] = {
-    ...inventory[editIndex],
-    category: editCategory.value,
-    date: formatDateMMDDYY(editDate.value),
-    stock: editStock.value,
-    name: editName.value,
-    unit: editUnit.value,
-    qty: Number(editQty.value),
-    used: Number(editUsed.value)
-  };
+async function saveEdit() {
+  if (!editId) return;
+
+  const res = await fetch(`/dentist/inventory/${editId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute('content')
+    },
+    body: JSON.stringify({
+      category: editCategory.value,
+      date_received: editDate.value,
+      stock_no: editStock.value,
+      name: editName.value,
+      unit: editUnit.value,
+      qty: Number(editQty.value),
+      used: Number(editUsed.value)
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error(err);
+    alert('EDIT FAILED — check console');
+    return;
+  }
 
   editModal.close();
-  renderTable();
+  editId = null;
+  loadInventory();
 }
-
-renderTable();
 
 function computeAddBalance() {
   const qty = Number(addQty.value || 0);
