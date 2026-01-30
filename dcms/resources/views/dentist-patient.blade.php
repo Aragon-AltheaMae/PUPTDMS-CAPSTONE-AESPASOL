@@ -220,23 +220,37 @@
         <div class="mx-4 border border-gray-200 rounded-2xl bg-white overflow-hidden">
 
           <div class="flex gap-4 flex-wrap px-4 pt-4 -mb-px">
-            <button class="filter-btn bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow"
-              data-filter="today" type="button">
-              <h3 class="text-4xl font-medium leading-none mb-2">5</h3>
-              <p class="text-base opacity-90">Scheduled Today</p>
-            </button>
 
-            <button class="filter-btn bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow"
-              data-filter="rescheduled" type="button">
-              <h3 class="text-4xl font-medium leading-none mb-2">10</h3>
-              <p class="text-base opacity-90">Rescheduled</p>
-            </button>
-
-            <button class="filter-btn bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow"
-              data-filter="all" type="button">
+            <!-- ALL -->
+            <button
+              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
+              data-filter="all"
+              type="button"
+            >
               <h3 class="text-4xl font-medium leading-none mb-2">50</h3>
-              <p class="text-base opacity-90">All</p>
+              <p class="text-base">All</p>
             </button>
+
+            <!-- TODAY -->
+            <button
+              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
+              data-filter="today"
+              type="button"
+            >
+              <h3 class="text-4xl font-medium leading-none mb-2">5</h3>
+              <p class="text-base">Scheduled Today</p>
+            </button>
+
+            <!-- RESCHEDULED -->
+            <button
+              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
+              data-filter="rescheduled"
+              type="button"
+            >
+              <h3 class="text-4xl font-medium leading-none mb-2">10</h3>
+              <p class="text-base">Rescheduled</p>
+            </button>
+
           </div>
 
           <div class="px-6 py-4 text-[22px] font-medium text-gray-700">
@@ -516,6 +530,27 @@
             </div>
 
           </div> <!-- END #patientContainer -->
+          <!-- Pagination -->
+            <div id="pagination" class="flex items-center justify-center gap-2 py-6 text-sm text-gray-500">
+
+              <button
+                id="prevPage"
+                class="flex items-center gap-1 px-2 py-1 text-gray-300 cursor-not-allowed"
+                disabled
+              >
+                <span>‹</span> Previous
+              </button>
+
+              <div id="pageNumbers" class="flex items-center gap-2"></div>
+
+              <button
+                id="nextPage"
+                class="flex items-center gap-1 px-2 py-1 text-[#8B0000] hover:underline"
+              >
+                Next <span>›</span>
+              </button>
+
+            </div>
         </div> <!-- END tabs/card wrapper -->
       </div> <!-- END mx-4 -->
     </div> <!-- END w-full max-w-6xl -->
@@ -758,6 +793,80 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
+  // -------------------------
+  // 🔢 PAGINATION
+  // -------------------------
+  const pagination = document.getElementById("pagination");
+  const pageNumbers = document.getElementById("pageNumbers");
+  const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+
+  const ITEMS_PER_PAGE = 5;
+  let currentPage = 1;
+  let currentItems = [];
+
+  function renderPagination(items) {
+    currentItems = items;
+    const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+
+    pageNumbers.innerHTML = "";
+
+    // Hide pagination if not needed
+    if (totalPages <= 1) {
+      pagination.classList.add("hidden");
+      return;
+    }
+    pagination.classList.remove("hidden");
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.className =
+        i === currentPage
+          ? "px-3 py-1 text-[#8B0000] font-medium"
+          : "px-3 py-1 hover:text-[#8B0000]";
+
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        updatePage();
+      });
+
+      pageNumbers.appendChild(btn);
+    }
+
+    prevPageBtn.disabled = currentPage === 1;
+    prevPageBtn.classList.toggle("cursor-not-allowed", currentPage === 1);
+    prevPageBtn.classList.toggle("text-gray-300", currentPage === 1);
+
+    nextPageBtn.disabled = currentPage === totalPages;
+  }
+
+  function updatePage() {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+
+    patientContainer.innerHTML = "";
+    currentItems.slice(start, end).forEach(p => patientContainer.appendChild(p));
+
+    renderPagination(currentItems);
+  }
+
+  prevPageBtn?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePage();
+    }
+  });
+
+  nextPageBtn?.addEventListener("click", () => {
+    const totalPages = Math.ceil(currentItems.length / ITEMS_PER_PAGE);
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePage();
+    }
+  });
+
+
   function applyAll() {
     let filtered = allPatients.filter(p => passesFilters(p));
 
@@ -771,10 +880,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    patientContainer.innerHTML = "";
-    filtered.forEach(p => patientContainer.appendChild(p));
-
+    currentPage = 1;
+    renderPagination(filtered);
+    updatePage();
     updateCounts();
+
   }
 
   function updateCounts() {
@@ -791,13 +901,40 @@ document.addEventListener("DOMContentLoaded", () => {
     if (allBtnCount) allBtnCount.textContent = allCount;
   }
 
-  // Tabs
+  // -------------------------
+  // TAB CLICK (FILTER LOGIC)
+  // -------------------------
   filterButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       activeTab = btn.dataset.filter;
       applyAll();
     });
   });
+
+  // -------------------------
+  // TAB COLOR UI (NEW – SAFE)
+  // -------------------------
+  const setActiveTabUI = (btn) => {
+    btn.classList.remove("bg-[#660000]", "text-white/75");
+    btn.classList.add("bg-[#8B0000]", "text-white");
+  };
+
+  const setInactiveTabUI = (btn) => {
+    btn.classList.remove("bg-[#8B0000]", "text-white");
+    btn.classList.add("bg-[#660000]", "text-white/75");
+  };
+
+  // Default active tab = ALL
+  const defaultTab = document.querySelector('.filter-btn[data-filter="all"]');
+  if (defaultTab) setActiveTabUI(defaultTab);
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterButtons.forEach(setInactiveTabUI);
+      setActiveTabUI(btn);
+    });
+  });
+
 
   // Live search
   searchInput?.addEventListener("input", () => {
