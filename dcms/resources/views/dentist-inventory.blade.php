@@ -191,7 +191,7 @@
     </div>
 
 
-    <button onclick="addModal.showModal()"
+    <button onclick="resetAddForm(); addModal.showModal()"
       class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
       <i class="fa fa-plus mr-1"></i> Add Item
     </button>
@@ -575,27 +575,61 @@ function renderTable() {
   });
 }
 
+function resetAddForm() {
+  addCategory.selectedIndex = 0;
+  addDate.value = '';
+  addStock.value = '';
+  addName.value = '';
+  addUnit.selectedIndex = 0;
+  addQty.value = '';
+  addUsed.value = '';
+  addBalance.value = '';
+}
+
 async function addItem() {
-  await fetch('/dentist/inventory', {
+  if (
+    addCategory.selectedIndex === 0 ||
+    addUnit.selectedIndex === 0 ||
+    !addDate.value ||
+    !addStock.value ||
+    !addName.value ||
+    addQty.value === ''
+  ) {
+    alert('Please complete all required fields.');
+    return;
+  }
+
+  const res = await fetch('/dentist/inventory', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      'X-CSRF-TOKEN': document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute('content')
     },
     body: JSON.stringify({
       category: addCategory.value,
       date_received: addDate.value,
-      stock_no: addStock.value,
-      name: addName.value,
+      stock_no: addStock.value.trim(),
+      name: addName.value.trim(),
       unit: addUnit.value,
       qty: Number(addQty.value),
-      used: Number(addUsed.value)
+      used: Number(addUsed.value || 0)
     })
   });
 
+  if (!res.ok) {
+    const err = await res.json();
+    console.error(err);
+    alert(Object.values(err.errors).join('\n'));
+    return;
+  }
+
   addModal.close();
+  resetAddForm();
   loadInventory();
 }
+
 
 let editId = null;
 
