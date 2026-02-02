@@ -304,16 +304,18 @@
         Patient:
       </label>
 
-      <!-- INPUT FIELD -->
-      <input
-        type="text"
-        id="patientNameInput"
-        placeholder="Enter patient name"
-        class="h-10 w-[360px] rounded-md px-4
-               bg-[#8b0000] text-white
-               placeholder:text-white/70
-               focus:outline-none focus:ring-2 focus:ring-[#8b0000]"
-      />
+   <!-- PATIENT NAME (AUTO, NOT EDITABLE) -->
+        <input
+          type="text"
+          id="patientNameInput"
+          value="Alilah Gomez"
+          readonly
+          class="h-10 w-[360px] rounded-md px-4
+                bg-[#8b0000] text-white
+                font-medium
+                cursor-not-allowed
+                focus:outline-none"
+        />
     </div>
 
     <!-- Buttons -->
