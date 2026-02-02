@@ -21,13 +21,13 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         Inventory::create($request->validate([
-            'category' => 'required',
+            'category' => 'required|in:Medicine,Supplies',
             'date_received' => 'required|date',
-            'stock_no' => 'required',
-            'name' => 'required',
-            'unit' => 'required',
-            'qty' => 'required|integer',
-            'used' => 'required|integer',
+            'stock_no' => 'required|unique:inventory_items,stock_no',
+            'name' => 'required|string',
+            'unit' => 'required|in:Box,Pack,Bottle,Piece',
+            'qty' => 'required|integer|min:0',
+            'used' => 'required|integer|min:0',
         ]));
 
         return response()->json(['success' => true]);
@@ -36,13 +36,13 @@ class InventoryController extends Controller
     public function update(Request $request, Inventory $inventory)
     {
         $inventory->update($request->validate([
-            'category' => 'required',
+            'category' => 'required|in:Medicine,Supplies',
             'date_received' => 'required|date',
-            'stock_no' => 'required',
-            'name' => 'required',
-            'unit' => 'required',
-            'qty' => 'required|integer',
-            'used' => 'required|integer',
+            'stock_no' => 'required|unique:inventory_items,stock_no,' . $inventory->id,
+            'name' => 'required|string',
+            'unit' => 'required|in:Box,Pack,Bottle,Piece',
+            'qty' => 'required|integer|min:0',
+            'used' => 'required|integer|min:0',
         ]));
 
         return response()->json(['success' => true]);
