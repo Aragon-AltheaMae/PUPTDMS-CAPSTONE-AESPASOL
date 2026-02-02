@@ -144,119 +144,301 @@
     <!-- ================= MAIN ================= -->
     <main class="max-w-6xl mx-auto px-6">
 
-      <!-- Toggle pill -->
-      <div class="flex justify-center mt-12">
-        <div class="w-[620px] h-12 bg-[#7a0000] rounded-full p-1 flex shadow-sm">
-          <button id="btnUpcoming"
-            class="flex-1 rounded-full bg-[#8b0000] text-white text-xs font-medium transition">
-            Upcoming Appointments
-          </button>
-          <button id="btnPast"
-            class="flex-1 rounded-full text-white/70 text-xs font-medium transition">
-            Past Appointments
-          </button>
+     <!-- Toggle pill -->
+<div class="flex justify-center mt-14">
+  <div class="w-[760px] h-14 bg-[#7a0000] rounded-full p-1.5 flex shadow-md">
+
+    <button
+      id="btnUpcoming"
+      class="flex-1 rounded-full bg-[#8b0000]
+             text-white text-sm font-semibold
+             transition-all duration-200">
+      Upcoming Appointments
+    </button>
+
+    <button
+      id="btnPast"
+      class="flex-1 rounded-full
+             text-white/80 text-sm font-semibold
+             transition-all duration-200">
+      Past Appointments
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ========== UPCOMING SECTION ========== -->
+<section id="upcomingSection" class="mt-14 flex justify-center">
+  <div class="w-[1100px]">
+
+
+    <!-- LEFT LINE + DOT + CONTENT -->
+    <div class="relative pl-10">
+      <!-- vertical line -->
+      <div class="absolute left-[6px] top-[6px] w-[2px] h-[220px] bg-[#8b0000]"></div>
+
+      <!-- orange dot -->
+      <div class="absolute left-[0px] top-[0px] w-3 h-3 bg-orange-400 rounded-full"></div>
+
+      <!-- Month label -->
+      <h2 class="text-xl font-semibold text-[#8b0000] mb-6">February</h2>
+
+    <!-- TABLE HEADER -->
+          <div class="grid grid-cols-[36px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr_1.6fr]
+                text-[13px] font-semibold text-[#8b0000]
+                pb-3 border-b border-gray-400 mb-6 px-8">
+        <div></div>
+        <p>Date</p>
+        <p>Time</p>
+        <p>Service</p>
+        <p>Name</p>
+        <p>Program</p>
+        <p class="text-right pr-2">Action</p>
+      </div>
+   <div class="bg-[#f3f3f3] rounded-xl shadow-md border border-gray-200 px-8 py-5">
+
+  <div class="grid grid-cols-[36px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr_1.6fr]
+              items-center text-[13px] text-[#8b0000]">
+
+    <!-- dots -->
+    <div class="flex justify-center">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </div>
+
+    <p class="font-semibold">February 2, 2025</p>
+    <p>1:00 PM</p>
+    <p>Dental Cleaning</p>
+    <p class="font-semibold">Alilah Gomez</p>
+    <p>BSME</p>
+
+    <!-- Actions -->
+    <div class="flex flex-col gap-2 items-end pr-2">
+     <button
+        onclick="openStartProcedureModal()"
+        class="h-6 w-[130px] rounded-md text-[11px] font-semibold
+              text-white bg-green-600
+              cursor-pointer hover:bg-green-700 transition">
+        Start Procedure
+      </button>
+
+
+     <button
+        onclick="openRescheduleModal()"
+        class="h-6 w-[130px] rounded-md text-[11px] font-semibold
+              text-black bg-yellow-400
+              cursor-pointer hover:bg-yellow-500 transition">
+        Reschedule
+      </button>
+
+
+      <button
+        onclick="openCancelAppointmentModal()"
+        class="h-6 w-[130px] rounded-md text-[11px] font-semibold
+              text-white bg-[#8b0000]
+              cursor-pointer hover:bg-[#6f0000] transition">
+        Cancel
+      </button>
+
+    </div>
+
+    <!-- ================= RESCHEDULE MODAL ================= -->
+<div id="rescheduleModal"
+     class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+
+  <div class="bg-white w-[520px] rounded-2xl p-10 text-center shadow-xl">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-bold text-[#8b0000] mb-6">
+      Reschedule Appointment
+    </h2>
+
+    <!-- Message -->
+    <p class="text-lg font-semibold text-[#8b0000] mb-2">
+      Are you sure you want to<br>
+      reschedule this appointment?
+    </p>
+
+    <p class="text-sm text-gray-500 mb-10">
+      You will be able to select a new date and time.
+    </p>
+
+    <!-- Buttons -->
+    <div class="flex justify-center gap-6">
+      <button
+        onclick="closeRescheduleModal()"
+        class="px-8 py-2 rounded-full border border-[#8b0000]
+               text-[#8b0000] font-semibold
+               hover:bg-[#8b0000] hover:text-white transition">
+        Cancel
+      </button>
+
+      <button
+        onclick="confirmReschedule()"
+        class="px-10 py-2 rounded-full bg-[#8b0000]
+               text-white font-semibold
+               hover:bg-[#6f0000] transition">
+        Yes
+      </button>
+    </div>
+
+  </div>
+</div>
+  </div>
+</section>
+
+<!-- ================= START PROCEDURE MODAL ================= -->
+<div id="startProcedureModal"
+     class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+
+  <div class="bg-white w-[620px] min-h-[320px] rounded-2xl p-10 shadow-xl">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold text-black mb-8">
+      Confirm the start of procedure?
+    </h2>
+
+    <!-- Patient Row -->
+    <div class="flex items-center gap-4 mb-10">
+      <label class="text-[#8b0000] font-medium w-[80px]">
+        Patient:
+      </label>
+
+   <!-- PATIENT NAME (AUTO, NOT EDITABLE) -->
+        <input
+          type="text"
+          id="patientNameInput"
+          value="Alilah Gomez"
+          readonly
+          class="h-10 w-[360px] rounded-md px-4
+                bg-[#8b0000] text-white
+                font-medium
+                cursor-not-allowed
+                focus:outline-none"
+        />
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex gap-4">
+      <button
+        onclick="confirmStartProcedure()"
+        class="bg-green-500 hover:bg-green-600
+               text-white px-10 py-2 rounded-md
+               font-semibold transition">
+        START
+      </button>
+
+      <button
+        onclick="closeStartProcedureModal()"
+        class="bg-gray-400 hover:bg-gray-500
+               text-white px-10 py-2 rounded-md
+               font-semibold transition">
+        BACK
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= CANCEL APPOINTMENT MODAL ================= -->
+<div id="cancelAppointmentModal"
+     class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+
+  <div class="bg-white w-[520px] rounded-2xl p-10 text-center shadow-xl">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-bold text-black mb-6">
+      Cancel Appointment
+    </h2>
+
+    <!-- Message -->
+    <p class="text-lg font-semibold text-[#8b0000] mb-2">
+      Are you sure you want to<br>
+      cancel this appointment?
+    </p>
+
+    <p class="text-sm text-gray-500 mb-10">
+      This action cannot be undone.
+    </p>
+
+    <!-- Buttons -->
+    <div class="flex justify-center gap-6">
+      <button
+        onclick="closeCancelAppointmentModal()"
+        class="px-8 py-2 rounded-full border border-[#8b0000]
+               text-[#8b0000] font-semibold
+               hover:bg-[#8b0000] hover:text-white transition">
+        No
+      </button>
+
+      <button
+        onclick="confirmCancelAppointment()"
+        class="px-10 py-2 rounded-full bg-[#8b0000]
+               text-white font-semibold
+               hover:bg-[#6f0000] transition">
+        Yes
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+   <!-- ========== PAST SECTION ========== -->
+<section id="pastSection" class="mt-14 flex justify-center hidden">
+  <div class="w-[1100px]">
+
+    <!-- LEFT LINE + DOT + CONTENT -->
+    <div class="relative pl-10">
+      <!-- vertical line -->
+      <div class="absolute left-[6px] top-[6px] w-[2px] h-[200px] bg-[#8b0000]"></div>
+
+      <!-- orange dot -->
+      <div class="absolute left-[0px] top-[0px] w-3 h-3 bg-orange-400 rounded-full"></div>
+
+      <!-- Month label -->
+      <h2 class="text-xl font-semibold text-[#8b0000] mb-6">January</h2>
+
+      <!-- TABLE HEADER (NO ACTION) -->
+      <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
+                  text-[13px] font-semibold text-[#8b0000]
+                  pb-3 border-b border-gray-400 mb-6 px-8">
+
+        <div></div>
+        <p>Date</p>
+        <p>Time</p>
+        <p>Service</p>
+        <p>Name</p>
+        <p>Program</p>
+      </div>
+
+      <!-- Appointment card -->
+      <div class="bg-[#f3f3f3] rounded-xl shadow-md border border-gray-200 px-8 py-5">
+
+        <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
+                    items-center text-[13px] text-[#8b0000]">
+
+          <!-- dots -->
+          <div class="flex justify-center">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </div>
+
+          <p class="font-semibold">January 10, 2025</p>
+          <p>—</p>
+          <p>Tooth Extraction</p>
+          <p class="font-semibold">Juan Dela Cruz</p>
+          <p>BSIT</p>
+
         </div>
       </div>
 
-      <!-- ========== UPCOMING SECTION ========== -->
-      <section id="upcomingSection" class="mt-14 flex justify-center">
-        <div class="w-[760px] flex gap-10">
+    </div>
+  </div>
+</section>
 
-          <!-- Timeline left -->
-          <div class="relative w-[160px]">
-            <div class="absolute left-[22px] top-1 w-4 h-4 bg-orange-400 rounded-full"></div>
-            <div class="absolute left-[28px] top-5 w-[6px] h-[320px] bg-[#8b0000] rounded-full"></div>
-
-            <div class="pl-14 pt-0">
-              <p class="text-[20px] font-semibold text-[#8b0000]">January 29</p>
-            </div>
-          </div>
-
-          <!-- Card -->
-          <div class="flex-1">
-            <div class="bg-[#f3f3f3] rounded-2xl border border-gray-200 shadow-md px-10 py-7">
-              <div class="grid grid-cols-4 text-center text-[12px] font-semibold text-[#b46b6b]">
-                <p>Date</p>
-                <p>Service</p>
-                <p>Name</p>
-                <p>Program</p>
-              </div>
-
-              <div class="mt-4 grid grid-cols-4 text-center text-[11px] text-[#8b0000]">
-                <div class="leading-tight">
-                  <p>February 2,</p>
-                  <p>2025</p>
-                </div>
-                <p>Dental Cleaning</p>
-                <p>Alilah Gomez</p>
-                <p>BSME</p>
-              </div>
-
-              <div class="mt-5 h-px w-full bg-gray-300/70"></div>
-
-              <div class="mt-3 flex justify-end gap-2">
-                <button class="h-5 px-3 rounded-[4px] text-[10px] font-semibold text-white bg-green-600">
-                  Start Procedure
-                </button>
-                <button class="h-5 px-3 rounded-[4px] text-[10px] font-semibold text-[#5a3b00] bg-yellow-300">
-                  RESCHEDULE
-                </button>
-                <button class="h-5 px-3 rounded-[4px] text-[10px] font-semibold text-white bg-red-600">
-                  CANCEL
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ========== PAST SECTION ========== -->
-      <section id="pastSection" class="mt-14 flex justify-center hidden">
-        <div class="w-[760px] flex gap-10">
-
-          <!-- Timeline left -->
-          <div class="relative w-[160px]">
-            <div class="absolute left-[22px] top-1 w-4 h-4 bg-orange-400 rounded-full"></div>
-            <div class="absolute left-[28px] top-5 w-[6px] h-[320px] bg-[#8b0000] rounded-full"></div>
-
-            <div class="pl-14 pt-0">
-              <p class="text-[20px] font-semibold text-[#8b0000]">January 10</p>
-            </div>
-          </div>
-
-          <!-- Card -->
-          <div class="flex-1">
-            <div class="bg-[#f3f3f3] rounded-2xl border border-gray-200 shadow-md px-10 py-7">
-              <div class="grid grid-cols-4 text-center text-[12px] font-semibold text-[#b46b6b]">
-                <p>Date</p>
-                <p>Service</p>
-                <p>Name</p>
-                <p>Program</p>
-              </div>
-
-              <div class="mt-4 grid grid-cols-4 text-center text-[11px] text-[#8b0000]">
-                <div class="leading-tight">
-                  <p>January 10,</p>
-                  <p>2025</p>
-                </div>
-                <p>Tooth Extraction</p>
-                <p>Juan Dela Cruz</p>
-                <p>BSIT</p>
-              </div>
-
-              <div class="mt-5 h-px w-full bg-gray-300/70"></div>
-
-              <div class="mt-3 flex justify-end gap-2">
-                <button class="h-5 px-3 rounded-[4px] text-[10px] font-semibold text-white bg-gray-500">
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
 
       <div class="h-40"></div>
     </main>
@@ -289,7 +471,55 @@
       btnPast.classList.toggle("text-white", !isUpcoming);
       btnPast.classList.toggle("text-white/70", isUpcoming);
     }
+        function openRescheduleModal() {
+          document.getElementById('rescheduleModal').classList.remove('hidden');
+        }
 
+        function closeRescheduleModal() {
+          document.getElementById('rescheduleModal').classList.add('hidden');
+        }
+
+        function confirmReschedule() {
+          // redirect or open date-time picker page
+          window.location.href = "/dentist/reschedule"; 
+          // or show another modal
+        }
+
+          function openStartProcedureModal() {
+          document.getElementById('startProcedureModal').classList.remove('hidden');
+          document.getElementById('patientNameInput').focus();
+        }
+
+        function closeStartProcedureModal() {
+          document.getElementById('startProcedureModal').classList.add('hidden');
+          document.getElementById('patientNameInput').value = '';
+        }
+
+        function confirmStartProcedure() {
+          const patientName = document.getElementById('patientNameInput').value.trim();
+
+          if (!patientName) {
+            alert("Please enter the patient name.");
+            return;
+          }
+
+          // 🔧 Replace this with real logic (API / redirect / form submit)
+          alert("Starting procedure for: " + patientName);
+        }
+
+         function openCancelAppointmentModal() {
+          document.getElementById('cancelAppointmentModal').classList.remove('hidden');
+        }
+
+        function closeCancelAppointmentModal() {
+          document.getElementById('cancelAppointmentModal').classList.add('hidden');
+        }
+
+        function confirmCancelAppointment() {
+          // 🔧 Replace with real cancel logic (API / Laravel route)
+          alert("Appointment cancelled.");
+          closeCancelAppointmentModal();
+        }
     btnUpcoming.addEventListener("click", () => setActiveTab("upcoming"));
     btnPast.addEventListener("click", () => setActiveTab("past"));
   </script>
