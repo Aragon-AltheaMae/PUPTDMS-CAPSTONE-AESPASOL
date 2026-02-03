@@ -11,17 +11,13 @@ class Appointment extends Model
 
     protected $fillable = [
         'patient_id',
+        'service_type',
         'appointment_date',
         'appointment_time',
         'status',
         'patient_signature',
         'service_type',
     ];
-
-    public function service()
-    {
-        return $this->hasOne(AppointmentService::class);
-    }
 
     public function dentalHistory()
     {

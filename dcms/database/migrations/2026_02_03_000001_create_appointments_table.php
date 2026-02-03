@@ -7,16 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('appointment_services', function (Blueprint $table) {
+        Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('appointment_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('patient_id')->nullable();
             $table->string('service_type', 100);
+            $table->date('appointment_date');
+            $table->string('appointment_time', 20);
+
+            // ✅ SERVICE TYPE IS NOW HERE
+
+            $table->string('status')->default('pending');
+
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('appointment_services');
+        Schema::dropIfExists('appointments');
     }
 };
