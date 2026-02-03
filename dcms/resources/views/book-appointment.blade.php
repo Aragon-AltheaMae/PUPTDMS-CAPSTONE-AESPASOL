@@ -163,6 +163,7 @@
   }
   </style>
 </head>
+
 <body class="bg-white">
 
 <!-- HEADER -->
@@ -200,12 +201,14 @@
     @csrf
 
     <!-- STEP 1 -->
-    <div class="step-content">
+    <div class="step-content hidden">
       <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2 mb-10">
       Select Date and Time</h2>
 
       <label class="text-l font-bold text-[#8B0000]">Date</label>
-      <input type="text" id="datePicker" class="input input-bordered text-l w-full mt-2 mb-10" placeholder="Select date" readonly>
+      <input type="text" id="datePicker" name="appointment_date"
+       class="input input-bordered text-l w-full mt-2 mb-10"
+       placeholder="Select date" readonly>
       
       <label class="text-l font-bold text-[#8B0000]">Time Slot</label>
       <select name="appointment_time" id="timeSlot" required class="select select-bordered text-l mt-2 w-full">
@@ -339,7 +342,12 @@
 
       <div>
         <label class="text-sm font-semibold block mb-1">Previous Dentist: Dr.</label>
-        <input type="text" class="input input-sm border-[#8B0000] w-full" max-length="50" placeholder="Name">
+        <input
+          type="text"
+          name="previous_dentist"
+          class="input input-sm border-[#8B0000] w-full"
+          maxlength="50"
+          placeholder="Name">
       </div>
     </div>
 
@@ -415,17 +423,17 @@
     <div class="space-y-3 text-sm">
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Clicking</span>
-        <input type="radio" name="click" value="Yes" 
+        <input type="radio" name="clicking" value="Yes" 
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-        <input type="radio" name="click" value="No"  
+        <input type="radio" name="clicking" value="No"  
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Pain (joint, side of the face)</span>
-        <input type="radio" name="joint" value="Yes" 
+        <input type="radio" name="joint_pain" value="Yes" 
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-        <input type="radio" name="joint" value="No"  
+        <input type="radio" name="joint_pain" value="No"  
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
@@ -447,9 +455,9 @@
 
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
         <span>Frequent headaches</span>
-        <input type="radio" name="headaches" value="Yes" 
+        <input type="radio" name="jaw_headaches" value="Yes" 
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-        <input type="radio" name="headaches" value="No"  
+        <input type="radio" name="jaw_headaches" value="No"  
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
       </div>
 
@@ -969,7 +977,7 @@
     <label class="w-64">Person to contact in case of emergency:</label>
     <input
       type="text"
-      name="emergency_name"
+      name="emergency_person"
       maxlength="50"
       class="input input-sm border-[#8B0000] w-80"
       placeholder="Name"
@@ -982,8 +990,8 @@
     <label class="w-64">Contact Number:</label>
     <input
       type="tel"
-      id="emergency_contact"
-      name="emergency_contact"
+      id="emergency_number"
+      name="emergency_number"
       maxlength="11"
       class="input input-sm border-[#8B0000] w-80 transition-all"
       placeholder="09XXXXXXXXX"
@@ -1035,7 +1043,7 @@
           name="patient_signature"
           id="patient_signature"
           class="hidden"
-          accept=".jpg,.jpeg,.png,.pdf"
+          accept=".jpg,.jpeg,.png,"
           required
         >
       </label>
@@ -1139,30 +1147,34 @@ timeSlot.disabled = true;
 /* -------- Pikaday Calendar -------- */
 const picker = new Pikaday({
   field: document.getElementById('datePicker'),
+  format: 'YYYY-MM-DD',   // ✅ THIS IS THE FIX
   minDate: new Date(),
   disableDayFn: function(date) {
     const day = date.getDay();
     const formatted = date.toISOString().split('T')[0];
     return day === 0 || day === 6 || holidays.includes(formatted);
   },
-  onSelect: function(date) {
-    const formattedDate = date.toISOString().split('T')[0];
-    loadTimeSlots(formattedDate);
-  }
+onSelect: function(date) {
+  const formattedDate = date.toISOString().split('T')[0];
+  document.getElementById('datePicker').value = formattedDate;
+  loadTimeSlots(formattedDate);
+}
 });
 
 function initMiniDatePicker(id) {
   const el = document.getElementById(id);
   if (!el) return;
 
-  new Pikaday({
-    field: el,
-    format: 'YYYY-MM-DD',        
-    maxDate: new Date(),          
-    yearRange: [1950, new Date().getFullYear()],
-    showMonthAfterYear: true,
-    firstDay: 1,                  
-  });
+new Pikaday({
+  field: el,
+  maxDate: new Date(),
+  yearRange: [1950, new Date().getFullYear()],
+  showMonthAfterYear: true,
+  firstDay: 1,
+  onSelect: function(date) {
+    el.value = date.toISOString().split('T')[0]; 
+  }
+});
 }
 
 initMiniDatePicker('lastDentalVisit');
@@ -1200,7 +1212,10 @@ const submitBtn = document.getElementById("submitBtn");
 let completedSteps = [];
 
 // Initialize stepper on page load
-showStep(step);
+document.addEventListener("DOMContentLoaded", () => {
+  showStep(0);
+});
+
 function showStep(i) {
   // Show step content
   steps.forEach((s, idx) => {
@@ -1280,7 +1295,7 @@ function isStepComplete(currentStep) {
   }
 
   // Emergency Contact validation
-  const contactInput = stepEl.querySelector("#emergency_contact");
+  const contactInput = stepEl.querySelector("#emergency_number");
   if (contactInput) {
     const value = contactInput.value.trim();
     if (!/^\d{1,11}$/.test(value)) {
@@ -1419,10 +1434,10 @@ function buildSummary() {
         <p><b>Tooth Pain:</b> ${get("tooth_pain")}</p>
         <p><b>Sores/Lumps:</b> ${get("sores")}</p>
         <p><b>Jaw Injuries:</b> ${get("injuries")}</p>
-        <p><b>Clicking Jaw:</b> ${get("click")}</p>
-        <p><b>Joint Pain:</b> ${get("joint")}</p>
-        <p><b>Difficulty Chewing:</b> ${get("diff_chew")}</p>
-        <p><b>Headaches:</b> ${get("headaches")}</p>
+        <p><b>Clicking Jaw:</b> ${get("clicking")}</p>
+        <p><b>Joint Pain:</b> ${get("joint_pain")}</p>
+        <p><b>Difficulty Chewing:</b> ${get("difficulty_chewing")}</p>
+        <p><b>Headaches:</b> ${get("jaw_headaches")}</p>
         <p><b>Grinding/Clenching:</b> ${get("clench_grind")}</p>
         <p><b>Food Caught Between Teeth:</b> ${get("food_teeth")}</p>
         <p><b>Medicine Reaction:</b> ${get("med_reaction")}</p>
@@ -1444,8 +1459,8 @@ function buildSummary() {
       `)}
 
       ${card("Emergency Contact", `
-        <p><b>Name:</b> ${get("emergency_name")}</p>
-        <p><b>Contact:</b> ${get("emergency_contact")}</p>
+        <p><b>Name:</b> ${get("emergency_person")}</p>
+        <p><b>Contact:</b> ${get("emergency_number")}</p>
         <p><b>Relation:</b> ${get("emergency_relation")}</p>
       `)}
 
@@ -1465,7 +1480,7 @@ function closeModal() {
 }
 
 /* -------- Submit & Modal -------- */
-document.getElementById("appointmentForm").onsubmit = function(e){
+/*document.getElementById("appointmentForm").onsubmit = function(e){
   e.preventDefault();
   const date = document.getElementById("datePicker").value;
   const time = timeSlot.value;
@@ -1490,7 +1505,7 @@ document.getElementById("appointmentForm").onsubmit = function(e){
       }
     })
     .catch(()=> alert("Something went wrong. Please try again."));
-};
+};*/
 
 /* -------- Date Dental History Boxes -------- */
 const questions = [
@@ -1579,7 +1594,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  const contactInput = document.getElementById("emergency_contact");
+  const contactInput = document.getElementById("emergency_number");
 
   if (!contactInput) return;
 
