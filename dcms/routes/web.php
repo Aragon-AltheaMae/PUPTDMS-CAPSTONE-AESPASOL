@@ -234,3 +234,9 @@ Route::prefix('dentist')->group(function () {
     Route::put('/inventory/{inventory}', [InventoryController::class, 'update']);
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy']);
 });
+
+// -------------------
+// GET SELECTED DATES 
+// -------------------
+Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
+    ->name('appointments.available-slots');
