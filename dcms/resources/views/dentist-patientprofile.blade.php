@@ -170,10 +170,20 @@
           </div>
         </div>
         <div class="flex justify-center mt-8">
-          <button class="px-10 py-3 rounded-lg border border-yellow-400 text-yellow-300 hover:bg-yellow-400 hover:text-[#5e0000] transition font-medium">
-            View Odontogram
-          </button>
-        </div>
+       <div class="inline-block rounded-lg p-[2px]
+              bg-gradient-to-r from-[#8B0000] to-yellow-400">
+        <a
+          href="{{ route('dentist.viewOdontogram') }}"
+          class="block px-10 py-3 rounded-lg
+                bg-[#5e0000]
+                text-white-300 font-medium
+                hover:bg-transparent hover:text-[#5e0000]
+                transition">
+          View Odontogram
+        </a>
+      </div>
+    </div>
+
       </div>
     </section>
 

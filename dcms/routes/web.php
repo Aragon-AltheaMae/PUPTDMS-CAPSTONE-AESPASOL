@@ -153,6 +153,18 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-report');
     })->name('dentist.report');
 
+    
+Route::get('/dentist/view-odontogram', function () {
+    if (session('role') !== 'dentist') {
+        return redirect('/login');
+    }
+
+    return view('dentist-view_odontogram');
+})->name('dentist.viewOdontogram');
+
+
+});
+
     // ================= REPORTS =================
     Route::prefix('report')->group(function () {
 
@@ -180,8 +192,6 @@ Route::prefix('dentist')->group(function () {
         })->name('dentist.report.dental-services');
 
     });
-    
-});
 
 // -------------------
 // PATIENT ROUTES
