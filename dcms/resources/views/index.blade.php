@@ -735,8 +735,12 @@
 <dialog id="dentalClearanceModal" class="modal">
   <form
     id="clearanceRequestForm"
+    method="POST"
+    action="{{ route('document.requests.store') }}"
     class="modal-box rounded-2xl bg-[#F4F4F4] relative"
-    novalidate >
+    novalidate 
+  >
+    @csrf
 
     <!-- MINI WARNING -->
     <div
@@ -757,28 +761,36 @@
 
     <!-- TYPE -->
     <div class="mb-5">
-      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type of Clearance</label>
-      <select required
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">
+        Type of Clearance
+      </label>
+      <select 
+        name="document_type"
+        required
         class="select select-bordered w-full rounded-xl
                bg-[#F4F4F4] text-[#333333]
                focus:outline-none focus:ring-0 focus:border-[#8B0000]">
         <option value="" disabled selected>Select type of clearance</option>
-        <option>Dental Clearance</option>
-        <option>Annual Dental Clearance</option>
+        <option value="Dental Clearance">Dental Clearance</option>
+        <option value="Annual Dental Clearance">Annual Dental Clearance</option>
       </select>
     </div>
 
     <!-- PURPOSE -->
     <div class="mb-5">
-      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
-      <select required
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">
+        Purpose
+      </label>
+      <select 
+        name="purpose"
+        required
         class="select select-bordered w-full rounded-xl
                bg-[#F4F4F4] text-[#333333]
                focus:outline-none focus:ring-0 focus:border-[#8B0000]">
         <option value="" disabled selected>Select purpose</option>
-        <option>On-the-Job Training (OJT)</option>
-        <option>Employment Requirement</option>
-        <option>Academic Requirement</option>
+        <option value="On-the-Job Training (OJT)">On-the-Job Training (OJT)</option>
+        <option value= "Employment Requirement">Employment Requirement</option>
+        <option value="Academic Requirement">Academic Requirement</option>
       </select>
     </div>
 
@@ -791,7 +803,11 @@
       </button>
 
       <button type="button"
-        onclick="validateAndConfirm('clearanceRequestForm','Submit Dental Clearance request?','dentalClearanceModal')"
+        onclick="validateAndConfirm(
+        'clearanceRequestForm',
+        'Submit Dental Clearance request?',
+        'dentalClearanceModal'
+        )"
         class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
         Save
       </button>
@@ -803,9 +819,12 @@
 <dialog id="dentalHealthRecordModal" class="modal">
   <form
     id="healthRecordRequestForm"
+    method="POST"
+    action="{{ route('document.requests.store') }}"
     class="modal-box rounded-2xl bg-[#F4F4F4] relative"
     novalidate
   >
+    @csrf
 
     <!-- MINI WARNING -->
       <div
@@ -815,7 +834,6 @@
             text-xs font-semibold shadow-lg">
       Please complete all required fields
     </div>
-
 
     <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
       Request Dental Health Record
@@ -827,29 +845,37 @@
 
     <!-- TYPE -->
     <div class="mb-5">
-      <label class="block text-sm font-bold text-[#8B0000] mb-1">Type</label>
-      <select required
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">
+        Type of Dental Health Record
+      </label>
+      <select 
+        name="document_type"
+        required
         class="select select-bordered w-full rounded-xl
                bg-[#F4F4F4] text-[#333333]
                focus:outline-none focus:ring-0 focus:border-[#8B0000]">
         <option value="" disabled selected>Select type</option>
-        <option>All Dental Records</option>
-        <option>Medical Records</option>
-        <option>Diagnosis and Treatment</option>
+        <option value="All Dental Records">All Dental Records</option>
+        <option value="Medical Records">Medical Records</option>
+        <option value="Diagnosis and Treatment">Diagnosis and Treatment</option>
       </select>
     </div>
 
     <!-- PURPOSE -->
     <div class="mb-5">
-      <label class="block text-sm font-bold text-[#8B0000] mb-1">Purpose</label>
-      <select required
+      <label class="block text-sm font-bold text-[#8B0000] mb-1">
+        Purpose
+      </label>
+      <select 
+        name="purpose"
+        required
         class="select select-bordered w-full rounded-xl
                bg-[#F4F4F4] text-[#333333]
                focus:outline-none focus:ring-0 focus:border-[#8B0000]">
         <option value="" disabled selected>Select purpose</option>
-        <option>Personal Record</option>
-        <option>Academic Requirement</option>
-        <option>Employment Requirement</option>
+        <option value="Personal Record">Personal Record</option>
+        <option value="Academic Requirement">Academic Requirement</option>
+        <option value="Employment Requirement">Employment Requirement</option>
       </select>
     </div>
 
@@ -862,7 +888,11 @@
       </button>
 
       <button type="button"
-        onclick="validateHealthRecord('healthRecordRequestForm','Submit Dental Health Record request?','dentalHealthRecordModal')"
+        onclick="validateHealthRecord(
+        'healthRecordRequestForm',
+        'Submit Dental Health Record request?',
+        'dentalHealthRecordModal'
+        )"
         class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
         Save
         </button>
@@ -872,7 +902,6 @@
 
   </div>
 </main>
-
 
 <!-- CONFIRM SAVE MODAL -->
 <dialog id="confirmSaveModal" class="modal">
@@ -1009,22 +1038,23 @@ function toggleSidebar() {
     // close confirm modal
     confirmSaveModal.close();
 
-    // close the request modal (clearance/record)
+    // SUBMIT FIRST
+    if (_pendingFormId) {
+      submitFormAjax(_pendingFormId);
+    }
+
+    // close request modal
     if (_pendingModalIdToClose) {
       const reqModal = document.getElementById(_pendingModalIdToClose);
       if (reqModal) reqModal.close();
-      
+    }
+
+    // reset AFTER submit
     _pendingFormId = null;
     _pendingModalIdToClose = null;
-    }
 
-    // show submitted modal
+    // optional UX modal (will be interrupted by redirect anyway)
     submittedInfoModal.showModal();
-
-    // actually submit
-    if (_pendingFormId) {
-      document.getElementById(_pendingFormId).submit();
-    }
   }
 
     // validate submit request
@@ -1283,7 +1313,30 @@ function loadCalendar() {
   function viewRecord(id) { window.location.href = `record.php?id=${id}`; }
   function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString(); }
   function formatTime(timeStr) { return timeStr.substring(0,5); }
-</script>
 
+  function submitFormAjax(formId) {
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        submittedInfoModal.showModal();
+        form.reset();
+      }
+    })
+    .catch(() => {
+      alert('Something went wrong. Please try again.');
+    });
+  }
+
+</script>
 </body>
 </html>

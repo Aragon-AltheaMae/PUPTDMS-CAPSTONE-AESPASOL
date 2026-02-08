@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Patient;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
+use App\Http\Controllers\DocumentRequestController;
 
 // -------------------
 // AUTH PAGES
@@ -249,3 +250,21 @@ Route::prefix('dentist')->group(function () {
 // -------------------
 Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
     ->name('appointments.available-slots');
+
+/* =======================
+   DOCUMENT REQUESTS
+======================= */
+// Patient submits request
+Route::post('/document-requests', 
+    [DocumentRequestController::class, 'store']
+)->name('document.requests.store');
+
+// Patient views own requests
+Route::get('/document-requests', 
+    [DocumentRequestController::class, 'index']
+)->name('document.requests.index');
+
+// Admin / Dentist updates status
+Route::post('/document-requests/{id}/status',
+    [DocumentRequestController::class, 'updateStatus']
+)->name('document.requests.updateStatus');
