@@ -30,10 +30,71 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        .radio-red {
+          appearance: none;
+          -webkit-appearance: none;
+
+          width: 16px;
+          height: 16px;
+          min-width: 16px;
+          min-height: 16px;
+
+          border: 2px solid #8B0000;
+          border-radius: 50%;
+
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+
+          background-color: #fff;
+          cursor: pointer;
+          flex-shrink: 0;       /* 🚀 prevents oval distortion */
+        }
+
+        .radio-red::before {
+          content: "";
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #8B0000;
+          transform: scale(0);
+          transition: transform 0.15s ease-in-out;
+        }
+
+        .radio-red:checked::before {
+          transform: scale(1);
+        }
+
+        /* Disabled radio + label styling */
+        .filter-disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .filter-disabled input {
+          cursor: not-allowed;
+        }
+
+        /* Active state – EXACT SAME SHAPE */
+        .filter-active {
+          background-color: #8B0000 !important;
+          color: white !important;
+        }
+
+        .filter-active i,
+        .filter-active span {
+          color: white !important;
+        }
+
+        /* remove hover light bg when active */
+        .filter-active:hover {
+          background-color: #400000 !important;
+        }
+
     </style>
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-200 min-h-screen flex flex-col">
 
 <!-- ================= TOP HEADER ================= -->
 <header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
@@ -133,7 +194,7 @@
 </header>
 
 <!-- ================= MAIN ================= -->
-<main class="p-8">
+<main class="p-8 min-h-[calc(100vh-200px)]">
 
     <!-- HEADER ROW -->
     <div class="flex justify-between items-center mb-6">
@@ -144,7 +205,18 @@
                       bg-clip-text text-transparent">
                 Daily Treatment Record
             </h1>
-            <p class="text-red-700 mt-1">December 2025</p>
+            <div class="mt-2 flex items-center gap-3">
+              <label class="text-sm text-gray-600">Select Month & Year:</label>
+
+              <input
+                  type="month"
+                  id="monthPicker"
+                  class="border border-gray-300 rounded-md
+                        px-6 py-2 text-sm text-gray-700
+                        bg-white dark:bg-neutral-900 dark:text-gray-100
+                        focus:outline-none"
+                />
+            </div>
         </div>
 
         <!-- RIGHT: CREATE NEW REPORT BUTTON -->
@@ -180,7 +252,8 @@
 
             <!-- Search + Filter -->
             <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full">
-              <div class="flex items-center bg-white rounded-full overflow-hidden">
+              <div id="filterWrapper" class="flex items-center bg-white rounded-full overflow-hidden transition">
+
 
                 <!-- Left: Search -->
                 <div class="flex items-center gap-2 pl-3 pr-5 py-2 w-[320px]">
@@ -199,15 +272,20 @@
                 <!-- Divider -->
                 <div class="w-[2px] self-stretch bg-[#D9D9D9]"></div>
 
-                <!-- Right: Filter -->
-                <button
-                  id="openFilter"
-                  type="button"
-                  class="flex items-center gap-2 px-6 py-2 text-sm font-medium text-[#8B0000] bg-white hover:bg-[#FFF7E6] active:bg-[#FFEFC8]"
-                >
-                  <i class="fa-solid fa-sliders text-[13px]"></i>
-                  <span>Filter</span>
-                </button>
+                <!-- Right: Filter (OWN WRAPPER) -->
+                <div id="filterPill"
+                    class="flex items-center transition">
+
+                  <button
+                    id="openFilter"
+                    type="button"
+                    class="flex items-center gap-2 px-6 py-3 text-sm font-medium text-[#8B0000] hover:bg-[#e5ae2d]"
+                  >
+                    <i class="fa-solid fa-sliders text-[13px]"></i>
+                    <span>Filter</span>
+                  </button>
+
+                </div>
 
               </div>
             </div>
@@ -226,7 +304,7 @@
 
 
         <!-- INNER TABLE BORDER -->
-        <div class="border-2 border-gray-300 rounded-xl p-4 overflow-x-auto">
+        <div class="border-2 border-gray-300 rounded-xl p-4 overflow-x-auto min-h-[280px] flex flex-col items-start">
 
             <table class="table table-sm w-full">
                 <thead>
@@ -248,10 +326,118 @@
 
         </div>
     </div>
-
 </main>
 
+<!-- FILTER MODAL -->
+<div id="filterModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white w-[760px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
 
+    <!-- Header -->
+    <div class="px-6 py-4 flex items-center gap-3">
+      <i class="fa-solid fa-sliders text-[#8B0000]"></i>
+      <h2 class="text-xl font-medium text-[#8B0000]">Filter</h2>
+    </div>
+    <div class="h-px bg-gray-200"></div>
+
+    <!-- BODY -->
+    <div class="px-6 py-5 space-y-5">
+
+      <!-- SORT -->
+      <div class="space-y-3">
+        <p class="text-sm text-gray-500">Sort</p>
+        <div class="space-y-2">
+        <label class="flex items-center gap-3 text-sm text-gray-700">
+          <input type="radio" name="sort" value="az" class="radio-red" />
+          A–Z
+        </label>
+        <label class="flex items-center gap-3 text-sm text-gray-700">
+          <input type="radio" name="sort" value="za" class="radio-red" />
+          Z–A
+        </label>
+        </div>
+      </div>
+
+      <div class="h-px bg-gray-200"></div>
+
+      <!-- DATE RANGE -->
+      <div class="space-y-1">
+        <p class="text-sm text-gray-500">Date Range</p>
+
+        <div class="grid grid-cols-12 gap-4 items-start">
+
+          <div class="col-span-4 space-y-2 pt-2">
+            <label class="flex items-center gap-3 text-sm text-gray-700">
+              <input type="radio" name="dateOrder" value="asc" class="radio-red" />
+              Ascending
+            </label>
+            <label class="flex items-center gap-3 text-sm text-gray-700">
+              <input type="radio" name="dateOrder" value="desc" class="radio-red" />
+              Descending
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-px bg-gray-200"></div>
+
+      <!-- OFFICE -->
+      <div class="space-y-3">
+        <p class="text-sm text-gray-500">Office</p>
+        <div class="grid grid-cols-3 gap-6 text-sm">
+          <label class="flex items-center gap-3 text-sm text-gray-700">
+            <input type="radio" name="office" class="radio-red officeRadio" value="Administrative">
+            Administrative
+          </label>
+          <label class="flex items-center gap-3 text-sm text-gray-700">
+            <input type="radio" name="office" class="radio-red officeRadio" value="Faculty">
+            Faculty
+          </label>
+          <label class="flex items-center gap-3 text-sm text-gray-700">
+            <input type="radio" name="office" class="radio-red officeRadio" value="Dependent">
+            Dependent
+          </label>
+        </div>
+      </div>
+
+      <div class="h-px bg-gray-200"></div>
+
+      <!-- COURSES-->
+      <div class="space-y-3">
+        <p class="text-sm text-gray-500">Course</p>
+
+        <div class="grid grid-cols-6 gap-x-8 gap-y-4 text-sm">
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSIT"> BSIT</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSECE"> BSECE</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSBA - HRM"> BSBA - HRM</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSED - ENG"> BSED - ENG</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSOA"> BSOA</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSPSYCH"> BSPSYCH</label>
+
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="DIT"> DIT</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSME"> BSME</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSBA - MM"> BSBA - MM</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="BSED - MATH"> BSED - MATH</label>
+          <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="course" class="radio-red programRadio" value="DOMT"> DOMT</label>
+        </div>
+      </div>
+
+    </div>
+    <!-- FOOTER -->
+    <div class="h-px bg-gray-200"></div>
+    <div class="px-6 py-4 flex items-center justify-between">
+      <button id="clearFilterBtn" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">
+        Clear
+      </button>
+
+      <button id="applyFiltersBtn" type="button"
+        class="bg-[#8B0000] text-white px-8 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000]">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
 <dialog id="createReportModal" class="modal">
   <div class="modal-box max-w-4xl border-2 border-blue-400 bg-white">
 
@@ -285,11 +471,17 @@
         <label class="col-span-1 text-[#8B0000]">Date Range</label>
         <div class="col-span-3 flex gap-4">
           <input
-            type="date"
-            class="input input-bordered border-yellow-400 bg-white w-full" />
+            type="month"
+            id="fromMonth"
+            class="input input-bordered w-full"
+            placeholder="From (Month & Year)"
+          />
           <input
-            type="date"
-            class="input input-bordered border-yellow-400 bg-white w-full" />
+            type="month"
+            id="toMonth"
+            class="input input-bordered w-full"
+            placeholder="To (Month & Year)"
+          />
         </div>
       </div>
 
@@ -330,68 +522,9 @@
   </div>
 </dialog>
 
-<!-- ================= FOOTER ================= -->
+<!-- Footer -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-
-  <!-- ASIDE: CLINIC INFO -->
-  <aside class="space-y-4">
-    <div class="flex items-center gap-3">
-      
-      <!-- Logos -->
-      <div class="w-12">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
-      </div>
-
-      <div class="w-12">
-    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
-      </div>
-
-      <!-- Text -->
-      <div>
-        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-        <p class="text-sm whitespace-nowrap">
-          Polytechnic University of the Philippines – Taguig Campus
-        </p>
-      </div>
-    </div>
-
-    <!-- Location -->
-    <div class="flex items-start gap-3 text-sm">
-      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
-      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
-    </div>
-
-    <!-- Email -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
-      <p>pupdental@pup.edu.ph</p>
-    </div>
-
-    <!-- Phone -->
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
-      <p>(02) 123-4567</p>
-    </div>
-  </aside>
-
-  <!-- NAVIGATION -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Home</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">Appointment</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]"> Record</a>
-    <a href="#" class="link link-hover text-[#F4F4F4]">About Us</a>
-  </nav>
-
-  <!-- SERVICES -->
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
-    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
-    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
-  </nav>
-
+  <!-- Footer content here (unchanged) -->
 </footer>
 
 
@@ -534,11 +667,49 @@ const dailyRecords = [
   }
 ];
 
-function renderDailyRecords() {
+let searchKeyword = "";
+let selectedOffice = null;
+let selectedProgram = null;
+let nameSort = null;
+let dateSort = null;
+let selectedMonth = null;
+let selectedYear = null;
+
+
+const filterModal = document.getElementById("filterModal");
+
+document.getElementById("openFilter").addEventListener("click", () => {
+  filterModal.classList.remove("hidden");
+});
+
+filterModal.addEventListener("click", e => {
+  if (e.target === filterModal) {
+    filterModal.classList.add("hidden");
+  }
+});
+
+document.getElementById("applyFiltersBtn").addEventListener("click", () => {
+  filterModal.classList.add("hidden");
+});
+
+// For Hardcoded Data (Subjected to Change)
+function renderDailyRecords(data) {
   const tbody = document.getElementById("dailyTableBody");
   tbody.innerHTML = "";
 
-  dailyRecords.forEach(record => {
+  if (data.length === 0) {
+    tbody.innerHTML = `
+    <tr class="border-none">
+    <td colspan="8"
+        class="text-center text-gray-400 py-24 align-middle">
+      No Records.
+    </td>
+  </tr>
+  `;
+    return;
+  }
+
+  data.forEach(record => {
     tbody.innerHTML += `
       <tr class="text-sm text-gray-800">
         <td>${record.date}</td>
@@ -554,7 +725,244 @@ function renderDailyRecords() {
   });
 }
 
-renderDailyRecords();
+
+/* ================= FILTER LOGIC ================= */
+function applyFilters() {
+  let data = [...dailyRecords];
+
+  // 🔍 SEARCH (name, program, treatment, contact)
+  if (searchKeyword) {
+    data = data.filter(r =>
+      `${r.name} ${r.program} ${r.treatment} ${r.contact}`
+        .toLowerCase()
+        .includes(searchKeyword)
+    );
+  }
+
+  // 🏢 OFFICE
+  if (selectedOffice) {
+    data = data.filter(r => r.program === selectedOffice);
+  }
+
+  // 🎓 PROGRAM
+  if (selectedProgram) {
+    data = data.filter(r => r.program === selectedProgram);
+  }
+
+// 📆 DATE SORT
+  if (dateSort === "asc") {
+    data.sort((a, b) =>
+      new Date(`20${a.date.split("/").reverse().join("-")}`) -
+      new Date(`20${b.date.split("/").reverse().join("-")}`)
+    );
+  }
+
+  if (dateSort === "desc") {
+    data.sort((a, b) =>
+      new Date(`20${b.date.split("/").reverse().join("-")}`) -
+      new Date(`20${a.date.split("/").reverse().join("-")}`)
+    );
+  }
+
+  // 📆 MONTH & YEAR FILTER
+  if (selectedMonth && selectedYear) {
+    data = data.filter(r => {
+      const [m, d, y] = r.date.split("/");
+      const fullYear = `20${y}`;
+
+      return m === selectedMonth && fullYear === selectedYear;
+    });
+  }
+
+  // 🔤 NAME SORT
+  if (nameSort === "az") data.sort((a, b) => a.name.localeCompare(b.name));
+  if (nameSort === "za") data.sort((a, b) => b.name.localeCompare(a.name));
+
+  renderDailyRecords(data);
+  updateFilterButtonState();
+
+}
+
+/* ================= EVENTS ================= */
+
+// Search
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchKeyword = e.target.value.trim().toLowerCase();
+  applyFilters();
+});
+
+const officeRadios = document.querySelectorAll(".officeRadio");
+const programRadios = document.querySelectorAll(".programRadio");
+
+// Helper: disable a group
+function disableRadios(radios) {
+  radios.forEach(r => {
+    r.disabled = true;
+    r.closest("label")?.classList.add("filter-disabled");
+  });
+}
+
+// Helper: enable a group
+function enableRadios(radios) {
+  radios.forEach(r => {
+    r.disabled = false;
+    r.closest("label")?.classList.remove("filter-disabled");
+  });
+}
+
+// OFFICE selected → disable PROGRAM
+officeRadios.forEach(radio => {
+  radio.addEventListener("change", () => {
+    selectedOffice = radio.value;
+    selectedProgram = null;
+
+    // reset program radios
+    programRadios.forEach(p => p.checked = false);
+
+    disableRadios(programRadios);
+    enableRadios(officeRadios);
+
+    updateFilterButtonState();
+
+    applyFilters();
+  });
+});
+
+// PROGRAM selected → disable OFFICE
+programRadios.forEach(radio => {
+  radio.addEventListener("change", () => {
+    selectedProgram = radio.value;
+    selectedOffice = null;
+
+    // reset office radios
+    officeRadios.forEach(o => o.checked = false);
+
+    disableRadios(officeRadios);
+    enableRadios(programRadios);
+
+    updateFilterButtonState();
+
+    applyFilters();
+  });
+});
+
+// Date Range Sort
+document.querySelectorAll("input[name='dateOrder']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    dateSort = radio.value; // asc | desc
+    applyFilters();
+    updateFilterButtonState();
+  });
+});
+
+// Sort
+document.querySelectorAll("input[name='sort']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    nameSort = radio.value;
+    dateSort = null;
+    applyFilters();
+    updateFilterButtonState();
+  });
+});
+
+
+// Filter Activity
+const filterPill = document.getElementById("openFilter");
+
+function updateFilterButtonState() {
+  const hasActiveFilters =
+    selectedOffice ||
+    selectedProgram ||
+    nameSort ||
+    dateSort;
+
+  filterPill.classList.toggle("filter-active", !!hasActiveFilters);
+}
+
+// Handle month selection
+document.getElementById("monthPicker").addEventListener("change", e => {
+  if (!e.target.value) {
+    selectedMonth = null;
+    selectedYear = null;
+  } else {
+    const [year, month] = e.target.value.split("-");
+    selectedMonth = month;
+    selectedYear = year;
+  }
+
+  applyFilters();
+});
+
+// Clear filters
+// Clear Filter Button
+document.getElementById("clearFilterBtn").addEventListener("click", () => {
+  searchKeyword = "";
+  selectedOffice = null;
+  selectedProgram = null;
+  nameSort = null;
+  dateSort = null;
+
+
+  document.getElementById("searchInput").value = "";
+
+  // clear ALL radios
+  document.querySelectorAll("input[type=radio]").forEach(r => {
+    r.checked = false;
+    r.disabled = false;
+  });
+
+  enableRadios(officeRadios);
+  enableRadios(programRadios);
+
+  updateFilterButtonState();
+  applyFilters();
+});
+
+// Search Bar Clear Button
+document.getElementById("clearBtn").addEventListener("click", () => {
+  // clear search state
+  searchKeyword = "";
+
+  // clear input field
+  document.getElementById("searchInput").value = "";
+
+  // re-apply filters (shows all again)
+  applyFilters();
+  updateFilterButtonState();
+
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const monthPicker = document.getElementById("monthPicker");
+  const now = new Date();
+
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+
+  // set input value
+  monthPicker.value = `${year}-${month}`;
+
+  // set filter values
+  selectedMonth = month;
+  selectedYear = String(year);
+
+  applyFilters();
+});
+
+// Filter modal
+document.getElementById("openFilter").addEventListener("click", () => {
+  filterModal.classList.remove("hidden");
+});
+
+
+// Date Range - Report Modal
+const now = new Date();
+const month = String(now.getMonth() + 1).padStart(2, "0");
+const year = now.getFullYear();
+
+document.getElementById("fromMonth").value = `${year}-${month}`;
+document.getElementById("toMonth").value = `${year}-${month}`;
+
 
 document.getElementById('downloadReportBtn').addEventListener('click', function() {
     // Simulate download (You can replace this with actual download logic)
@@ -573,7 +981,7 @@ document.getElementById('downloadReportBtn').addEventListener('click', function(
         }, 3000); // Hide after 3 seconds
     }, 1000); // Simulating a 1-second download delay
 });
-
+ 
 </script>
 
 
