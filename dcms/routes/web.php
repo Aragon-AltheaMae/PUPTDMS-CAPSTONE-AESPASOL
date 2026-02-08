@@ -4,10 +4,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+
 use App\Models\Patient;
+
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\RecordController;
 
 // -------------------
 // AUTH PAGES
@@ -21,12 +24,13 @@ Route::get('/login', function () {
 // Patient Register
 Route::get('/register', function () {
     return view('auth.register');
-});
+})->name('register');
 
 // Dentist Login
 Route::get('/dentist/login', function () {
     return view('auth.dentist-login');
 })->name('dentist.login');
+
 
 // -------------------
 // AUTH ACTIONS
@@ -81,7 +85,7 @@ Route::post('/dentist/login', function (Request $request) {
             'dentist_email' => 'dentist',
         ]);
 
-    return view('dentist-dashboard');
+        return view('dentist-dashboard');
     }
 
     return back()->with('error', 'Invalid dentist credentials');
@@ -90,9 +94,14 @@ Route::post('/dentist/login', function (Request $request) {
 // Logout (all roles)
 Route::post('/logout', function () {
     session()->flush();
+
+    // Keeping this so other existing auth logic (if any) won't break.
+    // If you're not using Laravel Auth at all, it's harmless.
     Auth::logout();
+
     return redirect('/login');
 })->name('logout');
+
 
 // -------------------
 // HOMEPAGE
@@ -106,7 +115,13 @@ Route::get('/homepage', function () {
     return view('index', compact('patient'));
 })->name('homepage');
 
+
+// -------------------
+// DENTIST ROUTES
+// -------------------
+
 Route::prefix('dentist')->group(function () {
+
     // Dashboard Route
     Route::get('/dashboard', function () {
         if (session('role') !== 'dentist') {
@@ -139,14 +154,6 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-patientprofile');
     })->name('dentist.patient.profile');
 
-
-    /*Route::get('/inventory', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-inventory');
-    })->name('dentist.inventory');*/
-
     Route::get('/report', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -154,45 +161,44 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-report');
     })->name('dentist.report');
 
-    
-Route::get('/dentist/view-odontogram', function () {
-    if (session('role') !== 'dentist') {
-        return redirect('/login');
-    }
-
-    return view('dentist-view_odontogram');
-})->name('dentist.viewOdontogram');
-
+    Route::get('/dentist/view-odontogram', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-view_odontogram');
+    })->name('dentist.viewOdontogram');
 
 });
 
-    // ================= REPORTS =================
-    Route::prefix('report')->group(function () {
 
-        Route::get('/', function () {
-            if (session('role') !== 'dentist') {
-                return redirect('/login');
-            }
-            return view('dentist-report');
-        })->name('dentist.report');
+// ================= REPORTS =================
+Route::prefix('report')->group(function () {
 
-        // ✅ DAILY TREATMENT RECORD
-        Route::get('/daily-treatment-record', function () {
-            if (session('role') !== 'dentist') {
-                return redirect('/login');
-            }
-            return view('daily-treatment');
-        })->name('dentist.report.daily-treatment');
+    Route::get('/', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-report');
+    })->name('dentist.report');
 
-        // ✅ DENTAL SERVICES
-        Route::get('/dental-services', function () {
-            if (session('role') !== 'dentist') {
-                return redirect('/login');
-            }
-            return view('dental-services');
-        })->name('dentist.report.dental-services');
+    // ✅ DAILY TREATMENT RECORD
+    Route::get('/daily-treatment-record', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('daily-treatment');
+    })->name('dentist.report.daily-treatment');
 
-    });
+    // ✅ DENTAL SERVICES
+    Route::get('/dental-services', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dental-services');
+    })->name('dentist.report.dental-services');
+
+});
+
 
 // -------------------
 // PATIENT ROUTES
@@ -203,7 +209,7 @@ Route::prefix('patient')->middleware('role:patient')->group(function () {
     Route::get('/dashboard', function () {
         $patient = Patient::find(session('patient_id'));
         return view('patient-dashboard', compact('patient'));
-    });
+    })->name('patient.dashboard');
 
     Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment.index');
     Route::get('/appointment/create', [AppointmentController::class, 'create'])->name('appointment.create');
@@ -222,16 +228,20 @@ Route::prefix('patient')->middleware('role:patient')->group(function () {
 
 Route::get('/', fn () => redirect('/login'));
 
+// NOTE: You already have /patient/book-appointment above (protected).
+// Keeping this public route as you originally had (won't affect others).
 Route::get('/book-appointment', [AppointmentController::class, 'create'])
     ->name('book.appointment');
 
-Route::get('/record', fn () => view('record'))
+// ✅ FIX: record should use role:patient (because login is session-based, not Auth guard)
+Route::get('/record', [RecordController::class, 'index'])
     ->name('record')
     ->middleware('role:patient');
 
 Route::get('/about-us', fn () => view('about-us'))
     ->name('about.us')
     ->middleware('role:patient');
+
 
 // -------------------
 // INVENTORY
@@ -245,26 +255,26 @@ Route::prefix('dentist')->group(function () {
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy']);
 });
 
+
 // -------------------
-// GET SELECTED DATES 
+// GET SELECTED DATES
 // -------------------
 Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
     ->name('appointments.available-slots');
 
-/* =======================
-   DOCUMENT REQUESTS
-======================= */
+
+// =======================
+// DOCUMENT REQUESTS
+// =======================
+
 // Patient submits request
-Route::post('/document-requests', 
-    [DocumentRequestController::class, 'store']
-)->name('document.requests.store');
+Route::post('/document-requests', [DocumentRequestController::class, 'store'])
+    ->name('document.requests.store');
 
 // Patient views own requests
-Route::get('/document-requests', 
-    [DocumentRequestController::class, 'index']
-)->name('document.requests.index');
+Route::get('/document-requests', [DocumentRequestController::class, 'index'])
+    ->name('document.requests.index');
 
 // Admin / Dentist updates status
-Route::post('/document-requests/{id}/status',
-    [DocumentRequestController::class, 'updateStatus']
-)->name('document.requests.updateStatus');
+Route::post('/document-requests/{id}/status', [DocumentRequestController::class, 'updateStatus'])
+    ->name('document.requests.updateStatus');
