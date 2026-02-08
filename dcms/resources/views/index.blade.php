@@ -100,124 +100,125 @@
 
     .fade-up {
       animation: fadeUp 0.6s ease-out forwards;
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0) rotate(0deg);
     }
-    50% {
-      transform: translateY(-14px) rotate(2deg);
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
       }
-  }
-
-  .float-slow {
-    animation: float 4.5s ease-in-out infinite;
-    will-change: transform;
-  }
-
-    /* Shimmer effect */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
+      50% {
+        transform: translateY(-14px) rotate(2deg);
+        }
     }
-    100% {
-      background-position: 200% 0;
+
+    .float-slow {
+      animation: float 4.5s ease-in-out infinite;
+      will-change: transform;
     }
-  }
 
-  .shimmer-btn {
-    background: linear-gradient(
-      110deg,
-      #660000 25%,
-      rgba(255, 80, 80, 0.87) 37%,
-      #660000 63%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 10s linear infinite;
-  }
+      /* Shimmer effect */
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
 
-  @keyframes wave {
-    0% { transform: rotate(0deg); }
-    20% { transform: rotate(14deg); }
-    40% { transform: rotate(-8deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-4deg); }
-    100% { transform: rotate(0deg); }
-  }
+    .shimmer-btn {
+      background: linear-gradient(
+        110deg,
+        #660000 25%,
+        rgba(255, 80, 80, 0.87) 37%,
+        #660000 63%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 10s linear infinite;
+    }
 
-  .wave-hand {
-    transform-origin: 70% 70%;
-    animation: wave 2.5s ease-in-out infinite;
-  }
+    @keyframes wave {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(14deg); }
+      40% { transform: rotate(-8deg); }
+      60% { transform: rotate(14deg); }
+      80% { transform: rotate(-4deg); }
+      100% { transform: rotate(0deg); }
+    }
 
-  /* Sidebar icon centering fix */
-  .sidebar-link {
-    justify-content: center;
-    transition: background-color 0.2s ease,
-              transform 0.2s ease;
-  }
+    .wave-hand {
+      transform-origin: 70% 70%;
+      animation: wave 2.5s ease-in-out infinite;
+    }
 
-  /* Tooltip appears ONLY when collapsed */
-  .sidebar-link:hover .sidebar-tooltip {
+    /* Sidebar icon centering fix */
+    .sidebar-link {
+      justify-content: center;
+      transition: background-color 0.2s ease,
+                transform 0.2s ease;
+    }
+
+    /* Tooltip appears ONLY when collapsed */
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Hide tooltip when expanded */
+    #sidebar[style*="16rem"] .sidebar-tooltip {
+    display: none;
+    }
+
+    #sidebar[style*="16rem"] .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    /* Icon spacing only when expanded */
+    #sidebar[style*="16rem"] .sidebar-link i {
+      margin-right: 1rem;
+    }
+
+    #sidebar[style*="16rem"] .sidebar-link:hover {
+    transform: translateX(4px);
+    }
+
+    .sidebar-link:hover .sidebar-text {
     opacity: 1;
     transform: scale(1);
-  }
+    }
 
-  /* Hide tooltip when expanded */
-  #sidebar[style*="16rem"] .sidebar-tooltip {
-  display: none;
-  }
+    .sidebar-text {
+      transform-origin: left center;
+    }
 
-  #sidebar[style*="16rem"] .sidebar-link {
-    justify-content: flex-start;
-  }
+    /* DARK MODE */
+    [data-theme="dark"] body {
+    background-color: #111827; /* slate-900 */
+    color: #E5E7EB;
+    }
 
-  /* Icon spacing only when expanded */
-  #sidebar[style*="16rem"] .sidebar-link i {
-    margin-right: 1rem;
-  }
+    [data-theme="dark"] #sidebar {
+      background-color: #1F2933;
+    }
 
-  #sidebar[style*="16rem"] .sidebar-link:hover {
-  transform: translateX(4px);
-  }
+    [data-theme="dark"] .bg-white {
+      background-color: #1F2937 !important;
+    }
 
-  .sidebar-link:hover .sidebar-text {
-  opacity: 1;
-  transform: scale(1);
-  }
+    [data-theme="dark"] .text-[#333333] {
+      color: #E5E7EB !important;
+    }
 
-  .sidebar-text {
-    transform-origin: left center;
-  }
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  /* DARK MODE */
-  [data-theme="dark"] body {
-  background-color: #111827; /* slate-900 */
-  color: #E5E7EB;
-  }
-
-  [data-theme="dark"] #sidebar {
-    background-color: #1F2933;
-  }
-
-  [data-theme="dark"] .bg-white {
-    background-color: #1F2937 !important;
-  }
-
-  [data-theme="dark"] .text-[#333333] {
-    color: #E5E7EB !important;
-  }
-
-  body,
-  #sidebar,
-  main,
-  .card,
-  .modal-box {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-</style>
+  </style>
+</head>
 
 <body class="bg-white text-[#333333] font-normal">
 
@@ -287,7 +288,7 @@
             <div class="px-4 py-10 text-center justify-items-center">
               <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
               <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
             </div>
           @endforelse
         </div>
@@ -303,6 +304,7 @@
                     : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
               alt="Profile"
             />
+            
           </div>
         </div>
 
@@ -335,7 +337,7 @@
       <button onclick="toggleSidebar()"
         id="sidebarToggleBtn"
         class="w-10 h-10 flex items-center justify-center
-              rounded-full text-gray-500 hover:text-[#8B0000]
+              rounded-full text-[#757575] hover:text-[#8B0000]
               hover:bg-[#D9D9D9] transition-all duration-300">
         <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
       </button>
