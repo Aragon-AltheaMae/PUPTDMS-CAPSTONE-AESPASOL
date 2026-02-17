@@ -24,7 +24,7 @@
   </style>
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-200 min-h-screen flex flex-col">
 
 <!-- ================= TOP HEADER ================= -->
 <header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
@@ -125,6 +125,11 @@
       <i class="fa-solid fa-calendar-check text-lg"></i>
       <span>Appointments</span>
     </a>
+
+    <a href="{{ route('dentist.documentrequests') }}" class="flex flex-col items-center">
+      <i class="fa-solid fa-file-circle-check text-lg"></i>
+      <span>Document Requests</span>
+    </a>
     
     <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center ">
       <i class="fa-solid fa-box text-lg"></i>
@@ -138,8 +143,8 @@
   </nav>
 </header>
 
-<main class="p-6">
-<div class="bg-white rounded-xl shadow p-6">
+<main class="p-6 flex-1 flex">
+<div class="bg-white rounded-xl shadow p-6 flex flex-col w-full">
 
 <!-- TOOLBAR -->
 <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
@@ -218,7 +223,16 @@
 </table>
 </div>
 
+<!-- EMPTY STATE -->
+<div
+  id="emptyState"
+  class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium"
+>
+  No items in the inventory
 </div>
+
+</div>
+
 </main>
 
 <!-- ADD MODAL -->
@@ -504,6 +518,8 @@ document.getElementById("confirmDeleteBtn").onclick = async () => {
 
 let editIndex = null;
 
+const emptyState = document.getElementById("emptyState");
+
 function renderTable() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
@@ -549,6 +565,13 @@ function renderTable() {
         // Default order (do nothing)
         break;
     }   
+  
+  if (data.length === 0) {
+    emptyState.classList.remove("hidden");
+    return;
+  } else {
+    emptyState.classList.add("hidden");
+  }
 
   data.forEach((item, index) => {
     const balance = item.qty - item.used;
