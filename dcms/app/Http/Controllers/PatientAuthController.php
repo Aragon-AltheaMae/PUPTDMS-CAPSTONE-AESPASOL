@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class PatientAuthController extends Controller
 {
     // SHOW REGISTER FORM
     public function showRegister()
     {
-        return view('auth.register'); // ✅ keep views consistent
+        return view('auth.register');
     }
 
     // REGISTER PATIENT
@@ -44,49 +45,41 @@ class PatientAuthController extends Controller
         return view('auth.login');
     }
 
-    // LOGIN PROCESS
+    // ✅ LOGIN USING AUTH:PATIENT
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $patient = Patient::where('email', $request->email)->first();
-
-        if (!$patient || !Hash::check($request->password, $patient->password)) {
+        if (!Auth::guard('patient')->attempt($credentials)) {
             return back()
                 ->withErrors(['email' => 'Invalid credentials'])
                 ->withInput();
         }
 
-        session()->regenerate(); // ✅ prevent session fixation
-        session(['patient_id' => $patient->id]);
+        $request->session()->regenerate();
 
-        return redirect('/dashboard');
+        return redirect()->route('dashboard');
     }
 
-    // LOGOUT
-    public function logout()
+    // ✅ LOGOUT USING AUTH:PATIENT
+    public function logout(Request $request)
     {
-        session()->forget('patient_id');
-        session()->invalidate();
-        session()->regenerateToken();
+        Auth::guard('patient')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('success', 'Logged out successfully!');
     }
 
+    // DASHBOARD
     public function dashboard()
-{
-    // Check if patient is logged in
-    $patientId = session('patient_id');
-    if (!$patientId) {
-        return redirect()->route('login')->with('error', 'Please login first!');
+    {
+        $patient = Auth::guard('patient')->user();
+
+        return view('dashboard', compact('patient'));
     }
-
-    // Fetch patient from DB
-    $patient = Patient::find($patientId);
-
-    return view('dashboard', compact('patient'));
-}
 }
