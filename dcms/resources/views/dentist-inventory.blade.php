@@ -551,7 +551,16 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 </table>
 </div>
 
+<!-- EMPTY STATE -->
+<div
+  id="emptyState"
+  class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium"
+>
+  No items in the inventory
 </div>
+
+</div>
+
 </main>
 
 <!-- ADD MODAL -->
@@ -927,6 +936,8 @@ document.getElementById("confirmDeleteBtn").onclick = async () => {
 
 let editIndex = null;
 
+const emptyState = document.getElementById("emptyState");
+
 function renderTable() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
@@ -972,6 +983,13 @@ function renderTable() {
         // Default order (do nothing)
         break;
     }   
+  
+  if (data.length === 0) {
+    emptyState.classList.remove("hidden");
+    return;
+  } else {
+    emptyState.classList.add("hidden");
+  }
 
   data.forEach((item, index) => {
     const balance = item.qty - item.used;
