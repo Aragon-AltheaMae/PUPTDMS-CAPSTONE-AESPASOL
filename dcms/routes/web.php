@@ -8,6 +8,9 @@ use App\Models\Patient;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\Dentist\DailyTreatmentRecordController;
+use App\Http\Controllers\Dentist\DentalServicesRecordController;
+
 
 // -------------------
 // AUTH PAGES
@@ -278,3 +281,29 @@ Route::get('/document-requests',
 Route::post('/document-requests/{id}/status',
     [DocumentRequestController::class, 'updateStatus']
 )->name('document.requests.updateStatus');
+
+
+/* =======================
+   DAILY TREATMENT RECORD
+======================= */
+Route::prefix('dentist')->name('dentist.')->middleware(['auth'])->group(function () {
+    Route::get('/reports/daily-treatment-record',
+        [DailyTreatmentRecordController::class, 'index']
+    )->name('reports.daily-treatment-record');
+
+    Route::get('/reports/daily-treatment-record/list',
+        [DailyTreatmentRecordController::class, 'list']
+    )->name('reports.daily-treatment-record.list');
+
+});
+
+/* =======================
+   DENTAL SERVICES RECORD
+======================= */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dentist/dental-services-record', [DentalServicesRecordController::class, 'index'])
+        ->name('dentist.dental-services-record');
+
+    Route::get('/dentist/dental-services-record/data', [DentalServicesRecordController::class, 'data'])
+        ->name('dentist.dental-services-record.data');
+});
