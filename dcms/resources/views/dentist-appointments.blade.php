@@ -128,6 +128,11 @@
         <i class="fa-solid fa-calendar-check text-lg font-bold"></i>
         <span class="font-bold">Appointments</span>
       </a>
+
+      <a href="{{ route('dentist.documentrequests') }}" class="flex flex-col items-center">
+        <i class="fa-solid fa-file-circle-check text-lg"></i>
+        <span>Document Requests</span>
+      </a>
       
       <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center ">
         <i class="fa-solid fa-box text-lg"></i>

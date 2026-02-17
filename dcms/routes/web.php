@@ -154,8 +154,18 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-report');
     })->name('dentist.report');
 
-    
-Route::get('/dentist/view-odontogram', function () {
+
+    // Document Requests Route
+    Route::get('/document-requests', function () {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+
+        return view('dentist-documentrequests');
+    })->name('dentist.documentrequests');
+
+
+    Route::get('/dentist/view-odontogram', function () {
     if (session('role') !== 'dentist') {
         return redirect('/login');
     }
