@@ -205,9 +205,11 @@
     background-color: #1F2937 !important;
   }
 
-  [data-theme="dark"] .text-[#333333] {
-    color: #E5E7EB !important;
-  }
+ [data-theme="dark"] [class~="text-[#333333]"] {
+  color: #E5E7EB !important;
+}
+
+
 
   body,
   #sidebar,
