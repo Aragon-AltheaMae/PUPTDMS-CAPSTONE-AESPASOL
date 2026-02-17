@@ -346,6 +346,42 @@
       </span>
     </a>
 
+    <!-- DOCUMENT REQUESTS -->
+    <a href="{{ route('dentist.documentrequests') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.documentrequests*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
+      <i class="fa-solid fa-file-circle-check text-lg"></i>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Document Requests
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Document Requests
+      </span>
+    </a>
+
     <!-- INVENTORY -->
     <a href="{{ route('dentist.inventory') }}"
       class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
@@ -423,13 +459,13 @@
 </div>
 
   <!-- BOTTOM -->
-  <div class="px-3 pb-5 space-y-2">
+  <div class="px-3 space-y-2">
 
   <!-- DARK MODE TOGGLE -->
-  <button
+   <button
     id="themeToggle"
     class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-2 rounded-full
+          w-full rounded-full
           bg-[#7B6CF6] text-[#F4F4F4]
           transition-all duration-200
           hover:scale-105"
