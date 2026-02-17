@@ -131,7 +131,7 @@
       background-color: #1F2937 !important;
     }
 
-    [data-theme="dark"] .text-[#333333] {
+    [data-theme="dark"] .text-\[\#333333\] {
       color: #E5E7EB !important;
     }
 
@@ -271,7 +271,7 @@
       </span>
 
       <i class="fa-solid fa-chart-line text-lg"></i>
-      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
             transition-all duration-300 delay-150">
         Dashboard
       </span>
@@ -308,7 +308,7 @@
       </span>
 
       <i class="fa-solid fa-users text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
             transition-all duration-300 delay-150">
         Patients
       </span>
@@ -439,29 +439,6 @@
 
   <!-- BOTTOM -->
   <div class="px-3 pb-5 space-y-2">
-
-    <a href="#"
-       class="sidebar-link relative flex items-center px-3 py-3 rounded-xl hover:bg-gray-100
-       transition-all duration-200">
-      <i class="fa-regular fa-circle-question"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        Help
-      </span>
-      <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Help
-        </span>
-    </a>
 
   <!-- DARK MODE TOGGLE -->
   <button
@@ -1251,6 +1228,96 @@
 </footer>
 
 <script>
+// =========================
+// DARK MODE TOGGLE
+// =========================
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const html = document.documentElement;
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+updateThemeIcon(savedTheme);
+
+// Toggle on click
+themeToggle.addEventListener('click', () => {
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon(newTheme);
+});
+
+// Icon switch
+function updateThemeIcon(theme) {
+  if (theme === 'dark') {
+    themeIcon.classList.remove('fa-moon');
+    themeIcon.classList.add('fa-sun');
+  } else {
+    themeIcon.classList.remove('fa-sun');
+    themeIcon.classList.add('fa-moon');
+  }
+}
+
+let sidebarOpen = false;
+
+function applyLayout(sidebarWidth) {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+
+  sidebar.style.width = sidebarWidth;
+  main.style.marginLeft = sidebarWidth;
+  main.style.width = `auto`;
+}
+
+function toggleSidebar() {
+  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const texts = document.querySelectorAll('.sidebar-text');
+  const icon = document.getElementById('sidebarIcon');
+
+  sidebarOpen = !sidebarOpen;
+
+  if (sidebarOpen) {
+    // EXPAND
+    applyLayout('16rem');
+
+    texts.forEach(t => {
+      t.classList.remove('opacity-0', 'w-0');
+      t.classList.add('opacity-100', 'w-auto');
+    });
+
+    toggleWrapper.classList.remove('justify-center');
+    toggleWrapper.classList.add('justify-end');
+
+    toggleBtn.classList.add('translate-x-2');
+    icon.classList.replace('fa-bars', 'fa-xmark');
+
+  } else {
+    // COLLAPSE
+    applyLayout('72px');
+
+    texts.forEach(t => {
+      t.classList.add('opacity-0', 'w-0');
+      t.classList.remove('opacity-100', 'w-auto');
+    });
+
+    toggleWrapper.classList.remove('justify-end');
+    toggleWrapper.classList.add('justify-center');
+
+    toggleBtn.classList.remove('translate-x-2');
+    icon.classList.replace('fa-xmark', 'fa-bars');
+  }
+}
+
+  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
+  document.addEventListener('DOMContentLoaded', () => {
+    sidebarOpen = false;        // ensure state is correct
+    applyLayout('72px');        // collapsed layout on load
+  });
+
 document.addEventListener("DOMContentLoaded", () => {
   const patientContainer = document.getElementById("patientContainer");
   if (!patientContainer) return;

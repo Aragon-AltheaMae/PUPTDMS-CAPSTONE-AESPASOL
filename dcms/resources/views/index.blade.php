@@ -205,7 +205,7 @@
       background-color: #1F2937 !important;
     }
 
-    [data-theme="dark"] .text-[#333333] {
+    [data-theme="dark"] .text-\[\#333333\] {
       color: #E5E7EB !important;
     }
 
