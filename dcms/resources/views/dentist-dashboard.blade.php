@@ -124,7 +124,7 @@
       background-color: #1F2937 !important;
     }
 
-    [data-theme="dark"] .text-[#333333] {
+    [data-theme="dark"] .text-\[\#333333\] {
       color: #E5E7EB !important;
     }
 
@@ -433,29 +433,6 @@
   <!-- BOTTOM -->
   <div class="px-3 pb-5 space-y-2">
 
-    <a href="#"
-       class="sidebar-link relative flex items-center px-3 py-3 rounded-xl hover:bg-gray-100
-       transition-all duration-200">
-      <i class="fa-regular fa-circle-question"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        Help
-      </span>
-      <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Help
-        </span>
-    </a>
-
   <!-- DARK MODE TOGGLE -->
   <button
     id="themeToggle"
@@ -716,7 +693,7 @@
 <!-- ================= SCRIPTS ================= -->
 <script>
 
-  // =========================
+// =========================
 // DARK MODE TOGGLE
 // =========================
 const themeToggle = document.getElementById('themeToggle');
