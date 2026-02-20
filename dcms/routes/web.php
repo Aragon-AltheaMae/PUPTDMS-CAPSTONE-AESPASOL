@@ -61,19 +61,37 @@ Route::post('/register', function (Request $request) {
 
 // Patient Login POST
 Route::post('/login', function (Request $request) {
+
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    // Check if email exists
     $patient = Patient::where('email', $request->email)->first();
 
-    if ($patient && Hash::check($request->password, $patient->password)) {
-        session([
-            'role' => 'patient',
-            'patient_id' => $patient->id,
-            'email' => $patient->email,
-        ]);
-
-        return redirect('/homepage');
+    // Email not found
+    if (!$patient) {
+        return back()
+            ->with('error', 'No account found with this email.')
+            ->withInput();
     }
 
-    return back()->with('error', 'Invalid credentials');
+    // Password incorrect
+    if (!Hash::check($request->password, $patient->password)) {
+        return back()
+            ->with('error', 'Invalid credentials.')
+            ->withInput();
+    }
+
+    // ✅ Login success
+    session([
+        'role' => 'patient',
+        'patient_id' => $patient->id,
+        'email' => $patient->email,
+    ]);
+
+    return redirect('/homepage');
 });
 
 // Dentist Login POST (Hard-coded)
