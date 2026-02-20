@@ -6,8 +6,18 @@
   <title>PUPTSIS Login</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Tailwind  -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- DaisyUI -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -18,87 +28,109 @@
       }
     }
   </script>
+
+  <style>
+    .shine-text {
+      background: linear-gradient(
+        90deg,
+        #8B0000,
+        #FFD700,
+        #8B0000
+      );
+
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      animation: shine 6s linear infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: -200% center;
+      }
+    }
+
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  </style>
 </head>
 
-<style>
-.shine-text {
-  background: linear-gradient(
-    90deg,
-    #8B0000,
-    #F2B233,
-    #8B0000
-  );
-
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: shine 6s linear infinite;
-}
-
-@keyframes shine {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-
-#stars {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-</style>
-
-<body class="font-inter min-h-screen animated-bg bg-gradient-to-r from-[#8B0000] to-[#F2B233] flex items-center justify-center">
+<body class="font-inter min-h-screen animated-bg bg-gradient-to-r from-[#8B0000] to-[#FFD700] flex items-center justify-center">
 <canvas id="stars"></canvas>
-<div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl relative z-10">
-  <div class="flex w-[1100px] h-[600px] bg-white rounded-[1.5rem] overflow-hidden max-w-[95vw] max-h-[95vh] flex-col lg:flex-row">
+<div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl relative z-10 fade-up">
+  <div class="flex w-full lg:w-[1100px]
+            h-auto lg:h-[650px]
+            bg-white rounded-xl lg:rounded-[1.5rem]
+            overflow-hidden
+            flex-col lg:flex-row">
 
     <!-- Left Image -->
-    <div class="flex-[1.2] h-60 lg:h-auto">
-      <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" alt="Campus" class="w-full h-full object-cover">
+    <div class="flex-[0.85] h-52 sm:h-64 lg:h-auto">
+      <img src="/images/PUP TAGUIG CAMPUS.jpg" class="w-full h-full object-cover">
     </div>
 
     <!-- Right Panel -->
-    <div class="flex-[0.8] px-10 py-16 flex flex-col justify-center fade-up">
+    <div class="flex-[0.9]
+            px-6 sm:px-8 lg:px-10
+            py-8 lg:py-0
+            flex flex-col justify-center fade-up">
       <h1 class="text-center tracking-wide drop-shadow-lg">
-        <span class="block text-4xl lg:text-5xl font-extrabold shine-text">
+        <span class="block text-3xl sm:text-4xl lg:text-5xl font-extrabold shine-text">
           PUP-TAGUIG
         </span>
-        <span class="block text-2xl lg:text-3xl mt-2 font-extrabold shine-text">
+        <span class="block text-xl sm:text-2xl lg:text-3xl mt-2 font-extrabold shine-text">
           DENTAL MANAGEMENT SYSTEM
         </span>
     </h1>
 
-      <p class="text-center text-gray-600 mt-4 text-base">Log In to your account</p>
+      <p class="text-center text-[#757575] mt-4 mb-6">Log In to your account</p>
 
       {{-- Login Form --}}
       <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <label class="text-sm font-medium mb-1">Email</label>
+        <label class="text-sm text-[#333333] font-medium mb-4">Email</label>
         <input type="email" name="email" required
-          class="w-full px-4 py-3 rounded-lg bg-[#ECECEC] mb-6 focus:outline-none focus:ring-2 focus:ring-[#F2B233]">
+          class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] mb-6 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
 
-        <label class="text-sm font-medium mb-1">Password</label>
-        <div class="relative mb-6">
+        <label class="text-sm text-[#333333] font-medium">Password</label>
+        <div class="relative mb-2">
         <input
           id="password"
           type="password"
           name="password"
           required
-          class="w-full px-4 py-3 rounded-lg bg-[#ECECEC] pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]"
-        >
+          class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] pr-12 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
+
           <!-- Eye Icon -->
           <button
             type="button"
             onclick="togglePassword()"
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-          >
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
               viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -111,22 +143,39 @@
           </button>
         </div>
 
+      <!-- LOGIN ERROR ALERT -->
+      @if(session('error'))
+        <div class="rounded-lg bg-red-100 border border-red-400 text-[#8B0000] mt-4 mb-2 px-4 py-2 text-sm">
+          {{ session('error') }}
+        </div>
+      @endif
+
         <button type="submit"
-          class="mt-2 w-full py-3 rounded-xl bg-[#8B0000] text-white font-semibold hover:opacity-90 transition">
+          class="mt-2 w-full py-3 rounded-xl
+          bg-[#8B0000] text-[#F4F4F4] font-bold
+          hover:bg-[#660000]
+          transition active:scale-[0.98]">
           Log In
         </button>
       </form>
 
       <a href="{{ route('dentist.login') }}"
-        class="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-[#FFD166] to-[#8B0000] text-[#F4F4F4] font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
-        <img src="{{ asset('images/dentist-login.png') }}" alt="Dentist" class="w-7 h-7">
+      class="mt-4 w-full py-3 rounded-xl
+              bg-gradient-to-r from-[#FFD166] to-[#8B0000]
+              text-[#F4F4F4] font-bold
+              flex items-center justify-center gap-3
+              transition-all duration-300 ease-in-out
+              hover:opacity-90 hover:gap-4
+              active:scale-[0.98]">
+
+        <i class="fa-solid fa-user-doctor text-xl transition-transform duration-300 ease-in-out"></i>
         <span>Log in as Dentist</span>
       </a>
 
         <!-- New: Redirect to Registration -->
-        <p class="mt-6 text-center text-sm text-gray-600">
+        <p class="mt-6 text-center text-sm text-[#757575]">
         Don't have an account?
-        <a href="/register" class="text-[#F2B233] font-semibold hover:underline">Register here</a>
+        <a href="/register" class="text-[#8B0000] font-bold hover:underline">Register here</a>
         </p>
 
 </p>

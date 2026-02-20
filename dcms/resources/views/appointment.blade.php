@@ -33,7 +33,8 @@
   <style>
       body {
       font-family: 'Inter';
-    }
+      }
+      
       /* Smooth underline animation */
       .tabs-bordered .tab {
         transition: color 0.5s ease, font-weight 0.5s ease;

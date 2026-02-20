@@ -19,47 +19,148 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-
   <style>
     body { font-family: 'Inter'; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
-  .radio-red {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #8B0000;
-    border-radius: 9999px;
-    display: inline-grid;
-    place-content: center;
-    background: #fff;
-  }
-  .radio-red::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 9999px;
-    transform: scale(0);
-    transition: transform 120ms ease-in-out;
-    background: #8B0000;
-  }
-  .radio-red:checked::before { transform: scale(1); }
-</style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .radio-red {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #8B0000;
+      border-radius: 9999px;
+      display: inline-grid;
+      place-content: center;
+      background: #fff;
+    }
+
+    .radio-red::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      transform: scale(0);
+      transition: transform 120ms ease-in-out;
+      background: #8B0000;
+    }
+
+    .radio-red:checked::before {
+      transform: scale(1);
+      }
+
+    @keyframes wave {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(14deg); }
+      40% { transform: rotate(-8deg); }
+      60% { transform: rotate(14deg); }
+      80% { transform: rotate(-4deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .wave-hand {
+      transform-origin: 70% 70%;
+      animation: wave 2.5s ease-in-out infinite;
+    }
+
+    /* Sidebar icon centering fix */
+    .sidebar-link {
+      justify-content: center;
+      transition: background-color 0.2s ease,
+                transform 0.2s ease;
+    }
+
+    /* Tooltip appears ONLY when collapsed */
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Hide tooltip when expanded */
+    #sidebar[style*="16rem"] .sidebar-tooltip {
+    display: none;
+    }
+
+    #sidebar[style*="16rem"] .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    /* Icon spacing only when expanded */
+    #sidebar[style*="16rem"] .sidebar-link i {
+      margin-right: 1rem;
+    }
+
+    #sidebar[style*="16rem"] .sidebar-link:hover {
+    transform: translateX(4px);
+    }
+
+    .sidebar-link:hover .sidebar-text {
+    opacity: 1;
+    transform: scale(1);
+    }
+
+    .sidebar-text {
+      transform-origin: left center;
+    }
+
+    /* DARK MODE */
+    [data-theme="dark"] body {
+    background-color: #111827; /* slate-900 */
+    color: #E5E7EB;
+    }
+
+    [data-theme="dark"] #sidebar {
+      background-color: #1F2933;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #1F2937 !important;
+    }
+
+    [data-theme="dark"] .text-\[\#333333\] {
+      color: #E5E7EB !important;
+    }
+
+    body,
+    #sidebar,
+    main,
+    .card {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
-<!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
-  <div class="flex items-center gap-3 font-bold">
-    <!-- University Logo -->
-    <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <span>PUP TAGUIG DENTAL CLINIC</span>
-  </div>
+<!-- HEADER (TOP BAR) -->
+<div class="fixed top-0 left-0 right-0 z-50
+            bg-gradient-to-r from-[#660000] to-[#8B0000]
+            text-[#F4F4F4] px-6 py-4
+            flex items-center justify-between">
+
+    <div class="flex items-center gap-3">
+      <div class="w-12 rounded-full ml-5">
+          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+      </div>
+      <div class="w-12 rounded-full">
+          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      </div>
+      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+    </div>
 
   <div class="flex items-center gap-8">
       @php
@@ -80,7 +181,7 @@
       <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
       </label>
 
-      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
+      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-xl bg-white shadow-xl border border-gray-100">
         <div class="p-4 border-b flex items-center justify-between">
           <span class="font-bold text-[#8B0000]">Notifications</span>
 
@@ -91,7 +192,7 @@
         <div class="max-h-80 overflow-y-auto">
           @forelse($notifications as $n)
             <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
+              <div class="text-sm font-semibold text-[#333333]">
                 {{ $n['title'] ?? 'Notification' }}
               </div>
               @if(!empty($n['message']))
@@ -109,7 +210,7 @@
             <div class="px-4 py-10 text-center justify-items-center">
               <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
               <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
             </div>
           @endforelse
         </div>
@@ -118,62 +219,309 @@
 
     <div class="flex items-center gap-3">
       <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-      <div class="text-sm">
-        <p class="font-semibold">Dr. Nelson Angeles</p>
-        <p class="text-xs opacity-80">Dentist</p>
+      <div>
+        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
-
-      <form action="{{ route('logout') }}" method="POST" class="inline">
-        @csrf
-        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
-            <i class="fa-solid fa-right-from-bracket text-lg"></i>
-        </button>
-      </form>
-
     </div>
   </div>
-</header>
+</div>
 
-<!-- ================= NAV HEADER ================= -->
-<header class="bg-[#8B0000] text-white px-8 py-3">
-  <nav class="flex justify-around text-sm">
-    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center ">
+<aside id="sidebar"
+  class="fixed left-0 top-[80px]
+         h-[calc(100vh-80px)]
+         w-[72px]
+         bg-[#FAFAFA]
+         drop-shadow-xl
+         transition-all duration-300
+         flex flex-col justify-between z-40">
+
+  <!-- TOP -->
+  <div>
+    <div id="sidebarToggleWrapper"
+     class="flex items-center justify-center px-4 py-6 transition-all duration-300">
+      <button onclick="toggleSidebar()"
+        id="sidebarToggleBtn"
+        class="w-10 h-10 flex items-center justify-center
+              rounded-full text-[#757575] hover:text-[#8B0000]
+              hover:bg-[#D9D9D9] transition-all duration-300">
+        <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+
+  <!-- DIVIDER -->
+  <hr class="my-3 border-t border-[#DADADA]">
+  <!-- MENU -->
+  <nav class="space-y-1 px-3 text-gray-600">
+
+    <!-- DASHBOARD -->
+    <a href="{{ route('dentist.dashboard') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.dashboard')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-chart-line text-lg"></i>
-      <span>Dashboard</span>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Dashboard
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200
+            opacity-0 scale-95 transition-all duration-200">
+        Dashboard
+      </span>
     </a>
-    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center ">
+
+    <!-- PATIENTS -->
+    <a href="{{ route('dentist.patients') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.patients*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-users text-lg"></i>
-      <span class="font-bold">Patients</span>
+      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Patients
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Patients
+      </span>
     </a>
-    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center ">
+
+    <!-- APPOINTMENTS -->
+    <a href="{{ route('dentist.appointments') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.appointments*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span>Appointments</span>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Appointments
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Appointments
+      </span>
     </a>
-    <a href="{{ route('dentist.documentrequests') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-file-circle-check text-lg"></i>
-      <span>Document Requests</span>
-    </a>
-    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center ">
+
+    <!-- INVENTORY -->
+    <a href="{{ route('dentist.inventory') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.inventory*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-box text-lg"></i>
-      <span>Inventory</span>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Inventory
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Inventory
+      </span>
     </a>
-    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center ">
+
+    <!-- REPORTS -->
+    <a href="{{ route('dentist.report') }}"
+      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.report*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-file text-lg"></i>
-      <span>Reports</span>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Reports
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Reports
+      </span>
     </a>
   </nav>
-</header>
+</div>
 
-<!-- Main Content -->
-<main class="max-w-6xl mx-auto px-6 py-10 fade-in">
+  <!-- BOTTOM -->
+  <div class="px-3 pb-5 space-y-2">
 
-  <div class="bg-white rounded-3xl shadow-xl p-8 border border-[#8B0000]/30">
+  <!-- DARK MODE TOGGLE -->
+  <button
+    id="themeToggle"
+    class="sidebar-link relative flex items-center justify-center
+          w-full px-2 py-2 rounded-full
+          bg-[#7B6CF6] text-[#F4F4F4]
+          transition-all duration-200
+          hover:scale-105"
+    aria-label="Toggle dark mode">
+
+    <i id="themeIcon" class="fa-regular fa-moon text-lg"></i>
+    <span class="sidebar-text opacity-0 w-0 overflow-hidden
+               transition-all duration-300 delay-150">
+      Dark Mode
+    </span>
+    <!-- Tooltip (collapsed only) -->
+    <span
+      class="sidebar-tooltip
+            absolute left-full ml-8
+            px-3 py-1
+            rounded-full
+            bg-[#8B0000]
+            text-[#F4F4F4] text-sm font-semibold
+            whitespace-nowrap
+            opacity-0 scale-95
+            pointer-events-none
+            transition-all duration-200">
+      Dark Mode
+    </span>
+  </button>
+    
+    <form action="{{ route('logout') }}" method="POST">
+      @csrf
+      <button
+        class="sidebar-link w-full relative flex items-center px-3 py-3 rounded-xl
+               text-red-600 hover:bg-red-50 transition-all duration-200">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden
+             transition-all duration-300 delay-150">
+          Log out
+        </span>
+        <span
+          class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+          Log out
+        </span>
+      </button>
+    </form>
+
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main
+  id="mainContent"
+  class="pt-[100px]
+         px-6 py-10
+         w-full
+         transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
+
+  <div class="max-w-7xl mt-4 mx-auto fade-in">
+      <div class="px-2 md:px-6">
+
 
     <!-- Title + Search / Filter -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-      <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-400 bg-clip-text text-transparent">
-        Patient List
-      </h2>
+      <div class="mb-6">
+        <h2 class="text-3xl font-bold text-[#8B0000]">
+          Patient List
+        </h2>
+        <p class="text-gray-500 mt-1">
+          Click to Access Patient Information
+        </p>
+      </div>
 
       <!-- ✅ UPDATED SEARCH BAR DESIGN (matches your screenshot) -->
       <div class="flex items-center gap-6 w-full md:w-auto">
@@ -221,321 +569,494 @@
 
       <!-- Tabs -->
       <div class="mx-4">
-        <div class="mx-4 border border-gray-200 rounded-2xl bg-white overflow-hidden">
+        <div class="mx-4 relative">
 
-          <div class="flex gap-4 flex-wrap px-4 pt-4 -mb-px">
+        <!-- TABS (FLOATING / OVERLAPPING) -->
+        <div class="flex gap-4 px-6 relative z-20">
 
-            <!-- ALL -->
-            <button
-              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
-              data-filter="all"
-              type="button"
-            >
-              <h3 class="text-4xl font-medium leading-none mb-2">50</h3>
-              <p class="text-base">All</p>
-            </button>
+          <!-- TODAY -->
+          <button
+            class="filter-btn bg-[#8B0000] text-white
+                  rounded-t-2xl rounded-b-none
+                  px-6 py-4 w-[210px] text-left
+                  hover:opacity-90 transition-all duration-200"
+            data-filter="today"
+            type="button">
+            <h3 class="text-4xl font-medium leading-none mb-2">5</h3>
+            <p class="text-base">Scheduled Today</p>
+          </button>
 
-            <!-- TODAY -->
-            <button
-              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
-              data-filter="today"
-              type="button"
-            >
-              <h3 class="text-4xl font-medium leading-none mb-2">5</h3>
-              <p class="text-base">Scheduled Today</p>
-            </button>
+          <!-- RESCHEDULED -->
+          <button
+            class="filter-btn bg-[#8B0000] text-white
+                  rounded-t-2xl rounded-b-none
+                  px-6 py-4 w-[210px] text-left
+                  hover:opacity-90 transition-all duration-200"
+            data-filter="rescheduled"
+            type="button">
+            <h3 class="text-4xl font-medium leading-none mb-2">10</h3>
+            <p class="text-base">Rescheduled</p>
+          </button>
 
-            <!-- RESCHEDULED -->
-            <button
-              class="filter-btn bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow transition-all duration-200"
-              data-filter="rescheduled"
-              type="button"
-            >
-              <h3 class="text-4xl font-medium leading-none mb-2">10</h3>
-              <p class="text-base">Rescheduled</p>
-            </button>
+          <!-- ALL -->
+          <button
+            class="filter-btn bg-[#8B0000] text-white
+                  rounded-t-2xl rounded-b-none
+                  px-6 py-4 w-[210px] text-left
+                  hover:opacity-90 transition-all duration-200"
+            data-filter="all"
+            type="button">
+            <h3 class="text-4xl font-medium leading-none mb-2">50</h3>
+            <p class="text-base">All</p>
+          </button>
 
-          </div>
-
-          <div class="px-6 py-4 text-[22px] font-medium text-gray-700">
-            Click to Access Patient Information
-          </div>
+        </div>
+        <div class="mx-4 shadow-lg rounded-lg bg-white overflow-hidden relative">
 
           <!-- Patient Container -->
-          <div id="patientContainer" class="space-y-4 px-6 pb-6">
+          <div
+            id="patientContainer"
+            class="space-y-4 px-6 pb-6 pt-14 -mt-8 rounded-t-none">
+            
           <!-- Patient Card 1 -->
           <a href="/dentist/patient"
-                  class="patient-item today block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
+          class="patient-item today block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
 
-                  <div class="absolute left-0 top-0 h-full w-2 bg-[#2E2E2E] rounded-l-md"></div>
+          <!-- Accent bar -->
+          <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
 
-                  <div class="flex items-center w-full px-6 py-6 pl-10">
-                    <img src="https://i.pravatar.cc/51" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
+          <div class="flex items-center gap-6 px-8 py-6 pl-12">
 
-                    <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-                      <div class="col-span-4 leading-tight">
-                        <p class="text-[#8B0000] font-semibold text-[16px]">Capilitan, Beyonce</p>
-                        <p class="text-[#8B0000] text-[13px]">2023-00010 · BSIT · 2nd Year · Section 1</p>
-                        <span class="patient-info hidden">BSIT|2nd Year|1|2025-01-20</span>
-                      </div>
+            <!-- Avatar -->
+            <img
+              src="https://i.pravatar.cc/80"
+              class="w-16 h-16 rounded-full object-cover shadow"
+              alt="Patient"
+            />
 
-                      <div class="col-span-4 space-y-2">
-                        <div class="flex items-center gap-2 text-[#8B0000]">
-                          <i class="fa-regular fa-calendar text-[14px]"></i>
-                          <span class="text-[14px] font-medium">January 20, 2025</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-[#8B0000]">
-                          <i class="fa-regular fa-clock text-[14px]"></i>
-                          <span class="text-[14px] font-medium">9:00 AM</span>
-                        </div>
-                      </div>
+            <!-- Content -->
+            <div class="flex-1 grid grid-cols-12 items-center gap-6">
 
-                      <div class="col-span-3 space-y-2">
-                        <p class="text-[#8B0000] text-[15px] font-medium">Dental Checkup</p>
-                        <p class="text-green-700 text-[13px] flex items-center gap-2">
-                          <span class="text-green-700 text-[18px] leading-none">•</span>
-                          Appointment Today
-                        </p>
-                      </div>
+              <!-- Patient info -->
+              <div class="col-span-4">
+                <p class="font-semibold text-[#333333] text-sm">
+                  Villanueva, Emily
+                </p>
+                <p class="text-gray-500 text-xs">
+                  2023-00016 · BSECE · 2nd Year · Section 1
+                </p>
+                <span class="patient-info hidden">BSECE|2nd Year|1|2025-01-20</span>
+              </div>
 
-                      <div class="col-span-1 flex justify-end items-center">
-                        <span class="text-[#8B0000] text-2xl leading-none">→</span>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-
-
-           <!-- Patient Card 2 -->
-                  <a href="/dentist/patient"
-                    class="patient-item today block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
-
-                    <div class="absolute left-0 top-0 h-full w-2 bg-[#2E2E2E] rounded-l-md"></div>
-
-                    <div class="flex items-center w-full px-6 py-6 pl-10">
-                      <img src="https://i.pravatar.cc/52" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
-
-                      <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-                        <div class="col-span-4 leading-tight">
-                          <p class="text-[#8B0000] font-semibold text-[16px]">Dela Cruz, Mark</p>
-                          <p class="text-[#8B0000] text-[13px]">2023-00011 · BSECE · 1st Year · Section 2</p>
-                          <span class="patient-info hidden">BSECE|1st Year|2|2025-01-20</span>
-                        </div>
-
-                        <div class="col-span-4 space-y-2">
-                          <div class="flex items-center gap-2 text-[#8B0000]">
-                            <i class="fa-regular fa-calendar text-[14px]"></i>
-                            <span class="text-[14px] font-medium">January 20, 2025</span>
-                          </div>
-                          <div class="flex items-center gap-2 text-[#8B0000]">
-                            <i class="fa-regular fa-clock text-[14px]"></i>
-                            <span class="text-[14px] font-medium">11:30 AM</span>
-                          </div>
-                        </div>
-
-                        <div class="col-span-3 space-y-2">
-                          <p class="text-[#8B0000] text-[15px] font-medium">Tooth Cleaning</p>
-                          <p class="text-green-700 text-[13px] flex items-center gap-2">
-                            <span class="text-green-700 text-[18px] leading-none">•</span>
-                            Appointment Today
-                          </p>
-                        </div>
-
-                        <div class="col-span-1 flex justify-end items-center">
-                          <span class="text-[#8B0000] text-2xl leading-none">→</span>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-
-
-
-       <!-- Rescheduled -->
-          <a href="/dentist/patient"
-            class="patient-item rescheduled block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
-
-            <div class="absolute left-0 top-0 h-full w-2 bg-orange-600 rounded-l-md"></div>
-
-            <div class="flex items-center w-full px-6 py-6 pl-10">
-              <img src="https://i.pravatar.cc/54" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
-
-              <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-                <div class="col-span-4 leading-tight">
-                  <p class="text-[#8B0000] font-semibold text-[16px]">Reyes, Joshua</p>
-                  <p class="text-[#8B0000] text-[13px]">2023-00013 · BSED - ENG · 2nd Year · Section 1</p>
-                  <span class="patient-info hidden">BSED - ENG|2nd Year|1|2025-01-22</span>
+              <!-- Date & Time -->
+              <div class="col-span-4 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <i class="fa-regular fa-calendar text-blue-600"></i>
                 </div>
-
-                <div class="col-span-4 space-y-2">
-                  <div class="flex items-center gap-2 text-[#8B0000]">
-                    <i class="fa-regular fa-calendar text-[14px]"></i>
-                    <span class="text-[14px] font-medium">January 22, 2025</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-[#8B0000]">
-                    <i class="fa-regular fa-clock text-[14px]"></i>
-                    <span class="text-[14px] font-medium">10:00 AM</span>
-                  </div>
-                </div>
-
-                <div class="col-span-3 space-y-2">
-                  <p class="text-[#8B0000] text-[15px] font-medium">Tooth Extraction</p>
-                  <p class="text-orange-600 text-[13px] flex items-center gap-2">
-                    <span class="text-orange-600 text-[18px] leading-none">•</span>
-                    Rescheduled
+                <div class="text-sm">
+                  <p class="text-gray-400 text-xs uppercase tracking-wide">
+                    Date and Time
+                  </p>
+                  <p class="font-semibold text-[#333333]">
+                    20 Jan 2025
+                  </p>
+                  <p class="text-gray-600 text-xs">
+                    1:30 PM – 2:30 PM
                   </p>
                 </div>
+              </div>
 
-                <div class="col-span-1 flex justify-end items-center">
-                  <span class="text-[#8B0000] text-2xl leading-none">→</span>
+              <!-- Service -->
+              <div class="col-span-3 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <i class="fa-solid fa-tooth text-blue-600"></i>
                 </div>
+                <div class="text-sm">
+                  <p class="text-gray-400 text-xs uppercase tracking-wide">
+                    Service
+                  </p>
+                  <p class="font-semibold text-[#333333]">
+                    Dental Checkup
+                  </p>
+
+                  <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                    Appointment Today
+                  </span>
+                </div>
+              </div>
+
+              <!-- Arrow -->
+              <div class="col-span-1 flex justify-end">
+                <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+              </div>
+
+            </div>
+          </div>
+        </a>
+
+          <!-- Patient Card 2 -->
+          <a href="/dentist/patient"
+            class="patient-item today block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
+
+            <!-- Left accent bar -->
+            <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
+
+            <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
+
+              <!-- Avatar -->
+              <img
+                src="https://i.pravatar.cc/52"
+                class="w-16 h-16 rounded-full object-cover shadow"
+                alt="Patient"
+              />
+
+              <!-- Main content -->
+              <div class="flex-1 grid grid-cols-12 items-center gap-6">
+
+                <!-- Name + ID -->
+                <div class="col-span-4 leading-tight">
+                  <p class="font-semibold text-[#333333] text-sm">
+                    Dela Cruz, Mark
+                  </p>
+                  <p class="text-gray-500 text-xs">
+                    2023-00011 · BSECE · 1st Year · Section 2
+                  </p>
+                  <span class="patient-info hidden">BSECE|1st Year|2|2025-01-20</span>
+                </div>
+
+                <!-- DATE AND TIME -->
+                <div class="col-span-4 flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <i class="fa-regular fa-calendar text-blue-600"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p class="text-gray-400 text-xs uppercase tracking-wide">
+                      Date and Time
+                    </p>
+                    <p class="font-semibold text-[#333333]">
+                      January 20, 2025
+                    </p>
+                    <p class="text-gray-600 text-xs">
+                      11:30 AM
+                    </p>
+                  </div>
+                </div>
+
+                <!-- SERVICE -->
+                <div class="col-span-3 flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <i class="fa-solid fa-tooth text-blue-600"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p class="text-gray-400 text-xs uppercase tracking-wide">
+                      Service
+                    </p>
+                    <p class="font-semibold text-[#333333]">
+                      Tooth Cleaning
+                    </p>
+
+                    <span
+                      class="inline-block mt-2 px-3 py-1 rounded-full
+                            bg-green-100 text-green-700 text-xs font-medium">
+                      Appointment Today
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="col-span-1 flex justify-end items-center">
+                  <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+                </div>
+
               </div>
             </div>
           </a>
 
-
-        <a href="/dentist/patient"
-   class="patient-item rescheduled block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
-
-  <div class="absolute left-0 top-0 h-full w-2 bg-orange-600 rounded-l-md"></div>
-
-  <div class="flex items-center w-full px-6 py-6 pl-10">
-    <img src="https://i.pravatar.cc/55" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
-
-    <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-      <div class="col-span-4 leading-tight">
-        <p class="text-[#8B0000] font-semibold text-[16px]">Garcia, Nicole</p>
-        <p class="text-[#8B0000] text-[13px]">2023-00014 · BSOA · 1st Year · Section 2</p>
-        <span class="patient-info hidden">BSOA|1st Year|2|2025-01-23</span>
-      </div>
-
-      <div class="col-span-4 space-y-2">
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-calendar text-[14px]"></i>
-          <span class="text-[14px] font-medium">January 23, 2025</span>
-        </div>
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-clock text-[14px]"></i>
-          <span class="text-[14px] font-medium">1:00 PM</span>
-        </div>
-      </div>
-
-      <div class="col-span-3 space-y-2">
-        <p class="text-[#8B0000] text-[15px] font-medium">Dental Surgery</p>
-        <p class="text-orange-600 text-[13px] flex items-center gap-2">
-          <span class="text-orange-600 text-[18px] leading-none">•</span>
-          Rescheduled
-        </p>
-      </div>
-
-      <div class="col-span-1 flex justify-end items-center">
-        <span class="text-[#8B0000] text-2xl leading-none">→</span>
-      </div>
-    </div>
-  </div>
-</a>
-
-
-
+        <!-- Patient Card 3 -->
           <a href="/dentist/patient"
-   class="patient-item rescheduled block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
+            class="patient-item today block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
 
-  <div class="absolute left-0 top-0 h-full w-2 bg-orange-600 rounded-l-md"></div>
+            <!-- Left accent bar -->
+            <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
 
-  <div class="flex items-center w-full px-6 py-6 pl-10">
-    <img src="https://i.pravatar.cc/56" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
+            <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
 
-    <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-      <div class="col-span-4 leading-tight">
-        <p class="text-[#8B0000] font-semibold text-[16px]">Lopez, Christian</p>
-        <p class="text-[#8B0000] text-[13px]">2023-00015 · BSPSYCH · 3rd Year · Section 1</p>
-        <span class="patient-info hidden">BSPSYCH|3rd Year|1|2025-01-24</span>
-      </div>
+              <!-- Avatar -->
+              <img
+                src="https://i.pravatar.cc/52"
+                class="w-16 h-16 rounded-full object-cover shadow"
+                alt="Patient"
+              />
 
-      <div class="col-span-4 space-y-2">
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-calendar text-[14px]"></i>
-          <span class="text-[14px] font-medium">January 24, 2025</span>
-        </div>
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-clock text-[14px]"></i>
-          <span class="text-[14px] font-medium">4:30 PM</span>
-        </div>
-      </div>
+              <!-- Content -->
+              <div class="flex-1 grid grid-cols-12 items-center gap-6">
 
-      <div class="col-span-3 space-y-2">
-        <p class="text-[#8B0000] text-[15px] font-medium">Dental Consultation</p>
-        <p class="text-orange-600 text-[13px] flex items-center gap-2">
-          <span class="text-orange-600 text-[18px] leading-none">•</span>
-          Rescheduled
-        </p>
-      </div>
+              <!-- Patient info -->
+              <div class="col-span-4">
+                <p class="font-semibold text-[#333333] text-sm">
+                  Villanueva, Emily
+                </p>
+                <p class="text-gray-500 text-xs">
+                  2023-00016 · BSECE · 2nd Year · Section 1
+                </p>
+                <span class="patient-info hidden">BSECE|2nd Year|1|2025-01-20</span>
+              </div>
 
-      <div class="col-span-1 flex justify-end items-center">
-        <span class="text-[#8B0000] text-2xl leading-none">→</span>
-      </div>
-    </div>
-  </div>
-</a>
-
-         <a href="/dentist/patient"
-   class="patient-item today block relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition cursor-pointer">
-
-  <div class="absolute left-0 top-0 h-full w-2 bg-[#2E2E2E] rounded-l-md"></div>
-
-  <div class="flex items-center w-full px-6 py-6 pl-10">
-    <img src="https://i.pravatar.cc/57" class="w-20 h-20 rounded-full object-cover shadow" alt="Patient"/>
-
-    <div class="ml-6 flex-1 grid grid-cols-12 gap-6 items-start">
-      <div class="col-span-4 leading-tight">
-        <p class="text-[#8B0000] font-semibold text-[16px]">Villanueva, Emily</p>
-        <p class="text-[#8B0000] text-[13px]">2023-00016 · BSECE · 2nd Year · Section 1</p>
-        <span class="patient-info hidden">BSECE|2nd Year|1|2025-01-20</span>
-      </div>
-
-      <div class="col-span-4 space-y-2">
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-calendar text-[14px]"></i>
-          <span class="text-[14px] font-medium">January 20, 2025</span>
-        </div>
-        <div class="flex items-center gap-2 text-[#8B0000]">
-          <i class="fa-regular fa-clock text-[14px]"></i>
-          <span class="text-[14px] font-medium">2:00 PM</span>
-        </div>
-      </div>
-
-      <div class="col-span-3 space-y-2">
-        <p class="text-[#8B0000] text-[15px] font-medium">Dental Checkup</p>
-        <p class="text-green-700 text-[13px] flex items-center gap-2">
-          <span class="text-green-700 text-[18px] leading-none">•</span>
-          Appointment Today
-        </p>
-      </div>
-
-      <div class="col-span-1 flex justify-end items-center">
-        <span class="text-[#8B0000] text-2xl leading-none">→</span>
-      </div>
-    </div>
-  </div>
-</a>
-
-                  <div class="col-span-3 space-y-2">
-                    <p class="text-[#8B0000] text-[15px] font-medium">Tooth Cleaning</p>
-                    <p class="text-green-700 text-[13px] flex items-center gap-2">
-                      <span class="text-green-700 text-[18px] leading-none">•</span>
-                      Appointment Today
-                    </p>
-                  </div>
-
-                  <div class="col-span-1 flex justify-end items-center">
-                    <span class="text-[#8B0000] text-2xl leading-none">→</span>
-                  </div>
+              <!-- Date & Time -->
+              <div class="col-span-4 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <i class="fa-regular fa-calendar text-blue-600"></i>
                 </div>
+                <div class="text-sm">
+                  <p class="text-gray-400 text-xs uppercase tracking-wide">
+                    Date and Time
+                  </p>
+                  <p class="font-semibold text-[#333333]">
+                    20 Jan 2025
+                  </p>
+                  <p class="text-gray-600 text-xs">
+                    1:30 PM – 2:30 PM
+                  </p>
+                </div>
+              </div>
+
+              <!-- Service -->
+              <div class="col-span-3 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <i class="fa-solid fa-tooth text-blue-600"></i>
+                </div>
+                <div class="text-sm">
+                  <p class="text-gray-400 text-xs uppercase tracking-wide">
+                    Service
+                  </p>
+                  <p class="font-semibold text-[#333333]">
+                    Dental Checkup
+                  </p>
+
+                  <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                    Appointment Today
+                  </span>
+                </div>
+              </div>
+
+              <!-- Arrow -->
+              <div class="col-span-1 flex justify-end">
+                <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+              </div>
+
+            </div>
+          </div>
+        </a>
+
+      <!-- Rescheduled -->
+      <!-- Patient Card – RESCHEDULED -->
+      <a href="/dentist/patient"
+        class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
+
+        <!-- Left accent bar -->
+        <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
+
+        <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
+
+          <!-- Avatar -->
+          <img
+            src="https://i.pravatar.cc/54"
+            class="w-16 h-16 rounded-full object-cover shadow"
+            alt="Patient"
+          />
+
+          <!-- Main content -->
+          <div class="flex-1 grid grid-cols-12 items-center gap-6">
+
+            <!-- Name + ID -->
+            <div class="col-span-4 leading-tight">
+              <p class="font-semibold text-[#333333] text-sm">
+                Reyes, Joshua
+              </p>
+              <p class="text-gray-500 text-xs">
+                2023-00013 · BSED - ENG · 2nd Year · Section 1
+              </p>
+              <span class="patient-info hidden">BSED - ENG|2nd Year|1|2025-01-22</span>
+            </div>
+
+            <!-- DATE AND TIME -->
+            <div class="col-span-4 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-regular fa-calendar text-orange-600"></i>
+              </div>
+              <div class="text-sm">
+                <p class="text-gray-400 text-xs uppercase tracking-wide">
+                  Date and Time
+                </p>
+                <p class="font-semibold text-[#333333]">
+                  January 22, 2025
+                </p>
+                <p class="text-gray-600 text-xs">
+                  10:00 AM
+                </p>
               </div>
             </div>
 
-          </div> <!-- END #patientContainer -->
+            <!-- SERVICE -->
+            <div class="col-span-3 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-solid fa-tooth text-orange-600"></i>
+              </div>
+              <div class="text-sm">
+                <p class="text-gray-400 text-xs uppercase tracking-wide">
+                  Service
+                </p>
+                <p class="font-semibold text-[#333333]">
+                  Tooth Extraction
+                </p>
+
+                <span
+                  class="inline-block mt-2 px-3 py-1 rounded-full
+                        bg-orange-100 text-orange-600 text-xs font-medium">
+                  Rescheduled
+                </span>
+              </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-span-1 flex justify-end items-center">
+              <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+            </div>
+
+          </div>
+        </div>
+      </a>
+
+      <a href="/dentist/patient"
+        class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
+
+        <!-- Left accent bar -->
+        <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
+
+        <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
+
+          <!-- Avatar -->
+          <img
+            src="https://i.pravatar.cc/55"
+            class="w-16 h-16 rounded-full object-cover shadow"
+            alt="Patient"
+          />
+
+          <div class="flex-1 grid grid-cols-12 items-center gap-6">
+
+            <!-- Name -->
+            <div class="col-span-4 leading-tight">
+              <p class="font-semibold text-[#333333] text-sm">
+                Garcia, Nicole
+              </p>
+              <p class="text-gray-500 text-xs">
+                2023-00014 · BSOA · 1st Year · Section 2
+              </p>
+              <span class="patient-info hidden">BSOA|1st Year|2|2025-01-23</span>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="col-span-4 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-regular fa-calendar text-orange-600"></i>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase">Date and Time</p>
+                <p class="font-semibold text-[#333333] text-sm">January 23, 2025</p>
+                <p class="text-gray-600 text-xs">1:00 PM</p>
+              </div>
+            </div>
+
+            <!-- Service -->
+            <div class="col-span-3 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-solid fa-tooth text-orange-600"></i>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase">Service</p>
+                <p class="font-semibold text-[#333333] text-sm">Dental Surgery</p>
+                <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
+                  Rescheduled
+                </span>
+              </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-span-1 flex justify-end">
+              <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+            </div>
+
+          </div>
+        </div>
+      </a>
+
+      <a href="/dentist/patient"
+        class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
+
+        <!-- Left accent bar -->
+        <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
+
+        <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
+
+          <!-- Avatar -->
+          <img
+            src="https://i.pravatar.cc/56"
+            class="w-16 h-16 rounded-full object-cover shadow"
+            alt="Patient"
+          />
+
+          <div class="flex-1 grid grid-cols-12 items-center gap-6">
+
+            <!-- Name -->
+            <div class="col-span-4 leading-tight">
+              <p class="font-semibold text-[#333333] text-sm">
+                Lopez, Christian
+              </p>
+              <p class="text-gray-500 text-xs">
+                2023-00015 · BSPSYCH · 3rd Year · Section 1
+              </p>
+              <span class="patient-info hidden">BSPSYCH|3rd Year|1|2025-01-24</span>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="col-span-4 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-regular fa-calendar text-orange-600"></i>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase">Date and Time</p>
+                <p class="font-semibold text-[#333333] text-sm">January 24, 2025</p>
+                <p class="text-gray-600 text-xs">4:30 PM</p>
+              </div>
+            </div>
+
+            <!-- Service -->
+            <div class="col-span-3 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <i class="fa-solid fa-tooth text-orange-600"></i>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase">Service</p>
+                <p class="font-semibold text-[#333333] text-sm">Dental Consultation</p>
+                <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
+                  Rescheduled
+                </span>
+              </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-span-1 flex justify-end">
+              <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
+            </div>
+
+          </div>
+        </div>
+      </a>
+
+    </div> <!-- END #patientContainer -->
+
           <!-- Pagination -->
-            <div id="pagination" class="flex items-center justify-center gap-2 py-6 text-sm text-gray-500">
+            <div id="pagination" class="flex items-center justify-center gap-4 py-8 text-sm text-gray-600">
 
               <button
                 id="prevPage"
@@ -557,14 +1078,15 @@
             </div>
         </div> <!-- END tabs/card wrapper -->
       </div> <!-- END mx-4 -->
+    </div>
+     </div>
     </div> <!-- END w-full max-w-6xl -->
-  </div> <!-- END main white card -->
 </main>
 
 <!-- FILTER MODAL  -->
 
 <div id="filterModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
-  <div class="bg-white w-[760px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+  <div class="bg-white w-[760px] rounded-xl shadow-2xl overflow-hidden border border-gray-200">
     <!-- Header -->
     <div class="px-6 py-4 flex items-center gap-3">
       <i class="fa-solid fa-sliders text-[#8B0000]"></i>
@@ -706,6 +1228,96 @@
 </footer>
 
 <script>
+// =========================
+// DARK MODE TOGGLE
+// =========================
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const html = document.documentElement;
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+updateThemeIcon(savedTheme);
+
+// Toggle on click
+themeToggle.addEventListener('click', () => {
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon(newTheme);
+});
+
+// Icon switch
+function updateThemeIcon(theme) {
+  if (theme === 'dark') {
+    themeIcon.classList.remove('fa-moon');
+    themeIcon.classList.add('fa-sun');
+  } else {
+    themeIcon.classList.remove('fa-sun');
+    themeIcon.classList.add('fa-moon');
+  }
+}
+
+let sidebarOpen = false;
+
+function applyLayout(sidebarWidth) {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+
+  sidebar.style.width = sidebarWidth;
+  main.style.marginLeft = sidebarWidth;
+  main.style.width = `auto`;
+}
+
+function toggleSidebar() {
+  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const texts = document.querySelectorAll('.sidebar-text');
+  const icon = document.getElementById('sidebarIcon');
+
+  sidebarOpen = !sidebarOpen;
+
+  if (sidebarOpen) {
+    // EXPAND
+    applyLayout('16rem');
+
+    texts.forEach(t => {
+      t.classList.remove('opacity-0', 'w-0');
+      t.classList.add('opacity-100', 'w-auto');
+    });
+
+    toggleWrapper.classList.remove('justify-center');
+    toggleWrapper.classList.add('justify-end');
+
+    toggleBtn.classList.add('translate-x-2');
+    icon.classList.replace('fa-bars', 'fa-xmark');
+
+  } else {
+    // COLLAPSE
+    applyLayout('72px');
+
+    texts.forEach(t => {
+      t.classList.add('opacity-0', 'w-0');
+      t.classList.remove('opacity-100', 'w-auto');
+    });
+
+    toggleWrapper.classList.remove('justify-end');
+    toggleWrapper.classList.add('justify-center');
+
+    toggleBtn.classList.remove('translate-x-2');
+    icon.classList.replace('fa-xmark', 'fa-bars');
+  }
+}
+
+  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
+  document.addEventListener('DOMContentLoaded', () => {
+    sidebarOpen = false;        // ensure state is correct
+    applyLayout('72px');        // collapsed layout on load
+  });
+
 document.addEventListener("DOMContentLoaded", () => {
   const patientContainer = document.getElementById("patientContainer");
   if (!patientContainer) return;
@@ -725,7 +1337,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const allBtnCount = document.querySelector('.filter-btn[data-filter="all"] h3');
 
   // --- State
-  let activeTab = "all";
+  let activeTab = "today";
   let activeSearch = "";
   let activeSort = null;
   let activeCourse = null;
@@ -928,8 +1540,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.classList.add("bg-[#660000]", "text-white/75");
   };
 
-  // Default active tab = ALL
-  const defaultTab = document.querySelector('.filter-btn[data-filter="all"]');
+  // Default active tab = TODAY
+  const defaultTab = document.querySelector('.filter-btn[data-filter="today"]');
   if (defaultTab) setActiveTabUI(defaultTab);
 
   filterButtons.forEach(btn => {
