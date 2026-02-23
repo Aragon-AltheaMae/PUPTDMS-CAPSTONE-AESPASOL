@@ -6,79 +6,94 @@
   <title>Patient Registration</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
+  <!-- Tailwind  -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+    <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#8B0000',
-            secondary: '#660000',
-            accent: '#FFD700',
-            lightbg: '#F4F4F4',
-            mediumgray: '#D9D9D9'
-          },
-          fontFamily: { inter: ['Inter','sans-serif'] }
-        }
+  <style>
+      body {
+      font-family: 'Inter';
+      }
+
+  .shine-text {
+    background: linear-gradient(
+      90deg,
+      #8B0000,
+      #FFD700,
+      #8B0000
+    );
+
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: shine 6s linear infinite;
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: 200% center;
+    }
+    100% {
+      background-position: -200% center;
+    }
+  }
+
+  #stars {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-  </script>
+
+    .fade-up {
+      animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .fade-out {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  </style>
 </head>
 
-<style>
-.shine-text {
-  background: linear-gradient(
-    90deg,
-    #8B0000,
-    #F2B233,
-    #8B0000
-  );
-
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: shine 6s linear infinite;
-}
-
-@keyframes shine {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-
-#stars {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-</style>
-
-<body class="font-inter min-h-screen bg-gradient-to-r from-primary to-[#F2B233] flex items-center justify-center">
+<body class="font-inter min-h-screen bg-gradient-to-r from-[#8B0000] to-[#FFD700] flex items-center justify-center">
 <canvas id="stars"></canvas>
-<div class="bg-primary p-5 rounded-[1.75rem] shadow-2xl relative z-10">
-  <div class="flex w-[1100px] h-[650px] bg-white rounded-[1.5rem] overflow-hidden max-w-[95vw] max-h-[95vh] flex-col lg:flex-row">
+<div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl relative z-10 fade-up">
+  <div class="flex w-[1100px] h-[700px] bg-white rounded-[1.5rem] overflow-hidden max-w-[95vw] max-h-[95vh] flex-col lg:flex-row">
 
     <!-- Left Image -->
-    <div class="flex-[1.2] h-60 lg:h-auto">
+    <div class="flex-[0.75] lg:h-auto">
       <img src="/images/PUP TAGUIG CAMPUS.jpg" class="w-full h-full object-cover">
     </div>
 
     <!-- Right Panel -->
-    <div class="flex-[0.8] px-10 py-12 overflow-y-auto">
+    <div class="flex-[0.9] px-10 flex flex-col justify-center fade-up">
 
       <h1 class="text-4xl text-center font-extrabold shine-text">Create Account</h1>
-      <p class="text-center text-gray-600 mb-8">Register a new patient account</p>
+      <p class="text-sm text-center text-[#757575] mt-2">Register a new patient account</p>
 
       {{-- Validation Errors --}}
       @if ($errors->any())
-        <div class="bg-red-100 text-primary px-4 py-2 rounded mb-4 font-semibold">
+        <div class="bg-red-100 text-[#8B0000] px-4 py-2 rounded mb-4 font-semibold">
           <ul class="list-disc list-inside">
             @foreach ($errors->all() as $error)
               <li>{{ $error }}</li>
@@ -89,64 +104,62 @@
 
       {{-- Success --}}
       @if (session('success'))
-        <div class="bg-yellow-100 text-primary px-4 py-2 rounded mb-4 text-center font-semibold">
+        <div class="bg-yellow-100 text-[#8B0000] px-4 py-2 rounded mb-4 text-center font-semibold">
           {{ session('success') }}
         </div>
       @endif
-
-      <form method="POST" action="/register" class="space-y-4">
+      
+      <form method="POST" action="/register" class="grid grid-cols-2 gap-x-6 gap-y-4">
         @csrf
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Full Name</label>
+        <div class="col-span-2">
+          <label class="block text-sm text-[#333333] font-medium mt-4 mb-1">Full Name</label>
           <input name="name" value="{{ old('name') }}" required
-            class="w-full px-4 py-2 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary">
+            class="w-full px-4 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
+          <label class="block text-sm text-[#333333] font-medium mb-1">Email</label>
           <input type="email" name="email" value="{{ old('email') }}" required
-            class="w-full px-4 py-2 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary">
+            class="w-full px-4 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Phone</label>
+          <label class="block text-sm text-[#333333] font-medium mb-1">Phone</label>
           <input name="phone" value="{{ old('phone') }}"
-            class="w-full px-4 py-2 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary">
+            class="w-full px-4 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Birthdate</label>
+          <label class="block text-sm text-[#333333] font-medium mb-1">Birthdate</label>
           <input type="date" name="birthdate" value="{{ old('birthdate') }}" required
-            class="w-full px-4 py-2 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary">
+            class="w-full px-2 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Gender</label>
+          <label class="block text-sm text-[#333333] font-medium mb-1">Gender</label>
           <select name="gender" required
-            class="w-full px-4 py-2 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary">
+            class="w-full px-2 py-[10px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
             <option value="">Select</option>
             <option value="Male" {{ old('gender')=='Male'?'selected':'' }}>Male</option>
             <option value="Female" {{ old('gender')=='Female'?'selected':'' }}>Female</option>
           </select>
         </div>
 
-        <div>
-        <label class="block text-sm font-medium mb-1">Password</label>
+        <div class="col-span-2">
+        <label class="block text-sm text-[#333333] font-medium mb-1">Password</label>
         <div class="relative">
           <input
             id="password"
             type="password"
             name="password"
             required
-            class="w-full px-4 py-2 pr-12 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary"
-          >
+            class="w-full px-4 py-[7px] pr-12 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
 
           <button
             type="button"
             onclick="togglePassword('password','eyePassword')"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-          >
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
             <svg id="eyePassword" xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -160,25 +173,44 @@
             </svg>
           </button>
         </div>
+
+        <!-- Password Rules -->
+        <ul id="passwordRules"
+            class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-xs transition-opacity duration-300">
+
+          <li id="rule-length" class="flex items-center gap-2 text-gray-500">
+            <i class="fa-solid fa-circle-xmark"></i> At least 8 characters
+          </li>
+
+          <li id="rule-letter" class="flex items-center gap-2 text-gray-500">
+            <i class="fa-solid fa-circle-xmark"></i> At least one letter
+          </li>
+
+          <li id="rule-number" class="flex items-center gap-2 text-gray-500">
+            <i class="fa-solid fa-circle-xmark"></i> At least one number
+          </li>
+
+          <li id="rule-special" class="flex items-center gap-2 text-gray-500">
+            <i class="fa-solid fa-circle-xmark"></i> At least one special symbol
+          </li>
+        </ul>
       </div>
 
       <!-- Confirm Password -->
-      <div>
-        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+      <div class="col-span-2">
+        <label class="block text-sm text-[#333333] font-medium mb-1">Confirm Password</label>
         <div class="relative">
           <input
             id="confirmPassword"
             type="password"
             name="password_confirmation"
             required
-            class="w-full px-4 py-2 pr-12 rounded-lg bg-lightbg border border-mediumgray focus:ring-2 focus:ring-primary"
-          >
+            class="w-full px-4 py-[7px] pr-12 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
 
           <button
             type="button"
             onclick="togglePassword('confirmPassword','eyeConfirmPassword')"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-          >
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
             <svg id="eyeConfirmPassword" xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -193,15 +225,25 @@
           </button>
         </div>
       </div>
+      <p id="passwordMismatch"
+        class="hidden mt-1 text-xs text-red-600 font-medium">
+        Password does not match
+      </p>
 
-        <button class="w-full py-2 rounded-lg bg-primary text-accent font-semibold hover:bg-secondary transition">
+      <p id="passwordMatch"
+        class="hidden mt-1 text-xs text-green-600 font-medium flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i> Passwords match
+      </p>
+
+      <div class="col-span-2">
+        <button class="w-full py-2 rounded-lg bg-[#8B0000] text-[#F4F4F4] font-bold hover:bg-[#660000] transition">
           Register
         </button>
-      </form>
+      </div>
 
-      <p class="mt-6 text-center text-sm text-gray-600">
+      <p class="col-span-2 mt-4 text-center text-sm text-[#757575]">
         Already have an account?
-        <a href="/login" class="text-primary font-semibold hover:text-secondary">Login here</a>
+        <a href="/login" class="text-[#8B0000] font-bold hover:underline">Login here</a>
       </p>
 
     </div>
@@ -210,6 +252,89 @@
 
 
 <script>
+// PASSWORD RULES
+const password = document.getElementById('password');
+const confirmPassword = document.getElementById('confirmPassword');
+const mismatchText = document.getElementById('passwordMismatch');
+const matchText = document.getElementById('passwordMatch');
+const rulesBox = document.getElementById('passwordRules');
+
+let mismatchTimer = null;
+let hideRulesTimer = null;
+
+const rules = {
+  length: document.getElementById('rule-length'),
+  letter: document.getElementById('rule-letter'),
+  number: document.getElementById('rule-number'),
+  special: document.getElementById('rule-special')
+};
+
+function updateRule(rule, condition) {
+  const icon = rule.querySelector('i');
+  if (condition) {
+    rule.classList.remove('text-gray-500');
+    rule.classList.add('text-green-600');
+    icon.className = 'fa-solid fa-circle-check';
+  } else {
+    rule.classList.remove('text-green-600');
+    rule.classList.add('text-gray-500');
+    icon.className = 'fa-solid fa-circle-xmark';
+  }
+}
+
+password.addEventListener('input', () => {
+  const value = password.value;
+
+  const checks = {
+    length: value.length >= 8,
+    letter: /[A-Za-z]/.test(value),
+    number: /[0-9]/.test(value),
+    special: /[^A-Za-z0-9]/.test(value)
+  };
+
+  updateRule(rules.length, checks.length);
+  updateRule(rules.letter, checks.letter);
+  updateRule(rules.number, checks.number);
+  updateRule(rules.special, checks.special);
+
+  const allValid = Object.values(checks).every(Boolean);
+
+  // Always show rules while typing
+  rulesBox.classList.remove('hidden', 'fade-out');
+  rulesBox.style.opacity = '1';
+
+  clearTimeout(hideRulesTimer);
+
+  if (allValid) {
+    hideRulesTimer = setTimeout(() => {
+      rulesBox.classList.add('fade-out');
+      setTimeout(() => {
+        rulesBox.classList.add('hidden');
+      }, 400);
+    }, 100);
+  }
+});
+
+confirmPassword.addEventListener('input', () => {
+  clearTimeout(mismatchTimer);
+
+  mismatchTimer = setTimeout(() => {
+    if (!confirmPassword.value) {
+      mismatchText.classList.add('hidden');
+      matchText.classList.add('hidden');
+      return;
+    }
+
+    if (confirmPassword.value === password.value) {
+      mismatchText.classList.add('hidden');
+      matchText.classList.remove('hidden');
+    } else {
+      matchText.classList.add('hidden');
+      mismatchText.classList.remove('hidden');
+    }
+  }, 100);
+});
+
 /* ===== CANVAS STARS ===== */
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
