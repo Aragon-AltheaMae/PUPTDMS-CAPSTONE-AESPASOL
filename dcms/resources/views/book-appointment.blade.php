@@ -647,9 +647,19 @@
       >
       </div>
 
-      <div>
-        <label class="text-sm font-semibold block mt-4 mb-1">
-          When was your last medical examination?
+      <!-- LAST MEDICAL EXAM -->
+      <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
+        <span>Have you had a medical examination in the past year?</span>
+        <input type="radio" name="had_medical_exam" value="Yes"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
+        <input type="radio" name="had_medical_exam" value="No"
+          class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+      </div>
+
+      <!-- DATE FIELD (HIDDEN INITIALLY) -->
+      <div class="ml-8 hidden" id="medical_exam_box">
+        <label class="text-xs italic text-[#8B0000] mb-1 block">
+          If YES, when was your last medical examination?
         </label>
         <input 
           type="text" 
@@ -1002,7 +1012,8 @@
   <!-- RELATION -->
   <div class="flex items-center gap-4 relative">
   <label class="w-64" for="emergency_relation">Relation to Patient:</label>
-  <div class="relative w-80">
+  <div class="flex flex-col w-80">
+    <div class="relative w-full">
     <select
       id="emergency_relation"
       name="emergency_relation"
@@ -1014,6 +1025,7 @@
       <option value="Father">Father</option>
       <option value="Guardian">Guardian</option>
       <option value="Spouse">Spouse</option>
+      <option value="Others">Others</option>
     </select>
     <!-- Downward arrow -->
     <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
@@ -1021,6 +1033,16 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
       </svg>
     </div>
+  </div>
+
+    <input
+      type="text"
+      id="relation_other"
+      name="relation_other"
+      maxlength="30"
+      class="input input-sm border-[#8B0000] mt-2 hidden"
+      placeholder="Please specify relation"
+      >
   </div>
 </div>
 
@@ -1398,6 +1420,14 @@ function buildSummary() {
   const get = name => data.get(name) || "N/A";
   const getAll = name => data.getAll(name);
 
+  const selectedRelation = data.get("emergency_relation") || "";
+  const typedRelation = (data.get("relation_other") || "").trim();
+
+  const emergencyRelation =
+    selectedRelation === "Others"
+      ? (typedRelation || "Others")
+      : (selectedRelation || "N/A");
+
   const signatureFile = data.get("patient_signature");
   let signatureHTML = "Not uploaded";
 
@@ -1461,7 +1491,7 @@ function buildSummary() {
       ${card("Emergency Contact", `
         <p><b>Name:</b> ${get("emergency_person")}</p>
         <p><b>Contact:</b> ${get("emergency_number")}</p>
-        <p><b>Relation:</b> ${get("emergency_relation")}</p>
+        <p><b>Relation:</b> ${emergencyRelation}</p>
       `)}
 
       ${card("Signature", signatureHTML)}
@@ -1532,6 +1562,33 @@ questions.forEach(q => {
     });
   });
 });
+
+const medicalExamRadios = document.querySelectorAll('input[name="had_medical_exam"]');
+  const medicalExamBox = document.getElementById("medical_exam_box");
+
+  medicalExamRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (radio.value === "Yes" && radio.checked) {
+        medicalExamBox.classList.remove("hidden");
+      } else if (radio.value === "No" && radio.checked) {
+        medicalExamBox.classList.add("hidden");
+      }
+    });
+  });
+
+const relationSelect = document.getElementById("emergency_relation");
+  const otherInput = document.getElementById("relation_other");
+
+  relationSelect.addEventListener("change", function () {
+    if (this.value === "Others") {
+      otherInput.classList.remove("hidden");
+      otherInput.setAttribute("required", "true");
+    } else {
+      otherInput.classList.add("hidden");
+      otherInput.removeAttribute("required");
+      otherInput.value = "";
+    }
+  });
 
 const medicalToggles = [
   { name: 'good_health', boxId: 'good_health_box', showOn: 'No' }, 
