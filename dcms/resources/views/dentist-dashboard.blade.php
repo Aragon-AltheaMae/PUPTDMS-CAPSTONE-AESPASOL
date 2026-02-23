@@ -70,11 +70,23 @@
       animation: wave 2.5s ease-in-out infinite;
     }
 
-    /* Sidebar icon centering fix */
+    /* Smooth slide animation */
+    #sidebar {
+      transition: width 300ms ease, transform 300ms ease;
+      will-change: width, transform;
+    }
+
+    #mainContent {
+      transition: margin-left 300ms ease;
+    }
+
     .sidebar-link {
-      justify-content: center;
-      transition: background-color 0.2s ease,
-                transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      transition: background-color .2s ease, transform .2s ease;
     }
 
     /* Tooltip appears ONLY when collapsed */
@@ -92,9 +104,23 @@
       justify-content: flex-start;
     }
 
-    /* Icon spacing only when expanded */
-    #sidebar[style*="16rem"] .sidebar-link i {
-      margin-right: 1rem;
+    /* consistent icon column width */
+    .sidebar-link i{
+      width: 24px;           /* fixed width column */
+      min-width: 24px;
+      text-align: center;
+    }
+
+    /* CLOSED: center icon only */
+    #sidebar[style*="72px"] .sidebar-link {
+      justify-content: center;
+      gap: 0;
+    }
+
+    /* when expanded, align items nicely */
+    #sidebar[style*="16rem"] .sidebar-link{
+      justify-content: flex-start;
+      gap: 12px;             /* spacing between icon and text */
     }
 
     #sidebar[style*="16rem"] .sidebar-link:hover {
@@ -108,6 +134,19 @@
 
     .sidebar-text {
       transform-origin: left center;
+    }
+
+    /* Notification dropdown animation */
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(0.95) !important; /* zoom out */
+      pointer-events: none !important;
     }
 
     /* DARK MODE */
@@ -163,52 +202,57 @@
   $notifCount = $notifications->count();
   @endphp
 
-  <div class="dropdown dropdown-end">
-    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-      @if($notifCount > 0)
-        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-          {{ $notifCount }}
-        </span>
-      @endif
+  <div id="notifDropdown" class="relative">
+    
+  <button id="notifBtn" type="button"
+    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
 
-      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
-      </label>
+    @if($notifCount > 0)
+      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+        {{ $notifCount }}
+      </span>
+    @endif
 
-      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-        <div class="p-4 border-b flex items-center justify-between">
-          <span class="font-bold text-[#8B0000]">Notifications</span>
+    <i class="fa-regular fa-bell text-lg"></i>
+  </button>
 
-          {{-- Optional "View all" (only if you have this route) --}}
-          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-        </div>
+  <div id="notifMenu"
+  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+         opacity-0 scale-95 pointer-events-none
+         transition-all duration-200 ease-out origin-top-right">
 
-        <div class="max-h-80 overflow-y-auto">
-          @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
-              @if(!empty($n['message']))
-                <div class="text-xs text-[#ADADAD] mt-0.5">
-                  {{ $n['message'] }}
-                </div>
-              @endif
-              @if(!empty($n['time']))
-                <div class="text-[11px] text-gray-400 mt-1">
-                  {{ $n['time'] }}
-                </div>
-              @endif
-            </a>
-          @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
-            </div>
-          @endforelse
-        </div>
-      </div>
+    <div class="p-4 border-b flex items-center justify-between">
+      <span class="font-bold text-[#8B0000]">Notifications</span>
     </div>
+
+    <div class="max-h-80 overflow-y-auto">
+      @forelse($notifications as $n)
+        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+          <div class="text-sm font-semibold text-gray-900">
+            {{ $n['title'] ?? 'Notification' }}
+          </div>
+          @if(!empty($n['message']))
+            <div class="text-xs text-[#ADADAD] mt-0.5">
+              {{ $n['message'] }}
+            </div>
+          @endif
+          @if(!empty($n['time']))
+            <div class="text-[11px] text-gray-400 mt-1">
+              {{ $n['time'] }}
+            </div>
+          @endif
+        </a>
+      @empty
+        <div class="px-4 py-10 text-center justify-items-center">
+          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+          <div class="text-sm font-semibold text-gray-800">No notifications</div>
+          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+        </div>
+      @endforelse
+    </div>
+
+  </div>
+</div>
 
     <div class="flex items-center gap-3">
       <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
@@ -241,15 +285,13 @@
         <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
       </button>
     </div>
-
-  <!-- DIVIDER -->
-  <hr class="my-3 border-t border-[#DADADA]">
+    
   <!-- MENU -->
-  <nav class="space-y-1 px-3 text-gray-600">
+  <nav class="space-y-2 px-3 text-gray-600 text-sm">
 
     <!-- DASHBOARD -->
     <a href="{{ route('dentist.dashboard') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+      class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.dashboard')
@@ -286,7 +328,7 @@
 
     <!-- PATIENTS -->
     <a href="{{ route('dentist.patients') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+      class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.patients*')
@@ -322,7 +364,7 @@
 
     <!-- APPOINTMENTS -->
     <a href="{{ route('dentist.appointments') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+      class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.appointments*')
@@ -356,14 +398,45 @@
       </span>
     </a>
 
-<!-- INVENTORY -->
-    <a href="{{ route('dentist.documentrequests') }}" class="flex flex-col items-center">
+    <!-- Document Requests -->
+    <a href="{{ route('dentist.documentrequests') }}"
+      class="sidebar-link relative flex items-center  rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+              {{ request()->routeIs('dentist.documentrequests*')
+                ? 'bg-[#8B0000] text-[#F4F4F4]'
+                : '' }}">
+
+      <span
+        class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000]
+              transition-opacity duration-300
+              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
+      </span>
+
       <i class="fa-solid fa-file-circle-check text-lg"></i>
-      <span>Document Requests</span>
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
+            transition-all duration-300 delay-150">
+        Document Requests
+      </span>
+
+      <span class="sidebar-tooltip
+                absolute left-full ml-8
+                px-3 py-1
+                rounded-full
+                bg-[#8B0000]
+                text-[#F4F4F4] text-sm font-semibold
+                whitespace-nowrap
+                opacity-0 scale-95
+                pointer-events-none
+                transition-all duration-200">
+        Document Requests
+      </span>
     </a>
-    
+
+    <!-- INVENTORY -->
     <a href="{{ route('dentist.inventory') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+      class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.inventory*')
@@ -399,7 +472,7 @@
 
     <!-- REPORTS -->
     <a href="{{ route('dentist.report') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+      class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.report*')
@@ -432,7 +505,6 @@
         Reports
       </span>
     </a>
-
   </nav>
 </div>
 
@@ -443,14 +515,14 @@
   <button
     id="themeToggle"
     class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-2 rounded-full
+          w-full px-2 py-1.5 rounded-xl
           bg-[#7B6CF6] text-[#F4F4F4]
           transition-all duration-200
           hover:scale-105"
     aria-label="Toggle dark mode">
 
-    <i id="themeIcon" class="fa-regular fa-moon text-lg"></i>
-    <span class="sidebar-text opacity-0 w-0 overflow-hidden
+    <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
+    <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden
                transition-all duration-300 delay-150">
       Dark Mode
     </span>
@@ -473,9 +545,9 @@
     <form action="{{ route('logout') }}" method="POST">
       @csrf
       <button
-        class="sidebar-link w-full relative flex items-center px-3 py-3 rounded-xl
+        class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
                text-red-600 hover:bg-red-50 transition-all duration-200">
-        <i class="fa-solid fa-right-from-bracket"></i>
+        <i class="fa-solid fa-right-from-bracket text-sm"></i>
         <span class="sidebar-text opacity-0 w-0 overflow-hidden
              transition-all duration-300 delay-150">
           Log out
@@ -813,7 +885,6 @@ function toggleSidebar() {
     }
   });
 
-
   // ================= HIGHCHARTS BAR CHART =================
   Highcharts.chart('gadChart', {
     chart: {
@@ -854,6 +925,50 @@ function toggleSidebar() {
       }
     },
     credits: { enabled: false }
+  });
+
+  // NOTIFICATION
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("notifBtn");
+    const menu = document.getElementById("notifMenu");
+
+    let isOpen = false;
+
+    function openMenu() {
+      isOpen = true;
+      menu.classList.remove("notif-close");
+      menu.classList.add("notif-open");
+    }
+
+    function closeMenu() {
+      isOpen = false;
+      menu.classList.remove("notif-open");
+      menu.classList.add("notif-close");
+    }
+
+    // Toggle when clicking bell
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      isOpen ? closeMenu() : openMenu();
+    });
+
+    // Keep open when clicking inside menu
+    menu.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", () => {
+      if (isOpen) closeMenu();
+    });
+
+    // Close on ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isOpen) closeMenu();
+    });
+
+    // Start closed
+    closeMenu();
   });
 </script>
 
