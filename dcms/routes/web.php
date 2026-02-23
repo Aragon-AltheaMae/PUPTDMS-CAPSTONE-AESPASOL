@@ -10,13 +10,10 @@ use App\Models\Patient;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
-use App\Http\Controllers\Dentist\DailyTreatmentRecordController;
-use App\Http\Controllers\Dentist\DentalServicesRecordController;
-
 use App\Http\Controllers\RecordController;
 
 // -------------------
-// AUTH PAGES
+// AUTH PAGES (PUBLIC)
 // -------------------
 
 // Patient Login
@@ -36,7 +33,7 @@ Route::get('/dentist/login', function () {
 
 
 // -------------------
-// AUTH ACTIONS
+// AUTH ACTIONS (PUBLIC)
 // -------------------
 
 // Patient Registration
@@ -64,42 +61,23 @@ Route::post('/register', function (Request $request) {
 
 // Patient Login POST
 Route::post('/login', function (Request $request) {
-
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|string',
-    ]);
-
-    // Check if email exists
     $patient = Patient::where('email', $request->email)->first();
 
-    // Email not found
-    if (!$patient) {
-        return back()
-            ->with('error', 'No account found with this email.')
-            ->withInput();
+    if ($patient && Hash::check($request->password, $patient->password)) {
+        session([
+            'role' => 'patient',
+            'patient_id' => $patient->id,
+            'email' => $patient->email,
+        ]);
+
+        return redirect('/homepage');
     }
 
-    // Password incorrect
-    if (!Hash::check($request->password, $patient->password)) {
-        return back()
-            ->with('error', 'Invalid credentials.')
-            ->withInput();
-    }
-
-    // ✅ Login success
-    session([
-        'role' => 'patient',
-        'patient_id' => $patient->id,
-        'email' => $patient->email,
-    ]);
-
-    return redirect('/homepage');
+    return back()->with('error', 'Invalid credentials');
 });
 
 // Dentist Login POST (Hard-coded)
 Route::post('/dentist/login', function (Request $request) {
-
     if ($request->email === 'dentist' && $request->password === 'dentist123') {
         session([
             'role' => 'dentist',
@@ -115,9 +93,6 @@ Route::post('/dentist/login', function (Request $request) {
 // Logout (all roles)
 Route::post('/logout', function () {
     session()->flush();
-
-    // Keeping this so other existing auth logic (if any) won't break.
-    // If you're not using Laravel Auth at all, it's harmless.
     Auth::logout();
 
     return redirect('/login');
@@ -125,20 +100,57 @@ Route::post('/logout', function () {
 
 
 // -------------------
-// HOMEPAGE
+// ROOT REDIRECT (PUBLIC)
 // -------------------
 
-Route::get('/homepage', function () {
-    $patient = session()->has('patient_id')
-        ? Patient::find(session('patient_id'))
-        : null;
-
-    return view('index', compact('patient'));
-})->name('homepage');
+Route::get('/', fn () => redirect('/login'));
 
 
 // -------------------
-// DENTIST ROUTES
+// PATIENT-PROTECTED ROUTES
+// -------------------
+
+Route::middleware('role:patient')->group(function () {
+
+    // HOMEPAGE (now protected)
+    Route::get('/homepage', function () {
+        $patient = session()->has('patient_id')
+            ? Patient::find(session('patient_id'))
+            : null;
+
+        return view('index', compact('patient'));
+    })->name('homepage');
+
+    // BOOK APPOINTMENT (now protected; keeps same path + name)
+    Route::get('/book-appointment', [AppointmentController::class, 'create'])
+        ->name('book.appointment');
+
+    // GET SELECTED DATES / AVAILABLE SLOTS (now protected; keeps same path + name)
+    Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
+        ->name('appointments.available-slots');
+
+    // DOCUMENT REQUESTS (now protected; keeps same paths + names)
+    Route::post('/document-requests', [DocumentRequestController::class, 'store'])
+        ->name('document.requests.store');
+
+    Route::get('/document-requests', [DocumentRequestController::class, 'index'])
+        ->name('document.requests.index');
+
+    Route::post('/document-requests/{id}/status', [DocumentRequestController::class, 'updateStatus'])
+        ->name('document.requests.updateStatus');
+
+    // record should use role:patient (already protected before; kept here too)
+    Route::get('/record', [RecordController::class, 'index'])
+        ->name('record');
+
+    // about-us (already protected before; kept here too)
+    Route::get('/about-us', fn () => view('about-us'))
+        ->name('about.us');
+});
+
+
+// -------------------
+// DENTIST ROUTES (KEEP AS-IS; FORMATTED)
 // -------------------
 
 Route::prefix('dentist')->group(function () {
@@ -175,6 +187,7 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-patientprofile');
     })->name('dentist.patient.profile');
 
+    // Report Page
     Route::get('/report', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -182,30 +195,28 @@ Route::prefix('dentist')->group(function () {
         return view('dentist-report');
     })->name('dentist.report');
 
-
-    // Document Requests Route
+    // Document Requests Page
     Route::get('/document-requests', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
-
         return view('dentist-documentrequests');
     })->name('dentist.documentrequests');
 
-
+    // View Odontogram Page
     Route::get('/dentist/view-odontogram', function () {
-    if (session('role') !== 'dentist') {
-        return redirect('/login');
-    }
-
-    return view('dentist-view_odontogram');
-})->name('dentist.viewOdontogram');
-
-
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+        return view('dentist-view_odontogram');
+    })->name('dentist.viewOdontogram');
 });
 
 
-// ================= REPORTS =================
+// -------------------
+// REPORT ROUTES (KEEP AS-IS; FORMATTED)
+// -------------------
+
 Route::prefix('report')->group(function () {
 
     Route::get('/', function () {
@@ -215,7 +226,7 @@ Route::prefix('report')->group(function () {
         return view('dentist-report');
     })->name('dentist.report');
 
-    // ✅ DAILY TREATMENT RECORD
+    // DAILY TREATMENT RECORD
     Route::get('/daily-treatment-record', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
@@ -223,19 +234,18 @@ Route::prefix('report')->group(function () {
         return view('daily-treatment');
     })->name('dentist.report.daily-treatment');
 
-    // ✅ DENTAL SERVICES
+    // DENTAL SERVICES
     Route::get('/dental-services', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
         return view('dental-services');
     })->name('dentist.report.dental-services');
-
 });
 
 
 // -------------------
-// PATIENT ROUTES
+// PATIENT ROUTES 
 // -------------------
 
 Route::prefix('patient')->middleware('role:patient')->group(function () {
@@ -257,84 +267,15 @@ Route::prefix('patient')->middleware('role:patient')->group(function () {
 
 
 // -------------------
-// PUBLIC PAGES
+// INVENTORY (KEEP AS-IS; FORMATTED)
 // -------------------
 
-Route::get('/', fn () => redirect('/login'));
-
-// NOTE: You already have /patient/book-appointment above (protected).
-// Keeping this public route as you originally had (won't affect others).
-Route::get('/book-appointment', [AppointmentController::class, 'create'])
-    ->name('book.appointment');
-
-// ✅ FIX: record should use role:patient (because login is session-based, not Auth guard)
-Route::get('/record', [RecordController::class, 'index'])
-    ->name('record')
-    ->middleware('role:patient');
-
-Route::get('/about-us', fn () => view('about-us'))
-    ->name('about.us')
-    ->middleware('role:patient');
-
-
-// -------------------
-// INVENTORY
-// -------------------
 Route::prefix('dentist')->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])
         ->name('dentist.inventory');
+
     Route::get('/inventory/data', [InventoryController::class, 'fetch']);
     Route::post('/inventory', [InventoryController::class, 'store']);
     Route::put('/inventory/{inventory}', [InventoryController::class, 'update']);
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy']);
-});
-
-
-// -------------------
-// GET SELECTED DATES
-// -------------------
-Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
-    ->name('appointments.available-slots');
-
-
-// =======================
-// DOCUMENT REQUESTS
-// =======================
-
-// Patient submits request
-Route::post('/document-requests', [DocumentRequestController::class, 'store'])
-    ->name('document.requests.store');
-
-// Patient views own requests
-Route::get('/document-requests', [DocumentRequestController::class, 'index'])
-    ->name('document.requests.index');
-
-// Admin / Dentist updates status
-Route::post('/document-requests/{id}/status', [DocumentRequestController::class, 'updateStatus'])
-    ->name('document.requests.updateStatus');
-
-
-/* =======================
-   DAILY TREATMENT RECORD
-======================= */
-Route::prefix('dentist')->name('dentist.')->middleware(['auth'])->group(function () {
-    Route::get('/reports/daily-treatment-record',
-        [DailyTreatmentRecordController::class, 'index']
-    )->name('reports.daily-treatment-record');
-
-    Route::get('/reports/daily-treatment-record/list',
-        [DailyTreatmentRecordController::class, 'list']
-    )->name('reports.daily-treatment-record.list');
-
-});
-
-/* =======================
-   DENTAL SERVICES RECORD
-======================= */
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dentist/dental-services-record', [DentalServicesRecordController::class, 'index'])
-        ->name('dentist.dental-services-record');
-
-    Route::get('/dentist/dental-services-record/data', [DentalServicesRecordController::class, 'data'])
-        ->name('dentist.dental-services-record.data');
 });
