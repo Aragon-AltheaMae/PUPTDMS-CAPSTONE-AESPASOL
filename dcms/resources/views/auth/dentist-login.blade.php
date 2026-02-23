@@ -17,19 +17,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <script>
-    tailwind.config = {
-      daisyui: { themes: false },
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
     body { font-family: 'Inter'; }
 
@@ -42,40 +29,40 @@
       animation: fadeIn 0.6s ease-out forwards;
     }
 
-  #stars {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-.shine-text {
-  background: linear-gradient(
-    90deg,
-    #8B0000,
-    #F2B233,
-    #8B0000
-  );
+    .shine-text {
+      background: linear-gradient(
+        90deg,
+        #8B0000,
+        #FFD700,
+        #8B0000
+      );
 
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
 
-  animation: shine 6s linear infinite;
-}
+      animation: shine 6s linear infinite;
+    }
 
-@keyframes shine {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
+    @keyframes shine {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: -200% center;
+      }
+    }
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-r from-[#8B0000] to-[#F2B233] flex items-center justify-center">
+<body class="min-h-screen bg-gradient-to-r from-[#8B0000] to-[#FFD700] flex items-center justify-center">
   <canvas id="stars"></canvas>
   <div class="fade-in bg-white w-[420px] rounded-3xl shadow-2xl px-10 py-12 relative z-10">
 
@@ -84,7 +71,7 @@
       <h1 class="text-3xl font-extrabold shine-text">
         Dentist Portal
       </h1>
-      <p class="text-sm text-gray-500 mt-2">
+      <p class="text-sm text-[#757575] mt-2">
         PUP Taguig Dental Clinic
       </p>
     </div>
@@ -102,15 +89,16 @@
 
       <div>
         <label class="label">
-          <span class="label-text text-sm font-medium">Username</span>
+          <span class="label-text text-[#333333] text-sm font-medium">Username</span>
         </label>
         <input type="text" name="email" required
-               class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-[#F2B233]" />
+               class="input input-bordered w-full px-4 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9]
+               text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]" />
       </div>
 
       <div>
       <label class="label">
-        <span class="label-text text-sm font-medium">Password</span>
+        <span class="label-text text-[#333333] text-sm font-medium">Password</span>
       </label>
 
       <div class="relative">
@@ -119,15 +107,14 @@
           type="password"
           name="password"
           required
-          class="input input-bordered w-full pr-12 focus:outline-none focus:ring-2 focus:ring-[#F2B233]"
-        />
+          class="input input-bordered w-full px-4 py-[7px] rounded-lg bg-[#F4F4F4] border border-[#D9D9D9]
+          text-[#333333] focus:outline-none focus:ring-1 focus:ring-[#8B0000]"/>
 
         <!-- Eye icon -->
         <button
           type="button"
           onclick="toggleDentistPassword()"
-          class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
           <svg id="dentistEyeIcon" xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5" fill="none"
               viewBox="0 0 24 24" stroke="currentColor">
@@ -144,9 +131,7 @@
     </div>
 
       <button type="submit"
-        class="btn w-full rounded-xl text-white font-semibold
-               bg-gradient-to-r from-[#8B0000] to-[#F2B233]
-               hover:opacity-90 transition">
+        class="mt-2 w-full py-3 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-bold hover:bg-[#660000] transition">
         Log In
       </button>
     </form>

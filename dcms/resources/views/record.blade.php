@@ -1,19 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-white">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PUP Taguig Dental Clinic | Records</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PUP Taguig Dental Clinic</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-    
-    <!-- Font Inter -->
+
+  <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+
+  <script type="module" src="https://unpkg.com/cally"></script>
+
+  <script>
+    tailwind.config = {
+      daisyui: {
+        themes: false,
+      },
+    }
+  </script>
+
   <style>
     body {
       font-family: 'Inter';
@@ -21,8 +36,14 @@
 
     /* Fade-in animation */
     @keyframes fadeIn {
-      from { opacity:0; transform:translateY(6px); }
-      to { opacity:1; transform:translateY(0); } 
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .fade-in {
@@ -31,8 +52,12 @@
 
     /* Subtle pulse for icon */
     @keyframes softPulse {
-      0%,100%{transform:scale(1);}
-      50%{transform:scale(1.05);}
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
     }
 
     .pulse-icon {
@@ -41,51 +66,92 @@
 
     /* Skeleton shimmer */
     @keyframes shimmer {
-      0% {background-position:-400px 0;}
-      100% {background-position:400px 0;}
+      0% {
+        background-position: -400px 0;
+      }
+      100% {
+        background-position: 400px 0;
+      }
     }
 
     .skeleton {
-      background: linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 37%,#e5e7eb 63%);
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 37%,
+        #e5e7eb 63%
+      );
       background-size: 800px 100%;
       animation: shimmer 1.4s infinite linear;
-      border-radius:0.75rem;
+      border-radius: 0.75rem;
     }
 
+    /* Fade-up after skeleton loading */
     @keyframes fadeUp {
-      0% { opacity:0; transform:translateY(10px); }
-      100% { opacity:1; transform:translateY(0); }
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .fade-up {
       animation: fadeUp 0.6s ease-out forwards;
-    }
+  }
 
-    /* Modal styles */
-    .modal-bg {
-      position: fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background: rgba(0,0,0,0.5);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      z-index:50;
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
     }
+    50% {
+      transform: translateY(-14px) rotate(2deg);
+      }
+  }
 
-    .modal-content {
-      background:white;
-      padding:2rem;
-      border-radius:1rem;
-      max-width:600px;
-      width:90%;
-      max-height:80vh;
-      overflow-y:auto;
+  .float-slow {
+    animation: float 4.5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+    /* Shimmer effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
     }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 
-    /* Sidebar icon centering fix */
+  .shimmer-btn {
+    background: linear-gradient(
+      110deg,
+      #660000 25%,
+      rgba(255, 80, 80, 0.87) 37%,
+      #660000 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 10s linear infinite;
+  }
+
+  @keyframes wave {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(14deg); }
+    40% { transform: rotate(-8deg); }
+    60% { transform: rotate(14deg); }
+    80% { transform: rotate(-4deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .wave-hand {
+    transform-origin: 70% 70%;
+    animation: wave 2.5s ease-in-out infinite;
+  }
+
+  /* Sidebar icon centering fix */
   .sidebar-link {
     justify-content: center;
     transition: background-color 0.2s ease,
@@ -101,7 +167,7 @@
   /* Hide tooltip when expanded */
   #sidebar[style*="16rem"] .sidebar-tooltip {
   display: none;
-}
+  }
 
   #sidebar[style*="16rem"] .sidebar-link {
     justify-content: flex-start;
@@ -125,22 +191,39 @@
     transform-origin: left center;
   }
 
-    @keyframes float {
-    0%, 100% {
-      transform: translateY(0) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-14px) rotate(2deg);
-      }
-    }
+  /* DARK MODE */
+  [data-theme="dark"] body {
+  background-color: #111827; /* slate-900 */
+  color: #E5E7EB;
+  }
 
-    .float-slow {
-      animation: float 4.5s ease-in-out infinite;
-      will-change: transform;
-    }
-  </style>
-</head>
+  [data-theme="dark"] #sidebar {
+    background-color: #1F2933;
+  }
+
+  [data-theme="dark"] .bg-white {
+    background-color: #1F2937 !important;
+  }
+
+ [data-theme="dark"] [class~="text-[#333333]"] {
+  color: #E5E7EB !important;
+}
+
+
+
+  body,
+  #sidebar,
+  main,
+  .card,
+  .modal-box {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+</style>
+
 <body class="bg-white text-[#333333] font-normal">
+
+<!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
 <!-- HEADER (TOP BAR) -->
 <div class="fixed top-0 left-0 right-0 z-50
@@ -283,7 +366,7 @@
         </span>
 
         <i class="fa-solid fa-house text-lg"></i>
-        <span class="sidebar-text opacity-0 w-0 overflow-hidden
+        <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
              transition-all duration-300 delay-150">
           Home
         </span>
@@ -323,7 +406,7 @@
              transition-all duration-300 delay-150">
         Appointment
       </span>
-      <span
+        <span
           class="sidebar-tooltip
                 absolute left-full ml-8
                 px-3 py-1
@@ -355,11 +438,11 @@
       </span>
 
       <i class="fa-solid fa-folder-open text-lg"></i>
-      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
+      <span class="sidebar-text opacity-0 w-0 overflow-hidden
              transition-all duration-300 delay-150">
         Record
       </span>
-      <span
+        <span
           class="sidebar-tooltip
                 absolute left-full ml-8
                 px-3 py-1
@@ -395,7 +478,7 @@
              transition-all duration-300 delay-150">
         About Us
       </span>
-      <span
+        <span
           class="sidebar-tooltip
                 absolute left-full ml-8
                 px-3 py-1
@@ -438,8 +521,8 @@
         </span>
     </a>
 
-   <!-- DARK MODE TOGGLE -->
-    <button
+  <!-- DARK MODE TOGGLE -->
+  <button
     id="themeToggle"
     class="sidebar-link relative flex items-center justify-center
           w-full px-2 py-2 rounded-full
@@ -453,7 +536,6 @@
                transition-all duration-300 delay-150">
       Dark Mode
     </span>
-
     <!-- Tooltip (collapsed only) -->
     <span
       class="sidebar-tooltip
@@ -499,36 +581,127 @@
   </div>
 </aside>
 
-<!-- CONTENT -->
-<main
-  id="mainContent"
-  class="pt-[100px]
-         px-6 py-10
-         w-full
-         transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
+<!-- ================= MAIN CONTENT ================= -->
+<main id="mainContent"
+      class="pt-[110px] pl-[100px] pr-6 pb-20 min-h-screen fade-up">
 
-  <!-- CONTENT -->
-  <div class="max-w-7xl mx-auto py-10">
+  <h2 class="text-3xl font-extrabold text-center mt-12 mb-12 text-[#660000]">
+    Dental Records
+</h2>
 
-    <!-- TITLE -->
-    <h2 class="text-3xl font-extrabold flex justify-center mt-2 mb-10 
-           bg-gradient-to-r from-[#660000] to-[#FFD700] 
-           bg-clip-text text-transparent fade-up">
-            My Dental Records
-    </h2>
 
-    <!-- RECORDS CONTAINER -->
-    <div id="recordsContainer" class="bg-gradient-to-l from-[#FFD700] to-[#660000] p-0.5 rounded-2xl mb-10 fade-up">
-      <div class="bg-white rounded-2xl p-6 space-y-4">
-        <div id="recordsInnerContainer" class="space-y-4"></div>
+ <!-- ================= TIMELINE ================= -->
+<div class="max-w-6xl mx-auto
+            bg-gradient-to-l from-[#FFD700] to-[#660000]
+            p-0.5 rounded-2xl">
+
+  <div class="bg-white rounded-2xl px-10 py-10">
+
+    <!-- TIMELINE WRAPPER -->
+    <div class="relative">
+
+      <!-- ONE CONTINUOUS LINE -->
+      <div class="absolute left-[28px] top-0 bottom-0 w-px bg-[#8B0000]/40"></div>
+
+      <div class="space-y-8">
+
+        @forelse($records as $record)
+          <div class="relative flex items-center gap-6">
+
+            <!-- DOT (CENTERED ON LINE) -->
+            <div class="w-14 flex justify-center relative z-10">
+              <span class="w-4 h-4 rounded-full bg-[#8B0000]"></span>
+            </div>
+
+            <!-- CARD -->
+            <div class="flex-1 bg-white border rounded-xl px-6 py-4 shadow-sm">
+
+              <div class="grid grid-cols-3 items-center">
+
+                <!-- LEFT -->
+                <div>
+                  <p class="font-semibold text-[#8B0000]">
+                    {{ $record->service_type }}
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    {{ \Carbon\Carbon::parse($record->appointment_date)->format('d M Y') }}
+                  </p>
+                </div>
+
+                <!-- CENTER -->
+                <div class="text-center text-sm text-gray-700">
+                  {{ $record->appointment_time }}
+                </div>
+
+                <!-- RIGHT -->
+                <div class="text-right">
+                <button
+                    class="inline-flex items-center gap-2
+                          px-6 py-2
+                          rounded-full
+                          bg-[#7A0000]
+                          text-white text-sm font-medium
+                          shadow-md
+                          hover:bg-[#660000]
+                          transition">
+                    <i class="fa-regular fa-eye text-sm"></i>
+                    Details
+                  </button>
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        @empty
+          <div class="text-center py-16 text-gray-500">
+            No dental records yet.
+          </div>
+        @endforelse
+
       </div>
     </div>
-
   </div>
+</div>
+
+
 </main>
 
 <script>
-  let sidebarOpen = false;
+// =========================
+// DARK MODE TOGGLE
+// =========================
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const html = document.documentElement;
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+updateThemeIcon(savedTheme);
+
+// Toggle on click
+themeToggle.addEventListener('click', () => {
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon(newTheme);
+});
+
+// Icon switch
+function updateThemeIcon(theme) {
+  if (theme === 'dark') {
+    themeIcon.classList.remove('fa-moon');
+    themeIcon.classList.add('fa-sun');
+  } else {
+    themeIcon.classList.remove('fa-sun');
+    themeIcon.classList.add('fa-moon');
+  }
+}
+
+let sidebarOpen = false;
 
 function applyLayout(sidebarWidth) {
   const sidebar = document.getElementById('sidebar');
@@ -578,101 +751,6 @@ function toggleSidebar() {
     icon.classList.replace('fa-xmark', 'fa-bars');
   }
 }
-
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
-  });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    showSkeletons(); // Show skeletons
-
-    setTimeout(() => {
-      fetch("get_records.php")
-        .then(res => res.json())
-        .then(records => renderRecords(records))
-        .catch(() => showRecordsError());
-    }, 1500);
-  });
-
-  function showSkeletons() {
-    document.getElementById("recordsInnerContainer").innerHTML = `
-      <div class="space-y-4 animate-pulse">
-        ${[1,2,3,4,5,6].map(() => `
-          <div class="flex justify-between items-center border rounded-xl p-4">
-            <div class="flex-1 space-y-2">
-              <div class="h-4 w-1/2 skeleton"></div>
-              <div class="h-3 w-1/3 skeleton"></div>
-            </div>
-            <div class="w-24 h-8 skeleton"></div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  function renderRecords(records) {
-    const container = document.getElementById("recordsInnerContainer");
-    if (!records || records.length === 0) return showRecordsError();
-
-    container.innerHTML = "";
-    records.forEach(record => {
-      container.innerHTML += `
-        <div class="flex justify-between items-center border rounded-xl p-4 fade-up">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#FFD700] to-[#8B0000]"></span>
-              <p class="font-semibold">${record.procedure_name}</p>
-            </div>
-            <p class="text-sm">Last Visit: ${formatDate(record.visit_date)}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-sm mb-2">${formatTime(record.time_start)} - ${formatTime(record.time_end)}</p>
-            <button onclick="viewRecordDetails(${record.record_id})" class="btn btn-soft bg-[#8B0000] hover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4]">
-              View Details
-            </button>
-          </div>
-        </div>
-      `;
-    });
-  }
-
-  function showRecordsError() {
-    document.getElementById("recordsInnerContainer").innerHTML = `
-      <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
-        <img src="images/error-records.png" alt="Error" class="w-24 h-24">
-        <p class="text-2xl font-extrabold text-[#8B0000]">Oops! Something went wrong</p>
-        <p class="text-sm text-gray-600 max-w-sm">Unable to fetch your records.</p>
-      </div>
-    `;
-  }
-
-  // Helpers
-  function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString(); }
-  function formatTime(timeStr) { return timeStr.substring(0,5); }
-
-  // Modal logic
-  function viewRecordDetails(id) {
-    fetch(`get_records.php?id=${id}`)
-      .then(res => res.json())
-      .then(record => {
-        const modal = document.getElementById("recordModal");
-        const content = document.getElementById("modalContent");
-        content.innerHTML = `
-          <h3 class="text-xl font-bold mb-4">${record.procedure_name}</h3>
-          <p><strong>Date:</strong> ${formatDate(record.visit_date)}</p>
-          <p><strong>Time:</strong> ${formatTime(record.time_start)} - ${formatTime(record.time_end)}</p>
-          <p><strong>Details:</strong> ${record.details || "No additional details."}</p>
-        `;
-        modal.style.display = "flex";
-      })
-      .catch(() => alert("Failed to load record details"));
-  }
-
-  function closeModal() {
-    document.getElementById("recordModal").style.display = "none";
-  }
 </script>
 
 </body>
