@@ -529,7 +529,8 @@
 
 
 <script>
-const dailyRecords = [
+const DTR_LIST_URL = "{{ route('dentist.reports.daily-treatment-record.list') }}";
+/*const dailyRecords = [
   {
     date: "12/01/25",
     name: "Juan Dela Cruz",
@@ -665,7 +666,7 @@ const dailyRecords = [
     treatment: "Dental Check-up",
     minutes: 15
   }
-];
+];*/
 
 let searchKeyword = "";
 let selectedOffice = null;
@@ -693,7 +694,7 @@ document.getElementById("applyFiltersBtn").addEventListener("click", () => {
 });
 
 // For Hardcoded Data (Subjected to Change)
-function renderDailyRecords(data) {
+/*function renderDailyRecords(data) {
   const tbody = document.getElementById("dailyTableBody");
   tbody.innerHTML = "";
 
@@ -723,11 +724,66 @@ function renderDailyRecords(data) {
       </tr>
     `;
   });
+}*/
+
+function formatDateToMMDDYY(dateStr) {
+  // dateStr is typically "YYYY-MM-DD"
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const yy = String(d.getFullYear()).slice(-2);
+
+  return `${mm}/${dd}/${yy}`;
+}
+
+function renderDailyRecords(data) {
+  const tbody = document.getElementById("dailyTableBody");
+  tbody.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr class="border-none">
+        <td colspan="8" class="text-center text-gray-400 py-24 align-middle">
+          No Records.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  data.forEach(record => {
+    const contact = [
+      record.patient_email ? record.patient_email : null,
+      record.patient_phone ? record.patient_phone : null
+    ].filter(Boolean).join(" / ");
+
+    // your table has one column "Office / Program"
+    // show office_type if present, else program_code, else blank
+    const officeOrProgram = record.office_type || record.program_code || "";
+
+    const signature = record.has_signature ? "✔" : "";
+
+    tbody.innerHTML += `
+      <tr class="text-sm text-gray-800">
+        <td>${formatDateToMMDDYY(record.treatment_date)}</td>
+        <td>${record.patient_name ?? ""}</td>
+        <td>${contact}</td>
+        <td>${officeOrProgram}</td>
+        <td>${record.gender ?? ""}</td>
+        <td>${record.treatment_done ?? ""}</td>
+        <td class="text-center">${record.minutes_processed ?? 0}</td>
+        <td class="text-center">${signature}</td>
+      </tr>
+    `;
+  });
 }
 
 
+
 /* ================= FILTER LOGIC ================= */
-function applyFilters() {
+/*function applyFilters() {
   let data = [...dailyRecords];
 
   // 🔍 SEARCH (name, program, treatment, contact)
@@ -781,6 +837,48 @@ function applyFilters() {
   renderDailyRecords(data);
   updateFilterButtonState();
 
+}*/
+
+async function applyFilters() {
+  const params = new URLSearchParams();
+
+  // Month picker -> "YYYY-MM"
+  if (selectedYear && selectedMonth) {
+    params.set("month", `${selectedYear}-${selectedMonth}`);
+  }
+
+  // Search
+  if (searchKeyword) {
+    params.set("search", searchKeyword);
+  }
+
+  // Office or Program (mutually exclusive in your UI logic)
+  if (selectedOffice) {
+    params.set("office_type", selectedOffice);
+  }
+  if (selectedProgram) {
+    params.set("program_code", selectedProgram);
+  }
+
+  // Sorting
+  if (nameSort) params.set("sort_name", nameSort); // "az" | "za"
+  if (dateSort) params.set("sort_date", dateSort); // "asc" | "desc"
+
+  try {
+    const res = await fetch(`${DTR_LIST_URL}?${params.toString()}`, {
+      headers: { "Accept": "application/json" }
+    });
+
+    if (!res.ok) throw new Error("Failed to load records");
+
+    const json = await res.json();
+    renderDailyRecords(json.data || []);
+    updateFilterButtonState();
+  } catch (err) {
+    console.error(err);
+    renderDailyRecords([]); // show "No Records."
+    updateFilterButtonState();
+  }
 }
 
 /* ================= EVENTS ================= */
