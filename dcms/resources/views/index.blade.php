@@ -151,44 +151,77 @@
       animation: wave 2.5s ease-in-out infinite;
     }
 
-    /* Sidebar icon centering fix */
+    /* Sidebar base */
     .sidebar-link {
-      justify-content: center;
-      transition: background-color 0.2s ease,
-                transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Tooltip appears ONLY when collapsed */
-    .sidebar-link:hover .sidebar-tooltip {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip {
-    display: none;
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link {
+    /* EXPANDED state */
+    #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
     }
-
-    /* Icon spacing only when expanded */
-    #sidebar[style*="16rem"] .sidebar-link i {
-      margin-right: 1rem;
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+    #sidebar.expanded .nav-section-label {
+      display: block;
+    }
+    #sidebar.expanded .sidebar-text {
+      opacity: 1;
+      width: auto;
+      overflow: visible;
     }
 
-    #sidebar[style*="16rem"] .sidebar-link:hover {
-    transform: translateX(4px);
+    /* COLLAPSED state */
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+    }
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+    #sidebar.collapsed .nav-section-label {
+      display: none;
     }
 
-    .sidebar-link:hover .sidebar-text {
-    opacity: 1;
-    transform: scale(1);
+    /* Tooltip style */
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
     }
 
-    .sidebar-text {
-      transform-origin: left center;
+    .nav-section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #9CA3AF;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Notification dropdown animation */
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(0.95) !important; /* zoom out */
+      pointer-events: none !important;
     }
 
     /* DARK MODE */
@@ -217,10 +250,35 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+    #sidebar.collapsed .nav-section-label { display: none; }
+    #sidebar.expanded .nav-section-label { display: block; }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link { justify-content: flex-start; }
+    #sidebar.expanded .sidebar-link i { margin-right: 0.75rem; }
+    #sidebar.expanded .sidebar-link:hover { transform: translateX(4px); }
+    #sidebar.collapsed .sidebar-tooltip { display: block; }
+    #sidebar.expanded .sidebar-tooltip { display: none; }
+
+    /* Active nav glow */
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
   </style>
 </head>
 
-<body class="bg-white text-[#333333] font-normal">
+<body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
 <!-- <form method="POST" action="{{ url('/homepage') }}"> -->
 
@@ -230,14 +288,14 @@
             text-[#F4F4F4] px-6 py-4
             flex items-center justify-between">
 
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <div class="flex items-center gap-3">
+    <div class="w-12 rounded-full ml-5">
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+    </div>
+    <div class="w-12 rounded-full">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+    </div>
+    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
 
   <div class="flex items-center gap-8">
@@ -248,333 +306,199 @@
   $notifCount = $notifications->count();
   @endphp
 
-  <div class="dropdown dropdown-end">
-    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-      @if($notifCount > 0)
-        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-          {{ $notifCount }}
-        </span>
-      @endif
+  <div id="notifDropdown" class="relative">
+    
+  <button id="notifBtn" type="button"
+    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
 
-      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
-      </label>
+    @if($notifCount > 0)
+      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+        {{ $notifCount }}
+      </span>
+    @endif
 
-      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-        <div class="p-4 border-b flex items-center justify-between">
-          <span class="font-bold text-[#8B0000]">Notifications</span>
+    <i class="fa-regular fa-bell text-lg"></i>
+  </button>
 
-          {{-- Optional "View all" (only if you have this route) --}}
-          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-        </div>
+  <div id="notifMenu"
+  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+         opacity-0 scale-95 pointer-events-none
+         transition-all duration-200 ease-out origin-top-right">
 
-        <div class="max-h-80 overflow-y-auto">
-          @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
-              @if(!empty($n['message']))
-                <div class="text-xs text-[#ADADAD] mt-0.5">
-                  {{ $n['message'] }}
-                </div>
-              @endif
-              @if(!empty($n['time']))
-                <div class="text-[11px] text-gray-400 mt-1">
-                  {{ $n['time'] }}
-                </div>
-              @endif
-            </a>
-          @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+    <div class="p-4 border-b flex items-center justify-between">
+      <span class="font-bold text-[#8B0000]">Notifications</span>
+    </div>
+
+    <div class="max-h-80 overflow-y-auto">
+      @forelse($notifications as $n)
+        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+          <div class="text-sm font-semibold text-gray-900">
+            {{ $n['title'] ?? 'Notification' }}
+          </div>
+          @if(!empty($n['message']))
+            <div class="text-xs text-[#ADADAD] mt-0.5">
+              {{ $n['message'] }}
             </div>
-          @endforelse
+          @endif
+          @if(!empty($n['time']))
+            <div class="text-[11px] text-gray-400 mt-1">
+              {{ $n['time'] }}
+            </div>
+          @endif
+        </a>
+      @empty
+        <div class="px-4 py-10 text-center justify-items-center">
+          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+          <div class="text-sm font-semibold text-gray-800">No notifications</div>
+          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+        </div>
+      @endforelse
+    </div>
+
+  </div>
+</div>
+
+    <!-- Separator -->
+    <div class="w-px h-8 bg-white/30"></div>
+
+    <div class="flex items-center gap-3">
+      <div class="avatar">
+        <div class="w-10 rounded-full overflow-hidden">
+          <img
+            src="{{ $patient->profile_image
+                  ? asset('storage/'.$patient->profile_image)
+                  : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+            alt="Profile"
+          />
         </div>
       </div>
-    </div>
-        <div class="flex items-center gap-3">
-        {{-- Avatar --}}
-        <div class="avatar">
-          <div class="w-10 rounded-full overflow-hidden">
-            <img
-              src="{{ $patient->profile_image
-                    ? asset('storage/'.$patient->profile_image)
-                    : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
-              alt="Profile"
-            />
-            
-          </div>
+      <div class="leading-tight">
+        <div class="text-l font-semibold text-[#F4F4F4]">
+          {{ ucwords(strtolower($patient->name)) }}
         </div>
-
-        {{-- Name + Role --}}
-        <div class="leading-tight">
-          <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ ucwords(strtolower($patient->name)) }}
-          </div>
-          <div class="italic text-xs text-[#F4F4F4]/80">
-            Patient
-          </div>
-        </div>
+        <div class="italic text-xs text-[#F4F4F4]/80">Student</div>
       </div>
     </div>
   </div>
+</div>
 
+<!-- SIDEBAR -->
 <aside id="sidebar"
-  class="fixed left-0 top-[80px]
-         h-[calc(100vh-80px)]
-         w-[72px]
-         bg-[#FAFAFA]
+  class="fixed left-0 top-[72px]
+         h-[calc(100vh-72px)]
+         bg-white
          drop-shadow-xl
          transition-all duration-300
-         flex flex-col justify-between z-40">
+         flex flex-col justify-between z-40 expanded"
+  style="width: 200px;">
 
   <!-- TOP -->
-  <div>
-    <div id="sidebarToggleWrapper"
-     class="flex items-center justify-center px-4 py-6 transition-all duration-300">
+  <div class="pt-4">
+
+    <!-- Toggle Button -->
+    <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
       <button onclick="toggleSidebar()"
         id="sidebarToggleBtn"
-        class="w-10 h-10 flex items-center justify-center
+        class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#D9D9D9] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
+              hover:bg-[#F0F0F0] transition-all duration-300">
+        <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
       </button>
     </div>
 
-  <!-- DIVIDER -->
-  <hr class="my-3 border-t border-[#DADADA]">
-  <!-- MENU -->
-  <nav class="space-y-1 px-3 text-gray-600">
+  <!-- NAVIGATION LABEL -->
+<div class="nav-section-label px-4 mb-6">Navigation</div>
 
-      <!-- HOME DASHBOARD -->
+    <!-- MENU -->
+    <nav class="space-y-1 px-3 text-gray-600">
+
+      <!-- HOME -->
       <a href="{{ route('homepage') }}"
-        class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('homepage')
-                  ? 'bg-[#8B0000] text-[#F4F4F4]'
-                  : '' }}">
-        
-        <!-- ACTIVE INDICATOR -->
-        <span
-          class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300
-                {{ request()->routeIs('homepage') ? 'opacity-100' : 'opacity-0' }}">
-        </span>
-
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-          Home
-        </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Home
-        </span>
+                {{ request()->routeIs('homepage') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+        <span class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+              {{ request()->routeIs('homepage') ? 'opacity-100' : 'opacity-0' }}"></span>
+        <i class="fa-solid fa-house text-base w-5"></i>
+        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Home</span>
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Home</span>
       </a>
 
-    <!-- APPOINTMENT -->
-    <a href="{{ route('appointment.index') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
-              transition-all duration-200
-              hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('appointment.index*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+      <!-- APPOINTMENT -->
+      <a href="{{ route('appointment.index') }}"
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('appointment.index*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+        <span class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+              {{ request()->routeIs('appointment.index*') ? 'opacity-100' : 'opacity-0' }}"></span>
+        <i class="fa-regular fa-calendar text-base w-5"></i>
+        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Appointment</span>
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointment</span>
+      </a>
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('appointment.index*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+      <!-- RECORD -->
+      <a href="{{ route('record') }}"
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('record*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+        <span class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+              {{ request()->routeIs('record*') ? 'opacity-100' : 'opacity-0' }}"></span>
+        <i class="fa-regular fa-folder-open text-base w-5"></i>
+        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Record</span>
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Record</span>
+      </a>
 
-      <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        Appointment
-      </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Appointment
-        </span>
-    </a>
+      <!-- ABOUT US -->
+      <a href="{{ route('about.us') }}"
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('about.us*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+        <span class="absolute left-0 top-1/2 -translate-y-1/2
+              h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+              {{ request()->routeIs('about.us*') ? 'opacity-100' : 'opacity-0' }}"></span>
+        <i class="fa-solid fa-circle-info text-base w-5"></i>
+        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">About Us</span>
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">About Us</span>
+      </a>
 
-    <!-- RECORD -->
-    <a href="{{ route('record') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
-              transition-all duration-200
-              hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('record*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('record*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-folder-open text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        Record
-      </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Record
-        </span>
-    </a>
-
-    <!-- ABOUT US -->
-    <a href="{{ route('about.us') }}"
-      class="sidebar-link relative flex items-center px-3 py-3 rounded-xl
-              transition-all duration-200
-              hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('about.us*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('about.us*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-circle-info text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        About Us
-      </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          About Us
-        </span>
-    </a>
-  </nav>
-</div>
+    </nav>
+  </div>
 
   <!-- BOTTOM -->
   <div class="px-3 pb-5 space-y-2">
 
     <a href="#"
-       class="sidebar-link relative flex items-center px-3 py-3 rounded-xl hover:bg-gray-100
-       transition-all duration-200">
-      <i class="fa-regular fa-circle-question"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-        Help
-      </span>
-      <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Help
-        </span>
+       class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 text-gray-500">
+      <i class="fa-regular fa-circle-question text-base w-5"></i>
+      <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Help</span>
+      <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Help</span>
     </a>
 
-  <!-- DARK MODE TOGGLE -->
-  <button
-    id="themeToggle"
-    class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-2 rounded-full
-          bg-[#7B6CF6] text-[#F4F4F4]
-          transition-all duration-200
-          hover:scale-105"
-    aria-label="Toggle dark mode">
+    <!-- DARK MODE TOGGLE -->
+    <button id="themeToggle"
+      class="sidebar-link relative flex items-center
+            w-full px-3 py-2.5 rounded-xl
+            bg-[#7B6CF6] text-[#F4F4F4]
+            transition-all duration-200 hover:scale-105"
+      aria-label="Toggle dark mode">
+      <i id="themeIcon" class="fa-regular fa-moon text-base w-5"></i>
+      <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Dark Mode</span>
+      <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dark Mode</span>
+    </button>
 
-    <i id="themeIcon" class="fa-regular fa-moon text-lg"></i>
-    <span class="sidebar-text opacity-0 w-0 overflow-hidden
-               transition-all duration-300 delay-150">
-      Dark Mode
-    </span>
-    <!-- Tooltip (collapsed only) -->
-    <span
-      class="sidebar-tooltip
-            absolute left-full ml-8
-            px-3 py-1
-            rounded-full
-            bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold
-            whitespace-nowrap
-            opacity-0 scale-95
-            pointer-events-none
-            transition-all duration-200">
-      Dark Mode
-    </span>
-  </button>
-    
     <form action="{{ route('logout') }}" method="POST">
       @csrf
-      <button
-        class="sidebar-link w-full relative flex items-center px-3 py-3 rounded-xl
-               text-red-600 hover:bg-red-50 transition-all duration-200">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-          Log out
-        </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Log out
-        </span>
+      <button class="sidebar-link w-full relative flex items-center px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
+        <i class="fa-solid fa-right-from-bracket text-base w-5"></i>
+        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Log Out</span>
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log Out</span>
       </button>
     </form>
 
@@ -584,33 +508,36 @@
 <!-- CONTENT -->
 <main
   id="mainContent"
-  class="pt-[100px]
-         px-6 py-10
-         w-full
-         transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
+  class="pt-[100px] px-6 py-6 fade-up min-h-screen"
+  >
 
   <div class="max-w-7xl mt-4 mx-auto">
-    <!-- WELCOME -->
-    <h1 class="text-4xl font-extrabold mb-8 flex items-center gap-3 fade-up">
-      <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
-        Welcome, {{ ucwords(strtolower($patient->name)) }}!
-      </span>
 
-      <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
-    </h1>
+    <!-- BREADCRUMB -->
+    <div class="text-sm mb-4 font-medium fade-up">
+      <span class="text-gray-400">User</span>
+      <span class="mx-1 text-gray-400">&gt;</span>
+      <span class="text-[#8B0000] font-semibold">Homepage</span>
+    </div>
 
     <!-- HERO CARD -->
     <div class="bg-gradient-to-r from-[#8B0000] to-[#660000]
             text-[#F4F4F4] rounded-2xl p-10
             flex justify-between items-center
-            mb-16 fade-up relative overflow-visible">
+            mb-6 fade-up relative overflow-visible">
 
       <div>
-        <h1 class="text-5xl font-extrabold mt-4 mb-2 text-[#F4F4F4] fade-up">
-          Your smile starts here!
+        <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
+        <p class="text-sm text-[#F4F4F4] mb-1" id="greetingText">Good morning</p>
+        <h1 class="text-5xl font-extrabold mt-1 mb-2 text-[#F4F4F4] fade-up">
+          <span class="bg-gradient-to-r from-[#F4F4F4] to-[#FFD700] bg-clip-text text-transparent">
+        Welcome, {{ ucwords(strtolower($patient->name)) }}!
+      </span>
+
+      <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
         </h1>
-        <h2 class="text-lg font-normal mb-10 text-[#F4F4F4] fade-up">
-          Book a dental appointment at your convenience.
+        <h2 class="text-sm font-normal mb-8 text-[#F4F4F4] fade-up">
+          Healthy teeth start with one appointment. Let's keep your smile at its best.
         </h2>
 
         <button
@@ -641,97 +568,65 @@
 
     </div>
 
-    <!-- PROFILE + CALENDAR SECTION -->
-    <section class="max-w-7xl mx-auto px-2 mb-10">
-      <div class="flex flex-col md:flex-row gap-8">
-
-      <!-- PROFILE CARD -->
-      <div id="profileSkeletonContainer" class="bg-gradient-to-t from-[#FFD700] to-[#660000] p-0.5 rounded-2xl md:w-1/3">
-        <!-- content will be injected by JS -->
+    <!-- UPCOMING SCHEDULE CARD -->
+    <div class="mb-6 fade-up">
+      <div id="upcomingScheduleContainer">
+        <!-- Injected by JS -->
       </div>
-      
-      <!-- Calendar Section -->
-      <div class="md:w-2/3 flex flex-col gap-2">
+    </div>
 
-        <!-- Title outside the card -->
-        <h2 class="text-3xl font-extrabold text-[#8B0000] mb-6">Upcoming Schedule</h2>
+      <!-- PROFILE + CALENDAR SECTION -->
+    <section class="max-w-7xl mx-auto mb-10">
+      <div class="flex flex-col md:flex-row gap-6">
 
-        <!-- Calendar Card (content injected by JS) -->
-        <div
-          id="calendarSkeletonContainer"
-          class="bg-white border shadow rounded-2xl p-6 h-[390px] w-full">
-          <!-- Skeleton OR real calendar goes here -->
+        <!-- LEFT COLUMN: Profile + Request Docs -->
+        <div class="md:w-[600px] flex-shrink-0 flex flex-col gap-5">
+
+          <!-- PROFILE CARD -->
+          <div id="profileSkeletonContainer" class="rounded-2xl overflow-hidden shadow-lg">
+            <!-- content will be injected by JS -->
+          </div>
+
+          <!-- REQUEST DOCUMENTS -->
+          <div class="bg-white rounded-2xl shadow-lg p-5">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-folder text-[#8B0000] text-lg"></i>
+              </div>
+              <h3 class="font-extrabold text-lg text-[#333333]">Request Documents</h3>
+            </div>
+            <div id="requestDocsContainer" class="space-y-3"></div>
+          </div>
+
         </div>
+
+        <!-- RIGHT COLUMN: Calendar -->
+        <div class="flex-1 flex flex-col gap-2">
+          <h2 class="text-xl font-extrabold text-[#8B0000] mb-3">Upcoming Schedule</h2>
+          <div id="calendarSkeletonContainer"
+            class="bg-white border shadow-sm rounded-2xl p-6 h-[420px] w-full">
+          </div>
         </div>
+
       </div>
     </section>
 
-    <!-- ========================= -->
     <!-- DENTAL RECORDS SECTION -->
-    <!-- ========================= -->
-    <h2 class="text-3xl font-extrabold text-[#8B0000] mb-4">
-      My Dental Records
-    </h2>
-
-    <div id="recordsContainer" class="bg-gradient-to-l from-[#FFD700] to-[#660000] p-0.5 rounded-2xl mb-10">
-      <div class="bg-white rounded-2xl p-6 space-y-4">
-
-        <!-- Records will be injected here -->
-        <div id="recordsInnerContainer" class="space-y-4"></div>
-
-        <!-- View All -->
-        <div id="viewAllContainer" class="text-center pt-2">
-        <button class="btn btn-soft bg-[#8B0000] hover:bg-[#333333]
-          transition-colors duration-300
-          border-none text-sm rounded-2xl text-[#F4F4F4]">
-          <a href="{{ route('record') }}">View Full Record </a>
-        </button>
+    <div class="bg-white rounded-2xl shadow-lg mb-8 fade-up overflow-hidden">
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b">
+        <h2 class="text-xl font-extrabold text-[#8B0000]">My Dental Records</h2>
+        <div id="viewAllContainer" class="hidden">
+          <a href="{{ route('record') }}"
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8B0000]
+                   border border-[#8B0000] px-4 py-1.5 rounded-lg hover:bg-[#8B0000] hover:text-white transition-colors duration-200">
+            View Full Record <i class="fa-solid fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+      </div>
+      <div class="px-6 py-4">
+        <div id="recordsInnerContainer" class="space-y-3"></div>
       </div>
     </div>
-  </div>
-
-    <!-- REQUEST DOCUMENTS -->
-    <h2 class="text-3xl font-extrabold text-[#8B0000] mb-6">Request Documents</h2>
-
-    <div id="requestDocsContainer" class="space-y-4">
-      <a onclick="dentalClearanceModal.showModal()"
-          class="flex border rounded-2xl overflow-hidden
-          hover:border-red-800 hover:shadow-lg
-          transition cursor-pointer">
-
-    <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-      <img src="images/dental-clearance.png"/>
-    </div>
-
-    <div class="p-4">
-      <p class="font-extrabold text-xl text-[#8B0000] pb-2">
-        Request Dental Clearance
-      </p>
-      <p class="text-sm text-[#333333]">
-        Dental Clearance • Annual Dental Clearance
-      </p>
-    </div>
-  </a>
-
-  <a onclick="dentalHealthRecordModal.showModal()"
-      class="flex border rounded-2xl overflow-hidden
-          hover:border-red-800 hover:shadow-lg
-          transition cursor-pointer">
-          
-          <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-            <img src="images/dental-health-record.png"/> </div>
-            
-            <div class="p-4">
-              <p class="font-extrabold text-xl text-[#8B0000] pb-2">
-                Request Dental Health Record </p>
-                
-                <p class="text-sm text-[#333333]">
-                  All Dental Records • Medical Record • Diagnosis & Treatments
-                </p>
-              </div>
-            </a>
-          </div>
-        </div>
 
 <!-- REQUEST CLEARANCE MODAL -->
 <dialog id="dentalClearanceModal" class="modal">
@@ -966,61 +861,51 @@ function updateThemeIcon(theme) {
   }
 }
 
-let sidebarOpen = false;
+let sidebarOpen = true; // expanded by default
 
 function applyLayout(sidebarWidth) {
   const sidebar = document.getElementById('sidebar');
   const main = document.getElementById('mainContent');
-
   sidebar.style.width = sidebarWidth;
   main.style.marginLeft = sidebarWidth;
-  main.style.width = `auto`;
 }
 
 function toggleSidebar() {
-  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.getElementById('sidebar');
   const texts = document.querySelectorAll('.sidebar-text');
   const icon = document.getElementById('sidebarIcon');
+  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
   sidebarOpen = !sidebarOpen;
 
   if (sidebarOpen) {
-    // EXPAND
-    applyLayout('16rem');
-
+    applyLayout('200px');
+    sidebar.classList.remove('collapsed');
+    sidebar.classList.add('expanded');
     texts.forEach(t => {
       t.classList.remove('opacity-0', 'w-0');
-      t.classList.add('opacity-100', 'w-auto');
+      t.classList.add('opacity-100');
     });
-
     toggleWrapper.classList.remove('justify-center');
     toggleWrapper.classList.add('justify-end');
-
-    toggleBtn.classList.add('translate-x-2');
     icon.classList.replace('fa-bars', 'fa-xmark');
-
   } else {
-    // COLLAPSE
     applyLayout('72px');
-
+    sidebar.classList.remove('expanded');
+    sidebar.classList.add('collapsed');
     texts.forEach(t => {
       t.classList.add('opacity-0', 'w-0');
-      t.classList.remove('opacity-100', 'w-auto');
+      t.classList.remove('opacity-100');
     });
-
     toggleWrapper.classList.remove('justify-end');
     toggleWrapper.classList.add('justify-center');
-
-    toggleBtn.classList.remove('translate-x-2');
     icon.classList.replace('fa-xmark', 'fa-bars');
   }
 }
 
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
   document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
+    sidebarOpen = true;
+    applyLayout('200px');
   });
 
   // Request Clearance Confirmation
@@ -1098,50 +983,12 @@ function validateHealthRecord(formId, message, modalId) {
 
     // Simulate fetching data after 2 seconds
     setTimeout(() => {
-      // Profile
+      renderProfile();
+      loadCalendar();
+      renderRequestDocs();
+      renderUpcomingSchedule();
 
-      // Calendar
-     document.getElementById("calendarSkeletonContainer").innerHTML = `
-      <calendar-date class="cally w-full h-full flex flex-col p-2 fade-up">
-        <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-          <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-        </svg>
-
-        <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-          <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-        </svg>
-
-        <calendar-month class="w-full flex-1"></calendar-month>
-      </calendar-date>
-    `;
-
-      // Dental Records
-      fetch("get_records.php")
-        .then(res => res.json())
-        .then(records => renderRecords(records))
-        .catch(() => showRecordsError());
-
-      // Request Documents
-      document.getElementById("requestDocsContainer").innerHTML = `
-        <a onclick="dentalClearanceModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
-          <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-            <img src="images/dental-clearance.png"/>
-          </div>
-          <div class="p-4">
-            <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Clearance</p>
-            <p class="text-sm text-[#333333]">Dental Clearance • Annual Dental Clearance</p>
-          </div>
-        </a>
-        <a onclick="dentalHealthRecordModal.showModal()" class="flex border rounded-2xl overflow-hidden hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
-          <div class="bg-[#8B0000] w-24 p-4 flex items-center justify-center">
-            <img src="images/dental-health-record.png"/>
-          </div>
-          <div class="p-4">
-            <p class="font-extrabold text-xl text-[#8B0000] pb-2">Request Dental Health Record</p>
-            <p class="text-sm text-[#333333]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
-          </div>
-        </a>
-      `;
+      renderRecords();
     }, 2000);
 
   });
@@ -1150,80 +997,187 @@ function validateHealthRecord(formId, message, modalId) {
   // Functions
   // =========================
   function showSkeletons() {
-    // Hide the "View Full Record" button while loading
     const viewAll = document.getElementById("viewAllContainer");
-    if (viewAll) viewAll.style.display = "none";
+    if (viewAll) viewAll.classList.add('hidden');
 
-    // Add skeleton animation to profile container
-    const profileContainer = document.getElementById("profileSkeletonContainer");
-    profileContainer.innerHTML = `
-    <div class="bg-[#FAFAFA] rounded-2xl p-5 text-center animate-pulse">
-      <div class="w-[210px] h-[210px] rounded-full mx-auto skeleton mb-4"></div>
-      <div class="h-6 w-32 mx-auto skeleton mb-2"></div>
-      <div class="h-4 w-20 mx-auto skeleton mb-2"></div>
-      <div class="h-5 w-24 mx-auto skeleton"></div>
-    </div>
-  `;
-
-  // 2️replace skeleton with real profile after 2s
-  setTimeout(() => {
-    profileContainer.innerHTML = `
-      <div class="bg-[#F4F4F4] rounded-2xl p-5 text-center fade-up">
-        <div class="avatar mb-4 flex justify-center">
-          <div class="w-[210px] rounded-full">
-            <img
-              src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128"
-              alt="Profile" />
-          </div>
+    document.getElementById("profileSkeletonContainer").innerHTML = `
+      <div class="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
+        <div class="bg-gray-200 h-24 w-full"></div>
+        <div class="p-4 space-y-3">
+          ${[1,2,3,4].map(() => `<div class="flex gap-4"><div class="h-3 w-24 skeleton"></div><div class="h-3 w-40 skeleton"></div></div>`).join('')}
         </div>
-        <h3 class="font-bold text-2xl mb-1">{{ isset($patient->name) ? ucwords($patient->name) : 'Guest' }}</h3>
-        <p class="text-sm italic mb-4">Patient</p>
-        <p class="text-[#8B0000] text-lg font-bold mt-2">{{ $patient->patient_id ?? 'N/A' }}</p>
-        <p class="text-sm font-semibold mt-2">{{ $patient->email ?? '-' }}</p>
-        <p class="text-sm font-semibold mt-1">{{ $patient->phone ?? '-' }}</p>
-        <p class="text-sm mt-2">{{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</p>
-        <p class="text-sm mt-1">{{ $patient->gender ?? '-' }}</p>
-      </div>
-    `;
-  }, 2000);
-
-    // Calendar Skeleton
-     setTimeout(() => {
-    loadCalendar();
-  }, 2000);
-
-    // Dental Records Skeleton
-    document.getElementById("recordsInnerContainer").innerHTML = `
-      <div class="space-y-4 animate-pulse">
-        ${[1,2,3].map(() => `
-          <div class="bg-white rounded-2xl p-5 space-y-3 shadow-sm">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 skeleton"></div>
-              <div class="flex-1 space-y-2">
-                <div class="h-4 w-1/2 skeleton"></div>
-                <div class="h-3 w-1/3 skeleton"></div>
-              </div>
-            </div>
-            <div class="h-3 w-full skeleton"></div>
-            <div class="h-3 w-5/6 skeleton"></div>
-          </div>
-        `).join("")}
       </div>
     `;
 
-    // Request Documents Skeleton
+    document.getElementById("upcomingScheduleContainer").innerHTML = `
+      <div class="bg-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6 animate-pulse">
+        <div class="w-12 h-12 skeleton rounded-xl"></div>
+        <div class="flex-1 grid grid-cols-3 gap-4">
+          ${[1,2,3].map(() => `<div class="space-y-2"><div class="h-2 w-20 skeleton"></div><div class="h-4 w-32 skeleton"></div></div>`).join('')}
+        </div>
+        <div class="h-7 w-24 skeleton rounded-full"></div>
+      </div>
+    `;
+
+    document.getElementById("calendarSkeletonContainer").innerHTML = `
+      <div class="animate-pulse space-y-4">
+        <div class="h-6 w-32 skeleton mx-auto"></div>
+        <div class="grid grid-cols-7 gap-2">
+          ${Array(35).fill('<div class="h-9 skeleton rounded-lg"></div>').join('')}
+        </div>
+      </div>
+    `;
+
     document.getElementById("requestDocsContainer").innerHTML = `
       ${[1,2].map(() => `
-        <div class="flex border rounded-2xl overflow-hidden animate-pulse">
-          <div class="w-24 p-4 skeleton"></div>
-          <div class="p-4 flex-1 space-y-2">
-            <div class="h-6 w-32 skeleton"></div>
-            <div class="h-4 w-1/2 skeleton"></div>
+        <div class="flex items-center gap-3 border rounded-xl p-3 animate-pulse">
+          <div class="w-10 h-10 skeleton rounded-lg flex-shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-3 w-36 skeleton"></div>
+            <div class="h-2 w-48 skeleton"></div>
           </div>
         </div>
-      `).join("")}
+      `).join('')}
+    `;
+
+    document.getElementById("recordsInnerContainer").innerHTML = `
+      <div class="space-y-3 animate-pulse">
+        ${[1,2,3].map(() => `
+          <div class="flex items-center gap-4 border rounded-xl p-4">
+            <div class="w-3 h-3 rounded-full bg-gray-200 flex-shrink-0"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-4 w-40 skeleton"></div>
+              <div class="h-3 w-56 skeleton"></div>
+            </div>
+            <div class="h-8 w-20 skeleton rounded-lg"></div>
+          </div>
+        `).join('')}
+      </div>
     `;
   }
+
+  function renderProfile() {
+    document.getElementById("profileSkeletonContainer").innerHTML = `
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm fade-up">
+        <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-5 pt-6 pb-6 text-[#F4F4F4] flex items-center gap-4">
+          <div class="avatar flex-shrink-0">
+            <div class="w-14 h-14 rounded-full overflow-hidden ring-2 ring-white/30">
+              <img src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128" alt="Profile" />
+            </div>
+          </div>
+          <div>
+            <p class="font-bold text-base leading-tight">{{ isset($patient->name) ? ucwords(strtolower($patient->name)) : 'Guest' }}</p>
+            <p class="text-xs text-[#F4F4F4]/70 mb-2">Patient</p>
+            <span class="inline-block bg-[#FFD700] text-[#660000] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+              {{ $patient->patient_id ?? 'N/A' }}
+            </span>
+          </div>
+        </div>
+        <div class="mx-0 bg-white divide-y divide-gray-100 text-sm rounded-b-2xl overflow-hidden">
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Date of Birth</span>
+            <span class="font-semibold text-[#333333]">{{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</span>
+          </div>
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Gender</span>
+            <span class="font-semibold text-[#333333]">{{ $patient->gender ?? '-' }}</span>
+          </div>
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Address</span>
+            <span class="font-semibold text-[#333333]">{{ $patient->address ?? '-' }}</span>
+          </div>
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Contact</span>
+            <div>
+              <p class="font-semibold text-[#333333]">{{ $patient->phone ?? '-' }}</p>
+            </div>
+          </div>
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Email</span>
+            <p class="font-semibold text-[#333333]">{{ $patient->email ?? '-' }}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderRequestDocs() {
+    document.getElementById("requestDocsContainer").innerHTML = `
+      <a onclick="dentalHealthRecordModal.showModal()"
+        class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
+        <div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <img src="{{ asset('images/dental-health-record.png') }}" class="w-7 h-6"/>
+        </div>
+        <div>
+          <p class="font-bold text-sm text-[#333333]">Request Dental Health Record</p>
+          <p class="text-xs text-[#9CA3AF]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
+        </div>
+      </a>
+      <a onclick="dentalClearanceModal.showModal()"
+        class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
+        <div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <img src="{{ asset('images/dental-clearance.png') }}" class="w-7 h-6"/>
+        </div>
+        <div>
+          <p class="font-bold text-sm text-[#333333]">Request Dental Clearance</p>
+          <p class="text-xs text-[#9CA3AF]">Dental Clearance • Annual Dental Clearance</p>
+        </div>
+      </a>
+    `;
+  }
+
+  function renderUpcomingSchedule() {
+  const container = document.getElementById("upcomingScheduleContainer");
+  @if(isset($upcomingAppointment) && $upcomingAppointment)
+  container.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6 fade-up">
+      <div class="w-12 h-12 bg-[#FFF0F0] rounded-xl flex items-center justify-center flex-shrink-0">
+        <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
+      </div>
+      <div class="flex-1 grid grid-cols-3 gap-4">
+        <div>
+          <p class="text-[10px] uppercase font-semibold text-gray-400 mb-0.5">Next Appointment</p>
+          <p class="font-bold text-sm text-[#333333]">{{ $upcomingAppointment->service_type ?? 'Dental Visit' }}</p>
+        </div>
+        <div>
+          <p class="text-[10px] uppercase font-semibold text-gray-400 mb-0.5">Date & Time</p>
+          <p class="font-bold text-sm text-[#333333]">
+            {{ \Carbon\Carbon::parse($upcomingAppointment->appointment_date)->format('F d, Y') }}
+            &bull;
+            {{ $upcomingAppointment->appointment_time }}
+          </p>
+        </div>
+        <div>
+          <p class="text-[10px] uppercase font-semibold text-gray-400 mb-0.5">Dentist</p>
+          <p class="font-bold text-sm text-[#333333]">{{ $upcomingAppointment->dentist_name ?? 'TBA' }}</p>
+        </div>
+      </div>
+      <div class="flex-shrink-0">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+          {{ ($upcomingAppointment->status ?? '') === 'Confirmed'
+            ? 'bg-green-50 text-green-600 border border-green-200'
+            : 'bg-yellow-50 text-yellow-600 border border-yellow-200' }}">
+          <span class="w-1.5 h-1.5 rounded-full
+            {{ ($upcomingAppointment->status ?? '') === 'Confirmed' ? 'bg-green-500' : 'bg-yellow-500' }}">
+          </span>
+          {{ $upcomingAppointment->status ?? 'Pending' }}
+        </span>
+      </div>
+    </div>
+  `;
+  @else
+  container.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-sm px-6 py-5 flex items-center gap-4 fade-up">
+      <div class="w-10 h-10 bg-[#FFF0F0] rounded-xl flex items-center justify-center flex-shrink-0">
+        <i class="fa-regular fa-calendar text-[#8B0000]"></i>
+      </div>
+      <p class="text-sm text-[#9CA3AF]">No upcoming appointments.
+        <a href="{{ route('book.appointment') }}" class="text-[#8B0000] font-semibold hover:underline">Book one now</a>.
+      </p>
+    </div>
+  `;
+  @endif
+}
 
   function showCalendarSkeleton() {
   document.getElementById("calendarSkeletonContainer").innerHTML = `
@@ -1250,71 +1204,72 @@ function loadCalendar() {
 }
 
   // Dental Records Rendering
-  function renderRecords(records) {
+  function renderRecords() {
     const container = document.getElementById("recordsInnerContainer");
     const viewAll = document.getElementById("viewAllContainer");
-    viewAll.style.display = records && records.length ? "block" : "none";
 
-    if (!records || records.length === 0) {
+    @if(isset($records) && $records->count() > 0)
       container.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
-          <div class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-r from-[#FFD700] to-[#8B0000] pulse-icon">
-            <img src="images/nodental-record.png" class="w-10 h-10">
-          </div>
-          <p class="text-2xl font-extrabold text-[#8B0000]">Nothing here yet…</p>
-          <p class="text-sm text-[#ADADAD] max-w-sm">Time to book that first visit.</p>
-          <a href="{{ route('book.appointment') }}" class="btn btn-soft bg-[#8B0000] hover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
-            Book Appointment
-          </a>
-        </div>
-      `;
-      // hide button if no records
-      viewAll.style.display = "none";
-      return;
-    }
-
-    container.innerHTML = "";
-    records.forEach(record => {
-      container.innerHTML += `
-        <div class="flex justify-between items-center border rounded-xl p-4 fade-up">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#FFD700] to-[#8B0000]"></span>
-              <p class="font-semibold">${record.procedure_name}</p>
+        <div class="relative">
+          <div class="absolute left-[10px] top-3 bottom-3 w-px bg-[#8B0000]/30"></div>
+          <div class="space-y-3 pl-10">
+            @foreach($records as $record)
+            <div class="relative flex justify-between items-center border rounded-xl px-6 py-4 bg-white hover:shadow-sm transition fade-up">
+              <div class="absolute -left-[26px] w-4 h-4 rounded-full bg-[#8B0000] border-2 border-white ring-2 ring-[#8B0000]/20"></div>
+              <div>
+                <p class="font-semibold text-[#8B0000] text-sm">{{ $record->service_type }}</p>
+                <p class="text-xs text-[#9CA3AF] mt-0.5">
+                  {{ \Carbon\Carbon::parse($record->appointment_date)->format('d M Y') }}
+                  &bull;
+                  {{ $record->appointment_time }}
+                </p>
+              </div>
+              <button
+                class="flex items-center gap-1.5 bg-[#8B0000] hover:bg-[#660000] text-[#F4F4F4] text-xs font-semibold px-4 py-2 rounded-lg transition-colors duration-200">
+                <i class="fa-regular fa-eye text-xs"></i> Details
+              </button>
             </div>
-            <p class="text-sm">Last Visit: ${formatDate(record.visit_date)}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-sm mb-2">${formatTime(record.time_start)} - ${formatTime(record.time_end)}</p>
-            <button onclick="viewRecord(${record.record_id})" class="btn btn-soft bg-[#8B0000] hover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4]">
-              View Details
-            </button>
+            @endforeach
           </div>
         </div>
       `;
-    });
-
-    // show "View Full Record" button with fade-up animation
-    viewAll.style.display = "block";
-    viewAll.classList.add("fade-up");
+      viewAll.classList.remove('hidden');
+    @else
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12 text-center space-y-4 fade-in">
+          <div class="w-24 h-24 flex items-center justify-center pulse-icon">
+            <img src="{{ asset('images/nodental-record.png') }}" class="w-24 h-24">
+          </div>
+          <p class="text-xl font-bold text-[#8B0000]">Nothing here yet…</p>
+          <p class="text-sm text-[#ADADAD]">Time to book that first visit.</p>
+          <button>
+            <a href="{{ route('book.appointment') }}"
+              class="btn btn-soft bg-[#8B0000] font-mediumhover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
+              Book Appointment
+            </a>
+          </button>
+        </div>
+      `;
+      viewAll.classList.add('hidden');
+    @endif
   }
 
-  function showRecordsError() {
-    const container = document.getElementById("recordsInnerContainer");
-    document.getElementById("viewAllContainer").style.display = "none";
-    container.innerHTML = `
-      <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
-        <img src="images/error-records.png" alt="Error" class="w-24 h-24">
-        <p class="text-2xl font-extrabold text-[#8B0000]">Oops! Something went wrong</p>
-        <p class="text-sm text-[#ADADAD] max-w-sm">Unable to fetch your records.</p>
-      </div>
-    `;
-  }
+  // function showRecordsError() {
+  //   const container = document.getElementById("recordsInnerContainer");
+  //   document.getElementById("viewAllContainer").style.display = "none";
+  //   container.innerHTML = `
+  //     <div class="flex flex-col items-center justify-center py-14 text-center space-y-5 fade-in">
+  //       <img src="images/error-records.png" alt="Error" class="w-24 h-24">
+  //       <p class="text-2xl font-extrabold text-[#8B0000]">Oops! Something went wrong</p>
+  //       <p class="text-sm text-[#ADADAD] max-w-sm">Unable to fetch your records.</p>
+  //     </div>
+  //   `;
+  // }
 
   // Helpers
-  function viewRecord(id) { window.location.href = `record.php?id=${id}`; }
-  function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString(); }
-  function formatTime(timeStr) { return timeStr.substring(0,5); }
+  // function viewRecord(id) { window.location.href = `record.php?id=${id}`; }
+  // function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString(); }
+  // function formatTime(timeStr) { return timeStr.substring(0,5); }
 
   function submitFormAjax(formId) {
     const form = document.getElementById(formId);
@@ -1338,6 +1293,60 @@ function loadCalendar() {
       alert('Something went wrong. Please try again.');
     });
   }
+
+  // Dynamic greeting
+  (function() {
+    const hour = new Date().getHours();
+    let greeting = 'Good morning';
+    if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
+    else if (hour >= 18) greeting = 'Good evening';
+    const el = document.getElementById('greetingText');
+    if (el) el.textContent = greeting;
+  })();
+
+  // NOTIFICATION
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("notifBtn");
+    const menu = document.getElementById("notifMenu");
+
+    let isOpen = false;
+
+    function openMenu() {
+      isOpen = true;
+      menu.classList.remove("notif-close");
+      menu.classList.add("notif-open");
+    }
+
+    function closeMenu() {
+      isOpen = false;
+      menu.classList.remove("notif-open");
+      menu.classList.add("notif-close");
+    }
+
+    // Toggle when clicking bell
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      isOpen ? closeMenu() : openMenu();
+    });
+
+    // Keep open when clicking inside menu
+    menu.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", () => {
+      if (isOpen) closeMenu();
+    });
+
+    // Close on ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isOpen) closeMenu();
+    });
+
+    // Start closed
+    closeMenu();
+  });
 
 </script>
 </body>
