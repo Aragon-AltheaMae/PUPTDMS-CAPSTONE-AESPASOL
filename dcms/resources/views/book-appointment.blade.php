@@ -1220,21 +1220,52 @@
   </div>
 </div>
 
-  <!-- STEP 5 -->
-<div class="step-content hidden">
-  <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
+ <!-- STEP 5 (CONFIRMATION) -->
+<div class="step-content hidden" id="step5">
+  <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10">
 
     <!-- TITLE -->
-    <h2 class="text-xl font-bold mb-2 text-[#660000]">
-      Confirmation Summary
-    </h2>
+    <h2 class="text-3xl font-normal text-[#660000] mb-4">Confirmation</h2>
 
-    <div id="summaryBox" class="bg-[#F4F4F4] p-4 rounded mb-4"></div>
+    <!-- RED LINE -->
+    <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
 
-    <label class="flex items-center gap-2 mt-3 cursor-pointer">
-      <input type="checkbox" required class="checkbox checkbox-sm border-[#8B0000]">
-      <span class="text-sm text-[#660000]">I confirm all information is correct.</span>
+    <!-- CHECKBOX + TEXT -->
+    <label class="flex items-start gap-3 cursor-pointer select-none">
+      <!-- custom checkbox look (matches screenshot style) -->
+      <input
+        id="finalConfirm"
+        type="checkbox"
+        class="mt-1 w-5 h-5 border border-[#8B0000] rounded bg-white accent-[#8B0000]"
+        required
+      />
+      <span class="text-gray-700 text-sm leading-5">
+        I hereby confirm that I have reviewed my dental and medical information and accepted
+        the
+        <a href="/privacy-policy" class="text-[#8B0000] hover:underline">Privacy Policy</a>
+        and
+        <a href="/terms-of-service" class="text-[#8B0000] hover:underline">Terms of Service</a>.
+      </span>
     </label>
+
+    <!-- BUTTONS (Back + Submit) -->
+    <div class="flex justify-center gap-4 mt-10">
+      <button
+        type="button"
+        id="confirmBackBtn"
+        class="min-w-[110px] px-6 py-2 rounded border border-gray-500 bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow relative z-10"
+      >
+        &lsaquo; Back
+      </button>
+
+      <button
+        type="button"
+        id="finalSubmitBtn"
+        class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white hover:bg-[#7A0000] transition shadow"
+      >
+        Submit
+      </button>
+    </div>
 
   </div>
 </div>
@@ -1269,98 +1300,91 @@
 </dialog>
 
 <!-- MINI TAB WARNING -->
-<div id="miniTab" 
+<div id="miniTab"
   class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-md text-sm z-50">
   Please complete all required fields before proceeding.
 </div>
 
-<!-- NAVIGATION BUTTONS -->
-<div class="flex justify-center mt-8 gap-6">
+<!-- NAVIGATION BUTTONS (for Steps 1-4 only) -->
+<div class="flex justify-center mt-8 gap-6" id="navBtns">
+
+  <!-- PREVIOUS -->
   <button
-  type="button"
-  id="prevBtn"
-  class="flex items-center gap-2 px-6 py-2
-         rounded-lg
-         border border-gray-400
-         bg-[#F4F4F4]
-         text-[#660000]
-         font-medium
-         hover:bg-[#ECECEC]
-         shadow
-         transition">
+    type="button"
+    id="prevBtn"
+    class="flex items-center gap-2 px-6 py-2 rounded-lg border border-gray-400 bg-[#F4F4F4] text-[#660000]
+           font-medium hover:bg-[#ECECEC] shadow transition">
     <span class="text-xl leading-none">&lsaquo;</span>
     <span>Previous</span>
   </button>
 
+  <!-- NEXT -->
   <button
-  type="button"
-  id="nextBtn"
-  class="btn btn-primary
-        shadow
-        pr-10
-        pl-10">
-  <span>Next</span>
-  <span class="text-xl leading-none">&rsaquo;</span>
+    type="button"
+    id="nextBtn"
+    class="btn btn-primary shadow pr-10 pl-10">
+    <span>Next</span>
+    <span class="text-xl leading-none">&rsaquo;</span>
   </button>
-  <button 
-      type="button" 
-      class="btn btn-success hidden" 
-      id="submitBtn"
-      onclick="document.getElementById('confirmModal').showModal()"
-    >
-      Submit
-  </button>
-  </div>
 
-
-<!-- CONFIRMATION MODAL -->
+</div>
+<!-- FINAL CONFIRMATION MODAL -->
 <dialog id="confirmModal" class="modal">
-  <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-md">
 
-    <!-- Top Accent Bar -->
-    <div class="h-2 bg-[#8B0000] w-full"></div>
+  <div class="bg-[#8B0000] text-white rounded-2xl p-10 max-w-md mx-auto text-center shadow-2xl">
 
-    <!-- Body -->
-    <div class="px-10 py-10 text-center">
+    <h2 class="text-2xl font-semibold mb-6">
+      Appointment Confirmed
+    </h2>
 
-      <!-- Title -->
-      <h3 class="text-2xl font-bold text-[#8B0000] mb-4">
-        Appointment Confirmed
-      </h3>
+    <p class="text-sm leading-6 mb-6" id="confirmMessage">
+      <!-- JS will insert message here -->
+    </p>
 
-      <!-- Message -->
-      <p class="text-gray-600 text-base leading-relaxed mb-8">
-        Your appointment has been successfully scheduled.
-      </p>
+    <p class="mb-6">Thank you!</p>
 
-      <!-- Button -->
-      <div class="flex justify-center">
-        <a href="{{ route('homepage') }}"
-           class="px-8 py-3 rounded-xl bg-[#8B0000] hover:bg-[#7A0000] 
-                  text-white font-semibold tracking-wide 
-                  shadow-md hover:shadow-lg 
-                  transition-all duration-300">
-          Back to Home
-        </a>
-      </div>
+     <!-- OK BUTTON WITH LARAVEL ROUTE -->
+    <a href="{{ route('homepage') }}"
+       class="inline-block bg-gray-200 text-[#8B0000] px-8 py-2 rounded shadow hover:bg-gray-300 transition">
+       OK
+    </a>
 
-    </div>
   </div>
+
 </dialog>
-
-
-
-
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
-
+/* =========================
+   MINI TAB
+========================= */
 const miniTab = document.getElementById("miniTab");
 
-/* -------- Data -------- */
-const holidays = ["2026-01-01","2026-04-09"];
+function showMiniTab(message) {
+  if (!miniTab) return;
+  miniTab.textContent = message || "Please complete all required fields before proceeding.";
+  miniTab.classList.remove("hidden");
+  miniTab.classList.add("show");
+
+  clearTimeout(window.__miniTabTimer);
+  window.__miniTabTimer = setTimeout(() => {
+    miniTab.classList.add("hidden");
+    miniTab.classList.remove("show");
+  }, 3000);
+}
+
+function showInputError(input) {
+  if (!input) return;
+  input.classList.add("input-error", "shake");
+  setTimeout(() => input.classList.remove("shake"), 300);
+}
+
+/* =========================
+   DATA
+========================= */
+const holidays = ["2026-01-01", "2026-04-09"];
 const allSlots = [
   { t: "9:00 AM", available: true },
   { t: "10:00 AM", available: true },
@@ -1545,9 +1569,14 @@ initMiniDatePicker('medicalExamDate');
 let step = 0;
 const steps = document.querySelectorAll(".step-content");
 const indicators = document.querySelectorAll(".step");
+
+const navBtns = document.getElementById("navBtns");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
-const submitBtn = document.getElementById("submitBtn");
+
+const confirmBackBtn = document.getElementById("confirmBackBtn");
+const finalSubmitBtn = document.getElementById("finalSubmitBtn");
+const finalConfirm = document.getElementById("finalConfirm");
 
 let completedSteps = [];
 
@@ -1560,7 +1589,7 @@ let completedSteps = [];
 
 
 function showStep(i) {
-  // Show step content
+  // show/hide content
   steps.forEach((s, idx) => {
     if (idx === i) {
       s.classList.remove("hidden");
@@ -1571,28 +1600,24 @@ function showStep(i) {
     }
   });
 
+  // Stepper indicators (Completed / In Progress)
   indicators.forEach((ind, idx) => {
-    // Remove old in-progress text
-    ind.querySelectorAll(".in-progress").forEach(el => el.remove());
-
-    // Remove completed text if step is not completed
-    if(idx >= i) {
+    ind.querySelectorAll(".in-progress").forEach((el) => el.remove());
+    if (idx >= i) {
       const completedText = ind.querySelector(".completed-text");
-      if(completedText) completedText.remove();
+      if (completedText) completedText.remove();
     }
 
-    // Reset styles
     ind.classList.remove("step-success", "step-primary", "in-progress-step");
     ind.style.color = "";
     ind.style.fontWeight = "";
 
-    if(idx < i && completedSteps.includes(idx)){
-      // Completed → green, bold
+    if (idx < i && completedSteps.includes(idx)) {
       ind.classList.add("step-success");
       ind.style.color = "#16a34a";
       ind.style.fontWeight = "700";
 
-      if(!ind.querySelector(".completed-text")){
+      if (!ind.querySelector(".completed-text")) {
         const completedText = document.createElement("span");
         completedText.className = "completed-text";
         completedText.textContent = "Completed";
@@ -1601,8 +1626,7 @@ function showStep(i) {
       }
     }
 
-    if(idx === i){
-      // Current → blue, bold
+    if (idx === i) {
       ind.classList.add("step-primary", "in-progress-step");
       ind.style.color = "#2563eb";
       ind.style.fontWeight = "700";
@@ -1611,34 +1635,60 @@ function showStep(i) {
       span.className = "in-progress";
       span.textContent = "In Progress";
       ind.appendChild(span);
-      setTimeout(() => span.classList.add("show"), 50); // fade-in animation
+      setTimeout(() => span.classList.add("show"), 50);
     }
   });
 
-  prevBtn.style.display = i === 0 ? "none" : "inline-flex";
-  nextBtn.style.display = i === steps.length - 1 ? "none" : "inline-flex";
-  submitBtn.style.display = i === steps.length - 1 ? "inline-flex" : "none";
+  // ✅ Hide bottom nav on Step 5
+  const isLast = i === steps.length - 1;
+  if (navBtns) navBtns.style.display = isLast ? "none" : "flex";
 
-  if(i === steps.length - 1) buildSummary();
+  // ✅ Bottom buttons only for Steps 1–4
+  if (prevBtn) prevBtn.style.display = i === 0 ? "none" : "inline-flex";
+  if (nextBtn) nextBtn.style.display = isLast ? "none" : "inline-flex";
 
-  // Scroll to top of form with fade
-  document.querySelector(".max-w-4xl").scrollIntoView({ behavior: "smooth" });
+  // build summary on last step
+  if (isLast) buildSummary();
+
+  // scroll
+  const formWrap = document.querySelector(".max-w-4xl");
+  if (formWrap) formWrap.scrollIntoView({ behavior: "smooth" });
+
+  // keep step value synced
+  step = i;
 }
 
-// CHECKER //
+/* =========================
+   VALIDATION
+========================= */
 function isStepComplete(currentStep) {
   const stepEl = steps[currentStep];
+  if (!stepEl) return true;
 
-  // Required fields check
-  const inputs = stepEl.querySelectorAll(
+  // Required text/select/textarea
+  const fields = stepEl.querySelectorAll(
     "input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]"
   );
-
-  for (const input of inputs) {
-    if (!input.value.trim()) return false;
+  for (const input of fields) {
+    if (!input.value || !input.value.trim()) return false;
   }
 
-  // Emergency Contact validation
+  // Required checkboxes
+  const requiredCheckboxes = stepEl.querySelectorAll("input[type='checkbox'][required]");
+  for (const cb of requiredCheckboxes) {
+    if (!cb.checked) return false;
+  }
+
+  // Radios grouped
+  const radios = stepEl.querySelectorAll("input[type='radio']");
+  if (radios.length) {
+    const groups = [...new Set([...radios].map((r) => r.name))];
+    for (const name of groups) {
+      if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
+    }
+  }
+
+  // Emergency Contact validation (digits only 1–11)
   const contactInput = stepEl.querySelector("#emergency_number");
   if (contactInput) {
     const value = contactInput.value.trim();
@@ -1649,112 +1699,64 @@ function isStepComplete(currentStep) {
     }
   }
 
-  // Radio validation
-  const radios = stepEl.querySelectorAll("input[type='radio']");
-  if (radios.length) {
-    const groups = [...new Set([...radios].map(r => r.name))];
-    for (const name of groups) {
-      if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
-    }
-  }
-
   return true;
 }
 
-
-function showMiniTab(message) {
-  miniTab.textContent = message;
-  miniTab.classList.remove("hidden");
-  miniTab.classList.add("show");
-
-  setTimeout(() => {
-    miniTab.classList.add("hidden");
-    miniTab.classList.remove("show");
-  }, 3000);
-}
-
-function showInputError(input) {
-  input.classList.add("input-error", "shake");
-  setTimeout(() => input.classList.remove("shake"), 300);
-}
-
-// Next button
-nextBtn.onclick = () => {
-  if (!isStepComplete(step)) {
-    // Show mini tab notification
-    miniTab.classList.remove("hidden");
-    miniTab.classList.add("show");
-
-    // Hide after 3 seconds
-    setTimeout(() => {
-      miniTab.classList.add("hidden");
-      miniTab.classList.remove("show");
-    }, 3000);
-
-    const firstEmpty = steps[step].querySelector("input[required]:invalid, select[required]:invalid, textarea[required]:invalid");
-    if (firstEmpty) {
-      firstEmpty.focus();
+/* =========================
+   NEXT / PREV HANDLERS
+========================= */
+if (nextBtn) {
+  nextBtn.addEventListener("click", () => {
+    if (!isStepComplete(step)) {
+      showMiniTab("Please complete all required fields before proceeding.");
       return;
     }
 
-    // For radios, focus first unanswered group
-    if (step === 3) {
-      const radios = steps[step].querySelectorAll("input[type='radio']");
-      const groups = [...new Set([...radios].map(r => r.name))];
-      for (let name of groups) {
-        if (!steps[step].querySelector(`input[name="${name}"]:checked`)) {
-          // Focus first radio in that group
-          const firstRadio = steps[step].querySelector(`input[name="${name}"]`);
-          if (firstRadio) firstRadio.focus();
-          break;
-        }
-      }
-    }
+    if (!completedSteps.includes(step)) completedSteps.push(step);
 
-    return; 
-  }
-
-  // Mark current step as completed
-  if (!completedSteps.includes(step)) completedSteps.push(step);
-
-  step++;
-  showStep(step);
-};
-
-// Previous button
-prevBtn.onclick = () => {
-  if(step > 0) step--;
-  showStep(step);
-};
-
-/* -------- Build Summary (Polished) -------- */
-function yn(val) {
-  return val ? val : "N/A";
+    const nextIndex = Math.min(step + 1, steps.length - 1);
+    showStep(nextIndex);
+  });
 }
 
+if (prevBtn) {
+  prevBtn.addEventListener("click", () => {
+    const prevIndex = Math.max(step - 1, 0);
+    showStep(prevIndex);
+  });
+}
+
+// Step 5 Back button (go back to Step 4)
+if (confirmBackBtn) {
+  confirmBackBtn.addEventListener("click", () => {
+    const prevIndex = Math.max(step - 1, 0);
+    showStep(prevIndex);
+  });
+}
+
+/* =========================
+   SUMMARY BUILDER
+========================= */
 function buildSummary() {
   const form = document.getElementById("appointmentForm");
+  if (!form) return;
+
   const data = new FormData(form);
 
   const date = document.getElementById("appointment_date").value;
   const time = document.getElementById("appointment_time").value;
 
-  const get = name => data.get(name) || "N/A";
-  const getAll = name => data.getAll(name);
+  const get = (name) => data.get(name) || "N/A";
+  const getAll = (name) => data.getAll(name);
 
   const selectedRelation = data.get("emergency_relation") || "";
   const typedRelation = (data.get("relation_other") || "").trim();
-
   const emergencyRelation =
-    selectedRelation === "Others"
-      ? (typedRelation || "Others")
-      : (selectedRelation || "N/A");
+    selectedRelation === "Others" ? typedRelation || "Others" : selectedRelation || "N/A";
 
   const signatureFile = data.get("patient_signature");
   let signatureHTML = "Not uploaded";
-
   if (signatureFile && signatureFile.size > 0) {
-    // Create a temporary URL for the uploaded image file
     const imageUrl = URL.createObjectURL(signatureFile);
     signatureHTML = `<img src="${imageUrl}" alt="Signature" style="max-width: 250px; max-height: 150px; border: 1px solid #8B0000; border-radius: 8px;">`;
   }
@@ -1766,9 +1768,8 @@ function buildSummary() {
     </div>
   `;
 
-  let html = `
+  const html = `
     <div class="space-y-6">
-
       ${card("Appointment Details", `
         <p><b>Date:</b> ${date}</p>
         <p><b>Time:</b> ${time}</p>
@@ -1817,64 +1818,106 @@ function buildSummary() {
       `)}
 
       ${card("Signature", signatureHTML)}
-
     </div>
   `;
 
-  document.getElementById("summaryBox").innerHTML = html;
+  const summaryBox = document.getElementById("summaryBox");
+  if (summaryBox) summaryBox.innerHTML = html;
 }
 
-/* -------- Modal Close + Redirect -------- */
-function closeModal() {
-  const modal = document.getElementById("confirmModal");
-  modal.close();
-  window.location.href = "index.html";
+/* =========================
+   MODAL (Step 5 Submit)
+========================= */
+const confirmModal = document.getElementById("confirmModal");
+const confirmMessage = document.getElementById("confirmMessage");
+const okBtn = document.getElementById("okBtn");
+
+if (finalSubmitBtn) {
+  finalSubmitBtn.addEventListener("click", () => {
+    if (!finalConfirm || !finalConfirm.checked) {
+      showMiniTab("Please confirm before submitting.");
+      return;
+    }
+
+    const date = document.getElementById("datePicker")?.value || "";
+    const time = document.getElementById("timeSlot")?.value || "";
+
+    if (confirmMessage) {
+      confirmMessage.innerHTML = `
+        Your dental appointment at PUP Taguig Dental Clinic
+        has been successfully scheduled on <b>${date}</b> at <b>${time}</b>.
+        Please arrive on time and bring your school or office ID.
+      `;
+    }
+
+    confirmModal?.showModal();
+  });
 }
 
+// OK button redirect
+if (okBtn) {
+  okBtn.addEventListener("click", () => {
+    // ✅ Change this to your Blade route if you prefer:
+    // window.location.href = "{{ route('homepage') }}";
+    window.location.href = "/patient/dashboard";
+  });
+}
 
+// prevent default form submit refresh
+const form = document.getElementById("appointmentForm");
+if (form) {
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+  });
+}
 
-/* -------- Date Dental History Boxes -------- */
+/* =========================
+   EXTRA TOGGLES (kept)
+========================= */
 const questions = [
-    { name: 'difficult_extraction', boxId: 'extraction_date_box' },
-    { name: 'dentures', boxId: 'dentures_date_box' },
-    { name: 'ortho_treatment', boxId: 'ortho_date_box' }
-  ];
+  { name: "difficult_extraction", boxId: "extraction_date_box" },
+  { name: "dentures", boxId: "dentures_date_box" },
+  { name: "ortho_treatment", boxId: "ortho_date_box" },
+];
 
-questions.forEach(q => {
+questions.forEach((q) => {
   const radios = document.getElementsByName(q.name);
   const box = document.getElementById(q.boxId);
+  if (!box || !radios.length) return;
+
   const input = box.querySelector("input");
 
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
       if (radio.checked && radio.value === "Yes") {
         box.classList.remove("hidden");
-        input.required = true;
+        if (input) input.required = true;
       } else if (radio.checked) {
         box.classList.add("hidden");
-        input.required = false;
-        input.value = "";
+        if (input) {
+          input.required = false;
+          input.value = "";
+        }
       }
     });
   });
 });
 
 const medicalExamRadios = document.querySelectorAll('input[name="had_medical_exam"]');
-  const medicalExamBox = document.getElementById("medical_exam_box");
+const medicalExamBox = document.getElementById("medical_exam_box");
 
-  medicalExamRadios.forEach(radio => {
-    radio.addEventListener("change", () => {
-      if (radio.value === "Yes" && radio.checked) {
-        medicalExamBox.classList.remove("hidden");
-      } else if (radio.value === "No" && radio.checked) {
-        medicalExamBox.classList.add("hidden");
-      }
-    });
+medicalExamRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (!medicalExamBox) return;
+    if (radio.value === "Yes" && radio.checked) medicalExamBox.classList.remove("hidden");
+    if (radio.value === "No" && radio.checked) medicalExamBox.classList.add("hidden");
   });
+});
 
 const relationSelect = document.getElementById("emergency_relation");
-  const otherInput = document.getElementById("relation_other");
+const otherInput = document.getElementById("relation_other");
 
+if (relationSelect && otherInput) {
   relationSelect.addEventListener("change", function () {
     if (this.value === "Others") {
       otherInput.classList.remove("hidden");
@@ -1885,29 +1928,31 @@ const relationSelect = document.getElementById("emergency_relation");
       otherInput.value = "";
     }
   });
+}
 
 const medicalToggles = [
-  { name: 'good_health', boxId: 'good_health_box', showOn: 'No' }, 
-  { name: 'under_treatment', boxId: 'treatment_box', showOn: 'Yes' },
-  { name: 'hospitalized', boxId: 'hospital_box', showOn: 'Yes' },
-  { name: 'medication', boxId: 'medication_box', showOn: 'Yes' }
+  { name: "good_health", boxId: "good_health_box", showOn: "No" },
+  { name: "under_treatment", boxId: "treatment_box", showOn: "Yes" },
+  { name: "hospitalized", boxId: "hospital_box", showOn: "Yes" },
+  { name: "medication", boxId: "medication_box", showOn: "Yes" },
 ];
 
-medicalToggles.forEach(item => {
+medicalToggles.forEach((item) => {
   const radios = document.getElementsByName(item.name);
   const box = document.getElementById(item.boxId);
+  if (!box || !radios.length) return;
 
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      const selected = [...radios].find(r => r.checked);
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const selected = [...radios].find((r) => r.checked);
       const inputs = box.querySelectorAll("input");
 
       if (selected && selected.value === item.showOn) {
-        box.classList.remove('hidden');
-        inputs.forEach(i => i.required = true);
+        box.classList.remove("hidden");
+        inputs.forEach((i) => (i.required = true));
       } else {
-        box.classList.add('hidden');
-        inputs.forEach(i => {
+        box.classList.add("hidden");
+        inputs.forEach((i) => {
           i.required = false;
           i.value = "";
         });
@@ -1916,83 +1961,65 @@ medicalToggles.forEach(item => {
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const tobaccoRadios = document.getElementsByName("tobacco_use");
-  const details = document.getElementById("tobacco_details");
-
-  tobaccoRadios.forEach(radio => {
+// Tobacco details
+const tobaccoRadios = document.getElementsByName("tobacco_use");
+const tobaccoDetails = document.getElementById("tobacco_details");
+if (tobaccoDetails && tobaccoRadios.length) {
+  tobaccoRadios.forEach((radio) => {
     radio.addEventListener("change", () => {
-      if (radio.checked && radio.value === "Yes") {
-        details.classList.remove("hidden");
-      } else {
-        details.classList.add("hidden");
-      }
+      if (radio.checked && radio.value === "Yes") tobaccoDetails.classList.remove("hidden");
+      else tobaccoDetails.classList.add("hidden");
     });
   });
-});
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("patient_signature");
-  const fileNameDisplay = document.getElementById("signature_filename");
-
-  input.addEventListener("change", () => {
-    if (input.files.length > 0) {
-      fileNameDisplay.textContent = input.files[0].name;
-      fileNameDisplay.classList.remove("hidden");
+// Signature filename display
+const signatureInput = document.getElementById("patient_signature");
+const signatureFileName = document.getElementById("signature_filename");
+if (signatureInput && signatureFileName) {
+  signatureInput.addEventListener("change", () => {
+    if (signatureInput.files.length > 0) {
+      signatureFileName.textContent = signatureInput.files[0].name;
+      signatureFileName.classList.remove("hidden");
     } else {
-      fileNameDisplay.textContent = "";
-      fileNameDisplay.classList.add("hidden");
+      signatureFileName.textContent = "";
+      signatureFileName.classList.add("hidden");
     }
   });
-});
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  const contactInput = document.getElementById("emergency_number");
-
-  if (!contactInput) return;
-
-  // INPUT EVENT
-  contactInput.addEventListener("input", (e) => {
+// Emergency number formatting
+const emergencyNumber = document.getElementById("emergency_number");
+if (emergencyNumber) {
+  emergencyNumber.addEventListener("input", (e) => {
     const rawValue = e.target.value;
 
     if (/[^0-9]/.test(rawValue)) {
       showMiniTab("Contact number must contain digits only.");
-      showInputError(contactInput);
-      contactInput.classList.remove("input-valid");
+      showInputError(emergencyNumber);
+      emergencyNumber.classList.remove("input-valid");
     }
 
     let value = rawValue.replace(/\D/g, "");
-
     if (value.startsWith("9")) value = "0" + value;
-    if (value.length === 1 && value !== "0") value = "09" + value;
 
     value = value.slice(0, 11);
-    contactInput.value = value;
+    emergencyNumber.value = value;
 
     if (/^09\d{9}$/.test(value)) {
-      contactInput.classList.remove("input-error");
-      contactInput.classList.add("input-valid");
+      emergencyNumber.classList.remove("input-error");
+      emergencyNumber.classList.add("input-valid");
     } else {
-      contactInput.classList.remove("input-valid");
+      emergencyNumber.classList.remove("input-valid");
     }
   });
 
-  // BLUR EVENT
-  contactInput.addEventListener("blur", () => {
-    if (contactInput.value === "") {
-      contactInput.classList.remove("input-error", "input-valid");
+  emergencyNumber.addEventListener("blur", () => {
+    if (emergencyNumber.value === "") {
+      emergencyNumber.classList.remove("input-error", "input-valid");
     }
   });
-});
-
-// confirmation modal 
-  document.getElementById("appointmentForm").addEventListener("submit", function(e) {
-      e.preventDefault(); // Prevent page reload
-      
-      // Show modal
-      document.getElementById("confirmModal").showModal();
-  });
-</script>
+}
 </script>
 </body>
 </html>
