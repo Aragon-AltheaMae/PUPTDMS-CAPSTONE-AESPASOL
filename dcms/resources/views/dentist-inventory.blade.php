@@ -656,20 +656,14 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
       <!-- UNIT -->
       <label class="text-sm text-[#8B0000]">Units</label>
-      <select id="addUnit"
-        class="select select-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
-        <option disabled selected>Select unit</option>
-        <option value="Box">Box</option>
-        <option value="Pack">Pack</option>
-        <option value="Bottle">Bottle</option>
-        <option value="Piece">Piece</option>
-      </select>
+      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+        placeholder="e.g. Box / Pack / Bottle / Piece">
 
       <!-- QTY -->
       <label class="text-sm text-[#8B0000]">Quantity</label>
       <input id="addQty" type="number"
         class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()">
+        oninput="computeAddBalance()"> 
 
       <!-- USED -->
       <label class="text-sm text-[#8B0000]">Consumed</label>
@@ -718,14 +712,9 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
       <label>Supply Name</label>
       <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
 
-      <label>Units</label>
-      <select id="editUnit"
-        class="select select-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
-        <option value="Box">Box</option>
-        <option value="Pack">Pack</option>
-        <option value="Bottle">Bottle</option>
-        <option value="Piece">Piece</option>
-      </select>
+      <label class="text-sm text-[#8B0000]">Units</label>
+      <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+        placeholder="e.g. Box / Pack / Bottle / Piece">
 
 
       <label>Quantity</label>
@@ -1077,7 +1066,7 @@ function resetAddForm() {
   addDate.value = '';
   addStock.value = '';
   addName.value = '';
-  addUnit.selectedIndex = 0;
+  addUnit.value = '';
   addQty.value = '';
   addUsed.value = '';
   addBalance.value = '';
@@ -1090,6 +1079,7 @@ async function addItem() {
     !addDate.value ||
     !addStock.value ||
     !addName.value ||
+    !addUnit.value ||
     addQty.value === ''
   ) {
     alert('Please complete all required fields.');

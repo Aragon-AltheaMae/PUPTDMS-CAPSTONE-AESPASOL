@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
     body {
@@ -87,6 +88,90 @@
   .completed-text.show {
     opacity: 1;
   }
+
+  /*Calendar*/
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px 0;
+    text-align: center;
+  }
+
+  .cal-grid .day-header {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #8B0000;
+    padding: 4px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .cal-grid .day-cell {
+    font-size: 0.85rem;
+    padding: 6px 2px;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    font-weight: 500;
+  }
+
+  .cal-grid .day-cell:hover:not(.disabled):not(.other-month) {
+    background: #f0d6d6;
+    color: #8B0000;
+  }
+
+  .cal-grid .day-cell.disabled { color: #ccc; cursor: not-allowed; }
+  .cal-grid .day-cell.other-month { color: #ddd; cursor: default; }
+  .cal-grid .day-cell.today { font-weight: 800; color: #8B0000; }
+  .cal-grid .day-cell.selected {
+    background: #8B0000 !important;
+    color: #fff !important;
+    font-weight: 700;
+  }
+
+  .cal-nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    color: #8B0000;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .cal-nav-btn:hover { background: #f0d6d6; }
+  .slot-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    border: 1.5px solid #8B0000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: #8B0000;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+  }
+
+  .slot-chip:hover:not(.full) { background: #f0d6d6; }
+  .slot-chip.selected { background: #8B0000; color: #fff; }
+  .slot-chip.full { border-color: #ccc; color: #999; cursor: not-allowed; text-decoration: line-through; }
+  .date-banner {
+    background: #8B0000;
+    color: #fff;
+    border-radius: 0.6rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: none;
+  }
+  .date-banner.show { display: block; }
 
   /* Fade-in for in-progress text */
   .in-progress {
@@ -201,20 +286,54 @@
     @csrf
 
     <!-- STEP 1 -->
-    <div class="step-content hidden">
-      <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2 mb-10">
-      Select Date and Time</h2>
+<div class="step-content hidden">
+  <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2 mb-10">
+    Select Date and Time
+  </h2>
 
-      <label class="text-l font-bold text-[#8B0000]">Date</label>
-      <input type="text" id="datePicker" name="appointment_date"
-       class="input input-bordered text-l w-full mt-2 mb-10"
-       placeholder="Select date" readonly>
-      
-      <label class="text-l font-bold text-[#8B0000]">Time Slot</label>
-      <select name="appointment_time" id="timeSlot" required class="select select-bordered text-l mt-2 w-full">
-        <option value="">Select time</option>
-      </select>
+  <!-- Hidden inputs keep same names for form submission -->
+  <input type="hidden" id="appointment_date" name="appointment_date">
+  <input type="hidden" id="appointment_time" name="appointment_time">
+
+  <div class="flex flex-col gap-6">
+
+    <!-- CALENDAR -->
+    <div class="bg-white border-2 border-[#8B0000] rounded-2xl p-4 flex-shrink-0 mx-auto" style="width: 650px;">
+      <div class="flex items-center justify-between mb-4">
+        <button class="cal-nav-btn" id="prevMonth" type="button">&#8249;</button>
+        <span id="monthLabel" class="font-bold text-[#8B0000] text-base tracking-wide"></span>
+        <button class="cal-nav-btn" id="nextMonth" type="button">&#8250;</button>
+      </div>
+      <div class="cal-grid mb-1">
+        <div class="day-header">Sun</div>
+        <div class="day-header">Mon</div>
+        <div class="day-header">Tue</div>
+        <div class="day-header">Wed</div>
+        <div class="day-header">Thu</div>
+        <div class="day-header">Fri</div>
+        <div class="day-header">Sat</div>
+      </div>
+      <div class="cal-grid" id="calDays"></div>
     </div>
+
+    <!-- TIME SLOTS -->
+    <div class="flex-1 w-full">
+      <label class="text-sm font-bold text-[#8B0000] block mb-3">Available Time Slots</label>
+      <div class="date-banner mb-4" id="dateBanner"></div>
+      <div id="slotContainer" class="hidden">
+        <p class="text-xs text-gray-500 mb-3 italic">Click a slot to select your preferred time.</p>
+        <div class="flex flex-wrap gap-2" id="slotGrid"></div>
+        <div id="selectedSlotDisplay" class="mt-4 text-sm font-semibold text-[#8B0000] hidden">
+          <i class="fa-regular fa-clock mr-1"></i> Selected: <span id="selectedSlotText"></span>
+        </div>
+      </div>
+      <div id="slotPlaceholder" class="text-sm text-gray-400 italic mt-2">
+      <i class="fa-regular fa-calendar-xmark mr-1"></i> Please select a date first.
+    </div>
+    </div>
+
+  </div>
+</div>
 
     <!-- STEP 2 -->
     <div class="step-content hidden">
@@ -308,11 +427,33 @@
       </div>
     </label>
 
+    <!-- Card 5 -->
+    <div class="col-span-1 md:col-span-2 flex justify-center">
+    <label class="cursor-pointer group w-1/2">
+      <input type="radio" name="service_type" value="Others" class="hidden peer">
+      <div class="bg-[#ECECEC] rounded-xl p-6 border-2 border-[#8B0000]
+                  peer-checked:bg-[#8B0000] peer-checked:text-[#F4F4F4]
+                  hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                  shadow-md hover:shadow-xl
+                  transition-all duration-200 ease-in
+                  animate-fade-up delay-4">
+        <div class="flex flex-col items-center text-center gap-3">
+          <div class="w-32 h-32 rounded-full flex items-center justify-center">
+            <img src="images/dental-others.png"/>
+          </div>
+          <h3 class="font-bold text-xl text-[#660000] text-current">Others</h3>
+          <p class="text-sm text-current">
+            Can't find your service? Let us know what you need.
+          </p>
+        </div>
+      </div>
+    </label>
     </div>
-  </div>
+    </div>
+</div>
 
     <!-- STEP 3 -->
-<div class="step-content hidden">
+  <div class="step-content hidden">
   <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
 
     <!-- TITLE -->
@@ -649,7 +790,7 @@
 
       <!-- LAST MEDICAL EXAM -->
       <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
-        <span>Have you had a medical examination in the past year?</span>
+        <span>When was your last medical examination?</span>
         <input type="radio" name="had_medical_exam" value="Yes"
           class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
         <input type="radio" name="had_medical_exam" value="No"
@@ -1129,6 +1270,35 @@
   </div>
 </div>
 
+<!-- OTHERS SERVICE MODAL -->
+<dialog id="othersModal" class="modal">
+  <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-md">
+    <div class="h-2 bg-[#8B0000] w-full"></div>
+    <div class="px-8 py-8">
+      <h3 class="text-xl font-bold text-[#8B0000] mb-1">Other Service</h3>
+      <p class="text-sm text-gray-500 mb-5">Please describe the service you need.</p>
+      <input
+        type="text"
+        id="service_others_text"
+        name="service_others_text"
+        class="input input-bordered border-[#8B0000] w-full mb-6"
+        placeholder="e.g. Teeth whitening, fluoride treatment..."
+        maxlength="100"
+      >
+      <div class="flex justify-end gap-3">
+        <button type="button" id="othersCancelBtn"
+          class="px-5 py-2 rounded-lg border border-gray-400 text-[#660000] font-medium hover:bg-gray-100 transition">
+          Cancel
+        </button>
+        <button type="button" id="othersConfirmBtn"
+          class="px-5 py-2 rounded-lg bg-[#8B0000] text-white font-medium hover:bg-[#6f0000] transition">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <!-- MINI TAB WARNING -->
 <div id="miniTab"
   class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-md text-sm z-50">
@@ -1225,75 +1395,177 @@ const allSlots = [
   { t: "3:00 PM", available: true },
 ];
 
-const timeSlot = document.getElementById("timeSlot");
-if (timeSlot) timeSlot.disabled = true;
+/* -------- Calendar -------- */
+let currentYear, currentMonth, selectedDate = null, selectedTime = null;
+const todayDate = new Date(); todayDate.setHours(0,0,0,0);
+currentYear  = todayDate.getFullYear();
+currentMonth = todayDate.getMonth();
 
-/* =========================
-   PIKADAY (MAIN DATE)
-========================= */
-if (document.getElementById("datePicker")) {
-  new Pikaday({
-    field: document.getElementById("datePicker"),
-    format: "YYYY-MM-DD",
-    minDate: new Date(),
-    disableDayFn: function (date) {
-      const day = date.getDay();
-      const formatted = date.toISOString().split("T")[0];
-      return day === 0 || day === 6 || holidays.includes(formatted);
-    },
-    onSelect: function (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      document.getElementById("datePicker").value = formattedDate;
-      loadTimeSlots(formattedDate);
-    },
-  });
+function pad(n) { return String(n).padStart(2, "0"); }
+function formatISO(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+function isDisabled(date) {
+  const day = date.getDay();
+  const iso = formatISO(date.getFullYear(), date.getMonth(), date.getDate());
+  return day === 0 || day === 6 || holidays.includes(iso) || date < todayDate;
 }
 
-function loadTimeSlots(date) {
-  if (!timeSlot) return;
-  timeSlot.innerHTML = '<option value="">Select time</option>';
-  timeSlot.disabled = false;
+function renderCalendar() {
+  const MONTHS = ["January","February","March","April","May","June",
+                  "July","August","September","October","November","December"];
+  document.getElementById("monthLabel").textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+  const calDays = document.getElementById("calDays");
+  calDays.innerHTML = "";
+
+  const firstDay    = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const prevDays    = new Date(currentYear, currentMonth, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const cell = document.createElement("div");
+    cell.className = "day-cell other-month";
+    cell.textContent = prevDays - firstDay + 1 + i;
+    calDays.appendChild(cell);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const iso  = formatISO(currentYear, currentMonth, d);
+    const cell = document.createElement("div");
+    cell.className = "day-cell";
+    cell.textContent = d;
+
+    if (isDisabled(date)) {
+      cell.classList.add("disabled");
+    } else {
+      cell.addEventListener("click", () => selectDate(iso, cell));
+    }
+
+    const todayISO = formatISO(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+    if (iso === todayISO) cell.classList.add("today");
+    if (iso === selectedDate) cell.classList.add("selected");
+
+    calDays.appendChild(cell);
+  }
+
+  const total = firstDay + daysInMonth;
+  const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= trailing; i++) {
+    const cell = document.createElement("div");
+    cell.className = "day-cell other-month";
+    cell.textContent = i;
+    calDays.appendChild(cell);
+  }
+}
+
+function selectDate(iso) {
+  selectedDate = iso;
+  selectedTime = null;
+  document.getElementById("appointment_date").value = iso;
+  document.getElementById("appointment_time").value = "";
+
+  const [y, m, d] = iso.split("-");
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const banner = document.getElementById("dateBanner");
+  banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
+  banner.classList.add("show");
+
+  renderCalendar();
+  renderSlots();
+}
+
+function renderSlots() {
+  document.getElementById("slotPlaceholder").classList.add("hidden");
+  document.getElementById("slotContainer").classList.remove("hidden");
+  document.getElementById("selectedSlotDisplay").classList.add("hidden");
+  document.getElementById("selectedSlotText").textContent = "";
+
+  const slotGrid = document.getElementById("slotGrid");
+  slotGrid.innerHTML = "";
 
   const slotsForDate = allSlots.slice(0, 5);
-  slotsForDate.forEach((s) => {
-    const opt = document.createElement("option");
-    opt.value = s.t;
-    opt.textContent = s.available ? `${s.t} – Available` : `${s.t} – FULL`;
-    if (!s.available) opt.disabled = true;
-    timeSlot.appendChild(opt);
-  });
+  slotsForDate.forEach(slot => {
+    const chip = document.createElement("div");
+    chip.className = "slot-chip" + (slot.available ? "" : " full");
+    chip.textContent = slot.available ? slot.t : `${slot.t} – Full`;
 
-  timeSlot.value = "";
+    if (slot.available) {
+      chip.addEventListener("click", () => {
+        slotGrid.querySelectorAll(".slot-chip").forEach(c => c.classList.remove("selected"));
+        chip.classList.add("selected");
+        selectedTime = slot.t;
+        document.getElementById("appointment_time").value = slot.t;
+        document.getElementById("selectedSlotText").textContent = slot.t;
+        document.getElementById("selectedSlotDisplay").classList.remove("hidden");
+      });
+    }
+    slotGrid.appendChild(chip);
+  });
 }
 
-/* =========================
-   MINI DATE PICKERS
-========================= */
+document.getElementById("prevMonth").addEventListener("click", () => {
+  currentMonth--;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  renderCalendar();
+});
+document.getElementById("nextMonth").addEventListener("click", () => {
+  currentMonth++;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  renderCalendar();
+});
+
+renderCalendar();
+// Others modal
+const othersModal = document.getElementById("othersModal");
+const othersInput = document.getElementById("service_others_text");
+const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
+
+othersRadio.addEventListener("change", function() {
+  othersInput.required = true;
+  othersModal.showModal();
+  setTimeout(() => othersInput.focus(), 100);
+});
+
+document.getElementById("othersConfirmBtn").addEventListener("click", () => {
+  if (!othersInput.value.trim()) {
+    othersInput.classList.add("input-error", "shake");
+    setTimeout(() => othersInput.classList.remove("shake"), 300);
+    return;
+  }
+  othersModal.close();
+});
+
+document.getElementById("othersCancelBtn").addEventListener("click", () => {
+  othersInput.value = "";
+  othersInput.required = false;
+  othersModal.close();
+  // Uncheck the Others radio
+  othersRadio.checked = false;
+});
+
 function initMiniDatePicker(id) {
   const el = document.getElementById(id);
   if (!el) return;
 
-  new Pikaday({
-    field: el,
-    maxDate: new Date(),
-    yearRange: [1950, new Date().getFullYear()],
-    showMonthAfterYear: true,
-    firstDay: 1,
-    onSelect: function (date) {
-      el.value = date.toISOString().split("T")[0];
-    },
-  });
+new Pikaday({
+  field: el,
+  maxDate: new Date(),
+  yearRange: [1950, new Date().getFullYear()],
+  showMonthAfterYear: true,
+  firstDay: 1,
+  onSelect: function(date) {
+    el.value = date.toISOString().split('T')[0]; 
+  }
+});
 }
 
-initMiniDatePicker("lastDentalVisit");
-initMiniDatePicker("extractionDate");
-initMiniDatePicker("denturesDate");
-initMiniDatePicker("orthoDate");
-initMiniDatePicker("medicalExamDate");
+initMiniDatePicker('lastDentalVisit');
+initMiniDatePicker('extractionDate');
+initMiniDatePicker('denturesDate');
+initMiniDatePicker('orthoDate');
+initMiniDatePicker('medicalExamDate');
 
-/* =========================
-   STEP LOGIC
-========================= */
+/* -------- Step Logic with "In Progress" & Checkmarks -------- */
 let step = 0;
 const steps = document.querySelectorAll(".step-content");
 const indicators = document.querySelectorAll(".step");
@@ -1308,16 +1580,24 @@ const finalConfirm = document.getElementById("finalConfirm");
 
 let completedSteps = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+// Initialize stepper on page load
   showStep(0);
-});
+  renderCalendar();
+  setTimeout(() => {
+    steps[0].classList.add("show");
+  }, 50);
+
 
 function showStep(i) {
   // show/hide content
   steps.forEach((s, idx) => {
-    s.classList.toggle("hidden", idx !== i);
-    if (idx === i) s.classList.add("show");
-    else s.classList.remove("show");
+    if (idx === i) {
+      s.classList.remove("hidden");
+      setTimeout(() => s.classList.add("show"), 50);
+    } else {
+      s.classList.remove("show");
+      s.classList.add("hidden");
+    }
   });
 
   // Stepper indicators (Completed / In Progress)
@@ -1463,8 +1743,8 @@ function buildSummary() {
 
   const data = new FormData(form);
 
-  const date = document.getElementById("datePicker")?.value || "N/A";
-  const time = document.getElementById("timeSlot")?.value || "N/A";
+  const date = document.getElementById("appointment_date").value;
+  const time = document.getElementById("appointment_time").value;
 
   const get = (name) => data.get(name) || "N/A";
   const getAll = (name) => data.getAll(name);
@@ -1495,7 +1775,9 @@ function buildSummary() {
         <p><b>Time:</b> ${time}</p>
       `)}
 
-      ${card("Service", `<p>${get("service_type")}</p>`)}
+      ${card("Service", `
+        <p>${get("service_type") === "Others" ? "Others – " + (get("service_others_text") || "N/A") : get("service_type")}</p>
+      `)}
 
       ${card("Dental History", `
         <p><b>Last Dental Visit:</b> ${get("last_dental_visit")}</p>
