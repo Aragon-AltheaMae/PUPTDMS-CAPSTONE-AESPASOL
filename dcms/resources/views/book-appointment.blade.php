@@ -16,7 +16,6 @@
 
   <style>
     body {
-      background-color: #F4F4F4;
       font-family: 'Inter';
     }
 
@@ -249,10 +248,10 @@
   </style>
 </head>
 
-<body class="bg-white">
+<body class="bg-[#F4F4F4]">
 
 <!-- HEADER -->
-<div class="bg-gradient-to-r from-red-900 to-red-700 text-white px-6 py-4 flex items-center justify-between">
+<div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
   <a href="{{ route('homepage') }}" class="flex items-center gap-3">
     <div class="w-12 ml-5">
       <img src="images/PUP.png" alt="PUP Logo">
@@ -263,9 +262,9 @@
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </a>
 
-  <a href="{{ route('homepage') }}" class="flex items-center gap-2 bg-white text-red-700 px-3 py-1 rounded-lg hover:bg-gray-100 transition">
-    <span class="font-semibold text-sm">Back to Home</span>
-  </a>
+    <a href="{{ route('homepage') }}" class="flex items-center gap-2 bg-white text-[#8B0000] px-3 py-1 rounded-lg hover:bg-gray-100 transition">
+      <span class="font-semibold text-sm">Back to Home</span>
+    </a>
 </div>
 
 <h1 class="text-4xl font-extrabold m-12 text-[#660000] text-center">
@@ -273,7 +272,7 @@
 </h1>
 
 <!-- MAIN FORM -->
-<div class="max-w-4xl mx-auto p-8 bg-[#ECECEC] rounded-xl mt-5 mb-12 shadow-xl">
+<div class="max-w-4xl mx-auto p-8 bg-white rounded-xl mt-5 mb-12 shadow-lg">
   <ul class="steps w-full mb-10">
     <li class="step step-primary" id="s1">Date & Time</li>
     <li class="step" id="s2">Service</li>
@@ -1222,10 +1221,10 @@
 
  <!-- STEP 5 (CONFIRMATION) -->
 <div class="step-content hidden" id="step5">
-  <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10">
+  <div class="bg-white shadow-xl rounded-xl p-10">
 
-    <h2 class="text-3xl font-normal text-[#660000] mb-4">Confirmation</h2>
-    <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
+    <h2 class="text-2xl font-bold text-[#660000] mb-4">Confirmation</h2>
+    <div class="h-[1px] w-full bg-[#8B0000] mb-8"></div>
     <div id="summaryBox" class="mb-8"></div>
     <label class="flex items-start gap-3 cursor-pointer select-none">
      
@@ -1249,16 +1248,16 @@
       <button
         type="button"
         id="confirmBackBtn"
-        class="min-w-[110px] px-6 py-2 rounded border border-gray-500 bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow relative z-10"
-      >
+        class="min-w-[110px] px-6 py-2 rounded border border-gray-500
+        bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow relative z-10">
         &lsaquo; Back
       </button>
 
       <button
         type="button"
         id="finalSubmitBtn"
-        class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white hover:bg-[#7A0000] transition shadow"
-      >
+        class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white
+        hover:bg-[#7A0000] transition shadow">
         Submit
       </button>
     </div>
