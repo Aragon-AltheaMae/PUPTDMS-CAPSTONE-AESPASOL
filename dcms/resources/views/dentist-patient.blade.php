@@ -134,6 +134,16 @@
       pointer-events: none !important;
     }
 
+  /* active right segment */
+   #openFilter.filter-active{
+  background:#8B0000 !important;
+  color:#fff !important;
+}
+
+#openFilter.filter-active i{
+  color:#fff !important;
+}
+
     /* DARK MODE */
     [data-theme="dark"] body {
     background-color: #111827; /* slate-900 */
@@ -580,10 +590,11 @@
       </div>
 
       <!-- ✅ UPDATED SEARCH BAR DESIGN (matches your screenshot) -->
-      <div class="flex items-center gap-6 w-full md:w-auto">
-        <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full md:w-auto">
-          <div class="flex items-center bg-white rounded-full overflow-hidden w-full">
-
+            <div class="flex items-center gap-6 w-full md:w-auto">
+            <div id="searchWrapper"
+                class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full md:w-auto">
+           <div id="searchInner"
+              class="flex items-center bg-white rounded-full overflow-hidden w-full h-12">
             <!-- left: search -->
             <div class="flex items-center gap-2 pl-3 pr-5 py-2 flex-1">
               <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
@@ -599,22 +610,21 @@
             </div>
 
             <!-- divider -->
-            <div class="w-[2px] self-stretch bg-[#F2C94C]"></div>
+            <div id="searchDivider" class="w-[2px] self-stretch bg-[#F2C94C]"></div>
 
             <!-- right: filter -->
-            <button
-              id="openFilter"
+            <button id="openFilter"
               type="button"
-              class="flex items-center gap-2 px-6 py-2 text-sm font-medium text-[#8B0000] bg-white hover:bg-[#FFF7E6] active:bg-[#FFEFC8]"
-            >
-              <i class="fa-solid fa-sliders text-[13px]"></i>
-              <span>Filter</span>
+              class="h-full px-6 flex items-center gap-2 font-semibold
+                    text-[#8B0000] bg-white
+                    rounded-none rounded-r-full border-0">
+              <i class="fa-solid fa-sliders"></i>
+              Filter
             </button>
 
           </div>
         </div>
 
-        <!-- Clear -->
         <button id="clearBtn" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">
           Clear
         </button>
@@ -1140,9 +1150,9 @@
 </main>
 
 <!-- FILTER MODAL  -->
-
 <div id="filterModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
-  <div class="bg-white w-[760px] rounded-xl shadow-2xl overflow-hidden border border-gray-200">
+  <div class="bg-white w-[760px] rounded-xl shadow-2xl overflow-hidden border border-gray-200 flex flex-col">
+
     <!-- Header -->
     <div class="px-6 py-4 flex items-center gap-3">
       <i class="fa-solid fa-sliders text-[#8B0000]"></i>
@@ -1150,7 +1160,8 @@
     </div>
     <div class="h-px bg-gray-200"></div>
 
-    <div class="px-6 py-5 space-y-5">
+    <!-- Body (scrollable if needed) -->
+    <div class="px-6 py-5 space-y-5 max-h-[76vh] overflow-y-auto scroll-smooth">
 
       <!-- Sort -->
       <div class="space-y-3">
@@ -1169,7 +1180,7 @@
 
       <div class="h-px bg-gray-200"></div>
 
-      <!-- Date Range + (Ascending/Descending on the right like screenshot) -->
+      <!-- Date Range -->
       <div class="space-y-3">
         <p class="text-sm text-gray-500">Date Range</p>
 
@@ -1197,7 +1208,7 @@
             </div>
           </div>
 
-          <!-- Right radios (visual only; DOES NOT affect your JS unless you want it to) -->
+          <!-- Right radios -->
           <div class="col-span-4 space-y-2 pt-6">
             <label class="flex items-center gap-3 text-sm text-gray-700">
               <input type="radio" name="dateOrder" value="Ascending" class="radio-red" />
@@ -1237,7 +1248,6 @@
 
       <!-- Year + Section -->
       <div class="grid grid-cols-12 gap-10">
-        <!-- Year -->
         <div class="col-span-6 space-y-3">
           <p class="text-sm text-gray-500">Year</p>
           <div class="grid grid-cols-2 gap-y-3 text-sm text-gray-700">
@@ -1248,7 +1258,6 @@
           </div>
         </div>
 
-        <!-- Section -->
         <div class="col-span-6 space-y-3">
           <p class="text-sm text-gray-500">Section</p>
           <div class="space-y-3 text-sm text-gray-700">
@@ -1258,25 +1267,46 @@
         </div>
       </div>
 
-    </div>
+      <div class="h-px bg-gray-200"></div>
+
+      <!-- Department -->
+      <div class="space-y-3">
+        <p class="text-sm text-gray-500">Department</p>
+
+        <div class="flex flex-wrap gap-x-12 gap-y-4 text-sm text-gray-700">
+          <label class="flex items-center gap-3 whitespace-nowrap">
+            <input type="radio" name="department" value="Administrative" class="filter-input radio-red" />
+            Administrative
+          </label>
+          <label class="flex items-center gap-3 whitespace-nowrap">
+            <input type="radio" name="department" value="Faculty" class="filter-input radio-red" />
+            Faculty
+          </label>
+          <label class="flex items-center gap-3 whitespace-nowrap">
+            <input type="radio" name="department" value="Dependent" class="filter-input radio-red" />
+            Dependent
+          </label>
+        </div>
+      </div>
+
+    </div><!-- ✅ END BODY -->
 
     <div class="h-px bg-gray-200"></div>
 
-    <!-- Footer actions -->
-    <div class="px-6 py-4 flex items-center justify-between">
+    <!-- Footer actions (always bottom) -->
+    <div class="px-6 py-4 flex items-center justify-between bg-white">
       <button id="clearFiltersModal" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">
         Clear
       </button>
 
-      <!-- keep id="applyFilters" so your JS still works -->
       <button id="applyFilters" type="button"
-        class="bg-[#8B0000] text-white px-8 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000]">
+        class="bg-[#8B0000] text-white px-8 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000] transition">
         Save
       </button>
     </div>
+
   </div>
 </div>
-
 
 <!-- Footer -->
 <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
@@ -1284,30 +1314,27 @@
 </footer>
 
 <script>
-// =========================
-// DARK MODE TOGGLE
-// =========================
+/* =========================
+   DARK MODE TOGGLE
+========================= */
 const themeToggle = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
 const html = document.documentElement;
 
-// Load saved theme
 const savedTheme = localStorage.getItem('theme') || 'light';
 html.setAttribute('data-theme', savedTheme);
 updateThemeIcon(savedTheme);
 
-// Toggle on click
-themeToggle.addEventListener('click', () => {
+themeToggle?.addEventListener('click', () => {
   const currentTheme = html.getAttribute('data-theme');
   const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
   html.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
   updateThemeIcon(newTheme);
 });
 
-// Icon switch
 function updateThemeIcon(theme) {
+  if (!themeIcon) return;
   if (theme === 'dark') {
     themeIcon.classList.remove('fa-moon');
     themeIcon.classList.add('fa-sun');
@@ -1317,11 +1344,15 @@ function updateThemeIcon(theme) {
   }
 }
 
+/* =========================
+   SIDEBAR TOGGLE
+========================= */
 let sidebarOpen = false;
 
 function applyLayout(sidebarWidth) {
   const sidebar = document.getElementById('sidebar');
   const main = document.getElementById('mainContent');
+  if (!sidebar || !main) return;
 
   sidebar.style.width = sidebarWidth;
   main.style.marginLeft = sidebarWidth;
@@ -1337,7 +1368,6 @@ function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
 
   if (sidebarOpen) {
-    // EXPAND
     applyLayout('16rem');
 
     texts.forEach(t => {
@@ -1345,14 +1375,12 @@ function toggleSidebar() {
       t.classList.add('opacity-100', 'w-auto');
     });
 
-    toggleWrapper.classList.remove('justify-center');
-    toggleWrapper.classList.add('justify-end');
+    toggleWrapper?.classList.remove('justify-center');
+    toggleWrapper?.classList.add('justify-end');
 
-    toggleBtn.classList.add('translate-x-2');
-    icon.classList.replace('fa-bars', 'fa-xmark');
-
+    toggleBtn?.classList.add('translate-x-2');
+    if (icon) icon.classList.replace('fa-bars', 'fa-xmark');
   } else {
-    // COLLAPSE
     applyLayout('72px');
 
     texts.forEach(t => {
@@ -1360,20 +1388,24 @@ function toggleSidebar() {
       t.classList.remove('opacity-100', 'w-auto');
     });
 
-    toggleWrapper.classList.remove('justify-end');
-    toggleWrapper.classList.add('justify-center');
+    toggleWrapper?.classList.remove('justify-end');
+    toggleWrapper?.classList.add('justify-center');
 
-    toggleBtn.classList.remove('translate-x-2');
-    icon.classList.replace('fa-xmark', 'fa-bars');
+    toggleBtn?.classList.remove('translate-x-2');
+    if (icon) icon.classList.replace('fa-xmark', 'fa-bars');
   }
 }
 
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  sidebarOpen = false;
+  applyLayout('72px');
+});
 
+
+/* =========================
+   PATIENT LIST FILTER + PAGINATION
+   ✅ includes LIVE "Filter button lights up" inside modal
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
   const patientContainer = document.getElementById("patientContainer");
   if (!patientContainer) return;
@@ -1381,9 +1413,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const allPatients = Array.from(patientContainer.querySelectorAll(".patient-item"));
 
   const filterModal = document.getElementById("filterModal");
-  const openFilter = document.getElementById("openFilter");
+  const filterPill = document.getElementById("openFilter");  // ✅ highlight this
   const clearFiltersModal = document.getElementById("clearFiltersModal");
-  const applyFilters = document.getElementById("applyFilters");
+  const applyFiltersBtn = document.getElementById("applyFilters");
   const searchInput = document.getElementById("searchInput");
   const clearBtn = document.getElementById("clearBtn");
   const filterButtons = document.querySelectorAll(".filter-btn");
@@ -1392,45 +1424,96 @@ document.addEventListener("DOMContentLoaded", () => {
   const rescheduledBtnCount = document.querySelector('.filter-btn[data-filter="rescheduled"] h3');
   const allBtnCount = document.querySelector('.filter-btn[data-filter="all"] h3');
 
-  // --- State
+  const monthPicker = document.getElementById("monthPicker"); // optional
+  const openFilter = document.getElementById("openFilter");
+const searchWrapper = document.getElementById("searchWrapper");
+const searchDivider = document.getElementById("searchDivider");
+
+  // -------------------------
+  // STATE
+  // -------------------------
   let activeTab = "today";
-  let activeSearch = "";
-  let activeSort = null;
-  let activeCourse = null;
-  let activeYear = null;
-  let activeSection = null;
+  let searchKeyword = "";
+
+  let selectedProgram = null;
+  let selectedYearLevel = null;
+  let selectedSection = null;
+  let selectedDepartment = null;
+
+  let nameSort = null; // "az" | "za"
+  let dateSort = null; // "asc" | "desc"
+
+  let selectedMonth = null;
+  let selectedCalendarYear = null;
+
   let activeFromDate = "";
   let activeToDate = "";
 
-  // Modal open/close
-  openFilter?.addEventListener("click", (e) => {
-    e.preventDefault();
-    filterModal.classList.remove("hidden");
+  // -------------------------
+  // MUTUAL EXCLUSION (dept <-> course/year/section)
+  // -------------------------
+  const deptRadios = [...document.querySelectorAll('input[name="department"]')];
+  const courseRadios = [...document.querySelectorAll('input[name="course"]')];
+  const yearRadios = [...document.querySelectorAll('input[name="year"]')];
+  const sectionRadios = [...document.querySelectorAll('input[name="section"]')];
+
+  const otherRadios = [...courseRadios, ...yearRadios, ...sectionRadios];
+
+  function anyChecked(list) {
+    return list.some(i => i.checked);
+  }
+
+  function setDisabled(list, disabled) {
+    list.forEach(i => {
+      i.disabled = disabled;
+      i.closest("label")?.classList.toggle("opacity-50", disabled);
+      i.closest("label")?.classList.toggle("cursor-not-allowed", disabled);
+    });
+  }
+
+  function clearChecked(list) {
+    list.forEach(i => (i.checked = false));
+  }
+
+  function syncMutualExclusion() {
+    const deptSelected  = anyChecked(deptRadios);
+    const otherSelected = anyChecked(otherRadios);
+
+    if (deptSelected) {
+      clearChecked(otherRadios);
+      setDisabled(otherRadios, true);
+      setDisabled(deptRadios, false);
+      return;
+    }
+
+    if (otherSelected) {
+      clearChecked(deptRadios);
+      setDisabled(deptRadios, true);
+      setDisabled(otherRadios, false);
+      return;
+    }
+
+    setDisabled(deptRadios, false);
+    setDisabled(otherRadios, false);
+  }
+
+  [...deptRadios, ...otherRadios].forEach(radio => {
+    radio.addEventListener("change", syncMutualExclusion);
   });
 
-  filterModal?.addEventListener("click", (e) => {
-    if (e.target === filterModal) filterModal.classList.add("hidden");
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") filterModal.classList.add("hidden");
-  });
-
-  // Clear button next to search (clears ONLY search text)
-  clearBtn?.addEventListener("click", () => {
-    if (!searchInput) return;
-    searchInput.value = "";
-    searchInput.dispatchEvent(new Event("input"));
-  });
-
+  // -------------------------
+  // HELPERS
+  // -------------------------
   function getInfo(p) {
     const raw = p.querySelector(".patient-info")?.textContent?.trim() || "";
-    const parts = raw.split("|");
+    const parts = raw.split("|").map(s => s.trim());
+
     return {
-      course: parts[0] || "",
+      program: parts[0] || "",
       year: parts[1] || "",
       section: parts[2] || "",
-      dateStr: parts[3] || ""
+      dateStr: parts[3] || "",
+      department: parts[4] || p.dataset.department || ""
     };
   }
 
@@ -1438,35 +1521,86 @@ document.addEventListener("DOMContentLoaded", () => {
     return (p.querySelector(".font-semibold")?.textContent || "").trim();
   }
 
-  function passesFilters(p, tabOverride = null) {
-    const tabToUse = tabOverride ?? activeTab;
+  function getType(p) {
+    return p.dataset.type || "";
+  }
 
-    if (tabToUse !== "all" && !p.classList.contains(tabToUse)) return false;
+  const infoLowerIncludes = (val, target) =>
+    (val || "").toLowerCase().includes((target || "").toLowerCase());
 
-    if (activeSearch) {
-      const name = getName(p).toLowerCase();
-      if (!name.includes(activeSearch)) return false;
-    }
+  // -------------------------
+  // FILTER BUTTON STATE (SAVED/APPLIED FILTERS)
+  // -------------------------
+ function updateFilterButtonState() {
+  const hasActiveFilters =
+    !!searchKeyword ||
+    !!selectedProgram ||
+    !!selectedYearLevel ||
+    !!selectedSection ||
+    !!selectedDepartment ||
+    !!nameSort ||
+    !!dateSort ||
+    !!activeFromDate ||
+    !!activeToDate;
 
-    const info = getInfo(p);
+  openFilter?.classList.toggle("filter-active", hasActiveFilters);
+}
+  // ✅ LIVE FILTER BUTTON STATE (WHILE CLICKING INSIDE MODAL)
+  function updateFilterButtonStateLiveFromModal() {
+    if (!filterPill || !filterModal) return;
 
-    if (activeCourse && !info.course.includes(activeCourse)) return false;
-    if (activeYear && !info.year.includes(activeYear)) return false;
-    if (activeSection && info.section !== activeSection) return false;
+    const anyRadioChecked = !!filterModal.querySelector('input[type="radio"]:checked');
+    const fromHasValue = !!document.getElementById("fromDate")?.value;
+    const toHasValue = !!document.getElementById("toDate")?.value;
 
-    if (activeFromDate || activeToDate) {
-      const d = info.dateStr ? new Date(info.dateStr) : null;
-      if (!d || isNaN(d.getTime())) return false;
+    // Light up if may pinipili sa modal OR may search OR may applied filters already
+    const liveActive = anyRadioChecked || fromHasValue || toHasValue || !!searchKeyword;
 
-      if (activeFromDate && d < new Date(activeFromDate)) return false;
-      if (activeToDate && d > new Date(activeToDate)) return false;
-    }
-
-    return true;
+    filterPill.classList.toggle("filter-active", liveActive);
   }
 
   // -------------------------
-  // 🔢 PAGINATION
+  // MODAL OPEN/CLOSE
+  // -------------------------
+  filterPill?.addEventListener("click", (e) => {
+    e.preventDefault();
+    filterModal?.classList.remove("hidden");
+    syncMutualExclusion();
+
+    // show live state immediately when modal opens
+    updateFilterButtonStateLiveFromModal();
+  });
+
+  filterModal?.addEventListener("click", (e) => {
+    if (e.target === filterModal) {
+      filterModal.classList.add("hidden");
+      // when closing, revert to APPLIED filters state
+      updateFilterButtonState();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      filterModal?.classList.add("hidden");
+      updateFilterButtonState();
+    }
+  });
+
+  // LIVE listen to any changes inside modal (radios + dates)
+  filterModal?.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("change", updateFilterButtonStateLiveFromModal);
+    inp.addEventListener("input", updateFilterButtonStateLiveFromModal); // for date typing
+  });
+
+  // Clear search button (ONLY search)
+  clearBtn?.addEventListener("click", () => {
+    if (!searchInput) return;
+    searchInput.value = "";
+    searchInput.dispatchEvent(new Event("input"));
+  });
+
+  // -------------------------
+  // PAGINATION
   // -------------------------
   const pagination = document.getElementById("pagination");
   const pageNumbers = document.getElementById("pageNumbers");
@@ -1481,14 +1615,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentItems = items;
     const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
-    pageNumbers.innerHTML = "";
+    if (pageNumbers) pageNumbers.innerHTML = "";
 
-    // Hide pagination if not needed
     if (totalPages <= 1) {
-      pagination.classList.add("hidden");
+      pagination?.classList.add("hidden");
       return;
     }
-    pagination.classList.remove("hidden");
+    pagination?.classList.remove("hidden");
 
     for (let i = 1; i <= totalPages; i++) {
       const btn = document.createElement("button");
@@ -1503,14 +1636,20 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePage();
       });
 
-      pageNumbers.appendChild(btn);
+      pageNumbers?.appendChild(btn);
     }
 
-    prevPageBtn.disabled = currentPage === 1;
-    prevPageBtn.classList.toggle("cursor-not-allowed", currentPage === 1);
-    prevPageBtn.classList.toggle("text-gray-300", currentPage === 1);
+    if (prevPageBtn) {
+      prevPageBtn.disabled = currentPage === 1;
+      prevPageBtn.classList.toggle("cursor-not-allowed", currentPage === 1);
+      prevPageBtn.classList.toggle("text-gray-300", currentPage === 1);
+    }
 
-    nextPageBtn.disabled = currentPage === totalPages;
+    if (nextPageBtn) {
+      nextPageBtn.disabled = currentPage === totalPages;
+      nextPageBtn.classList.toggle("cursor-not-allowed", currentPage === totalPages);
+      nextPageBtn.classList.toggle("text-gray-300", currentPage === totalPages);
+    }
   }
 
   function updatePage() {
@@ -1538,35 +1677,146 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // -------------------------
+  // APPLY FILTERS TO LIST
+  // -------------------------
+  function applyFilters() {
+    let data = [...allPatients];
 
-  function applyAll() {
-    let filtered = allPatients.filter(p => passesFilters(p));
+    // TAB
+    if (activeTab !== "all") {
+      data = data.filter(p => p.classList.contains(activeTab));
+    }
 
-    if (activeSort) {
-      filtered.sort((a, b) => {
-        const nameA = getName(a).toUpperCase();
-        const nameB = getName(b).toUpperCase();
-        return activeSort === "A-Z"
-          ? nameA.localeCompare(nameB)
-          : nameB.localeCompare(nameA);
+    // SEARCH
+    if (searchKeyword) {
+      data = data.filter(p => {
+        const info = getInfo(p);
+        const haystack = `${getName(p)} ${info.program} ${getType(p)} ${info.department}`.toLowerCase();
+        return haystack.includes(searchKeyword);
       });
     }
 
+    // PROGRAM
+    if (selectedProgram) {
+      data = data.filter(p => infoLowerIncludes(getInfo(p).program, selectedProgram));
+    }
+
+    // YEAR / SECTION
+    if (selectedYearLevel || selectedSection) {
+      data = data.filter(p => {
+        const info = getInfo(p);
+        if (selectedYearLevel && !infoLowerIncludes(info.year, selectedYearLevel)) return false;
+        if (selectedSection && String(info.section).trim() !== String(selectedSection).trim()) return false;
+        return true;
+      });
+    }
+
+    // DEPARTMENT
+    if (selectedDepartment) {
+      data = data.filter(p => infoLowerIncludes(getInfo(p).department, selectedDepartment));
+    }
+
+    // DATE RANGE
+    if (activeFromDate || activeToDate) {
+      data = data.filter(p => {
+        const ds = getInfo(p).dateStr;
+        const d = ds ? new Date(ds) : null;
+        if (!d || isNaN(d.getTime())) return false;
+
+        if (activeFromDate && d < new Date(activeFromDate)) return false;
+        if (activeToDate && d > new Date(activeToDate)) return false;
+
+        return true;
+      });
+    }
+
+    // MONTH/YEAR (optional)
+    if (selectedMonth && selectedCalendarYear) {
+      data = data.filter(p => {
+        const ds = getInfo(p).dateStr;
+        const d = ds ? new Date(ds) : null;
+        if (!d || isNaN(d.getTime())) return false;
+
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const y = String(d.getFullYear());
+        return m === selectedMonth && y === selectedCalendarYear;
+      });
+    }
+
+    // NAME SORT
+    if (nameSort === "az") data.sort((a, b) => getName(a).localeCompare(getName(b)));
+    if (nameSort === "za") data.sort((a, b) => getName(b).localeCompare(getName(a)));
+
+    // DATE SORT (optional)
+    if (dateSort === "asc") data.sort((a, b) => new Date(getInfo(a).dateStr) - new Date(getInfo(b).dateStr));
+    if (dateSort === "desc") data.sort((a, b) => new Date(getInfo(b).dateStr) - new Date(getInfo(a).dateStr));
+
     currentPage = 1;
-    renderPagination(filtered);
+    renderPagination(data);
     updatePage();
     updateCounts();
+    updateFilterButtonState();
+  }
 
+  // -------------------------
+  // COUNTS
+  // -------------------------
+  function computeCountForTab(tab) {
+    let data = [...allPatients];
+
+    if (tab !== "all") data = data.filter(p => p.classList.contains(tab));
+
+    if (searchKeyword) {
+      data = data.filter(p => {
+        const info = getInfo(p);
+        const haystack = `${getName(p)} ${info.program} ${getType(p)} ${info.department}`.toLowerCase();
+        return haystack.includes(searchKeyword);
+      });
+    }
+
+    if (selectedProgram) data = data.filter(p => infoLowerIncludes(getInfo(p).program, selectedProgram));
+
+    if (selectedYearLevel || selectedSection) {
+      data = data.filter(p => {
+        const info = getInfo(p);
+        if (selectedYearLevel && !infoLowerIncludes(info.year, selectedYearLevel)) return false;
+        if (selectedSection && String(info.section).trim() !== String(selectedSection).trim()) return false;
+        return true;
+      });
+    }
+
+    if (selectedDepartment) data = data.filter(p => infoLowerIncludes(getInfo(p).department, selectedDepartment));
+
+    if (activeFromDate || activeToDate) {
+      data = data.filter(p => {
+        const ds = getInfo(p).dateStr;
+        const d = ds ? new Date(ds) : null;
+        if (!d || isNaN(d.getTime())) return false;
+        if (activeFromDate && d < new Date(activeFromDate)) return false;
+        if (activeToDate && d > new Date(activeToDate)) return false;
+        return true;
+      });
+    }
+
+    if (selectedMonth && selectedCalendarYear) {
+      data = data.filter(p => {
+        const ds = getInfo(p).dateStr;
+        const d = ds ? new Date(ds) : null;
+        if (!d || isNaN(d.getTime())) return false;
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const y = String(d.getFullYear());
+        return m === selectedMonth && y === selectedCalendarYear;
+      });
+    }
+
+    return data.length;
   }
 
   function updateCounts() {
-    const todayCount = allPatients.filter(p => passesFilters(p, "today")).length;
-    const rescheduledCount = allPatients.filter(p => passesFilters(p, "rescheduled")).length;
-
-    const prevTab = activeTab;
-    activeTab = "all";
-    const allCount = allPatients.filter(p => passesFilters(p, "all")).length;
-    activeTab = prevTab;
+    const todayCount = computeCountForTab("today");
+    const rescheduledCount = computeCountForTab("rescheduled");
+    const allCount = computeCountForTab("all");
 
     if (scheduledBtnCount) scheduledBtnCount.textContent = todayCount;
     if (rescheduledBtnCount) rescheduledBtnCount.textContent = rescheduledCount;
@@ -1574,123 +1824,156 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // TAB CLICK (FILTER LOGIC)
+  // TABS
   // -------------------------
   filterButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       activeTab = btn.dataset.filter;
-      applyAll();
+      applyFilters();
     });
   });
 
   // -------------------------
-  // TAB COLOR UI (NEW – SAFE)
+  // SEARCH
   // -------------------------
-  const setActiveTabUI = (btn) => {
-    btn.classList.remove("bg-[#660000]", "text-white/75");
-    btn.classList.add("bg-[#8B0000]", "text-white");
-  };
-
-  const setInactiveTabUI = (btn) => {
-    btn.classList.remove("bg-[#8B0000]", "text-white");
-    btn.classList.add("bg-[#660000]", "text-white/75");
-  };
-
-  // Default active tab = TODAY
-  const defaultTab = document.querySelector('.filter-btn[data-filter="today"]');
-  if (defaultTab) setActiveTabUI(defaultTab);
-
-  filterButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      filterButtons.forEach(setInactiveTabUI);
-      setActiveTabUI(btn);
-    });
-  });
-
-
-  // Live search
   searchInput?.addEventListener("input", () => {
-    activeSearch = searchInput.value.trim().toLowerCase();
-    applyAll();
+    searchKeyword = searchInput.value.trim().toLowerCase();
+    applyFilters();
   });
 
-  // Apply filters in modal
-  applyFilters?.addEventListener("click", () => {
-    activeSort = filterModal.querySelector('input[name="sort"]:checked')?.value || null;
-    activeCourse = filterModal.querySelector('input[name="course"]:checked')?.value || null;
-    activeYear = filterModal.querySelector('input[name="year"]:checked')?.value || null;
-    activeSection = filterModal.querySelector('input[name="section"]:checked')?.value || null;
-    activeFromDate = document.getElementById("fromDate").value || "";
-    activeToDate = document.getElementById("toDate").value || "";
+  // -------------------------
+  // MONTH PICKER (optional)
+  // -------------------------
+  if (monthPicker) {
+    monthPicker.addEventListener("change", (e) => {
+      if (!e.target.value) {
+        selectedMonth = null;
+        selectedCalendarYear = null;
+      } else {
+        const [year, month] = e.target.value.split("-");
+        selectedMonth = month;
+        selectedCalendarYear = year;
+      }
+      applyFilters();
+    });
 
-    filterModal.classList.add("hidden");
-    applyAll();
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yy = String(now.getFullYear());
+    monthPicker.value = `${yy}-${mm}`;
+    selectedMonth = mm;
+    selectedCalendarYear = yy;
+  }
+
+  // -------------------------
+  // APPLY (SAVE) FILTERS (MODAL)
+  // -------------------------
+  applyFiltersBtn?.addEventListener("click", () => {
+    selectedDepartment = filterModal?.querySelector('input[name="department"]:checked')?.value || null;
+    selectedProgram    = filterModal?.querySelector('input[name="course"]:checked')?.value || null;
+    selectedYearLevel  = filterModal?.querySelector('input[name="year"]:checked')?.value || null;
+    selectedSection    = filterModal?.querySelector('input[name="section"]:checked')?.value || null;
+
+    const sortVal = filterModal?.querySelector('input[name="sort"]:checked')?.value || null;
+    nameSort = (sortVal === "A-Z" || sortVal === "az") ? "az"
+           : (sortVal === "Z-A" || sortVal === "za") ? "za"
+           : null;
+
+    // date order radios (Ascending/Descending) -> map to "asc/desc"
+    const dateOrderVal = filterModal?.querySelector('input[name="dateOrder"]:checked')?.value || null;
+    dateSort = (dateOrderVal === "Ascending" || dateOrderVal === "asc") ? "asc"
+           : (dateOrderVal === "Descending" || dateOrderVal === "desc") ? "desc"
+           : null;
+
+    activeFromDate = document.getElementById("fromDate")?.value || "";
+    activeToDate   = document.getElementById("toDate")?.value || "";
+
+    filterModal?.classList.add("hidden");
+    syncMutualExclusion();
+    applyFilters();           // ✅ applies + highlights based on saved
+    updateFilterButtonState();// ✅ ensure pill stays correct
   });
 
-  // Clear filters in modal
+  // -------------------------
+  // CLEAR FILTERS (MODAL)
+  // -------------------------
   clearFiltersModal?.addEventListener("click", () => {
-    filterModal.querySelectorAll(".filter-input").forEach(i => i.checked = false);
-    document.getElementById("fromDate").value = "";
-    document.getElementById("toDate").value = "";
+    // Uncheck all radios inside modal
+    filterModal?.querySelectorAll("input[type='radio']").forEach(i => {
+      i.checked = false;
+      i.disabled = false;
+      i.closest("label")?.classList.remove("opacity-50", "cursor-not-allowed");
+    });
 
-    activeSort = null;
-    activeCourse = null;
-    activeYear = null;
-    activeSection = null;
+    // Reset dates
+    const from = document.getElementById("fromDate");
+    const to = document.getElementById("toDate");
+    if (from) from.value = "";
+    if (to) to.value = "";
+
+    // Reset state
+    selectedDepartment = null;
+    selectedProgram = null;
+    selectedYearLevel = null;
+    selectedSection = null;
+    nameSort = null;
+    dateSort = null;
     activeFromDate = "";
     activeToDate = "";
 
-    filterModal.classList.add("hidden");
-    applyAll();
+    syncMutualExclusion();
+    filterModal?.classList.add("hidden");
+    applyFilters();
+    updateFilterButtonState();
   });
 
-  // Initial render
-  applyAll();
+  // -------------------------
+  // INITIAL
+  // -------------------------
+  syncMutualExclusion();
+  applyFilters();
 });
 
-// NOTIFICATION
+
+/* =========================
+   NOTIFICATION DROPDOWN
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("notifBtn");
-    const menu = document.getElementById("notifMenu");
+  const btn = document.getElementById("notifBtn");
+  const menu = document.getElementById("notifMenu");
+  if (!btn || !menu) return;
 
-    let isOpen = false;
+  let isOpen = false;
 
-    function openMenu() {
-      isOpen = true;
-      menu.classList.remove("notif-close");
-      menu.classList.add("notif-open");
-    }
+  function openMenu() {
+    isOpen = true;
+    menu.classList.remove("notif-close");
+    menu.classList.add("notif-open");
+  }
 
-    function closeMenu() {
-      isOpen = false;
-      menu.classList.remove("notif-open");
-      menu.classList.add("notif-close");
-    }
+  function closeMenu() {
+    isOpen = false;
+    menu.classList.remove("notif-open");
+    menu.classList.add("notif-close");
+  }
 
-    // Toggle when clicking bell
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    // Keep open when clicking inside menu
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-
-    // Close when clicking outside
-    document.addEventListener("click", () => {
-      if (isOpen) closeMenu();
-    });
-
-    // Close on ESC
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) closeMenu();
-    });
-
-    // Start closed
-    closeMenu();
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isOpen ? closeMenu() : openMenu();
   });
+
+  menu.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("click", () => {
+    if (isOpen) closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen) closeMenu();
+  });
+
+  closeMenu();
+});
 </script>
 
 </body>

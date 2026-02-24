@@ -29,6 +29,8 @@
         }
       }
     }
+
+    
   </script>
 </head>
 
@@ -416,19 +418,7 @@
 
 
 <script>
-  // Tailwind configuration
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: { sans: ['Inter', 'ui-sans-serif'] },
-        colors: {
-          primary: '#8B0000'
-        }
-      }
-    }
-  }
-
-
+  
   // Show Future Visits content
   function showFuture() {
     document.getElementById('futureContent').classList.remove('hidden');
