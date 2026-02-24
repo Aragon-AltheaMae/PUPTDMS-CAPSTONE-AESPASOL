@@ -1132,19 +1132,57 @@
   <span>Next</span>
   <span class="text-xl leading-none">&rsaquo;</span>
   </button>
-  <button type="submit" class="btn btn-success hidden" id="submitBtn">Submit</button>
-</div>
+  <button 
+      type="button" 
+      class="btn btn-success hidden" 
+      id="submitBtn"
+      onclick="document.getElementById('confirmModal').showModal()"
+    >
+      Submit
+  </button>
+  </div>
+
 
 <!-- CONFIRMATION MODAL -->
 <dialog id="confirmModal" class="modal">
-  <div class="modal-box">
-    <h3 class="font-bold text-lg">Appointment Confirmed</h3>
-    <p class="py-4" id="modalText"></p>
-    <div class="modal-action">
-      <button class="btn" onclick="closeModal()">OK</button>
+  <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-md">
+
+    <!-- Top Accent Bar -->
+    <div class="h-2 bg-[#8B0000] w-full"></div>
+
+    <!-- Body -->
+    <div class="px-10 py-10 text-center">
+
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-[#8B0000] mb-4">
+        Appointment Confirmed
+      </h3>
+
+      <!-- Message -->
+      <p class="text-gray-600 text-base leading-relaxed mb-8">
+        Your appointment has been successfully scheduled.
+      </p>
+
+      <!-- Button -->
+      <div class="flex justify-center">
+        <a href="{{ route('homepage') }}"
+           class="px-8 py-3 rounded-xl bg-[#8B0000] hover:bg-[#7A0000] 
+                  text-white font-semibold tracking-wide 
+                  shadow-md hover:shadow-lg 
+                  transition-all duration-300">
+          Back to Home
+        </a>
+      </div>
+
     </div>
   </div>
 </dialog>
+
+
+
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
@@ -1509,33 +1547,7 @@ function closeModal() {
   window.location.href = "index.html";
 }
 
-/* -------- Submit & Modal -------- */
-/*document.getElementById("appointmentForm").onsubmit = function(e){
-  e.preventDefault();
-  const date = document.getElementById("datePicker").value;
-  const time = timeSlot.value;
 
-  const formData = new FormData(this);
-  formData.append("appointment_date", date);
-
-  fetch("save_appointment.php", { method:"POST", body: formData })
-    .then(res => res.json())
-    .then(data => {
-      if(data.status === "success") {
-        document.getElementById("modalText").innerHTML = `
-          Your dental appointment at <b>PUP Taguig Dental Clinic</b> has been successfully scheduled on
-          <b>${date}</b> at <b>${time}</b>.<br><br>
-          Please arrive on time and bring your school or office ID.<br><br>
-          Thank you!
-        `;
-        confirmModal.showModal();
-      } else {
-        alert(data.message);
-        loadTimeSlots(date);
-      }
-    })
-    .catch(()=> alert("Something went wrong. Please try again."));
-};*/
 
 /* -------- Date Dental History Boxes -------- */
 const questions = [
@@ -1689,6 +1701,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// confirmation modal 
+  document.getElementById("appointmentForm").addEventListener("submit", function(e) {
+      e.preventDefault(); // Prevent page reload
+      
+      // Show modal
+      document.getElementById("confirmModal").showModal();
+  });
+</script>
 </script>
 </body>
 </html>
