@@ -1224,15 +1224,11 @@
 <div class="step-content hidden" id="step5">
   <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10">
 
-    <!-- TITLE -->
     <h2 class="text-3xl font-normal text-[#660000] mb-4">Confirmation</h2>
-
-    <!-- RED LINE -->
     <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
-
-    <!-- CHECKBOX + TEXT -->
+    <div id="summaryBox" class="mb-8"></div>
     <label class="flex items-start gap-3 cursor-pointer select-none">
-      <!-- custom checkbox look (matches screenshot style) -->
+     
       <input
         id="finalConfirm"
         type="checkbox"
@@ -1328,6 +1324,7 @@
   </button>
 
 </div>
+
 <!-- FINAL CONFIRMATION MODAL -->
 <dialog id="confirmModal" class="modal">
 
@@ -1839,8 +1836,8 @@ if (finalSubmitBtn) {
       return;
     }
 
-    const date = document.getElementById("datePicker")?.value || "";
-    const time = document.getElementById("timeSlot")?.value || "";
+    const date = document.getElementById("appointment_date")?.value || "N/A";
+    const time = document.getElementById("appointment_time")?.value || "N/A";
 
     if (confirmMessage) {
       confirmMessage.innerHTML = `
