@@ -816,13 +816,41 @@
 
     </form>
 
-    <!-- Mini Tab: Download Complete Notification -->
-    <div id="downloadCompleteTab" class="hidden fixed top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-green-600 text-white py-2 px-8 rounded-lg shadow-lg">
-      Download Complete
-    </div>
+<!-- DOWNLOAD COMPLETE MODAL -->
+<dialog id="downloadCompleteModal" class="modal">
+  <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-md">
 
-        </div>
-      </dialog>
+    <!-- Top Accent Bar -->
+    <div class="h-2 bg-[#8B0000] w-full"></div>
+
+    <!-- Body -->
+    <div class="px-10 py-10 text-center">
+
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-[#8B0000] mb-4">
+        Download Complete
+      </h3>
+
+      <!-- Message -->
+      <p class="text-gray-600 text-base leading-relaxed mb-8">
+        Your report has been successfully downloaded.
+      </p>
+
+      <!-- Okay Button -->
+      <div class="flex justify-center">
+        <button
+          onclick="closeDownloadModal()"
+          class="px-8 py-3 rounded-xl bg-[#8B0000] hover:bg-[#7A0000]
+                 text-white font-semibold tracking-wide
+                 shadow-md hover:shadow-lg
+                 transition-all duration-300">
+          Okay
+        </button>
+      </div>
+
+    </div>
+  </div>
+</dialog>
     </div>
   </main>
 </body>
@@ -1155,6 +1183,21 @@ function toggleSidebar() {
     // Start closed
     closeMenu();
   });
+// DOWNLOAD COMPLETE MODAL LOGIC
+  const downloadBtn = document.getElementById("downloadReportBtn");
+  const downloadModal = document.getElementById("downloadCompleteModal");
+
+  downloadBtn.addEventListener("click", function () {
+
+    // 👉 Your actual download logic should be here
+
+    // After download completes, show modal
+    downloadModal.showModal();
+  });
+
+  function closeDownloadModal() {
+    downloadModal.close();
+  }
 </script>
 
 </body>
