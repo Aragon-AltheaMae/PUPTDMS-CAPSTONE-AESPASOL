@@ -228,7 +228,7 @@
 
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
-      padding-left: 0;
+      padding-left: 10px;
       padding-right: 0;
     }
     #sidebar.collapsed .sidebar-link i {
@@ -311,7 +311,9 @@
       <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      <a href="{{ route('homepage') }}">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      </a>
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -420,7 +422,7 @@
         class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
               hover:bg-[#F0F0F0] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
+        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
       </button>
     </div>
 
@@ -428,11 +430,11 @@
 <div class="nav-section-label px-4 mb-6">Navigation</div>
 
     <!-- MENU -->
-    <nav class="space-y-1 px-3 text-gray-600">
+    <nav class="space-y-2 px-3 text-gray-600">
 
       <!-- HOME -->
       <a href="{{ route('homepage') }}"
-        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('homepage') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">

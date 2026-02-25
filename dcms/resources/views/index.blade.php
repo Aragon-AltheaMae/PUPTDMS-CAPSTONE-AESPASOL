@@ -19,7 +19,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <script type="module" src="https://unpkg.com/cally"></script>
 
   <script>
     tailwind.config = {
@@ -206,7 +205,7 @@
       font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: #9CA3AF;
+      color: #757575;
       text-transform: uppercase;
       margin-bottom: 0.25rem;
     }
@@ -255,7 +254,7 @@
 
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
-      padding-left: 0;
+      padding-left: 10px;
       padding-right: 0;
     }
     #sidebar.collapsed .sidebar-link i {
@@ -275,6 +274,36 @@
       box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
     }
 
+    /* Greeting icon animations */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes floatMoon {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+    }
+
+    @keyframes driftCloud {
+      0%, 100% { transform: translateX(0px); }
+      50% { transform: translateX(3px); }
+    }
+
+    .greet-spin {
+      animation: spinSlow 8s linear infinite;
+      display: inline-block;
+    }
+
+    .greet-float {
+      animation: floatMoon 3s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    .greet-drift {
+      animation: driftCloud 3s ease-in-out infinite;
+      display: inline-block;
+    }
   </style>
 </head>
 
@@ -293,7 +322,9 @@
       <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      <a href="{{ route('homepage') }}">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      </a>
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -402,7 +433,7 @@
         class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
               hover:bg-[#F0F0F0] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
+        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
       </button>
     </div>
 
@@ -410,11 +441,11 @@
 <div class="nav-section-label px-4 mb-6">Navigation</div>
 
     <!-- MENU -->
-    <nav class="space-y-1 px-3 text-gray-600">
+    <nav class="space-y-2 px-3 text-gray-600">
 
       <!-- HOME -->
       <a href="{{ route('homepage') }}"
-        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('homepage') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -527,8 +558,10 @@
             mb-6 fade-up relative overflow-visible">
 
       <div>
-        <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
-        <p class="text-sm text-[#F4F4F4] mb-1" id="greetingText">Good morning</p>
+        <div class="flex items-center gap-1.5 mb-1">
+          <i class="fa-solid fa-sun text-yellow-400 text-sm greet-spin" id="greetingIcon"></i>
+          <p class="text-m text-[#F4F4F4]" id="greetingText">Good morning</p>
+        </div>
         <h1 class="text-5xl font-extrabold mt-1 mb-2 text-[#F4F4F4] fade-up">
           <span class="bg-gradient-to-r from-[#F4F4F4] to-[#FFD700] bg-clip-text text-transparent">
         Welcome, {{ ucwords(strtolower($patient->name)) }}!
@@ -536,7 +569,7 @@
 
       <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
         </h1>
-        <h2 class="text-sm font-normal mb-8 text-[#F4F4F4] fade-up">
+        <h2 class="text-m font-normal mt-4 mb-6 text-[#F4F4F4] fade-up">
           Healthy teeth start with one appointment. Let's keep your smile at its best.
         </h2>
 
@@ -545,8 +578,8 @@
                 px-6 py-3 rounded-2xl
                 border-none text-base font-semibold
                 text-[#F4F4F4]
-                transition-transform duration-300
-                hover:-translate-y-0.5
+                transition-transform duration-500
+                hover:-translate-y-2
                 hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
 
           <a href="{{ route('book.appointment') }}" class="flex items-center gap-2">
@@ -570,12 +603,12 @@
 
     <!-- UPCOMING SCHEDULE CARD -->
     <div class="mb-6 fade-up">
-      <div id="upcomingScheduleContainer">
+      <div id="upcomingAppointment">
         <!-- Injected by JS -->
       </div>
     </div>
 
-      <!-- PROFILE + CALENDAR SECTION -->
+    <!-- CALENDAR SECTION -->
     <section class="max-w-7xl mx-auto mb-10">
       <div class="flex flex-col md:flex-row gap-6">
 
@@ -589,12 +622,6 @@
 
           <!-- REQUEST DOCUMENTS -->
           <div class="bg-white rounded-2xl shadow-lg p-5">
-            <div class="flex items-center gap-4 mb-4">
-              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <i class="fa-solid fa-folder text-[#8B0000] text-lg"></i>
-              </div>
-              <h3 class="font-extrabold text-lg text-[#333333]">Request Documents</h3>
-            </div>
             <div id="requestDocsContainer" class="space-y-3"></div>
           </div>
 
@@ -602,9 +629,15 @@
 
         <!-- RIGHT COLUMN: Calendar -->
         <div class="flex-1 flex flex-col gap-2">
-          <h2 class="text-xl font-extrabold text-[#8B0000] mb-3">Upcoming Schedule</h2>
           <div id="calendarSkeletonContainer"
-            class="bg-white border shadow-sm rounded-2xl p-6 h-[420px] w-full">
+            class="bg-white border shadow-sm rounded-2xl p-6 h-[630px] w-full">
+            
+            <!-- Heading inside the card -->
+            <div class="flex items-center gap-2 mb-3 fade-up">
+              <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
+              <h2 class="text-xl font-extrabold text-[#8B0000]">Upcoming Schedule</h2>
+            </div>
+
           </div>
         </div>
 
@@ -1009,7 +1042,7 @@ function validateHealthRecord(formId, message, modalId) {
       </div>
     `;
 
-    document.getElementById("upcomingScheduleContainer").innerHTML = `
+    document.getElementById("upcomingAppointment").innerHTML = `
       <div class="bg-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6 animate-pulse">
         <div class="w-12 h-12 skeleton rounded-xl"></div>
         <div class="flex-1 grid grid-cols-3 gap-4">
@@ -1059,41 +1092,41 @@ function validateHealthRecord(formId, message, modalId) {
   function renderProfile() {
     document.getElementById("profileSkeletonContainer").innerHTML = `
       <div class="bg-white rounded-2xl overflow-hidden shadow-sm fade-up">
-        <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-5 pt-6 pb-6 text-[#F4F4F4] flex items-center gap-4">
+        <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-6 text-[#F4F4F4] flex items-center gap-4">
           <div class="avatar flex-shrink-0">
-            <div class="w-14 h-14 rounded-full overflow-hidden ring-2 ring-white/30">
+            <div class="w-14 h-14 rounded-full overflow-hidden ring-1 ring-white/30">
               <img src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128" alt="Profile" />
             </div>
           </div>
           <div>
-            <p class="font-bold text-base leading-tight">{{ isset($patient->name) ? ucwords(strtolower($patient->name)) : 'Guest' }}</p>
-            <p class="text-xs text-[#F4F4F4]/70 mb-2">Patient</p>
-            <span class="inline-block bg-[#FFD700] text-[#660000] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+            <p class="font-bold text-xl leading-tight">{{ isset($patient->name) ? ucwords(strtolower($patient->name)) : 'Guest' }}</p>
+            <p class="text-sm text-[#F4F4F4]/70 mb-2">Student</p>
+            <span class="inline-block bg-[#FFD700]/40 text-[#FFD700] border border-[#FFD700] text-xs font-extrabold px-2.5 py-0.5 rounded-full">
               {{ $patient->patient_id ?? 'N/A' }}
             </span>
           </div>
         </div>
         <div class="mx-0 bg-white divide-y divide-gray-100 text-sm rounded-b-2xl overflow-hidden">
           <div class="flex px-4 py-3 gap-4">
-            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Date of Birth</span>
+            <span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Date of Birth</span>
             <span class="font-semibold text-[#333333]">{{ $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : '-' }}</span>
           </div>
           <div class="flex px-4 py-3 gap-4">
-            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Gender</span>
+            <span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Age</span>
+            <span class="font-semibold text-[#333333]">{{ $patient->age ?? '-' }}</span>
+          </div>
+          <div class="flex px-4 py-3 gap-4">
+            <span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Gender</span>
             <span class="font-semibold text-[#333333]">{{ $patient->gender ?? '-' }}</span>
           </div>
           <div class="flex px-4 py-3 gap-4">
-            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Address</span>
-            <span class="font-semibold text-[#333333]">{{ $patient->address ?? '-' }}</span>
-          </div>
-          <div class="flex px-4 py-3 gap-4">
-            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Contact</span>
+            <span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Contact</span>
             <div>
               <p class="font-semibold text-[#333333]">{{ $patient->phone ?? '-' }}</p>
             </div>
           </div>
           <div class="flex px-4 py-3 gap-4">
-            <span class="text-[#9CA3AF] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Email</span>
+            <span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">Email</span>
             <p class="font-semibold text-[#333333]">{{ $patient->email ?? '-' }}</p>
           </div>
         </div>
@@ -1102,7 +1135,13 @@ function validateHealthRecord(formId, message, modalId) {
   }
 
   function renderRequestDocs() {
-    document.getElementById("requestDocsContainer").innerHTML = `
+  document.getElementById("requestDocsContainer").innerHTML = `
+    <div class="flex items-center gap-4 mb-4">
+      <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+        <i class="fa-solid fa-folder text-[#8B0000] text-lg"></i>
+      </div>
+      <h3 class="font-extrabold text-lg text-[#333333]">Request Documents</h3>
+    </div>
       <a onclick="dentalHealthRecordModal.showModal()"
         class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
         <div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1110,7 +1149,7 @@ function validateHealthRecord(formId, message, modalId) {
         </div>
         <div>
           <p class="font-bold text-sm text-[#333333]">Request Dental Health Record</p>
-          <p class="text-xs text-[#9CA3AF]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
+          <p class="text-xs text-[#757575]">All Dental Records • Medical Record • Diagnosis & Treatments</p>
         </div>
       </a>
       <a onclick="dentalClearanceModal.showModal()"
@@ -1120,14 +1159,14 @@ function validateHealthRecord(formId, message, modalId) {
         </div>
         <div>
           <p class="font-bold text-sm text-[#333333]">Request Dental Clearance</p>
-          <p class="text-xs text-[#9CA3AF]">Dental Clearance • Annual Dental Clearance</p>
+          <p class="text-xs text-[#757575]">Dental Clearance • Annual Dental Clearance</p>
         </div>
       </a>
     `;
   }
 
   function renderUpcomingSchedule() {
-  const container = document.getElementById("upcomingScheduleContainer");
+  const container = document.getElementById("upcomingAppointment");
   @if(isset($upcomingAppointment) && $upcomingAppointment)
   container.innerHTML = `
     <div class="bg-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6 fade-up">
@@ -1171,7 +1210,7 @@ function validateHealthRecord(formId, message, modalId) {
       <div class="w-10 h-10 bg-[#FFF0F0] rounded-xl flex items-center justify-center flex-shrink-0">
         <i class="fa-regular fa-calendar text-[#8B0000]"></i>
       </div>
-      <p class="text-sm text-[#9CA3AF]">No upcoming appointments.
+      <p class="text-sm text-[#757575]">No upcoming appointments.
         <a href="{{ route('book.appointment') }}" class="text-[#8B0000] font-semibold hover:underline">Book one now</a>.
       </p>
     </div>
@@ -1179,7 +1218,7 @@ function validateHealthRecord(formId, message, modalId) {
   @endif
 }
 
-  function showCalendarSkeleton() {
+function showCalendarSkeleton() {
   document.getElementById("calendarSkeletonContainer").innerHTML = `
     <div class="grid grid-cols-7 gap-2 animate-pulse">
       ${Array(35).fill('<div class="h-8 w-8 skeleton rounded"></div>').join("")}
@@ -1188,19 +1227,244 @@ function validateHealthRecord(formId, message, modalId) {
 }
 
 function loadCalendar() {
-  document.getElementById("calendarSkeletonContainer").innerHTML = `
-    <calendar-date class="cally w-full h-full flex flex-col p-2 fade-up">
-      <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-        <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-      </svg>
 
-      <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-        <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-      </svg>
+  // ── Data from Blade / PHP ──────────────────────────────
+  const MAX_PER_DAY = 10;
 
-      <calendar-month class="w-full flex-1"></calendar-month>
-    </calendar-date>
-  `;
+  const myAppointments = {
+    @if(isset($appointments) && $appointments->count() > 0)
+      @foreach($appointments as $appt)
+        "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
+      @endforeach
+    @endif
+  };
+
+  const apptCounts = {
+    @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
+      @foreach($appointmentCountsPerDay as $date => $count)
+        "{{ $date }}": {{ $count }},
+      @endforeach
+    @endif
+  };
+
+  const unavailableDates = [
+    @if(isset($unavailableDates) && count($unavailableDates) > 0)
+      @foreach($unavailableDates as $d)
+        "{{ $d }}",
+      @endforeach
+    @endif
+  ];
+
+  const holidays = {
+    @if(isset($philippineHolidays) && count($philippineHolidays) > 0)
+      @foreach($philippineHolidays as $date => $name)
+        "{{ $date }}": "{{ addslashes($name) }}",
+      @endforeach
+    @endif
+  };
+
+  // ── State ──────────────────────────────────────────────
+  const today = new Date();
+  let currentYear  = today.getFullYear();
+  let currentMonth = today.getMonth();
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  // Sunday = 0, Saturday = 6
+  function isWeekend(year, month, day) {
+    const dow = new Date(year, month, day).getDay();
+    return dow === 0 || dow === 6;
+  }
+
+  // ── Main render ────────────────────────────────────────
+  function renderCalendar(year, month) {
+    const monthNames = ["January","February","March","April","May","June",
+                        "July","August","September","October","November","December"];
+
+    // Sunday-first day labels
+    const dayLabels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    const firstDow    = new Date(year, month, 1).getDay(); // 0=Sun, 6=Sat
+    const totalDays   = new Date(year, month + 1, 0).getDate();
+
+    // Sunday-based: no offset adjustment needed — getDay() already gives 0 for Sunday
+    const leadingEmpties = firstDow;
+
+    let cells = '';
+
+    // Leading empty cells
+    for (let i = 0; i < leadingEmpties; i++) cells += `<div></div>`;
+
+    for (let d = 1; d <= totalDays; d++) {
+      const dateStr   = `${year}-${pad(month + 1)}-${pad(d)}`;
+      const isToday   = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+      const weekend   = isWeekend(year, month, d);
+      const holiday   = holidays[dateStr] || null;
+      const myAppt    = myAppointments[dateStr] || null;
+      const count     = apptCounts[dateStr] || 0;
+      const isFull    = count >= MAX_PER_DAY;
+      const isUnavail = unavailableDates.includes(dateStr) || weekend;
+
+      // ── Styling ────────────────────────────────────────
+      let bgClass   = '';
+      let textClass = 'text-[#333333]';
+      let ringClass = '';
+      let dotHtml   = '';
+      let tooltipTxt = '';
+
+      if (isToday) {
+        bgClass   = 'bg-[#8B0000]';
+        textClass = 'text-white font-extrabold';
+        ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
+      } else if (holiday) {
+        // Highlighted amber background for holidays
+        bgClass   = 'bg-amber-50 hover:bg-amber-100';
+        textClass = 'text-amber-700 font-semibold';
+      } else if (isUnavail) {
+        bgClass   = '';
+        textClass = 'text-gray-300';
+      } else {
+        bgClass = 'hover:bg-[#FFF0F0]';
+      }
+
+      // ── Dots ───────────────────────────────────────────
+
+      // My appointment (green dot)
+      if (myAppt) {
+        const dotColor = isToday ? 'bg-white' : 'bg-[#008440]';
+        dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}"></span>`;
+        tooltipTxt = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${myAppt}`;
+      }
+
+      // Full schedule (red dot) — only when no personal appointment
+      if (isFull && !myAppt && !isUnavail && !holiday) {
+        dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
+        tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (${count} appointments)`;
+      }
+
+      // Holiday — amber dot + holiday name in tooltip (overrides others unless myAppt)
+      if (holiday && !myAppt) {
+        dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;
+        tooltipTxt = `<i class="fa-solid fa-star mr-1 text-amber-300"></i>${holiday}`;
+      }
+
+      // Weekend / unavailable — tooltip only, no dot
+      if (isUnavail && !holiday && !myAppt) {
+        tooltipTxt = weekend
+          ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed`
+          : `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+      }
+
+      // ── Tooltip ────────────────────────────────────────
+      const tooltipHtml = tooltipTxt ? `
+        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50
+                    bg-[#1a1a1a] text-white text-[11px] font-medium
+                    px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl
+                    opacity-0 group-hover:opacity-100 pointer-events-none
+                    transition-opacity duration-200">
+          ${tooltipTxt}
+          <div class="absolute top-full left-1/2 -translate-x-1/2
+                      border-4 border-transparent border-t-[#1a1a1a]"></div>
+        </div>` : '';
+
+      cells += `
+        <div class="relative group flex items-center justify-center">
+          ${tooltipHtml}
+          <div class="relative w-9 h-9 flex items-center justify-center
+                      text-sm rounded-full transition-all duration-150
+                      ${bgClass} ${textClass} ${ringClass} cursor-default">
+            ${d}
+            ${dotHtml}
+          </div>
+        </div>`;
+    }
+
+    // ── Day labels ─────────────────────────────────────
+    const headerHtml = dayLabels.map((l, i) => {
+      // Sunday (i=0) and Saturday (i=6) labels in muted red
+      const labelColor = (i === 0 || i === 6)
+        ? 'text-[#8B0000]/40'
+        : 'text-[#9CA3AF]';
+      return `<div class="text-center text-[10px] font-bold ${labelColor} uppercase tracking-widest">${l}</div>`;
+    }).join('');
+
+    // ── Render ─────────────────────────────────────────
+    document.getElementById("calendarSkeletonContainer").innerHTML = `
+      <div class="fade-up" style="height:100%; display:flex; flex-direction:column; user-select:none;">
+
+        <!-- Heading -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <i class="fa-regular fa-calendar-check" style="color:#8B0000; font-size:1.25rem;"></i>
+          <h2 style="font-size:1.125rem; font-weight:800; color:#8B0000; margin:0;">Upcoming Schedule</h2>
+        </div>
+
+        <!-- Month / Year header -->
+        <div class="flex items-center justify-between mt-6 mb-5">
+          <button onclick="changeMonth(-1)"
+            class="w-8 h-8 flex items-center justify-center rounded-full
+                   hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <div class="text-center">
+            <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+            <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+          </div>
+          <button onclick="changeMonth(1)"
+            class="w-8 h-8 flex items-center justify-center rounded-full
+                   hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Day labels (Sun–Sat) -->
+        <div class="grid grid-cols-7 gap-12 mt-4 mb-2">${headerHtml}</div>
+
+        <!-- Day cells -->
+        <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
+
+        <!-- Legend -->
+        <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#008440] flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">My Appointment</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">Full Schedule</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-50 border border-amber-400 flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">Holiday</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="text-gray-300 text-base font-bold leading-none flex-shrink-0">–</span>
+            <span class="text-[11px] text-[#555]">Not Available</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-4 h-4 rounded-full bg-[#8B0000] inline-flex items-center justify-center flex-shrink-0">
+              <span class="text-white text-[8px] font-extrabold">•</span>
+            </span>
+            <span class="text-[11px] text-[#555]">Today</span>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
+  window.changeMonth = function(dir) {
+    currentMonth += dir;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+    renderCalendar(currentYear, currentMonth);
+  };
+
+  renderCalendar(currentYear, currentMonth);
 }
 
   // Dental Records Rendering
@@ -1218,7 +1482,7 @@ function loadCalendar() {
               <div class="absolute -left-[26px] w-4 h-4 rounded-full bg-[#8B0000] border-2 border-white ring-2 ring-[#8B0000]/20"></div>
               <div>
                 <p class="font-semibold text-[#8B0000] text-sm">{{ $record->service_type }}</p>
-                <p class="text-xs text-[#9CA3AF] mt-0.5">
+                <p class="text-xs text-[#757575] mt-0.5">
                   {{ \Carbon\Carbon::parse($record->appointment_date)->format('d M Y') }}
                   &bull;
                   {{ $record->appointment_time }}
@@ -1242,12 +1506,20 @@ function loadCalendar() {
           </div>
           <p class="text-xl font-bold text-[#8B0000]">Nothing here yet…</p>
           <p class="text-sm text-[#ADADAD]">Time to book that first visit.</p>
-          <button>
-            <a href="{{ route('book.appointment') }}"
-              class="btn btn-soft bg-[#8B0000] font-mediumhover:bg-[#333333] border-none text-sm rounded-2xl text-[#F4F4F4] px-6">
-              Book Appointment
-            </a>
-          </button>
+          <button
+          class="btn btn-soft shimmer-btn
+                px-6 py-3 rounded-2xl
+                border-none text-base font-semibold
+                text-[#F4F4F4]
+                transition-transform duration-500
+                hover:-translate-y-2
+                hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+
+          <a href="{{ route('book.appointment') }}" class="flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            Book Appointment
+          </a>
+        </button>
         </div>
       `;
       viewAll.classList.add('hidden');
@@ -1297,11 +1569,28 @@ function loadCalendar() {
   // Dynamic greeting
   (function() {
     const hour = new Date().getHours();
-    let greeting = 'Good morning';
-    if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
-    else if (hour >= 18) greeting = 'Good evening';
-    const el = document.getElementById('greetingText');
-    if (el) el.textContent = greeting;
+    let greeting, iconClasses, animClass;
+
+    if (hour >= 6 && hour < 12) {
+      greeting  = 'Good morning';
+      iconClasses = 'fa-solid fa-sun text-yellow-400 text-sm';
+      animClass = 'greet-spin';
+    } else if (hour >= 12 && hour < 18) {
+      greeting  = 'Good afternoon';
+      iconClasses = 'fa-solid fa-cloud-sun text-yellow-300 text-sm';
+      animClass = 'greet-drift';
+    } else {
+      greeting  = 'Good evening';
+      iconClasses = 'fa-solid fa-moon text-blue-300 text-sm';
+      animClass = 'greet-float';
+    }
+
+    const el   = document.getElementById('greetingText');
+    const icon = document.getElementById('greetingIcon');
+    if (el)   el.textContent = greeting;
+    if (icon) {
+      icon.className = iconClasses + ' ' + animClass;
+    }
   })();
 
   // NOTIFICATION

@@ -255,7 +255,7 @@
 
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
-      padding-left: 0;
+      padding-left: 10px;
       padding-right: 0;
     }
     #sidebar.collapsed .sidebar-link i {
@@ -292,7 +292,9 @@
       <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
     <div class="w-12 rounded-full">
-      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      <a href="{{ route('homepage') }}">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+      </a>
     </div>
     <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
   </div>
@@ -401,7 +403,7 @@
         class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
               hover:bg-[#F0F0F0] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
+        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
       </button>
     </div>
 
@@ -409,18 +411,18 @@
 <div class="nav-section-label px-4 mb-6">Navigation</div>
 
     <!-- MENU -->
-    <nav class="space-y-1 px-3 text-gray-600">
+    <nav class="space-y-2 px-3 text-gray-600">
 
       <!-- HOME -->
       <a href="{{ route('homepage') }}"
-        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
+        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('homepage') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
         <span class="absolute left-0 top-1/2 -translate-y-1/2
               h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
               {{ request()->routeIs('homepage') ? 'opacity-100' : 'opacity-0' }}"></span>
-        <i class="fa-solid fa-house text-lg"></i>
+        <i class="fa-solid fa-house text-base w-5"></i>
         <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Home</span>
         <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Home</span>
       </a>
@@ -434,7 +436,7 @@
         <span class="absolute left-0 top-1/2 -translate-y-1/2
               h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
               {{ request()->routeIs('appointment.index*') ? 'opacity-100' : 'opacity-0' }}"></span>
-        <i class="fa-regular fa-calendar text-base w-5 "></i>
+        <i class="fa-regular fa-calendar text-base w-5"></i>
         <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Appointment</span>
         <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointment</span>
       </a>
@@ -448,7 +450,7 @@
         <span class="absolute left-0 top-1/2 -translate-y-1/2
               h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
               {{ request()->routeIs('record*') ? 'opacity-100' : 'opacity-0' }}"></span>
-        <i class="fa-regular fa-folder-open text-base w-5 "></i>
+        <i class="fa-regular fa-folder-open text-base w-5"></i>
         <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Record</span>
         <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Record</span>
       </a>
@@ -462,7 +464,7 @@
         <span class="absolute left-0 top-1/2 -translate-y-1/2
               h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
               {{ request()->routeIs('about.us*') ? 'opacity-100' : 'opacity-0' }}"></span>
-        <i class="fa-solid fa-circle-info text-base w-5 "></i>
+        <i class="fa-solid fa-circle-info text-base w-5"></i>
         <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">About Us</span>
         <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">About Us</span>
       </a>
@@ -475,7 +477,7 @@
 
     <a href="#"
        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 text-gray-500">
-      <i class="fa-regular fa-circle-question text-base w-5 "></i>
+      <i class="fa-regular fa-circle-question text-base w-5"></i>
       <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Help</span>
       <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Help</span>
     </a>
@@ -487,7 +489,7 @@
             bg-[#7B6CF6] text-[#F4F4F4]
             transition-all duration-200 hover:scale-105"
       aria-label="Toggle dark mode">
-      <i id="themeIcon" class="fa-regular fa-moon text-base w-5 "></i>
+      <i id="themeIcon" class="fa-regular fa-moon text-base w-5"></i>
       <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Dark Mode</span>
       <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dark Mode</span>
     </button>
@@ -495,7 +497,7 @@
     <form action="{{ route('logout') }}" method="POST">
       @csrf
       <button class="sidebar-link w-full relative flex items-center px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
-        <i class="fa-solid fa-right-from-bracket text-base w-5 "></i>
+        <i class="fa-solid fa-right-from-bracket text-base w-5"></i>
         <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Log Out</span>
         <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log Out</span>
       </button>
