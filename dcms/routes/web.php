@@ -11,6 +11,9 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\RecordController;
+use App\Http\Controllers\HomepageController;
+
+Route::get('/homepage', [HomepageController::class, 'index'])->name('homepage');
 
 // -------------------
 // AUTH PAGES (PUBLIC)

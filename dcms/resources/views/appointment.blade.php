@@ -380,7 +380,7 @@
 <div class="nav-section-label px-4 mb-6">Navigation</div>
 
     <!-- MENU -->
-    <nav class="space-y-1 px-3 text-gray-600">
+    <nav class="space-y-2 px-3 text-gray-600">
 
       <!-- HOME -->
       <a href="{{ route('homepage') }}"
@@ -492,48 +492,27 @@
     </div>
          
   <div class="max-w-7xl mt-4 mx-auto">
-  <!-- ===== Dental Clinic Schedule ===== -->
-  <!-- ===== CALENDAR ===== -->
-  <section class="flex justify-center fade-up">
-    <div class="w-full max-w-3xl flex flex-col items-center gap-3">
+  <!-- ===== CLINIC SCHEDULE CALENDAR ===== -->
+    <section class="fade-up mb-14">
+      <h1 class="text-3xl font-extrabold text-[#660000] text-center mt-8 mb-6">
+        Dental Clinic Schedule
+      </h1>
 
-    <h1 class="text-3xl font-extrabold text-[#660000] w-full text-center mt-8 mb-4">
-      Dental Clinic Schedule
-    </h1>
-
-    <div class="bg-[#F4F4F4] border shadow rounded-2xl p-6 h-[390px] w-[990px]">
-      <!-- Appointment date from DB -->
-      <calendar-date
-        class="cally w-full h-full flex flex-col p-2"
-        data-selected-date="2025-12-29"
-      >
-        <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-          <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-        </svg>
-
-        <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-          <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-        </svg>
-
-        <calendar-month class="w-full flex-1"></calendar-month>
-      </calendar-date>
-    </div>
-
-    <!-- Legend -->
-    <div class="flex gap-6 mt-4 mb-24 text-sm">
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 bg-red-500 rounded"></span> Full Schedule
+      {{-- Calendar container — same ID as homepage so loadCalendar() targets it --}}
+      <div id="calendarSkeletonContainer"
+           class="bg-white border shadow-sm rounded-2xl p-6 mx-auto"
+           style="max-width:700px; min-height:480px;">
+        {{-- Skeleton shown while JS loads --}}
+        <div class="animate-pulse space-y-4">
+          <div class="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
+          <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px;">
+            @for($i = 0; $i < 35; $i++)
+              <div class="h-9 bg-gray-200 rounded-lg"></div>
+            @endfor
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 bg-orange-400 rounded"></span> Not Available
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 bg-blue-500 rounded"></span> Holiday
-      </div>
-    </div>
-
-  </div>
-</section>
+    </section>
 
   <!-- ===== My Appointments ===== -->
   <section class="max-w-5xl mx-auto fade-up">
@@ -768,6 +747,244 @@ function toggleSidebar() {
     // Start closed
     closeMenu();
   });
+
+  function loadCalendar() {
+
+  // ── Data from Blade / PHP ──────────────────────────────
+  const MAX_PER_DAY = 10;
+
+  const myAppointments = {
+    @if(isset($appointments) && $appointments->count() > 0)
+      @foreach($appointments as $appt)
+        "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
+      @endforeach
+    @endif
+  };
+
+  const apptCounts = {
+    @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
+      @foreach($appointmentCountsPerDay as $date => $count)
+        "{{ $date }}": {{ $count }},
+      @endforeach
+    @endif
+  };
+
+  const unavailableDates = [
+    @if(isset($unavailableDates) && count($unavailableDates) > 0)
+      @foreach($unavailableDates as $d)
+        "{{ $d }}",
+      @endforeach
+    @endif
+  ];
+
+  const holidays = {
+    @if(isset($philippineHolidays) && count($philippineHolidays) > 0)
+      @foreach($philippineHolidays as $date => $name)
+        "{{ $date }}": "{{ addslashes($name) }}",
+      @endforeach
+    @endif
+  };
+
+  // ── State ──────────────────────────────────────────────
+  const today = new Date();
+  let currentYear  = today.getFullYear();
+  let currentMonth = today.getMonth();
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  // Sunday = 0, Saturday = 6
+  function isWeekend(year, month, day) {
+    const dow = new Date(year, month, day).getDay();
+    return dow === 0 || dow === 6;
+  }
+
+  // ── Main render ────────────────────────────────────────
+  function renderCalendar(year, month) {
+    const monthNames = ["January","February","March","April","May","June",
+                        "July","August","September","October","November","December"];
+
+    // Sunday-first day labels
+    const dayLabels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    const firstDow    = new Date(year, month, 1).getDay(); // 0=Sun, 6=Sat
+    const totalDays   = new Date(year, month + 1, 0).getDate();
+
+    // Sunday-based: no offset adjustment needed — getDay() already gives 0 for Sunday
+    const leadingEmpties = firstDow;
+
+    let cells = '';
+
+    // Leading empty cells
+    for (let i = 0; i < leadingEmpties; i++) cells += `<div></div>`;
+
+    for (let d = 1; d <= totalDays; d++) {
+      const dateStr   = `${year}-${pad(month + 1)}-${pad(d)}`;
+      const isToday   = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+      const weekend   = isWeekend(year, month, d);
+      const holiday   = holidays[dateStr] || null;
+      const myAppt    = myAppointments[dateStr] || null;
+      const count     = apptCounts[dateStr] || 0;
+      const isFull    = count >= MAX_PER_DAY;
+      const isUnavail = unavailableDates.includes(dateStr) || weekend;
+
+      // ── Styling ────────────────────────────────────────
+      let bgClass   = '';
+      let textClass = 'text-[#333333]';
+      let ringClass = '';
+      let dotHtml   = '';
+      let tooltipTxt = '';
+
+      if (isToday) {
+        bgClass   = 'bg-[#8B0000]';
+        textClass = 'text-white font-extrabold';
+        ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
+      } else if (holiday) {
+        // Highlighted amber background for holidays
+        bgClass   = 'bg-amber-50 hover:bg-amber-100';
+        textClass = 'text-amber-700 font-semibold';
+      } else if (isUnavail) {
+        bgClass   = '';
+        textClass = 'text-gray-300';
+      } else {
+        bgClass = 'hover:bg-[#FFF0F0]';
+      }
+
+      // ── Dots ───────────────────────────────────────────
+
+      // My appointment (green dot)
+      if (myAppt) {
+        const dotColor = isToday ? 'bg-white' : 'bg-[#008440]';
+        dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}"></span>`;
+        tooltipTxt = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${myAppt}`;
+      }
+
+      // Full schedule (red dot) — only when no personal appointment
+      if (isFull && !myAppt && !isUnavail && !holiday) {
+        dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
+        tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (${count} appointments)`;
+      }
+
+      // Holiday — amber dot + holiday name in tooltip (overrides others unless myAppt)
+      if (holiday && !myAppt) {
+        dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;
+        tooltipTxt = `<i class="fa-solid fa-star mr-1 text-amber-300"></i>${holiday}`;
+      }
+
+      // Weekend / unavailable — tooltip only, no dot
+      if (isUnavail && !holiday && !myAppt) {
+        tooltipTxt = weekend
+          ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed`
+          : `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+      }
+
+      // ── Tooltip ────────────────────────────────────────
+      const tooltipHtml = tooltipTxt ? `
+        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50
+                    bg-[#1a1a1a] text-white text-[11px] font-medium
+                    px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl
+                    opacity-0 group-hover:opacity-100 pointer-events-none
+                    transition-opacity duration-200">
+          ${tooltipTxt}
+          <div class="absolute top-full left-1/2 -translate-x-1/2
+                      border-4 border-transparent border-t-[#1a1a1a]"></div>
+        </div>` : '';
+
+      cells += `
+        <div class="relative group flex items-center justify-center">
+          ${tooltipHtml}
+          <div class="relative w-9 h-9 flex items-center justify-center
+                      text-sm rounded-full transition-all duration-150
+                      ${bgClass} ${textClass} ${ringClass} cursor-default">
+            ${d}
+            ${dotHtml}
+          </div>
+        </div>`;
+    }
+
+    // ── Day labels ─────────────────────────────────────
+    const headerHtml = dayLabels.map((l, i) => {
+      // Sunday (i=0) and Saturday (i=6) labels in muted red
+      const labelColor = (i === 0 || i === 6)
+        ? 'text-[#8B0000]/40'
+        : 'text-[#9CA3AF]';
+      return `<div class="text-center text-[10px] font-bold ${labelColor} uppercase tracking-widest">${l}</div>`;
+    }).join('');
+
+    // ── Render ─────────────────────────────────────────
+    document.getElementById("calendarSkeletonContainer").innerHTML = `
+      <div class="fade-up h-full flex flex-col select-none">
+
+        <!-- Month / Year header -->
+        <div class="flex items-center justify-between mb-5">
+          <button onclick="changeMonth(-1)"
+            class="w-8 h-8 flex items-center justify-center rounded-full
+                   hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <div class="text-center">
+            <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+            <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+          </div>
+          <button onclick="changeMonth(1)"
+            class="w-8 h-8 flex items-center justify-center rounded-full
+                   hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Day labels (Sun–Sat) -->
+        <div class="grid grid-cols-7 gap-12 mt-4 mb-2">${headerHtml}</div>
+
+        <!-- Day cells -->
+        <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
+
+        <!-- Legend -->
+        <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#008440] flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">My Appointment</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">Full Schedule</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-50 border border-amber-400 flex-shrink-0"></span>
+            <span class="text-[11px] text-[#555]">Holiday</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="text-gray-300 text-base font-bold leading-none flex-shrink-0">–</span>
+            <span class="text-[11px] text-[#555]">Not Available</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="w-4 h-4 rounded-full bg-[#8B0000] inline-flex items-center justify-center flex-shrink-0">
+              <span class="text-white text-[8px] font-extrabold">•</span>
+            </span>
+            <span class="text-[11px] text-[#555]">Today</span>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
+  window.changeMonth = function(dir) {
+    currentMonth += dir;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+    renderCalendar(currentYear, currentMonth);
+  };
+
+  renderCalendar(currentYear, currentMonth);
+}
+
+document.addEventListener('DOMContentLoaded', () => loadCalendar());
+
 </script>
 
 </body>
