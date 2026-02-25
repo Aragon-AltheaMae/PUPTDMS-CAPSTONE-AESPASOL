@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
 
             // user who encoded/ the record 
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('created_by')->constrained('patients')->cascadeOnDelete();
 
             // date + time
             $table->dateTime('time_in');
