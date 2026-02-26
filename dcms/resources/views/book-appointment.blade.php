@@ -1935,6 +1935,9 @@ function buildSummary() {
 /* =========================
    MODAL (FINAL SUBMIT)
 ========================= */
+/* =========================
+   MODAL (FINAL SUBMIT)
+========================= */
 const confirmModal = document.getElementById("confirmModal");
 const confirmMessage = document.getElementById("confirmMessage");
 const okBtn = document.getElementById("okBtn");
@@ -1949,7 +1952,7 @@ if (finalSubmitBtn) {
     const date = document.getElementById("appointment_date")?.value || "N/A";
     const time = document.getElementById("appointment_time")?.value || "N/A";
 
-   if (confirmMessage) {
+    if (confirmMessage) {
       confirmMessage.innerHTML = `
         Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
         <b>${date}</b> at <b>${time}</b>.<br>
@@ -1958,22 +1961,22 @@ if (finalSubmitBtn) {
       `;
     }
 
+    // show modal first
     confirmModal?.showModal();
   });
 }
 
 if (okBtn) {
   okBtn.addEventListener("click", () => {
-    confirmModal?.close();
-    window.location.href = "{{ route('homepage') }}";
+    document.getElementById("appointmentForm").submit();
   });
 }
 
 // prevent default form submit refresh (kept since you're using modal instead of real submit)
-const appointmentForm = document.getElementById("appointmentForm");
-if (appointmentForm) {
-  appointmentForm.addEventListener("submit", (e) => e.preventDefault());
-}
+//const appointmentForm = document.getElementById("appointmentForm");
+//if (appointmentForm) {
+  //appointmentForm.addEventListener("submit", (e) => e.preventDefault());
+//}
 
 /* =========================
    EXTRA TOGGLES
