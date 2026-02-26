@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use App\Models\Appointment;
 use App\Models\DentalHistory;
@@ -13,6 +14,9 @@ use App\Models\Patient;
 
 class AppointmentController extends Controller
 {
+    // Max appointments per day before marking as "Full Schedule"
+    const MAX_APPOINTMENTS_PER_DAY = 5;
+
     /* =======================
        SHOW PATIENT APPOINTMENTS
     ======================= */
@@ -26,15 +30,43 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
+        // Get all appointments with relationships
         $appointments = Appointment::with([
-                'dentalHistory',
-                'medicalHistory',
-                'medicalHistory.conditions'
-            ])
+            'dentalHistory',
+            'medicalHistory',
+            'medicalHistory.conditions'
+        ])
             ->where('patient_id', $patient->id)
+            ->orderBy('appointment_date', 'asc')
             ->get();
 
-        return view('appointment', compact('appointments', 'patient'));
+        // Count appointments per day for calendar availability
+        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        // Unavailable dates (weekends are handled in JavaScript)
+        $unavailableDates = []; // Add your custom unavailable dates here if needed
+
+        // Philippine Holidays - using the helper method
+        $currentYear = now()->year;
+        $philippineHolidays = [];
+        for ($year = $currentYear; $year <= $currentYear + 4; $year++) {
+            $philippineHolidays = array_merge($philippineHolidays, $this->getPhilippineHolidays($year));
+        }
+
+        // Notifications (if you have any)
+        $notifications = [];
+
+        return view('appointment', compact(
+            'appointments',
+            'patient',
+            'appointmentCountsPerDay',
+            'unavailableDates',
+            'philippineHolidays',
+            'notifications'
+        ));
     }
 
     /* =======================
@@ -42,7 +74,47 @@ class AppointmentController extends Controller
     ======================= */
     public function create()
     {
-        return view('book-appointment');
+        $patientId = session('patient_id');
+
+        if (!$patientId) {
+            return redirect()->route('login')->with('error', 'Please login first!');
+        }
+
+        $patient = Patient::findOrFail($patientId);
+
+        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+
+        if ($hasActiveAppointment) {
+            return redirect()->back()->with([
+                'activeAppointmentModal' => true,
+                'activeAppointmentMsg' =>
+                "You already have an active appointment. Please wait until it is completed before booking another one."
+            ]);
+        }
+
+        // Also pass calendar data to the booking form if needed
+        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $unavailableDates = [];
+
+        // Philippine Holidays - using the helper method
+        $currentYear = now()->year;
+        $philippineHolidays = array_merge(
+            $this->getPhilippineHolidays($currentYear),
+            $this->getPhilippineHolidays($currentYear + 1)
+        );
+
+        return view('book-appointment', compact(
+            'patient',
+            'appointmentCountsPerDay',
+            'unavailableDates',
+            'philippineHolidays'
+        ));
     }
 
     /* =======================
@@ -61,6 +133,29 @@ class AppointmentController extends Controller
 
             'patient_signature'  => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        $patientId = session('patient_id');
+
+        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+
+        if ($hasActiveAppointment) {
+            return redirect()->route('homepage')->with([
+                'activeAppointmentModal' => true,
+                'activeAppointmentMsg' => "You already have an active appointment. Please wait until it's marked Done or Cancelled before booking another one."
+            ]);
+        }
+
+        // Check if the selected date is already fully booked
+        $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
+            ->count();
+
+        if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sorry, this date is fully booked. Please select another date.');
+        }
 
         $signaturePath = $request->file('patient_signature')
             ->store('signatures', 'public');
@@ -107,7 +202,7 @@ class AppointmentController extends Controller
                 'med_reaction'       => strtoupper($request->med_reaction),
 
                 'periodontal'        => strtoupper($request->periodontal),
-                'difficult_extraction'=> strtoupper($request->difficult_extraction),
+                'difficult_extraction' => strtoupper($request->difficult_extraction),
                 'prolonged_bleeding' => strtoupper($request->prolonged_bleeding),
                 'dentures'           => strtoupper($request->dentures),
                 'ortho_treatment'    => strtoupper($request->ortho_treatment),
@@ -116,7 +211,7 @@ class AppointmentController extends Controller
                 'dentures_date'      => $request->dentures_date,
                 'ortho_date'         => $request->ortho_date,
 
-                'additional_concerns'=> $request->additional_concerns,
+                'additional_concerns' => $request->additional_concerns,
             ]);
 
             /* =======================
@@ -192,6 +287,42 @@ class AppointmentController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'Appointment booked successfully!');
+        return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
+    }
+
+    private function getPhilippineHolidays(int $year): array
+    {
+        $holidays = [
+            // Regular Holidays
+            "$year-01-01" => "New Year's Day",
+            "$year-04-09" => "Day of Valor",
+            "$year-05-01" => "Labor Day",
+            "$year-06-12" => "Independence Day",
+            "$year-11-30" => "Bonifacio Day",
+            "$year-12-25" => "Christmas Day",
+            "$year-12-30" => "Rizal Day",
+
+            // Special Non-Working Holidays
+            "$year-02-25" => "EDSA People Power Anniversary",
+            "$year-08-21" => "Ninoy Aquino Day",
+            "$year-11-01" => "All Saints' Day",
+            "$year-11-02" => "All Souls' Day",
+            "$year-12-08" => "Feast of the Immaculate Conception",
+            "$year-12-24" => "Christmas Eve",
+            "$year-12-31" => "New Year's Eve",
+        ];
+
+        // Holy Week — computed dynamically from Easter
+        $easter = Carbon::createFromTimestamp(easter_date($year));
+        $holidays[$easter->copy()->subDays(4)->format('Y-m-d')] = 'Holy Wednesday';
+        $holidays[$easter->copy()->subDays(3)->format('Y-m-d')] = 'Maundy Thursday';
+        $holidays[$easter->copy()->subDays(2)->format('Y-m-d')] = 'Good Friday';
+        $holidays[$easter->copy()->subDays(1)->format('Y-m-d')] = 'Black Saturday';
+
+        // National Heroes Day = last Monday of August
+        $lastMondayAug = Carbon::create($year, 8, 31)->modify('last monday');
+        $holidays[$lastMondayAug->format('Y-m-d')] = 'National Heroes Day';
+
+        return $holidays;
     }
 }
