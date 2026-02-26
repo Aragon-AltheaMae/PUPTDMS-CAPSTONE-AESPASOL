@@ -136,7 +136,7 @@
   </style>
 </head>
 
-<body class="bg-[#F4F4F4]">
+<body class="bg-[#F4F4F4] min-h-screen flex flex-col">
 
 <!-- HEADER (TOP BAR) -->
 <div class="fixed top-0 left-0 right-0 z-50
@@ -531,7 +531,7 @@
   </div>
 </aside>
 
-<main id="mainContent" class="pt-[100px] px-6 py-10 w-full
+<main id="mainContent" class="flex-1 pt-[100px] px-6 pb-10 w-full
 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
 <div class="max-w-7xl mt-4 mx-auto fade-in">
@@ -757,10 +757,10 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
     </div>
 </dialog>
 
-<!-- Footer -->
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
-  <!-- Footer content here (unchanged) -->
-</footer>
+      <!-- Footer -->
+        <footer class="footer sm:footer-horizontal mt-auto
+            bg-[#660000] text-[#F4F4F4] p-10">
+        </footer>
 
 <script>
 /*let inventory = [
