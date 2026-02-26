@@ -2,24 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Patient;
 
+
 class RecordController extends Controller
 {
-    public function index()
+        public function index()
     {
-        if (!session()->has('patient_id')) {
-            return redirect('/login');
+        $patientId = session('patient_id');
+
+        if (!$patientId) {
+            return redirect()->route('login')->with('error', 'Please login first!');
         }
 
-        $patient = Patient::find(session('patient_id'));
+        $patient = Patient::findOrFail($patientId);
 
         $records = Appointment::where('patient_id', $patient->id)
-            ->whereIn('status', ['completed', 'booked', 'pending'])
-            ->orderBy('appointment_date', 'desc') // ✅ FIX
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
             ->get();
 
-        return view('record', compact('records', 'patient'));
+        return view('record', compact('patient', 'records'));
     }
 }
