@@ -242,6 +242,21 @@
     100% { transform: translateX(0); }
   }
 
+  /* FORCE PERFECT CENTER */
+dialog.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+/* Dark overlay */
+dialog.modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
   .shake {
     animation: shake 0.3s ease-in-out;
   }
@@ -1219,29 +1234,60 @@
   </div>
 </div>
 
- <!-- STEP 5 (CONFIRMATION) -->
+<!-- STEP 5 -->
 <div class="step-content hidden" id="step5">
-  <div class="bg-white shadow-xl rounded-xl p-10">
 
-    <h2 class="text-2xl font-bold text-[#660000] mb-4">Confirmation</h2>
-    <div class="h-[1px] w-full bg-[#8B0000] mb-8"></div>
-    <div id="summaryBox" class="mb-8"></div>
-    <label class="flex items-start gap-3 cursor-pointer select-none">
-     
-      <input
-        id="finalConfirm"
-        type="checkbox"
-        class="mt-1 w-5 h-5 border border-[#8B0000] rounded bg-white accent-[#8B0000]"
-        required
-      />
-      <span class="text-gray-700 text-sm leading-5">
-        I hereby confirm that I have reviewed my dental and medical information and accepted
-        the
-        <a href="/privacy-policy" class="text-[#8B0000] hover:underline">Privacy Policy</a>
-        and
-        <a href="/terms-of-service" class="text-[#8B0000] hover:underline">Terms of Service</a>.
-      </span>
-    </label>
+  <!-- SUMMARY SECTION -->
+  <div id="summarySection">
+    <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10 mb-8">
+      <h2 class="text-3xl font-normal text-[#660000] mb-4">Summary</h2>
+      <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
+      <div id="summaryBox"></div>
+    </div>
+
+    <div class="flex justify-center gap-4">
+      <button
+        type="button"
+        id="summaryBackBtn"
+        class="min-w-[110px] px-6 py-2 rounded border border-gray-500 bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow"
+      >
+        &lsaquo; Back
+      </button>
+
+      <!-- CHANGED TO NEXT -->
+      <button
+        type="button"
+        id="goToConfirmationBtn"
+        class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white hover:bg-[#7A0000] transition shadow"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION SECTION (HIDDEN FIRST) -->
+  <div id="confirmationSection" class="hidden">
+
+    <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10">
+      <h2 class="text-3xl font-normal text-[#660000] mb-4">Confirmation</h2>
+      <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
+
+      <label class="flex items-start gap-3 cursor-pointer select-none">
+
+        <input
+          id="finalConfirm"
+          type="checkbox"
+          class="mt-1 w-5 h-5 border border-[#8B0000] rounded bg-white accent-[#8B0000]"
+          required
+        />
+
+        <span class="text-gray-700 text-sm leading-5">
+          I hereby confirm that I have reviewed my dental and medical information and accepted the
+          <a href="/privacy-policy" class="text-[#8B0000] hover:underline">Privacy Policy</a>
+          and
+          <a href="/terms-of-service" class="text-[#8B0000] hover:underline">Terms of Service</a>.
+        </span>
+      </label>
 
     <!-- BUTTONS (Back + Submit) -->
     <div class="flex justify-center gap-4 mt-10">
@@ -1260,9 +1306,11 @@
         hover:bg-[#7A0000] transition shadow">
         Submit
       </button>
+      </div>
     </div>
 
   </div>
+
 </div>
 
 <!-- OTHERS SERVICE MODAL -->
@@ -1326,30 +1374,28 @@
 
 <!-- FINAL CONFIRMATION MODAL -->
 <dialog id="confirmModal" class="modal">
+  <div class="modal-box p-0 rounded-2xl overflow-hidden shadow-2xl w-full max-w-[600px]">
+    
+    <!-- Top red panel -->
+    <div class="bg-[#8B0000] text-white px-12 py-10 text-center">
+      <h2 class="text-2xl font-semibold mb-6">Appointment Confirmed</h2>
 
-  <div class="bg-[#8B0000] text-white rounded-2xl p-10 max-w-md mx-auto text-center shadow-2xl">
+      <p class="text-sm leading-6 mb-6" id="confirmMessage"></p>
 
-    <h2 class="text-2xl font-semibold mb-6">
-      Appointment Confirmed
-    </h2>
+      <p class="mb-6">Thank you!</p>
 
-    <p class="text-sm leading-6 mb-6" id="confirmMessage">
-      <!-- JS will insert message here -->
-    </p>
-
-    <p class="mb-6">Thank you!</p>
-
-     <!-- OK BUTTON WITH LARAVEL ROUTE -->
-    <a href="{{ route('homepage') }}"
-       class="inline-block bg-gray-200 text-[#8B0000] px-8 py-2 rounded shadow hover:bg-gray-300 transition">
-       OK
-    </a>
+      <!-- OK BUTTON -->
+      <button
+        type="button"
+        id="okBtn"
+        class="inline-block bg-gray-200 text-[#8B0000] px-8 py-2 rounded shadow hover:bg-gray-300 transition"
+      >
+        OK
+      </button>
+    </div>
 
   </div>
-
 </dialog>
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
@@ -1391,9 +1437,13 @@ const allSlots = [
   { t: "3:00 PM", available: true },
 ];
 
-/* -------- Calendar -------- */
+/* =========================
+   CALENDAR
+========================= */
 let currentYear, currentMonth, selectedDate = null, selectedTime = null;
-const todayDate = new Date(); todayDate.setHours(0,0,0,0);
+const todayDate = new Date(); 
+todayDate.setHours(0,0,0,0);
+
 currentYear  = todayDate.getFullYear();
 currentMonth = todayDate.getMonth();
 
@@ -1407,16 +1457,21 @@ function isDisabled(date) {
 }
 
 function renderCalendar() {
+  const monthLabel = document.getElementById("monthLabel");
+  const calDays = document.getElementById("calDays");
+  if (!monthLabel || !calDays) return;
+
   const MONTHS = ["January","February","March","April","May","June",
                   "July","August","September","October","November","December"];
-  document.getElementById("monthLabel").textContent = `${MONTHS[currentMonth]} ${currentYear}`;
-  const calDays = document.getElementById("calDays");
+
+  monthLabel.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
   calDays.innerHTML = "";
 
   const firstDay    = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const prevDays    = new Date(currentYear, currentMonth, 0).getDate();
 
+  // leading days
   for (let i = 0; i < firstDay; i++) {
     const cell = document.createElement("div");
     cell.className = "day-cell other-month";
@@ -1424,6 +1479,7 @@ function renderCalendar() {
     calDays.appendChild(cell);
   }
 
+  // current month
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const iso  = formatISO(currentYear, currentMonth, d);
@@ -1434,7 +1490,7 @@ function renderCalendar() {
     if (isDisabled(date)) {
       cell.classList.add("disabled");
     } else {
-      cell.addEventListener("click", () => selectDate(iso, cell));
+      cell.addEventListener("click", () => selectDate(iso));
     }
 
     const todayISO = formatISO(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
@@ -1444,6 +1500,7 @@ function renderCalendar() {
     calDays.appendChild(cell);
   }
 
+  // trailing days
   const total = firstDay + daysInMonth;
   const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let i = 1; i <= trailing; i++) {
@@ -1457,26 +1514,38 @@ function renderCalendar() {
 function selectDate(iso) {
   selectedDate = iso;
   selectedTime = null;
-  document.getElementById("appointment_date").value = iso;
-  document.getElementById("appointment_time").value = "";
 
-  const [y, m, d] = iso.split("-");
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const dateInput = document.getElementById("appointment_date");
+  const timeInput = document.getElementById("appointment_time");
+  if (dateInput) dateInput.value = iso;
+  if (timeInput) timeInput.value = "";
+
   const banner = document.getElementById("dateBanner");
-  banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
-  banner.classList.add("show");
+  if (banner) {
+    const [y, m, d] = iso.split("-");
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
+    banner.classList.add("show");
+  }
 
   renderCalendar();
   renderSlots();
 }
 
 function renderSlots() {
-  document.getElementById("slotPlaceholder").classList.add("hidden");
-  document.getElementById("slotContainer").classList.remove("hidden");
-  document.getElementById("selectedSlotDisplay").classList.add("hidden");
-  document.getElementById("selectedSlotText").textContent = "";
-
+  const slotPlaceholder = document.getElementById("slotPlaceholder");
+  const slotContainer = document.getElementById("slotContainer");
+  const selectedSlotDisplay = document.getElementById("selectedSlotDisplay");
+  const selectedSlotText = document.getElementById("selectedSlotText");
   const slotGrid = document.getElementById("slotGrid");
+
+  if (!slotGrid) return;
+
+  if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
+  if (slotContainer) slotContainer.classList.remove("hidden");
+  if (selectedSlotDisplay) selectedSlotDisplay.classList.add("hidden");
+  if (selectedSlotText) selectedSlotText.textContent = "";
+
   slotGrid.innerHTML = "";
 
   const slotsForDate = allSlots.slice(0, 5);
@@ -1490,69 +1559,93 @@ function renderSlots() {
         slotGrid.querySelectorAll(".slot-chip").forEach(c => c.classList.remove("selected"));
         chip.classList.add("selected");
         selectedTime = slot.t;
-        document.getElementById("appointment_time").value = slot.t;
-        document.getElementById("selectedSlotText").textContent = slot.t;
-        document.getElementById("selectedSlotDisplay").classList.remove("hidden");
+
+        const timeInput = document.getElementById("appointment_time");
+        if (timeInput) timeInput.value = slot.t;
+
+        if (selectedSlotText) selectedSlotText.textContent = slot.t;
+        if (selectedSlotDisplay) selectedSlotDisplay.classList.remove("hidden");
       });
     }
     slotGrid.appendChild(chip);
   });
 }
 
-document.getElementById("prevMonth").addEventListener("click", () => {
-  currentMonth--;
-  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-  renderCalendar();
-});
-document.getElementById("nextMonth").addEventListener("click", () => {
-  currentMonth++;
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  renderCalendar();
-});
+// month nav buttons (SAFE)
+const prevMonthBtn = document.getElementById("prevMonth");
+if (prevMonthBtn) {
+  prevMonthBtn.addEventListener("click", () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+  });
+}
+
+const nextMonthBtn = document.getElementById("nextMonth");
+if (nextMonthBtn) {
+  nextMonthBtn.addEventListener("click", () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCalendar();
+  });
+}
 
 renderCalendar();
-// Others modal
+
+/* =========================
+   OTHERS MODAL (SAFE)
+========================= */
 const othersModal = document.getElementById("othersModal");
 const othersInput = document.getElementById("service_others_text");
 const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
 
-othersRadio.addEventListener("change", function() {
-  othersInput.required = true;
-  othersModal.showModal();
-  setTimeout(() => othersInput.focus(), 100);
-});
+if (othersRadio && othersModal && othersInput) {
+  othersRadio.addEventListener("change", function() {
+    othersInput.required = true;
+    othersModal.showModal();
+    setTimeout(() => othersInput.focus(), 100);
+  });
+}
 
-document.getElementById("othersConfirmBtn").addEventListener("click", () => {
-  if (!othersInput.value.trim()) {
-    othersInput.classList.add("input-error", "shake");
-    setTimeout(() => othersInput.classList.remove("shake"), 300);
-    return;
-  }
-  othersModal.close();
-});
+const othersConfirmBtn = document.getElementById("othersConfirmBtn");
+if (othersConfirmBtn && othersModal && othersInput) {
+  othersConfirmBtn.addEventListener("click", () => {
+    if (!othersInput.value.trim()) {
+      othersInput.classList.add("input-error", "shake");
+      setTimeout(() => othersInput.classList.remove("shake"), 300);
+      return;
+    }
+    othersModal.close();
+  });
+}
 
-document.getElementById("othersCancelBtn").addEventListener("click", () => {
-  othersInput.value = "";
-  othersInput.required = false;
-  othersModal.close();
-  // Uncheck the Others radio
-  othersRadio.checked = false;
-});
+const othersCancelBtn = document.getElementById("othersCancelBtn");
+if (othersCancelBtn && othersModal && othersInput) {
+  othersCancelBtn.addEventListener("click", () => {
+    othersInput.value = "";
+    othersInput.required = false;
+    othersModal.close();
+    if (othersRadio) othersRadio.checked = false;
+  });
+}
 
+/* =========================
+   DATE PICKERS
+========================= */
 function initMiniDatePicker(id) {
   const el = document.getElementById(id);
   if (!el) return;
 
-new Pikaday({
-  field: el,
-  maxDate: new Date(),
-  yearRange: [1950, new Date().getFullYear()],
-  showMonthAfterYear: true,
-  firstDay: 1,
-  onSelect: function(date) {
-    el.value = date.toISOString().split('T')[0]; 
-  }
-});
+  new Pikaday({
+    field: el,
+    maxDate: new Date(),
+    yearRange: [1950, new Date().getFullYear()],
+    showMonthAfterYear: true,
+    firstDay: 1,
+    onSelect: function(date) {
+      el.value = date.toISOString().split('T')[0];
+    }
+  });
 }
 
 initMiniDatePicker('lastDentalVisit');
@@ -1561,7 +1654,9 @@ initMiniDatePicker('denturesDate');
 initMiniDatePicker('orthoDate');
 initMiniDatePicker('medicalExamDate');
 
-/* -------- Step Logic with "In Progress" & Checkmarks -------- */
+/* =========================
+   STEPPER LOGIC
+========================= */
 let step = 0;
 const steps = document.querySelectorAll(".step-content");
 const indicators = document.querySelectorAll(".step");
@@ -1570,22 +1665,31 @@ const navBtns = document.getElementById("navBtns");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 
-const confirmBackBtn = document.getElementById("confirmBackBtn");
+/* ✅ Step 5 sections */
+const summarySection = document.getElementById("summarySection");
+const confirmationSection = document.getElementById("confirmationSection");
+
+/* ✅ Step 5 buttons */
+const summaryBackBtn = document.getElementById("summaryBackBtn");
+const goToConfirmationBtn = document.getElementById("goToConfirmationBtn");
+const confirmationBackBtn = document.getElementById("confirmationBackBtn");
+
+/* ✅ Final confirm + submit */
 const finalSubmitBtn = document.getElementById("finalSubmitBtn");
 const finalConfirm = document.getElementById("finalConfirm");
 
 let completedSteps = [];
 
-// Initialize stepper on page load
-  showStep(0);
-  renderCalendar();
-  setTimeout(() => {
-    steps[0].classList.add("show");
-  }, 50);
+function resetStep5View() {
+  if (summarySection) summarySection.classList.remove("hidden");
+  if (confirmationSection) confirmationSection.classList.add("hidden");
+}
 
+// init
+showStep(0);
+setTimeout(() => steps[0]?.classList.add("show"), 50);
 
 function showStep(i) {
-  // show/hide content
   steps.forEach((s, idx) => {
     if (idx === i) {
       s.classList.remove("hidden");
@@ -1596,7 +1700,6 @@ function showStep(i) {
     }
   });
 
-  // Stepper indicators (Completed / In Progress)
   indicators.forEach((ind, idx) => {
     ind.querySelectorAll(".in-progress").forEach((el) => el.remove());
     if (idx >= i) {
@@ -1635,22 +1738,18 @@ function showStep(i) {
     }
   });
 
-  // ✅ Hide bottom nav on Step 5
   const isLast = i === steps.length - 1;
-  if (navBtns) navBtns.style.display = isLast ? "none" : "flex";
 
-  // ✅ Bottom buttons only for Steps 1–4
+  if (navBtns) navBtns.style.display = isLast ? "none" : "flex";
   if (prevBtn) prevBtn.style.display = i === 0 ? "none" : "inline-flex";
   if (nextBtn) nextBtn.style.display = isLast ? "none" : "inline-flex";
 
-  // build summary on last step
-  if (isLast) buildSummary();
+  if (isLast) {
+    buildSummary();
+    resetStep5View();
+  }
 
-  // scroll
-  const formWrap = document.querySelector(".max-w-4xl");
-  if (formWrap) formWrap.scrollIntoView({ behavior: "smooth" });
-
-  // keep step value synced
+  document.querySelector(".max-w-4xl")?.scrollIntoView({ behavior: "smooth" });
   step = i;
 }
 
@@ -1661,7 +1760,6 @@ function isStepComplete(currentStep) {
   const stepEl = steps[currentStep];
   if (!stepEl) return true;
 
-  // Required text/select/textarea
   const fields = stepEl.querySelectorAll(
     "input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]"
   );
@@ -1669,13 +1767,11 @@ function isStepComplete(currentStep) {
     if (!input.value || !input.value.trim()) return false;
   }
 
-  // Required checkboxes
   const requiredCheckboxes = stepEl.querySelectorAll("input[type='checkbox'][required]");
   for (const cb of requiredCheckboxes) {
     if (!cb.checked) return false;
   }
 
-  // Radios grouped
   const radios = stepEl.querySelectorAll("input[type='radio']");
   if (radios.length) {
     const groups = [...new Set([...radios].map((r) => r.name))];
@@ -1684,7 +1780,6 @@ function isStepComplete(currentStep) {
     }
   }
 
-  // Emergency Contact validation (digits only 1–11)
   const contactInput = stepEl.querySelector("#emergency_number");
   if (contactInput) {
     const value = contactInput.value.trim();
@@ -1699,7 +1794,7 @@ function isStepComplete(currentStep) {
 }
 
 /* =========================
-   NEXT / PREV HANDLERS
+   NEXT / PREV (Steps 1-4)
 ========================= */
 if (nextBtn) {
   nextBtn.addEventListener("click", () => {
@@ -1707,7 +1802,6 @@ if (nextBtn) {
       showMiniTab("Please complete all required fields before proceeding.");
       return;
     }
-
     if (!completedSteps.includes(step)) completedSteps.push(step);
 
     const nextIndex = Math.min(step + 1, steps.length - 1);
@@ -1722,11 +1816,28 @@ if (prevBtn) {
   });
 }
 
-// Step 5 Back button (go back to Step 4)
-if (confirmBackBtn) {
-  confirmBackBtn.addEventListener("click", () => {
-    const prevIndex = Math.max(step - 1, 0);
-    showStep(prevIndex);
+/* =========================
+   STEP 5 FLOW
+========================= */
+if (summaryBackBtn) {
+  summaryBackBtn.addEventListener("click", () => {
+    showStep(3); // back to step 4
+  });
+}
+
+if (goToConfirmationBtn) {
+  goToConfirmationBtn.addEventListener("click", () => {
+    if (summarySection) summarySection.classList.add("hidden");
+    if (confirmationSection) confirmationSection.classList.remove("hidden");
+    confirmationSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+if (confirmationBackBtn) {
+  confirmationBackBtn.addEventListener("click", () => {
+    if (confirmationSection) confirmationSection.classList.add("hidden");
+    if (summarySection) summarySection.classList.remove("hidden");
+    summarySection?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }
 
@@ -1739,8 +1850,8 @@ function buildSummary() {
 
   const data = new FormData(form);
 
-  const date = document.getElementById("appointment_date").value;
-  const time = document.getElementById("appointment_time").value;
+  const date = document.getElementById("appointment_date")?.value || "N/A";
+  const time = document.getElementById("appointment_time")?.value || "N/A";
 
   const get = (name) => data.get(name) || "N/A";
   const getAll = (name) => data.getAll(name);
@@ -1822,7 +1933,10 @@ function buildSummary() {
 }
 
 /* =========================
-   MODAL (Step 5 Submit)
+   MODAL (FINAL SUBMIT)
+========================= */
+/* =========================
+   MODAL (FINAL SUBMIT)
 ========================= */
 const confirmModal = document.getElementById("confirmModal");
 const confirmMessage = document.getElementById("confirmMessage");
@@ -1840,35 +1954,32 @@ if (finalSubmitBtn) {
 
     if (confirmMessage) {
       confirmMessage.innerHTML = `
-        Your dental appointment at PUP Taguig Dental Clinic
-        has been successfully scheduled on <b>${date}</b> at <b>${time}</b>.
+        Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
+        <b>${date}</b> at <b>${time}</b>.<br>
         Please arrive on time and bring your school or office ID.
+        <br>
       `;
     }
 
+    // show modal first
     confirmModal?.showModal();
   });
 }
 
-// OK button redirect
 if (okBtn) {
   okBtn.addEventListener("click", () => {
-    // ✅ Change this to your Blade route if you prefer:
-    // window.location.href = "{{ route('homepage') }}";
-    window.location.href = "/patient/dashboard";
+    document.getElementById("appointmentForm").submit();
   });
 }
 
-// prevent default form submit refresh
-const form = document.getElementById("appointmentForm");
-if (form) {
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-  });
-}
+// prevent default form submit refresh (kept since you're using modal instead of real submit)
+//const appointmentForm = document.getElementById("appointmentForm");
+//if (appointmentForm) {
+  //appointmentForm.addEventListener("submit", (e) => e.preventDefault());
+//}
 
 /* =========================
-   EXTRA TOGGLES (kept)
+   EXTRA TOGGLES
 ========================= */
 const questions = [
   { name: "difficult_extraction", boxId: "extraction_date_box" },
@@ -1902,13 +2013,14 @@ questions.forEach((q) => {
 const medicalExamRadios = document.querySelectorAll('input[name="had_medical_exam"]');
 const medicalExamBox = document.getElementById("medical_exam_box");
 
-medicalExamRadios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    if (!medicalExamBox) return;
-    if (radio.value === "Yes" && radio.checked) medicalExamBox.classList.remove("hidden");
-    if (radio.value === "No" && radio.checked) medicalExamBox.classList.add("hidden");
+if (medicalExamRadios.length && medicalExamBox) {
+  medicalExamRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      if (radio.value === "Yes" && radio.checked) medicalExamBox.classList.remove("hidden");
+      if (radio.value === "No" && radio.checked) medicalExamBox.classList.add("hidden");
+    });
   });
-});
+}
 
 const relationSelect = document.getElementById("emergency_relation");
 const otherInput = document.getElementById("relation_other");

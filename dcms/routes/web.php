@@ -124,7 +124,7 @@ Route::middleware('role:patient')->group(function () {
         return view('index', compact('patient'));
     })->name('homepage');
 
-    // BOOK APPOINTMENT (now protected; keeps same path + name)
+     //BOOK APPOINTMENT (now protected; keeps same path + name)
     Route::get('/book-appointment', [AppointmentController::class, 'create'])
         ->name('book.appointment');
 
@@ -143,8 +143,8 @@ Route::middleware('role:patient')->group(function () {
         ->name('document.requests.updateStatus');
 
     // record should use role:patient (already protected before; kept here too)
-    Route::get('/record', [RecordController::class, 'index'])
-        ->name('record');
+   Route::get('/record', [RecordController::class, 'index'])
+    ->name('record');
 
     // about-us (already protected before; kept here too)
     Route::get('/about-us', fn () => view('about-us'))

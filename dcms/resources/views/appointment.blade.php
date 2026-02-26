@@ -753,37 +753,39 @@ function toggleSidebar() {
   // ── Data from Blade / PHP ──────────────────────────────
   const MAX_PER_DAY = 10;
 
-  const myAppointments = {
+ 
+ const myAppointments = {
     @if(isset($appointments) && $appointments->count() > 0)
-      @foreach($appointments as $appt)
-        "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
-      @endforeach
+        @foreach($appointments as $appt)
+            "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}":
+            "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
+        @endforeach
     @endif
-  };
+};
 
-  const apptCounts = {
+const apptCounts = {
     @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
-      @foreach($appointmentCountsPerDay as $date => $count)
-        "{{ $date }}": {{ $count }},
-      @endforeach
+        @foreach($appointmentCountsPerDay as $date => $count)
+            "{{ $date }}": {{ $count }},
+        @endforeach
     @endif
-  };
+};
 
-  const unavailableDates = [
+const unavailableDates = [
     @if(isset($unavailableDates) && count($unavailableDates) > 0)
-      @foreach($unavailableDates as $d)
-        "{{ $d }}",
-      @endforeach
+        @foreach($unavailableDates as $d)
+            "{{ $d }}",
+        @endforeach
     @endif
-  ];
+];
 
-  const holidays = {
+const holidays = {
     @if(isset($philippineHolidays) && count($philippineHolidays) > 0)
-      @foreach($philippineHolidays as $date => $name)
-        "{{ $date }}": "{{ addslashes($name) }}",
-      @endforeach
+        @foreach($philippineHolidays as $date => $name)
+            "{{ $date }}": "{{ addslashes($name) }}",
+        @endforeach
     @endif
-  };
+};
 
   // ── State ──────────────────────────────────────────────
   const today = new Date();
