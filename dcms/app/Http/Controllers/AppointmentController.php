@@ -53,7 +53,8 @@ class AppointmentController extends Controller
         $request->validate([
             'appointment_date'   => 'required|date',
             'appointment_time'   => 'required',
-            'service_type'       => 'required',
+            'service_type'       => 'required|string|max:50',
+            'other_services' =>'required_if:service_type,Others|nullable|string|max:50',
 
             'emergency_person'   => 'required|max:50',
             'emergency_number'   => 'required|max:15',
@@ -74,6 +75,9 @@ class AppointmentController extends Controller
             $appointment = Appointment::create([
                 'patient_id'       => session('patient_id'),
                 'service_type'     => $request->service_type,
+                'other_services' => $request->service_type === 'Others'
+                    ? trim($request->service_others_text)
+                    : null,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $request->appointment_time,
                 'status'           => 'pending',
