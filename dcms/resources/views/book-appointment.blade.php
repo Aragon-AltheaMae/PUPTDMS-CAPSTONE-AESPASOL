@@ -298,6 +298,7 @@ dialog.modal::backdrop {
 
   <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
+  <input type="hidden" name="other_services" id="other_services_hidden">
 
     <!-- STEP 1 -->
 <div class="step-content hidden">
@@ -1598,6 +1599,7 @@ renderCalendar();
 const othersModal = document.getElementById("othersModal");
 const othersInput = document.getElementById("service_others_text");
 const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
+const othersHidden = document.getElementById("other_services_hidden");
 
 if (othersRadio && othersModal && othersInput) {
   othersRadio.addEventListener("change", function() {
@@ -1615,6 +1617,7 @@ if (othersConfirmBtn && othersModal && othersInput) {
       setTimeout(() => othersInput.classList.remove("shake"), 300);
       return;
     }
+    if (othersHidden) othersHidden.value = othersInput.value.trim();
     othersModal.close();
   });
 }
@@ -1623,6 +1626,7 @@ const othersCancelBtn = document.getElementById("othersCancelBtn");
 if (othersCancelBtn && othersModal && othersInput) {
   othersCancelBtn.addEventListener("click", () => {
     othersInput.value = "";
+    if (othersHidden) othersHidden.value = "";
     othersInput.required = false;
     othersModal.close();
     if (othersRadio) othersRadio.checked = false;
