@@ -46,6 +46,7 @@ class AppointmentController extends Controller
             ->pluck('count', 'appointment_date')
             ->toArray();
 
+
         // Unavailable dates (weekends are handled in JavaScript)
         $unavailableDates = []; // Add your custom unavailable dates here if needed
 
@@ -82,22 +83,32 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'approved'])
-            ->exists();
+        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+        //     ->whereIn('status', ['pending', 'approved'])
+        //     ->exists();
 
-        if ($hasActiveAppointment) {
-            return redirect()->back()->with([
-                'activeAppointmentModal' => true,
-                'activeAppointmentMsg' =>
-                "You already have an active appointment. Please wait until it is completed before booking another one."
-            ]);
-        }
+        // if ($hasActiveAppointment) {
+        //     return redirect()->back()->with([
+        //         'activeAppointmentModal' => true,
+        //         'activeAppointmentMsg' =>
+        //         "You already have an active appointment. Please wait until it is completed before booking another one."
+        //     ]);
+        // }
 
         // Also pass calendar data to the booking form if needed
         $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $appointmentCountsPerSlot = Appointment::selectRaw('appointment_date, appointment_time, COUNT(*) as count')
+            ->groupBy('appointment_date', 'appointment_time')
+            ->get()
+            ->groupBy('appointment_date')
+            ->map(function ($rows) {
+                // output: ["1:00 PM" => 1, "2:00 PM" => 1, ...]
+                return $rows->pluck('count', 'appointment_time');
+            })
             ->toArray();
 
         $unavailableDates = [];
@@ -112,6 +123,7 @@ class AppointmentController extends Controller
         return view('book-appointment', compact(
             'patient',
             'appointmentCountsPerDay',
+            'appointmentCountsPerSlot',
             'unavailableDates',
             'philippineHolidays'
         ));
@@ -126,7 +138,7 @@ class AppointmentController extends Controller
             'appointment_date'   => 'required|date',
             'appointment_time'   => 'required',
             'service_type'       => 'required|string|max:50',
-            'other_services' =>'required_if:service_type,Others|nullable|string|max:50',
+            'other_services' => 'required_if:service_type,Others|nullable|string|max:50',
 
             'emergency_person'   => 'required|max:50',
             'emergency_number'   => 'required|max:15',
@@ -137,16 +149,16 @@ class AppointmentController extends Controller
 
         $patientId = session('patient_id');
 
-        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'approved'])
-            ->exists();
+        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+        //     ->whereIn('status', ['pending', 'approved'])
+        //     ->exists();
 
-        if ($hasActiveAppointment) {
-            return redirect()->route('homepage')->with([
-                'activeAppointmentModal' => true,
-                'activeAppointmentMsg' => "You already have an active appointment. Please wait until it's marked Done or Cancelled before booking another one."
-            ]);
-        }
+        // if ($hasActiveAppointment) {
+        //     return redirect()->route('homepage')->with([
+        //         'activeAppointmentModal' => true,
+        //         'activeAppointmentMsg' => "You already have an active appointment. Please wait until it's marked Done or Cancelled before booking another one."
+        //     ]);
+        // }
 
         // Check if the selected date is already fully booked
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
@@ -156,6 +168,16 @@ class AppointmentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
+        }
+
+        $timeTaken = Appointment::where('appointment_date', $request->appointment_date)
+            ->where('appointment_time', $request->appointment_time)
+            ->exists();
+
+        if ($timeTaken) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sorry, that time slot was already taken. Please choose another time.');
         }
 
         $signaturePath = $request->file('patient_signature')
