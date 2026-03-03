@@ -8,17 +8,24 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('appointments', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('patient_id')->nullable();
-            $table->string('service_type', 100);
-            $table->date('appointment_date');
-            $table->string('appointment_time', 20);
+        $table->id();
 
-            // ✅ SERVICE TYPE IS NOW HERE
+        $table->foreignId('patient_id')
+            ->constrained('patients')
+            ->onDelete('cascade');
 
-            $table->string('status')->default('pending');
+        $table->string('service_type', 100);
+        $table->string('other_services', 50)->nullable();
 
-            $table->timestamps();
+        $table->date('appointment_date');
+        $table->time('appointment_time');
+
+        $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])
+              ->default('pending');
+
+        $table->unique(['patient_id', 'appointment_date', 'appointment_time']);
+
+        $table->timestamps();
         });
     }
 
