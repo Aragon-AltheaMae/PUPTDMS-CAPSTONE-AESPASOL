@@ -14,7 +14,7 @@ use App\Models\Patient;
 
 class AppointmentController extends Controller
 {
-    // Max appointments per day before marking as "Full Schedule"
+    
     const MAX_APPOINTMENTS_PER_DAY = 5;
 
     /* =======================
@@ -83,7 +83,7 @@ class AppointmentController extends Controller
         $patient = Patient::findOrFail($patientId);
 
         $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'approved'])
+            ->whereIn('status', ['pending', 'confirmed'])
             ->exists();
 
         if ($hasActiveAppointment) {
@@ -138,7 +138,7 @@ class AppointmentController extends Controller
         $patientId = session('patient_id');
 
         $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'approved'])
+            ->whereIn('status', ['pending', 'confirmed'])
             ->exists();
 
         if ($hasActiveAppointment) {
@@ -171,7 +171,7 @@ class AppointmentController extends Controller
                 'patient_id'       => session('patient_id'),
                 'service_type'     => $request->service_type,
                 'other_services' => $request->service_type === 'Others'
-                    ? trim($request->service_others_text)
+                    ? trim($request->other_services ?? '')
                     : null,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $request->appointment_time,
@@ -187,29 +187,29 @@ class AppointmentController extends Controller
                 'last_dental_visit' => $request->last_dental_visit,
                 'previous_dentist'  => $request->previous_dentist,
 
-                'bleeding_gums'      => strtoupper($request->bleeding_gums),
-                'sensitive_temp'     => strtoupper($request->sensitive_temp),
-                'sensitive_taste'    => strtoupper($request->sensitive_taste),
-                'tooth_pain'         => strtoupper($request->tooth_pain),
-                'sores'              => strtoupper($request->sores),
-                'injuries'           => strtoupper($request->injuries),
+                'bleeding_gums'      => booleanValue($request->bleeding_gums),
+                'sensitive_temp'     => booleanValue($request->sensitive_temp),
+                'sensitive_taste'    => booleanValue($request->sensitive_taste),
+                'tooth_pain'         => booleanValue($request->tooth_pain),
+                'sores'              => booleanValue($request->sores),
+                'injuries'           => booleanValue($request->injuries),
 
-                'clicking'           => strtoupper($request->clicking),
-                'joint_pain'         => strtoupper($request->joint_pain),
-                'difficulty_moving'  => strtoupper($request->difficulty_moving),
-                'difficulty_chewing' => strtoupper($request->difficulty_chewing),
-                'jaw_headaches'      => strtoupper($request->jaw_headaches),
-                'clench_grind'       => strtoupper($request->clench_grind),
-                'biting'             => strtoupper($request->biting),
-                'teeth_loosening'    => strtoupper($request->teeth_loosening),
-                'food_teeth'         => strtoupper($request->food_teeth),
-                'med_reaction'       => strtoupper($request->med_reaction),
+                'clicking'           => booleanValue($request->clicking),
+                'joint_pain'         => booleanValue($request->joint_pain),
+                'difficulty_moving'  => booleanValue($request->difficulty_moving),
+                'difficulty_chewing' => booleanValue($request->difficulty_chewing),
+                'jaw_headaches'      => booleanValue($request->jaw_headaches),
+                'clench_grind'       => booleanValue($request->clench_grind),
+                'biting'             => booleanValue($request->biting),
+                'teeth_loosening'    => booleanValue($request->teeth_loosening),
+                'food_teeth'         => booleanValue($request->food_teeth),
+                'med_reaction'       => booleanValue($request->med_reaction),
 
-                'periodontal'        => strtoupper($request->periodontal),
-                'difficult_extraction' => strtoupper($request->difficult_extraction),
-                'prolonged_bleeding' => strtoupper($request->prolonged_bleeding),
-                'dentures'           => strtoupper($request->dentures),
-                'ortho_treatment'    => strtoupper($request->ortho_treatment),
+                'periodontal'        => booleanValue($request->periodontal),
+                'difficult_extraction' => booleanValue($request->difficult_extraction),
+                'prolonged_bleeding' => booleanValue($request->prolonged_bleeding),
+                'dentures'           => booleanValue($request->dentures),
+                'ortho_treatment'    => booleanValue($request->ortho_treatment),
 
                 'extraction_date'    => $request->extraction_date,
                 'dentures_date'      => $request->dentures_date,
@@ -224,34 +224,34 @@ class AppointmentController extends Controller
             $medicalHistory = MedicalHistory::create([
                 'appointment_id' => $appointment->id,
 
-                'good_health' => strtoupper($request->good_health),
+                'good_health' => booleanValue($request->good_health),
                 'good_health_details' => $request->good_health_details,
                 'medical_exam_date' => $request->medical_exam_date,
 
-                'under_treatment' => strtoupper($request->under_treatment),
+                'under_treatment' => booleanValue($request->under_treatment),
                 'treatment_details' => $request->treatment_details,
 
-                'hospitalized' => strtoupper($request->hospitalized),
+                'hospitalized' => booleanValue($request->hospitalized),
                 'hospital_details' => $request->hospital_details,
 
-                'allergy_medicine' => strtoupper($request->allergy_medicine),
-                'allergy_food' => strtoupper($request->allergy_food),
+                'allergy_medicine' => booleanValue($request->allergy_medicine),
+                'allergy_food' => booleanValue($request->allergy_food),
                 'allergy_others' => $request->allergy_others,
 
-                'medication' => strtoupper($request->medication),
+                'medication' => booleanValue($request->medication),
                 'medication_details' => $request->medication_details,
 
-                'pregnant' => strtoupper($request->pregnant),
-                'nursing' => strtoupper($request->nursing),
-                'birth_control' => strtoupper($request->birth_control),
+                'pregnant' => booleanValue($request->pregnant),
+                'nursing' => booleanValue($request->nursing),
+                'birth_control' => booleanValue($request->birth_control),
 
-                'tobacco_use' => strtoupper($request->tobacco_use),
+                'tobacco_use' => booleanValue($request->tobacco_use),
                 'tobacco_per_day' => $request->tobacco_per_day,
                 'tobacco_per_week' => $request->tobacco_per_week,
 
-                'headaches' => strtoupper($request->headaches),
-                'earaches' => strtoupper($request->earaches),
-                'neck_aches' => strtoupper($request->neck_aches),
+                'headaches' => booleanValue($request->headaches),
+                'earaches' => booleanValue($request->earaches),
+                'neck_aches' => booleanValue($request->neck_aches),
 
                 'emergency_person' => $request->emergency_person,
                 'emergency_number' => $request->emergency_number,
