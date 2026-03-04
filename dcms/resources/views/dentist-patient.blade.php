@@ -20,9 +20,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+
+  <script>
+    tailwind.config = {
+      daisyui: {
+        themes: false,
+      },
+    }
+  </script>
+
   <style>
     body {
       font-family: 'Inter';
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes fadeIn {
@@ -41,12 +62,15 @@
       content: ""; width: 8px; height: 8px; border-radius: 9999px;
       transform: scale(0); transition: transform 120ms ease-in-out; background: #8B0000;
     }
-    .radio-red:checked::before { transform: scale(1); }
+
+    .radio-red:checked::before {
+      transform: scale(1);
+    }
 
     .sidebar-link {
-      display: flex; align-items: center; width: 100%;
-      padding: 12px; border-radius: 12px;
-      transition: background-color .2s ease, transform .2s ease;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
     .sidebar-link:hover .sidebar-tooltip { opacity: 1; transform: scale(1); }
     #sidebar[style*="16rem"] .sidebar-tooltip { display: none; }
@@ -64,180 +88,239 @@
     #openFilter.filter-active { background: #8B0000 !important; color: #fff !important; }
     #openFilter.filter-active i { color: #fff !important; }
 
-    /* DARK MODE */
-    [data-theme="dark"] body { background-color: #111827; color: #E5E7EB; }
-    [data-theme="dark"] #sidebar { background-color: #1F2933; }
-    [data-theme="dark"] .bg-white { background-color: #1F2937 !important; }
-    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
-    body, #sidebar, main, .card { transition: background-color 0.3s ease, color 0.3s ease; }
-
-    /* =============================================
-       TABS — white card style with colored icon + bottom border
-    ============================================= */
-    @keyframes tabSlideUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+      padding-left: 0.25rem;
     }
 
-    .tab-btn {
-      position: relative;
-      background: #fff;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 16px;
-      padding: 18px 16px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0;
-      cursor: pointer;
-      transition: box-shadow .2s ease, transform .2s ease, border-color .2s;
-      overflow: hidden;
-      animation: tabSlideUp .35s ease both;
-    }
-    .tab-btn:nth-child(1) { animation-delay: .03s; }
-    .tab-btn:nth-child(2) { animation-delay: .08s; }
-    .tab-btn:nth-child(3) { animation-delay: .13s; }
-    .tab-btn:nth-child(4) { animation-delay: .18s; }
-    .tab-btn:nth-child(5) { animation-delay: .23s; }
-    .tab-btn:nth-child(6) { animation-delay: .28s; }
-
-    .tab-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,.08);
-      border-color: #D1D5DB;
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
     }
 
-    /* bottom accent border — hidden by default, shown on active */
-    .tab-btn::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 4px;
-      border-radius: 0 0 16px 16px;
-      opacity: 0;
-      transition: opacity .2s;
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
     }
-    .tab-btn.tab-active {
-      border-color: transparent;
-      box-shadow: 0 6px 24px rgba(0,0,0,.10);
-      transform: translateY(-2px);
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
     }
     .tab-btn.tab-active::after { opacity: 1; }
 
-    /* icon wrapper — rounded square with soft tinted bg */
-    .tab-icon-wrap {
-      width: 40px; height: 40px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 14px;
-      font-size: 18px;
+    #sidebar.expanded .sidebar-text {
+      opacity: 1;
+      width: auto;
+      overflow: visible;
     }
 
-    /* number + label row — icon left, number right */
-    .tab-top-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      width: 100%;
-      gap: 8px;
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
     }
 
-    .tab-count {
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -1px;
-      color: #111827;
-    }
-    .tab-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .6px;
-      color: #6B7280;
-      text-transform: uppercase;
-      margin-top: 6px;
+    #sidebar.collapsed .sidebar-tooltip {
       display: block;
     }
 
-    /* Per-tab icon + accent colors */
-    .tab-scheduled  .tab-icon-wrap { background: #EFF6FF; color: #2563EB; }
-    .tab-upcoming   .tab-icon-wrap { background: #FFF7ED; color: #EA580C; }
-    .tab-rescheduled.tab-icon-wrap,
-    .tab-rescheduled .tab-icon-wrap { background: #EFF6FF; color: #0EA5E9; }
-    .tab-cancelled  .tab-icon-wrap { background: #FDF2FF; color: #A855F7; }
-    .tab-completed  .tab-icon-wrap { background: #F0FDF4; color: #16A34A; }
-    .tab-all        .tab-icon-wrap { background: #FFF7ED; color: #D97706; }
-
-    /* bottom border colors per tab */
-    .tab-scheduled::after  { background: #2563EB; }
-    .tab-upcoming::after   { background: #EA580C; }
-    .tab-rescheduled::after{ background: #0EA5E9; }
-    .tab-cancelled::after  { background: #A855F7; }
-    .tab-completed::after  { background: #16A34A; }
-    .tab-all::after        { background: #D97706; }
-
-    /* active border on the card itself matches accent */
-    .tab-scheduled.tab-active  { border-color: #BFDBFE !important; box-shadow: 0 6px 24px rgba(37,99,235,.12); }
-    .tab-upcoming.tab-active   { border-color: #FED7AA !important; box-shadow: 0 6px 24px rgba(234,88,12,.12); }
-    .tab-rescheduled.tab-active{ border-color: #BAE6FD !important; box-shadow: 0 6px 24px rgba(14,165,233,.12); }
-    .tab-cancelled.tab-active  { border-color: #E9D5FF !important; box-shadow: 0 6px 24px rgba(168,85,247,.12); }
-    .tab-completed.tab-active  { border-color: #BBF7D0 !important; box-shadow: 0 6px 24px rgba(22,163,74,.12); }
-    .tab-all.tab-active        { border-color: #FDE68A !important; box-shadow: 0 6px 24px rgba(217,119,6,.12); }
-
-    /* =============================================
-       ENHANCED PATIENT CARDS
-    ============================================= */
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
+    #sidebar.collapsed .section-label {
+      display: none;
     }
 
-    .patient-card {
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(0.95) !important;
+      pointer-events: none !important;
+    }
+
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link span:first-of-type {
+      margin: 0 auto;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
+    .theme-toggle-container {
       position: relative;
-      background: #fff;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 16px;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
       cursor: pointer;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
-      animation: cardIn .4s ease both;
-    }
-    .patient-card:nth-child(1) { animation-delay: .05s; }
-    .patient-card:nth-child(2) { animation-delay: .12s; }
-    .patient-card:nth-child(3) { animation-delay: .19s; }
-    .patient-card:nth-child(4) { animation-delay: .26s; }
-    .patient-card:nth-child(5) { animation-delay: .33s; }
-
-    .patient-card:hover {
-      border-color: #D1D5DB;
-      box-shadow: 0 8px 28px rgba(0,0,0,.09);
-      transform: translateY(-2px);
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
     }
 
-    /* left accent bar */
-    .patient-card .accent-bar {
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
       position: absolute;
-      left: 0; top: 14px; bottom: 14px;
-      width: 4px;
-      border-radius: 0 4px 4px 0;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
     }
-    .accent-upcoming    { background: linear-gradient(180deg, #E64A19, #BF360C); }
-    .accent-today       { background: linear-gradient(180deg, #1E88E5, #1565C0); }
-    .accent-rescheduled { background: linear-gradient(180deg, #FB8C00, #E65100); }
-    .accent-cancelled   { background: linear-gradient(180deg, #E53935, #B71C1C); }
-    .accent-completed   { background: linear-gradient(180deg, #388E3C, #1B5E20); }
-    .accent-default     { background: linear-gradient(180deg, #9CA3AF, #6B7280); }
 
-    /* arrow CTA */
-    .card-arrow-btn {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: #F3F4F6;
-      border: 1.5px solid #E5E7EB;
-      display: flex; align-items: center; justify-content: center;
-      color: #9CA3AF; font-size: 14px;
-      flex-shrink: 0;
-      transition: all .2s;
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    /* DARK MODE STYLES */
+    [data-theme="dark"] body {
+      background-color: #000D1A;
+      color: #E5E7EB;
+    }
+
+    [data-theme="dark"] #sidebar {
+      background-color: #000D1A;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #000D1A !important;
     }
     .patient-card:hover .card-arrow-btn {
       background: #8B0000;
@@ -246,36 +329,22 @@
       box-shadow: 0 4px 12px rgba(139,0,0,.3);
     }
 
-    /* status pill */
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 11px;
-      border-radius: 20px;
-      font-size: 11px; font-weight: 600;
-      margin-top: 6px;
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
     }
-    .status-pill .pill-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: pillPulse 2s infinite;
-    }
-    @keyframes pillPulse {
-      0%,100% { opacity: 1; } 50% { opacity: .35; }
-    }
-    .pill-today       { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
-    .pill-upcoming    { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
-    .pill-rescheduled { background: #FFF7ED; color: #B45309; border: 1px solid #FDE68A; }
-    .pill-cancelled   { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
-    .pill-completed   { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
-    .pill-default     { background: #F9FAFB; color: #374151; border: 1px solid #E5E7EB; }
 
-    /* icon box */
-    .icon-box {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
+    }
+
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
+    }
+
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     @media (max-width: 1024px) { .grid-cols-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -285,13 +354,11 @@
 
 <body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
-  <!-- ═══════════════════════════════════════════
-       HEADER — UNCHANGED
-  ═══════════════════════════════════════════ -->
+  <!-- HEADER (TOP BAR) -->
   <div class="fixed top-0 left-0 right-0 z-50
-              bg-gradient-to-r from-[#660000] to-[#8B0000]
-              text-[#F4F4F4] px-6 py-4
-              flex items-center justify-between">
+            bg-gradient-to-r from-[#660000] to-[#8B0000]
+            text-[#F4F4F4] px-6 py-4
+            flex items-center justify-between">
 
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
@@ -305,42 +372,61 @@
 
     <div class="flex items-center gap-8">
       @php
+      // Pass $notifications from controller, or leave it empty for now
+      // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
       $notifications = collect($notifications ?? []);
       $notifCount = $notifications->count();
       @endphp
 
       <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+
+        <button id="notifBtn" type="button"
+          class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+
           @if($notifCount > 0)
           <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
             {{ $notifCount }}
           </span>
           @endif
+
           <i class="fa-regular fa-bell text-lg"></i>
         </button>
 
         <div id="notifMenu"
           class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-                 opacity-0 scale-95 pointer-events-none
-                 transition-all duration-200 ease-out origin-top-right">
+         opacity-0 scale-95 pointer-events-none
+         transition-all duration-200 ease-out origin-top-right">
+
           <div class="p-4 border-b flex items-center justify-between">
             <span class="font-bold text-[#8B0000]">Notifications</span>
           </div>
+
           <div class="max-h-80 overflow-y-auto">
             @forelse($notifications as $n)
             <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
-              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+              <div class="text-xs text-[#ADADAD] mt-0.5">
+                {{ $n['message'] }}
+              </div>
+              @endif
+              @if(!empty($n['time']))
+              <div class="text-[11px] text-gray-400 mt-1">
+                {{ $n['time'] }}
+              </div>
+              @endif
             </a>
             @empty
             <div class="px-4 py-10 text-center justify-items-center">
               <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
               <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
             </div>
             @endforelse
           </div>
+
         </div>
       </div>
 
@@ -350,25 +436,6 @@
           <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
           <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       SIDEBAR — UNCHANGED
-  ═══════════════════════════════════════════ -->
-  <aside id="sidebar"
-    class="fixed left-0 top-[80px] h-[calc(100vh-80px)] w-[72px]
-           bg-[#FAFAFA] drop-shadow-xl transition-all duration-300
-           flex flex-col justify-between z-40">
-    <div>
-      <div id="sidebarToggleWrapper"
-        class="flex items-center justify-center px-4 py-6 transition-all duration-300">
-        <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-          class="w-10 h-10 flex items-center justify-center rounded-full
-                 text-[#757575] hover:text-[#8B0000] hover:bg-[#D9D9D9] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
-        </button>
       </div>
       <nav class="space-y-2 px-3 text-gray-600 text-sm">
         <a href="{{ route('dentist.dashboard') }}"
@@ -1098,21 +1165,46 @@
       applyFilters();
     });
 
-    /* NOTIFICATION DROPDOWN */
+    // NOTIFICATION
     document.addEventListener("DOMContentLoaded", () => {
-      const btn  = document.getElementById("notifBtn");
+      const btn = document.getElementById("notifBtn");
       const menu = document.getElementById("notifMenu");
-      if (!btn || !menu) return;
+
       let isOpen = false;
-      const openMenu  = () => { isOpen=true;  menu.classList.remove("notif-close"); menu.classList.add("notif-open"); };
-      const closeMenu = () => { isOpen=false; menu.classList.remove("notif-open");  menu.classList.add("notif-close"); };
-      btn.addEventListener("click", e => { e.stopPropagation(); isOpen ? closeMenu() : openMenu(); });
-      menu.addEventListener("click", e => e.stopPropagation());
-      document.addEventListener("click", () => { if(isOpen) closeMenu(); });
-      document.addEventListener("keydown", e => { if(e.key==="Escape"&&isOpen) closeMenu(); });
+
+      function openMenu() {
+        isOpen = true;
+        menu.classList.remove("notif-close");
+        menu.classList.add("notif-open");
+      }
+
+      function closeMenu() {
+        isOpen = false;
+        menu.classList.remove("notif-open");
+        menu.classList.add("notif-close");
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isOpen ? closeMenu() : openMenu();
+      });
+
+      menu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", () => {
+        if (isOpen) closeMenu();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isOpen) closeMenu();
+      });
+
       closeMenu();
     });
   </script>
 
 </body>
+
 </html>
