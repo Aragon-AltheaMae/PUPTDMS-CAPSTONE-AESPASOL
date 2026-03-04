@@ -680,7 +680,7 @@
       One Appointment at a Time
     </h3>
 
-    <p class="text-sm text-[#555] mb-6 leading-relaxed">
+    <p class="text-sm text-[#333] mb-6 leading-relaxed">
       {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed before booking another one." }}
     </p>
 
@@ -948,8 +948,8 @@
             textClass = 'text-white font-extrabold';
             ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
           } else if (holiday) {
-            bgClass = 'bg-amber-50 hover:bg-amber-100';
-            textClass = 'text-amber-700 font-semibold';
+            bgClass = 'bg-blue-50 hover:bg-blue-100';
+            textClass = 'text-blue-700 font-semibold';
           } else if (isUnavail) {
             bgClass = '';
             textClass = 'text-gray-300';
@@ -974,8 +974,8 @@
 
           // Holiday
           if (holiday && !myAppt) {
-            dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;
-            tooltipTxt = `<i class="fa-solid fa-star mr-1 text-amber-300"></i>${holiday}`;
+            dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
+            tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
           }
 
           // Weekend / unavailable
@@ -1011,7 +1011,7 @@
 
         // ── Day labels ─────────────────────────────────────
         const headerHtml = dayLabels.map((l, i) => {
-          const labelColor = (i === 0 || i === 6) ? 'text-[#8B0000]/40' : 'text-[#9CA3AF]';
+          const labelColor = (i === 0 || i === 6) ? 'text-[#8B0000]/40' : 'text-[#333333]';
           return `<div class="text-center text-[10px] font-bold ${labelColor} uppercase tracking-widest">${l}</div>`;
         }).join('');
 
@@ -1053,25 +1053,25 @@
           <div class="mt-4 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
             <div class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-[#008440] flex-shrink-0"></span>
-              <span class="text-[11px] text-[#555]">My Appointment</span>
+              <span class="text-[11px] text-[#333]">My Appointment</span>
             </div>
             <div class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
-              <span class="text-[11px] text-[#555]">Full Schedule</span>
+              <span class="text-[11px] text-[#333]">Full Schedule</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-50 border border-amber-400 flex-shrink-0"></span>
-              <span class="text-[11px] text-[#555]">Holiday</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-50 border border-amber-400 flex-shrink-0"></span>
+              <span class="text-[11px] text-[#333]">Holiday</span>
             </div>
             <div class="flex items-center gap-1.5">
               <span class="text-gray-300 text-base font-bold leading-none flex-shrink-0">–</span>
-              <span class="text-[11px] text-[#555]">Not Available</span>
+              <span class="text-[11px] text-[#333]">Not Available</span>
             </div>
             <div class="flex items-center gap-1.5">
               <span class="w-4 h-4 rounded-full bg-[#8B0000] inline-flex items-center justify-center flex-shrink-0">
                 <span class="text-white text-[8px] font-extrabold">•</span>
               </span>
-              <span class="text-[11px] text-[#555]">Today</span>
+              <span class="text-[11px] text-[#333]">Today</span>
             </div>
           </div>
         </div>
