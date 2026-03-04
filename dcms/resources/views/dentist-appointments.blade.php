@@ -43,67 +43,67 @@
       animation: fadeIn 0.6s ease-out forwards;
     }
 
-
-
     .sidebar-link {
       display: flex;
       align-items: center;
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      transition: background-color .2s ease, transform .2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Tooltip appears ONLY when collapsed */
-    .sidebar-link:hover .sidebar-tooltip {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip {
-      display: none;
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link {
+    #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
+      padding-left: 0.25rem;
     }
 
-    /* consistent icon column width */
-    .sidebar-link i {
-      width: 24px;
-      /* fixed width column */
-      min-width: 24px;
-      text-align: center;
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
     }
 
-    /* CLOSED: center icon only */
-    #sidebar[style*="72px"] .sidebar-link {
-      justify-content: center;
-      gap: 0;
-    }
-
-    /* when expanded, align items nicely */
-    #sidebar[style*="16rem"] .sidebar-link {
-      justify-content: flex-start;
-      gap: 12px;
-      /* spacing between icon and text */
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link:hover {
+    #sidebar.expanded .sidebar-link:hover {
       transform: translateX(4px);
     }
 
-    .sidebar-link:hover .sidebar-text {
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-text {
       opacity: 1;
-      transform: scale(1);
+      width: auto;
+      overflow: visible;
     }
 
-    .sidebar-text {
-      transform-origin: left center;
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
     }
 
-    /* Notification dropdown animation */
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
     .notif-open {
       opacity: 1 !important;
       transform: scale(1) !important;
@@ -113,34 +113,196 @@
     .notif-close {
       opacity: 0 !important;
       transform: scale(0.95) !important;
-      /* zoom out */
       pointer-events: none !important;
     }
 
-    /* DARK MODE */
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link span:first-of-type {
+      margin: 0 auto;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
+    }
+
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    /* DARK MODE STYLES */
     [data-theme="dark"] body {
-      background-color: #111827;
-      /* slate-900 */
+      background-color: #000D1A;
       color: #E5E7EB;
     }
 
     [data-theme="dark"] #sidebar {
-      background-color: #1F2933;
+      background-color: #000D1A;
     }
 
     [data-theme="dark"] .bg-white {
-      background-color: #1F2937 !important;
+      background-color: #000D1A !important;
     }
 
     [data-theme="dark"] .text-\[\#333333\] {
       color: #E5E7EB !important;
     }
 
-    body,
-    #sidebar,
-    main,
-    .card {
-      transition: background-color 0.3s ease, color 0.3s ease;
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
+    }
+
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
+    }
+
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
+    }
+
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
@@ -148,329 +310,243 @@
 <body class="bg-[#F4F4F4] text-[#333333] font-normal min-h-screen flex flex-col"">
 
   <!-- HEADER (TOP BAR) -->
-  <div class="fixed top-0 left-0 right-0 z-50
-            bg-gradient-to-r from-[#660000] to-[#8B0000]
-            text-[#F4F4F4] px-6 py-4
-            flex items-center justify-between">
+  <div class=" fixed top-0 left-0 right-0 z-50
+  bg-gradient-to-r from-[#660000] to-[#8B0000]
+  text-[#F4F4F4] px-6 py-4
+  flex items-center justify-between">
 
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <div class="flex items-center gap-3">
+    <div class="w-12 rounded-full ml-5">
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
+    <div class="w-12 rounded-full">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+    </div>
+    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  </div>
 
-    <div class="flex items-center gap-8">
-      @php
-      // Pass $notifications from controller, or leave it empty for now
-      // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
+  <div class="flex items-center gap-8">
+    @php
+    // Pass $notifications from controller, or leave it empty for now
+    // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+    $notifications = collect($notifications ?? []);
+    $notifCount = $notifications->count();
+    @endphp
 
-      <div id="notifDropdown" class="relative">
+    <div id="notifDropdown" class="relative">
 
-        <button id="notifBtn" type="button"
-          class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      <button id="notifBtn" type="button"
+        class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
 
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-            {{ $notifCount }}
-          </span>
-          @endif
+        @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+        @endif
 
-          <i class="fa-regular fa-bell text-lg"></i>
-        </button>
+        <i class="fa-regular fa-bell text-lg"></i>
+      </button>
 
-        <div id="notifMenu"
-          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+      <div id="notifMenu"
+        class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
          opacity-0 scale-95 pointer-events-none
          transition-all duration-200 ease-out origin-top-right">
 
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
-          </div>
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
+        </div>
 
-          <div class="max-h-80 overflow-y-auto">
-            @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
-              @if(!empty($n['message']))
-              <div class="text-xs text-[#ADADAD] mt-0.5">
-                {{ $n['message'] }}
-              </div>
-              @endif
-              @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
-              @endif
-            </a>
-            @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+            <div class="text-sm font-semibold text-gray-900">
+              {{ $n['title'] ?? 'Notification' }}
             </div>
-            @endforelse
+            @if(!empty($n['message']))
+            <div class="text-xs text-[#ADADAD] mt-0.5">
+              {{ $n['message'] }}
+            </div>
+            @endif
+            @if(!empty($n['time']))
+            <div class="text-[11px] text-gray-400 mt-1">
+              {{ $n['time'] }}
+            </div>
+            @endif
+          </a>
+          @empty
+          <div class="px-4 py-10 text-center justify-items-center">
+            <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+            <div class="text-sm font-semibold text-gray-800">No notifications</div>
+            <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
           </div>
-
+          @endforelse
         </div>
+
       </div>
+    </div>
 
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-        <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
-        </div>
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div>
+        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
     </div>
   </div>
+  </div>
 
+  <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[80px]
-         h-[calc(100vh-80px)]
-         w-[72px]
-         bg-[#FAFAFA]
+    class="fixed left-0 top-[72px]
+         h-[calc(100vh-72px)]
+         bg-white
          drop-shadow-xl
          transition-all duration-300
-         flex flex-col justify-between z-40">
+         flex flex-col justify-between z-40 expanded"
+    style="width: 200px;">
 
     <!-- TOP -->
-    <div>
-      <div id="sidebarToggleWrapper"
-        class="flex items-center justify-center px-4 py-6 transition-all duration-300">
+    <div class="pt-4">
+
+      <!-- Toggle Button -->
+      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()"
           id="sidebarToggleBtn"
-          class="w-10 h-10 flex items-center justify-center
+          class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#D9D9D9] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
+              hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
+      <!-- NAVIGATION LABEL -->
+      <div class="section-label px-4 mb-6">Navigation</div>
+
       <!-- MENU -->
-      <nav class="space-y-2 px-3 text-gray-600 text-sm">
+      <nav class="space-y-2 px-3 text-gray-600">
 
         <!-- DASHBOARD -->
         <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.dashboard')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-chart-line text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-chart-line text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Dashboard
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200
-            opacity-0 scale-95 transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Dashboard
           </span>
         </a>
 
         <!-- PATIENTS -->
         <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.patients*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
+            <i class="fa-solid fa-users text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-users text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Patients
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Patients
           </span>
         </a>
 
         <!-- APPOINTMENTS -->
         <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.appointments*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-calendar-check text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-calendar-check text-lg"></i>
-          <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Appointments
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Appointments
           </span>
         </a>
 
         <!-- Document Requests -->
         <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.documentrequests*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file-circle-check text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-file-circle-check text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Document Requests
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Document Requests
           </span>
         </a>
 
         <!-- INVENTORY -->
         <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.inventory*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-box text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-box text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Inventory
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Inventory
           </span>
         </a>
 
         <!-- REPORTS -->
         <a href="{{ route('dentist.report') }}"
-          class="sidebar-link relative flex items-center  rounded-xl
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.report*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
+                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-          <span
-            class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file text-lg"></i>
           </span>
-
-          <i class="fa-solid fa-file text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
             Reports
           </span>
-
-          <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Reports
           </span>
         </a>
@@ -478,60 +554,33 @@
     </div>
 
     <!-- BOTTOM -->
-    <div class="px-3 pb-5 space-y-2">
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
 
-      <!-- DARK MODE TOGGLE -->
-      <button
-        id="themeToggle"
-        class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-1.5 rounded-xl
-          bg-[#7B6CF6] text-[#F4F4F4]
-          transition-all duration-200
-          hover:scale-105"
-        aria-label="Toggle dark mode">
-
-        <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
-        <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden
-               transition-all duration-300 delay-150">
-          Dark Mode
-        </span>
-        <!-- Tooltip (collapsed only) -->
-        <span
-          class="sidebar-tooltip
-            absolute left-full ml-8
-            px-3 py-1
-            rounded-full
-            bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold
-            whitespace-nowrap
-            opacity-0 scale-95
-            pointer-events-none
-            transition-all duration-200">
-          Dark Mode
-        </span>
-      </button>
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+            <i class="fa-regular fa-moon"></i>
+          </button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
 
       <form action="{{ route('logout') }}" method="POST">
         @csrf
         <button
-          class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
-               text-red-600 hover:bg-red-50 transition-all duration-200">
-          <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
+             text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
             Log out
           </span>
-          <span
-            class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Log out
           </span>
         </button>
@@ -543,8 +592,7 @@
   <!-- ================= MAIN ================= -->
   <main
     id="mainContent"
-    class="flex-1 pt-[100px] px-6 pb-0 w-full transition-transform duration-500
-            ease-[cubic-bezier(0.4,0,0.2,1)]">
+    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
 
     <div class="max-w-7xl mt-4 mx-auto fade-in">
       <!-- Toggle pill -->
@@ -621,358 +669,358 @@
                     Cancel
                   </button>
                 </div>
-              </div> 
-            </div> 
-          </div> 
-        </div> 
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-                <!-- ================= RESCHEDULE MODAL ================= -->
-                <div id="rescheduleModal"
-                  class="fixed inset-0 bg-black/40 flex items-center 
+      <!-- ================= RESCHEDULE MODAL ================= -->
+      <div id="rescheduleModal"
+        class="fixed inset-0 bg-black/40 flex items-center 
                       justify-center hidden z-50">
-                  <div class="bg-white w-[560px] rounded-2xl overflow-hidden 
+        <div class="bg-white w-[560px] rounded-2xl overflow-hidden 
                               shadow-2xl">
 
-                    <!-- HEADER -->
-                    <div class="bg-yellow-200 px-8 py-5 text-center">
-                      <h2 class="text-xl font-bold text-[#8b0000]">
-                        Reschedule Appointment
-                      </h2>
-                    </div>
+          <!-- HEADER -->
+          <div class="bg-yellow-200 px-8 py-5 text-center">
+            <h2 class="text-xl font-bold text-[#8b0000]">
+              Reschedule Appointment
+            </h2>
+          </div>
 
-                    <!-- BODY -->
-                    <div class="px-10 py-7 bg-gray-50">
+          <!-- BODY -->
+          <div class="px-10 py-7 bg-gray-50">
 
-                      <p class="text-base font-bold text-gray-900 mb-1 text-center">
-                        You are about to reschedule this appointment.
-                      </p>
-                      <p class="text-sm text-gray-500 mb-5 text-center">
-                        You will be able to select a new date and time.
-                      </p>
+            <p class="text-base font-bold text-gray-900 mb-1 text-center">
+              You are about to reschedule this appointment.
+            </p>
+            <p class="text-sm text-gray-500 mb-5 text-center">
+              You will be able to select a new date and time.
+            </p>
 
-                      <!-- Appointment Details card -->
-                      <div class="bg-white border border-gray-200 rounded-2xl 
+            <!-- Appointment Details card -->
+            <div class="bg-white border border-gray-200 rounded-2xl 
                                   px-8 py-5 text-center mb-4 shadow-sm">
-                        <div class="flex items-center justify-center gap-2 
+              <div class="flex items-center justify-center gap-2 
                                   text-gray-700 text-sm font-bold mb-3">
-                          <i class="fa-regular fa-circle-user text-lg"></i>
-                          <span>Appointment Details</span>
-                        </div>
+                <i class="fa-regular fa-circle-user text-lg"></i>
+                <span>Appointment Details</span>
+              </div>
 
-                        <p class="text-sm text-gray-800">
-                          Patient Name: <span class="font-bold">Alilah Gomez</span>
-                        </p>
+              <p class="text-sm text-gray-800">
+                Patient Name: <span class="font-bold">Alilah Gomez</span>
+              </p>
 
-                        <p class="text-sm text-gray-600 mt-1">
-                          February 2, 2025 | 1:00 PM
-                        </p>
-                      </div>
+              <p class="text-sm text-gray-600 mt-1">
+                February 2, 2025 | 1:00 PM
+              </p>
+            </div>
 
-                      <p class="text-xs text-gray-400 mb-5 text-center">
-                        This change will be recorded in the appointment history.
-                      </p>
+            <p class="text-xs text-gray-400 mb-5 text-center">
+              This change will be recorded in the appointment history.
+            </p>
 
-                      <!-- BUTTONS -->
-                      <div class="flex justify-end gap-3">
-                        <button onclick="closeRescheduleModal()"
-                          class="px-6 py-2 rounded-lg border border-gray-300
+            <!-- BUTTONS -->
+            <div class="flex justify-end gap-3">
+              <button onclick="closeRescheduleModal()"
+                class="px-6 py-2 rounded-lg border border-gray-300
                                   bg-white text-gray-700 font-semibold
                                   hover:bg-gray-100 transition text-sm shadow-sm">
-                          Cancel
-                        </button>
-                        <button onclick="confirmReschedule()"
-                          class="px-6 py-2 rounded-lg bg-yellow-400 
+                Cancel
+              </button>
+              <button onclick="confirmReschedule()"
+                class="px-6 py-2 rounded-lg bg-yellow-400 
                                  text-gray-700 font-semibold hover:bg-yellow-500  
                                  transition text-sm shadow-sm">
-                          Reschedule
-                        </button>
-                      </div>
+                Reschedule
+              </button>
+            </div>
 
-                    </div>
-                  </div>
-                </div>
+          </div>
+        </div>
+      </div>
 
-                <!-- ================= START PROCEDURE MODAL ================= -->
-                <div id="startProcedureModal"
-                  class="fixed inset-0 bg-black/50 flex items-center 
+      <!-- ================= START PROCEDURE MODAL ================= -->
+      <div id="startProcedureModal"
+        class="fixed inset-0 bg-black/50 flex items-center 
                        justify-center hidden z-50">
-                  <div class="bg-white w-[560px] rounded-2xl 
+        <div class="bg-white w-[560px] rounded-2xl 
                               overflow-hidden shadow-2xl">
 
-                    <!-- HEADER -->
-                    <div class="bg-green-700 px-8 py-5 text-center">
-                      <h2 class="text-xl font-bold text-white">
-                        Confirm Procedure Start
-                      </h2>
-                    </div>
+          <!-- HEADER -->
+          <div class="bg-green-700 px-8 py-5 text-center">
+            <h2 class="text-xl font-bold text-white">
+              Confirm Procedure Start
+            </h2>
+          </div>
 
-                    <!-- BODY -->
-                    <div class="px-10 py-7 bg-gray-50">
+          <!-- BODY -->
+          <div class="px-10 py-7 bg-gray-50">
 
-                      <p class="text-base font-bold text-gray-900 mb-1 text-center">
-                        You are about to begin this appointment's procedure.
-                      </p>
-                      <p class="text-sm text-gray-500 mb-5 text-center">
-                        This will mark the appointment as in progress.
-                      </p>
+            <p class="text-base font-bold text-gray-900 mb-1 text-center">
+              You are about to begin this appointment's procedure.
+            </p>
+            <p class="text-sm text-gray-500 mb-5 text-center">
+              This will mark the appointment as in progress.
+            </p>
 
-                      <!-- Appointment Details card -->
-                      <div class="bg-white border border-gray-200 rounded-2xl 
+            <!-- Appointment Details card -->
+            <div class="bg-white border border-gray-200 rounded-2xl 
                                   px-8 py-5 text-center mb-4 shadow-sm">
-                        <div class="flex items-center justify-center gap-2 
+              <div class="flex items-center justify-center gap-2 
                                     text-gray-700 text-sm font-bold mb-3">
-                          <i class="fa-regular fa-circle-user text-lg"></i>
-                          <span>Appointment Details</span>
-                        </div>
+                <i class="fa-regular fa-circle-user text-lg"></i>
+                <span>Appointment Details</span>
+              </div>
 
-                        <p class="text-sm text-gray-800">
-                          Patient Name: <span class="font-bold" id="startPatientName">Alilah Gomez</span>
-                        </p>
+              <p class="text-sm text-gray-800">
+                Patient Name: <span class="font-bold" id="startPatientName">Alilah Gomez</span>
+              </p>
 
-                        <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">
-                          February 2, 2025 | 1:00 PM
-                        </p>
-                      </div>
+              <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">
+                February 2, 2025 | 1:00 PM
+              </p>
+            </div>
 
-                      <p class="text-xs text-gray-400 mb-5 text-center">
-                        This action will be recorded in the patient's treatment history.
-                      </p>
+            <p class="text-xs text-gray-400 mb-5 text-center">
+              This action will be recorded in the patient's treatment history.
+            </p>
 
-                      <!-- BUTTONS -->
-                      <div class="flex justify-end gap-3">
-                        <button onclick="closeStartProcedureModal()"
-                          class="px-6 py-2 rounded-lg border border-gray-300 
+            <!-- BUTTONS -->
+            <div class="flex justify-end gap-3">
+              <button onclick="closeStartProcedureModal()"
+                class="px-6 py-2 rounded-lg border border-gray-300 
                                 bg-white text-gray-700 font-semibold
                                 hover:bg-gray-100 transition text-sm shadow-sm">
-                          Cancel
-                        </button>
-                        <button onclick="confirmStartProcedure()"
-                          class="px-6 py-2 rounded-lg bg-green-700 
+                Cancel
+              </button>
+              <button onclick="confirmStartProcedure()"
+                class="px-6 py-2 rounded-lg bg-green-700 
                                 text-white font-semibold hover:bg-green-800 
                                 transition text-sm shadow-sm">
-                          Start Procedure
-                        </button>
-                      </div>
+                Start Procedure
+              </button>
+            </div>
 
-                    </div>
-                  </div>
-                </div>
+          </div>
+        </div>
+      </div>
 
-                <!-- ================= CANCEL APPOINTMENT MODAL ================= -->
-                <div id="cancelAppointmentModal"
-                  class="fixed inset-0 bg-black/40 flex items-center 
+      <!-- ================= CANCEL APPOINTMENT MODAL ================= -->
+      <div id="cancelAppointmentModal"
+        class="fixed inset-0 bg-black/40 flex items-center 
                       justify-center hidden z-50">
-                  <div class="bg-white w-[560px] rounded-2xl 
+        <div class="bg-white w-[560px] rounded-2xl 
                               overflow-hidden shadow-2xl">
 
-                    <!-- HEADER -->
-                    <div class="bg-[#8b0000] px-8 py-5 text-center">
-                      <h2 class="text-xl font-bold text-white">
-                        Cancel Appointment
-                      </h2>
-                    </div>
+          <!-- HEADER -->
+          <div class="bg-[#8b0000] px-8 py-5 text-center">
+            <h2 class="text-xl font-bold text-white">
+              Cancel Appointment
+            </h2>
+          </div>
 
-                    <!-- BODY -->
-                    <div class="px-10 py-7 bg-gray-50">
+          <!-- BODY -->
+          <div class="px-10 py-7 bg-gray-50">
 
-                      <p class="text-base font-bold text-gray-900 mb-1 text-center">
-                        You are about to cancel this appointment.
-                      </p>
-                      <p class="text-sm text-gray-500 mb-5 text-center">
-                        This action cannot be undone.
-                      </p>
+            <p class="text-base font-bold text-gray-900 mb-1 text-center">
+              You are about to cancel this appointment.
+            </p>
+            <p class="text-sm text-gray-500 mb-5 text-center">
+              This action cannot be undone.
+            </p>
 
-                      <!-- Appointment Details card -->
-                      <div class="bg-white border border-gray-200 rounded-2xl 
+            <!-- Appointment Details card -->
+            <div class="bg-white border border-gray-200 rounded-2xl 
                                   px-8 py-5 text-center mb-4 shadow-sm">
-                        <div class="flex items-center justify-center gap-2 
+              <div class="flex items-center justify-center gap-2 
                                     text-gray-700 text-sm font-bold mb-3">
-                          <i class="fa-regular fa-calendar-check text-lg"></i>
-                          <span>Appointment Details</span>
-                        </div>
+                <i class="fa-regular fa-calendar-check text-lg"></i>
+                <span>Appointment Details</span>
+              </div>
 
-                        <p class="text-sm text-gray-800">
-                          Patient Name: <span class="font-bold">
-                            Alilah Gomez</span>
-                        </p>
+              <p class="text-sm text-gray-800">
+                Patient Name: <span class="font-bold">
+                  Alilah Gomez</span>
+              </p>
 
-                        <p class="text-sm text-gray-600 mt-1">
-                          February 2, 2025 | 1:00 PM</p>
-                      </div>
+              <p class="text-sm text-gray-600 mt-1">
+                February 2, 2025 | 1:00 PM</p>
+            </div>
 
-                      <p class="text-xs text-gray-400 mb-5 text-center">
-                        This action will be recorded and cannot be undone.
-                      </p>
+            <p class="text-xs text-gray-400 mb-5 text-center">
+              This action will be recorded and cannot be undone.
+            </p>
 
-                      <!-- Buttons — right-aligned -->
-                      <div class="flex justify-end gap-3">
-                        <button onclick="closeCancelAppointmentModal()"
-                          class="px-6 py-2 rounded-lg border border-gray-300 
+            <!-- Buttons — right-aligned -->
+            <div class="flex justify-end gap-3">
+              <button onclick="closeCancelAppointmentModal()"
+                class="px-6 py-2 rounded-lg border border-gray-300 
                                 bg-white text-gray-700 font-semibold
                                 hover:bg-gray-100 transition text-sm shadow-sm">
-                          Keep Appointment
-                        </button>
-                        <button onclick="confirmCancelAppointment()"
-                          class="px-6 py-2 rounded-lg bg-[#8b0000] text-white 
+                Keep Appointment
+              </button>
+              <button onclick="confirmCancelAppointment()"
+                class="px-6 py-2 rounded-lg bg-[#8b0000] text-white 
                                 font-semibold hover:bg-[#6f0000] 
                                 transition text-sm shadow-sm">
-                          Cancel Appointment
-                        </button>
-                      </div>
+                Cancel Appointment
+              </button>
+            </div>
 
-                    </div>
-                  </div>
-                </div>
+          </div>
+        </div>
+      </div>
 
 
-                <!-- ========== PAST SECTION ========== -->
-                <section id="pastSection" 
-                  class="mt-14 flex justify-center hidden">
-                  <div class="w-[1100px]">
+      <!-- ========== PAST SECTION ========== -->
+      <section id="pastSection"
+        class="mt-14 flex justify-center hidden">
+        <div class="w-[1100px]">
 
-                    <div class="relative pl-10">
-                      <div class="absolute left-[6px] top-[6px] w-[2px] 
+          <div class="relative pl-10">
+            <div class="absolute left-[6px] top-[6px] w-[2px] 
                                   h-[200px] bg-[#8b0000]"></div>
-                      <div class="absolute left-[0px] top-[0px] w-3 h-3 
+            <div class="absolute left-[0px] top-[0px] w-3 h-3 
                                   bg-orange-400 rounded-full"></div>
 
-                      <h2 class="text-xl font-semibold text-[#8b0000] mb-6">
-                        January
-                      </h2>
+            <h2 class="text-xl font-semibold text-[#8b0000] mb-6">
+              January
+            </h2>
 
-                      <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
+            <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
                                   text-[13px] font-semibold text-[#8b0000]
                                   pb-3 border-b border-gray-400 mb-6 px-8">
 
-                        <div></div>
-                        <p>Date</p>
-                        <p>Time</p>
-                        <p>Service</p>
-                        <p>Name</p>
-                        <p>Program</p>
-                      </div>
+              <div></div>
+              <p>Date</p>
+              <p>Time</p>
+              <p>Service</p>
+              <p>Name</p>
+              <p>Program</p>
+            </div>
 
-                      <!-- Appointment card -->
-                      <div class="bg-white rounded-xl shadow-md border border-gray-200 px-8 py-5">
+            <!-- Appointment card -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 px-8 py-5">
 
-                        <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
+              <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
                                     items-center text-[13px] text-[#8b0000]">
 
 
-                          <div class="flex justify-center">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                          </div>
+                <div class="flex justify-center">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </div>
 
-                          <p class="font-semibold">January 10, 2025</p>
-                          <p>—</p>
-                          <p>Tooth Extraction</p>
-                          <p class="font-semibold">Juan Dela Cruz</p>
-                          <p>BSIT</p>
+                <p class="font-semibold">January 10, 2025</p>
+                <p>—</p>
+                <p>Tooth Extraction</p>
+                <p class="font-semibold">Juan Dela Cruz</p>
+                <p>BSIT</p>
 
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                </section>
+              </div>
             </div>
-        </main>
 
-          <!-- Footer -->
-          <footer class="footer sm:footer-horizontal 
-            bg-[#660000] text-[#F4F4F4] p-10">
-          </footer>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
 
   <script>
     // =========================
-    // DARK MODE TOGGLE
+    // THEME TOGGLE 
     // =========================
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
     const html = document.documentElement;
+    const themeToggleContainer = document.getElementById("themeToggle");
+    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
 
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
 
-    // Toggle on click
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      themeOptions.forEach(option => {
+        if (option.getAttribute("data-theme") === theme) {
+          option.classList.add("active");
+        } else {
+          option.classList.remove("active");
+        }
+      });
 
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeIcon(newTheme);
-    });
-
-    // Icon switch
-    function updateThemeIcon(theme) {
-      if (theme === 'dark') {
-        themeIcon.classList.remove('fa-moon');
-        themeIcon.classList.add('fa-sun');
+      if (theme === "dark") {
+        themeIndicator.classList.add("dark-mode");
       } else {
-        themeIcon.classList.remove('fa-sun');
-        themeIcon.classList.add('fa-moon');
+        themeIndicator.classList.remove("dark-mode");
       }
     }
 
-    let sidebarOpen = false;
+    applyTheme(localStorage.getItem("theme") || "light");
+
+    themeOptions.forEach(option => {
+      option.addEventListener("click", () => {
+        const theme = option.getAttribute("data-theme");
+        applyTheme(theme);
+      });
+    });
+
+    let sidebarOpen = true;
 
     function applyLayout(sidebarWidth) {
       const sidebar = document.getElementById('sidebar');
       const main = document.getElementById('mainContent');
-
       sidebar.style.width = sidebarWidth;
       main.style.marginLeft = sidebarWidth;
-      main.style.width = `auto`;
     }
 
     function toggleSidebar() {
-      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-      const toggleBtn = document.getElementById('sidebarToggleBtn');
+      const sidebar = document.getElementById('sidebar');
       const texts = document.querySelectorAll('.sidebar-text');
       const icon = document.getElementById('sidebarIcon');
+      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
       sidebarOpen = !sidebarOpen;
 
       if (sidebarOpen) {
-        // EXPAND
-        applyLayout('16rem');
-
+        applyLayout('220px');
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('expanded');
         texts.forEach(t => {
           t.classList.remove('opacity-0', 'w-0');
-          t.classList.add('opacity-100', 'w-auto');
+          t.classList.add('opacity-100');
         });
-
         toggleWrapper.classList.remove('justify-center');
         toggleWrapper.classList.add('justify-end');
-
-        toggleBtn.classList.add('translate-x-2');
         icon.classList.replace('fa-bars', 'fa-xmark');
-
       } else {
-        // COLLAPSE
         applyLayout('72px');
-
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
         texts.forEach(t => {
           t.classList.add('opacity-0', 'w-0');
-          t.classList.remove('opacity-100', 'w-auto');
+          t.classList.remove('opacity-100');
         });
-
         toggleWrapper.classList.remove('justify-end');
         toggleWrapper.classList.add('justify-center');
-
-        toggleBtn.classList.remove('translate-x-2');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
+      applyTheme(localStorage.getItem("theme") || "light");
     }
 
-    // ✅ INITIAL STATE SYNC (CRITICAL FIX)
     document.addEventListener('DOMContentLoaded', () => {
-      sidebarOpen = false; // ensure state is correct
-      applyLayout('72px'); // collapsed layout on load
+      sidebarOpen = true;
+      applyLayout('220px');
     });
 
     const btnUpcoming = document.getElementById("btnUpcoming");
