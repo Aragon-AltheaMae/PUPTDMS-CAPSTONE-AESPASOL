@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class HomepageController extends Controller
 {
     // Max appointments per day before marking as "Full Schedule"
-    const MAX_APPOINTMENTS_PER_DAY = 10;
+    const MAX_APPOINTMENTS_PER_DAY = 5;
 
     public function index()
     {
@@ -22,82 +22,61 @@ class HomepageController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // Latest completed dental records
-        $records = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['completed', 'Completed'])
-            ->latest('appointment_date')
+        // All appointments for this patient
+        $appointments = Appointment::where('patient_id', $patient->id)
+            ->orderBy('appointment_date', 'asc')
+            ->get();
+
+        // Upcoming appointment
+        $upcomingAppointment = Appointment::where('patient_id', $patient->id)
+            ->where('appointment_date', '>=', now()->toDateString())
+            ->orderBy('appointment_date', 'asc')
+            ->first();
+
+        // Count appointments per day for the calendar
+        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        // Unavailable dates
+        $unavailableDates = [];
+
+        // Philippine holidays for current and next year
+        $currentYear = now()->year;
+        $philippineHolidays = [];
+        for ($year = $currentYear; $year <= $currentYear + 4; $year++) {
+            $philippineHolidays = array_merge($philippineHolidays, $this->getPhilippineHolidays($year));
+        }
+
+        // Completed records for the timeline (last 5)
+        $records = Appointment::where('patient_id', $patient->id)
+            ->whereIn('status', ['completed', 'Completed']) // handle both cases
+            ->orderBy('appointment_date', 'desc')
             ->take(5)
             ->get();
 
-        // Next upcoming appointment
-        $upcomingAppointment = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'Pending', 'confirmed', 'Confirmed'])
-            ->where('appointment_date', '>=', now()->toDateString())
-            ->orderBy('appointment_date', 'asc')
-            ->orderBy('appointment_time', 'asc')
-            ->first();
+        // Notifications
+        $notifications = [];
 
-        // Patient's own appointments for the year (for calendar dots)
-        $appointments = Appointment::where('patient_id', $patientId)
-            ->whereYear('appointment_date', now()->year)
-            ->get();
-
-        // Count ALL appointments per day clinic-wide (for full schedule detection)
-        $appointmentCountsPerDay = Appointment::whereYear('appointment_date', now()->year)
-            ->whereNotIn('status', ['cancelled', 'Cancelled', 'rejected', 'Rejected'])
-            ->selectRaw('appointment_date, COUNT(*) as total')
-            ->groupBy('appointment_date')
-            ->pluck('total', 'appointment_date')
-            ->toArray();
-
-        // Dates marked as unavailable by admin
-        // Replace with a DB query later if you create an unavailable_dates table
-        $unavailableDates = [
-            // e.g. '2026-03-15', '2026-04-10'
-        ];
-
-        // Philippine Public Holidays for current year
-        $year = now()->year;
-        $philippineHolidays = $this->getPhilippineHolidays($year);
-
-        // Notifications — confirmed upcoming appointments
-        $notifications = Appointment::where('patient_id', $patientId)
-            ->where('appointment_date', '>=', now()->toDateString())
-            ->whereIn('status', ['confirmed', 'Confirmed'])
-            ->orderBy('appointment_date', 'asc')
-            ->get()
-            ->map(function ($appt) {
-                return [
-                    'title'   => 'Appointment Confirmed',
-                    'message' => $appt->service_type . ' on ' .
-                                 Carbon::parse($appt->appointment_date)->format('M d, Y') .
-                                 ' at ' . $appt->appointment_time,
-                    'time'    => Carbon::parse($appt->appointment_date)->diffForHumans(),
-                    'url'     => route('appointment.index'),
-                ];
-            });
-
-        return view('homepage', compact(
+        return view('index', compact(
             'patient',
-            'records',
-            'upcomingAppointment',
             'appointments',
+            'upcomingAppointment',
             'appointmentCountsPerDay',
             'unavailableDates',
             'philippineHolidays',
+            'records',
             'notifications'
         ));
     }
 
-    /**
-     * Returns Philippine public holidays for a given year.
-     */
     private function getPhilippineHolidays(int $year): array
     {
         $holidays = [
             // Regular Holidays
             "$year-01-01" => "New Year's Day",
-            "$year-04-09" => "Araw ng Kagitingan",
+            "$year-04-09" => "Day of Valor",
             "$year-05-01" => "Labor Day",
             "$year-06-12" => "Independence Day",
             "$year-11-30" => "Bonifacio Day",
@@ -115,7 +94,7 @@ class HomepageController extends Controller
         ];
 
         // Holy Week — computed dynamically from Easter
-        $easter    = Carbon::createFromTimestamp(easter_date($year));
+        $easter = Carbon::createFromTimestamp(easter_date($year));
         $holidays[$easter->copy()->subDays(4)->format('Y-m-d')] = 'Holy Wednesday';
         $holidays[$easter->copy()->subDays(3)->format('Y-m-d')] = 'Maundy Thursday';
         $holidays[$easter->copy()->subDays(2)->format('Y-m-d')] = 'Good Friday';

@@ -145,7 +145,7 @@
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
 <!-- HEADER (TOP BAR) -->
 <div class="fixed top-0 left-0 right-0 z-50
@@ -543,8 +543,8 @@
 <!-- CONTENT -->
 <main
   id="mainContent"
-  class="pt-[100px]
-         px-6 py-10
+  class="flex-1 pt-[100px]
+         px-6 pb-10
          w-full
          transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
@@ -685,21 +685,21 @@
         <h2 class="text-red-700 font-semibold mb-2">Medicine</h2>
 
         <div class="flex justify-between items-center border-b py-2">
-            <span class="text-[#8B0000]"span>Amoxicillin 500mg</span>
+            <span class="text-[#8B0000]">Amoxicillin 500mg</span>
             <span class="bg-red-600 text-white text-xs px-4 py-1 rounded-full">
             LOW
             </span>
         </div>
 
         <div class="flex justify-between items-center border-b py-2">
-            <span class="text-[#8B0000]"span>Paracetamol 500mg</span>
+            <span class="text-[#8B0000]">Paracetamol 500mg</span>
             <span class="bg-red-600 text-white text-xs px-4 py-1 rounded-full">
             LOW
             </span>
         </div>
 
         <div class="flex justify-between items-center border-b py-2">
-            <span class="text-[#8B0000]"span>Chlorhexidine Mouthwash</span>
+            <span class="text-[#8B0000]">Chlorhexidine Mouthwash</span>
             <span class="bg-red-600 text-white text-xs px-4 py-1 rounded-full">
             LOW
             </span>
@@ -708,17 +708,17 @@
         <hr class="my-4 border-yellow-400">
 
         <!-- MEDICAL SUPPLIES -->
-        <h2 class="text-red-700 font-semibold mb-2">Medical Supplies</h>
+        <h2 class="text-red-700 font-semibold mb-2">Medical Supplies</h2>
 
         <div class="flex justify-between items-center border-b py-2">
-            <span class="text-[#8B0000]"span>Disposable Dental Needles</span>
+            <span class="text-[#8B0000]">Disposable Dental Needles</span>
             <span class="bg-red-600 text-white text-xs px-4 py-1 rounded-full">
             LOW
             </span>
         </div>
 
         <div class="flex justify-between items-center border-b py-2">
-            <span class="text-[#8B0000]"span>Disposable Mouth Mirrors</span>
+            <span class="text-[#8B0000]">Disposable Mouth Mirrors</span>
             <span class="bg-red-600 text-white text-xs px-4 py-1 rounded-full">
             LOW
             </span>
@@ -815,6 +815,8 @@
       </div>
 
     </form>
+  </div>
+</dialog>
 
 <!-- DOWNLOAD COMPLETE MODAL -->
 <dialog id="downloadCompleteModal" class="modal">
@@ -851,10 +853,11 @@
     </div>
   </div>
 </dialog>
-    </div>
-  </main>
-</body>
-
+    
+    <!-- Footer -->
+    <footer class="footer sm:footer-horizontal mt-auto
+      bg-[#660000] text-[#F4F4F4] p-10">
+    </footer>
 
 <!-- ================= SCRIPTS ================= -->
 <script>
