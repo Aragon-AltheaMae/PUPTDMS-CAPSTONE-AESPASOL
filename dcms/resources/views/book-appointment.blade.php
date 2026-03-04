@@ -454,8 +454,8 @@
           </h2>
 
           <!-- Hidden inputs keep same names for form submission -->
-          <input type="hidden" id="appointment_date" name="appointment_date">
-          <input type="hidden" id="appointment_time" name="appointment_time">
+          <input type="hidden" id="appointment_date" name="appointment_date" required>
+          <input type="hidden" id="appointment_time" name="appointment_time" required>
 
           <div class="flex flex-col gap-6">
 
@@ -651,49 +651,49 @@
               <!-- REUSABLE FORMAT -->
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Do your gums bleed while brushing/flossing?</span>
-                <input type="radio" name="bleeding_gums" value="Yes"
+                <input type="radio" name="bleeding_gums" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="bleeding_gums" value="No"
+                <input type="radio" name="bleeding_gums" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are your teeth sensitive to hot or cold?</span>
-                <input type="radio" name="sensitive_temp" value="Yes"
+                <input type="radio" name="sensitive_temp" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sensitive_temp" value="No"
+                <input type="radio" name="sensitive_temp" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are your teeth sensitive to sweets or sour?</span>
-                <input type="radio" name="sensitive_taste" value="Yes"
+                <input type="radio" name="sensitive_taste" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sensitive_taste" value="No"
+                <input type="radio" name="sensitive_taste" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Do you feel any pain in your teeth?</span>
-                <input type="radio" name="tooth_pain" value="Yes"
+                <input type="radio" name="tooth_pain" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="tooth_pain" value="No"
+                <input type="radio" name="tooth_pain" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Do you have any sores/lumps in or near your mouth?</span>
-                <input type="radio" name="sores" value="Yes"
+                <input type="radio" name="sores" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sores" value="No"
+                <input type="radio" name="sores" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Have you had any head,neck, or jaw injuries?</span>
-                <input type="radio" name="injuries" value="Yes"
+                <input type="radio" name="injuries" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="injuries" value="No"
+                <input type="radio" name="injuries" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -709,81 +709,81 @@
             <div class="space-y-3 text-sm">
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Clicking</span>
-                <input type="radio" name="clicking" value="Yes"
+                <input type="radio" name="clicking" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="clicking" value="No"
+                <input type="radio" name="clicking" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Pain (joint, side of the face)</span>
-                <input type="radio" name="joint_pain" value="Yes"
+                <input type="radio" name="joint_pain" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="joint_pain" value="No"
+                <input type="radio" name="joint_pain" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Difficulty in opening/closing</span>
-                <input type="radio" name="difficulty_moving" value="Yes"
+                <input type="radio" name="difficulty_moving" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="difficulty_moving" value="No"
+                <input type="radio" name="difficulty_moving" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Difficulty in chewing</span>
-                <input type="radio" name="difficulty_chewing" value="Yes"
+                <input type="radio" name="difficulty_chewing" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="difficulty_chewing" value="No"
+                <input type="radio" name="difficulty_chewing" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Frequent headaches</span>
-                <input type="radio" name="jaw_headaches" value="Yes"
+                <input type="radio" name="jaw_headaches" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="jaw_headaches" value="No"
+                <input type="radio" name="jaw_headaches" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Do you clench or grind your teeth?</span>
-                <input type="radio" name="clench_grind" value="Yes"
+                <input type="radio" name="clench_grind" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="clench_grind" value="No"
+                <input type="radio" name="clench_grind" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Frequent lips/cheek biting</span>
-                <input type="radio" name="biting" value="Yes"
+                <input type="radio" name="biting" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="biting" value="No"
+                <input type="radio" name="biting" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Have you noticed loosening your teeth?</span>
-                <input type="radio" name="teeth_loosening" value="Yes"
+                <input type="radio" name="teeth_loosening" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="teeth_loosening" value="No"
+                <input type="radio" name="teeth_loosening" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Does food get caught between your teeth?</span>
-                <input type="radio" name="food_teeth" value="Yes"
+                <input type="radio" name="food_teeth" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="food_teeth" value="No"
+                <input type="radio" name="food_teeth" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Have you ever had reaction to any kind of medicine or dental anesthetic?</span>
-                <input type="radio" name="med_reaction" value="Yes"
+                <input type="radio" name="med_reaction" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="med_reaction" value="No"
+                <input type="radio" name="med_reaction" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
             </div>
@@ -794,17 +794,17 @@
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
               <span class="text-sm">Have you had any periodontal (gum) treatment?</span>
-              <input type="radio" name="periodontal" value="Yes"
+              <input type="radio" name="periodontal" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="periodontal" value="No"
+              <input type="radio" name="periodontal" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
               <span class="text-sm">Have you had a difficult tooth extraction?</span>
-              <input type="radio" name="difficult_extraction" value="Yes"
+              <input type="radio" name="difficult_extraction" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="difficult_extraction" value="No"
+              <input type="radio" name="difficult_extraction" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
@@ -824,17 +824,17 @@
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
               <span class="text-sm">Have you had prolonged bleeding following tooth extractions before?</span>
-              <input type="radio" name="prolonged_bleeding" value="Yes"
+              <input type="radio" name="prolonged_bleeding" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="prolonged_bleeding" value="No"
+              <input type="radio" name="prolonged_bleeding" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
               <span class="text-sm">Do you wear complete or partial dentures?</span>
-              <input type="radio" name="dentures" value="Yes"
+              <input type="radio" name="dentures" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="dentures" value="No"
+              <input type="radio" name="dentures" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
@@ -853,9 +853,9 @@
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
               <span class="text-sm">Have you had orthodontic treatment?</span>
-              <input type="radio" name="ortho_treatment" value="Yes"
+              <input type="radio" name="ortho_treatment" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="ortho_treatment" value="No"
+              <input type="radio" name="ortho_treatment" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
@@ -890,6 +890,7 @@
           </div><!-- END bg card -->
         </div><!-- END step-content -->
 
+
         <!-- STEP 4 -->
         <div class="step-content hidden">
           <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
@@ -914,9 +915,9 @@
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are you in good health?</span>
-                <input type="radio" name="good_health" value="Yes"
+                <input type="radio" name="good_health" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="good_health" value="No"
+                <input type="radio" name="good_health" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -932,9 +933,9 @@
               <!-- LAST MEDICAL EXAM -->
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
                 <span>When was your last medical examination?</span>
-                <input type="radio" name="had_medical_exam" value="Yes"
+                <input type="radio" name="had_medical_exam" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="had_medical_exam" value="No"
+                <input type="radio" name="had_medical_exam" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -954,9 +955,9 @@
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
                 <span>Are you currently receiving treatment for any illness?</span>
-                <input type="radio" name="under_treatment" value="Yes"
+                <input type="radio" name="under_treatment" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="under_treatment" value="No"
+                <input type="radio" name="under_treatment" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -971,9 +972,9 @@
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
                 <span>Have you ever been hospitalized?</span>
-                <input type="radio" name="hospitalized" value="Yes"
+                <input type="radio" name="hospitalized" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="hospitalized" value="No"
+                <input type="radio" name="hospitalized" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -994,17 +995,17 @@
             <div class="space-y-3 text-sm">
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Medicines</span>
-                <input type="radio" name="allergy_medicine" value="Yes"
+                <input type="radio" name="allergy_medicine" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="allergy_medicine" value="No"
+                <input type="radio" name="allergy_medicine" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Food</span>
-                <input type="radio" name="allergy_food" value="Yes"
+                <input type="radio" name="allergy_food" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="allergy_food" value="No"
+                <input type="radio" name="allergy_food" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
@@ -1021,9 +1022,9 @@
             <!-- MEDICATION -->
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 text-sm mt-4">
               <span>Are you taking any prescription or non-prescription medication?</span>
-              <input type="radio" name="medication" value="Yes"
+              <input type="radio" name="medication" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="medication" value="No"
+              <input type="radio" name="medication" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
@@ -1051,25 +1052,25 @@
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are you pregnant?</span>
-                <input type="radio" name="pregnant" value="Yes"
+                <input type="radio" name="pregnant" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="pregnant" value="No"
+                <input type="radio" name="pregnant" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are you nursing?</span>
-                <input type="radio" name="nursing" value="Yes"
+                <input type="radio" name="nursing" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="nursing" value="No"
+                <input type="radio" name="nursing" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Are you taking birth control pills?</span>
-                <input type="radio" name="birth_control" value="Yes"
+                <input type="radio" name="birth_control" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="birth_control" value="No"
+                <input type="radio" name="birth_control" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
             </div>
@@ -1194,9 +1195,9 @@
 
             <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4 text-sm">
               <span></span>
-              <input type="radio" name="tobacco_use" value="Yes"
+              <input type="radio" name="tobacco_use" value="YES"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="tobacco_use" value="No"
+              <input type="radio" name="tobacco_use" value="NO"
                 class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
             </div>
 
@@ -1228,25 +1229,25 @@
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Headaches</span>
-                <input type="radio" name="headaches" value="Yes"
+                <input type="radio" name="headaches" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="headaches" value="No"
+                <input type="radio" name="headaches" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Earaches</span>
-                <input type="radio" name="earaches" value="Yes"
+                <input type="radio" name="earaches" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="earaches" value="No"
+                <input type="radio" name="earaches" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
 
               <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
                 <span>Neck aches</span>
-                <input type="radio" name="neck_aches" value="Yes"
+                <input type="radio" name="neck_aches" value="YES"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="neck_aches" value="No"
+                <input type="radio" name="neck_aches" value="NO"
                   class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
               </div>
             </div>
@@ -1436,7 +1437,7 @@
               <p class="text-sm text-gray-500 mb-5">Please describe the service you need.</p>
               <input
                 type="text"
-                id="service_others_text"
+                id="other_services"
                 name="service_others_text"
                 class="input input-bordered border-[#8B0000] w-full mb-6"
                 placeholder="e.g. Teeth whitening, fluoride treatment..."
@@ -2116,7 +2117,7 @@
              OTHERS MODAL (SAFE)
           ========================= */
           const othersModal = document.getElementById("othersModal");
-          const othersInput = document.getElementById("service_others_text");
+          const othersInput = document.getElementById("other_services");
           const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
 
           if (othersRadio && othersModal && othersInput) {
@@ -2477,9 +2478,6 @@
           /* =========================
              MODAL (FINAL SUBMIT)
           ========================= */
-          /* =========================
-             MODAL (FINAL SUBMIT)
-          ========================= */
           const confirmModal = document.getElementById("confirmModal");
           const confirmMessage = document.getElementById("confirmMessage");
           const okBtn = document.getElementById("okBtn");
@@ -2516,12 +2514,6 @@
             });
           }
 
-          // prevent default form submit refresh (kept since you're using modal instead of real submit)
-          //const appointmentForm = document.getElementById("appointmentForm");
-          //if (appointmentForm) {
-          //appointmentForm.addEventListener("submit", (e) => e.preventDefault());
-          //}
-
           /* =========================
              EXTRA TOGGLES
           ========================= */
@@ -2548,7 +2540,7 @@
 
             radios.forEach((radio) => {
               radio.addEventListener("change", () => {
-                if (radio.checked && radio.value === "Yes") {
+                if (radio.checked && radio.value === "YES") {
                   box.classList.remove("hidden");
                   if (input) input.required = true;
                 } else if (radio.checked) {
@@ -2568,8 +2560,8 @@
           if (medicalExamRadios.length && medicalExamBox) {
             medicalExamRadios.forEach((radio) => {
               radio.addEventListener("change", () => {
-                if (radio.value === "Yes" && radio.checked) medicalExamBox.classList.remove("hidden");
-                if (radio.value === "No" && radio.checked) medicalExamBox.classList.add("hidden");
+                if (radio.value === "YES" && radio.checked) medicalExamBox.classList.remove("hidden");
+                if (radio.value === "NO" && radio.checked) medicalExamBox.classList.add("hidden");
               });
             });
           }
@@ -2593,22 +2585,22 @@
           const medicalToggles = [{
               name: "good_health",
               boxId: "good_health_box",
-              showOn: "No"
+              showOn: "NO"
             },
             {
               name: "under_treatment",
               boxId: "treatment_box",
-              showOn: "Yes"
+              showOn: "YES"
             },
             {
               name: "hospitalized",
               boxId: "hospital_box",
-              showOn: "Yes"
+              showOn: "YES"
             },
             {
               name: "medication",
               boxId: "medication_box",
-              showOn: "Yes"
+              showOn: "YES"
             },
           ];
 
@@ -2642,7 +2634,7 @@
           if (tobaccoDetails && tobaccoRadios.length) {
             tobaccoRadios.forEach((radio) => {
               radio.addEventListener("change", () => {
-                if (radio.checked && radio.value === "Yes") tobaccoDetails.classList.remove("hidden");
+                if (radio.checked && radio.value === "YES") tobaccoDetails.classList.remove("hidden");
                 else tobaccoDetails.classList.add("hidden");
               });
             });
@@ -2782,6 +2774,10 @@
             restoreDraft();
           });
         </script>
-</body>
 
+      </form>
+    </div>
+  </div>
+
+</body>
 </html>
