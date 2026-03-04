@@ -574,8 +574,8 @@
 <!-- CONTENT -->
 <main
   id="mainContent"
-  class="pt-[100px]
-         px-6 py-10
+  class="flex-1 pt-[100px]
+         px-6 pb-10
          w-full
          transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
@@ -767,6 +767,11 @@
       
     </div>
 </main>
+
+    <!-- Footer -->
+    <footer class="footer sm:footer-horizontal 
+      bg-[#660000] text-[#F4F4F4] p-10">
+    </footer>
 
 <!-- ================= SCRIPTS ================= -->
 <script>

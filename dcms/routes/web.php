@@ -12,8 +12,7 @@ use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\HomepageController;
-
-Route::get('/homepage', [HomepageController::class, 'index'])->name('homepage');
+use App\Http\Controllers\PatientController;
 
 // -------------------
 // AUTH PAGES (PUBLIC)
@@ -73,7 +72,7 @@ Route::post('/login', function (Request $request) {
             'email' => $patient->email,
         ]);
 
-        return redirect('/homepage');
+        return redirect()->route('homepage');
     }
 
     return back()->with('error', 'Invalid credentials');
@@ -106,7 +105,7 @@ Route::post('/logout', function () {
 // ROOT REDIRECT (PUBLIC)
 // -------------------
 
-Route::get('/', fn () => redirect('/login'));
+Route::get('/', fn() => redirect('/login'));
 
 
 // -------------------
@@ -115,16 +114,16 @@ Route::get('/', fn () => redirect('/login'));
 
 Route::middleware('role:patient')->group(function () {
 
-    // HOMEPAGE (now protected)
-    Route::get('/homepage', function () {
-        $patient = session()->has('patient_id')
-            ? Patient::find(session('patient_id'))
-            : null;
+    Route::get('/homepage', [HomepageController::class, 'index'])->name('homepage');
+    // Route::get('/homepage', function () {
+    //     $patient = session()->has('patient_id')
+    //         ? Patient::find(session('patient_id'))
+    //         : null;
 
-        return view('index', compact('patient'));
-    })->name('homepage');
+    //     return view('index', compact('patient'));
+    // })->name('homepage');
 
-     //BOOK APPOINTMENT (now protected; keeps same path + name)
+    //BOOK APPOINTMENT (now protected; keeps same path + name)
     Route::get('/book-appointment', [AppointmentController::class, 'create'])
         ->name('book.appointment');
 
@@ -143,11 +142,11 @@ Route::middleware('role:patient')->group(function () {
         ->name('document.requests.updateStatus');
 
     // record should use role:patient (already protected before; kept here too)
-   Route::get('/record', [RecordController::class, 'index'])
-    ->name('record');
+    Route::get('/record', [RecordController::class, 'index'])
+        ->name('record');
 
     // about-us (already protected before; kept here too)
-    Route::get('/about-us', fn () => view('about-us'))
+    Route::get('/about-us', fn() => view('about-us'))
         ->name('about.us');
 });
 
