@@ -18,27 +18,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Inter';
-    }
+    body { font-family: 'Inter'; }
 
     /* Fade-in animation */
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
-
-    
+    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
     .sidebar-link {
       display: flex;
@@ -56,45 +43,25 @@
     }
 
     /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip {
-    display: none;
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link {
-      justify-content: flex-start;
-    }
+    #sidebar[style*="16rem"] .sidebar-tooltip { display: none; }
+    #sidebar[style*="16rem"] .sidebar-link { justify-content: flex-start; }
 
     /* consistent icon column width */
     .sidebar-link i{
-      width: 24px;           /* fixed width column */
+      width: 24px;
       min-width: 24px;
       text-align: center;
     }
 
     /* CLOSED: center icon only */
-    #sidebar[style*="72px"] .sidebar-link {
-      justify-content: center;
-      gap: 0;
-    }
+    #sidebar[style*="72px"] .sidebar-link { justify-content: center; gap: 0; }
 
     /* when expanded, align items nicely */
-    #sidebar[style*="16rem"] .sidebar-link{
-      justify-content: flex-start;
-      gap: 12px;             /* spacing between icon and text */
-    }
+    #sidebar[style*="16rem"] .sidebar-link{ justify-content: flex-start; gap: 12px; }
+    #sidebar[style*="16rem"] .sidebar-link:hover { transform: translateX(4px); }
 
-    #sidebar[style*="16rem"] .sidebar-link:hover {
-    transform: translateX(4px);
-    }
-
-    .sidebar-link:hover .sidebar-text {
-    opacity: 1;
-    transform: scale(1);
-    }
-
-    .sidebar-text {
-      transform-origin: left center;
-    }
+    .sidebar-link:hover .sidebar-text { opacity: 1; transform: scale(1); }
+    .sidebar-text { transform-origin: left center; }
 
     /* Notification dropdown animation */
     .notif-open {
@@ -102,36 +69,59 @@
       transform: scale(1) !important;
       pointer-events: auto !important;
     }
-
     .notif-close {
       opacity: 0 !important;
-      transform: scale(0.95) !important; /* zoom out */
+      transform: scale(0.95) !important;
       pointer-events: none !important;
     }
 
     /* DARK MODE */
     [data-theme="dark"] body {
-    background-color: #111827; /* slate-900 */
-    color: #E5E7EB;
+      background-color: #111827;
+      color: #E5E7EB;
     }
+    [data-theme="dark"] #sidebar { background-color: #1F2933; }
+    [data-theme="dark"] .bg-white { background-color: #1F2937 !important; }
+    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
 
-    [data-theme="dark"] #sidebar {
-      background-color: #1F2933;
-    }
-
-    [data-theme="dark"] .bg-white {
-      background-color: #1F2937 !important;
-    }
-
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
-    }
-
-    body,
-    #sidebar,
-    main,
-    .card {
+    body, #sidebar, main, .card {
       transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ===== Filter modal radio look (matches screenshot) ===== */
+    .filter-radio {
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      border: 2px solid #8B1A1A;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+    .filter-radio::after{
+      content:"";
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background: #8B1A1A;
+      display: none;
+    }
+    input[type="radio"].filter-input:checked + .filter-radio::after { display:block; }
+
+    /* make date placeholder look subtle like sample */
+    .filter-date {
+      width: 240px;
+      padding: 10px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 15px;
+      background: #fff;
+      outline: none;
+      box-sizing: border-box;
+      color: #333;
     }
   </style>
 </head>
@@ -144,75 +134,69 @@
             text-[#F4F4F4] px-6 py-4
             flex items-center justify-between">
 
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <div class="flex items-center gap-3">
+    <div class="w-12 rounded-full ml-5">
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
     </div>
+    <div class="w-12 rounded-full">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+    </div>
+    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  </div>
 
   <div class="flex items-center gap-8">
-      @php
-  // Pass $notifications from controller, or leave it empty for now
-  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
-  @endphp
+    @php
+      $notifications = collect($notifications ?? []);
+      $notifCount = $notifications->count();
+    @endphp
 
-  <div id="notifDropdown" class="relative">
-    
-  <button id="notifBtn" type="button"
-    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+    <div id="notifDropdown" class="relative">
+      <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+        @if($notifCount > 0)
+          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+            {{ $notifCount }}
+          </span>
+        @endif
+        <i class="fa-regular fa-bell text-lg"></i>
+      </button>
 
-    @if($notifCount > 0)
-      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-        {{ $notifCount }}
-      </span>
-    @endif
+      <div id="notifMenu"
+        class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+              opacity-0 scale-95 pointer-events-none
+              transition-all duration-200 ease-out origin-top-right">
 
-    <i class="fa-regular fa-bell text-lg"></i>
-  </button>
-
-  <div id="notifMenu"
-  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-         opacity-0 scale-95 pointer-events-none
-         transition-all duration-200 ease-out origin-top-right">
-
-    <div class="p-4 border-b flex items-center justify-between">
-      <span class="font-bold text-[#8B0000]">Notifications</span>
-    </div>
-
-    <div class="max-h-80 overflow-y-auto">
-      @forelse($notifications as $n)
-        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-          <div class="text-sm font-semibold text-gray-900">
-            {{ $n['title'] ?? 'Notification' }}
-          </div>
-          @if(!empty($n['message']))
-            <div class="text-xs text-[#ADADAD] mt-0.5">
-              {{ $n['message'] }}
-            </div>
-          @endif
-          @if(!empty($n['time']))
-            <div class="text-[11px] text-gray-400 mt-1">
-              {{ $n['time'] }}
-            </div>
-          @endif
-        </a>
-      @empty
-        <div class="px-4 py-10 text-center justify-items-center">
-          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-          <div class="text-sm font-semibold text-gray-800">No notifications</div>
-          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
         </div>
-      @endforelse
-    </div>
 
-  </div>
-</div>
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+                <div class="text-xs text-[#ADADAD] mt-0.5">
+                  {{ $n['message'] }}
+                </div>
+              @endif
+              @if(!empty($n['time']))
+                <div class="text-[11px] text-gray-400 mt-1">
+                  {{ $n['time'] }}
+                </div>
+              @endif
+            </a>
+          @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+            </div>
+          @endforelse
+        </div>
+
+      </div>
+    </div>
 
     <div class="flex items-center gap-3">
       <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
@@ -245,271 +229,262 @@
         <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
       </button>
     </div>
-    
-  <!-- MENU -->
-  <nav class="space-y-2 px-3 text-gray-600 text-sm">
 
-    <!-- DASHBOARD -->
-    <a href="{{ route('dentist.dashboard') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+    <!-- MENU -->
+    <nav class="space-y-2 px-3 text-gray-600 text-sm">
+
+      <!-- DASHBOARD -->
+      <a href="{{ route('dentist.dashboard') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.dashboard')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-chart-line text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Dashboard
-      </span>
+        <i class="fa-solid fa-chart-line text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Dashboard
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200
-            opacity-0 scale-95 transition-all duration-200">
-        Dashboard
-      </span>
-    </a>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Dashboard
+        </span>
+      </a>
 
-    <!-- PATIENTS -->
-    <a href="{{ route('dentist.patients') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+      <!-- PATIENTS -->
+      <a href="{{ route('dentist.patients') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.patients*')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-users text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Patients
-      </span>
+        <i class="fa-solid fa-users text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Patients
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Patients
-      </span>
-    </a>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Patients
+        </span>
+      </a>
 
-    <!-- APPOINTMENTS -->
-    <a href="{{ route('dentist.appointments') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+      <!-- APPOINTMENTS -->
+      <a href="{{ route('dentist.appointments') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.appointments*')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Appointments
-      </span>
+        <i class="fa-solid fa-calendar-check text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Appointments
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Appointments
-      </span>
-    </a>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Appointments
+        </span>
+      </a>
 
-    <!-- Document Requests -->
-    <a href="{{ route('dentist.documentrequests') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+      <!-- Document Requests -->
+      <a href="{{ route('dentist.documentrequests') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.documentrequests*')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-file-circle-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Document Requests
-      </span>
+        <i class="fa-solid fa-file-circle-check text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Document Requests
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Document Requests
-      </span>
-    </a>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Document Requests
+        </span>
+      </a>
 
-    <!-- INVENTORY -->
-    <a href="{{ route('dentist.inventory') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+      <!-- INVENTORY -->
+      <a href="{{ route('dentist.inventory') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.inventory*')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-box text-lg"></i>
-      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Inventory
-      </span>
+        <i class="fa-solid fa-box text-lg"></i>
+        <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Inventory
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Inventory
-      </span>
-    </a>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Inventory
+        </span>
+      </a>
 
-    <!-- REPORTS -->
-    <a href="{{ route('dentist.report') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
+      <!-- REPORTS -->
+      <a href="{{ route('dentist.report') }}"
+        class="sidebar-link relative flex items-center  rounded-xl
                 transition-all duration-200
                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
               {{ request()->routeIs('dentist.report*')
                 ? 'bg-[#8B0000] text-[#F4F4F4]'
                 : '' }}">
 
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
+        <span
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000]
+                transition-opacity duration-300
+                {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
+        </span>
 
-      <i class="fa-solid fa-file text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Reports
-      </span>
+        <i class="fa-solid fa-file text-lg"></i>
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+          Reports
+        </span>
 
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Reports
-      </span>
-    </a>
-  </nav>
-</div>
+        <span class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+          Reports
+        </span>
+      </a>
+    </nav>
+  </div>
 
   <!-- BOTTOM -->
   <div class="px-3 pb-5 space-y-2">
 
-  <!-- DARK MODE TOGGLE -->
-  <button
-    id="themeToggle"
-    class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-1.5 rounded-xl
-          bg-[#7B6CF6] text-[#F4F4F4]
-          transition-all duration-200
-          hover:scale-105"
-    aria-label="Toggle dark mode">
+    <!-- DARK MODE TOGGLE -->
+    <button
+      id="themeToggle"
+      class="sidebar-link relative flex items-center justify-center
+            w-full px-2 py-1.5 rounded-xl
+            bg-[#7B6CF6] text-[#F4F4F4]
+            transition-all duration-200
+            hover:scale-105"
+      aria-label="Toggle dark mode">
 
-    <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
-    <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden
-               transition-all duration-300 delay-150">
-      Dark Mode
-    </span>
-    <!-- Tooltip (collapsed only) -->
-    <span
-      class="sidebar-tooltip
-            absolute left-full ml-8
-            px-3 py-1
-            rounded-full
-            bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold
-            whitespace-nowrap
-            opacity-0 scale-95
-            pointer-events-none
-            transition-all duration-200">
-      Dark Mode
-    </span>
-  </button>
-    
+      <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
+      <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
+        Dark Mode
+      </span>
+
+      <span
+        class="sidebar-tooltip
+              absolute left-full ml-8
+              px-3 py-1
+              rounded-full
+              bg-[#8B0000]
+              text-[#F4F4F4] text-sm font-semibold
+              whitespace-nowrap
+              opacity-0 scale-95
+              pointer-events-none
+              transition-all duration-200">
+        Dark Mode
+      </span>
+    </button>
+
     <form action="{{ route('logout') }}" method="POST">
       @csrf
       <button
         class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
-               text-red-600 hover:bg-red-50 transition-all duration-200">
+              text-red-600 hover:bg-red-50 transition-all duration-200">
         <i class="fa-solid fa-right-from-bracket text-sm"></i>
-        <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
+        <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">
           Log out
         </span>
         <span
@@ -534,90 +509,198 @@
 <main id="mainContent" class="flex-1 pt-[100px] px-6 pb-10 w-full
 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
-<div class="max-w-7xl mt-4 mx-auto fade-in">
-  <div class="bg-white rounded-xl shadow p-6">
-    
-  <!-- TOOLBAR -->
-   <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-    <!-- Gradient Border Wrapper -->
-     <div class="p-[2px] rounded-full bg-gradient-to-r from-[#660000] to-[#FFD700] w-72">
-      <!-- Inner Container -->
-       <div class="flex items-center bg-white rounded-full px-4 py-2">
-        <i class="fa fa-search text-[#660000]"></i>
-        
-        <input id="searchInput" class="ml-3 outline-none w-full text-sm
-        bg-white text-gray-800 placeholder-gray-400"
-        placeholder="Search Stock No., Name" oninput="renderTable()"/>
+  <div class="max-w-7xl mt-4 mx-auto fade-in">
+    <div class="bg-white rounded-xl shadow p-6">
+
+      <!-- TOOLBAR -->
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+
+        <!-- Search -->
+        <div class="p-[2px] rounded-full bg-gradient-to-r from-[#660000] to-[#FFD700] w-72">
+          <div class="flex items-center bg-white rounded-full px-4 py-2">
+            <i class="fa fa-search text-[#660000]"></i>
+            <input
+              id="searchInput"
+              class="ml-3 outline-none w-full text-sm bg-white text-gray-800 placeholder-gray-400"
+              placeholder="Search Stock No., Name"
+              oninput="renderTable()"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+
+          <!-- FILTER BUTTON (replaces separate Show/Sort bars) -->
+          <button
+            type="button"
+            onclick="openFilterModal()"
+            class="btn btn-sm rounded-full border-none bg-white text-[#660000] hover:bg-[#F4F4F4]"
+            style="box-shadow: inset 0 0 0 2px #e0e0e0;"
+          >
+            <i class="fa-solid fa-filter text-[#660000] mr-1"></i>
+            Filter
+          </button>
+
+          <button onclick="resetAddForm(); addModal.showModal()"
+            class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
+            <i class="fa fa-plus mr-1"></i> Add Item
+          </button>
+
+        </div>
       </div>
+
+      <!-- TABLE -->
+      <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
+          <thead>
+            <tr class="text-[#8B0000] text-xs uppercase">
+              <th>Date</th>
+              <th>Stock No.</th>
+              <th>Supplies</th>
+              <th>Unit</th>
+              <th>Qty</th>
+              <th>Used</th>
+              <th>Balance</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div
+        id="emptyState"
+        class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium"
+      >
+        No items in the inventory
+      </div>
+
     </div>
-    
-    <div class="flex gap-2">
-
-    <!-- SHOW SELECT -->
-    <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-    <select
-        id="showSelect"
-        class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-        onchange="renderTable()">
-        <option value="all">Show: All Products</option>
-        <option value="medicine">Medicine</option>
-        <option value="supplies">Supplies</option>
-    </select>
-    </div>
-
-    <!-- SORT SELECT -->
-    <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-    <select
-        id="sortSelect"
-        class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-        onchange="renderTable()"
-    >
-        <option value="">Sort: Default</option>
-        <option value="qty_asc">Quantity (Lowest to Highest)</option>
-        <option value="alphabetical">Alphabetical (A–Z)</option>
-        <option value="date_received">Date Received</option>
-    </select>
-    </div>
-
-
-    <button onclick="resetAddForm(); addModal.showModal()"
-      class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
-      <i class="fa fa-plus mr-1"></i> Add Item
-    </button>
-
   </div>
-</div>
-
-<!-- TABLE -->
-<div class="overflow-x-auto">
-<table class="table table-sm w-full">
-<thead>
-<tr class="text-[#8B0000] text-xs uppercase">
-  <th>Date</th>
-  <th>Stock No.</th>
-  <th>Supplies</th>
-  <th>Unit</th>
-  <th>Qty</th>
-  <th>Used</th>
-  <th>Balance</th>
-  <th class="text-center">Action</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
-</div>
-
-<!-- EMPTY STATE -->
-<div
-  id="emptyState"
-  class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium"
->
-  No items in the inventory
-</div>
-
-</div>
 
 </main>
+
+<!-- FILTER MODAL (FIXED FOOTER - NOT SCROLLING) -->
+<dialog id="filterModal" class="modal">
+  <div class="bg-white w-[760px] h-[700px] rounded-xl shadow-2xl overflow-hidden border border-gray-200 flex flex-col">
+
+    <!-- Header -->
+    <div class="px-7 py-4 border-b flex items-center gap-3 shrink-0">
+      <i class="fa-solid fa-filter" style="color:#8B1A1A;"></i>
+      <span class="text-[22px] font-bold" style="color:#8B1A1A;">Filter</span>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto">
+
+      <!-- Sort -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Sort</div>
+
+        <div class="flex flex-col gap-4">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_sort" value="az">
+            <span class="filter-radio"></span>
+            A-Z
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_sort" value="za">
+            <span class="filter-radio"></span>
+            Z-A
+          </label>
+        </div>
+      </div>
+
+      <!-- Date Received -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Date Received</div>
+
+        <div class="flex items-start gap-6 flex-wrap">
+          <div class="flex flex-col gap-2">
+            <span class="text-[15px] text-[#333]">From:</span>
+            <input id="fp_dateFrom" type="date" class="filter-date">
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <span class="text-[15px] text-[#333]">To:</span>
+            <input id="fp_dateTo" type="date" class="filter-date">
+          </div>
+
+          <div class="flex flex-col gap-4 pt-9">
+            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="asc">
+              <span class="filter-radio"></span>
+              Ascending
+            </label>
+
+            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="desc">
+              <span class="filter-radio"></span>
+              Descending
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item Type -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Item Type</div>
+
+        <div class="flex gap-14 flex-wrap">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_itemType" value="medicine">
+            <span class="filter-radio"></span>
+            Medicine
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_itemType" value="supplies">
+            <span class="filter-radio"></span>
+            Dental Supplies
+          </label>
+        </div>
+      </div>
+
+      <!-- Stock Level -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Stock Level</div>
+
+        <div class="flex gap-14 flex-wrap">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_stock" value="low-high">
+            <span class="filter-radio"></span>
+            Lowest to Highest
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_stock" value="high-low">
+            <span class="filter-radio"></span>
+            Highest to Lowest
+          </label>
+        </div>
+      </div>
+
+    </div> <!-- ✅ CLOSE SCROLLABLE CONTENT HERE -->
+
+    <!-- Footer (STICKY / NOT SCROLLING) -->
+    <div class="px-7 py-4 border-t flex items-center justify-between bg-white shrink-0">
+      <button type="button" onclick="clearFilterPanel()"
+        class="bg-transparent border-none font-semibold text-[16px]"
+        style="color:#8B1A1A;">
+        Clear
+      </button>
+
+      <button type="button" onclick="saveFilterPanel()"
+        class="btn border-none"
+        style="background:#8B1A1A; color:white; border-radius:8px; padding:12px 52px; font-weight:600;">
+        Save
+      </button>
+    </div>
+
+  </div>
+</dialog>
 
 <!-- ADD MODAL -->
 <dialog id="addModal" class="modal">
@@ -628,7 +711,7 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
     </h3>
 
     <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
-    
+
       <!-- CATEGORY -->
       <label class="text-sm text-[#8B0000]">Category</label>
       <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
@@ -637,7 +720,7 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
         <option value="Supplies">Supplies</option>
       </select>
 
-      <!-- DATE (AUTO / DROPDOWN) -->
+      <!-- DATE -->
       <label class="text-sm text-[#8B0000]">Date Received</label>
       <input
         id="addDate"
@@ -663,7 +746,7 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
       <label class="text-sm text-[#8B0000]">Quantity</label>
       <input id="addQty" type="number"
         class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()"> 
+        oninput="computeAddBalance()">
 
       <!-- USED -->
       <label class="text-sm text-[#8B0000]">Consumed</label>
@@ -716,7 +799,6 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
       <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
         placeholder="e.g. Box / Pack / Bottle / Piece">
 
-
       <label>Quantity</label>
       <input id="editQty" type="number"
         class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
@@ -744,121 +826,24 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
 <!-- DELETE CONFIRMATION MODAL -->
 <dialog id="deleteModal" class="modal">
-    <div class="modal-box max-w-md bg-white rounded-lg text-center">
+  <div class="modal-box max-w-md bg-white rounded-lg text-center">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
+    <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
 
-      <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
-      <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
-
-      <div class="modal-action justify-center gap-4">
-        <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
-        <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
-      </div>
-
+    <div class="modal-action justify-center gap-4">
+      <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
+      <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
     </div>
+  </div>
 </dialog>
 
-      <!-- Footer -->
-        <footer class="footer sm:footer-horizontal mt-auto
-            bg-[#660000] text-[#F4F4F4] p-10">
-        </footer>
+<!-- Footer -->
+<footer class="footer sm:footer-horizontal mt-auto bg-[#660000] text-[#F4F4F4] p-10"></footer>
 
 <script>
-/*let inventory = [
-  {
-    category: "Supplies",
-    date: "01/20/25",
-    stock: "18-001",
-    name: "Disposable Dental Needles",
-    unit: "Piece",
-    qty: 42,
-    used: 8
-  },
-  {
-    category: "Medicine",
-    date: "01/21/25",
-    stock: "18-002",
-    name: "Amoxicillin 500mg",
-    unit: "Box",
-    qty: 30,
-    used: 5
-  },
-  {
-    category: "Supplies",
-    date: "01/22/25",
-    stock: "18-003",
-    name: "Latex Examination Gloves",
-    unit: "Box",
-    qty: 50,
-    used: 12
-  },
-  {
-    category: "Medicine",
-    date: "01/23/25",
-    stock: "18-004",
-    name: "Paracetamol 500mg",
-    unit: "Box",
-    qty: 40,
-    used: 10
-  },
-  {
-    category: "Supplies",
-    date: "01/24/25",
-    stock: "18-005",
-    name: "Dental Cotton Rolls",
-    unit: "Pack",
-    qty: 60,
-    used: 15
-  },
-  {
-    category: "Supplies",
-    date: "01/25/25",
-    stock: "18-006",
-    name: "Disposable Mouth Mirrors",
-    unit: "Piece",
-    qty: 25,
-    used: 5
-  },
-  {
-    category: "Medicine",
-    date: "01/26/25",
-    stock: "18-007",
-    name: "Ibuprofen 400mg",
-    unit: "Box",
-    qty: 35,
-    used: 7
-  },
-  {
-    category: "Supplies",
-    date: "01/27/25",
-    stock: "18-008",
-    name: "Cotton Swabs",
-    unit: "Pack",
-    qty: 80,
-    used: 20
-  },
-  {
-    category: "Medicine",
-    date: "01/28/25",
-    stock: "18-009",
-    name: "Chlorhexidine Mouthwash 0.12%",
-    unit: "Bottle",
-    qty: 20,
-    used: 4
-  },
-  {
-    category: "Supplies",
-    date: "01/29/25",
-    stock: "18-010",
-    name: "Dental Floss Packs",
-    unit: "Pack",
-    qty: 50,
-    used: 10
-  }
-];*/
-
-// =========================
-// DARK MODE TOGGLE
-// =========================
+/* =========================
+   DARK MODE TOGGLE
+========================= */
 const themeToggle = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
 const html = document.documentElement;
@@ -889,6 +874,9 @@ function updateThemeIcon(theme) {
   }
 }
 
+/* =========================
+   SIDEBAR
+========================= */
 let sidebarOpen = false;
 
 function applyLayout(sidebarWidth) {
@@ -909,7 +897,6 @@ function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
 
   if (sidebarOpen) {
-    // EXPAND
     applyLayout('16rem');
 
     texts.forEach(t => {
@@ -924,7 +911,6 @@ function toggleSidebar() {
     icon.classList.replace('fa-bars', 'fa-xmark');
 
   } else {
-    // COLLAPSE
     applyLayout('72px');
 
     texts.forEach(t => {
@@ -940,21 +926,81 @@ function toggleSidebar() {
   }
 }
 
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
-  });
+// ✅ INITIAL STATE SYNC (CRITICAL FIX)
+document.addEventListener('DOMContentLoaded', () => {
+  sidebarOpen = false;
+  applyLayout('72px');
+});
 
+/* =========================
+   INVENTORY DATA LOAD
+========================= */
 let inventory = [];
 
 async function loadInventory() {
-  const res = await fetch('/dentist/inventory/data');
+  const res = await fetch('/dentist/inventory/data', { cache: 'no-store' });
+
+  // if backend accidentally returns HTML (like login page), this prevents silent failure
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    console.error("Inventory data is not JSON. Check if route is protected or returning HTML.");
+    return;
+  }
+
   inventory = await res.json();
   renderTable();
 }
 loadInventory();
 
+async function addItem() {
+  if (
+    addCategory.selectedIndex === 0 ||
+    !addDate.value ||
+    !addStock.value ||
+    !addName.value ||
+    !addUnit.value ||
+    addQty.value === ''
+  ) {
+    alert('Please complete all required fields.');
+    return;
+  }
+
+  const res = await fetch('/dentist/inventory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json' // ✅ important: prevents Laravel from redirecting
+    },
+    body: JSON.stringify({
+      category: addCategory.value,
+      date_received: addDate.value,
+      stock_no: addStock.value.trim(),
+      name: addName.value.trim(),
+      unit: addUnit.value.trim(),
+      qty: Number(addQty.value),
+      used: Number(addUsed.value || 0)
+    })
+  });
+
+  if (!res.ok) {
+    // Laravel validation errors will be JSON if Accept is application/json
+    const text = await res.text();
+    console.error("ADD FAILED:", text);
+    alert("Add failed — check console");
+    return;
+  }
+
+  addModal.close();
+  resetAddForm();
+
+  // ✅ make sure UI refresh happens AFTER the DB is updated
+  await loadInventory();
+}
+
+/* =========================
+   DELETE
+========================= */
 let deleteId = null;
 
 function deleteItem(id) {
@@ -968,9 +1014,7 @@ document.getElementById("confirmDeleteBtn").onclick = async () => {
   await fetch(`/dentist/inventory/${deleteId}`, {
     method: 'DELETE',
     headers: {
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     }
   });
 
@@ -979,8 +1023,79 @@ document.getElementById("confirmDeleteBtn").onclick = async () => {
   loadInventory();
 };
 
-let editIndex = null;
+/* =========================
+   FILTER PANEL STATE (NEW)
+========================= */
+const activeFilters = {
+  sort: "",        // "az" | "za"
+  dateFrom: "",
+  dateTo: "",
+  dateOrder: "",   // "asc" | "desc"
+  itemType: "",    // "medicine" | "supplies"
+  stock: ""        // "low-high" | "high-low"
+};
 
+function openFilterModal() {
+  // sync UI with activeFilters before opening
+  setRadioByNameValue("fp_sort", activeFilters.sort);
+  setRadioByNameValue("fp_dateOrder", activeFilters.dateOrder);
+  setRadioByNameValue("fp_itemType", activeFilters.itemType);
+  setRadioByNameValue("fp_stock", activeFilters.stock);
+
+  document.getElementById("fp_dateFrom").value = activeFilters.dateFrom || "";
+  document.getElementById("fp_dateTo").value = activeFilters.dateTo || "";
+
+  filterModal.showModal();
+}
+
+function setRadioByNameValue(name, value) {
+  const radios = document.querySelectorAll(`input[name="${name}"]`);
+  radios.forEach(r => r.checked = (value && r.value === value));
+  if (!value) radios.forEach(r => r.checked = false);
+}
+
+function getCheckedValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : "";
+}
+
+function clearFilterPanel() {
+  // clear modal fields
+  setRadioByNameValue("fp_sort", "");
+  setRadioByNameValue("fp_dateOrder", "");
+  setRadioByNameValue("fp_itemType", "");
+  setRadioByNameValue("fp_stock", "");
+  document.getElementById("fp_dateFrom").value = "";
+  document.getElementById("fp_dateTo").value = "";
+
+  // clear active filters immediately
+  activeFilters.sort = "";
+  activeFilters.dateFrom = "";
+  activeFilters.dateTo = "";
+  activeFilters.dateOrder = "";
+  activeFilters.itemType = "";
+  activeFilters.stock = "";
+
+  filterModal.close();
+  renderTable();
+}
+
+function saveFilterPanel() {
+  activeFilters.sort = getCheckedValue("fp_sort");
+  activeFilters.dateOrder = getCheckedValue("fp_dateOrder");
+  activeFilters.itemType = getCheckedValue("fp_itemType");
+  activeFilters.stock = getCheckedValue("fp_stock");
+
+  activeFilters.dateFrom = document.getElementById("fp_dateFrom").value || "";
+  activeFilters.dateTo = document.getElementById("fp_dateTo").value || "";
+
+  filterModal.close();
+  renderTable();
+}
+
+/* =========================
+   TABLE RENDER
+========================= */
 const emptyState = document.getElementById("emptyState");
 
 function renderTable() {
@@ -988,47 +1103,59 @@ function renderTable() {
   tbody.innerHTML = "";
 
   let data = [...inventory];
-  
-  const show = showSelect.value;
 
-  if (show === "medicine") {
+  // Item Type filter
+  if (activeFilters.itemType === "medicine") {
     data = data.filter(item => item.category === "Medicine");
   }
-
-  if (show === "supplies") {
+  if (activeFilters.itemType === "supplies") {
     data = data.filter(item => item.category === "Supplies");
   }
 
+  // Search
   const search = searchInput.value.toLowerCase();
   if (search) {
     data = data.filter(i =>
-      i.stock_no.toLowerCase().includes(search) ||
-      i.name.toLowerCase().includes(search)
+      String(i.stock_no || "").toLowerCase().includes(search) ||
+      String(i.name || "").toLowerCase().includes(search)
     );
   }
 
-  const sort = sortSelect.value;
-    switch (sort) {
-    case "qty_asc":
-        // Quantity (lowest → highest)
-        data.sort((a, b) => Number(a.qty) - Number(b.qty));
-        break;
+  // Date range filter (by date_received)
+  const from = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null;
+  const to = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null;
 
-    case "alphabetical":
-        // Alphabetical by supply / medicine name
-        data.sort((a, b) => a.name.localeCompare(b.name));
-        break;
+  if (from) from.setHours(0,0,0,0);
+  if (to)   to.setHours(23,59,59,999);
 
-    case "date_received":
-        // Date received (oldest → newest)
-        data.sort((a, b) => new Date(a.date_received) - new Date(b.date_received));
-        break;
+  if (from) data = data.filter(i => i.date_received && new Date(i.date_received) >= from);
+  if (to)   data = data.filter(i => i.date_received && new Date(i.date_received) <= to);
 
-    default:
-        // Default order (do nothing)
-        break;
-    }   
-  
+  // Sorting (priority: Stock Level > Sort A-Z/Z-A > Date Order)
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const toTime = (v) => {
+    if (!v) return 0;
+    const t = new Date(v).getTime();
+    return Number.isFinite(t) ? t : 0;
+  };
+
+  if (activeFilters.stock === "low-high") {
+    data.sort((a,b) => toNum(a.qty) - toNum(b.qty));
+  } else if (activeFilters.stock === "high-low") {
+    data.sort((a,b) => toNum(b.qty) - toNum(a.qty));
+  } else if (activeFilters.sort === "az") {
+    data.sort((a,b) => String(a.name || "").localeCompare(String(b.name || "")));
+  } else if (activeFilters.sort === "za") {
+    data.sort((a,b) => String(b.name || "").localeCompare(String(a.name || "")));
+  } else if (activeFilters.dateOrder === "asc") {
+    data.sort((a,b) => toTime(a.date_received) - toTime(b.date_received));
+  } else if (activeFilters.dateOrder === "desc") {
+    data.sort((a,b) => toTime(b.date_received) - toTime(a.date_received));
+  }
+
   if (data.length === 0) {
     emptyState.classList.remove("hidden");
     return;
@@ -1036,16 +1163,17 @@ function renderTable() {
     emptyState.classList.add("hidden");
   }
 
-  data.forEach((item, index) => {
-    const balance = item.qty - item.used;
+  data.forEach((item) => {
+    const balance = toNum(item.qty) - toNum(item.used);
+
     tbody.innerHTML += `
-    <tr class="text-gray-800"> <!-- sets the font color -->
-        <td class="text-[#333333]">${item.formatted_date}</td>
-        <td class="text-[#333333]">${item.stock_no}</td>
-        <td class="text-[#333333]">${item.name}</td>
-        <td class="text-[#333333]">${item.unit}</td>
-        <td class="text-[#333333]">${item.qty}</td>
-        <td class="text-[#333333]">${item.used}</td>
+      <tr class="text-gray-800">
+        <td class="text-[#333333]">${item.formatted_date ?? ''}</td>
+        <td class="text-[#333333]">${item.stock_no ?? ''}</td>
+        <td class="text-[#333333]">${item.name ?? ''}</td>
+        <td class="text-[#333333]">${item.unit ?? ''}</td>
+        <td class="text-[#333333]">${item.qty ?? 0}</td>
+        <td class="text-[#333333]">${item.used ?? 0}</td>
         <td class="text-[#333333]">${balance}</td>
         <td class="flex justify-center gap-2">
           <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
@@ -1061,6 +1189,9 @@ function renderTable() {
   });
 }
 
+/* =========================
+   ADD
+========================= */
 function resetAddForm() {
   addCategory.selectedIndex = 0;
   addDate.value = '';
@@ -1075,7 +1206,6 @@ function resetAddForm() {
 async function addItem() {
   if (
     addCategory.selectedIndex === 0 ||
-    addUnit.selectedIndex === 0 ||
     !addDate.value ||
     !addStock.value ||
     !addName.value ||
@@ -1090,9 +1220,7 @@ async function addItem() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify({
       category: addCategory.value,
@@ -1117,7 +1245,9 @@ async function addItem() {
   loadInventory();
 }
 
-
+/* =========================
+   EDIT
+========================= */
 let editId = null;
 
 function openEdit(id) {
@@ -1144,9 +1274,7 @@ async function saveEdit() {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify({
       category: editCategory.value,
@@ -1171,6 +1299,9 @@ async function saveEdit() {
   loadInventory();
 }
 
+/* =========================
+   BALANCE
+========================= */
 function computeAddBalance() {
   const qty = Number(addQty.value || 0);
   const used = Number(addUsed.value || 0);
@@ -1178,61 +1309,47 @@ function computeAddBalance() {
 }
 
 function computeEditBalance() {
-  editBalance.value =
-    Number(editQty.value || 0) - Number(editUsed.value || 0);
+  editBalance.value = Number(editQty.value || 0) - Number(editUsed.value || 0);
 }
 
-function formatDateMMDDYY(dateStr) {
-  const d = new Date(dateStr);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const yy = String(d.getFullYear()).slice(-2);
-  return `${mm}/${dd}/${yy}`;
-}
+/* =========================
+   NOTIFICATION
+========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("notifBtn");
+  const menu = document.getElementById("notifMenu");
 
-// NOTIFICATION
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("notifBtn");
-    const menu = document.getElementById("notifMenu");
+  let isOpen = false;
 
-    let isOpen = false;
+  function openMenu() {
+    isOpen = true;
+    menu.classList.remove("notif-close");
+    menu.classList.add("notif-open");
+  }
 
-    function openMenu() {
-      isOpen = true;
-      menu.classList.remove("notif-close");
-      menu.classList.add("notif-open");
-    }
+  function closeMenu() {
+    isOpen = false;
+    menu.classList.remove("notif-open");
+    menu.classList.add("notif-close");
+  }
 
-    function closeMenu() {
-      isOpen = false;
-      menu.classList.remove("notif-open");
-      menu.classList.add("notif-close");
-    }
-
-    // Toggle when clicking bell
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    // Keep open when clicking inside menu
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-
-    // Close when clicking outside
-    document.addEventListener("click", () => {
-      if (isOpen) closeMenu();
-    });
-
-    // Close on ESC
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) closeMenu();
-    });
-
-    // Start closed
-    closeMenu();
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isOpen ? closeMenu() : openMenu();
   });
+
+  menu.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("click", () => {
+    if (isOpen) closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen) closeMenu();
+  });
+
+  closeMenu();
+});
 </script>
 
 </body>
