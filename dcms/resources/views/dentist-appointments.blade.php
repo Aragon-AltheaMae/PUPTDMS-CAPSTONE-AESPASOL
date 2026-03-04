@@ -29,42 +29,71 @@
     }
     .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
-    .sidebar-link{
-      display:flex; align-items:center; width:100%;
-      padding:12px; border-radius:12px;
-      transition: background-color .2s ease, transform .2s ease;
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    .sidebar-link:hover .sidebar-tooltip{
-      opacity:1; transform:scale(1);
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+      padding-left: 0.25rem;
     }
 
-    /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip { display: none; }
-    #sidebar[style*="16rem"] .sidebar-link { justify-content: flex-start; }
-
-    /* consistent icon column width */
-    .sidebar-link i {
-      width: 24px;
-      min-width: 24px;
-      text-align: center;
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
     }
 
-    /* CLOSED: center icon only */
-    #sidebar[style*="72px"] .sidebar-link { justify-content:center; gap:0; }
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
 
-    /* when expanded, align items nicely */
-    #sidebar[style*="16rem"] .sidebar-link { justify-content: flex-start; gap: 12px; }
-    #sidebar[style*="16rem"] .sidebar-link:hover { transform: translateX(4px); }
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
 
-    .sidebar-link:hover .sidebar-text { opacity: 1; transform: scale(1); }
-    .sidebar-text { transform-origin: left center; }
+    #sidebar.expanded .section-label {
+      display: block;
+    }
 
-    /* Notification dropdown animation */
-    .notif-open{
-      opacity:1 !important;
-      transform:scale(1) !important;
-      pointer-events:auto !important;
+    #sidebar.expanded .sidebar-text {
+      opacity: 1;
+      width: auto;
+      overflow: visible;
+    }
+
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
     }
 
     .notif-close {
@@ -73,292 +102,466 @@
       pointer-events: none !important;
     }
 
-    /* DARK MODE */
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link span:first-of-type {
+      margin: 0 auto;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
+    }
+
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    /* DARK MODE STYLES */
     [data-theme="dark"] body {
-      background-color: #111827;
+      background-color: #000D1A;
       color: #E5E7EB;
     }
 
-    [data-theme="dark"] #sidebar { background-color: #1F2933; }
-    [data-theme="dark"] .bg-white { background-color: #1F2937 !important; }
-    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
+    [data-theme="dark"] #sidebar {
+      background-color: #000D1A;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #000D1A !important;
+    }
 
     body, #sidebar, main, .card {
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* ── IMPROVED APPOINTMENT CARD STYLES ── */
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
     }
 
-    .appt-card {
-      background: #ffffff;
-      border: 1px solid #E8E0D8;
-      border-radius: 14px;
-      position: relative;
-      overflow: hidden;
-      transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
-      animation: slideIn 0.3s ease both;
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
     }
-    .appt-card:hover {
-      border-color: rgba(139,0,0,0.2);
-      box-shadow: 0 4px 20px rgba(139,0,0,0.08);
-      transform: translateX(2px);
-    }
-    .appt-card::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0;
-      width: 4px;
-      background: #8B0000;
-      border-radius: 14px 0 0 14px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .appt-card:hover::before { opacity: 1; }
 
-    .service-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 12px; font-weight: 500;
-      padding: 3px 10px; border-radius: 6px;
-      width: fit-content;
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
     }
-    .service-badge-default { background: #f9f0f0; color: #8B0000; }
-    .service-badge-surgery  { background: #fff0f0; color: #C41E3A; }
-    .service-badge-checkup  { background: #ebf5ee; color: #2D7A5E; }
-    .service-badge-whitening{ background: #fff3e0; color: #B86C00; }
-    .service-badge-extraction{ background: #fff0e8; color: #B85000; }
 
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 500;
-      padding: 4px 10px; border-radius: 20px;
-    }
-    .status-confirmed { background: #ebf5ee; color: #2D7A5E; }
-    .status-pending   { background: #fff3e0; color: #B86C00; }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink:0; }
-
-    .time-chip {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #F5F0EB; border: 1px solid #E8E0D8;
-      border-radius: 7px; padding: 5px 10px;
-      font-size: 13px; font-weight: 500; color: #6B5E52;
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
 
 <body class="bg-[#F4F4F4] text-[#333333] font-normal min-h-screen flex flex-col">
 
-  <!-- ═══════════════════════════════════════════════
-       HEADER (TOP BAR) — UNCHANGED
-  ════════════════════════════════════════════════ -->
-  <div class="fixed top-0 left-0 right-0 z-50
-            bg-gradient-to-r from-[#660000] to-[#8B0000]
-            text-[#F4F4F4] px-6 py-4
-            flex items-center justify-between">
+  <!-- HEADER (TOP BAR) -->
+  <div class=" fixed top-0 left-0 right-0 z-50
+  bg-gradient-to-r from-[#660000] to-[#8B0000]
+  text-[#F4F4F4] px-6 py-4
+  flex items-center justify-between">
 
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+  <div class="flex items-center gap-3">
+    <div class="w-12 rounded-full ml-5">
+      <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+    </div>
+    <div class="w-12 rounded-full">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+    </div>
+    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  </div>
+
+  <div class="flex items-center gap-8">
+    @php
+    // Pass $notifications from controller, or leave it empty for now
+    // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+    $notifications = collect($notifications ?? []);
+    $notifCount = $notifications->count();
+    @endphp
+
+    <div id="notifDropdown" class="relative">
+
+      <button id="notifBtn" type="button"
+        class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+
+        @if($notifCount > 0)
+        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+          {{ $notifCount }}
+        </span>
+        @endif
+
+        <i class="fa-regular fa-bell text-lg"></i>
+      </button>
+
+      <div id="notifMenu"
+        class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+         opacity-0 scale-95 pointer-events-none
+         transition-all duration-200 ease-out origin-top-right">
+
+        <div class="p-4 border-b flex items-center justify-between">
+          <span class="font-bold text-[#8B0000]">Notifications</span>
+        </div>
+
+        <div class="max-h-80 overflow-y-auto">
+          @forelse($notifications as $n)
+          <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+            <div class="text-sm font-semibold text-gray-900">
+              {{ $n['title'] ?? 'Notification' }}
+            </div>
+            @if(!empty($n['message']))
+            <div class="text-xs text-[#ADADAD] mt-0.5">
+              {{ $n['message'] }}
+            </div>
+            @endif
+            @if(!empty($n['time']))
+            <div class="text-[11px] text-gray-400 mt-1">
+              {{ $n['time'] }}
+            </div>
+            @endif
+          </a>
+          @empty
+          <div class="px-4 py-10 text-center justify-items-center">
+            <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+            <div class="text-sm font-semibold text-gray-800">No notifications</div>
+            <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+          </div>
+          @endforelse
+        </div>
+
       </div>
-      <div class="w-12 rounded-full">
-        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
 
-    <div class="flex items-center gap-8">
-      @php
-        $notifications = collect($notifications ?? []);
-        $notifCount = $notifications->count();
-      @endphp
-
-      <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-          @if($notifCount > 0)
-            <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-              {{ $notifCount }}
-            </span>
-          @endif
-          <i class="fa-regular fa-bell text-lg"></i>
-        </button>
-
-        <div id="notifMenu"
-          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-                 opacity-0 scale-95 pointer-events-none
-                 transition-all duration-200 ease-out origin-top-right">
-
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
-          </div>
-
-          <div class="max-h-80 overflow-y-auto">
-            @forelse($notifications as $n)
-              <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-                <div class="text-sm font-semibold text-gray-900">
-                  {{ $n['title'] ?? 'Notification' }}
-                </div>
-                @if(!empty($n['message']))
-                  <div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>
-                @endif
-                @if(!empty($n['time']))
-                  <div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>
-                @endif
-              </a>
-            @empty
-              <div class="px-4 py-10 text-center justify-items-center">
-                <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-                <div class="text-sm font-semibold text-gray-800">No notifications</div>
-                <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
-              </div>
-            @endforelse
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10" alt="Profile">
-        <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
-        </div>
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div>
+        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
     </div>
   </div>
+  </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SIDEBAR — UNCHANGED
-  ════════════════════════════════════════════════ -->
+  <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[80px]
-           h-[calc(100vh-80px)]
-           w-[72px]
-           bg-[#FAFAFA]
-           drop-shadow-xl
-           transition-all duration-300
-           flex flex-col justify-between z-40">
+    class="fixed left-0 top-[72px]
+         h-[calc(100vh-72px)]
+         bg-white
+         drop-shadow-xl
+         transition-all duration-300
+         flex flex-col justify-between z-40 expanded"
+    style="width: 200px;">
 
-    <div>
-      <div id="sidebarToggleWrapper"
-        class="flex items-center justify-center px-4 py-6 transition-all duration-300">
+    <!-- TOP -->
+    <div class="pt-4">
+
+      <!-- Toggle Button -->
+      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()"
           id="sidebarToggleBtn"
-          class="w-10 h-10 flex items-center justify-center
-                 rounded-full text-[#757575] hover:text-[#8B0000]
-                 hover:bg-[#D9D9D9] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
+          class="w-8 h-8 flex items-center justify-center
+              rounded-full text-[#757575] hover:text-[#8B0000]
+              hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
-      <nav class="space-y-2 px-3 text-gray-600 text-sm">
+      <!-- NAVIGATION LABEL -->
+      <div class="section-label px-4 mb-6">Navigation</div>
+
+      <!-- MENU -->
+      <nav class="space-y-2 px-3 text-gray-600">
 
         <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-chart-line text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Dashboard</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Dashboard</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-chart-line text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Dashboard
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Dashboard
+          </span>
         </a>
 
         <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.patients*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-users text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Patients</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Patients</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
+            <i class="fa-solid fa-users text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Patients
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Patients
+          </span>
         </a>
 
         <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.appointments*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-calendar-check text-lg"></i>
-          <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Appointments</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Appointments</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-calendar-check text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Appointments
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Appointments
+          </span>
         </a>
 
         <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.documentrequests*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-file-circle-check text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Document Requests</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Document Requests</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file-circle-check text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Document Requests
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Document Requests
+          </span>
         </a>
 
         <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.inventory*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-box text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Inventory</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Inventory</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-box text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Inventory
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Inventory
+          </span>
         </a>
 
         <a href="{{ route('dentist.report') }}"
-          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
-                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs('dentist.report*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000]
-                transition-opacity duration-300 {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-file text-lg"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Reports</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
-                pointer-events-none transition-all duration-200">Reports</span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
+
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Reports
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Reports
+          </span>
         </a>
 
       </nav>
     </div>
 
-    <div class="px-3 pb-5 space-y-2">
-      <button
-        id="themeToggle"
-        class="sidebar-link relative flex items-center justify-center
-               w-full px-2 py-1.5 rounded-xl
-               bg-[#7B6CF6] text-[#F4F4F4]
-               transition-all duration-200
-               hover:scale-105"
-        aria-label="Toggle dark mode">
-        <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
-        <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Dark Mode</span>
-        <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-          Dark Mode
-        </span>
-      </button>
+    <!-- BOTTOM -->
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
+
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+            <i class="fa-regular fa-moon"></i>
+          </button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
 
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
-               text-red-600 hover:bg-red-50 transition-all duration-200">
-          <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Log out</span>
-          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+        <button
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
+             text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
+            Log out
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
             Log out
           </span>
         </button>
@@ -380,7 +583,7 @@
   ════════════════════════════════════════════════ -->
   <main
     id="mainContent"
-    class="flex-1 pt-[100px] px-6 pb-0 w-full transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
+    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
 
     <div class="max-w-7xl mt-4 mx-auto fade-in">
 
@@ -813,35 +1016,49 @@
 
     function applyLayout(w) {
       const sidebar = document.getElementById('sidebar');
-      const main    = document.getElementById('mainContent');
-      if (sidebar) sidebar.style.width = w;
-      if (main)    main.style.marginLeft = w;
+      const main = document.getElementById('mainContent');
+      sidebar.style.width = sidebarWidth;
+      main.style.marginLeft = sidebarWidth;
     }
 
     function toggleSidebar() {
-      const texts   = document.querySelectorAll('.sidebar-text');
-      const wrapper = document.getElementById('sidebarToggleWrapper');
-      const btn     = document.getElementById('sidebarToggleBtn');
-      const icon    = document.getElementById('sidebarIcon');
+      const sidebar = document.getElementById('sidebar');
+      const texts = document.querySelectorAll('.sidebar-text');
+      const icon = document.getElementById('sidebarIcon');
+      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
       sidebarOpen = !sidebarOpen;
 
       if (sidebarOpen) {
-        applyLayout('16rem');
-        texts.forEach(t => { t.classList.remove('opacity-0','w-0'); t.classList.add('opacity-100','w-auto'); });
-        wrapper?.classList.replace('justify-center','justify-end');
-        btn?.classList.add('translate-x-2');
-        if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-xmark'); }
+        applyLayout('220px');
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('expanded');
+        texts.forEach(t => {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
+        });
+        toggleWrapper.classList.remove('justify-center');
+        toggleWrapper.classList.add('justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
-        texts.forEach(t => { t.classList.add('opacity-0','w-0'); t.classList.remove('opacity-100','w-auto'); });
-        wrapper?.classList.replace('justify-end','justify-center');
-        btn?.classList.remove('translate-x-2');
-        if (icon) { icon.classList.remove('fa-xmark'); icon.classList.add('fa-bars'); }
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
+        texts.forEach(t => {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        toggleWrapper.classList.remove('justify-end');
+        toggleWrapper.classList.add('justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
       }
+      applyTheme(localStorage.getItem("theme") || "light");
     }
 
-    document.addEventListener('DOMContentLoaded', () => { sidebarOpen = false; applyLayout('72px'); });
+    document.addEventListener('DOMContentLoaded', () => {
+      sidebarOpen = true;
+      applyLayout('220px');
+    });
 
     // ── TABS ──
     const btnUpcoming     = document.getElementById('btnUpcoming');
