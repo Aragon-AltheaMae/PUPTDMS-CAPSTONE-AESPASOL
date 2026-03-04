@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('inventory_items', function (Blueprint $table) {
             $table->id();
+            
             $table->enum('category', ['Medicine', 'Supplies']);
             $table->date('date_received');
             $table->string('stock_no')->unique();
