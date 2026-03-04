@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,26 +21,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Inter';
-    }
+    body { font-family: 'Inter'; }
 
-    /* Fade-in animation */
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
+    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
     .sidebar-link {
       display: flex;
@@ -283,8 +269,8 @@
       background-color: #000D1A !important;
     }
 
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
+    body, #sidebar, main, .card {
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     [data-theme="dark"] .theme-toggle-container {
@@ -307,7 +293,7 @@
   </style>
 </head>
 
-<body class="bg-[#F4F4F4] text-[#333333] font-normal min-h-screen flex flex-col"">
+<body class="bg-[#F4F4F4] text-[#333333] font-normal min-h-screen flex flex-col">
 
   <!-- HEADER (TOP BAR) -->
   <div class=" fixed top-0 left-0 right-0 z-50
@@ -425,7 +411,6 @@
       <!-- MENU -->
       <nav class="space-y-2 px-3 text-gray-600">
 
-        <!-- DASHBOARD -->
         <a href="{{ route('dentist.dashboard') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -446,7 +431,6 @@
           </span>
         </a>
 
-        <!-- PATIENTS -->
         <a href="{{ route('dentist.patients') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -467,7 +451,6 @@
           </span>
         </a>
 
-        <!-- APPOINTMENTS -->
         <a href="{{ route('dentist.appointments') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -488,7 +471,6 @@
           </span>
         </a>
 
-        <!-- Document Requests -->
         <a href="{{ route('dentist.documentrequests') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -509,7 +491,6 @@
           </span>
         </a>
 
-        <!-- INVENTORY -->
         <a href="{{ route('dentist.inventory') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -530,7 +511,6 @@
           </span>
         </a>
 
-        <!-- REPORTS -->
         <a href="{{ route('dentist.report') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
                 transition-all duration-200
@@ -550,6 +530,7 @@
             Reports
           </span>
         </a>
+
       </nav>
     </div>
 
@@ -585,399 +566,455 @@
           </span>
         </button>
       </form>
-
     </div>
   </aside>
 
-  <!-- ================= MAIN ================= -->
+  @php
+    $upcomingAppointments = $upcomingAppointments ?? collect();
+    $pastAppointments     = $pastAppointments ?? collect();
+    $today                = $today ?? \Carbon\Carbon::today()->toDateString();
+
+    $upcomingGrouped = $upcomingAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'));
+    $pastGrouped     = $pastAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'));
+  @endphp
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN CONTENT — IMPROVED
+  ════════════════════════════════════════════════ -->
   <main
     id="mainContent"
     class="pt-[100px] px-6 py-6 fade-up min-h-screen">
 
     <div class="max-w-7xl mt-4 mx-auto fade-in">
-      <!-- Toggle pill -->
-      <div class="flex justify-center mt-14">
-        <div class="w-[760px] h-14 bg-[#7a0000] rounded-full p-1.5 flex shadow-md">
 
-          <button id="btnUpcoming" class="flex-1 rounded-full bg-[#8b0000]
-        text-white text-sm font-semibold
-        transition-all duration-200">
+      <!-- Page title row -->
+      <div class="flex items-end justify-between mt-8 mb-6 px-1">
+        <div>
+          <h1 class="text-2xl font-bold text-[#1A0F0F]">Appointments</h1>
+          <p class="text-sm text-gray-400 mt-0.5">
+            {{ now()->format('l, F j, Y') }}
+          </p>
+        </div>
+
+        <!-- Tab toggle — same look, just repositioned inline -->
+        <div class="flex bg-[#7a0000] rounded-full p-1.5 shadow-md gap-1">
+          <button id="btnUpcoming"
+            class="px-6 py-2 rounded-full bg-[#8b0000] text-white text-sm font-semibold transition-all duration-200">
             Upcoming Appointments
           </button>
-
-          <button id="btnPast" class="flex-1 rounded-full text-white/80 text-sm font-semibold
-        transition-all duration-200">
+          <button id="btnPast"
+            class="px-6 py-2 rounded-full text-white/80 text-sm font-semibold transition-all duration-200">
             Past Appointments
           </button>
         </div>
       </div>
 
-      <!-- ========== UPCOMING SECTION ========== -->
-      <section id="upcomingSection" class="mt-14 flex justify-center">
-        <div class="w-[1100px]">
+      <!-- ═══════ UPCOMING SECTION ═══════ -->
+      <section id="upcomingSection" class="pb-14">
 
-          <div class="relative pl-10">
-            <div class="absolute left-[6px] top-[6px] w-[2px] h-[220px] bg-[#8b0000]"></div>
-            <div class="absolute left-[0px] top-[0px] w-3 h-3 bg-orange-400 rounded-full"></div>
-            <h2 class="text-xl font-semibold text-[#8b0000] mb-6">February</h2>
+        @forelse($upcomingGrouped as $month => $items)
+          <div class="relative pl-10 mb-14">
+            <!-- Timeline line -->
+            <div class="absolute left-[6px] top-[6px] w-[2px] h-full bg-[#8b0000]/20"></div>
+            <!-- Timeline dot -->
+            <div class="absolute left-0 top-[4px] w-3 h-3 bg-[#8b0000] rounded-full shadow-[0_0_0_3px_rgba(139,0,0,0.15)]"></div>
 
-            <div class="grid grid-cols-[36px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr_1.6fr]
-            text-[13px] font-semibold text-[#8b0000] pb-3 border-b border-gray-400 mb-6 px-8">
-              <div>
-
-              </div>
-              <p>Date</p>
-              <p>Time</p>
-              <p>Service</p>
-              <p>Name</p>
-              <p>Program</p>
-              <p class="pl-16">Action</p>
+            <!-- Month heading -->
+            <div class="flex items-center gap-3 mb-5">
+              <h2 class="text-xl font-bold text-[#8b0000]">{{ $month }}</h2>
+              <span class="bg-[#f9f0f0] text-[#8b0000] text-xs font-semibold px-3 py-1 rounded-full border border-[#8b0000]/10">
+                {{ $items->count() }} {{ Str::plural('appointment', $items->count()) }}
+              </span>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 px-8 py-5">
-              <div class="grid grid-cols-[36px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr_1.6fr]
-            items-center text-[13px] text-[#8b0000]">
-
-
-                <div class="flex justify-center">
-                  <i class="fa-solid fa-ellipsis-vertical"></i>
-                </div>
-
-                <p class="font-semibold">February 2, 2025</p>
-                <p>1:00 PM</p>
-                <p>Dental Cleaning</p>
-                <p class="font-semibold">Alilah Gomez</p>
-                <p>BSME</p>
-
-                <!-- Actions -->
-                <div class="flex flex-col gap-2 items-end pr-2">
-                  <button onclick="openStartProcedureModal()" class="h-6 w-[130px]
-                    rounded-md text-[11px] font-semibold text-white bg-green-600
-                    cursor-pointer hover:bg-green-700 transition">
-                    Start Procedure
-                  </button>
-
-                  <button onclick="openRescheduleModal()" class="h-6 w-[130px]
-                    rounded-md text-[11px] font-semibold text-black bg-yellow-400
-                    cursor-pointer hover:bg-yellow-500 transition">
-                    Reschedule
-                  </button>
-
-                  <button onclick="openCancelAppointmentModal()" class="h-6 w-[130px]
-                    rounded-md text-[11px] font-semibold
-                    text-white bg-[#8b0000] cursor-pointer hover:bg-[#6f0000] transition">
-                    Cancel
-                  </button>
-                </div>
-              </div>
+            <!-- Column headers -->
+            <div class="grid grid-cols-[1.6fr_1.1fr_1.8fr_1.8fr_1.1fr_1fr_1.5fr]
+              text-[11px] font-semibold uppercase tracking-wider text-gray-400
+              pb-2 border-b border-gray-200 mb-3 px-5">
+              <span>Date</span>
+              <span>Time</span>
+              <span>Service</span>
+              <span>Patient</span>
+              <span>Program</span>
+              <span>Status</span>
+              <span class="text-right">Actions</span>
             </div>
+
+            <!-- Cards -->
+            <div class="space-y-3">
+              @foreach($items as $i => $appt)
+                @php
+                  $patientName  = optional($appt->patient)->name ?? 'Unknown Patient';
+                  $program      = optional($appt->patient)->program ?? '—';
+                  $dateLabel    = \Carbon\Carbon::parse($appt->appointment_date)->format('F j, Y');
+                  $weekday      = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
+                  $timeLabel    = $appt->appointment_time
+                                    ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+                                    : '—';
+                  $serviceLabel = ($appt->service_type ?? '') === 'Others'
+                                    ? (($appt->other_services ?? '') ?: 'Others')
+                                    : ($appt->service_type ?? '—');
+                  $isToday      = ($appt->appointment_date ?? null) === $today;
+
+                  // Color-code the service badge
+                  $serviceLower = strtolower($serviceLabel);
+                  $badgeClass = 'service-badge-default';
+                  if (str_contains($serviceLower, 'surgery'))    $badgeClass = 'service-badge-surgery';
+                  elseif (str_contains($serviceLower, 'check'))  $badgeClass = 'service-badge-checkup';
+                  elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
+                  elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+                @endphp
+
+                <div class="appt-card" style="animation-delay: {{ $i * 0.04 }}s">
+                  <div class="grid grid-cols-[1.6fr_1.1fr_1.8fr_1.8fr_1.1fr_1fr_1.5fr]
+                    items-center px-5 py-4 gap-2">
+
+                    <!-- Date -->
+                    <div>
+                      <p class="text-[13px] font-semibold text-gray-800">{{ $dateLabel }}</p>
+                      <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
+                      @if($isToday)
+                        <span class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide
+                          bg-green-400 text-white px-2 py-0.5 rounded-md">Today</span>
+                      @endif
+                    </div>
+
+                    <!-- Time -->
+                    <div>
+                      <span class="time-chip">
+                        <i class="fa-regular fa-clock text-xs"></i>
+                        {{ $timeLabel }}
+                      </span>
+                    </div>
+
+                    <!-- Service -->
+                    <div>
+                      <span class="service-badge {{ $badgeClass }}">
+                        {{ $serviceLabel }}
+                      </span>
+                    </div>
+
+                    <!-- Patient -->
+                    <div>
+                      <p class="text-[13px] font-semibold text-gray-800">{{ $patientName }}</p>
+                    </div>
+
+                    <!-- Program -->
+                    <div>
+                      @if($program === '—')
+                        <span class="text-[12px] text-gray-400">—</span>
+                      @else
+                        <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-medium
+                          px-2.5 py-1 rounded-full border border-gray-200">
+                          {{ $program }}
+                        </span>
+                      @endif
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                      @if($isToday)
+                        <span class="status-pill status-confirmed">
+                          <span class="status-dot"></span>Confirmed
+                        </span>
+                      @else
+                        <span class="status-pill status-pending">
+                          <span class="status-dot"></span>Upcoming
+                        </span>
+                      @endif
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col gap-1.5 items-end">
+                      <button
+                        type="button"
+                        class="w-[120px] h-7 rounded-lg text-[11px] font-semibold text-white
+                          bg-green-700 hover:bg-green-800 transition-all duration-150
+                          flex items-center justify-center gap-1.5
+                          disabled:opacity-50 disabled:cursor-not-allowed"
+                        onclick="openStartProcedureModal(this)"
+                        data-id="{{ $appt->id }}"
+                        data-name="{{ $patientName }}"
+                        data-datetime="{{ $dateLabel }} | {{ $timeLabel }}"
+                        {{ $isToday ? '' : 'disabled' }}
+                        title="{{ $isToday ? '' : 'Only available on appointment date' }}">
+                        <i class="fa-solid fa-play text-[9px]"></i> Start
+                      </button>
+
+                      <button
+                        type="button"
+                        class="w-[120px] h-7 rounded-lg text-[11px] font-semibold
+                          bg-amber-50 text-amber-700 border border-amber-200
+                          hover:bg-amber-100 transition-all duration-150
+                          flex items-center justify-center gap-1.5"
+                        onclick="openRescheduleModal(this)"
+                        data-id="{{ $appt->id }}"
+                        data-name="{{ $patientName }}"
+                        data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
+                        <i class="fa-solid fa-rotate-right text-[9px]"></i> Reschedule
+                      </button>
+
+                      <button
+                        type="button"
+                        class="w-[120px] h-7 rounded-lg text-[11px] font-semibold
+                          bg-red-50 text-[#8b0000] border border-red-200
+                          hover:bg-red-100 transition-all duration-150
+                          flex items-center justify-center gap-1.5"
+                        onclick="openCancelAppointmentModal(this)"
+                        data-id="{{ $appt->id }}"
+                        data-name="{{ $patientName }}"
+                        data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
+                        <i class="fa-solid fa-xmark text-[9px]"></i> Cancel
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              @endforeach
+            </div>
+
           </div>
-        </div>
+        @empty
+          <div class="flex flex-col items-center justify-center py-24 text-gray-400">
+            <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-gray-300"></i>
+            <p class="text-base font-semibold text-gray-500">No upcoming appointments</p>
+            <p class="text-sm mt-1">New appointments will appear here once scheduled.</p>
+          </div>
+        @endforelse
+
       </section>
 
-      <!-- ================= RESCHEDULE MODAL ================= -->
-      <div id="rescheduleModal"
-        class="fixed inset-0 bg-black/40 flex items-center 
-                      justify-center hidden z-50">
-        <div class="bg-white w-[560px] rounded-2xl overflow-hidden 
-                              shadow-2xl">
+      <!-- ═══════ PAST SECTION ═══════ -->
+      <section id="pastSection" class="pb-14 hidden">
 
-          <!-- HEADER -->
-          <div class="bg-yellow-200 px-8 py-5 text-center">
-            <h2 class="text-xl font-bold text-[#8b0000]">
-              Reschedule Appointment
-            </h2>
-          </div>
+        @forelse($pastGrouped as $month => $items)
+          <div class="relative pl-10 mb-14">
+            <div class="absolute left-[6px] top-[6px] w-[2px] h-full bg-gray-200"></div>
+            <div class="absolute left-0 top-[4px] w-3 h-3 bg-gray-400 rounded-full"></div>
 
-          <!-- BODY -->
-          <div class="px-10 py-7 bg-gray-50">
-
-            <p class="text-base font-bold text-gray-900 mb-1 text-center">
-              You are about to reschedule this appointment.
-            </p>
-            <p class="text-sm text-gray-500 mb-5 text-center">
-              You will be able to select a new date and time.
-            </p>
-
-            <!-- Appointment Details card -->
-            <div class="bg-white border border-gray-200 rounded-2xl 
-                                  px-8 py-5 text-center mb-4 shadow-sm">
-              <div class="flex items-center justify-center gap-2 
-                                  text-gray-700 text-sm font-bold mb-3">
-                <i class="fa-regular fa-circle-user text-lg"></i>
-                <span>Appointment Details</span>
-              </div>
-
-              <p class="text-sm text-gray-800">
-                Patient Name: <span class="font-bold">Alilah Gomez</span>
-              </p>
-
-              <p class="text-sm text-gray-600 mt-1">
-                February 2, 2025 | 1:00 PM
-              </p>
+            <div class="flex items-center gap-3 mb-5">
+              <h2 class="text-xl font-bold text-gray-500">{{ $month }}</h2>
+              <span class="bg-gray-100 text-gray-400 text-xs font-semibold px-3 py-1 rounded-full">
+                {{ $items->count() }} {{ Str::plural('appointment', $items->count()) }}
+              </span>
             </div>
 
-            <p class="text-xs text-gray-400 mb-5 text-center">
-              This change will be recorded in the appointment history.
-            </p>
-
-            <!-- BUTTONS -->
-            <div class="flex justify-end gap-3">
-              <button onclick="closeRescheduleModal()"
-                class="px-6 py-2 rounded-lg border border-gray-300
-                                  bg-white text-gray-700 font-semibold
-                                  hover:bg-gray-100 transition text-sm shadow-sm">
-                Cancel
-              </button>
-              <button onclick="confirmReschedule()"
-                class="px-6 py-2 rounded-lg bg-yellow-400 
-                                 text-gray-700 font-semibold hover:bg-yellow-500  
-                                 transition text-sm shadow-sm">
-                Reschedule
-              </button>
+            <!-- Column headers -->
+            <div class="grid grid-cols-[1.6fr_1.1fr_1.8fr_1.8fr_1.1fr]
+              text-[11px] font-semibold uppercase tracking-wider text-gray-400
+              pb-2 border-b border-gray-200 mb-3 px-5">
+              <span>Date</span>
+              <span>Time</span>
+              <span>Service</span>
+              <span>Patient</span>
+              <span>Program</span>
             </div>
 
-          </div>
-        </div>
-      </div>
+            <div class="space-y-3">
+              @foreach($items as $i => $appt)
+                @php
+                  $patientName  = optional($appt->patient)->name ?? 'Unknown Patient';
+                  $program      = optional($appt->patient)->program ?? '—';
+                  $dateLabel    = \Carbon\Carbon::parse($appt->appointment_date)->format('F j, Y');
+                  $weekday      = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
+                  $timeLabel    = $appt->appointment_time
+                                    ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+                                    : '—';
+                  $serviceLabel = ($appt->service_type ?? '') === 'Others'
+                                    ? (($appt->other_services ?? '') ?: 'Others')
+                                    : ($appt->service_type ?? '—');
 
-      <!-- ================= START PROCEDURE MODAL ================= -->
-      <div id="startProcedureModal"
-        class="fixed inset-0 bg-black/50 flex items-center 
-                       justify-center hidden z-50">
-        <div class="bg-white w-[560px] rounded-2xl 
-                              overflow-hidden shadow-2xl">
+                  $serviceLower = strtolower($serviceLabel);
+                  $badgeClass = 'service-badge-default';
+                  if (str_contains($serviceLower, 'surgery'))    $badgeClass = 'service-badge-surgery';
+                  elseif (str_contains($serviceLower, 'check'))  $badgeClass = 'service-badge-checkup';
+                  elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
+                  elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+                @endphp
 
-          <!-- HEADER -->
-          <div class="bg-green-700 px-8 py-5 text-center">
-            <h2 class="text-xl font-bold text-white">
-              Confirm Procedure Start
-            </h2>
-          </div>
+                <div class="appt-card opacity-75" style="animation-delay: {{ $i * 0.04 }}s">
+                  <div class="grid grid-cols-[1.6fr_1.1fr_1.8fr_1.8fr_1.1fr]
+                    items-center px-5 py-4 gap-2">
 
-          <!-- BODY -->
-          <div class="px-10 py-7 bg-gray-50">
+                    <div>
+                      <p class="text-[13px] font-semibold text-gray-500">{{ $dateLabel }}</p>
+                      <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
+                    </div>
 
-            <p class="text-base font-bold text-gray-900 mb-1 text-center">
-              You are about to begin this appointment's procedure.
-            </p>
-            <p class="text-sm text-gray-500 mb-5 text-center">
-              This will mark the appointment as in progress.
-            </p>
+                    <div>
+                      <span class="time-chip text-gray-400">
+                        <i class="fa-regular fa-clock text-xs"></i>
+                        {{ $timeLabel }}
+                      </span>
+                    </div>
 
-            <!-- Appointment Details card -->
-            <div class="bg-white border border-gray-200 rounded-2xl 
-                                  px-8 py-5 text-center mb-4 shadow-sm">
-              <div class="flex items-center justify-center gap-2 
-                                    text-gray-700 text-sm font-bold mb-3">
-                <i class="fa-regular fa-circle-user text-lg"></i>
-                <span>Appointment Details</span>
-              </div>
+                    <div>
+                      <span class="service-badge {{ $badgeClass }} opacity-70">
+                        {{ $serviceLabel }}
+                      </span>
+                    </div>
 
-              <p class="text-sm text-gray-800">
-                Patient Name: <span class="font-bold" id="startPatientName">Alilah Gomez</span>
-              </p>
+                    <div>
+                      <p class="text-[13px] font-medium text-gray-500">{{ $patientName }}</p>
+                    </div>
 
-              <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">
-                February 2, 2025 | 1:00 PM
-              </p>
-            </div>
+                    <div>
+                      @if($program === '—')
+                        <span class="text-[12px] text-gray-400">—</span>
+                      @else
+                        <span class="inline-block bg-gray-100 text-gray-400 text-[11px] font-medium
+                          px-2.5 py-1 rounded-full border border-gray-200">
+                          {{ $program }}
+                        </span>
+                      @endif
+                    </div>
 
-            <p class="text-xs text-gray-400 mb-5 text-center">
-              This action will be recorded in the patient's treatment history.
-            </p>
-
-            <!-- BUTTONS -->
-            <div class="flex justify-end gap-3">
-              <button onclick="closeStartProcedureModal()"
-                class="px-6 py-2 rounded-lg border border-gray-300 
-                                bg-white text-gray-700 font-semibold
-                                hover:bg-gray-100 transition text-sm shadow-sm">
-                Cancel
-              </button>
-              <button onclick="confirmStartProcedure()"
-                class="px-6 py-2 rounded-lg bg-green-700 
-                                text-white font-semibold hover:bg-green-800 
-                                transition text-sm shadow-sm">
-                Start Procedure
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- ================= CANCEL APPOINTMENT MODAL ================= -->
-      <div id="cancelAppointmentModal"
-        class="fixed inset-0 bg-black/40 flex items-center 
-                      justify-center hidden z-50">
-        <div class="bg-white w-[560px] rounded-2xl 
-                              overflow-hidden shadow-2xl">
-
-          <!-- HEADER -->
-          <div class="bg-[#8b0000] px-8 py-5 text-center">
-            <h2 class="text-xl font-bold text-white">
-              Cancel Appointment
-            </h2>
-          </div>
-
-          <!-- BODY -->
-          <div class="px-10 py-7 bg-gray-50">
-
-            <p class="text-base font-bold text-gray-900 mb-1 text-center">
-              You are about to cancel this appointment.
-            </p>
-            <p class="text-sm text-gray-500 mb-5 text-center">
-              This action cannot be undone.
-            </p>
-
-            <!-- Appointment Details card -->
-            <div class="bg-white border border-gray-200 rounded-2xl 
-                                  px-8 py-5 text-center mb-4 shadow-sm">
-              <div class="flex items-center justify-center gap-2 
-                                    text-gray-700 text-sm font-bold mb-3">
-                <i class="fa-regular fa-calendar-check text-lg"></i>
-                <span>Appointment Details</span>
-              </div>
-
-              <p class="text-sm text-gray-800">
-                Patient Name: <span class="font-bold">
-                  Alilah Gomez</span>
-              </p>
-
-              <p class="text-sm text-gray-600 mt-1">
-                February 2, 2025 | 1:00 PM</p>
-            </div>
-
-            <p class="text-xs text-gray-400 mb-5 text-center">
-              This action will be recorded and cannot be undone.
-            </p>
-
-            <!-- Buttons — right-aligned -->
-            <div class="flex justify-end gap-3">
-              <button onclick="closeCancelAppointmentModal()"
-                class="px-6 py-2 rounded-lg border border-gray-300 
-                                bg-white text-gray-700 font-semibold
-                                hover:bg-gray-100 transition text-sm shadow-sm">
-                Keep Appointment
-              </button>
-              <button onclick="confirmCancelAppointment()"
-                class="px-6 py-2 rounded-lg bg-[#8b0000] text-white 
-                                font-semibold hover:bg-[#6f0000] 
-                                transition text-sm shadow-sm">
-                Cancel Appointment
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ========== PAST SECTION ========== -->
-      <section id="pastSection"
-        class="mt-14 flex justify-center hidden">
-        <div class="w-[1100px]">
-
-          <div class="relative pl-10">
-            <div class="absolute left-[6px] top-[6px] w-[2px] 
-                                  h-[200px] bg-[#8b0000]"></div>
-            <div class="absolute left-[0px] top-[0px] w-3 h-3 
-                                  bg-orange-400 rounded-full"></div>
-
-            <h2 class="text-xl font-semibold text-[#8b0000] mb-6">
-              January
-            </h2>
-
-            <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
-                                  text-[13px] font-semibold text-[#8b0000]
-                                  pb-3 border-b border-gray-400 mb-6 px-8">
-
-              <div></div>
-              <p>Date</p>
-              <p>Time</p>
-              <p>Service</p>
-              <p>Name</p>
-              <p>Program</p>
-            </div>
-
-            <!-- Appointment card -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 px-8 py-5">
-
-              <div class="grid grid-cols-[32px_1.8fr_1.2fr_1.8fr_1.8fr_1.2fr]
-                                    items-center text-[13px] text-[#8b0000]">
-
-
-                <div class="flex justify-center">
-                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                  </div>
                 </div>
-
-                <p class="font-semibold">January 10, 2025</p>
-                <p>—</p>
-                <p>Tooth Extraction</p>
-                <p class="font-semibold">Juan Dela Cruz</p>
-                <p>BSIT</p>
-
-              </div>
+              @endforeach
             </div>
 
           </div>
-        </div>
+        @empty
+          <div class="flex flex-col items-center justify-center py-24 text-gray-400">
+            <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-gray-300"></i>
+            <p class="text-base font-semibold text-gray-500">No past appointments</p>
+            <p class="text-sm mt-1">Completed appointments will appear here.</p>
+          </div>
+        @endforelse
+
       </section>
+
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+  <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10"></footer>
+
+  <!-- ═══════════════════════════════════════════════
+       MODALS — UNCHANGED (logic preserved)
+  ════════════════════════════════════════════════ -->
+
+  <!-- Reschedule Modal -->
+  <div id="rescheduleModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-[9999]">
+    <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
+      <div class="bg-yellow-200 px-8 py-5 text-center">
+        <h2 class="text-xl font-bold text-[#8b0000]">Reschedule Appointment</h2>
+      </div>
+      <div class="px-10 py-7 bg-gray-50">
+        <p class="text-base font-bold text-gray-900 mb-1 text-center">You are about to reschedule this appointment.</p>
+        <p class="text-sm text-gray-500 mb-5 text-center">You will be able to select a new date and time.</p>
+        <div class="bg-white border border-gray-200 rounded-2xl px-8 py-5 text-center mb-4 shadow-sm">
+          <div class="flex items-center justify-center gap-2 text-gray-700 text-sm font-bold mb-3">
+            <i class="fa-regular fa-circle-user text-lg"></i>
+            <span>Appointment Details</span>
+          </div>
+          <p class="text-sm text-gray-800">Patient Name: <span class="font-bold" id="resPatientName">—</span></p>
+          <p class="text-sm text-gray-600 mt-1" id="resAppointmentDate">—</p>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button onclick="closeRescheduleModal()"
+            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">
+            Cancel
+          </button>
+          <button onclick="confirmReschedule()"
+            class="px-6 py-2 rounded-lg bg-yellow-500 text-gray-800 font-semibold hover:bg-yellow-600 transition text-sm shadow-sm">
+            Reschedule
+          </button>
+        </div>
+      </div>
     </div>
-  </footer>
+  </div>
+
+  <!-- Start Procedure Modal -->
+  <div id="startProcedureModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-[9999]">
+    <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
+      <div class="bg-green-700 px-8 py-5 text-center">
+        <h2 class="text-xl font-bold text-white">Confirm Procedure Start</h2>
+      </div>
+      <div class="px-10 py-7 bg-gray-50">
+        <p class="text-base font-bold text-gray-900 mb-1 text-center">You are about to begin this appointment's procedure.</p>
+        <p class="text-sm text-gray-500 mb-5 text-center">This will mark the appointment as in progress.</p>
+        <div class="bg-white border border-gray-200 rounded-2xl px-8 py-5 text-center mb-4 shadow-sm">
+          <div class="flex items-center justify-center gap-2 text-gray-700 text-sm font-bold mb-3">
+            <i class="fa-regular fa-circle-user text-lg"></i>
+            <span>Appointment Details</span>
+          </div>
+          <p class="text-sm text-gray-800">Patient Name: <span class="font-bold" id="startPatientName">—</span></p>
+          <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">—</p>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button onclick="closeStartProcedureModal()"
+            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">
+            Cancel
+          </button>
+          <button onclick="confirmStartProcedure()"
+            class="px-6 py-2 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 transition text-sm shadow-sm">
+            Start Procedure
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Modal -->
+  <div id="cancelAppointmentModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-[9999]">
+    <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
+      <div class="bg-[#8b0000] px-8 py-5 text-center">
+        <h2 class="text-xl font-bold text-white">Cancel Appointment</h2>
+      </div>
+      <div class="px-10 py-7 bg-gray-50">
+        <p class="text-base font-bold text-gray-900 mb-1 text-center">You are about to cancel this appointment.</p>
+        <p class="text-sm text-gray-500 mb-5 text-center">This action cannot be undone.</p>
+        <div class="bg-white border border-gray-200 rounded-2xl px-8 py-5 text-center mb-4 shadow-sm">
+          <div class="flex items-center justify-center gap-2 text-gray-700 text-sm font-bold mb-3">
+            <i class="fa-regular fa-calendar-check text-lg"></i>
+            <span>Appointment Details</span>
+          </div>
+          <p class="text-sm text-gray-800">Patient Name: <span class="font-bold" id="cancelPatientName">—</span></p>
+          <p class="text-sm text-gray-600 mt-1" id="cancelAppointmentDate">—</p>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button onclick="closeCancelAppointmentModal()"
+            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">
+            Keep Appointment
+          </button>
+          <button onclick="confirmCancelAppointment()"
+            class="px-6 py-2 rounded-lg bg-[#8b0000] text-white font-semibold hover:bg-[#6f0000] transition text-sm shadow-sm">
+            Cancel Appointment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // =========================
-    // THEME TOGGLE 
-    // =========================
-    const html = document.documentElement;
-    const themeToggleContainer = document.getElementById("themeToggle");
-    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
+    // ── DARK MODE ──
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const html        = document.documentElement;
 
-    function applyTheme(theme) {
-      html.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
 
-      themeOptions.forEach(option => {
-        if (option.getAttribute("data-theme") === theme) {
-          option.classList.add("active");
-        } else {
-          option.classList.remove("active");
-        }
-      });
-
-      if (theme === "dark") {
-        themeIndicator.classList.add("dark-mode");
-      } else {
-        themeIndicator.classList.remove("dark-mode");
-      }
-    }
-
-    applyTheme(localStorage.getItem("theme") || "light");
-
-    themeOptions.forEach(option => {
-      option.addEventListener("click", () => {
-        const theme = option.getAttribute("data-theme");
-        applyTheme(theme);
-      });
+    themeToggle?.addEventListener('click', () => {
+      const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
     });
 
-    let sidebarOpen = true;
+    function updateThemeIcon(theme) {
+      if (!themeIcon) return;
+      themeIcon.classList.toggle('fa-moon', theme !== 'dark');
+      themeIcon.classList.toggle('fa-sun',  theme === 'dark');
+    }
 
-    function applyLayout(sidebarWidth) {
+    // ── SIDEBAR ──
+    let sidebarOpen = false;
+
+    function applyLayout(w) {
       const sidebar = document.getElementById('sidebar');
       const main = document.getElementById('mainContent');
       sidebar.style.width = sidebarWidth;
@@ -1023,124 +1060,90 @@
       applyLayout('220px');
     });
 
-    const btnUpcoming = document.getElementById("btnUpcoming");
-    const btnPast = document.getElementById("btnPast");
-    const upcomingSection = document.getElementById("upcomingSection");
-    const pastSection = document.getElementById("pastSection");
+    // ── TABS ──
+    const btnUpcoming     = document.getElementById('btnUpcoming');
+    const btnPast         = document.getElementById('btnPast');
+    const upcomingSection = document.getElementById('upcomingSection');
+    const pastSection     = document.getElementById('pastSection');
 
     function setActiveTab(tab) {
-      const isUpcoming = tab === "upcoming";
-
-      // show/hide sections
-      upcomingSection.classList.toggle("hidden", !isUpcoming);
-      pastSection.classList.toggle("hidden", isUpcoming);
-
-      // active styles (match your pill)
-      btnUpcoming.classList.toggle("bg-[#8b0000]", isUpcoming);
-      btnUpcoming.classList.toggle("text-white", isUpcoming);
-      btnUpcoming.classList.toggle("text-white/70", !isUpcoming);
-
-      btnPast.classList.toggle("bg-[#8b0000]", !isUpcoming);
-      btnPast.classList.toggle("text-white", !isUpcoming);
-      btnPast.classList.toggle("text-white/70", isUpcoming);
+      const isUpcoming = tab === 'upcoming';
+      upcomingSection?.classList.toggle('hidden', !isUpcoming);
+      pastSection?.classList.toggle('hidden', isUpcoming);
+      btnUpcoming?.classList.toggle('bg-[#8b0000]', isUpcoming);
+      btnUpcoming?.classList.toggle('text-white',   isUpcoming);
+      btnUpcoming?.classList.toggle('text-white/70',!isUpcoming);
+      btnPast?.classList.toggle('bg-[#8b0000]', !isUpcoming);
+      btnPast?.classList.toggle('text-white',   !isUpcoming);
+      btnPast?.classList.toggle('text-white/70', isUpcoming);
     }
 
-    function openRescheduleModal() {
+    btnUpcoming?.addEventListener('click', () => setActiveTab('upcoming'));
+    btnPast?.addEventListener('click',     () => setActiveTab('past'));
+
+    // ── MODALS ──
+    let selectedApptId = null;
+
+    function openRescheduleModal(btn) {
+      selectedApptId = btn.dataset.id;
+      document.getElementById('resPatientName').textContent    = btn.dataset.name || '—';
+      document.getElementById('resAppointmentDate').textContent = btn.dataset.datetime || '—';
       document.getElementById('rescheduleModal').classList.remove('hidden');
     }
-
     function closeRescheduleModal() {
       document.getElementById('rescheduleModal').classList.add('hidden');
+      selectedApptId = null;
     }
-
     function confirmReschedule() {
-      // redirect or open date-time picker page
-      window.location.href = "/dentist/reschedule";
-      // or show another modal
+      window.location.href = `/dentist/appointments/${selectedApptId}/reschedule`;
     }
 
-    function openStartProcedureModal() {
+    function openStartProcedureModal(btn) {
+      selectedApptId = btn.dataset.id;
+      document.getElementById('startPatientName').textContent    = btn.dataset.name || '—';
+      document.getElementById('startAppointmentDate').textContent = btn.dataset.datetime || '—';
       document.getElementById('startProcedureModal').classList.remove('hidden');
-      document.getElementById('patientNameInput').focus();
     }
-
     function closeStartProcedureModal() {
       document.getElementById('startProcedureModal').classList.add('hidden');
-      document.getElementById('patientNameInput').value = '';
+      selectedApptId = null;
     }
-
     function confirmStartProcedure() {
-      const patientName = document.getElementById('patientNameInput').value.trim();
-
-      if (!patientName) {
-        alert("Please enter the patient name.");
-        return;
-      }
-
-      // 🔧 Replace this with real logic (API / redirect / form submit)
-      alert("Starting procedure for: " + patientName);
+      window.location.href = `/dentist/appointments/${selectedApptId}/start`;
     }
 
-    function openCancelAppointmentModal() {
+    function openCancelAppointmentModal(btn) {
+      selectedApptId = btn.dataset.id;
+      document.getElementById('cancelPatientName').textContent    = btn.dataset.name || '—';
+      document.getElementById('cancelAppointmentDate').textContent = btn.dataset.datetime || '—';
       document.getElementById('cancelAppointmentModal').classList.remove('hidden');
     }
-
     function closeCancelAppointmentModal() {
       document.getElementById('cancelAppointmentModal').classList.add('hidden');
+      selectedApptId = null;
     }
-
     function confirmCancelAppointment() {
-      // Replace with real cancel logic (API / Laravel route)
-      alert("Appointment cancelled.");
-      closeCancelAppointmentModal();
+      window.location.href = `/dentist/appointments/${selectedApptId}/cancel`;
     }
-    btnUpcoming.addEventListener("click", () => setActiveTab("upcoming"));
-    btnPast.addEventListener("click", () => setActiveTab("past"));
 
-    // NOTIFICATION
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("notifBtn");
-      const menu = document.getElementById("notifMenu");
+    // ── NOTIFICATION DROPDOWN ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn  = document.getElementById('notifBtn');
+      const menu = document.getElementById('notifMenu');
+      if (!btn || !menu) return;
 
       let isOpen = false;
+      const openMenu  = () => { isOpen = true;  menu.classList.remove('notif-close'); menu.classList.add('notif-open'); };
+      const closeMenu = () => { isOpen = false; menu.classList.remove('notif-open');  menu.classList.add('notif-close'); };
 
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
+      btn.addEventListener('click', (e) => { e.stopPropagation(); isOpen ? closeMenu() : openMenu(); });
+      menu.addEventListener('click', (e) => e.stopPropagation());
+      document.addEventListener('click', () => { if (isOpen) closeMenu(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen) closeMenu(); });
 
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
-
-      // Toggle when clicking bell
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      // Keep open when clicking inside menu
-      menu.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      // Close when clicking outside
-      document.addEventListener("click", () => {
-        if (isOpen) closeMenu();
-      });
-
-      // Close on ESC
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen) closeMenu();
-      });
-
-      // Start closed
       closeMenu();
     });
   </script>
-</body>
 
+</body>
 </html>

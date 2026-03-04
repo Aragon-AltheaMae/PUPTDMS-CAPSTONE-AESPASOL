@@ -19,9 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Inter';
-    }
+    body { font-family: 'Inter'; }
 
     /* Fade-in animation */
     @keyframes fadeIn {
@@ -106,7 +104,6 @@
       transform: scale(1) !important;
       pointer-events: auto !important;
     }
-
     .notif-close {
       opacity: 0 !important;
       transform: scale(0.95) !important;
@@ -271,6 +268,9 @@
       background-color: #000D1A;
       color: #E5E7EB;
     }
+    [data-theme="dark"] #sidebar { background-color: #1F2933; }
+    [data-theme="dark"] .bg-white { background-color: #1F2937 !important; }
+    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
 
     [data-theme="dark"] #sidebar {
       background-color: #000D1A;
@@ -279,9 +279,13 @@
     [data-theme="dark"] .bg-white {
       background-color: #000D1A !important;
     }
-
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
+    .filter-radio::after{
+      content:"";
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background: #8B1A1A;
+      display: none;
     }
 
     [data-theme="dark"] .theme-toggle-container {
@@ -321,6 +325,11 @@
       </div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
+    <div class="w-12 rounded-full">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+    </div>
+    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  </div>
 
     <div class="flex items-center gap-8">
       @php
@@ -586,21 +595,174 @@
     </div>
   </aside>
 
-  <!-- ================= MAIN ================= -->
-  <main
-    id="mainContent"
-    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto">
 
-    <div class="max-w-7xl mt-4 mx-auto fade-in">
-      <div class="bg-white rounded-xl shadow p-6">
+      <!-- Sort -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Sort</div>
 
-        <!-- TOOLBAR -->
-        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-          <!-- Gradient Border Wrapper -->
-          <div class="p-[2px] rounded-full bg-gradient-to-r from-[#660000] to-[#FFD700] w-72">
-            <!-- Inner Container -->
-            <div class="flex items-center bg-white rounded-full px-4 py-2">
-              <i class="fa fa-search text-[#660000]"></i>
+        <div class="flex flex-col gap-4">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_sort" value="az">
+            <span class="filter-radio"></span>
+            A-Z
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_sort" value="za">
+            <span class="filter-radio"></span>
+            Z-A
+          </label>
+        </div>
+      </div>
+
+      <!-- Date Received -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Date Received</div>
+
+        <div class="flex items-start gap-6 flex-wrap">
+          <div class="flex flex-col gap-2">
+            <span class="text-[15px] text-[#333]">From:</span>
+            <input id="fp_dateFrom" type="date" class="filter-date">
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <span class="text-[15px] text-[#333]">To:</span>
+            <input id="fp_dateTo" type="date" class="filter-date">
+          </div>
+
+          <div class="flex flex-col gap-4 pt-9">
+            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="asc">
+              <span class="filter-radio"></span>
+              Ascending
+            </label>
+
+            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="desc">
+              <span class="filter-radio"></span>
+              Descending
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item Type -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Item Type</div>
+
+        <div class="flex gap-14 flex-wrap">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_itemType" value="medicine">
+            <span class="filter-radio"></span>
+            Medicine
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_itemType" value="supplies">
+            <span class="filter-radio"></span>
+            Dental Supplies
+          </label>
+        </div>
+      </div>
+
+      <!-- Stock Level -->
+      <div class="px-7 py-7 border-b">
+        <div class="text-[15px] text-[#555] mb-5">Stock Level</div>
+
+        <div class="flex gap-14 flex-wrap">
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_stock" value="low-high">
+            <span class="filter-radio"></span>
+            Lowest to Highest
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
+            <input class="filter-input hidden" type="radio" name="fp_stock" value="high-low">
+            <span class="filter-radio"></span>
+            Highest to Lowest
+          </label>
+        </div>
+      </div>
+
+    </div> <!-- ✅ CLOSE SCROLLABLE CONTENT HERE -->
+
+    <!-- Footer (STICKY / NOT SCROLLING) -->
+    <div class="px-7 py-4 border-t flex items-center justify-between bg-white shrink-0">
+      <button type="button" onclick="clearFilterPanel()"
+        class="bg-transparent border-none font-semibold text-[16px]"
+        style="color:#8B1A1A;">
+        Clear
+      </button>
+
+      <button type="button" onclick="saveFilterPanel()"
+        class="btn border-none"
+        style="background:#8B1A1A; color:white; border-radius:8px; padding:12px 52px; font-weight:600;">
+        Save
+      </button>
+    </div>
+
+  </div>
+</dialog>
+
+<!-- ADD MODAL -->
+<dialog id="addModal" class="modal">
+  <div class="modal-box max-w-xl bg-white rounded-lg">
+
+    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
+      Add Inventory Item
+    </h3>
+
+    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
+
+      <!-- CATEGORY -->
+      <label class="text-sm text-[#8B0000]">Category</label>
+      <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
+        <option disabled selected>Select Category</option>
+        <option value="Medicine">Medicine</option>
+        <option value="Supplies">Supplies</option>
+      </select>
+
+      <!-- DATE -->
+      <label class="text-sm text-[#8B0000]">Date Received</label>
+      <input
+        id="addDate"
+        type="date"
+        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+      />
+
+      <!-- STOCK -->
+      <label class="text-sm text-[#8B0000]">Stock Number</label>
+      <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
+
+      <!-- NAME -->
+      <label class="text-sm text-[#8B0000]">Supply Name</label>
+      <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
+        placeholder="ex. Nitrile Gloves Large">
+
+      <!-- UNIT -->
+      <label class="text-sm text-[#8B0000]">Units</label>
+      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+        placeholder="e.g. Box / Pack / Bottle / Piece">
+
+      <!-- QTY -->
+      <label class="text-sm text-[#8B0000]">Quantity</label>
+      <input id="addQty" type="number"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+        oninput="computeAddBalance()">
+
+      <!-- USED -->
+      <label class="text-sm text-[#8B0000]">Consumed</label>
+      <input id="addUsed" type="number"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+        oninput="computeAddBalance()">
+
+      <!-- BALANCE -->
+      <label class="text-sm text-[#8B0000]">Balance</label>
+      <input id="addBalance"
+        class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
+        readonly>
 
               <input id="searchInput" class="ml-3 outline-none w-full text-sm
         bg-white text-gray-800 placeholder-gray-400"
@@ -771,15 +933,10 @@
           placeholder="e.g. Box / Pack / Bottle / Piece">
 
 
-        <label>Quantity</label>
-        <input id="editQty" type="number"
-          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-          oninput="computeEditBalance()">
-
-        <label>Consumed</label>
-        <input id="editUsed" type="number"
-          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-          oninput="computeEditBalance()">
+      <label>Quantity</label>
+      <input id="editQty" type="number"
+        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+        oninput="computeEditBalance()">
 
         <label>Balance</label>
         <input id="editBalance"
@@ -796,18 +953,18 @@
     </div>
   </dialog>
 
-  <!-- DELETE CONFIRMATION MODAL -->
-  <dialog id="deleteModal" class="modal">
-    <div class="modal-box max-w-md bg-white rounded-lg text-center">
+  </div>
+</dialog>
 
-      <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
-      <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
+<!-- DELETE CONFIRMATION MODAL -->
+<dialog id="deleteModal" class="modal">
+  <div class="modal-box max-w-md bg-white rounded-lg text-center">
+    <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
+    <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
 
-      <div class="modal-action justify-center gap-4">
-        <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
-        <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
-      </div>
-
+    <div class="modal-action justify-center gap-4">
+      <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
+      <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
     </div>
   </dialog>
 
@@ -1007,17 +1164,8 @@
 
       let isOpen = false;
 
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
-
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
+  } else {
+    applyLayout('72px');
 
       // Toggle when clicking bell
       btn.addEventListener("click", (e) => {
@@ -1046,22 +1194,85 @@
 
     let inventory = [];
 
-    async function loadInventory() {
-      const res = await fetch('/dentist/inventory/data');
-      inventory = await res.json();
-      renderTable();
-    }
-    loadInventory();
+    toggleBtn.classList.remove('translate-x-2');
+    icon.classList.replace('fa-xmark', 'fa-bars');
+  }
+}
 
-    let deleteId = null;
+// ✅ INITIAL STATE SYNC (CRITICAL FIX)
+document.addEventListener('DOMContentLoaded', () => {
+  sidebarOpen = false;
+  applyLayout('72px');
+});
 
-    function deleteItem(id) {
-      deleteId = id;
-      deleteModal.showModal();
-    }
+/* =========================
+   INVENTORY DATA LOAD
+let inventory = [];
 
-    document.getElementById("confirmDeleteBtn").onclick = async () => {
-      if (!deleteId) return;
+async function loadInventory() {
+  const res = await fetch('/dentist/inventory/data', { cache: 'no-store' });
+
+  // if backend accidentally returns HTML (like login page), this prevents silent failure
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    console.error("Inventory data is not JSON. Check if route is protected or returning HTML.");
+    return;
+  }
+
+  inventory = await res.json();
+  renderTable();
+}
+loadInventory();
+
+async function addItem() {
+  if (
+    addCategory.selectedIndex === 0 ||
+    !addDate.value ||
+    !addStock.value ||
+    !addName.value ||
+    !addUnit.value ||
+    addQty.value === ''
+  ) {
+    alert('Please complete all required fields.');
+    return;
+  }
+
+  const res = await fetch('/dentist/inventory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json' // ✅ important: prevents Laravel from redirecting
+    },
+    body: JSON.stringify({
+      category: addCategory.value,
+      date_received: addDate.value,
+      stock_no: addStock.value.trim(),
+      name: addName.value.trim(),
+      unit: addUnit.value.trim(),
+      qty: Number(addQty.value),
+      used: Number(addUsed.value || 0)
+    })
+  });
+
+  if (!res.ok) {
+    // Laravel validation errors will be JSON if Accept is application/json
+    const text = await res.text();
+    console.error("ADD FAILED:", text);
+    alert("Add failed — check console");
+    return;
+  }
+
+  addModal.close();
+  resetAddForm();
+
+  // ✅ make sure UI refresh happens AFTER the DB is updated
+  await loadInventory();
+}
+
+/* =========================
+   DELETE
+let deleteId = null;
 
       await fetch(`/dentist/inventory/${deleteId}`, {
         method: 'DELETE',
@@ -1077,73 +1288,162 @@
       loadInventory();
     };
 
-    let editIndex = null;
+  await fetch(`/dentist/inventory/${deleteId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    }
+  });
 
     const emptyState = document.getElementById("emptyState");
 
-    function renderTable() {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
+/* =========================
+   FILTER PANEL STATE (NEW)
+const activeFilters = {
+  sort: "",        // "az" | "za"
+  dateFrom: "",
+  dateTo: "",
+  dateOrder: "",   // "asc" | "desc"
+  itemType: "",    // "medicine" | "supplies"
+  stock: ""        // "low-high" | "high-low"
+};
 
-      let data = [...inventory];
+function openFilterModal() {
+  // sync UI with activeFilters before opening
+  setRadioByNameValue("fp_sort", activeFilters.sort);
+  setRadioByNameValue("fp_dateOrder", activeFilters.dateOrder);
+  setRadioByNameValue("fp_itemType", activeFilters.itemType);
+  setRadioByNameValue("fp_stock", activeFilters.stock);
+
+  document.getElementById("fp_dateFrom").value = activeFilters.dateFrom || "";
+  document.getElementById("fp_dateTo").value = activeFilters.dateTo || "";
+
+  filterModal.showModal();
+}
+
+function setRadioByNameValue(name, value) {
+  const radios = document.querySelectorAll(`input[name="${name}"]`);
+  radios.forEach(r => r.checked = (value && r.value === value));
+  if (!value) radios.forEach(r => r.checked = false);
+}
+
+function getCheckedValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : "";
+}
+
+function clearFilterPanel() {
+  // clear modal fields
+  setRadioByNameValue("fp_sort", "");
+  setRadioByNameValue("fp_dateOrder", "");
+  setRadioByNameValue("fp_itemType", "");
+  setRadioByNameValue("fp_stock", "");
+  document.getElementById("fp_dateFrom").value = "";
+  document.getElementById("fp_dateTo").value = "";
+
+  // clear active filters immediately
+  activeFilters.sort = "";
+  activeFilters.dateFrom = "";
+  activeFilters.dateTo = "";
+  activeFilters.dateOrder = "";
+  activeFilters.itemType = "";
+  activeFilters.stock = "";
+
+  filterModal.close();
+  renderTable();
+}
+
+function saveFilterPanel() {
+  activeFilters.sort = getCheckedValue("fp_sort");
+  activeFilters.dateOrder = getCheckedValue("fp_dateOrder");
+  activeFilters.itemType = getCheckedValue("fp_itemType");
+  activeFilters.stock = getCheckedValue("fp_stock");
+
+  activeFilters.dateFrom = document.getElementById("fp_dateFrom").value || "";
+  activeFilters.dateTo = document.getElementById("fp_dateTo").value || "";
+
+  filterModal.close();
+  renderTable();
+}
+
+/* =========================
+   TABLE RENDER
+const emptyState = document.getElementById("emptyState");
 
       const show = showSelect.value;
 
-      if (show === "medicine") {
-        data = data.filter(item => item.category === "Medicine");
-      }
+  let data = [...inventory];
 
-      if (show === "supplies") {
-        data = data.filter(item => item.category === "Supplies");
-      }
+  // Item Type filter
+  if (activeFilters.itemType === "medicine") {
+    data = data.filter(item => item.category === "Medicine");
+  }
+  if (activeFilters.itemType === "supplies") {
+    data = data.filter(item => item.category === "Supplies");
+  }
 
-      const search = searchInput.value.toLowerCase();
-      if (search) {
-        data = data.filter(i =>
-          i.stock_no.toLowerCase().includes(search) ||
-          i.name.toLowerCase().includes(search)
-        );
-      }
+  // Search
+  const search = searchInput.value.toLowerCase();
+  if (search) {
+    data = data.filter(i =>
+      String(i.stock_no || "").toLowerCase().includes(search) ||
+      String(i.name || "").toLowerCase().includes(search)
+    );
+  }
 
-      const sort = sortSelect.value;
-      switch (sort) {
-        case "qty_asc":
-          // Quantity (lowest → highest)
-          data.sort((a, b) => Number(a.qty) - Number(b.qty));
-          break;
+  // Date range filter (by date_received)
+  const from = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null;
+  const to = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null;
 
-        case "alphabetical":
-          // Alphabetical by supply / medicine name
-          data.sort((a, b) => a.name.localeCompare(b.name));
-          break;
+  if (from) from.setHours(0,0,0,0);
+  if (to)   to.setHours(23,59,59,999);
 
-        case "date_received":
-          // Date received (oldest → newest)
-          data.sort((a, b) => new Date(a.date_received) - new Date(b.date_received));
-          break;
+  if (from) data = data.filter(i => i.date_received && new Date(i.date_received) >= from);
+  if (to)   data = data.filter(i => i.date_received && new Date(i.date_received) <= to);
 
-        default:
-          // Default order (do nothing)
-          break;
-      }
+  // Sorting (priority: Stock Level > Sort A-Z/Z-A > Date Order)
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const toTime = (v) => {
+    if (!v) return 0;
+    const t = new Date(v).getTime();
+    return Number.isFinite(t) ? t : 0;
+  };
 
-      if (data.length === 0) {
-        emptyState.classList.remove("hidden");
-        return;
-      } else {
-        emptyState.classList.add("hidden");
-      }
+  if (activeFilters.stock === "low-high") {
+    data.sort((a,b) => toNum(a.qty) - toNum(b.qty));
+  } else if (activeFilters.stock === "high-low") {
+    data.sort((a,b) => toNum(b.qty) - toNum(a.qty));
+  } else if (activeFilters.sort === "az") {
+    data.sort((a,b) => String(a.name || "").localeCompare(String(b.name || "")));
+  } else if (activeFilters.sort === "za") {
+    data.sort((a,b) => String(b.name || "").localeCompare(String(a.name || "")));
+  } else if (activeFilters.dateOrder === "asc") {
+    data.sort((a,b) => toTime(a.date_received) - toTime(b.date_received));
+  } else if (activeFilters.dateOrder === "desc") {
+    data.sort((a,b) => toTime(b.date_received) - toTime(a.date_received));
+  }
 
-      data.forEach((item, index) => {
-        const balance = item.qty - item.used;
-        tbody.innerHTML += `
-    <tr class="text-gray-800"> <!-- sets the font color -->
-        <td class="text-[#333333]">${item.formatted_date}</td>
-        <td class="text-[#333333]">${item.stock_no}</td>
-        <td class="text-[#333333]">${item.name}</td>
-        <td class="text-[#333333]">${item.unit}</td>
-        <td class="text-[#333333]">${item.qty}</td>
-        <td class="text-[#333333]">${item.used}</td>
+  if (data.length === 0) {
+    emptyState.classList.remove("hidden");
+    return;
+  } else {
+    emptyState.classList.add("hidden");
+  }
+
+  data.forEach((item) => {
+    const balance = toNum(item.qty) - toNum(item.used);
+
+    tbody.innerHTML += `
+      <tr class="text-gray-800">
+        <td class="text-[#333333]">${item.formatted_date ?? ''}</td>
+        <td class="text-[#333333]">${item.stock_no ?? ''}</td>
+        <td class="text-[#333333]">${item.name ?? ''}</td>
+        <td class="text-[#333333]">${item.unit ?? ''}</td>
+        <td class="text-[#333333]">${item.qty ?? 0}</td>
+        <td class="text-[#333333]">${item.used ?? 0}</td>
         <td class="text-[#333333]">${balance}</td>
         <td class="flex justify-center gap-2">
           <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
@@ -1156,138 +1456,167 @@
           </button>
         </td>
       </tr>`;
-      });
-    }
+  });
+}
 
-    function resetAddForm() {
-      addCategory.selectedIndex = 0;
-      addDate.value = '';
-      addStock.value = '';
-      addName.value = '';
-      addUnit.value = '';
-      addQty.value = '';
-      addUsed.value = '';
-      addBalance.value = '';
-    }
+/* =========================
+   ADD
+function resetAddForm() {
+  addCategory.selectedIndex = 0;
+  addDate.value = '';
+  addStock.value = '';
+  addName.value = '';
+  addUnit.value = '';
+  addQty.value = '';
+  addUsed.value = '';
+  addBalance.value = '';
+}
 
-    async function addItem() {
-      if (
-        addCategory.selectedIndex === 0 ||
-        addUnit.selectedIndex === 0 ||
-        !addDate.value ||
-        !addStock.value ||
-        !addName.value ||
-        !addUnit.value ||
-        addQty.value === ''
-      ) {
-        alert('Please complete all required fields.');
-        return;
-      }
+async function addItem() {
+  if (
+    addCategory.selectedIndex === 0 ||
+    !addDate.value ||
+    !addStock.value ||
+    !addName.value ||
+    !addUnit.value ||
+    addQty.value === ''
+  ) {
+    alert('Please complete all required fields.');
+    return;
+  }
 
-      const res = await fetch('/dentist/inventory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute('content')
-        },
-        body: JSON.stringify({
-          category: addCategory.value,
-          date_received: addDate.value,
-          stock_no: addStock.value.trim(),
-          name: addName.value.trim(),
-          unit: addUnit.value,
-          qty: Number(addQty.value),
-          used: Number(addUsed.value || 0)
-        })
-      });
+  const res = await fetch('/dentist/inventory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify({
+      category: addCategory.value,
+      date_received: addDate.value,
+      stock_no: addStock.value.trim(),
+      name: addName.value.trim(),
+      unit: addUnit.value,
+      qty: Number(addQty.value),
+      used: Number(addUsed.value || 0)
+    })
+  });
 
-      if (!res.ok) {
-        const err = await res.json();
-        console.error(err);
-        alert(Object.values(err.errors).join('\n'));
-        return;
-      }
+  if (!res.ok) {
+    const err = await res.json();
+    console.error(err);
+    alert(Object.values(err.errors).join('\n'));
+    return;
+  }
 
-      addModal.close();
-      resetAddForm();
-      loadInventory();
-    }
+  addModal.close();
+  resetAddForm();
+  loadInventory();
+}
 
-    let editId = null;
+/* =========================
+   EDIT
+let editId = null;
 
-    function openEdit(id) {
-      editId = id;
-      const i = inventory.find(item => item.id === id);
-      if (!i) return;
+function openEdit(id) {
+  editId = id;
+  const i = inventory.find(item => item.id === id);
+  if (!i) return;
 
-      editCategory.value = i.category;
-      editStock.value = i.stock_no;
-      editName.value = i.name;
-      editUnit.value = i.unit;
-      editQty.value = i.qty;
-      editUsed.value = i.used;
-      editDate.value = i.date_received?.slice(0, 10);
+  editCategory.value = i.category;
+  editStock.value = i.stock_no;
+  editName.value = i.name;
+  editUnit.value = i.unit;
+  editQty.value = i.qty;
+  editUsed.value = i.used;
+  editDate.value = i.date_received?.slice(0, 10);
 
-      computeEditBalance();
-      editModal.showModal();
-    }
+  computeEditBalance();
+  editModal.showModal();
+}
 
-    async function saveEdit() {
-      if (!editId) return;
+async function saveEdit() {
+  if (!editId) return;
 
-      const res = await fetch(`/dentist/inventory/${editId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute('content')
-        },
-        body: JSON.stringify({
-          category: editCategory.value,
-          date_received: editDate.value,
-          stock_no: editStock.value,
-          name: editName.value,
-          unit: editUnit.value,
-          qty: Number(editQty.value),
-          used: Number(editUsed.value)
-        })
-      });
+  const res = await fetch(`/dentist/inventory/${editId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify({
+      category: editCategory.value,
+      date_received: editDate.value,
+      stock_no: editStock.value,
+      name: editName.value,
+      unit: editUnit.value,
+      qty: Number(editQty.value),
+      used: Number(editUsed.value)
+    })
+  });
 
-      if (!res.ok) {
-        const err = await res.text();
-        console.error(err);
-        alert('EDIT FAILED — check console');
-        return;
-      }
+  if (!res.ok) {
+    const err = await res.text();
+    console.error(err);
+    alert('EDIT FAILED — check console');
+    return;
+  }
 
-      editModal.close();
-      editId = null;
-      loadInventory();
-    }
+  editModal.close();
+  editId = null;
+  loadInventory();
+}
 
-    function computeAddBalance() {
-      const qty = Number(addQty.value || 0);
-      const used = Number(addUsed.value || 0);
-      addBalance.value = qty - used;
-    }
+/* =========================
+   BALANCE
+function computeAddBalance() {
+  const qty = Number(addQty.value || 0);
+  const used = Number(addUsed.value || 0);
+  addBalance.value = qty - used;
+}
 
-    function computeEditBalance() {
-      editBalance.value =
-        Number(editQty.value || 0) - Number(editUsed.value || 0);
-    }
+function computeEditBalance() {
+  editBalance.value = Number(editQty.value || 0) - Number(editUsed.value || 0);
+}
 
-    function formatDateMMDDYY(dateStr) {
-      const d = new Date(dateStr);
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      const yy = String(d.getFullYear()).slice(-2);
-      return `${mm}/${dd}/${yy}`;
-    }
-  </script>
+/* =========================
+   NOTIFICATION
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("notifBtn");
+  const menu = document.getElementById("notifMenu");
+
+  let isOpen = false;
+
+  function openMenu() {
+    isOpen = true;
+    menu.classList.remove("notif-close");
+    menu.classList.add("notif-open");
+  }
+
+  function closeMenu() {
+    isOpen = false;
+    menu.classList.remove("notif-open");
+    menu.classList.add("notif-close");
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  menu.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("click", () => {
+    if (isOpen) closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen) closeMenu();
+  });
+
+  closeMenu();
+});
+</script>
 
 </body>
-
 </html>

@@ -14,7 +14,6 @@ use App\Models\Patient;
 
 class AppointmentController extends Controller
 {
-    // Max appointments per day before marking as "Full Schedule"
     const MAX_APPOINTMENTS_PER_DAY = 5;
 
     /* =======================
@@ -30,34 +29,29 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // Get all appointments with relationships
         $appointments = Appointment::with([
-            'dentalHistory',
-            'medicalHistory',
-            'medicalHistory.conditions'
-        ])
+                'dentalHistory',
+                'medicalHistory',
+                'medicalHistory.conditions'
+            ])
             ->where('patient_id', $patient->id)
             ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // Count appointments per day for calendar availability
         $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
+        $unavailableDates = [];
 
-        // Unavailable dates (weekends are handled in JavaScript)
-        $unavailableDates = []; // Add your custom unavailable dates here if needed
-
-        // Philippine Holidays - using the helper method
         $currentYear = now()->year;
         $philippineHolidays = [];
         for ($year = $currentYear; $year <= $currentYear + 4; $year++) {
             $philippineHolidays = array_merge($philippineHolidays, $this->getPhilippineHolidays($year));
         }
 
-        // Notifications (if you have any)
         $notifications = [];
 
         return view('appointment', compact(
@@ -83,19 +77,6 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-        //     ->whereIn('status', ['pending', 'approved'])
-        //     ->exists();
-
-        // if ($hasActiveAppointment) {
-        //     return redirect()->back()->with([
-        //         'activeAppointmentModal' => true,
-        //         'activeAppointmentMsg' =>
-        //         "You already have an active appointment. Please wait until it is completed before booking another one."
-        //     ]);
-        // }
-
-        // Also pass calendar data to the booking form if needed
         $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -106,14 +87,13 @@ class AppointmentController extends Controller
             ->get()
             ->groupBy('appointment_date')
             ->map(function ($rows) {
-                // output: ["1:00 PM" => 1, "2:00 PM" => 1, ...]
+                // keys are "H:i:s" because DB is TIME
                 return $rows->pluck('count', 'appointment_time');
             })
             ->toArray();
 
         $unavailableDates = [];
 
-        // Philippine Holidays - using the helper method
         $currentYear = now()->year;
         $philippineHolidays = array_merge(
             $this->getPhilippineHolidays($currentYear),
@@ -135,43 +115,43 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'appointment_date'   => 'required|date',
-            'appointment_time'   => 'required',
-            'service_type'       => 'required|string|max:50',
-            'other_services' => 'required_if:service_type,Others|nullable|string|max:50',
+            'appointment_date'     => 'required|date',
+            'appointment_time'     => 'required|string', // "1:00 PM"
+            'service_type'         => 'required|string|max:50',
+            'service_others_text'  => 'required_if:service_type,Others|nullable|string|max:100',
 
-            'emergency_person'   => 'required|max:50',
-            'emergency_number'   => 'required|max:15',
-            'emergency_relation' => 'required',
+            'emergency_person'     => 'required|string|max:50',
+            'emergency_number'     => 'required|string|max:15',
+            'emergency_relation'   => 'required|string',
 
-            'patient_signature'  => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
+            'patient_signature'    => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         $patientId = session('patient_id');
+        if (!$patientId) {
+            return redirect()->route('login')->with('error', 'Please login first!');
+        }
 
-        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-        //     ->whereIn('status', ['pending', 'approved'])
-        //     ->exists();
+        // Convert UI "1:00 PM" -> DB TIME "13:00:00"
+        try {
+            $mysqlTime = $this->toMysqlTime($request->appointment_time);
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Invalid time format. Please pick a valid time slot.');
+        }
 
-        // if ($hasActiveAppointment) {
-        //     return redirect()->route('homepage')->with([
-        //         'activeAppointmentModal' => true,
-        //         'activeAppointmentMsg' => "You already have an active appointment. Please wait until it's marked Done or Cancelled before booking another one."
-        //     ]);
-        // }
-
-        // Check if the selected date is already fully booked
-        $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
-            ->count();
-
+        // Full day check
+        $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)->count();
         if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
         }
 
+        // Slot check (must match DB TIME)
         $timeTaken = Appointment::where('appointment_date', $request->appointment_date)
-            ->where('appointment_time', $request->appointment_time)
+            ->where('appointment_time', $mysqlTime)
             ->exists();
 
         if ($timeTaken) {
@@ -180,58 +160,51 @@ class AppointmentController extends Controller
                 ->with('error', 'Sorry, that time slot was already taken. Please choose another time.');
         }
 
-        $signaturePath = $request->file('patient_signature')
-            ->store('signatures', 'public');
+        $signaturePath = $request->file('patient_signature')->store('signatures', 'public');
 
-        /* ---------- DATABASE TRANSACTION ---------- */
-        DB::transaction(function () use ($request, $signaturePath) {
+        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId) {
 
-            /* =======================
-               APPOINTMENT
-            ======================= */
             $appointment = Appointment::create([
-                'patient_id'       => session('patient_id'),
+                'patient_id'       => $patientId,
                 'service_type'     => $request->service_type,
-                'other_services' => $request->service_type === 'Others'
-                    ? trim($request->service_others_text)
+                'other_services'   => $request->service_type === 'Others'
+                    ? trim($request->service_others_text ?? '')
                     : null,
                 'appointment_date' => $request->appointment_date,
-                'appointment_time' => $request->appointment_time,
+                'appointment_time' => $mysqlTime,
                 'status'           => 'pending',
             ]);
 
-            /* =======================
-               DENTAL HISTORY (ENUM YES/NO)
-            ======================= */
+            // DENTAL HISTORY: store ENUM 'YES'/'NO'
             DentalHistory::create([
                 'appointment_id' => $appointment->id,
 
                 'last_dental_visit' => $request->last_dental_visit,
                 'previous_dentist'  => $request->previous_dentist,
 
-                'bleeding_gums'      => strtoupper($request->bleeding_gums),
-                'sensitive_temp'     => strtoupper($request->sensitive_temp),
-                'sensitive_taste'    => strtoupper($request->sensitive_taste),
-                'tooth_pain'         => strtoupper($request->tooth_pain),
-                'sores'              => strtoupper($request->sores),
-                'injuries'           => strtoupper($request->injuries),
+                'bleeding_gums'      => $this->yesNoValue($request->bleeding_gums),
+                'sensitive_temp'     => $this->yesNoValue($request->sensitive_temp),
+                'sensitive_taste'    => $this->yesNoValue($request->sensitive_taste),
+                'tooth_pain'         => $this->yesNoValue($request->tooth_pain),
+                'sores'              => $this->yesNoValue($request->sores),
+                'injuries'           => $this->yesNoValue($request->injuries),
 
-                'clicking'           => strtoupper($request->clicking),
-                'joint_pain'         => strtoupper($request->joint_pain),
-                'difficulty_moving'  => strtoupper($request->difficulty_moving),
-                'difficulty_chewing' => strtoupper($request->difficulty_chewing),
-                'jaw_headaches'      => strtoupper($request->jaw_headaches),
-                'clench_grind'       => strtoupper($request->clench_grind),
-                'biting'             => strtoupper($request->biting),
-                'teeth_loosening'    => strtoupper($request->teeth_loosening),
-                'food_teeth'         => strtoupper($request->food_teeth),
-                'med_reaction'       => strtoupper($request->med_reaction),
+                'clicking'           => $this->yesNoValue($request->clicking),
+                'joint_pain'         => $this->yesNoValue($request->joint_pain),
+                'difficulty_moving'  => $this->yesNoValue($request->difficulty_moving),
+                'difficulty_chewing' => $this->yesNoValue($request->difficulty_chewing),
+                'jaw_headaches'      => $this->yesNoValue($request->jaw_headaches),
+                'clench_grind'       => $this->yesNoValue($request->clench_grind),
+                'biting'             => $this->yesNoValue($request->biting),
+                'teeth_loosening'    => $this->yesNoValue($request->teeth_loosening),
+                'food_teeth'         => $this->yesNoValue($request->food_teeth),
+                'med_reaction'       => $this->yesNoValue($request->med_reaction),
 
-                'periodontal'        => strtoupper($request->periodontal),
-                'difficult_extraction' => strtoupper($request->difficult_extraction),
-                'prolonged_bleeding' => strtoupper($request->prolonged_bleeding),
-                'dentures'           => strtoupper($request->dentures),
-                'ortho_treatment'    => strtoupper($request->ortho_treatment),
+                'periodontal'          => $this->yesNoValue($request->periodontal),
+                'difficult_extraction' => $this->yesNoValue($request->difficult_extraction),
+                'prolonged_bleeding'   => $this->yesNoValue($request->prolonged_bleeding),
+                'dentures'             => $this->yesNoValue($request->dentures),
+                'ortho_treatment'      => $this->yesNoValue($request->ortho_treatment),
 
                 'extraction_date'    => $request->extraction_date,
                 'dentures_date'      => $request->dentures_date,
@@ -240,86 +213,109 @@ class AppointmentController extends Controller
                 'additional_concerns' => $request->additional_concerns,
             ]);
 
-            /* =======================
-               MEDICAL HISTORY (ENUM YES/NO)
-            ======================= */
+            // MEDICAL HISTORY: store ENUM 'YES'/'NO'
             $medicalHistory = MedicalHistory::create([
                 'appointment_id' => $appointment->id,
 
-                'good_health' => strtoupper($request->good_health),
+                'good_health'         => $this->yesNoValue($request->good_health),
                 'good_health_details' => $request->good_health_details,
-                'medical_exam_date' => $request->medical_exam_date,
+                'medical_exam_date'   => $request->medical_exam_date,
 
-                'under_treatment' => strtoupper($request->under_treatment),
-                'treatment_details' => $request->treatment_details,
+                'under_treatment'     => $this->yesNoValue($request->under_treatment),
+                'treatment_details'   => $request->treatment_details,
 
-                'hospitalized' => strtoupper($request->hospitalized),
-                'hospital_details' => $request->hospital_details,
+                'hospitalized'        => $this->yesNoValue($request->hospitalized),
+                'hospital_details'    => $request->hospital_details,
 
-                'allergy_medicine' => strtoupper($request->allergy_medicine),
-                'allergy_food' => strtoupper($request->allergy_food),
-                'allergy_others' => $request->allergy_others,
+                'allergy_medicine'    => $this->yesNoValue($request->allergy_medicine),
+                'allergy_food'        => $this->yesNoValue($request->allergy_food),
+                'allergy_others'      => $request->allergy_others,
 
-                'medication' => strtoupper($request->medication),
-                'medication_details' => $request->medication_details,
+                'medication'          => $this->yesNoValue($request->medication),
+                'medication_details'  => $request->medication_details,
 
-                'pregnant' => strtoupper($request->pregnant),
-                'nursing' => strtoupper($request->nursing),
-                'birth_control' => strtoupper($request->birth_control),
+                'pregnant'            => $this->yesNoValue($request->pregnant),
+                'nursing'             => $this->yesNoValue($request->nursing),
+                'birth_control'       => $this->yesNoValue($request->birth_control),
 
-                'tobacco_use' => strtoupper($request->tobacco_use),
-                'tobacco_per_day' => $request->tobacco_per_day,
-                'tobacco_per_week' => $request->tobacco_per_week,
+                'tobacco_use'         => $this->yesNoValue($request->tobacco_use),
+                'tobacco_per_day'     => $request->tobacco_per_day,
+                'tobacco_per_week'    => $request->tobacco_per_week,
 
-                'headaches' => strtoupper($request->headaches),
-                'earaches' => strtoupper($request->earaches),
-                'neck_aches' => strtoupper($request->neck_aches),
+                'headaches'           => $this->yesNoValue($request->headaches),
+                'earaches'            => $this->yesNoValue($request->earaches),
+                'neck_aches'          => $this->yesNoValue($request->neck_aches),
 
-                'emergency_person' => $request->emergency_person,
-                'emergency_number' => $request->emergency_number,
-                'emergency_relation' => $request->emergency_relation,
+                'emergency_person'    => $request->emergency_person,
+                'emergency_number'    => $request->emergency_number,
+                'emergency_relation'  => $request->emergency_relation,
 
-                'patient_signature' => $signaturePath,
+                'patient_signature'   => $signaturePath,
             ]);
 
-            /* =======================
-               MEDICAL CONDITIONS (BOOLEAN)
-            ======================= */
-            $conditions = $request->conditions ?? [];
+            // MEDICAL CONDITIONS (booleans are fine)
+            $conditions = $request->input('conditions', []);
 
             MedicalHistoryCondition::create([
                 'medical_history_id' => $medicalHistory->id,
 
-                'aids_hiv' => in_array('AIDS/HIV', $conditions),
-                'fainting' => in_array('Fainting/Dizzy Spells', $conditions),
-                'alcohol_dependency' => in_array('Alcohol or Chemical Dependency', $conditions),
-                'high_low_bp' => in_array('High/Low Blood Pressure', $conditions),
-                'arthritis' => in_array('Arthritis/Rheumatism', $conditions),
-                'hyper_hypoglycemia' => in_array('Hyper/Hypoglycemia', $conditions),
-                'artificial_joints' => in_array('Artificial Joints or Valves', $conditions),
-                'kidney_disease' => in_array('Kidney Disease', $conditions),
-                'asthma' => in_array('Asthma', $conditions),
-                'liver_disease' => in_array('Liver Disease', $conditions),
-                'blood_transfusion' => in_array('Blood Transfusion', $conditions),
-                'mental_disorder' => in_array('Mental/Nervous Disorder', $conditions),
-                'cancer' => in_array('Cancer/Radiotherapy/Chemotherapy', $conditions),
-                'stomach_ulcers' => in_array('Stomach Ulcers', $conditions),
-                'diabetes' => in_array('Diabetes', $conditions),
-                'stroke' => in_array('Stroke', $conditions),
-                'eating_disorders' => in_array('Eating Disorders', $conditions),
-                'tuberculosis' => in_array('Tuberculosis', $conditions),
-                'epilepsy' => in_array('Epilepsy/Seizures', $conditions),
-                'venereal_disease' => in_array('Venereal/Communicable Disease', $conditions),
+                'aids_hiv'           => in_array('AIDS/HIV', $conditions, true),
+                'fainting'           => in_array('Fainting/Dizzy Spells', $conditions, true),
+                'alcohol_dependency' => in_array('Alcohol or Chemical Dependency', $conditions, true),
+                'high_low_bp'        => in_array('High/Low Blood Pressure', $conditions, true),
+                'arthritis'          => in_array('Arthritis/Rheumatism', $conditions, true),
+                'hyper_hypoglycemia' => in_array('Hyper/Hypoglycemia', $conditions, true),
+                'artificial_joints'  => in_array('Artificial Joints or Valves', $conditions, true),
+                'kidney_disease'     => in_array('Kidney Disease', $conditions, true),
+                'asthma'             => in_array('Asthma', $conditions, true),
+                'liver_disease'      => in_array('Liver Disease', $conditions, true),
+                'blood_transfusion'  => in_array('Blood Transfusion', $conditions, true),
+                'mental_disorder'    => in_array('Mental/Nervous Disorder', $conditions, true),
+                'cancer'             => in_array('Cancer/Radiotherapy/Chemotherapy', $conditions, true),
+                'stomach_ulcers'     => in_array('Stomach Ulcers', $conditions, true),
+                'diabetes'           => in_array('Diabetes', $conditions, true),
+                'stroke'             => in_array('Stroke', $conditions, true),
+                'eating_disorders'   => in_array('Eating Disorders', $conditions, true),
+                'tuberculosis'       => in_array('Tuberculosis', $conditions, true),
+                'epilepsy'           => in_array('Epilepsy/Seizures', $conditions, true),
+                'venereal_disease'   => in_array('Venereal/Communicable Disease', $conditions, true),
             ]);
         });
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
     }
 
+    /* =======================
+       HELPERS
+    ======================= */
+
+    private function toMysqlTime(string $time12h): string
+    {
+        // "1:00 PM" -> "13:00:00"
+        return Carbon::createFromFormat('g:i A', trim($time12h))->format('H:i:s');
+    }
+
+    /**
+     * Converts any "truthy" value to ENUM strings 'YES'/'NO' (uppercase).
+     * Works with: "YES"/"NO", "Yes"/"No", "on"/null, true/false, "1"/"0"
+     */
+    private function yesNoValue($value): string
+    {
+        if ($value === null) return 'NO';
+
+        if (is_bool($value)) return $value ? 'YES' : 'NO';
+
+        $v = strtoupper(trim((string) $value));
+
+        // when checkbox is checked in HTML, it often becomes "on"
+        if (in_array($v, ['YES', 'Y', 'TRUE', '1', 'ON'], true)) return 'YES';
+
+        return 'NO';
+    }
+
     private function getPhilippineHolidays(int $year): array
     {
         $holidays = [
-            // Regular Holidays
             "$year-01-01" => "New Year's Day",
             "$year-04-09" => "Day of Valor",
             "$year-05-01" => "Labor Day",
@@ -328,7 +324,6 @@ class AppointmentController extends Controller
             "$year-12-25" => "Christmas Day",
             "$year-12-30" => "Rizal Day",
 
-            // Special Non-Working Holidays
             "$year-02-25" => "EDSA People Power Anniversary",
             "$year-08-21" => "Ninoy Aquino Day",
             "$year-11-01" => "All Saints' Day",
@@ -338,14 +333,12 @@ class AppointmentController extends Controller
             "$year-12-31" => "New Year's Eve",
         ];
 
-        // Holy Week — computed dynamically from Easter
         $easter = Carbon::createFromTimestamp(easter_date($year));
         $holidays[$easter->copy()->subDays(4)->format('Y-m-d')] = 'Holy Wednesday';
         $holidays[$easter->copy()->subDays(3)->format('Y-m-d')] = 'Maundy Thursday';
         $holidays[$easter->copy()->subDays(2)->format('Y-m-d')] = 'Good Friday';
         $holidays[$easter->copy()->subDays(1)->format('Y-m-d')] = 'Black Saturday';
 
-        // National Heroes Day = last Monday of August
         $lastMondayAug = Carbon::create($year, 8, 31)->modify('last monday');
         $holidays[$lastMondayAug->format('Y-m-d')] = 'National Heroes Day';
 
