@@ -13,6 +13,9 @@ use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\Dentist\DentistPatientController;
+use App\Http\Controllers\Dentist\DentistAppointmentController;
+
 
 // -------------------
 // AUTH PAGES (PUBLIC)
@@ -166,20 +169,13 @@ Route::prefix('dentist')->group(function () {
     })->name('dentist.dashboard');
 
     // Patients Route
-    Route::get('/patients', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-patient');
-    })->name('dentist.patients');
+   Route::get('/dentist/patients', [DentistPatientController::class, 'index'])
+    ->name('dentist.patients');
 
     // Appointments Route
-    Route::get('/appointments', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-appointments');
-    })->name('dentist.appointments');
+   // Appointments Route (Controller)
+Route::get('/appointments', [DentistAppointmentController::class, 'index'])
+    ->name('dentist.appointments');
 
     // Patient Profile Route
     Route::get('/patient', function () {
