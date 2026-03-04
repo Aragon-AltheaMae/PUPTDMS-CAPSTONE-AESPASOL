@@ -379,7 +379,7 @@
     }
 
     dialog#activeAppointmentModal::backdrop {
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(16, 16, 16, 0.45);
     }
 
     dialog#activeAppointmentModal .swal-card {
@@ -946,71 +946,71 @@
 
   <!-- modal for one appointment only -->
   <dialog id="activeAppointmentModal" class="modal">
-  <!-- Clicking outside closes by default for <dialog>, we will prevent that in JS -->
-  <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
+    <!-- Clicking outside closes by default for <dialog>, we will prevent that in JS -->
+    <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
 
-    <!-- Icon bubble -->
-    <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
-      <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
+      <!-- Icon bubble -->
+      <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
+        <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
+      </div>
+
+      <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">
+        One Appointment at a Time
+      </h3>
+
+      <p class="text-sm text-[#333] mb-6 leading-relaxed">
+        {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed before booking another one." }}
+      </p>
+
+      <div class="flex items-center justify-center gap-3">
+        <!-- View appointment -->
+        <a href="{{ route('appointment.index') }}"
+          class="btn border-none bg-[#8B0000] hover:bg-[#660000] text-white rounded-xl px-5">
+          <i class="fa-regular fa-calendar-check"></i>
+          View My Appointment
+        </a>
+
+        <!-- Close -->
+        <button type="button"
+          id="closeActiveApptModalBtn"
+          class="btn btn-ghost rounded-xl px-6">
+          Close
+        </button>
+      </div>
     </div>
+  </dialog>
 
-    <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">
-      One Appointment at a Time
-    </h3>
+  @if(session('activeAppointmentModal'))
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("activeAppointmentModal");
+      const closeBtn = document.getElementById("closeActiveApptModalBtn");
 
-    <p class="text-sm text-[#333] mb-6 leading-relaxed">
-      {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed before booking another one." }}
-    </p>
+      if (!modal) return;
 
-    <div class="flex items-center justify-center gap-3">
-      <!-- View appointment -->
-      <a href="{{ route('appointment.index') }}"
-         class="btn border-none bg-[#8B0000] hover:bg-[#660000] text-white rounded-xl px-5">
-        <i class="fa-regular fa-calendar-check"></i>
-        View My Appointment
-      </a>
+      // Open it
+      modal.showModal();
 
-      <!-- Close -->
-      <button type="button"
-              id="closeActiveApptModalBtn"
-              class="btn btn-ghost rounded-xl px-6">
-        Close
-      </button>
-    </div>
-  </div>
-</dialog>
+      // Prevent closing via backdrop click (click outside)
+      modal.addEventListener('click', (e) => {
+        const box = modal.querySelector('.modal-box');
+        if (!box) return;
+        const clickedOutside = !box.contains(e.target);
+        if (clickedOutside) e.preventDefault(); // keep open
+      });
 
-@if(session('activeAppointmentModal'))
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("activeAppointmentModal");
-    const closeBtn = document.getElementById("closeActiveApptModalBtn");
+      // Prevent closing via ESC
+      modal.addEventListener('cancel', (e) => {
+        e.preventDefault();
+      });
 
-    if (!modal) return;
-
-    // Open it
-    modal.showModal();
-
-    // Prevent closing via backdrop click (click outside)
-    modal.addEventListener('click', (e) => {
-      const box = modal.querySelector('.modal-box');
-      if (!box) return;
-      const clickedOutside = !box.contains(e.target);
-      if (clickedOutside) e.preventDefault(); // keep open
+      // Close button
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => modal.close());
+      }
     });
-
-    // Prevent closing via ESC
-    modal.addEventListener('cancel', (e) => {
-      e.preventDefault();
-    });
-
-    // Close button
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => modal.close());
-    }
-  });
-</script>
-@endif
+  </script>
+  @endif
 
   <!-- ========================= -->
   <!-- FETCH DENTAL RECORDS -->
@@ -1393,29 +1393,29 @@
 
       const myAppointments = {
         @if(isset($appointments) && $appointments->count() > 0)
-        @foreach($appointments as $appt)
-        "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
-        @endforeach
+          @foreach($appointments as $appt)
+            "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
+          @endforeach
         @endif
       };
 
       const apptCounts = {
         @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
-        @foreach($appointmentCountsPerDay as $date => $count)
-        "{{ $date }}": {{ $count }},
-        @endforeach
+          @foreach($appointmentCountsPerDay as $date => $count)
+            "{{ $date }}": {{ $count }},
+          @endforeach
         @endif
       };
 
       const unavailableDates = [
         @foreach(($unavailableDates ?? []) as $d)
-        "{{ $d }}",
+          "{{ $d }}",
         @endforeach
       ];
 
       const allHolidays = {
         @foreach(($philippineHolidays ?? []) as $date => $name)
-        "{{ $date }}": "{{ addslashes($name) }}",
+          "{{ $date }}": "{{ addslashes($name) }}",
         @endforeach
       };
 
@@ -1782,28 +1782,23 @@
         menu.classList.add("notif-close");
       }
 
-      // Toggle when clicking bell
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         isOpen ? closeMenu() : openMenu();
       });
 
-      // Keep open when clicking inside menu
       menu.addEventListener("click", (e) => {
         e.stopPropagation();
       });
 
-      // Close when clicking outside
       document.addEventListener("click", () => {
         if (isOpen) closeMenu();
       });
 
-      // Close on ESC
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && isOpen) closeMenu();
       });
 
-      // Start closed
       closeMenu();
     });
   </script>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Inventory | PUP Taguig Dental Clinic</title>
@@ -9,7 +10,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Font Inter -->
@@ -28,6 +29,7 @@
         opacity: 0;
         transform: translateY(6px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -38,65 +40,67 @@
       animation: fadeIn 0.6s ease-out forwards;
     }
 
-    
-
     .sidebar-link {
       display: flex;
       align-items: center;
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      transition: background-color .2s ease, transform .2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Tooltip appears ONLY when collapsed */
-    .sidebar-link:hover .sidebar-tooltip {
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+      padding-left: 0.25rem;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-text {
       opacity: 1;
-      transform: scale(1);
+      width: auto;
+      overflow: visible;
     }
 
-    /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip {
-    display: none;
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
     }
 
-    #sidebar[style*="16rem"] .sidebar-link {
-      justify-content: flex-start;
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
     }
 
-    /* consistent icon column width */
-    .sidebar-link i{
-      width: 24px;           /* fixed width column */
-      min-width: 24px;
-      text-align: center;
+    #sidebar.collapsed .section-label {
+      display: none;
     }
 
-    /* CLOSED: center icon only */
-    #sidebar[style*="72px"] .sidebar-link {
-      justify-content: center;
-      gap: 0;
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
     }
 
-    /* when expanded, align items nicely */
-    #sidebar[style*="16rem"] .sidebar-link{
-      justify-content: flex-start;
-      gap: 12px;             /* spacing between icon and text */
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
     }
 
-    #sidebar[style*="16rem"] .sidebar-link:hover {
-    transform: translateX(4px);
-    }
-
-    .sidebar-link:hover .sidebar-text {
-    opacity: 1;
-    transform: scale(1);
-    }
-
-    .sidebar-text {
-      transform-origin: left center;
-    }
-
-    /* Notification dropdown animation */
     .notif-open {
       opacity: 1 !important;
       transform: scale(1) !important;
@@ -105,645 +109,695 @@
 
     .notif-close {
       opacity: 0 !important;
-      transform: scale(0.95) !important; /* zoom out */
+      transform: scale(0.95) !important;
       pointer-events: none !important;
     }
 
-    /* DARK MODE */
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link span:first-of-type {
+      margin: 0 auto;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
+    }
+
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    /* DARK MODE STYLES */
     [data-theme="dark"] body {
-    background-color: #111827; /* slate-900 */
-    color: #E5E7EB;
+      background-color: #000D1A;
+      color: #E5E7EB;
     }
 
     [data-theme="dark"] #sidebar {
-      background-color: #1F2933;
+      background-color: #000D1A;
     }
 
     [data-theme="dark"] .bg-white {
-      background-color: #1F2937 !important;
+      background-color: #000D1A !important;
     }
 
     [data-theme="dark"] .text-\[\#333333\] {
       color: #E5E7EB !important;
     }
 
-    body,
-    #sidebar,
-    main,
-    .card {
-      transition: background-color 0.3s ease, color 0.3s ease;
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
+    }
+
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
+    }
+
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
+    }
+
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
 
 <body class="bg-[#F4F4F4] min-h-screen flex flex-col">
 
-<!-- HEADER (TOP BAR) -->
-<div class="fixed top-0 left-0 right-0 z-50
+  <!-- HEADER (TOP BAR) -->
+  <div class="fixed top-0 left-0 right-0 z-50
             bg-gradient-to-r from-[#660000] to-[#8B0000]
             text-[#F4F4F4] px-6 py-4
             flex items-center justify-between">
 
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
-          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
       </div>
       <div class="w-12 rounded-full">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
       </div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
 
-  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-8">
       @php
-  // Pass $notifications from controller, or leave it empty for now
-  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
-  @endphp
+      // Pass $notifications from controller, or leave it empty for now
+      // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+      $notifications = collect($notifications ?? []);
+      $notifCount = $notifications->count();
+      @endphp
 
-  <div id="notifDropdown" class="relative">
-    
-  <button id="notifBtn" type="button"
-    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+      <div id="notifDropdown" class="relative">
 
-    @if($notifCount > 0)
-      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-        {{ $notifCount }}
-      </span>
-    @endif
+        <button id="notifBtn" type="button"
+          class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
 
-    <i class="fa-regular fa-bell text-lg"></i>
-  </button>
+          @if($notifCount > 0)
+          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+            {{ $notifCount }}
+          </span>
+          @endif
 
-  <div id="notifMenu"
-  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+          <i class="fa-regular fa-bell text-lg"></i>
+        </button>
+
+        <div id="notifMenu"
+          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
          opacity-0 scale-95 pointer-events-none
          transition-all duration-200 ease-out origin-top-right">
 
-    <div class="p-4 border-b flex items-center justify-between">
-      <span class="font-bold text-[#8B0000]">Notifications</span>
-    </div>
-
-    <div class="max-h-80 overflow-y-auto">
-      @forelse($notifications as $n)
-        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-          <div class="text-sm font-semibold text-gray-900">
-            {{ $n['title'] ?? 'Notification' }}
+          <div class="p-4 border-b flex items-center justify-between">
+            <span class="font-bold text-[#8B0000]">Notifications</span>
           </div>
-          @if(!empty($n['message']))
-            <div class="text-xs text-[#ADADAD] mt-0.5">
-              {{ $n['message'] }}
+
+          <div class="max-h-80 overflow-y-auto">
+            @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
+              </div>
+              @if(!empty($n['message']))
+              <div class="text-xs text-[#ADADAD] mt-0.5">
+                {{ $n['message'] }}
+              </div>
+              @endif
+              @if(!empty($n['time']))
+              <div class="text-[11px] text-gray-400 mt-1">
+                {{ $n['time'] }}
+              </div>
+              @endif
+            </a>
+            @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
             </div>
-          @endif
-          @if(!empty($n['time']))
-            <div class="text-[11px] text-gray-400 mt-1">
-              {{ $n['time'] }}
-            </div>
-          @endif
-        </a>
-      @empty
-        <div class="px-4 py-10 text-center justify-items-center">
-          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-          <div class="text-sm font-semibold text-gray-800">No notifications</div>
-          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+            @endforelse
+          </div>
+
         </div>
-      @endforelse
-    </div>
+      </div>
 
-  </div>
-</div>
-
-    <div class="flex items-center gap-3">
-      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-      <div>
-        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+      <div class="flex items-center gap-3">
+        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+        <div>
+          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<aside id="sidebar"
-  class="fixed left-0 top-[80px]
-         h-[calc(100vh-80px)]
-         w-[72px]
-         bg-[#FAFAFA]
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed left-0 top-[72px]
+         h-[calc(100vh-72px)]
+         bg-white
          drop-shadow-xl
          transition-all duration-300
-         flex flex-col justify-between z-40">
+         flex flex-col justify-between z-40 expanded"
+    style="width: 200px;">
 
-  <!-- TOP -->
-  <div>
-    <div id="sidebarToggleWrapper"
-     class="flex items-center justify-center px-4 py-6 transition-all duration-300">
-      <button onclick="toggleSidebar()"
-        id="sidebarToggleBtn"
-        class="w-10 h-10 flex items-center justify-center
+    <!-- TOP -->
+    <div class="pt-4">
+
+      <!-- Toggle Button -->
+      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
+        <button onclick="toggleSidebar()"
+          id="sidebarToggleBtn"
+          class="w-8 h-8 flex items-center justify-center
               rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#D9D9D9] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
-      </button>
-    </div>
-    
-  <!-- MENU -->
-  <nav class="space-y-2 px-3 text-gray-600 text-sm">
-
-    <!-- DASHBOARD -->
-    <a href="{{ route('dentist.dashboard') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.dashboard')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-chart-line text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Dashboard
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200
-            opacity-0 scale-95 transition-all duration-200">
-        Dashboard
-      </span>
-    </a>
-
-    <!-- PATIENTS -->
-    <a href="{{ route('dentist.patients') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.patients*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-users text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Patients
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Patients
-      </span>
-    </a>
-
-    <!-- APPOINTMENTS -->
-    <a href="{{ route('dentist.appointments') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.appointments*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Appointments
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Appointments
-      </span>
-    </a>
-
-    <!-- Document Requests -->
-    <a href="{{ route('dentist.documentrequests') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.documentrequests*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-file-circle-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Document Requests
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Document Requests
-      </span>
-    </a>
-
-    <!-- INVENTORY -->
-    <a href="{{ route('dentist.inventory') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.inventory*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-box text-lg"></i>
-      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Inventory
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Inventory
-      </span>
-    </a>
-
-    <!-- REPORTS -->
-    <a href="{{ route('dentist.report') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.report*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-file text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Reports
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Reports
-      </span>
-    </a>
-  </nav>
-</div>
-
-  <!-- BOTTOM -->
-  <div class="px-3 pb-5 space-y-2">
-
-  <!-- DARK MODE TOGGLE -->
-  <button
-    id="themeToggle"
-    class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-1.5 rounded-xl
-          bg-[#7B6CF6] text-[#F4F4F4]
-          transition-all duration-200
-          hover:scale-105"
-    aria-label="Toggle dark mode">
-
-    <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
-    <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden
-               transition-all duration-300 delay-150">
-      Dark Mode
-    </span>
-    <!-- Tooltip (collapsed only) -->
-    <span
-      class="sidebar-tooltip
-            absolute left-full ml-8
-            px-3 py-1
-            rounded-full
-            bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold
-            whitespace-nowrap
-            opacity-0 scale-95
-            pointer-events-none
-            transition-all duration-200">
-      Dark Mode
-    </span>
-  </button>
-    
-    <form action="{{ route('logout') }}" method="POST">
-      @csrf
-      <button
-        class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
-               text-red-600 hover:bg-red-50 transition-all duration-200">
-        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-        <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-          Log out
-        </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Log out
-        </span>
-      </button>
-    </form>
-
-  </div>
-</aside>
-
-<main id="mainContent" class="flex-1 pt-[100px] px-6 pb-10 w-full
-transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
-
-<div class="max-w-7xl mt-4 mx-auto fade-in">
-  <div class="bg-white rounded-xl shadow p-6">
-    
-  <!-- TOOLBAR -->
-   <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-    <!-- Gradient Border Wrapper -->
-     <div class="p-[2px] rounded-full bg-gradient-to-r from-[#660000] to-[#FFD700] w-72">
-      <!-- Inner Container -->
-       <div class="flex items-center bg-white rounded-full px-4 py-2">
-        <i class="fa fa-search text-[#660000]"></i>
-        
-        <input id="searchInput" class="ml-3 outline-none w-full text-sm
-        bg-white text-gray-800 placeholder-gray-400"
-        placeholder="Search Stock No., Name" oninput="renderTable()"/>
+              hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
-    </div>
-    
-    <div class="flex gap-2">
 
-    <!-- SHOW SELECT -->
-    <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-    <select
-        id="showSelect"
-        class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-        onchange="renderTable()">
-        <option value="all">Show: All Products</option>
-        <option value="medicine">Medicine</option>
-        <option value="supplies">Supplies</option>
-    </select>
-    </div>
+      <!-- NAVIGATION LABEL -->
+      <div class="section-label px-4 mb-6">Navigation</div>
 
-    <!-- SORT SELECT -->
-    <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-    <select
-        id="sortSelect"
-        class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-        onchange="renderTable()"
-    >
-        <option value="">Sort: Default</option>
-        <option value="qty_asc">Quantity (Lowest to Highest)</option>
-        <option value="alphabetical">Alphabetical (A–Z)</option>
-        <option value="date_received">Date Received</option>
-    </select>
-    </div>
+      <!-- MENU -->
+      <nav class="space-y-2 px-3 text-gray-600">
 
+        <!-- DASHBOARD -->
+        <a href="{{ route('dentist.dashboard') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-    <button onclick="resetAddForm(); addModal.showModal()"
-      class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
-      <i class="fa fa-plus mr-1"></i> Add Item
-    </button>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-chart-line text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Dashboard
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Dashboard
+          </span>
+        </a>
 
-  </div>
-</div>
+        <!-- PATIENTS -->
+        <a href="{{ route('dentist.patients') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-<!-- TABLE -->
-<div class="overflow-x-auto">
-<table class="table table-sm w-full">
-<thead>
-<tr class="text-[#8B0000] text-xs uppercase">
-  <th>Date</th>
-  <th>Stock No.</th>
-  <th>Supplies</th>
-  <th>Unit</th>
-  <th>Qty</th>
-  <th>Used</th>
-  <th>Balance</th>
-  <th class="text-center">Action</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
-</div>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
+            <i class="fa-solid fa-users text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Patients
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Patients
+          </span>
+        </a>
 
-<!-- EMPTY STATE -->
-<div
-  id="emptyState"
-  class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium"
->
-  No items in the inventory
-</div>
+        <!-- APPOINTMENTS -->
+        <a href="{{ route('dentist.appointments') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-</div>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-calendar-check text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Appointments
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Appointments
+          </span>
+        </a>
 
-</main>
+        <!-- Document Requests -->
+        <a href="{{ route('dentist.documentrequests') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-<!-- ADD MODAL -->
-<dialog id="addModal" class="modal">
-  <div class="modal-box max-w-xl bg-white rounded-lg">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file-circle-check text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Document Requests
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Document Requests
+          </span>
+        </a>
 
-    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
-      Add Inventory Item
-    </h3>
+        <!-- INVENTORY -->
+        <a href="{{ route('dentist.inventory') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
-    
-      <!-- CATEGORY -->
-      <label class="text-sm text-[#8B0000]">Category</label>
-      <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
-        <option disabled selected>Select Category</option>
-        <option value="Medicine">Medicine</option>
-        <option value="Supplies">Supplies</option>
-      </select>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-box text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Inventory
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Inventory
+          </span>
+        </a>
 
-      <!-- DATE (AUTO / DROPDOWN) -->
-      <label class="text-sm text-[#8B0000]">Date Received</label>
-      <input
-        id="addDate"
-        type="date"
-        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-      />
+        <!-- REPORTS -->
+        <a href="{{ route('dentist.report') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+                transition-all duration-200
+                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2
+                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
 
-      <!-- STOCK -->
-      <label class="text-sm text-[#8B0000]">Stock Number</label>
-      <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
-
-      <!-- NAME -->
-      <label class="text-sm text-[#8B0000]">Supply Name</label>
-      <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="ex. Nitrile Gloves Large">
-
-      <!-- UNIT -->
-      <label class="text-sm text-[#8B0000]">Units</label>
-      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="e.g. Box / Pack / Bottle / Piece">
-
-      <!-- QTY -->
-      <label class="text-sm text-[#8B0000]">Quantity</label>
-      <input id="addQty" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()"> 
-
-      <!-- USED -->
-      <label class="text-sm text-[#8B0000]">Consumed</label>
-      <input id="addUsed" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()">
-
-      <!-- BALANCE -->
-      <label class="text-sm text-[#8B0000]">Balance</label>
-      <input id="addBalance"
-        class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
-        readonly>
-
-    </div>
-
-    <div class="modal-action mt-6">
-      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="addModal.close()">Back</button>
-      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="addItem()">Save</button>
-    </div>
-
-  </div>
-</dialog>
-
-<!-- EDIT MODAL -->
-<dialog id="editModal" class="modal">
-  <div class="modal-box max-w-xl bg-white rounded-lg">
-
-    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
-      Edit Inventory Item
-    </h3>
-
-    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center text-[#8B0000]">
-      <label>Category</label>
-      <select id="editCategory" class="select select-bordered w-48 bg-white text-[#333333]">
-        <option value="Medicine">Medicine</option>
-        <option value="Supplies">Supplies</option>
-      </select>
-
-      <label>Date Received</label>
-      <input id="editDate" type="date"
-        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
-
-      <label>Stock Number</label>
-      <input id="editStock" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
-
-      <label>Supply Name</label>
-      <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
-
-      <label class="text-sm text-[#8B0000]">Units</label>
-      <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="e.g. Box / Pack / Bottle / Piece">
-
-
-      <label>Quantity</label>
-      <input id="editQty" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeEditBalance()">
-
-      <label>Consumed</label>
-      <input id="editUsed" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeEditBalance()">
-
-      <label>Balance</label>
-      <input id="editBalance"
-        class="input input-bordered w-28 bg-[#F4F4F4] border-[#D9D9D9] text-[#333333]"
-        readonly>
-
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
+            <i class="fa-solid fa-file text-lg"></i>
+          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+            Reports
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Reports
+          </span>
+        </a>
+      </nav>
     </div>
 
-    <div class="modal-action mt-6">
-      <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="editModal.close()">Back</button>
-      <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="saveEdit()">Save</button>
+    <!-- BOTTOM -->
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
+
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+            <i class="fa-regular fa-moon"></i>
+          </button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
+             text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
+            Log out
+          </span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            Log out
+          </span>
+        </button>
+      </form>
+
     </div>
+  </aside>
 
-  </div>
-</dialog>
+  <!-- ================= MAIN ================= -->
+  <main
+    id="mainContent"
+    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
 
-<!-- DELETE CONFIRMATION MODAL -->
-<dialog id="deleteModal" class="modal">
+    <div class="max-w-7xl mt-4 mx-auto fade-in">
+      <div class="bg-white rounded-xl shadow p-6">
+
+        <!-- TOOLBAR -->
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <!-- Gradient Border Wrapper -->
+          <div class="p-[2px] rounded-full bg-gradient-to-r from-[#660000] to-[#FFD700] w-72">
+            <!-- Inner Container -->
+            <div class="flex items-center bg-white rounded-full px-4 py-2">
+              <i class="fa fa-search text-[#660000]"></i>
+
+              <input id="searchInput" class="ml-3 outline-none w-full text-sm
+        bg-white text-gray-800 placeholder-gray-400"
+                placeholder="Search Stock No., Name" oninput="renderTable()" />
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+
+            <!-- SHOW SELECT -->
+            <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
+              <select
+                id="showSelect"
+                class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
+                onchange="renderTable()">
+                <option value="all">Show: All Products</option>
+                <option value="medicine">Medicine</option>
+                <option value="supplies">Supplies</option>
+              </select>
+            </div>
+
+            <!-- SORT SELECT -->
+            <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
+              <select
+                id="sortSelect"
+                class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
+                onchange="renderTable()">
+                <option value="">Sort: Default</option>
+                <option value="qty_asc">Quantity (Lowest to Highest)</option>
+                <option value="alphabetical">Alphabetical (A–Z)</option>
+                <option value="date_received">Date Received</option>
+              </select>
+            </div>
+
+
+            <button onclick="resetAddForm(); addModal.showModal()"
+              class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
+              <i class="fa fa-plus mr-1"></i> Add Item
+            </button>
+
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-x-auto">
+          <table class="table table-sm w-full">
+            <thead>
+              <tr class="text-[#8B0000] text-xs uppercase">
+                <th>Date</th>
+                <th>Stock No.</th>
+                <th>Supplies</th>
+                <th>Unit</th>
+                <th>Qty</th>
+                <th>Used</th>
+                <th>Balance</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div
+          id="emptyState"
+          class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium">
+          No items in the inventory
+        </div>
+
+      </div>
+
+  </main>
+
+  <!-- ADD MODAL -->
+  <dialog id="addModal" class="modal">
+    <div class="modal-box max-w-xl bg-white rounded-lg">
+
+      <h3 class="font-bold text-lg text-[#8B0000] mb-6">
+        Add Inventory Item
+      </h3>
+
+      <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
+
+        <!-- CATEGORY -->
+        <label class="text-sm text-[#8B0000]">Category</label>
+        <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
+          <option disabled selected>Select Category</option>
+          <option value="Medicine">Medicine</option>
+          <option value="Supplies">Supplies</option>
+        </select>
+
+        <!-- DATE (AUTO / DROPDOWN) -->
+        <label class="text-sm text-[#8B0000]">Date Received</label>
+        <input
+          id="addDate"
+          type="date"
+          class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" />
+
+        <!-- STOCK -->
+        <label class="text-sm text-[#8B0000]">Stock Number</label>
+        <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
+
+        <!-- NAME -->
+        <label class="text-sm text-[#8B0000]">Supply Name</label>
+        <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
+          placeholder="ex. Nitrile Gloves Large">
+
+        <!-- UNIT -->
+        <label class="text-sm text-[#8B0000]">Units</label>
+        <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+          placeholder="e.g. Box / Pack / Bottle / Piece">
+
+        <!-- QTY -->
+        <label class="text-sm text-[#8B0000]">Quantity</label>
+        <input id="addQty" type="number"
+          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+          oninput="computeAddBalance()">
+
+        <!-- USED -->
+        <label class="text-sm text-[#8B0000]">Consumed</label>
+        <input id="addUsed" type="number"
+          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+          oninput="computeAddBalance()">
+
+        <!-- BALANCE -->
+        <label class="text-sm text-[#8B0000]">Balance</label>
+        <input id="addBalance"
+          class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
+          readonly>
+
+      </div>
+
+      <div class="modal-action mt-6">
+        <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="addModal.close()">Back</button>
+        <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="addItem()">Save</button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- EDIT MODAL -->
+  <dialog id="editModal" class="modal">
+    <div class="modal-box max-w-xl bg-white rounded-lg">
+
+      <h3 class="font-bold text-lg text-[#8B0000] mb-6">
+        Edit Inventory Item
+      </h3>
+
+      <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center text-[#8B0000]">
+        <label>Category</label>
+        <select id="editCategory" class="select select-bordered w-48 bg-white text-[#333333]">
+          <option value="Medicine">Medicine</option>
+          <option value="Supplies">Supplies</option>
+        </select>
+
+        <label>Date Received</label>
+        <input id="editDate" type="date"
+          class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
+
+        <label>Stock Number</label>
+        <input id="editStock" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
+
+        <label>Supply Name</label>
+        <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
+
+        <label class="text-sm text-[#8B0000]">Units</label>
+        <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
+          placeholder="e.g. Box / Pack / Bottle / Piece">
+
+
+        <label>Quantity</label>
+        <input id="editQty" type="number"
+          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+          oninput="computeEditBalance()">
+
+        <label>Consumed</label>
+        <input id="editUsed" type="number"
+          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
+          oninput="computeEditBalance()">
+
+        <label>Balance</label>
+        <input id="editBalance"
+          class="input input-bordered w-28 bg-[#F4F4F4] border-[#D9D9D9] text-[#333333]"
+          readonly>
+
+      </div>
+
+      <div class="modal-action mt-6">
+        <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="editModal.close()">Back</button>
+        <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="saveEdit()">Save</button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <dialog id="deleteModal" class="modal">
     <div class="modal-box max-w-md bg-white rounded-lg text-center">
 
       <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
@@ -755,15 +809,21 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
       </div>
 
     </div>
-</dialog>
+  </dialog>
 
-      <!-- Footer -->
-        <footer class="footer sm:footer-horizontal mt-auto
-            bg-[#660000] text-[#F4F4F4] p-10">
-        </footer>
+  <!-- Footer -->
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
 
-<script>
-/*let inventory = [
+  <script>
+    /*let inventory = [
   {
     category: "Supplies",
     date: "01/20/25",
@@ -856,189 +916,227 @@ transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
   }
 ];*/
 
-// =========================
-// DARK MODE TOGGLE
-// =========================
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-const html = document.documentElement;
+    // =========================
+    // THEME TOGGLE 
+    // =========================
+    const html = document.documentElement;
+    const themeToggleContainer = document.getElementById("themeToggle");
+    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
 
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-updateThemeIcon(savedTheme);
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
 
-// Toggle on click
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      themeOptions.forEach(option => {
+        if (option.getAttribute("data-theme") === theme) {
+          option.classList.add("active");
+        } else {
+          option.classList.remove("active");
+        }
+      });
 
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  updateThemeIcon(newTheme);
-});
-
-// Icon switch
-function updateThemeIcon(theme) {
-  if (theme === 'dark') {
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
-  } else {
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
-  }
-}
-
-let sidebarOpen = false;
-
-function applyLayout(sidebarWidth) {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('mainContent');
-
-  sidebar.style.width = sidebarWidth;
-  main.style.marginLeft = sidebarWidth;
-  main.style.width = `auto`;
-}
-
-function toggleSidebar() {
-  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
-  const texts = document.querySelectorAll('.sidebar-text');
-  const icon = document.getElementById('sidebarIcon');
-
-  sidebarOpen = !sidebarOpen;
-
-  if (sidebarOpen) {
-    // EXPAND
-    applyLayout('16rem');
-
-    texts.forEach(t => {
-      t.classList.remove('opacity-0', 'w-0');
-      t.classList.add('opacity-100', 'w-auto');
-    });
-
-    toggleWrapper.classList.remove('justify-center');
-    toggleWrapper.classList.add('justify-end');
-
-    toggleBtn.classList.add('translate-x-2');
-    icon.classList.replace('fa-bars', 'fa-xmark');
-
-  } else {
-    // COLLAPSE
-    applyLayout('72px');
-
-    texts.forEach(t => {
-      t.classList.add('opacity-0', 'w-0');
-      t.classList.remove('opacity-100', 'w-auto');
-    });
-
-    toggleWrapper.classList.remove('justify-end');
-    toggleWrapper.classList.add('justify-center');
-
-    toggleBtn.classList.remove('translate-x-2');
-    icon.classList.replace('fa-xmark', 'fa-bars');
-  }
-}
-
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
-  });
-
-let inventory = [];
-
-async function loadInventory() {
-  const res = await fetch('/dentist/inventory/data');
-  inventory = await res.json();
-  renderTable();
-}
-loadInventory();
-
-let deleteId = null;
-
-function deleteItem(id) {
-  deleteId = id;
-  deleteModal.showModal();
-}
-
-document.getElementById("confirmDeleteBtn").onclick = async () => {
-  if (!deleteId) return;
-
-  await fetch(`/dentist/inventory/${deleteId}`, {
-    method: 'DELETE',
-    headers: {
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
+      if (theme === "dark") {
+        themeIndicator.classList.add("dark-mode");
+      } else {
+        themeIndicator.classList.remove("dark-mode");
+      }
     }
-  });
 
-  deleteModal.close();
-  deleteId = null;
-  loadInventory();
-};
+    applyTheme(localStorage.getItem("theme") || "light");
 
-let editIndex = null;
+    themeOptions.forEach(option => {
+      option.addEventListener("click", () => {
+        const theme = option.getAttribute("data-theme");
+        applyTheme(theme);
+      });
+    });
 
-const emptyState = document.getElementById("emptyState");
+    let sidebarOpen = true;
 
-function renderTable() {
-  const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = "";
+    function applyLayout(sidebarWidth) {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('mainContent');
+      sidebar.style.width = sidebarWidth;
+      main.style.marginLeft = sidebarWidth;
+    }
 
-  let data = [...inventory];
-  
-  const show = showSelect.value;
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const texts = document.querySelectorAll('.sidebar-text');
+      const icon = document.getElementById('sidebarIcon');
+      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
-  if (show === "medicine") {
-    data = data.filter(item => item.category === "Medicine");
-  }
+      sidebarOpen = !sidebarOpen;
 
-  if (show === "supplies") {
-    data = data.filter(item => item.category === "Supplies");
-  }
+      if (sidebarOpen) {
+        applyLayout('220px');
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('expanded');
+        texts.forEach(t => {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
+        });
+        toggleWrapper.classList.remove('justify-center');
+        toggleWrapper.classList.add('justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        applyLayout('72px');
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
+        texts.forEach(t => {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        toggleWrapper.classList.remove('justify-end');
+        toggleWrapper.classList.add('justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
+      }
+      applyTheme(localStorage.getItem("theme") || "light");
+    }
 
-  const search = searchInput.value.toLowerCase();
-  if (search) {
-    data = data.filter(i =>
-      i.stock_no.toLowerCase().includes(search) ||
-      i.name.toLowerCase().includes(search)
-    );
-  }
+    document.addEventListener('DOMContentLoaded', () => {
+      sidebarOpen = true;
+      applyLayout('220px');
+    });
 
-  const sort = sortSelect.value;
-    switch (sort) {
-    case "qty_asc":
-        // Quantity (lowest → highest)
-        data.sort((a, b) => Number(a.qty) - Number(b.qty));
-        break;
+    // NOTIFICATION
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("notifBtn");
+      const menu = document.getElementById("notifMenu");
 
-    case "alphabetical":
-        // Alphabetical by supply / medicine name
-        data.sort((a, b) => a.name.localeCompare(b.name));
-        break;
+      let isOpen = false;
 
-    case "date_received":
-        // Date received (oldest → newest)
-        data.sort((a, b) => new Date(a.date_received) - new Date(b.date_received));
-        break;
+      function openMenu() {
+        isOpen = true;
+        menu.classList.remove("notif-close");
+        menu.classList.add("notif-open");
+      }
 
-    default:
-        // Default order (do nothing)
-        break;
-    }   
-  
-  if (data.length === 0) {
-    emptyState.classList.remove("hidden");
-    return;
-  } else {
-    emptyState.classList.add("hidden");
-  }
+      function closeMenu() {
+        isOpen = false;
+        menu.classList.remove("notif-open");
+        menu.classList.add("notif-close");
+      }
 
-  data.forEach((item, index) => {
-    const balance = item.qty - item.used;
-    tbody.innerHTML += `
+      // Toggle when clicking bell
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isOpen ? closeMenu() : openMenu();
+      });
+
+      // Keep open when clicking inside menu
+      menu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      // Close when clicking outside
+      document.addEventListener("click", () => {
+        if (isOpen) closeMenu();
+      });
+
+      // Close on ESC
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isOpen) closeMenu();
+      });
+
+      // Start closed
+      closeMenu();
+    });
+
+    let inventory = [];
+
+    async function loadInventory() {
+      const res = await fetch('/dentist/inventory/data');
+      inventory = await res.json();
+      renderTable();
+    }
+    loadInventory();
+
+    let deleteId = null;
+
+    function deleteItem(id) {
+      deleteId = id;
+      deleteModal.showModal();
+    }
+
+    document.getElementById("confirmDeleteBtn").onclick = async () => {
+      if (!deleteId) return;
+
+      await fetch(`/dentist/inventory/${deleteId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
+        }
+      });
+
+      deleteModal.close();
+      deleteId = null;
+      loadInventory();
+    };
+
+    let editIndex = null;
+
+    const emptyState = document.getElementById("emptyState");
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      let data = [...inventory];
+
+      const show = showSelect.value;
+
+      if (show === "medicine") {
+        data = data.filter(item => item.category === "Medicine");
+      }
+
+      if (show === "supplies") {
+        data = data.filter(item => item.category === "Supplies");
+      }
+
+      const search = searchInput.value.toLowerCase();
+      if (search) {
+        data = data.filter(i =>
+          i.stock_no.toLowerCase().includes(search) ||
+          i.name.toLowerCase().includes(search)
+        );
+      }
+
+      const sort = sortSelect.value;
+      switch (sort) {
+        case "qty_asc":
+          // Quantity (lowest → highest)
+          data.sort((a, b) => Number(a.qty) - Number(b.qty));
+          break;
+
+        case "alphabetical":
+          // Alphabetical by supply / medicine name
+          data.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+
+        case "date_received":
+          // Date received (oldest → newest)
+          data.sort((a, b) => new Date(a.date_received) - new Date(b.date_received));
+          break;
+
+        default:
+          // Default order (do nothing)
+          break;
+      }
+
+      if (data.length === 0) {
+        emptyState.classList.remove("hidden");
+        return;
+      } else {
+        emptyState.classList.add("hidden");
+      }
+
+      data.forEach((item, index) => {
+        const balance = item.qty - item.used;
+        tbody.innerHTML += `
     <tr class="text-gray-800"> <!-- sets the font color -->
         <td class="text-[#333333]">${item.formatted_date}</td>
         <td class="text-[#333333]">${item.stock_no}</td>
@@ -1058,182 +1156,138 @@ function renderTable() {
           </button>
         </td>
       </tr>`;
-  });
-}
-
-function resetAddForm() {
-  addCategory.selectedIndex = 0;
-  addDate.value = '';
-  addStock.value = '';
-  addName.value = '';
-  addUnit.value = '';
-  addQty.value = '';
-  addUsed.value = '';
-  addBalance.value = '';
-}
-
-async function addItem() {
-  if (
-    addCategory.selectedIndex === 0 ||
-    addUnit.selectedIndex === 0 ||
-    !addDate.value ||
-    !addStock.value ||
-    !addName.value ||
-    !addUnit.value ||
-    addQty.value === ''
-  ) {
-    alert('Please complete all required fields.');
-    return;
-  }
-
-  const res = await fetch('/dentist/inventory', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
-    },
-    body: JSON.stringify({
-      category: addCategory.value,
-      date_received: addDate.value,
-      stock_no: addStock.value.trim(),
-      name: addName.value.trim(),
-      unit: addUnit.value,
-      qty: Number(addQty.value),
-      used: Number(addUsed.value || 0)
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    console.error(err);
-    alert(Object.values(err.errors).join('\n'));
-    return;
-  }
-
-  addModal.close();
-  resetAddForm();
-  loadInventory();
-}
-
-
-let editId = null;
-
-function openEdit(id) {
-  editId = id;
-  const i = inventory.find(item => item.id === id);
-  if (!i) return;
-
-  editCategory.value = i.category;
-  editStock.value = i.stock_no;
-  editName.value = i.name;
-  editUnit.value = i.unit;
-  editQty.value = i.qty;
-  editUsed.value = i.used;
-  editDate.value = i.date_received?.slice(0, 10);
-
-  computeEditBalance();
-  editModal.showModal();
-}
-
-async function saveEdit() {
-  if (!editId) return;
-
-  const res = await fetch(`/dentist/inventory/${editId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content')
-    },
-    body: JSON.stringify({
-      category: editCategory.value,
-      date_received: editDate.value,
-      stock_no: editStock.value,
-      name: editName.value,
-      unit: editUnit.value,
-      qty: Number(editQty.value),
-      used: Number(editUsed.value)
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.error(err);
-    alert('EDIT FAILED — check console');
-    return;
-  }
-
-  editModal.close();
-  editId = null;
-  loadInventory();
-}
-
-function computeAddBalance() {
-  const qty = Number(addQty.value || 0);
-  const used = Number(addUsed.value || 0);
-  addBalance.value = qty - used;
-}
-
-function computeEditBalance() {
-  editBalance.value =
-    Number(editQty.value || 0) - Number(editUsed.value || 0);
-}
-
-function formatDateMMDDYY(dateStr) {
-  const d = new Date(dateStr);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const yy = String(d.getFullYear()).slice(-2);
-  return `${mm}/${dd}/${yy}`;
-}
-
-// NOTIFICATION
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("notifBtn");
-    const menu = document.getElementById("notifMenu");
-
-    let isOpen = false;
-
-    function openMenu() {
-      isOpen = true;
-      menu.classList.remove("notif-close");
-      menu.classList.add("notif-open");
+      });
     }
 
-    function closeMenu() {
-      isOpen = false;
-      menu.classList.remove("notif-open");
-      menu.classList.add("notif-close");
+    function resetAddForm() {
+      addCategory.selectedIndex = 0;
+      addDate.value = '';
+      addStock.value = '';
+      addName.value = '';
+      addUnit.value = '';
+      addQty.value = '';
+      addUsed.value = '';
+      addBalance.value = '';
     }
 
-    // Toggle when clicking bell
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen ? closeMenu() : openMenu();
-    });
+    async function addItem() {
+      if (
+        addCategory.selectedIndex === 0 ||
+        addUnit.selectedIndex === 0 ||
+        !addDate.value ||
+        !addStock.value ||
+        !addName.value ||
+        !addUnit.value ||
+        addQty.value === ''
+      ) {
+        alert('Please complete all required fields.');
+        return;
+      }
 
-    // Keep open when clicking inside menu
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
+      const res = await fetch('/dentist/inventory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
+        },
+        body: JSON.stringify({
+          category: addCategory.value,
+          date_received: addDate.value,
+          stock_no: addStock.value.trim(),
+          name: addName.value.trim(),
+          unit: addUnit.value,
+          qty: Number(addQty.value),
+          used: Number(addUsed.value || 0)
+        })
+      });
 
-    // Close when clicking outside
-    document.addEventListener("click", () => {
-      if (isOpen) closeMenu();
-    });
+      if (!res.ok) {
+        const err = await res.json();
+        console.error(err);
+        alert(Object.values(err.errors).join('\n'));
+        return;
+      }
 
-    // Close on ESC
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) closeMenu();
-    });
+      addModal.close();
+      resetAddForm();
+      loadInventory();
+    }
 
-    // Start closed
-    closeMenu();
-  });
-</script>
+    let editId = null;
+
+    function openEdit(id) {
+      editId = id;
+      const i = inventory.find(item => item.id === id);
+      if (!i) return;
+
+      editCategory.value = i.category;
+      editStock.value = i.stock_no;
+      editName.value = i.name;
+      editUnit.value = i.unit;
+      editQty.value = i.qty;
+      editUsed.value = i.used;
+      editDate.value = i.date_received?.slice(0, 10);
+
+      computeEditBalance();
+      editModal.showModal();
+    }
+
+    async function saveEdit() {
+      if (!editId) return;
+
+      const res = await fetch(`/dentist/inventory/${editId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute('content')
+        },
+        body: JSON.stringify({
+          category: editCategory.value,
+          date_received: editDate.value,
+          stock_no: editStock.value,
+          name: editName.value,
+          unit: editUnit.value,
+          qty: Number(editQty.value),
+          used: Number(editUsed.value)
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error(err);
+        alert('EDIT FAILED — check console');
+        return;
+      }
+
+      editModal.close();
+      editId = null;
+      loadInventory();
+    }
+
+    function computeAddBalance() {
+      const qty = Number(addQty.value || 0);
+      const used = Number(addUsed.value || 0);
+      addBalance.value = qty - used;
+    }
+
+    function computeEditBalance() {
+      editBalance.value =
+        Number(editQty.value || 0) - Number(editUsed.value || 0);
+    }
+
+    function formatDateMMDDYY(dateStr) {
+      const d = new Date(dateStr);
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${mm}/${dd}/${yy}`;
+    }
+  </script>
 
 </body>
+
 </html>
