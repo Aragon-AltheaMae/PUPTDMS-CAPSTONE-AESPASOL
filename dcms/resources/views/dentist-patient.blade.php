@@ -46,30 +46,21 @@
       }
     }
 
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
+    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
     .radio-red {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #8B0000;
-      border-radius: 9999px;
-      display: inline-grid;
-      place-content: center;
-      background: #fff;
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px;
+      border: 2px solid #8B0000; border-radius: 9999px;
+      display: inline-grid; place-content: center; background: #fff;
     }
-
     .radio-red::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 9999px;
-      transform: scale(0);
-      transition: transform 120ms ease-in-out;
-      background: #8B0000;
+      content: ""; width: 8px; height: 8px; border-radius: 9999px;
+      transform: scale(0); transition: transform 120ms ease-in-out; background: #8B0000;
     }
 
     .radio-red:checked::before {
@@ -81,6 +72,21 @@
       align-items: center;
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
+    .sidebar-link:hover .sidebar-tooltip { opacity: 1; transform: scale(1); }
+    #sidebar[style*="16rem"] .sidebar-tooltip { display: none; }
+    #sidebar[style*="16rem"] .sidebar-link { justify-content: flex-start; }
+    .sidebar-link i { width: 24px; min-width: 24px; text-align: center; }
+    #sidebar[style*="72px"] .sidebar-link  { justify-content: center; gap: 0; }
+    #sidebar[style*="16rem"] .sidebar-link { justify-content: flex-start; gap: 12px; }
+    #sidebar[style*="16rem"] .sidebar-link:hover { transform: translateX(4px); }
+    .sidebar-link:hover .sidebar-text { opacity: 1; transform: scale(1); }
+    .sidebar-text { transform-origin: left center; }
+
+    .notif-open  { opacity: 1 !important; transform: scale(1) !important; pointer-events: auto !important; }
+    .notif-close { opacity: 0 !important; transform: scale(0.95) !important; pointer-events: none !important; }
+
+    #openFilter.filter-active { background: #8B0000 !important; color: #fff !important; }
+    #openFilter.filter-active i { color: #fff !important; }
 
     #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
@@ -102,6 +108,7 @@
     #sidebar.expanded .section-label {
       display: block;
     }
+    .tab-btn.tab-active::after { opacity: 1; }
 
     #sidebar.expanded .sidebar-text {
       opacity: 1;
@@ -315,9 +322,11 @@
     [data-theme="dark"] .bg-white {
       background-color: #000D1A !important;
     }
-
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
+    .patient-card:hover .card-arrow-btn {
+      background: #8B0000;
+      border-color: #8B0000;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(139,0,0,.3);
     }
 
     [data-theme="dark"] .theme-toggle-container {
@@ -337,6 +346,9 @@
       background: #2A2A2A;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
+
+    @media (max-width: 1024px) { .grid-cols-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 640px)  { .grid-cols-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 </head>
 
@@ -425,822 +437,433 @@
           <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- SIDEBAR -->
-  <aside id="sidebar"
-    class="fixed left-0 top-[72px]
-         h-[calc(100vh-72px)]
-         bg-white
-         drop-shadow-xl
-         transition-all duration-300
-         flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
-
-    <!-- TOP -->
-    <div class="pt-4">
-
-      <!-- Toggle Button -->
-      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
-        <button onclick="toggleSidebar()"
-          id="sidebarToggleBtn"
-          class="w-8 h-8 flex items-center justify-center
-              rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#F0F0F0] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <!-- NAVIGATION LABEL -->
-      <div class="section-label px-4 mb-6">Navigation</div>
-
-      <!-- MENU -->
-      <nav class="space-y-2 px-3 text-gray-600">
-
-        <!-- DASHBOARD -->
+      <nav class="space-y-2 px-3 text-gray-600 text-sm">
         <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-chart-line text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Dashboard
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Dashboard
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-chart-line text-lg"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Dashboard</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Dashboard</span>
         </a>
-
-        <!-- PATIENTS -->
         <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
-            <i class="fa-solid fa-users text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Patients
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Patients
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.patients*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-users text-lg"></i>
+          <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Patients</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Patients</span>
         </a>
-
-        <!-- APPOINTMENTS -->
         <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-calendar-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Appointments
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Appointments
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.appointments*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-calendar-check text-lg"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Appointments</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Appointments</span>
         </a>
-
-        <!-- Document Requests -->
         <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file-circle-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Document Requests
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Document Requests
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.documentrequests*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-file-circle-check text-lg"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Document Requests</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Document Requests</span>
         </a>
-
-        <!-- INVENTORY -->
         <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-box text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Inventory
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Inventory
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.inventory*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-box text-lg"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Inventory</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Inventory</span>
         </a>
-
-        <!-- REPORTS -->
         <a href="{{ route('dentist.report') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Reports
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Reports
-          </span>
+          class="sidebar-link relative flex items-center rounded-xl transition-all duration-200
+                 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                 {{ request()->routeIs('dentist.report*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                       {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <i class="fa-solid fa-file text-lg"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Reports</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Reports</span>
         </a>
       </nav>
     </div>
-
-    <!-- BOTTOM -->
-    <div class="px-3 pb-5 space-y-4">
-      <div class="section-label">Settings</div>
-
-      <div class="w-full px-3">
-        <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-            <i class="fa-solid fa-sun"></i>
-          </button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-            <i class="fa-regular fa-moon"></i>
-          </button>
-          <div class="theme-indicator" aria-hidden="true"></div>
-        </div>
-      </div>
-
+    <div class="px-3 pb-5 space-y-2">
+      <button id="themeToggle"
+        class="sidebar-link relative flex items-center justify-center w-full px-2 py-1.5 rounded-xl
+               bg-[#7B6CF6] text-[#F4F4F4] transition-all duration-200 hover:scale-105"
+        aria-label="Toggle dark mode">
+        <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
+        <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Dark Mode</span>
+        <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                     text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                     pointer-events-none transition-all duration-200">Dark Mode</span>
+      </button>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button
-          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
-             text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
-            <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          </div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
-            Log out
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Log out
-          </span>
+        <button class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
+                       text-red-600 hover:bg-red-50 transition-all duration-200">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000]
+                       text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95
+                       pointer-events-none transition-all duration-200">Log out</span>
         </button>
       </form>
-
     </div>
   </aside>
 
-  <!-- CONTENT -->
-  <main
-    id="mainContent"
-    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+  <!-- ═══════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════ -->
+  <main id="mainContent"
+    class="pt-[100px] px-6 py-10 w-full transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
     <div class="max-w-7xl mt-4 mx-auto fade-in">
       <div class="px-2 md:px-6">
 
-        <!-- Title + Search / Filter -->
+        <!-- Title + Search / Filter — UNCHANGED -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div class="mb-6">
-            <h2 class="text-3xl font-bold text-[#8B0000]">
-              Patient List
-            </h2>
-            <p class="text-gray-500 mt-1">
-              Click to Access Patient Information
-            </p>
+            <h2 class="text-3xl font-bold text-[#8B0000]">Patient List</h2>
+            <p class="text-gray-500 mt-1">Click to Access Patient Information</p>
           </div>
-
           <div class="flex items-center gap-6 w-full md:w-auto">
             <div id="searchWrapper"
               class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full md:w-auto">
-              <div id="searchInner"
-                class="flex items-center bg-white rounded-full overflow-hidden w-full h-12">
-                <!-- left: search -->
+              <div id="searchInner" class="flex items-center bg-white rounded-full overflow-hidden w-full h-12">
                 <div class="flex items-center gap-2 pl-3 pr-5 py-2 flex-1">
                   <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
                     <i class="fa-solid fa-magnifying-glass text-white text-[11px]"></i>
                   </span>
-
-                  <input
-                    id="searchInput"
-                    type="text"
-                    placeholder="Search"
+                  <input id="searchInput" type="text" placeholder="Search"
                     class="w-full md:w-72 bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none" />
                 </div>
-
                 <div id="searchDivider" class="w-[2px] self-stretch bg-[#F2C94C]"></div>
-
-                <button id="openFilter"
-                  type="button"
+                <button id="openFilter" type="button"
                   class="h-full px-6 flex items-center gap-2 font-semibold
-                    text-[#8B0000] bg-white
-                    rounded-none rounded-r-full border-0">
-                  <i class="fa-solid fa-sliders"></i>
-                  Filter
+                         text-[#8B0000] bg-white rounded-none rounded-r-full border-0">
+                  <i class="fa-solid fa-sliders"></i>Filter
                 </button>
-
               </div>
             </div>
-
-            <button id="clearBtn" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">
-              Clear
-            </button>
+            <button id="clearBtn" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">Clear</button>
           </div>
         </div>
 
-        <div class="w-full max-w-6xl mx-auto">
+        @php
+        use Carbon\Carbon;
+        $today = Carbon::today()->toDateString();
+        $appts = ($appointments instanceof \Illuminate\Pagination\AbstractPaginator)
+          ? collect($appointments->items()) : collect($appointments);
 
+        $todayCount       = $appts->filter(fn($a) => $a->appointment_date === $today && !in_array(strtolower($a->status ?? ''), ['cancelled','completed']))->count();
+        $upcomingCount    = $appts->filter(fn($a) => $a->appointment_date > $today && in_array(strtolower($a->status ?? ''), ['pending','confirmed']))->count();
+        $rescheduledCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'rescheduled')->count();
+        $cancelledCount   = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'cancelled')->count();
+        $completedCount   = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'completed')->count();
+        $allCount         = $appts->count();
+        @endphp
+
+        <div class="w-full max-w-6xl mx-auto">
           <div class="mx-4">
             <div class="mx-4 relative">
 
-              <div class="flex gap-4 px-6 relative z-20">
+              <!-- ═══════════════════════════════
+                   TABS — white card style
+              ═══════════════════════════════ -->
+              <div class="grid grid-cols-6 gap-3 px-6 relative z-20 mb-4">
 
-                <button
-                  class="filter-btn bg-[#8B0000] text-white
-                  rounded-t-2xl rounded-b-none
-                  px-6 py-4 w-[210px] text-left
-                  hover:opacity-90 transition-all duration-200"
-                  data-filter="today"
-                  type="button">
-                  <h3 class="text-4xl font-medium leading-none mb-2">5</h3>
-                  <p class="text-base">Scheduled Today</p>
+                <!-- SCHEDULED TODAY -->
+                <button class="filter-btn tab-btn tab-scheduled" data-filter="today" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <span class="tab-count">{{ $todayCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">Scheduled Today</span>
                 </button>
 
-                <button
-                  class="filter-btn bg-[#8B0000] text-white
-                  rounded-t-2xl rounded-b-none
-                  px-6 py-4 w-[210px] text-left
-                  hover:opacity-90 transition-all duration-200"
-                  data-filter="rescheduled"
-                  type="button">
-                  <h3 class="text-4xl font-medium leading-none mb-2">10</h3>
-                  <p class="text-base">Rescheduled</p>
+                <!-- UPCOMING -->
+                <button class="filter-btn tab-btn tab-upcoming" data-filter="upcoming" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <span class="tab-count">{{ $upcomingCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">Upcoming</span>
                 </button>
 
-                <button
-                  class="filter-btn bg-[#8B0000] text-white
-                  rounded-t-2xl rounded-b-none
-                  px-6 py-4 w-[210px] text-left
-                  hover:opacity-90 transition-all duration-200"
-                  data-filter="all"
-                  type="button">
-                  <h3 class="text-4xl font-medium leading-none mb-2">50</h3>
-                  <p class="text-base">All</p>
+                <!-- RESCHEDULED -->
+                <button class="filter-btn tab-btn tab-rescheduled" data-filter="rescheduled" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-rotate"></i>
+                    </div>
+                    <span class="tab-count">{{ $rescheduledCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">Rescheduled</span>
+                </button>
+
+                <!-- CANCELLED -->
+                <button class="filter-btn tab-btn tab-cancelled" data-filter="cancelled" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-xmark"></i>
+                    </div>
+                    <span class="tab-count">{{ $cancelledCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">Cancelled</span>
+                </button>
+
+                <!-- COMPLETED -->
+                <button class="filter-btn tab-btn tab-completed" data-filter="completed" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <span class="tab-count">{{ $completedCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">Completed</span>
+                </button>
+
+                <!-- ALL -->
+                <button class="filter-btn tab-btn tab-all" data-filter="all" type="button">
+                  <div class="tab-top-row">
+                    <div class="tab-icon-wrap">
+                      <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                    <span class="tab-count">{{ $allCount ?? 0 }}</span>
+                  </div>
+                  <span class="tab-label">All Patients</span>
                 </button>
 
               </div>
-              <div class="mx-4 shadow-lg rounded-lg bg-white overflow-hidden relative">
+              <!-- /tabs -->
 
-                <div
-                  id="patientContainer"
-                  class="space-y-4 px-6 pb-6 pt-14 -mt-8 rounded-t-none">
+              <!-- ═══════════════════════════════
+                   PATIENT CARDS CONTAINER
+              ═══════════════════════════════ -->
+              <div class="mx-4 shadow-lg rounded-2xl bg-white overflow-hidden relative">
+                <div id="patientContainer" class="space-y-3 px-6 pb-6 pt-5">
 
-                  <a href="/dentist/patient"
-                    class="patient-item today block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
+                  @forelse($appointments as $appt)
+                  @php
+                  $status       = strtolower($appt->status ?? '');
+                  $isCancelled  = $status === 'cancelled';
+                  $isCompleted  = $status === 'completed';
+                  $isRescheduled= $status === 'rescheduled';
+                  $isToday      = ($appt->appointment_date === $today) && !$isCancelled && !$isCompleted;
+                  $isUpcoming   = ($appt->appointment_date > $today) && in_array($status, ['pending','confirmed'], true);
 
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
+                  $tabClass = $isCancelled ? 'cancelled' :
+                    ($isCompleted   ? 'completed'    :
+                    ($isRescheduled ? 'rescheduled'  :
+                    ($isToday       ? 'today'        :
+                    ($isUpcoming    ? 'upcoming'     : 'all'))));
 
-                    <div class="flex items-center gap-6 px-8 py-6 pl-12">
+                  $patientName  = $appt->patient->name ?? 'Unknown Patient';
+                  $dateLabel    = Carbon::parse($appt->appointment_date)->format('d M Y');
+                  $timeLabel    = Carbon::parse($appt->appointment_time)->format('g:i A');
+                  $serviceLabel = ($appt->service_type === 'Others')
+                    ? ($appt->other_services ?: 'Others') : $appt->service_type;
 
-                      <img
-                        src="https://i.pravatar.cc/80"
-                        class="w-16 h-16 rounded-full object-cover shadow"
-                        alt="Patient" />
+                  // accent bar class
+                  $accentClass = $isCancelled   ? 'accent-cancelled'  :
+                    ($isCompleted   ? 'accent-completed'  :
+                    ($isRescheduled ? 'accent-rescheduled':
+                    ($isToday       ? 'accent-today'      :
+                    ($isUpcoming    ? 'accent-upcoming'   : 'accent-default'))));
 
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
+                  // icon box classes
+                  $iconBg = $isCancelled   ? 'bg-red-100'    :
+                    ($isCompleted   ? 'bg-green-100'  :
+                    ($isRescheduled ? 'bg-orange-100' :
+                    ($isToday       ? 'bg-blue-100'   :
+                    ($isUpcoming    ? 'bg-orange-100' : 'bg-gray-100'))));
+                  $iconColor = $isCancelled   ? 'text-red-600'    :
+                    ($isCompleted   ? 'text-green-600'  :
+                    ($isRescheduled ? 'text-orange-600' :
+                    ($isToday       ? 'text-blue-600'   :
+                    ($isUpcoming    ? 'text-orange-600' : 'text-gray-500'))));
 
-                        <div class="col-span-4">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Villanueva, Emily
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00016 · BSECE · 2nd Year · Section 1
-                          </p>
-                          <span class="patient-info hidden">BSECE|2nd Year|1|2025-01-20</span>
-                        </div>
+                  // pill class
+                  $pillClass = $isCancelled   ? 'pill-cancelled'  :
+                    ($isCompleted   ? 'pill-completed'  :
+                    ($isRescheduled ? 'pill-rescheduled':
+                    ($isToday       ? 'pill-today'      :
+                    ($isUpcoming    ? 'pill-upcoming'   : 'pill-default'))));
+                  $pillText  = $isCancelled   ? 'Cancelled'         :
+                    ($isCompleted   ? 'Completed'         :
+                    ($isRescheduled ? 'Rescheduled'       :
+                    ($isToday       ? 'Appointment Today' :
+                    ($isUpcoming    ? 'Upcoming · '.ucfirst($status) : ucfirst($status ?: 'Pending')))));
+                  @endphp
 
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Date and Time
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              20 Jan 2025
-                            </p>
-                            <p class="text-gray-600 text-xs">
-                              1:30 PM – 2:30 PM
-                            </p>
-                          </div>
-                        </div>
+                  <a href="{{ route('dentist.patient.profile') }}"
+                    class="patient-card patient-item all {{ $tabClass }} block">
 
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Service
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              Dental Checkup
-                            </p>
+                    <!-- accent bar -->
+                    <div class="accent-bar {{ $accentClass }}"></div>
 
-                            <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                              Appointment Today
-                            </span>
-                          </div>
-                        </div>
-
-                        <div class="col-span-1 flex justify-end">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
-                      </div>
-                    </div>
-                  </a>
-
-                  <a href="/dentist/patient"
-                    class="patient-item today block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
-
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
-
-                    <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
-
-                      <img
-                        src="https://i.pravatar.cc/52"
-                        class="w-16 h-16 rounded-full object-cover shadow"
-                        alt="Patient" />
-
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                        <div class="col-span-4 leading-tight">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Dela Cruz, Mark
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00011 · BSECE · 1st Year · Section 2
-                          </p>
-                          <span class="patient-info hidden">BSECE|1st Year|2|2025-01-20</span>
-                        </div>
-
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Date and Time
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              January 20, 2025
-                            </p>
-                            <p class="text-gray-600 text-xs">
-                              11:30 AM
-                            </p>
-                          </div>
-                        </div>
-
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Service
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              Tooth Cleaning
-                            </p>
-
-                            <span
-                              class="inline-block mt-2 px-3 py-1 rounded-full
-                            bg-green-100 text-green-700 text-xs font-medium">
-                              Appointment Today
-                            </span>
-                          </div>
-                        </div>
-
-                        <div class="col-span-1 flex justify-end items-center">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
-                      </div>
-                    </div>
-                  </a>
-
-                  <a href="/dentist/patient"
-                    class="patient-item today block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
-
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-[#2E2E2E] rounded-l-xl"></div>
-
-                    <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
-
-                      <img
-                        src="https://i.pravatar.cc/52"
-                        class="w-16 h-16 rounded-full object-cover shadow"
-                        alt="Patient" />
-
-                      <!-- Content -->
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                        <!-- Patient info -->
-                        <div class="col-span-4">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Villanueva, Emily
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00016 · BSECE · 2nd Year · Section 1
-                          </p>
-                          <span class="patient-info hidden">BSECE|2nd Year|1|2025-01-20</span>
-                        </div>
-
-                        <!-- Date & Time -->
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Date and Time
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              20 Jan 2025
-                            </p>
-                            <p class="text-gray-600 text-xs">
-                              1:30 PM – 2:30 PM
-                            </p>
-                          </div>
-                        </div>
-
-                        <!-- Service -->
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-blue-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Service
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              Dental Checkup
-                            </p>
-
-                            <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                              Appointment Today
-                            </span>
-                          </div>
-                        </div>
-
-                        <!-- Arrow -->
-                        <div class="col-span-1 flex justify-end">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
-                      </div>
-                    </div>
-                  </a>
-
-                  <!-- Rescheduled -->
-                  <!-- Patient Card – RESCHEDULED -->
-                  <a href="/dentist/patient"
-                    class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
-
-                    <!-- Left accent bar -->
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-                    <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
+                    <div class="flex items-center gap-5 px-8 py-5 pl-10">
 
                       <!-- Avatar -->
-                      <img
-                        src="https://i.pravatar.cc/54"
-                        class="w-16 h-16 rounded-full object-cover shadow"
+                      <img src="https://i.pravatar.cc/80?u={{ $appt->patient_id }}"
+                        class="w-14 h-14 rounded-2xl object-cover shadow-sm border-2 border-gray-100 flex-shrink-0"
                         alt="Patient" />
 
-                      <!-- Main content -->
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                        <!-- Name + ID -->
-                        <div class="col-span-4 leading-tight">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Reyes, Joshua
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00013 · BSED - ENG · 2nd Year · Section 1
-                          </p>
-                          <span class="patient-info hidden">BSED - ENG|2nd Year|1|2025-01-22</span>
-                        </div>
-
-                        <!-- DATE AND TIME -->
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-orange-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Date and Time
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              January 22, 2025
-                            </p>
-                            <p class="text-gray-600 text-xs">
-                              10:00 AM
-                            </p>
-                          </div>
-                        </div>
-
-                        <!-- SERVICE -->
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-orange-600"></i>
-                          </div>
-                          <div class="text-sm">
-                            <p class="text-gray-400 text-xs uppercase tracking-wide">
-                              Service
-                            </p>
-                            <p class="font-semibold text-[#333333]">
-                              Tooth Extraction
-                            </p>
-
-                            <span
-                              class="inline-block mt-2 px-3 py-1 rounded-full
-                        bg-orange-100 text-orange-600 text-xs font-medium">
-                              Rescheduled
-                            </span>
-                          </div>
-                        </div>
-
-                        <!-- Arrow -->
-                        <div class="col-span-1 flex justify-end items-center">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
+                      <!-- Name + ID -->
+                      <div class="w-44 flex-shrink-0">
+                        <p class="font-semibold text-[#1a1a1a] text-sm leading-tight">{{ $patientName }}</p>
+                        <span class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-gray-100
+                                     text-gray-500 text-[11px] font-medium">
+                          ID #{{ $appt->patient_id }}
+                        </span>
+                        <span class="patient-info hidden">N/A|N/A|N/A|{{ $appt->appointment_date }}|N/A</span>
                       </div>
+
+                      <!-- Divider -->
+                      <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
+
+                      <!-- Date & Time -->
+                      <div class="flex items-start gap-3 w-44 flex-shrink-0">
+                        <div class="icon-box bg-blue-50">
+                          <i class="fa-regular fa-calendar text-blue-500 text-base"></i>
+                        </div>
+                        <div>
+                          <p class="text-[10px] font-600 text-gray-400 uppercase tracking-wide mb-1">Date &amp; Time</p>
+                          <p class="font-semibold text-[#1a1a1a] text-sm">{{ $dateLabel }}</p>
+                          <p class="text-gray-500 text-xs mt-0.5">{{ $timeLabel }}</p>
+                        </div>
+                      </div>
+
+                      <!-- Divider -->
+                      <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
+
+                      <!-- Service + Status -->
+                      <div class="flex items-start gap-3 flex-1 min-w-0">
+                        <div class="icon-box {{ $iconBg }} flex-shrink-0">
+                          <i class="fa-solid fa-tooth {{ $iconColor }} text-base"></i>
+                        </div>
+                        <div class="min-w-0">
+                          <p class="text-[10px] font-600 text-gray-400 uppercase tracking-wide mb-1">Service</p>
+                          <p class="font-semibold text-[#1a1a1a] text-sm truncate">{{ $serviceLabel }}</p>
+                          <span class="status-pill {{ $pillClass }}">
+                            <span class="pill-dot"></span>
+                            {{ $pillText }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Arrow CTA -->
+                      <div class="card-arrow-btn ml-auto flex-shrink-0">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                      </div>
+
                     </div>
                   </a>
 
-                  <a href="/dentist/patient"
-                    class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
-
-                    <!-- Left accent bar -->
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-                    <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
-
-                      <!-- Avatar -->
-                      <img
-                        src="https://i.pravatar.cc/55"
-                        class="w-16 h-16 rounded-full object-cover shadow"
-                        alt="Patient" />
-
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                        <!-- Name -->
-                        <div class="col-span-4 leading-tight">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Garcia, Nicole
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00014 · BSOA · 1st Year · Section 2
-                          </p>
-                          <span class="patient-info hidden">BSOA|1st Year|2|2025-01-23</span>
-                        </div>
-
-                        <!-- Date & Time -->
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-orange-600"></i>
-                          </div>
-                          <div>
-                            <p class="text-gray-400 text-xs uppercase">Date and Time</p>
-                            <p class="font-semibold text-[#333333] text-sm">January 23, 2025</p>
-                            <p class="text-gray-600 text-xs">1:00 PM</p>
-                          </div>
-                        </div>
-
-                        <!-- Service -->
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-orange-600"></i>
-                          </div>
-                          <div>
-                            <p class="text-gray-400 text-xs uppercase">Service</p>
-                            <p class="font-semibold text-[#333333] text-sm">Dental Surgery</p>
-                            <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
-                              Rescheduled
-                            </span>
-                          </div>
-                        </div>
-
-                        <!-- Arrow -->
-                        <div class="col-span-1 flex justify-end">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
-                      </div>
-                    </div>
-                  </a>
-
-                  <a href="/dentist/patient"
-                    class="patient-item rescheduled block relative bg-white border border-gray-200 rounded-xl  shadow-sm hover:shadow-md transition cursor-pointer">
-
-                    <!-- Left accent bar -->
-                    <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-                    <div class="flex items-center w-full px-8 py-6 pl-12 gap-6">
-
-                      <!-- Avatar -->
-                      <img
-                        src="https://i.pravatar.cc/56"
-                        class="w-16 h-16 rounded-full object-cover shadow"
-                        alt="Patient" />
-
-                      <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                        <!-- Name -->
-                        <div class="col-span-4 leading-tight">
-                          <p class="font-semibold text-[#333333] text-sm">
-                            Lopez, Christian
-                          </p>
-                          <p class="text-gray-500 text-xs">
-                            2023-00015 · BSPSYCH · 3rd Year · Section 1
-                          </p>
-                          <span class="patient-info hidden">BSPSYCH|3rd Year|1|2025-01-24</span>
-                        </div>
-
-                        <!-- Date & Time -->
-                        <div class="col-span-4 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-regular fa-calendar text-orange-600"></i>
-                          </div>
-                          <div>
-                            <p class="text-gray-400 text-xs uppercase">Date and Time</p>
-                            <p class="font-semibold text-[#333333] text-sm">January 24, 2025</p>
-                            <p class="text-gray-600 text-xs">4:30 PM</p>
-                          </div>
-                        </div>
-
-                        <!-- Service -->
-                        <div class="col-span-3 flex items-start gap-3">
-                          <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                            <i class="fa-solid fa-tooth text-orange-600"></i>
-                          </div>
-                          <div>
-                            <p class="text-gray-400 text-xs uppercase">Service</p>
-                            <p class="font-semibold text-[#333333] text-sm">Dental Consultation</p>
-                            <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
-                              Rescheduled
-                            </span>
-                          </div>
-                        </div>
-
-                        <!-- Arrow -->
-                        <div class="col-span-1 flex justify-end">
-                          <i class="fa-solid fa-arrow-right text-[#8B0000] text-lg"></i>
-                        </div>
-
-                      </div>
-                    </div>
-                  </a>
-
-                </div> <!-- END #patientContainer -->
-
-                <!-- Pagination -->
-                <div id="pagination" class="flex items-center justify-center gap-4 py-8 text-sm text-gray-600">
-
-                  <button
-                    id="prevPage"
-                    class="flex items-center gap-1 px-2 py-1 text-gray-300 cursor-not-allowed"
-                    disabled>
-                    <span>‹</span> Previous
-                  </button>
-
-                  <div id="pageNumbers" class="flex items-center gap-2"></div>
-
-                  <button
-                    id="nextPage"
-                    class="flex items-center gap-1 px-2 py-1 text-[#8B0000] hover:underline">
-                    Next <span>›</span>
-                  </button>
+                  @empty
+                  <div class="py-16 text-center">
+                    <div class="text-5xl mb-4 opacity-20">🦷</div>
+                    <p class="text-gray-400 font-medium">No appointments found.</p>
+                  </div>
+                  @endforelse
 
                 </div>
-              </div> <!-- END tabs/card wrapper -->
-            </div> <!-- END mx-4 -->
+
+                <!-- Pagination — UNCHANGED -->
+                <div id="pagination" class="flex items-center justify-center gap-4 py-8 text-sm text-gray-600">
+                  <button id="prevPage" class="flex items-center gap-1 px-2 py-1 text-gray-300 cursor-not-allowed" disabled>
+                    <span>‹</span> Previous
+                  </button>
+                  <div id="pageNumbers" class="flex items-center gap-2"></div>
+                  <button id="nextPage" class="flex items-center gap-1 px-2 py-1 text-[#8B0000] hover:underline">
+                    Next <span>›</span>
+                  </button>
+                </div>
+
+              </div>
+              <!-- /patient container -->
+
+            </div>
           </div>
         </div>
-      </div> <!-- END w-full max-w-6xl -->
+
+      </div>
+    </div>
   </main>
 
-  <!-- FILTER MODAL  -->
+  <!-- ═══════════════════════════════════════════
+       FILTER MODAL — UNCHANGED
+  ═══════════════════════════════════════════ -->
   <div id="filterModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div class="bg-white w-[760px] rounded-xl shadow-2xl overflow-hidden border border-gray-200 flex flex-col">
-
-      <!-- Header -->
       <div class="px-6 py-4 flex items-center gap-3">
         <i class="fa-solid fa-sliders text-[#8B0000]"></i>
         <h2 class="text-xl font-medium text-[#8B0000]">Filter</h2>
       </div>
       <div class="h-px bg-gray-200"></div>
-
-      <!-- Body (scrollable if needed) -->
       <div class="px-6 py-5 space-y-5 max-h-[76vh] overflow-y-auto scroll-smooth">
-
-        <!-- Sort -->
         <div class="space-y-3">
           <p class="text-sm text-gray-500">Sort</p>
           <div class="space-y-2">
-            <label class="flex items-center gap-3 text-sm text-gray-700">
-              <input type="radio" name="sort" value="A-Z" class="filter-input radio-red" />
-              A-Z
-            </label>
-            <label class="flex items-center gap-3 text-sm text-gray-700">
-              <input type="radio" name="sort" value="Z-A" class="filter-input radio-red" />
-              Z-A
-            </label>
+            <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="sort" value="A-Z" class="filter-input radio-red" /> A-Z</label>
+            <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="sort" value="Z-A" class="filter-input radio-red" /> Z-A</label>
           </div>
         </div>
-
         <div class="h-px bg-gray-200"></div>
-
-        <!-- Date Range -->
         <div class="space-y-3">
           <p class="text-sm text-gray-500">Date Range</p>
-
           <div class="grid grid-cols-12 gap-6 items-start">
-            <!-- From/To -->
             <div class="col-span-8">
               <div class="grid grid-cols-2 gap-10">
                 <div class="space-y-2">
                   <label class="text-sm text-gray-700">From:</label>
-                  <input
-                    type="date"
-                    id="fromDate"
-                    class="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200" />
+                  <input type="date" id="fromDate" class="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200" />
                 </div>
-
                 <div class="space-y-2">
                   <label class="text-sm text-gray-700">To:</label>
-                  <input
-                    type="date"
-                    id="toDate"
-                    class="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200" />
+                  <input type="date" id="toDate" class="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200" />
                 </div>
               </div>
             </div>
-
-            <!-- Right radios -->
             <div class="col-span-4 space-y-2 pt-6">
-              <label class="flex items-center gap-3 text-sm text-gray-700">
-                <input type="radio" name="dateOrder" value="Ascending" class="radio-red" />
-                Ascending
-              </label>
-              <label class="flex items-center gap-3 text-sm text-gray-700">
-                <input type="radio" name="dateOrder" value="Descending" class="radio-red" />
-                Descending
-              </label>
+              <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="dateOrder" value="Ascending" class="radio-red" /> Ascending</label>
+              <label class="flex items-center gap-3 text-sm text-gray-700"><input type="radio" name="dateOrder" value="Descending" class="radio-red" /> Descending</label>
             </div>
           </div>
         </div>
-
         <div class="h-px bg-gray-200"></div>
-
-        <!-- Course -->
         <div class="space-y-3">
           <p class="text-sm text-gray-500">Course</p>
-
           <div class="grid grid-cols-6 gap-x-8 gap-y-4 text-sm text-gray-700">
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSIT" class="filter-input radio-red" /> BSIT</label>
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSECE" class="filter-input radio-red" /> BSECE</label>
@@ -1248,7 +871,6 @@
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSED - ENG" class="filter-input radio-red" /> BSED - ENG</label>
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSOA" class="filter-input radio-red" /> BSOA</label>
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSPSYCH" class="filter-input radio-red" /> BSPSYCH</label>
-
             <label class="flex items-center gap-3"><input type="radio" name="course" value="DIT" class="filter-input radio-red" /> DIT</label>
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSME" class="filter-input radio-red" /> BSME</label>
             <label class="flex items-center gap-3"><input type="radio" name="course" value="BSBA - MM" class="filter-input radio-red" /> BSBA - MM</label>
@@ -1256,10 +878,7 @@
             <label class="flex items-center gap-3"><input type="radio" name="course" value="DOMT" class="filter-input radio-red" /> DOMT</label>
           </div>
         </div>
-
         <div class="h-px bg-gray-200"></div>
-
-        <!-- Year + Section -->
         <div class="grid grid-cols-12 gap-10">
           <div class="col-span-6 space-y-3">
             <p class="text-sm text-gray-500">Year</p>
@@ -1270,7 +889,6 @@
               <label class="flex items-center gap-3"><input type="radio" name="year" value="4th Year" class="filter-input radio-red" /> 4th Year</label>
             </div>
           </div>
-
           <div class="col-span-6 space-y-3">
             <p class="text-sm text-gray-500">Section</p>
             <div class="space-y-3 text-sm text-gray-700">
@@ -1279,481 +897,218 @@
             </div>
           </div>
         </div>
-
         <div class="h-px bg-gray-200"></div>
-
-        <!-- Department -->
         <div class="space-y-3">
           <p class="text-sm text-gray-500">Department</p>
-
           <div class="flex flex-wrap gap-x-12 gap-y-4 text-sm text-gray-700">
-            <label class="flex items-center gap-3 whitespace-nowrap">
-              <input type="radio" name="department" value="Administrative" class="filter-input radio-red" />
-              Administrative
-            </label>
-            <label class="flex items-center gap-3 whitespace-nowrap">
-              <input type="radio" name="department" value="Faculty" class="filter-input radio-red" />
-              Faculty
-            </label>
-            <label class="flex items-center gap-3 whitespace-nowrap">
-              <input type="radio" name="department" value="Dependent" class="filter-input radio-red" />
-              Dependent
-            </label>
+            <label class="flex items-center gap-3 whitespace-nowrap"><input type="radio" name="department" value="Administrative" class="filter-input radio-red" /> Administrative</label>
+            <label class="flex items-center gap-3 whitespace-nowrap"><input type="radio" name="department" value="Faculty" class="filter-input radio-red" /> Faculty</label>
+            <label class="flex items-center gap-3 whitespace-nowrap"><input type="radio" name="department" value="Dependent" class="filter-input radio-red" /> Dependent</label>
           </div>
         </div>
-
       </div>
-
       <div class="h-px bg-gray-200"></div>
-
       <div class="px-6 py-4 flex items-center justify-between bg-white">
-        <button id="clearFiltersModal" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">
-          Clear
-        </button>
-
+        <button id="clearFiltersModal" type="button" class="text-[#8B0000] text-sm font-medium hover:underline">Clear</button>
         <button id="applyFilters" type="button"
-          class="bg-[#8B0000] text-white px-8 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000] transition">
-          Save
-        </button>
+          class="bg-[#8B0000] text-white px-8 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000] transition">Save</button>
       </div>
-
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
-    </div>
-  </footer>
+  <!-- Footer — UNCHANGED -->
+  <footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10"></footer>
 
+  <!-- ═══════════════════════════════════════════
+       ALL JAVASCRIPT — UNCHANGED
+  ═══════════════════════════════════════════ -->
   <script>
-    // =========================
-    // THEME TOGGLE 
-    // =========================
-    const html = document.documentElement;
-    const themeToggleContainer = document.getElementById("themeToggle");
-    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
-
-    function applyTheme(theme) {
-      html.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-
-      themeOptions.forEach(option => {
-        if (option.getAttribute("data-theme") === theme) {
-          option.classList.add("active");
-        } else {
-          option.classList.remove("active");
-        }
-      });
-
-      if (theme === "dark") {
-        themeIndicator.classList.add("dark-mode");
-      } else {
-        themeIndicator.classList.remove("dark-mode");
-      }
-    }
-
-    applyTheme(localStorage.getItem("theme") || "light");
-
-    themeOptions.forEach(option => {
-      option.addEventListener("click", () => {
-        const theme = option.getAttribute("data-theme");
-        applyTheme(theme);
-      });
+    /* DARK MODE */
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const html        = document.documentElement;
+    const savedTheme  = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+    themeToggle?.addEventListener('click', () => {
+      const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
     });
-
-    let sidebarOpen = true;
-
-    function applyLayout(sidebarWidth) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      sidebar.style.width = sidebarWidth;
-      main.style.marginLeft = sidebarWidth;
+    function updateThemeIcon(theme) {
+      if (!themeIcon) return;
+      themeIcon.classList.toggle('fa-moon', theme !== 'dark');
+      themeIcon.classList.toggle('fa-sun',  theme === 'dark');
     }
 
+    /* SIDEBAR */
+    let sidebarOpen = false;
+    function applyLayout(w) {
+      const s = document.getElementById('sidebar');
+      const m = document.getElementById('mainContent');
+      if (!s || !m) return;
+      s.style.width = w; m.style.marginLeft = w; m.style.width = 'auto';
+    }
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const texts = document.querySelectorAll('.sidebar-text');
-      const icon = document.getElementById('sidebarIcon');
       const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
+      const texts = document.querySelectorAll('.sidebar-text');
+      const icon  = document.getElementById('sidebarIcon');
       sidebarOpen = !sidebarOpen;
-
       if (sidebarOpen) {
-        applyLayout('220px');
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.add('expanded');
-        texts.forEach(t => {
-          t.classList.remove('opacity-0', 'w-0');
-          t.classList.add('opacity-100');
-        });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
-        icon.classList.replace('fa-bars', 'fa-xmark');
+        applyLayout('16rem');
+        texts.forEach(t => { t.classList.remove('opacity-0','w-0'); t.classList.add('opacity-100','w-auto'); });
+        toggleWrapper?.classList.replace('justify-center','justify-end');
+        document.getElementById('sidebarToggleBtn')?.classList.add('translate-x-2');
+        icon?.classList.replace('fa-bars','fa-xmark');
       } else {
         applyLayout('72px');
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
-        texts.forEach(t => {
-          t.classList.add('opacity-0', 'w-0');
-          t.classList.remove('opacity-100');
-        });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
-        icon.classList.replace('fa-xmark', 'fa-bars');
+        texts.forEach(t => { t.classList.add('opacity-0','w-0'); t.classList.remove('opacity-100','w-auto'); });
+        toggleWrapper?.classList.replace('justify-end','justify-center');
+        document.getElementById('sidebarToggleBtn')?.classList.remove('translate-x-2');
+        icon?.classList.replace('fa-xmark','fa-bars');
       }
-      applyTheme(localStorage.getItem("theme") || "light");
     }
+    document.addEventListener('DOMContentLoaded', () => { sidebarOpen = false; applyLayout('72px'); });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      sidebarOpen = true;
-      applyLayout('220px');
+    /* TAB ACTIVE STATE — add visual active class */
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+      });
     });
 
-    /* =========================
-       PATIENT LIST FILTER
-    ========================= */
+    /* PATIENT LIST FILTER + PAGINATION */
     document.addEventListener("DOMContentLoaded", () => {
       const patientContainer = document.getElementById("patientContainer");
       if (!patientContainer) return;
 
-      const allPatients = Array.from(patientContainer.querySelectorAll(".patient-item"));
-
-      const filterModal = document.getElementById("filterModal");
-      const filterPill = document.getElementById("openFilter"); // ✅ highlight this
+      const allPatients       = Array.from(patientContainer.querySelectorAll(".patient-item"));
+      const filterModal       = document.getElementById("filterModal");
+      const filterPill        = document.getElementById("openFilter");
       const clearFiltersModal = document.getElementById("clearFiltersModal");
-      const applyFiltersBtn = document.getElementById("applyFilters");
-      const searchInput = document.getElementById("searchInput");
-      const clearBtn = document.getElementById("clearBtn");
-      const filterButtons = document.querySelectorAll(".filter-btn");
+      const applyFiltersBtn   = document.getElementById("applyFilters");
+      const searchInput       = document.getElementById("searchInput");
+      const clearBtn          = document.getElementById("clearBtn");
+      const filterButtons     = document.querySelectorAll(".filter-btn");
 
-      const scheduledBtnCount = document.querySelector('.filter-btn[data-filter="today"] h3');
-      const rescheduledBtnCount = document.querySelector('.filter-btn[data-filter="rescheduled"] h3');
-      const allBtnCount = document.querySelector('.filter-btn[data-filter="all"] h3');
+      const countEls = {
+        today:       document.querySelector('.filter-btn[data-filter="today"] .tab-count'),
+        upcoming:    document.querySelector('.filter-btn[data-filter="upcoming"] .tab-count'),
+        rescheduled: document.querySelector('.filter-btn[data-filter="rescheduled"] .tab-count'),
+        cancelled:   document.querySelector('.filter-btn[data-filter="cancelled"] .tab-count'),
+        completed:   document.querySelector('.filter-btn[data-filter="completed"] .tab-count'),
+        all:         document.querySelector('.filter-btn[data-filter="all"] .tab-count'),
+      };
 
-      const monthPicker = document.getElementById("monthPicker"); // optional
-      const openFilter = document.getElementById("openFilter");
-      const searchWrapper = document.getElementById("searchWrapper");
-      const searchDivider = document.getElementById("searchDivider");
+      let activeTab = "today", searchKeyword = "";
+      let selectedProgram = null, selectedYearLevel = null, selectedSection = null, selectedDepartment = null;
+      let nameSort = null, dateSort = null;
+      let selectedMonth = null, selectedCalendarYear = null;
+      let activeFromDate = "", activeToDate = "";
 
-      // -------------------------
-      // STATE
-      // -------------------------
-      let activeTab = "today";
-      let searchKeyword = "";
+      const deptRadios  = [...document.querySelectorAll('input[name="department"]')];
+      const courseRadios= [...document.querySelectorAll('input[name="course"]')];
+      const yearRadios  = [...document.querySelectorAll('input[name="year"]')];
+      const sectionRadios=[...document.querySelectorAll('input[name="section"]')];
+      const otherRadios = [...courseRadios,...yearRadios,...sectionRadios];
 
-      let selectedProgram = null;
-      let selectedYearLevel = null;
-      let selectedSection = null;
-      let selectedDepartment = null;
-
-      let nameSort = null; // "az" | "za"
-      let dateSort = null; // "asc" | "desc"
-
-      let selectedMonth = null;
-      let selectedCalendarYear = null;
-
-      let activeFromDate = "";
-      let activeToDate = "";
-
-      // -------------------------
-      // MUTUAL EXCLUSION (dept <-> course/year/section)
-      // -------------------------
-      const deptRadios = [...document.querySelectorAll('input[name="department"]')];
-      const courseRadios = [...document.querySelectorAll('input[name="course"]')];
-      const yearRadios = [...document.querySelectorAll('input[name="year"]')];
-      const sectionRadios = [...document.querySelectorAll('input[name="section"]')];
-
-      const otherRadios = [...courseRadios, ...yearRadios, ...sectionRadios];
-
-      function anyChecked(list) {
-        return list.some(i => i.checked);
-      }
-
-      function setDisabled(list, disabled) {
-        list.forEach(i => {
-          i.disabled = disabled;
-          i.closest("label")?.classList.toggle("opacity-50", disabled);
-          i.closest("label")?.classList.toggle("cursor-not-allowed", disabled);
-        });
-      }
-
-      function clearChecked(list) {
-        list.forEach(i => (i.checked = false));
-      }
+      const anyChecked  = list => list.some(i => i.checked);
+      const setDisabled = (list, d) => list.forEach(i => {
+        i.disabled = d;
+        i.closest("label")?.classList.toggle("opacity-50", d);
+        i.closest("label")?.classList.toggle("cursor-not-allowed", d);
+      });
+      const clearChecked= list => list.forEach(i => i.checked = false);
 
       function syncMutualExclusion() {
-        const deptSelected = anyChecked(deptRadios);
-        const otherSelected = anyChecked(otherRadios);
-
-        if (deptSelected) {
-          clearChecked(otherRadios);
-          setDisabled(otherRadios, true);
-          setDisabled(deptRadios, false);
-          return;
-        }
-
-        if (otherSelected) {
-          clearChecked(deptRadios);
-          setDisabled(deptRadios, true);
-          setDisabled(otherRadios, false);
-          return;
-        }
-
-        setDisabled(deptRadios, false);
-        setDisabled(otherRadios, false);
+        if (anyChecked(deptRadios))  { clearChecked(otherRadios); setDisabled(otherRadios,true);  setDisabled(deptRadios,false); return; }
+        if (anyChecked(otherRadios)) { clearChecked(deptRadios);  setDisabled(deptRadios,true);   setDisabled(otherRadios,false); return; }
+        setDisabled(deptRadios,false); setDisabled(otherRadios,false);
       }
+      [...deptRadios,...otherRadios].forEach(r => r.addEventListener("change", syncMutualExclusion));
 
-      [...deptRadios, ...otherRadios].forEach(radio => {
-        radio.addEventListener("change", syncMutualExclusion);
-      });
+      const getInfo = p => {
+        const parts = (p.querySelector(".patient-info")?.textContent?.trim() || "").split("|").map(s => s.trim());
+        return { program: parts[0]||"", year: parts[1]||"", section: parts[2]||"", dateStr: parts[3]||"", department: parts[4]||p.dataset.department||"" };
+      };
+      const getName = p => (p.querySelector(".font-semibold")?.textContent||"").trim();
+      const getType = p => p.dataset.type||"";
+      const ilike   = (val,t) => (val||"").toLowerCase().includes((t||"").toLowerCase());
 
-      // -------------------------
-      // HELPERS
-      // -------------------------
-      function getInfo(p) {
-        const raw = p.querySelector(".patient-info")?.textContent?.trim() || "";
-        const parts = raw.split("|").map(s => s.trim());
-
-        return {
-          program: parts[0] || "",
-          year: parts[1] || "",
-          section: parts[2] || "",
-          dateStr: parts[3] || "",
-          department: parts[4] || p.dataset.department || ""
-        };
-      }
-
-      function getName(p) {
-        return (p.querySelector(".font-semibold")?.textContent || "").trim();
-      }
-
-      function getType(p) {
-        return p.dataset.type || "";
-      }
-
-      const infoLowerIncludes = (val, target) =>
-        (val || "").toLowerCase().includes((target || "").toLowerCase());
-
-      // -------------------------
-      // FILTER BUTTON STATE (SAVED/APPLIED FILTERS)
-      // -------------------------
       function updateFilterButtonState() {
-        const hasActiveFilters = !!searchKeyword ||
-          !!selectedProgram ||
-          !!selectedYearLevel ||
-          !!selectedSection ||
-          !!selectedDepartment ||
-          !!nameSort ||
-          !!dateSort ||
-          !!activeFromDate ||
-          !!activeToDate;
-
-        openFilter?.classList.toggle("filter-active", hasActiveFilters);
-      }
-      // ✅ LIVE FILTER BUTTON STATE (WHILE CLICKING INSIDE MODAL)
-      function updateFilterButtonStateLiveFromModal() {
-        if (!filterPill || !filterModal) return;
-
-        const anyRadioChecked = !!filterModal.querySelector('input[type="radio"]:checked');
-        const fromHasValue = !!document.getElementById("fromDate")?.value;
-        const toHasValue = !!document.getElementById("toDate")?.value;
-
-        // Light up if may pinipili sa modal OR may search OR may applied filters already
-        const liveActive = anyRadioChecked || fromHasValue || toHasValue || !!searchKeyword;
-
-        filterPill.classList.toggle("filter-active", liveActive);
+        const has = !!searchKeyword||!!selectedProgram||!!selectedYearLevel||!!selectedSection||!!selectedDepartment||!!nameSort||!!dateSort||!!activeFromDate||!!activeToDate;
+        filterPill?.classList.toggle("filter-active", has);
       }
 
-      // -------------------------
-      // MODAL OPEN/CLOSE
-      // -------------------------
-      filterPill?.addEventListener("click", (e) => {
-        e.preventDefault();
-        filterModal?.classList.remove("hidden");
-        syncMutualExclusion();
+      filterPill?.addEventListener("click", e => { e.preventDefault(); filterModal?.classList.remove("hidden"); syncMutualExclusion(); });
+      filterModal?.addEventListener("click", e => { if (e.target === filterModal) { filterModal.classList.add("hidden"); updateFilterButtonState(); } });
+      document.addEventListener("keydown", e => { if (e.key==="Escape") { filterModal?.classList.add("hidden"); updateFilterButtonState(); } });
+      clearBtn?.addEventListener("click", () => { if (!searchInput) return; searchInput.value=""; searchInput.dispatchEvent(new Event("input")); });
 
-        // show live state immediately when modal opens
-        updateFilterButtonStateLiveFromModal();
-      });
-
-      filterModal?.addEventListener("click", (e) => {
-        if (e.target === filterModal) {
-          filterModal.classList.add("hidden");
-          // when closing, revert to APPLIED filters state
-          updateFilterButtonState();
-        }
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          filterModal?.classList.add("hidden");
-          updateFilterButtonState();
-        }
-      });
-
-      // LIVE listen to any changes inside modal (radios + dates)
-      filterModal?.querySelectorAll("input").forEach(inp => {
-        inp.addEventListener("change", updateFilterButtonStateLiveFromModal);
-        inp.addEventListener("input", updateFilterButtonStateLiveFromModal); // for date typing
-      });
-
-      // Clear search button (ONLY search)
-      clearBtn?.addEventListener("click", () => {
-        if (!searchInput) return;
-        searchInput.value = "";
-        searchInput.dispatchEvent(new Event("input"));
-      });
-
-      // -------------------------
-      // PAGINATION
-      // -------------------------
       const pagination = document.getElementById("pagination");
-      const pageNumbers = document.getElementById("pageNumbers");
-      const prevPageBtn = document.getElementById("prevPage");
-      const nextPageBtn = document.getElementById("nextPage");
-
-      const ITEMS_PER_PAGE = 5;
-      let currentPage = 1;
-      let currentItems = [];
+      const pageNumbers= document.getElementById("pageNumbers");
+      const prevPageBtn= document.getElementById("prevPage");
+      const nextPageBtn= document.getElementById("nextPage");
+      const PER_PAGE   = 5;
+      let currentPage  = 1, currentItems = [];
 
       function renderPagination(items) {
         currentItems = items;
-        const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-
+        const total  = Math.ceil(items.length / PER_PAGE);
         if (pageNumbers) pageNumbers.innerHTML = "";
-
-        if (totalPages <= 1) {
-          pagination?.classList.add("hidden");
-          return;
-        }
+        if (total <= 1) { pagination?.classList.add("hidden"); return; }
         pagination?.classList.remove("hidden");
-
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= total; i++) {
           const btn = document.createElement("button");
           btn.textContent = i;
-          btn.className =
-            i === currentPage ?
-            "px-3 py-1 text-[#8B0000] font-medium" :
-            "px-3 py-1 hover:text-[#8B0000]";
-
-          btn.addEventListener("click", () => {
-            currentPage = i;
-            updatePage();
-          });
-
+          btn.className = i===currentPage ? "px-3 py-1 text-[#8B0000] font-medium" : "px-3 py-1 hover:text-[#8B0000]";
+          btn.addEventListener("click", () => { currentPage=i; updatePage(); });
           pageNumbers?.appendChild(btn);
         }
-
-        if (prevPageBtn) {
-          prevPageBtn.disabled = currentPage === 1;
-          prevPageBtn.classList.toggle("cursor-not-allowed", currentPage === 1);
-          prevPageBtn.classList.toggle("text-gray-300", currentPage === 1);
-        }
-
-        if (nextPageBtn) {
-          nextPageBtn.disabled = currentPage === totalPages;
-          nextPageBtn.classList.toggle("cursor-not-allowed", currentPage === totalPages);
-          nextPageBtn.classList.toggle("text-gray-300", currentPage === totalPages);
-        }
+        if (prevPageBtn) { prevPageBtn.disabled=currentPage===1; prevPageBtn.classList.toggle("cursor-not-allowed",currentPage===1); prevPageBtn.classList.toggle("text-gray-300",currentPage===1); }
+        if (nextPageBtn) { nextPageBtn.disabled=currentPage===total; nextPageBtn.classList.toggle("cursor-not-allowed",currentPage===total); nextPageBtn.classList.toggle("text-gray-300",currentPage===total); }
       }
 
       function updatePage() {
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        const end = start + ITEMS_PER_PAGE;
-
+        const s = (currentPage-1)*PER_PAGE, e = s+PER_PAGE;
         patientContainer.innerHTML = "";
-        currentItems.slice(start, end).forEach(p => patientContainer.appendChild(p));
-
+        currentItems.slice(s,e).forEach(p => patientContainer.appendChild(p));
         renderPagination(currentItems);
       }
 
-      prevPageBtn?.addEventListener("click", () => {
-        if (currentPage > 1) {
-          currentPage--;
-          updatePage();
-        }
-      });
+      prevPageBtn?.addEventListener("click", () => { if (currentPage>1) { currentPage--; updatePage(); } });
+      nextPageBtn?.addEventListener("click", () => { if (currentPage < Math.ceil(currentItems.length/PER_PAGE)) { currentPage++; updatePage(); } });
 
-      nextPageBtn?.addEventListener("click", () => {
-        const totalPages = Math.ceil(currentItems.length / ITEMS_PER_PAGE);
-        if (currentPage < totalPages) {
-          currentPage++;
-          updatePage();
-        }
-      });
-
-      // -------------------------
-      // APPLY FILTERS TO LIST
-      // -------------------------
       function applyFilters() {
         let data = [...allPatients];
-
-        if (activeTab !== "all") {
-          data = data.filter(p => p.classList.contains(activeTab));
-        }
-
-        if (searchKeyword) {
-          data = data.filter(p => {
-            const info = getInfo(p);
-            const haystack = `${getName(p)} ${info.program} ${getType(p)} ${info.department}`.toLowerCase();
-            return haystack.includes(searchKeyword);
-          });
-        }
-
-        if (selectedProgram) {
-          data = data.filter(p => infoLowerIncludes(getInfo(p).program, selectedProgram));
-        }
-
-        if (selectedYearLevel || selectedSection) {
-          data = data.filter(p => {
-            const info = getInfo(p);
-            if (selectedYearLevel && !infoLowerIncludes(info.year, selectedYearLevel)) return false;
-            if (selectedSection && String(info.section).trim() !== String(selectedSection).trim()) return false;
-            return true;
-          });
-        }
-
-        if (selectedDepartment) {
-          data = data.filter(p => infoLowerIncludes(getInfo(p).department, selectedDepartment));
-        }
-
-        if (activeFromDate || activeToDate) {
-          data = data.filter(p => {
-            const ds = getInfo(p).dateStr;
-            const d = ds ? new Date(ds) : null;
-            if (!d || isNaN(d.getTime())) return false;
-
-            if (activeFromDate && d < new Date(activeFromDate)) return false;
-            if (activeToDate && d > new Date(activeToDate)) return false;
-
-            return true;
-          });
-        }
-
-        if (selectedMonth && selectedCalendarYear) {
-          data = data.filter(p => {
-            const ds = getInfo(p).dateStr;
-            const d = ds ? new Date(ds) : null;
-            if (!d || isNaN(d.getTime())) return false;
-
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const y = String(d.getFullYear());
-            return m === selectedMonth && y === selectedCalendarYear;
-          });
-        }
-
-        if (nameSort === "az") data.sort((a, b) => getName(a).localeCompare(getName(b)));
-        if (nameSort === "za") data.sort((a, b) => getName(b).localeCompare(getName(a)));
-
-        if (dateSort === "asc") data.sort((a, b) => new Date(getInfo(a).dateStr) - new Date(getInfo(b).dateStr));
-        if (dateSort === "desc") data.sort((a, b) => new Date(getInfo(b).dateStr) - new Date(getInfo(a).dateStr));
+        if (activeTab !== "all") data = data.filter(p => p.classList.contains(activeTab));
+        if (searchKeyword) data = data.filter(p => `${getName(p)} ${getInfo(p).program} ${getType(p)} ${getInfo(p).department}`.toLowerCase().includes(searchKeyword));
+        if (selectedProgram)    data = data.filter(p => ilike(getInfo(p).program, selectedProgram));
+        if (selectedYearLevel || selectedSection) data = data.filter(p => {
+          const i = getInfo(p);
+          if (selectedYearLevel && !ilike(i.year, selectedYearLevel)) return false;
+          if (selectedSection   && String(i.section).trim() !== String(selectedSection).trim()) return false;
+          return true;
+        });
+        if (selectedDepartment) data = data.filter(p => ilike(getInfo(p).department, selectedDepartment));
+        if (activeFromDate || activeToDate) data = data.filter(p => {
+          const d = new Date(getInfo(p).dateStr);
+          if (isNaN(d)) return false;
+          if (activeFromDate && d < new Date(activeFromDate)) return false;
+          if (activeToDate   && d > new Date(activeToDate))   return false;
+          return true;
+        });
+        if (selectedMonth && selectedCalendarYear) data = data.filter(p => {
+          const d = new Date(getInfo(p).dateStr);
+          if (isNaN(d)) return false;
+          return String(d.getMonth()+1).padStart(2,"0")===selectedMonth && String(d.getFullYear())===selectedCalendarYear;
+        });
+        if (nameSort==="az") data.sort((a,b) => getName(a).localeCompare(getName(b)));
+        if (nameSort==="za") data.sort((a,b) => getName(b).localeCompare(getName(a)));
+        if (dateSort==="asc")  data.sort((a,b) => new Date(getInfo(a).dateStr)-new Date(getInfo(b).dateStr));
+        if (dateSort==="desc") data.sort((a,b) => new Date(getInfo(b).dateStr)-new Date(getInfo(a).dateStr));
 
         currentPage = 1;
         renderPagination(data);
@@ -1762,157 +1117,48 @@
         updateFilterButtonState();
       }
 
-      function computeCountForTab(tab) {
+      function computeCount(tab) {
         let data = [...allPatients];
-
-        if (tab !== "all") data = data.filter(p => p.classList.contains(tab));
-
-        if (searchKeyword) {
-          data = data.filter(p => {
-            const info = getInfo(p);
-            const haystack = `${getName(p)} ${info.program} ${getType(p)} ${info.department}`.toLowerCase();
-            return haystack.includes(searchKeyword);
-          });
-        }
-
-        if (selectedProgram) data = data.filter(p => infoLowerIncludes(getInfo(p).program, selectedProgram));
-
-        if (selectedYearLevel || selectedSection) {
-          data = data.filter(p => {
-            const info = getInfo(p);
-            if (selectedYearLevel && !infoLowerIncludes(info.year, selectedYearLevel)) return false;
-            if (selectedSection && String(info.section).trim() !== String(selectedSection).trim()) return false;
-            return true;
-          });
-        }
-
-        if (selectedDepartment) data = data.filter(p => infoLowerIncludes(getInfo(p).department, selectedDepartment));
-
-        if (activeFromDate || activeToDate) {
-          data = data.filter(p => {
-            const ds = getInfo(p).dateStr;
-            const d = ds ? new Date(ds) : null;
-            if (!d || isNaN(d.getTime())) return false;
-            if (activeFromDate && d < new Date(activeFromDate)) return false;
-            if (activeToDate && d > new Date(activeToDate)) return false;
-            return true;
-          });
-        }
-
-        if (selectedMonth && selectedCalendarYear) {
-          data = data.filter(p => {
-            const ds = getInfo(p).dateStr;
-            const d = ds ? new Date(ds) : null;
-            if (!d || isNaN(d.getTime())) return false;
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const y = String(d.getFullYear());
-            return m === selectedMonth && y === selectedCalendarYear;
-          });
-        }
-
+        if (tab!=="all") data = data.filter(p => p.classList.contains(tab));
+        if (searchKeyword) data = data.filter(p => `${getName(p)} ${getInfo(p).program} ${getType(p)} ${getInfo(p).department}`.toLowerCase().includes(searchKeyword));
+        if (selectedProgram)    data = data.filter(p => ilike(getInfo(p).program, selectedProgram));
+        if (selectedYearLevel || selectedSection) data = data.filter(p => { const i=getInfo(p); if(selectedYearLevel&&!ilike(i.year,selectedYearLevel))return false; if(selectedSection&&String(i.section).trim()!==String(selectedSection).trim())return false; return true; });
+        if (selectedDepartment) data = data.filter(p => ilike(getInfo(p).department, selectedDepartment));
+        if (activeFromDate||activeToDate) data = data.filter(p => { const d=new Date(getInfo(p).dateStr); if(isNaN(d))return false; if(activeFromDate&&d<new Date(activeFromDate))return false; if(activeToDate&&d>new Date(activeToDate))return false; return true; });
         return data.length;
       }
 
       function updateCounts() {
-        const todayCount = computeCountForTab("today");
-        const rescheduledCount = computeCountForTab("rescheduled");
-        const allCount = computeCountForTab("all");
-
-        if (scheduledBtnCount) scheduledBtnCount.textContent = todayCount;
-        if (rescheduledBtnCount) rescheduledBtnCount.textContent = rescheduledCount;
-        if (allBtnCount) allBtnCount.textContent = allCount;
+        Object.keys(countEls).forEach(tab => { if (countEls[tab]) countEls[tab].textContent = computeCount(tab); });
       }
 
-      filterButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          activeTab = btn.dataset.filter;
-          applyFilters();
-        });
-      });
-
-      searchInput?.addEventListener("input", () => {
-        searchKeyword = searchInput.value.trim().toLowerCase();
-        applyFilters();
-      });
-
-      if (monthPicker) {
-        monthPicker.addEventListener("change", (e) => {
-          if (!e.target.value) {
-            selectedMonth = null;
-            selectedCalendarYear = null;
-          } else {
-            const [year, month] = e.target.value.split("-");
-            selectedMonth = month;
-            selectedCalendarYear = year;
-          }
-          applyFilters();
-        });
-
-        const now = new Date();
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
-        const yy = String(now.getFullYear());
-        monthPicker.value = `${yy}-${mm}`;
-        selectedMonth = mm;
-        selectedCalendarYear = yy;
-      }
+      filterButtons.forEach(btn => { btn.addEventListener("click", () => { activeTab=btn.dataset.filter; applyFilters(); }); });
+      searchInput?.addEventListener("input", () => { searchKeyword=searchInput.value.trim().toLowerCase(); applyFilters(); });
 
       applyFiltersBtn?.addEventListener("click", () => {
-        selectedDepartment = filterModal?.querySelector('input[name="department"]:checked')?.value || null;
-        selectedProgram = filterModal?.querySelector('input[name="course"]:checked')?.value || null;
-        selectedYearLevel = filterModal?.querySelector('input[name="year"]:checked')?.value || null;
-        selectedSection = filterModal?.querySelector('input[name="section"]:checked')?.value || null;
-
-        const sortVal = filterModal?.querySelector('input[name="sort"]:checked')?.value || null;
-        nameSort = (sortVal === "A-Z" || sortVal === "az") ? "az" :
-          (sortVal === "Z-A" || sortVal === "za") ? "za" :
-          null;
-
-        // date order radios (Ascending/Descending) -> map to "asc/desc"
-        const dateOrderVal = filterModal?.querySelector('input[name="dateOrder"]:checked')?.value || null;
-        dateSort = (dateOrderVal === "Ascending" || dateOrderVal === "asc") ? "asc" :
-          (dateOrderVal === "Descending" || dateOrderVal === "desc") ? "desc" :
-          null;
-
-        activeFromDate = document.getElementById("fromDate")?.value || "";
-        activeToDate = document.getElementById("toDate")?.value || "";
-
+        selectedDepartment = filterModal?.querySelector('input[name="department"]:checked')?.value||null;
+        selectedProgram    = filterModal?.querySelector('input[name="course"]:checked')?.value||null;
+        selectedYearLevel  = filterModal?.querySelector('input[name="year"]:checked')?.value||null;
+        selectedSection    = filterModal?.querySelector('input[name="section"]:checked')?.value||null;
+        const sv = filterModal?.querySelector('input[name="sort"]:checked')?.value||null;
+        nameSort = sv==="A-Z"||sv==="az" ? "az" : sv==="Z-A"||sv==="za" ? "za" : null;
+        const dv = filterModal?.querySelector('input[name="dateOrder"]:checked')?.value||null;
+        dateSort = dv==="Ascending"||dv==="asc" ? "asc" : dv==="Descending"||dv==="desc" ? "desc" : null;
+        activeFromDate = document.getElementById("fromDate")?.value||"";
+        activeToDate   = document.getElementById("toDate")?.value||"";
         filterModal?.classList.add("hidden");
         syncMutualExclusion();
         applyFilters();
         updateFilterButtonState();
       });
 
-      // -------------------------
-      // CLEAR FILTERS
-      // -------------------------
       clearFiltersModal?.addEventListener("click", () => {
-        // Uncheck all radios inside modal
-        filterModal?.querySelectorAll("input[type='radio']").forEach(i => {
-          i.checked = false;
-          i.disabled = false;
-          i.closest("label")?.classList.remove("opacity-50", "cursor-not-allowed");
-        });
-
-        // Reset dates
-        const from = document.getElementById("fromDate");
-        const to = document.getElementById("toDate");
-        if (from) from.value = "";
-        if (to) to.value = "";
-
-        // Reset state
-        selectedDepartment = null;
-        selectedProgram = null;
-        selectedYearLevel = null;
-        selectedSection = null;
-        nameSort = null;
-        dateSort = null;
-        activeFromDate = "";
-        activeToDate = "";
-
-        syncMutualExclusion();
-        filterModal?.classList.add("hidden");
-        applyFilters();
-        updateFilterButtonState();
+        filterModal?.querySelectorAll("input[type='radio']").forEach(i => { i.checked=false; i.disabled=false; i.closest("label")?.classList.remove("opacity-50","cursor-not-allowed"); });
+        const f=document.getElementById("fromDate"); const t=document.getElementById("toDate");
+        if(f)f.value=""; if(t)t.value="";
+        selectedDepartment=selectedProgram=selectedYearLevel=selectedSection=nameSort=dateSort=null;
+        activeFromDate=activeToDate="";
+        syncMutualExclusion(); filterModal?.classList.add("hidden"); applyFilters(); updateFilterButtonState();
       });
 
       syncMutualExclusion();

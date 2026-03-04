@@ -18,10 +18,6 @@ class DocumentRequest extends Model
         'status',
     ];
 
-    /* =======================
-       RELATIONSHIPS
-    ======================= */
-
     public function patient()
     {
         return $this->belongsTo(Patient::class);
