@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,112 +22,358 @@
 
   <script>
     tailwind.config = {
-      daisyui: { themes: false }
+      daisyui: {
+        themes: false
+      }
     }
   </script>
 
   <style>
-    body { font-family: 'Inter'; }
-    @keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
-    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    body {
+      font-family: 'Inter';
+      overflow-x: hidden;
+    }
 
-    @keyframes softPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-    .pulse-icon { animation: softPulse 2s ease-in-out infinite; }
+    /* Layout (fix sidebar/main alignment) */
+    #mainContent {
+      margin-left: 200px;
+      transition: margin-left .3s ease;
+    }
 
-    @keyframes shimmer { 0% { background-position: -400px 0;} 100% { background-position: 400px 0;} }
+    #sidebar {
+      width: 200px;
+      transition: width .3s ease;
+    }
+
+    #sidebar.collapsed {
+      width: 72px !important;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes softPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .pulse-icon {
+      animation: softPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -400px 0;
+      }
+
+      100% {
+        background-position: 400px 0;
+      }
+    }
+
     .skeleton {
-      background: linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 37%,#e5e7eb 63%);
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
       background-size: 800px 100%;
       animation: shimmer 1.4s infinite linear;
       border-radius: 0.75rem;
     }
 
-    @keyframes fadeUp { 0%{opacity:0; transform:translateY(10px);} 100%{opacity:1; transform:translateY(0);} }
-    .fade-up { animation: fadeUp 0.6s ease-out forwards; }
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
 
-    @keyframes float { 0%,100%{transform: translateY(0) rotate(0deg);} 50%{transform: translateY(-14px) rotate(2deg);} }
-    .float-slow { animation: float 4.5s ease-in-out infinite; will-change: transform; }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-    @keyframes shimmerBtn { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+    .fade-up {
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-14px) rotate(2deg);
+      }
+    }
+
+    .float-slow {
+      animation: float 4.5s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    @keyframes shimmerBtn {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
     .shimmer-btn {
-      background: linear-gradient(110deg,#660000 25%,rgba(255,80,80,0.87) 37%,#660000 63%);
+      background: linear-gradient(110deg, #660000 25%, rgba(255, 80, 80, 0.87) 37%, #660000 63%);
       background-size: 200% 100%;
       animation: shimmerBtn 10s linear infinite;
     }
 
-    @keyframes wave { 0%{transform:rotate(0deg);}20%{transform:rotate(14deg);}40%{transform:rotate(-8deg);}60%{transform:rotate(14deg);}80%{transform:rotate(-4deg);}100%{transform:rotate(0deg);} }
-    .wave-hand { transform-origin: 70% 70%; animation: wave 2.5s ease-in-out infinite; }
+    @keyframes wave {
+      0% {
+        transform: rotate(0deg);
+      }
 
-    .sidebar-link { display:flex; align-items:center; transition: background-color .2s ease, transform .2s ease; }
-    #sidebar.expanded .sidebar-link { justify-content:flex-start; }
-    #sidebar.expanded .sidebar-link i { margin-right:.75rem; }
-    #sidebar.expanded .sidebar-link:hover { transform: translateX(4px); }
-    #sidebar.expanded .sidebar-tooltip { display:none; }
-    #sidebar.expanded .nav-section-label { display:block; }
-    #sidebar.expanded .sidebar-text { opacity:1; width:auto; overflow:visible; }
+      20% {
+        transform: rotate(14deg);
+      }
 
-    #sidebar.collapsed .sidebar-link { justify-content:center; }
-    #sidebar.collapsed .sidebar-text { opacity:0; width:0; overflow:hidden; }
-    #sidebar.collapsed .sidebar-tooltip { display:block; }
-    #sidebar.collapsed .nav-section-label { display:none; }
+      40% {
+        transform: rotate(-8deg);
+      }
 
-    .sidebar-link:hover .sidebar-tooltip { opacity: 1 !important; transform: scale(1) !important; }
+      60% {
+        transform: rotate(14deg);
+      }
 
-    .nav-section-label {
-      font-size: .65rem; font-weight: 700; letter-spacing: .08em; color:#757575;
-      text-transform: uppercase; margin-bottom:.25rem;
+      80% {
+        transform: rotate(-4deg);
+      }
+
+      100% {
+        transform: rotate(0deg);
+      }
     }
 
-    .notif-open { opacity:1 !important; transform: scale(1) !important; pointer-events:auto !important; }
-    .notif-close { opacity:0 !important; transform: scale(.95) !important; pointer-events:none !important; }
+    .wave-hand {
+      transform-origin: 70% 70%;
+      animation: wave 2.5s ease-in-out infinite;
+    }
 
-    [data-theme="dark"] body { background-color:#101010; color:#E5E7EB; }
-    [data-theme="dark"] #sidebar { background-color:#101010; }
-    [data-theme="dark"] .bg-white { background-color:#101010 !important; }
-    [data-theme="dark"] .text-\[\#333333\] { color:#E5E7EB !important; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      transition: background-color .2s ease, transform .2s ease;
+    }
 
-    body,#sidebar,main,.card,.modal-box { transition: background-color .3s ease, color .3s ease; }
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
 
-    .sidebar-link.bg-\[\#8B0000\] { box-shadow: 0 0 12px rgba(139,0,0,.45); }
+    #sidebar.expanded .sidebar-link i {
+      margin-right: .75rem;
+    }
 
-    @keyframes spinSlow { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
-    @keyframes floatMoon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
-    @keyframes driftCloud { 0%,100%{transform:translateX(0);} 50%{transform:translateX(3px);} }
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
 
-    .greet-spin { animation: spinSlow 8s linear infinite; display:inline-block; }
-    .greet-float { animation: floatMoon 3s ease-in-out infinite; display:inline-block; }
-    .greet-drift { animation: driftCloud 3s ease-in-out infinite; display:inline-block; }
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
 
-    dialog#activeAppointmentModal::backdrop { background: rgba(16,16,16,.45); }
-    dialog#activeAppointmentModal .swal-card { opacity:0; transform: translateY(10px) scale(.97); transition: opacity .18s ease, transform .18s ease; }
-    dialog#activeAppointmentModal[open] .swal-card { opacity:1; transform: translateY(0) scale(1); }
+    #sidebar.expanded .nav-section-label {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-text {
+      opacity: 1;
+      width: auto;
+      overflow: visible;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+    }
+
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.collapsed .nav-section-label {
+      display: none;
+    }
+
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .nav-section-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+    }
+
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(.95) !important;
+      pointer-events: none !important;
+    }
+
+    [data-theme="dark"] body {
+      background-color: #101010;
+      color: #E5E7EB;
+    }
+
+    [data-theme="dark"] #sidebar {
+      background-color: #101010;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #101010 !important;
+    }
+
+    [data-theme="dark"] .text-\[\#333333\] {
+      color: #E5E7EB !important;
+    }
+
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color .3s ease, color .3s ease;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, .45);
+    }
+
+    @keyframes spinSlow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes floatMoon {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    @keyframes driftCloud {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(3px);
+      }
+    }
+
+    .greet-spin {
+      animation: spinSlow 8s linear infinite;
+      display: inline-block;
+    }
+
+    .greet-float {
+      animation: floatMoon 3s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    .greet-drift {
+      animation: driftCloud 3s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    dialog#activeAppointmentModal::backdrop {
+      background: rgba(16, 16, 16, .45);
+    }
+
+    dialog#activeAppointmentModal .swal-card {
+      opacity: 0;
+      transform: translateY(10px) scale(.97);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    dialog#activeAppointmentModal[open] .swal-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   </style>
 </head>
 
 <body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
-@php
-  use Carbon\Carbon;
+  @php
+    use Carbon\Carbon;
 
-  // Notifications safe defaults
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
+    // Notifications safe defaults
+    $notifications = collect($notifications ?? []);
+    $notifCount = $notifications->count();
 
-  // Prepare records for safe JSON use
-  $homeRecords = ($records ?? collect())->map(function ($r) {
-    return [
-      'service'       => $r->service_type,
-      'date'          => $r->appointment_date ? Carbon::parse($r->appointment_date)->format('F d, Y') : '',
-      'time'          => $r->appointment_time ?? '',
-      'status'        => 'completed',
-      'duration'      => $r->duration ?? '',
-      'remarks'       => $r->remarks ?? '',
-      'oral'          => $r->oral_examination ?? '',
-      'diagnosis'     => $r->diagnosis ?? '',
-      'prescription'  => $r->prescription ?? '',
-    ];
-  })->values();
-@endphp
+    // Prepare records for safe JSON use
+    $homeRecords = ($records ?? collect())->map(function ($r) {
+      return [
+        'service' => $r->service_type,
+        'date' => $r->appointment_date ? Carbon::parse($r->appointment_date)->format('F d, Y') : '',
+        'time' => $r->appointment_time ?? '',
+        'status' => 'completed',
+        'duration' => $r->duration ?? '',
+        'remarks' => $r->remarks ?? '',
+        'oral' => $r->oral_examination ?? '',
+        'diagnosis' => $r->diagnosis ?? '',
+        'prescription' => $r->prescription ?? '',
+      ];
+    })->values();
+  @endphp
 
   <!-- HEADER -->
   <div class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
@@ -209,8 +456,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded">
     <!-- TOP -->
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -337,6 +583,7 @@
       <section class="max-w-7xl mx-auto mb-10">
         <div class="flex flex-col md:flex-row gap-6">
 
+          <!-- LEFT -->
           <div class="md:w-[600px] flex-shrink-0 flex flex-col gap-5">
             <div id="profileSkeletonContainer" class="rounded-2xl overflow-hidden shadow-lg"></div>
             <div class="bg-white rounded-2xl shadow-lg p-5">
@@ -344,6 +591,7 @@
             </div>
           </div>
 
+          <!-- RIGHT -->
           <div class="flex-1 flex flex-col gap-2">
             <div id="calendarSkeletonContainer" class="bg-white border shadow-sm rounded-2xl p-6 h-[630px] w-full">
               <div class="animate-pulse space-y-4">
@@ -491,10 +739,200 @@
         </form>
       </dialog>
 
-      <!-- (Your other modals are unchanged — keep them exactly as you had) -->
-      {{-- ✅ KEEP your clearance + record request modals here, unchanged --}}
-      {!! "" !!}
-    </div>
+      <!-- REQUEST CLEARANCE MODAL -->
+      <dialog id="dentalClearanceModal" class="modal">
+        <form
+          id="clearanceRequestForm"
+          method="POST"
+          action="{{ route('document.requests.store') }}"
+          class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+          novalidate>
+          @csrf
+
+          <div
+            id="clearanceWarning"
+            class="hidden absolute top-4 left-1/2 -translate-x-1/2
+              px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4]
+              text-xs font-semibold shadow-lg">
+            Please complete all required fields
+          </div>
+
+          <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+            Request Clearance
+          </h3>
+
+          <p class="text-sm text-[#333333] mb-5">
+            Please allow up to three (3) working days for processing.
+          </p>
+
+          <div class="mb-5">
+            <label class="block text-sm font-bold text-[#8B0000] mb-1">
+              Type of Clearance
+            </label>
+            <select
+              name="document_type"
+              required
+              class="select select-bordered w-full rounded-xl
+                 bg-[#F4F4F4] text-[#333333]
+                 focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+              <option value="" disabled selected>Select type of clearance</option>
+              <option value="Dental Clearance">Dental Clearance</option>
+              <option value="Annual Dental Clearance">Annual Dental Clearance</option>
+            </select>
+          </div>
+
+          <div class="mb-5">
+            <label class="block text-sm font-bold text-[#8B0000] mb-1">
+              Purpose
+            </label>
+            <select
+              name="purpose"
+              required
+              class="select select-bordered w-full rounded-xl
+                 bg-[#F4F4F4] text-[#333333]
+                 focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+              <option value="" disabled selected>Select purpose</option>
+              <option value="On-the-Job Training (OJT)">On-the-Job Training (OJT)</option>
+              <option value="Employment Requirement">Employment Requirement</option>
+              <option value="Academic Requirement">Academic Requirement</option>
+            </select>
+          </div>
+
+          <div class="modal-action flex justify-between">
+            <button type="button"
+              onclick="dentalClearanceModal.close()"
+              class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+              Back
+            </button>
+
+            <button type="submit"
+              class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
+              Save
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
+      <dialog id="dentalHealthRecordModal" class="modal">
+        <form
+          id="healthRecordRequestForm"
+          method="POST"
+          action="{{ route('document.requests.store') }}"
+          class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+          novalidate>
+          @csrf
+
+          <div
+            id="healthRecordWarning"
+            class="hidden absolute top-4 left-1/2 -translate-x-1/2
+              px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4]
+              text-xs font-semibold shadow-lg">
+            Please complete all required fields
+          </div>
+
+          <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+            Request Dental Health Record
+          </h3>
+
+          <p class="text-sm mb-5 text-[#333333]">
+            Please allow up to three (3) working days for processing.
+          </p>
+
+          <div class="mb-5">
+            <label class="block text-sm font-bold text-[#8B0000] mb-1">
+              Type of Dental Health Record
+            </label>
+            <select
+              name="document_type"
+              required
+              class="select select-bordered w-full rounded-xl
+                 bg-[#F4F4F4] text-[#333333]
+                 focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+              <option value="" disabled selected>Select type</option>
+              <option value="All Dental Records">All Dental Records</option>
+              <option value="Medical Records">Medical Records</option>
+              <option value="Diagnosis and Treatment">Diagnosis and Treatment</option>
+            </select>
+          </div>
+
+          <div class="mb-5">
+            <label class="block text-sm font-bold text-[#8B0000] mb-1">
+              Purpose
+            </label>
+            <select
+              name="purpose"
+              required
+              class="select select-bordered w-full rounded-xl
+                 bg-[#F4F4F4] text-[#333333]
+                 focus:outline-none focus:ring-0 focus:border-[#8B0000]">
+              <option value="" disabled selected>Select purpose</option>
+              <option value="Personal Record">Personal Record</option>
+              <option value="Academic Requirement">Academic Requirement</option>
+              <option value="Employment Requirement">Employment Requirement</option>
+            </select>
+          </div>
+
+          <div class="modal-action flex justify-between">
+            <button type="button"
+              onclick="dentalHealthRecordModal.close()"
+              class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+              Back
+            </button>
+
+            <button type="submit"
+              class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
+              Save
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- CONFIRM SAVE MODAL (kept, but not used by this file unless you wire it) -->
+      <dialog id="confirmSaveModal" class="modal">
+        <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+          <h3 class="font-bold text-lg mb-2">Confirm</h3>
+          <p id="confirmSaveText" class="mb-6">Are you sure?</p>
+          <div class="modal-action flex justify-between">
+            <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
+            <button onclick="submitConfirmedForm?.()" class="btn btn-error text-[#F4F4F4]">Yes, Submit</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- SUBMITTED INFO MODAL (kept) -->
+      <dialog id="submittedInfoModal" class="modal">
+        <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+          <h3 class="font-bold text-lg mb-2">Submitted!</h3>
+          <p>Your request has been submitted.</p>
+          <div class="modal-action">
+            <button onclick="submittedInfoModal.close()" class="btn btn-error text-[#F4F4F4]">OK</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- ACTIVE APPOINTMENT MODAL (FIXED HTML) -->
+      <dialog id="activeAppointmentModal" class="modal">
+        <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
+          <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
+            <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
+          </div>
+
+          <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">Active Appointment Detected</h3>
+          <p class="text-sm text-gray-600 mb-6">
+            You already have an active appointment. Please complete or cancel it before booking a new one.
+          </p>
+
+          <div class="modal-action justify-center gap-3">
+            <a href="{{ route('appointment.index') }}" class="btn bg-[#8B0000] text-[#F4F4F4] hover:bg-[#7A0000] transition-colors duration-200">
+              View My Appointments
+            </a>
+            <button id="closeActiveApptModalBtn" type="button" class="btn btn-ghost">Close</button>
+          </div>
+        </div>
+      </dialog>
+
+    </div> <!-- /max-w -->
   </main>
 
   <!-- ACTIVE APPOINTMENT MODAL SCRIPT -->
@@ -506,11 +944,13 @@
         if (!modal) return;
 
         modal.showModal();
+
         modal.addEventListener('click', (e) => {
           const box = modal.querySelector('.modal-box');
           if (!box) return;
           if (!box.contains(e.target)) e.preventDefault();
         });
+
         modal.addEventListener('cancel', (e) => e.preventDefault());
         if (closeBtn) closeBtn.addEventListener("click", () => modal.close());
       });
@@ -529,7 +969,7 @@
     html.setAttribute('data-theme', savedTheme);
     updateThemeIcon(savedTheme);
 
-    themeToggle.addEventListener('click', () => {
+    themeToggle?.addEventListener('click', () => {
       const currentTheme = html.getAttribute('data-theme');
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', newTheme);
@@ -538,6 +978,7 @@
     });
 
     function updateThemeIcon(theme) {
+      if (!themeIcon) return;
       if (theme === 'dark') {
         themeIcon.classList.remove('fa-moon');
         themeIcon.classList.add('fa-sun');
@@ -547,11 +988,16 @@
       }
     }
 
-    // Sidebar
+    // =========================
+    // SIDEBAR TOGGLE (kept your logic, fixed layout)
+    // =========================
     let sidebarOpen = true;
+
     function applyLayout(sidebarWidth) {
       const sidebar = document.getElementById('sidebar');
       const main = document.getElementById('mainContent');
+      if (!sidebar || !main) return;
+
       sidebar.style.width = sidebarWidth;
       main.style.marginLeft = sidebarWidth;
     }
@@ -562,24 +1008,32 @@
       const icon = document.getElementById('sidebarIcon');
       const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
+      if (!sidebar) return;
+
       sidebarOpen = !sidebarOpen;
 
       if (sidebarOpen) {
         applyLayout('200px');
         sidebar.classList.remove('collapsed');
         sidebar.classList.add('expanded');
-        texts.forEach(t => { t.classList.remove('opacity-0','w-0'); t.classList.add('opacity-100'); });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
-        icon.classList.replace('fa-bars','fa-xmark');
+        texts.forEach(t => {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
+        });
+        toggleWrapper?.classList.remove('justify-center');
+        toggleWrapper?.classList.add('justify-end');
+        icon?.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
         sidebar.classList.remove('expanded');
         sidebar.classList.add('collapsed');
-        texts.forEach(t => { t.classList.add('opacity-0','w-0'); t.classList.remove('opacity-100'); });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
-        icon.classList.replace('fa-xmark','fa-bars');
+        texts.forEach(t => {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        toggleWrapper?.classList.remove('justify-end');
+        toggleWrapper?.classList.add('justify-center');
+        icon?.classList.replace('fa-xmark', 'fa-bars');
       }
     }
 
@@ -722,7 +1176,7 @@
           <h3 class="font-extrabold text-lg text-[#333333]">Request Documents</h3>
         </div>
 
-        <a onclick="dentalHealthRecordModal.showModal()"
+        <a onclick="document.getElementById('dentalHealthRecordModal')?.showModal()"
           class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
           <div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
             <img src="{{ asset('images/dental-health-record.png') }}" class="w-7 h-6"/>
@@ -733,7 +1187,7 @@
           </div>
         </a>
 
-        <a onclick="dentalClearanceModal.showModal()"
+        <a onclick="document.getElementById('dentalClearanceModal')?.showModal()"
           class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">
           <div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
             <img src="{{ asset('images/dental-clearance.png') }}" class="w-7 h-6"/>
@@ -800,7 +1254,7 @@
     }
 
     // =========================
-    // Calendar
+    // Calendar (FIXED: removed "- >" typo + fixed counts object)
     // =========================
     function loadCalendar() {
       const MAX_PER_DAY = 5;
@@ -816,7 +1270,7 @@
       const apptCounts = {
         @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
           @foreach($appointmentCountsPerDay as $date => $count)
-            "{{ $date }}": {{ (int)$count }},
+            "{{ $date }}": {{ (int) $count }},
           @endforeach
         @endif
       };
@@ -837,35 +1291,38 @@
       let currentYear = today.getFullYear();
       let currentMonth = today.getMonth();
 
-      function pad(n){ return String(n).padStart(2,'0'); }
-      function isWeekend(year, month, day){
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function isWeekend(year, month, day) {
         const dow = new Date(year, month, day).getDay();
         return dow === 0 || dow === 6;
       }
 
-      function getHolidaysForMonth(year, month){
+      function getHolidaysForMonth(year, month) {
         const filtered = {};
         Object.keys(allHolidays).forEach(dateStr => {
-          const [y,m] = dateStr.split('-').map(Number);
+          const [y, m] = dateStr.split('-').map(Number);
           if (y === year && m === month + 1) filtered[dateStr] = allHolidays[dateStr];
         });
         return filtered;
       }
 
-      function renderCalendar(year, month){
-        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        const dayLabels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      function renderCalendar(year, month) {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const firstDow = new Date(year, month, 1).getDay();
         const totalDays = new Date(year, month + 1, 0).getDate();
         const leadingEmpties = firstDow;
 
         const holidays = getHolidaysForMonth(year, month);
         let cells = '';
-        for(let i=0;i<leadingEmpties;i++) cells += `<div></div>`;
+        for (let i = 0; i < leadingEmpties; i++) cells += `<div></div>`;
 
-        for(let d=1; d<=totalDays; d++){
-          const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
-          const isToday = (d===today.getDate() && month===today.getMonth() && year===today.getFullYear());
+        for (let d = 1; d <= totalDays; d++) {
+          const dateStr = `${year}-${pad(month + 1)}-${pad(d)}`;
+          const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
           const weekend = isWeekend(year, month, d);
           const holiday = holidays[dateStr] || null;
           const myAppt = myAppointments[dateStr] || null;
@@ -873,32 +1330,44 @@
           const isFull = count >= MAX_PER_DAY;
           const isUnavail = unavailableDates.includes(dateStr) || weekend;
 
-          let bgClass='', textClass='text-[#333333]', ringClass='', dotHtml='', tooltipTxt='';
+          let bgClass = '',
+            textClass = 'text-[#333333]',
+            ringClass = '',
+            dotHtml = '',
+            tooltipTxt = '';
 
-          if (isToday){ bgClass='bg-[#8B0000]'; textClass='text-white font-extrabold'; ringClass='ring-2 ring-[#8B0000]/30 ring-offset-1'; }
-          else if (holiday){ bgClass='bg-blue-50 hover:bg-blue-100'; textClass='text-blue-700 font-semibold'; }
-          else if (isUnavail){ textClass='text-gray-300'; }
-          else { bgClass='hover:bg-[#FFF0F0]'; }
+          if (isToday) {
+            bgClass = 'bg-[#8B0000]';
+            textClass = 'text-white font-extrabold';
+            ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
+          } else if (holiday) {
+            bgClass = 'bg-blue-50 hover:bg-blue-100';
+            textClass = 'text-blue-700 font-semibold';
+          } else if (isUnavail) {
+            textClass = 'text-gray-300';
+          } else {
+            bgClass = 'hover:bg-[#FFF0F0]';
+          }
 
-          if (myAppt){
+          if (myAppt) {
             const dotColor = isToday ? 'bg-white' : 'bg-[#008440]';
             dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}"></span>`;
             tooltipTxt = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${myAppt}`;
           }
 
-          if (isFull && !myAppt && !isUnavail && !holiday){
+          if (isFull && !myAppt && !isUnavail && !holiday) {
             dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
             tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (${count} appointments)`;
           }
 
-          if (holiday && !myAppt){
+          if (holiday && !myAppt) {
             dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
             tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
           }
 
-          if (isUnavail && !holiday && !myAppt){
-            tooltipTxt = weekend ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed`
-                                 : `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+          if (isUnavail && !holiday && !myAppt) {
+            tooltipTxt = weekend ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed` :
+              `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
           }
 
           const tooltipHtml = tooltipTxt ? `
@@ -917,8 +1386,8 @@
             </div>`;
         }
 
-        const headerHtml = dayLabels.map((l,i)=>{
-          const labelColor = (i===0 || i===6) ? 'text-[#8B0000]/40' : 'text-[#333333]';
+        const headerHtml = dayLabels.map((l, i) => {
+          const labelColor = (i === 0 || i === 6) ? 'text-[#8B0000]/40' : 'text-[#333333]';
           return `<div class="text-center text-[10px] font-bold ${labelColor} uppercase tracking-widest">${l}</div>`;
         }).join('');
 
@@ -949,10 +1418,16 @@
         `;
       }
 
-      window.changeMonth = function(dir){
+      window.changeMonth = function (dir) {
         currentMonth += dir;
-        if(currentMonth > 11){ currentMonth = 0; currentYear++; }
-        if(currentMonth < 0){ currentMonth = 11; currentYear--; }
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
         renderCalendar(currentYear, currentMonth);
       };
 
@@ -1037,7 +1512,6 @@
       openRecordModal(data);
     }
 
-    // ✅ SINGLE SOURCE OF TRUTH (no duplicate function name)
     function openRecordModal(data) {
       const modal = document.getElementById('record_modal');
       if (!modal) return;
@@ -1054,10 +1528,10 @@
       statusEl.className = BADGE;
 
       const s = status.toLowerCase();
-      if (s === 'completed') statusEl.classList.add('bg-emerald-200','text-emerald-900');
-      else if (s === 'rescheduled') statusEl.classList.add('bg-yellow-200','text-yellow-900');
-      else if (s === 'cancelled') statusEl.classList.add('bg-red-200','text-red-900');
-      else statusEl.classList.add('bg-gray-200','text-gray-800');
+      if (s === 'completed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
+      else if (s === 'rescheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
+      else if (s === 'cancelled') statusEl.classList.add('bg-red-200', 'text-red-900');
+      else statusEl.classList.add('bg-gray-200', 'text-gray-800');
 
       const durEl = document.getElementById('m_duration');
       durEl.textContent = (data.duration || '—').trim() || '—';
@@ -1077,20 +1551,36 @@
       const menu = document.getElementById("notifMenu");
       let isOpen = false;
 
-      function openMenu(){ isOpen=true; menu.classList.remove("notif-close"); menu.classList.add("notif-open"); }
-      function closeMenu(){ isOpen=false; menu.classList.remove("notif-open"); menu.classList.add("notif-close"); }
+      function openMenu() {
+        isOpen = true;
+        menu.classList.remove("notif-close");
+        menu.classList.add("notif-open");
+      }
 
-      if(btn && menu){
-        btn.addEventListener("click",(e)=>{ e.stopPropagation(); isOpen ? closeMenu() : openMenu(); });
-        menu.addEventListener("click",(e)=>e.stopPropagation());
-        document.addEventListener("click",()=>{ if(isOpen) closeMenu(); });
-        document.addEventListener("keydown",(e)=>{ if(e.key==="Escape" && isOpen) closeMenu(); });
+      function closeMenu() {
+        isOpen = false;
+        menu.classList.remove("notif-open");
+        menu.classList.add("notif-close");
+      }
+
+      if (btn && menu) {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          isOpen ? closeMenu() : openMenu();
+        });
+        menu.addEventListener("click", (e) => e.stopPropagation());
+        document.addEventListener("click", () => {
+          if (isOpen) closeMenu();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && isOpen) closeMenu();
+        });
         closeMenu();
       }
     });
 
     // Dynamic greeting
-    (function() {
+    (function () {
       const hour = new Date().getHours();
       let greeting, iconClasses, animClass;
 
@@ -1116,4 +1606,5 @@
   </script>
 
 </body>
+
 </html>
