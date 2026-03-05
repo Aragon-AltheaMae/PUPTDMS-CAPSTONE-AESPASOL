@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dentist Dashboard | PUP Taguig Dental Clinic </title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,21 +13,16 @@
   <!-- daisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Cally Calendar -->
-  <script type="module" src="https://unpkg.com/cally"></script>
+  <!-- Chart.js (replaces Highcharts — free, no license issues) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-  <!-- Highcharts -->
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-  <script src="https://code.highcharts.com/modules/exporting.js"></script>
-  <script src="https://code.highcharts.com/modules/export-data.js"></script>
-  
   <script>
     tailwind.config = {
       daisyui: {
@@ -40,942 +36,932 @@
       font-family: 'Inter';
     }
 
-    /* Fade-in animation */
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
+    .fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
     @keyframes wave {
-      0% { transform: rotate(0deg); }
-      20% { transform: rotate(14deg); }
-      40% { transform: rotate(-8deg); }
-      60% { transform: rotate(14deg); }
-      80% { transform: rotate(-4deg); }
+      0%   { transform: rotate(0deg); }
+      20%  { transform: rotate(14deg); }
+      40%  { transform: rotate(-8deg); }
+      60%  { transform: rotate(14deg); }
+      80%  { transform: rotate(-4deg); }
       100% { transform: rotate(0deg); }
     }
-
     .wave-hand {
       transform-origin: 70% 70%;
       animation: wave 2.5s ease-in-out infinite;
     }
 
-    /* Smooth slide animation */
-    #sidebar {
-      transition: width 300ms ease, transform 300ms ease;
-      will-change: width, transform;
-    }
-
-    #mainContent {
-      transition: margin-left 300ms ease;
-    }
-
     .sidebar-link {
       display: flex;
       align-items: center;
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      transition: background-color .2s ease, transform .2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Tooltip appears ONLY when collapsed */
+    #sidebar.expanded .sidebar-link { justify-content: flex-start; padding-left: 0.25rem; }
+    #sidebar.expanded .sidebar-link i { margin-right: 0.75rem; }
+    #sidebar.expanded .sidebar-link:hover { transform: translateX(4px); }
+    #sidebar.expanded .sidebar-tooltip { display: none; }
+    #sidebar.expanded .section-label { display: block; }
+    #sidebar.expanded .sidebar-text { opacity: 1; width: auto; overflow: visible; }
+    #sidebar.collapsed .sidebar-text { opacity: 0; width: 0; overflow: hidden; }
+    #sidebar.collapsed .sidebar-tooltip { display: block; }
+    #sidebar.collapsed .section-label { display: none; }
+
     .sidebar-link:hover .sidebar-tooltip {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Hide tooltip when expanded */
-    #sidebar[style*="16rem"] .sidebar-tooltip {
-    display: none;
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link {
-      justify-content: flex-start;
-    }
-
-    /* consistent icon column width */
-    .sidebar-link i{
-      width: 24px;           /* fixed width column */
-      min-width: 24px;
-      text-align: center;
-    }
-
-    /* CLOSED: center icon only */
-    #sidebar[style*="72px"] .sidebar-link {
-      justify-content: center;
-      gap: 0;
-    }
-
-    /* when expanded, align items nicely */
-    #sidebar[style*="16rem"] .sidebar-link{
-      justify-content: flex-start;
-      gap: 12px;             /* spacing between icon and text */
-    }
-
-    #sidebar[style*="16rem"] .sidebar-link:hover {
-    transform: translateX(4px);
-    }
-
-    .sidebar-link:hover .sidebar-text {
-    opacity: 1;
-    transform: scale(1);
-    }
-
-    .sidebar-text {
-      transform-origin: left center;
-    }
-
-    /* Notification dropdown animation */
-    .notif-open {
       opacity: 1 !important;
       transform: scale(1) !important;
-      pointer-events: auto !important;
     }
 
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(0.95) !important; /* zoom out */
-      pointer-events: none !important;
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
     }
 
-    /* DARK MODE */
-    [data-theme="dark"] body {
-    background-color: #111827; /* slate-900 */
-    color: #E5E7EB;
-    }
+    .notif-open  { opacity: 1 !important; transform: scale(1) !important; pointer-events: auto !important; }
+    .notif-close { opacity: 0 !important; transform: scale(0.95) !important; pointer-events: none !important; }
 
-    [data-theme="dark"] #sidebar {
-      background-color: #1F2933;
-    }
-
-    [data-theme="dark"] .bg-white {
-      background-color: #1F2937 !important;
-    }
-
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
-    }
-
-    body,
-    #sidebar,
-    main,
-    .card {
+    body, #sidebar, main, .card, .modal-box {
       transition: background-color 0.3s ease, color 0.3s ease;
     }
+
+    #sidebar.collapsed .section-label { display: none; }
+    #sidebar.expanded .section-label  { display: block; }
+
+    #sidebar.collapsed .sidebar-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    #sidebar.collapsed .sidebar-link span:first-of-type { margin: 0 auto; }
+    #sidebar.collapsed .sidebar-link i { margin-right: 0 !important; width: 100%; text-align: center; }
+    #sidebar.expanded  .sidebar-link { justify-content: flex-start; }
+    #sidebar.expanded  .sidebar-link i { margin-right: 0.75rem; }
+    #sidebar.expanded  .sidebar-link span i { margin-right: 0 !important; }
+    #sidebar.expanded  .sidebar-link:hover { transform: translateX(4px); }
+    #sidebar.collapsed .sidebar-tooltip { display: block; }
+    #sidebar.expanded  .sidebar-tooltip { display: none; }
+
+    .sidebar-link.bg-\[\#8B0000\] { box-shadow: 0 0 12px rgba(139, 0, 0, 0.45); }
+
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full { display: flex; justify-content: center; }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
+    }
+    #sidebar.collapsed .theme-option { width: 35px; height: 40px; flex: none; }
+    .theme-option i { font-size: 16px; }
+    #sidebar.collapsed .theme-option i { font-size: 15px; }
+    .theme-option.active { color: #374151; }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator { width: calc(50% - 2px); height: calc(100% - 8px); left: 4px; top: 4px; border-radius: 20px; }
+    #sidebar.expanded .theme-indicator.dark-mode { transform: translateX(calc(100% + 0px)); }
+    #sidebar.collapsed .theme-indicator { width: calc(100% - 8px); height: calc(50% - 6px); left: 4px; top: 4px; border-radius: 16px; }
+    #sidebar.collapsed .theme-indicator.dark-mode { transform: translateY(calc(100% + 4px)); }
+
+    /* DARK MODE */
+    [data-theme="dark"] body           { background-color: #000D1A; color: #E5E7EB; }
+    [data-theme="dark"] #sidebar       { background-color: #000D1A; }
+    [data-theme="dark"] .bg-white      { background-color: #000D1A !important; }
+    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
+    [data-theme="dark"] .theme-toggle-container { background: #1F1F1F; border-color: #2A2A2A; }
+    [data-theme="dark"] .theme-option  { color: #6B7280; }
+    [data-theme="dark"] .theme-option.active { color: #F3F4F6; }
+    [data-theme="dark"] .theme-indicator { background: #2A2A2A; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
   </style>
 </head>
 
 <body class="bg-white text-[#333333] font-normal">
 
-<!-- HEADER (TOP BAR) -->
-<div class="fixed top-0 left-0 right-0 z-50
-            bg-gradient-to-r from-[#660000] to-[#8B0000]
-            text-[#F4F4F4] px-6 py-4
-            flex items-center justify-between">
-
+  <!-- HEADER -->
+  <div class="fixed top-0 left-0 right-0 z-50
+              bg-gradient-to-r from-[#660000] to-[#8B0000]
+              text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
+      <div class="w-12 rounded-full ml-5"><img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" /></div>
+      <div class="w-12 rounded-full"><img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" /></div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-
-  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-8">
       @php
-  // Pass $notifications from controller, or leave it empty for now
-  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
-  @endphp
-
-  <div id="notifDropdown" class="relative">
-    
-  <button id="notifBtn" type="button"
-    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-
-    @if($notifCount > 0)
-      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-        {{ $notifCount }}
-      </span>
-    @endif
-
-    <i class="fa-regular fa-bell text-lg"></i>
-  </button>
-
-  <div id="notifMenu"
-  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-         opacity-0 scale-95 pointer-events-none
-         transition-all duration-200 ease-out origin-top-right">
-
-    <div class="p-4 border-b flex items-center justify-between">
-      <span class="font-bold text-[#8B0000]">Notifications</span>
-    </div>
-
-    <div class="max-h-80 overflow-y-auto">
-      @forelse($notifications as $n)
-        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-          <div class="text-sm font-semibold text-gray-900">
-            {{ $n['title'] ?? 'Notification' }}
+        $notifications = collect($notifications ?? []);
+        $notifCount = $notifications->count();
+      @endphp
+      <div id="notifDropdown" class="relative">
+        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+          @if($notifCount > 0)
+          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">{{ $notifCount }}</span>
+          @endif
+          <i class="fa-regular fa-bell text-lg"></i>
+        </button>
+        <div id="notifMenu"
+          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+                 opacity-0 scale-95 pointer-events-none transition-all duration-200 ease-out origin-top-right">
+          <div class="p-4 border-b flex items-center justify-between">
+            <span class="font-bold text-[#8B0000]">Notifications</span>
           </div>
-          @if(!empty($n['message']))
-            <div class="text-xs text-[#ADADAD] mt-0.5">
-              {{ $n['message'] }}
+          <div class="max-h-80 overflow-y-auto">
+            @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
+              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
+            </a>
+            @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
             </div>
-          @endif
-          @if(!empty($n['time']))
-            <div class="text-[11px] text-gray-400 mt-1">
-              {{ $n['time'] }}
-            </div>
-          @endif
-        </a>
-      @empty
-        <div class="px-4 py-10 text-center justify-items-center">
-          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-          <div class="text-sm font-semibold text-gray-800">No notifications</div>
-          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+            @endforelse
+          </div>
         </div>
-      @endforelse
-    </div>
-
-  </div>
-</div>
-
-    <div class="flex items-center gap-3">
-      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-      <div>
-        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
-    </div>
-  </div>
-</div>
-
-<aside id="sidebar"
-  class="fixed left-0 top-[80px]
-         h-[calc(100vh-80px)]
-         w-[72px]
-         bg-[#FAFAFA]
-         drop-shadow-xl
-         transition-all duration-300
-         flex flex-col justify-between z-40">
-
-  <!-- TOP -->
-  <div>
-    <div id="sidebarToggleWrapper"
-     class="flex items-center justify-center px-4 py-6 transition-all duration-300">
-      <button onclick="toggleSidebar()"
-        id="sidebarToggleBtn"
-        class="w-10 h-10 flex items-center justify-center
-              rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#D9D9D9] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-bars text-lg"></i>
-      </button>
-    </div>
-    
-  <!-- MENU -->
-  <nav class="space-y-2 px-3 text-gray-600 text-sm">
-
-    <!-- DASHBOARD -->
-    <a href="{{ route('dentist.dashboard') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.dashboard')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-chart-line text-lg"></i>
-      <span class="sidebar-text font-bold opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Dashboard
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200
-            opacity-0 scale-95 transition-all duration-200">
-        Dashboard
-      </span>
-    </a>
-
-    <!-- PATIENTS -->
-    <a href="{{ route('dentist.patients') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.patients*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.patients*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-users text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Patients
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Patients
-      </span>
-    </a>
-
-    <!-- APPOINTMENTS -->
-    <a href="{{ route('dentist.appointments') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.appointments*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.appointments*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Appointments
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Appointments
-      </span>
-    </a>
-
-    <!-- Document Requests -->
-    <a href="{{ route('dentist.documentrequests') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.documentrequests*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.documentrequests*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-file-circle-check text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Document Requests
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Document Requests
-      </span>
-    </a>
-
-    <!-- INVENTORY -->
-    <a href="{{ route('dentist.inventory') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.inventory*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.inventory*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-box text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Inventory
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Inventory
-      </span>
-    </a>
-
-    <!-- REPORTS -->
-    <a href="{{ route('dentist.report') }}"
-      class="sidebar-link relative flex items-center  rounded-xl
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-              {{ request()->routeIs('dentist.report*')
-                ? 'bg-[#8B0000] text-[#F4F4F4]'
-                : '' }}">
-
-      <span
-        class="absolute left-0 top-1/2 -translate-y-1/2
-              h-6 w-1 rounded-r bg-[#8B0000]
-              transition-opacity duration-300
-              {{ request()->routeIs('dentist.report*') ? 'opacity-100' : 'opacity-0' }}">
-      </span>
-
-      <i class="fa-solid fa-file text-lg"></i>
-      <span class="sidebar-text opacity-0 w-0 overflow-hidden
-            transition-all duration-300 delay-150">
-        Reports
-      </span>
-
-      <span class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-        Reports
-      </span>
-    </a>
-  </nav>
-</div>
-
-  <!-- BOTTOM -->
-  <div class="px-3 pb-5 space-y-2">
-
-  <!-- DARK MODE TOGGLE -->
-  <button
-    id="themeToggle"
-    class="sidebar-link relative flex items-center justify-center
-          w-full px-2 py-1.5 rounded-xl
-          bg-[#7B6CF6] text-[#F4F4F4]
-          transition-all duration-200
-          hover:scale-105"
-    aria-label="Toggle dark mode">
-
-    <i id="themeIcon" class="fa-regular fa-moon text-sm"></i>
-    <span class="sidebar-text text-sm opacity-0 w-0 overflow-hidden
-               transition-all duration-300 delay-150">
-      Dark Mode
-    </span>
-    <!-- Tooltip (collapsed only) -->
-    <span
-      class="sidebar-tooltip
-            absolute left-full ml-8
-            px-3 py-1
-            rounded-full
-            bg-[#8B0000]
-            text-[#F4F4F4] text-sm font-semibold
-            whitespace-nowrap
-            opacity-0 scale-95
-            pointer-events-none
-            transition-all duration-200">
-      Dark Mode
-    </span>
-  </button>
-    
-    <form action="{{ route('logout') }}" method="POST">
-      @csrf
-      <button
-        class="sidebar-link w-full relative flex items-center px-3 py-2 rounded-xl text-sm
-               text-red-600 hover:bg-red-50 transition-all duration-200">
-        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-        <span class="sidebar-text opacity-0 w-0 overflow-hidden
-             transition-all duration-300 delay-150">
-          Log out
-        </span>
-        <span
-          class="sidebar-tooltip
-                absolute left-full ml-8
-                px-3 py-1
-                rounded-full
-                bg-[#8B0000]
-                text-[#F4F4F4] text-sm font-semibold
-                whitespace-nowrap
-                opacity-0 scale-95
-                pointer-events-none
-                transition-all duration-200">
-          Log out
-        </span>
-      </button>
-    </form>
-
-  </div>
-</aside>
-
-<!-- CONTENT -->
-<main
-  id="mainContent"
-  class="flex-1 pt-[100px]
-         px-6 pb-10
-         w-full
-         transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
-
-  <div class="max-w-7xl mt-4 mx-auto fade-in">
-
-    <!-- GREETING -->
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <div class="flex items-center gap-2 mb-1">
-          <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
-          <p id="currentDate" class="text-sm text-[#757575]"></p>
-        </div>
-        <h1 class="text-4xl font-extrabold mb-8 flex items-center gap-3 fade-in">
-          <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
-              Good Morning,
-            <span id="dentistName"></span>
-            <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
-          </span>
-        </h1>
-      </div>
-
       <div class="flex items-center gap-3">
-        <span class="text-sm">The Dentist is</span>
-        <button id="statusBtn" class="btn btn-success rounded-full px-6">IN</button>
+        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+        <div>
+          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- ================= GRID ================= -->
-    <div class="grid grid-cols-12 gap-6 items-start">
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
+           transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    style="width: 200px;">
+    <div class="pt-4">
+      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
+        <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
+                 hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+      <div class="section-label px-4 mb-6">Navigation</div>
+      <nav class="space-y-2 px-3 text-gray-600">
+        <a href="{{ route('dentist.dashboard') }}"
+          class="relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200
+                 bg-[#8B0000] text-[#F4F4F4]">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] opacity-100"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-chart-line text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Dashboard</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dashboard</span>
+        </a>
+        <a href="{{ route('dentist.patients') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1.5"><i class="fa-solid fa-users text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Patients</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Patients</span>
+        </a>
+        <a href="{{ route('dentist.appointments') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-calendar-check text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Appointments</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointments</span>
+        </a>
+        <a href="{{ route('dentist.documentrequests') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-file-circle-check text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Document Requests</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Document Requests</span>
+        </a>
+        <a href="{{ route('dentist.inventory') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-box text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Inventory</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Inventory</span>
+        </a>
+        <a href="{{ route('dentist.report') }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-file text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Reports</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Reports</span>
+        </a>
+      </nav>
+    </div>
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
 
-      <!-- GAD ANALYTICS -->
-      <div class="col-span-12 lg:col-span-4 card bg-white shadow">
-      <div class="card-body">
-          <div id="gadChart" class="h-full w-full"></div>
+  <!-- CONTENT -->
+  <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+    <div class="max-w-7xl mt-4 mx-auto fade-in">
+
+      <!-- GREETING -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
+            <p id="currentDate" class="text-sm text-[#757575]"></p>
+          </div>
+          <h1 class="text-4xl font-extrabold mb-8 flex items-center gap-3 fade-in">
+            <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
+              Good Morning, <span id="dentistName"></span>
+              <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
+            </span>
+          </h1>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-[#757575]">The Dentist is</span>
+          <button id="statusBtn" onclick="openStatusModal()" class="btn btn-success rounded-full px-6 font-bold shadow transition-all duration-300">
+            <span id="statusLabel" class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
+            </span>
+          </button>
         </div>
       </div>
 
-
-      <!-- DENTAL STATS COLUMN -->
-      <div class="col-span-12 lg:col-span-2 flex flex-col gap-4 h-full">
-
-      <!-- DENTAL CASES -->
-      <div class="card bg-[#8B0000] text-white shadow flex-1">
-          <div class="card-body p-6 text-center justify-center">
-          <p class="text-s">Dental Cases</p>
-          <p class="text-4xl font-bold">45</p>
-          <p class="text-xs">December 2025</p>
+      <!-- KPI CARDS -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#660000] text-white p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest opacity-70 mb-1">Dental Cases</p>
+              <p class="text-4xl font-extrabold tracking-tight leading-none">45</p>
+              <p class="text-xs opacity-60 mt-1">December 2025</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-tooth text-yellow-300 text-lg"></i>
+            </div>
           </div>
+          <div class="flex items-center gap-1 mt-3 text-green-300 text-xs font-semibold">
+            <i class="fa-solid fa-arrow-trend-up text-xs"></i> +8% vs last month
+          </div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-white/5"></div>
+        </div>
+        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Total Appts</p>
+              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">62</p>
+              <p class="text-xs text-gray-400 mt-1">December 2025</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+              <i class="fa-regular fa-calendar-check text-[#8B0000] text-lg"></i>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mt-3 text-green-500 text-xs font-semibold">
+            <i class="fa-solid fa-arrow-trend-up text-xs"></i> +5% vs last month
+          </div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-red-50/50"></div>
+        </div>
+        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Today's Patients</p>
+              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">{{ $todayAppointments->count() }}</p>
+              <p class="text-xs text-gray-400 mt-1">Scheduled today</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-user-clock text-[#8B0000] text-lg"></i>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mt-3 text-xs font-semibold {{ $todayAppointments->where('status','confirmed')->count() > 0 ? 'text-green-500' : 'text-gray-400' }}">
+            <i class="fa-solid fa-circle-check text-xs"></i>
+            {{ $todayAppointments->where('status','confirmed')->count() }} confirmed
+            &nbsp;·&nbsp;
+            <span class="text-yellow-500">{{ $todayAppointments->where('status','pending')->count() }} pending</span>
+          </div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-red-50/50"></div>
+        </div>
+        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Clinic Status</p>
+              <p id="statusKpiLabel" class="text-2xl font-extrabold tracking-tight text-green-600 leading-none mt-1">Open</p>
+              <p class="text-xs text-gray-400 mt-1">Dentist is currently IN</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
+              <i id="statusKpiIcon" class="fa-solid fa-door-open text-green-600 text-lg"></i>
+            </div>
+          </div>
+          <button onclick="openStatusModal()" class="mt-3 text-xs font-semibold text-[#8B0000] hover:underline flex items-center gap-1">
+            Change status <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-green-50/50"></div>
+        </div>
       </div>
 
-      <!-- TOTAL APPOINTMENTS -->
-      <div class="card bg-white text-red-700 shadow flex-1 border border-gray-200">
-          <div class="card-body p-6 text-center justify-center">
-          <p class="text-s">Total Appointments</p>
-          <p class="text-4xl font-bold">62</p>
-          <p class="text-xs">December 2025</p>
-          </div>
-      </div>
-
-      </div>
-
-
-      <!-- Calendar Section -->
-      <div id="calendarSkeletonContainer" class="col-span-12 lg:col-span-6 flex flex-col text-[#333333] gap-2">
-
-          <!-- Calendar Card -->
-          <div class="bg-white border shadow rounded-2xl p-6 w-full">
-              <calendar-date class="cally w-full h-full flex flex-col p-2">
-              <svg slot="previous" class="fill-current size-4" viewBox="0 0 24 24">
-                  <path d="M15.75 19.5 8.25 12l7.5-7.5"/>
-              </svg>
-
-              <svg slot="next" class="fill-current size-4" viewBox="0 0 24 24">
-                  <path d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-              </svg>
-
-              <calendar-month class="w-full flex-1"></calendar-month>
-              </calendar-date>
-          </div>
-
-          <!-- Legend -->
-          <div class="flex gap-6 mt-3 text-sm justify-center">
-              <div class="flex items-center gap-2">
-              <span class="w-4 h-4 bg-red-500 rounded"></span> Full Schedule
+      <!-- ROW 2: CALENDAR + SCHEDULE -->
+      <div class="grid grid-cols-12 gap-6 mb-6 items-stretch">
+        <div class="col-span-12 lg:col-span-7">
+          <div id="dentistCalendarContainer" class="bg-white border shadow rounded-2xl p-6 w-full min-h-[420px] h-full">
+            <div class="animate-pulse space-y-4">
+              <div class="h-6 w-40 bg-gray-200 rounded mx-auto"></div>
+              <div class="grid grid-cols-7 gap-2">
+                @for($i = 0; $i < 35; $i++)
+                  <div class="h-9 bg-gray-200 rounded-lg"></div>
+                @endfor
               </div>
-              <div class="flex items-center gap-2">
-              <span class="w-4 h-4 bg-orange-400 rounded"></span> Not Available
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow h-full">
+            <div class="card-body flex flex-col">
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-base font-bold flex items-center gap-2">
+                  <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
+                </h2>
+                <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">
+                  {{ $todayAppointments->count() }} {{ Str::plural('patient', $todayAppointments->count()) }}
+                </span>
               </div>
-              <div class="flex items-center gap-2">
-              <span class="w-4 h-4 bg-blue-500 rounded"></span> Holiday
+              <div class="space-y-2 flex-1 overflow-y-auto pr-1">
+                @forelse($todayAppointments as $appointment)
+                @php
+                  $name = $appointment->patient->name ?? 'Unknown Patient';
+                  $time = \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A');
+                  $service = $appointment->service_type === 'others'
+                    ? ($appointment->other_services ?? 'Other Service')
+                    : $appointment->service_type;
+                  $isConfirmed = $appointment->status === 'confirmed';
+                @endphp
+                <a href="{{ route('dentist.appointments') }}"
+                  class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]">
+                  <div class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    {{ strtoupper(substr($name, 0, 1)) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-sm truncate">{{ $name }}</p>
+                    <p class="text-xs opacity-70 truncate flex items-center gap-1">
+                      <i class="fa-solid fa-stethoscope text-yellow-300 flex-shrink-0 text-[10px]"></i>
+                      {{ ucwords($service) }} · {{ $time }}
+                    </p>
+                  </div>
+                  @if($isConfirmed)
+                  <span class="badge badge-sm bg-green-400 text-white border-none flex-shrink-0 text-[10px]">✓</span>
+                  @else
+                  <span class="badge badge-sm bg-yellow-400 text-[#660000] border-none flex-shrink-0 text-[10px]">!</span>
+                  @endif
+                </a>
+                @empty
+                <div class="flex flex-col items-center justify-center py-10 opacity-60">
+                  <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-yellow-300"></i>
+                  <p class="text-sm font-semibold">No appointments today</p>
+                  <p class="text-xs opacity-70 mt-1">Enjoy your free day, Doctor!</p>
+                </div>
+                @endforelse
               </div>
-          </div>
-      </div>
-
-
-
-      <!-- INVENTORY COLUMN -->
-      <div class="col-span-5 flex flex-col gap-6">
-
-      <!-- MEDICAL SUPPLY INVENTORY -->
-      <div class="relative rounded-lg p-[2px]" style="background: linear-gradient(to bottom, #660000, #FFD700);">
-          <div class="card bg-white shadow border border-transparent rounded-lg">
-          <div class="card-body">
-              <h3 class="font-semibold text-red-700 mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-boxes"></i> Medical Supply Inventory
-              </h3>
-              <table class="table table-sm">
-              <thead>
-                  <tr class="text-red-700">
-                  <th>Supplies</th><th>Units</th><th>Qty</th><th>Consumed</th><th>Balance</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr class="text-[#333333]">
-                  <td>Disposable Dental Needles Short</td>
-                  <td>piece</td>
-                  <td>42</td>
-                  <td>8</td>
-                  <td>34</td>
-                  </tr>
-              </tbody>
-              </table>
-              <button class="mt-3 px-6 py-2 rounded-lg font-semibold" style="background-color: #8B0000; color: white; width: fit;">Visit Inventory
-              </button>
-          </div>
-          </div>
-      </div>
-
-      <!-- MEDICINE SUPPLY INVENTORY -->
-      <div class="relative rounded-lg p-[2px]" style="background: linear-gradient(to bottom, #660000, #FFD700);">
-          <div class="card bg-white shadow border border-transparent rounded-lg">
-          <div class="card-body">
-              <h3 class="font-semibold text-red-700 mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-pills"></i> Medicine Supply Inventory
-              </h3>
-              <table class="table table-sm">
-              <thead>
-                  <tr class="text-red-700">
-                  <th>Medicine</th><th>Form</th><th>Qty</th><th>Used</th><th>Balance</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr class="text-[#333333]">
-                  <td>Amoxicillin</td>
-                  <td>Capsule</td>
-                  <td>120</td>
-                  <td>30</td>
-                  <td>90</td>
-                  </tr>
-              </tbody>
-              </table>
-              <!-- CENTERED BUTTON -->
-              <button class="mt-3 px-6 py-2 rounded-lg font-semibold" style="background-color: #8B0000; color: white; width: fit;"> Visit Inventory
-              </button>
-          </div>
-          </div>
-      </div>
-      </div>
-
-      <!-- SCHEDULE -->
-      <div class="col-span-7 card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow">
-        <div class="card-body">
-          <h1 class="text-lg font-bold">Scheduled Patients Today</h1>
-
-          <div class="space-y-3">
-
-            <!-- Patient Card -->
-            <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
-              <img src="https://i.pravatar.cc/40" class="rounded-full">
-              <div class="flex-1 text-left">
-                <p class="font-semibold">Capilitan, Beyonce</p>
-                <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
-              </div>
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-
-            <button class="flex items-center gap-4 bg-red-800 p-3 rounded-lg w-full transition duration-300 transform hover:scale-105 hover:shadow-lg hover:bg-red-700 focus:outline-none">
-              <img src="https://i.pravatar.cc/40" class="rounded-full">
-              <div class="flex-1 text-left">
-                <p class="font-semibold">Caculitan, Britney</p>
-                <p class="text-xs opacity-80">Dental Cleaning • 10:00 AM</p>
-              </div>
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-
+              <a href="{{ route('dentist.appointments') }}"
+                class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
+                View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
+              </a>
+            </div>
           </div>
         </div>
       </div>
-      
+
+      <!-- ROW 3: GAD CHART + INVENTORY -->
+      <div class="grid grid-cols-12 gap-6">
+
+        <!-- GAD ANALYTICS — Chart.js -->
+        <div class="col-span-12 lg:col-span-7 card bg-white shadow rounded-2xl">
+          <div class="card-body p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold text-[#8B0000]">
+                  <i class="fa-solid fa-chart-column mr-1.5 opacity-70"></i>GAD Analytics
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex</p>
+              </div>
+              <div class="flex items-center gap-4 text-xs font-semibold">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#FFC0CB"></span>Female</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#89CFF0"></span>Male</span>
+              </div>
+            </div>
+            <!-- Canvas for Chart.js — explicit height required -->
+            <div style="height: 300px; width: 100%;">
+              <canvas id="gadChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- INVENTORY COLUMN -->
+        <div class="col-span-12 lg:col-span-5 flex flex-col gap-4">
+          <!-- MEDICAL SUPPLY -->
+          <div class="relative rounded-2xl p-[2px]" style="background: linear-gradient(135deg, #660000, #FFD700);">
+            <div class="card bg-white rounded-2xl">
+              <div class="card-body p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-boxes"></i> Medical Supplies
+                  </h3>
+                  <a href="{{ route('dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                    View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  </a>
+                </div>
+                <table class="table table-xs w-full">
+                  <thead>
+                    <tr class="text-[#8B0000] text-[11px]">
+                      <th>Item</th><th class="text-center">Qty</th><th class="text-center">Used</th><th class="text-center">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-xs text-[#333]">
+                    <tr>
+                      <td class="max-w-[140px] truncate">Disposable Dental Needles</td>
+                      <td class="text-center">42</td><td class="text-center">8</td>
+                      <td class="text-center"><span class="badge badge-xs bg-green-100 text-green-700 border-none font-semibold">34</span></td>
+                    </tr>
+                    <tr>
+                      <td class="max-w-[140px] truncate">Dental Cotton Rolls</td>
+                      <td class="text-center">100</td><td class="text-center">94</td>
+                      <td class="text-center"><span class="badge badge-xs bg-red-100 text-red-700 border-none font-semibold animate-pulse">6 ⚠</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- MEDICINE SUPPLY -->
+          <div class="relative rounded-2xl p-[2px]" style="background: linear-gradient(135deg, #660000, #FFD700);">
+            <div class="card bg-white rounded-2xl">
+              <div class="card-body p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-pills"></i> Medicine Supplies
+                  </h3>
+                  <a href="{{ route('dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                    View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  </a>
+                </div>
+                <table class="table table-xs w-full">
+                  <thead>
+                    <tr class="text-[#8B0000] text-[11px]">
+                      <th>Medicine</th><th class="text-center">Form</th><th class="text-center">Qty</th><th class="text-center">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-xs text-[#333]">
+                    <tr>
+                      <td>Amoxicillin</td><td class="text-center">Capsule</td><td class="text-center">120</td>
+                      <td class="text-center"><span class="badge badge-xs bg-green-100 text-green-700 border-none font-semibold">90</span></td>
+                    </tr>
+                    <tr>
+                      <td>Mefenamic Acid</td><td class="text-center">Tablet</td><td class="text-center">50</td>
+                      <td class="text-center"><span class="badge badge-xs bg-red-100 text-red-700 border-none font-semibold animate-pulse">4 ⚠</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-</main>
+  </main>
 
-    <!-- Footer -->
-    <footer class="footer sm:footer-horizontal 
-      bg-[#660000] text-[#F4F4F4] p-10">
-    </footer>
+  <!-- STATUS MODAL -->
+  <div id="statusModal"
+    class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div id="statusModalBox" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
+      <div id="modalBanner" class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-4 text-white text-center">
+        <div id="modalIcon" class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl bg-white/20">
+          <i class="fa-solid fa-door-closed"></i>
+        </div>
+        <h2 id="modalTitle" class="text-xl font-extrabold">Close the Clinic?</h2>
+        <p id="modalSubtitle" class="text-sm opacity-80 mt-1">You are about to mark yourself as <strong>OUT</strong></p>
+      </div>
+      <div class="px-6 py-5">
+        <p id="modalBody" class="text-sm text-[#555] text-center leading-relaxed">
+          This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>. Patients will not be able to book new appointments while you are out.
+        </p>
+        <div class="flex gap-3 mt-5">
+          <button onclick="closeStatusModal()" class="flex-1 btn btn-ghost border border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-100">Cancel</button>
+          <button id="confirmStatusBtn" onclick="confirmStatus()" class="flex-1 btn rounded-xl font-bold text-white bg-[#8B0000] hover:bg-[#660000] border-none shadow">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- ================= SCRIPTS ================= -->
-<script>
+  <!-- Footer -->
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
 
-// =========================
-// DARK MODE TOGGLE
-// =========================
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-const html = document.documentElement;
+  <script>
+    // ── Theme & Sidebar ──
+    const html = document.documentElement;
 
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-updateThemeIcon(savedTheme);
-
-// Toggle on click
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  updateThemeIcon(newTheme);
-});
-
-// Icon switch
-function updateThemeIcon(theme) {
-  if (theme === 'dark') {
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
-  } else {
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
-  }
-}
-
-let sidebarOpen = false;
-
-function applyLayout(sidebarWidth) {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('mainContent');
-
-  sidebar.style.width = sidebarWidth;
-  main.style.marginLeft = sidebarWidth;
-  main.style.width = `auto`;
-}
-
-function toggleSidebar() {
-  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
-  const texts = document.querySelectorAll('.sidebar-text');
-  const icon = document.getElementById('sidebarIcon');
-
-  sidebarOpen = !sidebarOpen;
-
-  if (sidebarOpen) {
-    // EXPAND
-    applyLayout('16rem');
-
-    texts.forEach(t => {
-      t.classList.remove('opacity-0', 'w-0');
-      t.classList.add('opacity-100', 'w-auto');
-    });
-
-    toggleWrapper.classList.remove('justify-center');
-    toggleWrapper.classList.add('justify-end');
-
-    toggleBtn.classList.add('translate-x-2');
-    icon.classList.replace('fa-bars', 'fa-xmark');
-
-  } else {
-    // COLLAPSE
-    applyLayout('72px');
-
-    texts.forEach(t => {
-      t.classList.add('opacity-0', 'w-0');
-      t.classList.remove('opacity-100', 'w-auto');
-    });
-
-    toggleWrapper.classList.remove('justify-end');
-    toggleWrapper.classList.add('justify-center');
-
-    toggleBtn.classList.remove('translate-x-2');
-    icon.classList.replace('fa-xmark', 'fa-bars');
-  }
-}
-
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
-  });
-
-  // Dentist data source (API-ready)
-  const dentist = { name: "Dr. Nelson" };
-
-  document.getElementById("dentistName").textContent = dentist.name + "!";
-
-  document.getElementById("currentDate").textContent =
-    new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
-
-  const statusBtn = document.getElementById("statusBtn");
-  statusBtn.addEventListener("click", () => {
-    if (statusBtn.textContent === "IN") {
-      statusBtn.textContent = "OUT";
-      statusBtn.classList.replace("btn-success", "btn-error");
-    } else {
-      statusBtn.textContent = "IN";
-      statusBtn.classList.replace("btn-error", "btn-success");
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      document.querySelectorAll(".theme-option").forEach(o =>
+        o.getAttribute("data-theme") === theme ? o.classList.add("active") : o.classList.remove("active")
+      );
+      const ind = document.querySelector(".theme-indicator");
+      if (ind) theme === "dark" ? ind.classList.add("dark-mode") : ind.classList.remove("dark-mode");
     }
-  });
 
-  // ================= HIGHCHARTS BAR CHART =================
-  Highcharts.chart('gadChart', {
-    chart: {
-      type: 'column',
-      backgroundColor: '#ffffff'
-    },
-    title: {
-      text: 'GAD Analytics'
-    },
-    xAxis: {
-      categories: ['Student', 'Administrative', 'Faculty', 'Dependent'],
-      title: { text: 'Category' }
-    },
-    yAxis: {
-      min: 0,
-      title: { text: 'Number of Cases' }
-    },
-    series: [
-      {
-        name: 'Female',
-        data: [25, 10, 15, 8], // example data
-        color: '#FFC0CB' // baby pink
-      },
-      {
-        name: 'Male',
-        data: [20, 15, 12, 10], // example data
-        color: '#89CFF0' // baby blue
+    let sidebarOpen = true;
+    function applyLayout(w) {
+      document.getElementById('sidebar').style.width = w;
+      document.getElementById('mainContent').style.marginLeft = w;
+    }
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const texts   = document.querySelectorAll('.sidebar-text');
+      const icon    = document.getElementById('sidebarIcon');
+      const wrapper = document.getElementById('sidebarToggleWrapper');
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) {
+        applyLayout('220px');
+        sidebar.classList.replace('collapsed', 'expanded');
+        texts.forEach(t => { t.classList.remove('opacity-0','w-0'); t.classList.add('opacity-100'); });
+        wrapper.classList.replace('justify-center', 'justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        applyLayout('72px');
+        sidebar.classList.replace('expanded', 'collapsed');
+        texts.forEach(t => { t.classList.add('opacity-0','w-0'); t.classList.remove('opacity-100'); });
+        wrapper.classList.replace('justify-end', 'justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
       }
-    ],
-    tooltip: {
-      shared: true,
-      valueSuffix: ' cases'
-    },
-    plotOptions: {
-      column: {
-        pointPadding: 0.2,
-        borderWidth: 0
+      applyTheme(localStorage.getItem("theme") || "light");
+    }
+
+    // Dentist greeting
+    const dentist = { name: "Dr. Nelson" };
+    document.getElementById("dentistName").textContent = dentist.name + "!";
+    document.getElementById("currentDate").textContent =
+      new Date().toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+    // Dynamic greeting text
+    function getGreeting() {
+      const h = new Date().getHours();
+      return h < 12 ? 'Good Morning,' : h < 18 ? 'Good Afternoon,' : 'Good Evening,';
+    }
+    const greetEl = document.querySelector('.bg-gradient-to-r.from-\\[\\#660000\\].to-\\[\\#FFD700\\].bg-clip-text');
+    if (greetEl) {
+      const fn = greetEl.childNodes[0];
+      if (fn && fn.nodeType === Node.TEXT_NODE) fn.textContent = getGreeting() + ' ';
+    }
+
+    // ── Status Modal ──
+    let dentistIsIn = true;
+    function openStatusModal() {
+      const modal = document.getElementById('statusModal');
+      const box   = document.getElementById('statusModalBox');
+      const banner = document.getElementById('modalBanner');
+      const icon   = document.getElementById('modalIcon');
+      const title  = document.getElementById('modalTitle');
+      const sub    = document.getElementById('modalSubtitle');
+      const body   = document.getElementById('modalBody');
+      if (dentistIsIn) {
+        banner.className = 'bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-4 text-white text-center';
+        icon.innerHTML = '<i class="fa-solid fa-door-closed"></i>';
+        title.textContent = 'Close the Clinic?';
+        sub.innerHTML = 'You are about to mark yourself as <strong>OUT</strong>';
+        body.innerHTML = 'This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>. Patients will not be able to book new appointments while you are out.';
+      } else {
+        banner.className = 'bg-gradient-to-r from-green-600 to-green-700 px-6 pt-6 pb-4 text-white text-center';
+        icon.innerHTML = '<i class="fa-solid fa-door-open"></i>';
+        title.textContent = 'Open the Clinic?';
+        sub.innerHTML = 'You are about to mark yourself as <strong>IN</strong>';
+        body.innerHTML = 'This will indicate that the clinic is <span class="font-semibold text-green-700">now open</span>. Patients will be able to see your availability and book appointments.';
       }
-    },
-    credits: { enabled: false }
-  });
-
-  // NOTIFICATION
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("notifBtn");
-    const menu = document.getElementById("notifMenu");
-
-    let isOpen = false;
-
-    function openMenu() {
-      isOpen = true;
-      menu.classList.remove("notif-close");
-      menu.classList.add("notif-open");
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100');
+      setTimeout(() => box.classList.replace('scale-90', 'scale-100'), 10);
     }
-
-    function closeMenu() {
-      isOpen = false;
-      menu.classList.remove("notif-open");
-      menu.classList.add("notif-close");
+    function closeStatusModal() {
+      const modal = document.getElementById('statusModal');
+      const box   = document.getElementById('statusModalBox');
+      box.classList.replace('scale-100', 'scale-90');
+      setTimeout(() => { modal.classList.add('opacity-0','pointer-events-none'); modal.classList.remove('opacity-100'); }, 150);
     }
-
-    // Toggle when clicking bell
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen ? closeMenu() : openMenu();
+    function confirmStatus() {
+      const btn      = document.getElementById('statusBtn');
+      const label    = document.getElementById('statusLabel');
+      const kpiLabel = document.getElementById('statusKpiLabel');
+      const kpiIcon  = document.getElementById('statusKpiIcon');
+      dentistIsIn = !dentistIsIn;
+      if (dentistIsIn) {
+        btn.classList.replace('btn-error','btn-success');
+        label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN';
+        if (kpiLabel) { kpiLabel.textContent = 'Open'; kpiLabel.className = 'text-2xl font-extrabold tracking-tight text-green-600 leading-none mt-1'; }
+        if (kpiIcon)  kpiIcon.className = 'fa-solid fa-door-open text-green-600 text-lg';
+      } else {
+        btn.classList.replace('btn-success','btn-error');
+        label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full"></span> OUT';
+        if (kpiLabel) { kpiLabel.textContent = 'Closed'; kpiLabel.className = 'text-2xl font-extrabold tracking-tight text-red-600 leading-none mt-1'; }
+        if (kpiIcon)  kpiIcon.className = 'fa-solid fa-door-closed text-red-600 text-lg';
+      }
+      closeStatusModal();
+    }
+    document.getElementById('statusModal').addEventListener('click', function(e) {
+      if (e.target === this) closeStatusModal();
     });
 
-    // Keep open when clicking inside menu
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
+    // ── Single DOMContentLoaded ──
+    document.addEventListener("DOMContentLoaded", () => {
+
+      // Layout & theme
+      applyLayout('220px');
+      applyTheme(localStorage.getItem("theme") || "light");
+      document.querySelectorAll(".theme-option").forEach(o =>
+        o.addEventListener("click", () => applyTheme(o.getAttribute("data-theme")))
+      );
+
+      // Notifications
+      const notifBtn  = document.getElementById("notifBtn");
+      const notifMenu = document.getElementById("notifMenu");
+      let notifOpen = false;
+      const openNotif  = () => { notifOpen = true;  notifMenu.classList.remove("notif-close"); notifMenu.classList.add("notif-open"); };
+      const closeNotif = () => { notifOpen = false; notifMenu.classList.remove("notif-open");  notifMenu.classList.add("notif-close"); };
+      notifBtn.addEventListener("click", e => { e.stopPropagation(); notifOpen ? closeNotif() : openNotif(); });
+      notifMenu.addEventListener("click", e => e.stopPropagation());
+      document.addEventListener("click",   () => { if (notifOpen) closeNotif(); });
+      document.addEventListener("keydown", e => { if (e.key === "Escape" && notifOpen) closeNotif(); });
+      closeNotif();
+
+      // ── GAD Chart with Chart.js ──
+      // Delay slightly so the container has correct width after layout is applied
+      setTimeout(() => {
+        const ctx = document.getElementById('gadChart');
+        if (!ctx) return;
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Student', 'Administrative', 'Faculty', 'Dependent'],
+            datasets: [
+              {
+                label: 'Female',
+                data: [25, 10, 15, 8],
+                backgroundColor: 'rgba(255, 192, 203, 0.85)',
+                borderColor: '#FFB6C1',
+                borderWidth: 1,
+                borderRadius: 6,
+              },
+              {
+                label: 'Male',
+                data: [20, 15, 12, 10],
+                backgroundColor: 'rgba(137, 207, 240, 0.85)',
+                borderColor: '#7EC8E3',
+                borderWidth: 1,
+                borderRadius: 6,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false  // we show a custom legend in the card header
+              },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} cases`
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 12 }, color: '#555' },
+                title: { display: true, text: 'Patient Category', font: { family: 'Inter', size: 12 }, color: '#888' }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { borderDash: [4, 4], color: '#f0f0f0' },
+                ticks: { precision: 0, font: { family: 'Inter', size: 12 }, color: '#555' },
+                title: { display: true, text: 'Number of Cases', font: { family: 'Inter', size: 12 }, color: '#888' }
+              }
+            }
+          }
+        });
+      }, 150);
+
+      // Calendar
+      loadDentistCalendar();
     });
 
-    // Close when clicking outside
-    document.addEventListener("click", () => {
-      if (isOpen) closeMenu();
-    });
+    // ── Calendar ──
+    function loadDentistCalendar() {
+      const MAX_PER_DAY = 5;
+      const apptCounts = {
+        @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay ?? []) > 0)
+          @foreach($appointmentCountsPerDay as $date => $count)
+            "{{ $date }}": {{ $count }},
+          @endforeach
+        @else
+          @if(isset($todayAppointments) && $todayAppointments->count() > 0)
+            "{{ \Carbon\Carbon::today()->format('Y-m-d') }}": {{ $todayAppointments->count() }},
+          @endif
+        @endif
+      };
+      const unavailableDates = [
+        @foreach(($unavailableDates ?? []) as $d) "{{ $d }}", @endforeach
+      ];
+      const allHolidays = {
+        @foreach(($philippineHolidays ?? []) as $date => $name) "{{ $date }}": "{{ addslashes($name) }}", @endforeach
+      };
 
-    // Close on ESC
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) closeMenu();
-    });
+      const today = new Date();
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth();
 
-    // Start closed
-    closeMenu();
-  });
-</script>
+      function pad(n) { return String(n).padStart(2,'0'); }
+      function isWeekend(y,m,d) { const dow = new Date(y,m,d).getDay(); return dow===0||dow===6; }
+      function getHolidaysForMonth(year,month) {
+        const out = {};
+        Object.keys(allHolidays).forEach(ds => {
+          const [y,m] = ds.split('-').map(Number);
+          if (y===year && m===month+1) out[ds]=allHolidays[ds];
+        });
+        return out;
+      }
+
+      function renderDentistCalendar(year,month) {
+        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const dayLabels  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        const firstDow   = new Date(year,month,1).getDay();
+        const totalDays  = new Date(year,month+1,0).getDate();
+        const holidays   = getHolidaysForMonth(year,month);
+
+        const headerHtml = dayLabels.map((l,i)=>{
+          const c=(i===0||i===6)?'text-[#8B0000]/40':'text-[#555]';
+          return `<div class="text-center text-[10px] font-bold ${c} uppercase tracking-widest">${l}</div>`;
+        }).join('');
+
+        let cells='';
+        for(let i=0;i<firstDow;i++) cells+=`<div></div>`;
+
+        for(let d=1;d<=totalDays;d++){
+          const dateStr=`${year}-${pad(month+1)}-${pad(d)}`;
+          const isToday=d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+          const weekend=isWeekend(year,month,d);
+          const holiday=holidays[dateStr]||null;
+          const count=apptCounts[dateStr]||0;
+          const isFull=count>=MAX_PER_DAY;
+          const isUnavail=unavailableDates.includes(dateStr)||weekend;
+          const hasAppts=count>0;
+
+          let dotHtml='',badgeHtml='',tooltipTxt='';
+          if(holiday){
+            dotHtml=`<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
+            tooltipTxt=`<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
+          }
+          if(hasAppts&&!isUnavail){
+            if(isFull){
+              dotHtml=`<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
+              tooltipTxt=`<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked — ${count} patients`;
+            }else{
+              dotHtml=`<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isToday?'bg-white':'bg-[#8B0000]'}"></span>`;
+              tooltipTxt=`<i class="fa-solid fa-user-clock mr-1 text-yellow-300"></i>${count} patient${count>1?'s':''} scheduled`;
+            }
+            const pillColor=isFull?'bg-red-500 text-white':(isToday?'bg-white text-[#8B0000]':'bg-[#8B0000] text-white');
+            badgeHtml=`<span class="absolute -top-1.5 -right-1.5 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ${pillColor} shadow">${count}</span>`;
+          }
+          if(isUnavail&&!holiday&&!hasAppts){
+            tooltipTxt=weekend?`<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed`:`<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+          }
+
+          let bgClass='',textClass='text-[#333]',ringClass='',cursor='cursor-default';
+          if(isToday){bgClass='bg-[#8B0000]';textClass='text-white font-extrabold';ringClass='ring-2 ring-[#8B0000]/30 ring-offset-1';}
+          else if(holiday){bgClass='bg-blue-50 hover:bg-blue-100';textClass='text-blue-700 font-semibold';}
+          else if(isFull){bgClass='bg-red-50 hover:bg-red-100';textClass='text-red-600 font-semibold';cursor='cursor-pointer';}
+          else if(hasAppts){bgClass='bg-[#FFF5F5] hover:bg-[#FFE8E8]';textClass='text-[#8B0000] font-semibold';cursor='cursor-pointer';}
+          else if(isUnavail){textClass='text-gray-300';}
+          else{bgClass='hover:bg-gray-100';}
+
+          const tooltipHtml=tooltipTxt?`
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50
+                        bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5
+                        rounded-lg whitespace-nowrap shadow-xl
+                        opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+              ${tooltipTxt}
+              <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div>
+            </div>`:'';
+
+          cells+=`
+            <div class="relative group flex items-center justify-center">
+              ${tooltipHtml}
+              <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full
+                          transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}">
+                ${d}${dotHtml}${badgeHtml}
+              </div>
+            </div>`;
+        }
+
+        document.getElementById('dentistCalendarContainer').innerHTML=`
+          <div class="h-full flex flex-col select-none">
+            <div class="flex items-center justify-center gap-2 mb-3">
+              <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
+              <h2 class="text-lg font-extrabold text-[#333]">Clinic Appointment Schedule</h2>
+            </div>
+            <hr class="border-t border-gray-200 mb-2">
+            <div class="flex items-center justify-between my-4">
+              <button onclick="changeDentistMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <div class="text-center">
+                <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+                <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+              </div>
+              <button onclick="changeDentistMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-7 gap-2 mb-2">${headerHtml}</div>
+            <div class="grid grid-cols-7 gap-2" style="row-gap:1.2rem;">${cells}</div>
+            <div class="mt-5 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+              <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-[#8B0000] flex-shrink-0"></span><span class="text-[11px] text-[#555]">Today</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-[#FFF5F5] border border-[#8B0000] flex-shrink-0"></span><span class="text-[11px] text-[#555]">Has Patients</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-red-50 border border-red-400 flex-shrink-0"></span><span class="text-[11px] text-[#555]">Fully Booked</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-blue-50 border border-blue-400 flex-shrink-0"></span><span class="text-[11px] text-[#555]">Holiday</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-gray-300 text-base font-bold leading-none">–</span><span class="text-[11px] text-[#555]">Unavailable</span></div>
+            </div>
+          </div>`;
+      }
+
+      window.changeDentistMonth = function(dir) {
+        currentMonth += dir;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+        renderDentistCalendar(currentYear, currentMonth);
+      };
+
+      renderDentistCalendar(currentYear, currentMonth);
+    }
+  </script>
 
 </body>
 </html>

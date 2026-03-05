@@ -23,4 +23,29 @@ class Patient extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function dentalHistory()
+    {
+        return $this->hasOne(\App\Models\DentalHistory::class);
+    }
+
+    public function dentalHistoryDates()
+    {
+        return $this->hasOne(\App\Models\DentalHistoryConditionDate::class);
+    }
+
+    public function dentalHistoryConcerns()
+    {
+        return $this->hasOne(\App\Models\DentalHistoryConcern::class);
+    }
+
+    public function dentalHistoryAnswers()
+    {
+        return $this->hasMany(\App\Models\DentalHistoryAnswer::class);
+    }
+    
+     public function medicalHistory()
+    {
+        return $this->hasOne(\App\Models\MedicalHistory::class);
+    }
 }
