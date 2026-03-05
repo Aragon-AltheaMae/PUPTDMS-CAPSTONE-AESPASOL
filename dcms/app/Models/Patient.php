@@ -43,4 +43,9 @@ class Patient extends Authenticatable
     {
         return $this->hasMany(\App\Models\DentalHistoryAnswer::class);
     }
+    
+     public function medicalHistory()
+    {
+        return $this->hasOne(\App\Models\MedicalHistory::class);
+    }
 }

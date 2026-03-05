@@ -264,8 +264,10 @@ class AppointmentController extends Controller
             }
 
             // 3) MEDICAL HISTORY (patient-based)
-            $medicalHistory = MedicalHistory::updateOrCreate([
-                    'patient_id' => $patientId,
+            // ✅ FIXED updateOrCreate: 1st arg = where, 2nd arg = values
+            $medicalHistory = MedicalHistory::updateOrCreate(
+                ['patient_id' => $patientId],
+                [
                     'emergency_person'   => $request->emergency_person,
                     'emergency_number'   => $request->emergency_number,
                     'emergency_relation' => $request->emergency_relation,
@@ -348,7 +350,7 @@ class AppointmentController extends Controller
 
             foreach ($selectedDiseaseIds as $diseaseId) {
                 MedicalHistoryDiseaseAnswer::create([
-                    'patient_id'         => $patientId, 
+                    'patient_id'         => $patientId,
                     'medical_history_id' => $medicalHistory->id,
                     'disease_id'         => $diseaseId,
                     'has_disease'        => true,
