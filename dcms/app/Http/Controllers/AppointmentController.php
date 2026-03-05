@@ -115,12 +115,15 @@ class AppointmentController extends Controller
             $this->getPhilippineHolidays($currentYear + 1)
         );
 
+        $diseases = Disease::orderBy('sort_order')->get();
+
         return view('book-appointment', compact(
             'patient',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',
             'unavailableDates',
-            'philippineHolidays'
+            'philippineHolidays',
+            'diseases'
         ));
     }
 
@@ -140,6 +143,9 @@ class AppointmentController extends Controller
             'emergency_relation'   => 'required|string',
 
             'patient_signature'    => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
+
+            'diseases'   => 'array',
+            'diseases.*' => 'string|exists:diseases,code',
         ]);
 
         $patientId = session('patient_id');
@@ -312,39 +318,102 @@ class AppointmentController extends Controller
 
             foreach ($medicalAnswerMap as $code => $rawValue) {
                 $q = $questions->get($code);
-                if (!$q) {
+                if (!$q) continue;
+
+                // Normalize by type
+                if ($q->type === 'bool') {
+                    $bool = ($this->yesNoValue($rawValue) === 'YES');
+
+                    MedicalHistoryAnswer::updateOrCreate(
+                        [
+                            'patient_id'         => $patientId,
+                            'medical_history_id' => $medicalHistory->id,
+                            'question_id'        => $q->id,
+                        ],
+                        [
+                            'answer_bool' => $bool,
+                            'answer_text' => null,
+                            'answer_date' => null,
+                        ]
+                    );
+
                     continue;
                 }
 
-                $payload = [
-                    'medical_history_id' => $medicalHistory->id,
-                    'question_id'        => $q->id,
-                    'answer_bool'        => null,
-                    'answer_text'        => null,
-                    'answer_date'        => null,
-                ];
+                if ($q->type === 'text') {
+                    $text = ($rawValue === null) ? '' : trim((string) $rawValue);
 
-                if ($q->type === 'bool') {
-                    $payload['answer_bool'] = ($this->yesNoValue($rawValue) === 'YES');
-                } elseif ($q->type === 'text') {
-                    $payload['answer_text'] = ($rawValue === null) ? null : trim((string) $rawValue);
-                } elseif ($q->type === 'date') {
-                    $payload['answer_date'] = $rawValue ?: null;
+                    // remove row if empty text 
+                    if ($text === '') {
+                        MedicalHistoryAnswer::where([
+                            'patient_id'         => $patientId,
+                            'medical_history_id' => $medicalHistory->id,
+                            'question_id'        => $q->id,
+                        ])->delete();
+                        continue;
+                    }
+
+                    MedicalHistoryAnswer::updateOrCreate(
+                        [
+                            'patient_id'         => $patientId,
+                            'medical_history_id' => $medicalHistory->id,
+                            'question_id'        => $q->id,
+                        ],
+                        [
+                            'answer_bool' => null,
+                            'answer_text' => $text,
+                            'answer_date' => null,
+                        ]
+                    );
+
+                    continue;
                 }
 
-                MedicalHistoryAnswer::updateOrCreate(
-                    [
-                        'patient_id'         => $patientId,
-                        'medical_history_id' => $medicalHistory->id,
-                        'question_id'        => $q->id,
-                    ],
-                    $payload
-                );
+                if ($q->type === 'date') {
+                    $date = $rawValue ? trim((string) $rawValue) : '';
+
+                    // remove row if empty date
+                    if ($date === '') {
+                        MedicalHistoryAnswer::where([
+                            'patient_id'         => $patientId,
+                            'medical_history_id' => $medicalHistory->id,
+                            'question_id'        => $q->id,
+                        ])->delete();
+                        continue;
+                    }
+
+                    MedicalHistoryAnswer::updateOrCreate(
+                        [
+                            'patient_id'         => $patientId,
+                            'medical_history_id' => $medicalHistory->id,
+                            'question_id'        => $q->id,
+                        ],
+                        [
+                            'answer_bool' => null,
+                            'answer_text' => null,
+                            'answer_date' => $date, 
+                        ]
+                    );
+
+                    continue;
+                }
             }
 
-            // 4) DISEASES (selected labels from form)
-            $selectedDiseaseLabels = $request->input('conditions', []);
-            $selectedDiseaseIds = Disease::whereIn('label', $selectedDiseaseLabels)->pluck('id')->all();
+            MedicalHistoryAnswer::where('patient_id', $patientId)
+                ->where('medical_history_id', $medicalHistory->id)
+                ->whereNull('answer_bool')
+                ->whereNull('answer_date')
+                ->where(function ($q) {
+                    $q->whereNull('answer_text')
+                    ->orWhereRaw("TRIM(answer_text) = ''");
+                })
+                ->delete();
+
+            // 4) DISEASES (selected codes from form)
+            $selectedDiseaseCodes = $request->input('diseases', []);
+            $selectedDiseaseIds = Disease::whereIn('code', $selectedDiseaseCodes)
+                    ->pluck('id')
+                    ->all();
 
             MedicalHistoryDiseaseAnswer::where('medical_history_id', $medicalHistory->id)->delete();
 
