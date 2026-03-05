@@ -19,7 +19,7 @@ return new class extends Migration {
         $table->date('last_dental_visit')->nullable();
         $table->string('previous_dentist', 60)->nullable();
 
-        $table->timestamps();
+            $table->timestamps();
         });
     }
 
@@ -28,4 +28,3 @@ return new class extends Migration {
         Schema::dropIfExists('dental_histories');
     }
 };
-
