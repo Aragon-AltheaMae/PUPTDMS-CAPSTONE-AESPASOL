@@ -15,6 +15,8 @@ use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\Dentist\DentistPatientController;
 use App\Http\Controllers\Dentist\DentistAppointmentController;
+use App\Http\Controllers\Admin\AdminAuthController;
+
 
 
 // -------------------
@@ -94,6 +96,32 @@ Route::post('/dentist/login', function (Request $request) {
 
     return back()->with('error', 'Invalid dentist credentials');
 })->name('dentist.login.submit');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AUTH
+|--------------------------------------------------------------------------
+*/
+
+// Show admin login page
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+
+// Process admin login
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+// Admin dashboard (protected)
+Route::get('/admin/dashboard', function () {
+
+    if (!session('admin_logged_in')) {
+        return redirect('/admin/login');
+    }
+
+    return view('admin-dashboard');
+
+})->name('admin.dashboard');
+
+// Admin logout
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 // Logout (all roles)
 Route::post('/logout', function () {
