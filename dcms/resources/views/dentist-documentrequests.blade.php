@@ -1038,7 +1038,7 @@
 
                     <div class="col-span-4">
                       <p class="font-semibold text-[#333333] text-sm">Aragon, Althea</p>
-                      <p class="text-gray-500 text-xs">Dependent</p>
+                      <p class="text-gray-500 text-xs">Administrative</p>
                     </div>
 
                     <div class="col-span-3 flex items-start gap-3">
@@ -1083,7 +1083,7 @@
 
                   <div>
                     <p class="font-semibold text-[#333333]">Aragon, Althea</p>
-                    <p class="text-sm text-gray-500">Dependent</p>
+                    <p class="text-sm text-gray-500">Administrative</p>
                   </div>
 
                   <div class="flex items-center gap-6">
@@ -1409,6 +1409,71 @@
         <button id="rejectConfirmBtn"
           class="bg-[#8B0000] text-white px-12 py-3 rounded-lg font-extrabold hover:bg-[#6e0000] transition">
           REJECT
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ✅ APPROVED RESULT MODAL -->
+<div id="approvedResultModal"
+  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
+  <div class="w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl bg-[#0B7A3B]">
+    <div class="px-10 py-12 text-center text-white">
+      <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+        This request has been<br/>approved.
+      </h2>
+
+      <p class="text-white/80 text-sm mt-6 leading-relaxed">
+        The document will now be printed for signing and validation.<br/>
+        The patient will be notified for the claiming of the document.
+      </p>
+
+      <div class="mt-7 text-white/90 text-sm font-semibold">Claiming Validity:</div>
+
+      <div class="mt-4 flex flex-col items-center gap-3">
+        <div class="flex items-center gap-3">
+          <span class="w-12 text-right text-white/80 text-sm">From:</span>
+          <input id="approvedFrom" type="date"
+            class="w-40 h-8 rounded bg-white/90 text-gray-900 px-3 text-sm outline-none focus:ring-2 focus:ring-white/60">
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="w-12 text-right text-white/80 text-sm">Until:</span>
+          <input id="approvedUntil" type="date"
+            class="w-40 h-8 rounded bg-white/90 text-gray-900 px-3 text-sm outline-none focus:ring-2 focus:ring-white/60">
+        </div>
+      </div>
+
+      <div class="mt-10 flex justify-end">
+        <button id="approvedResultClose"
+          class="bg-gray-200 text-gray-800 px-8 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ✅ REJECTED RESULT MODAL -->
+<div id="rejectedResultModal"
+  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
+  <div class="w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl bg-[#7B0000]">
+    <div class="px-10 py-14 text-center text-white">
+      <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+        This request has been<br/>rejected.
+      </h2>
+
+      <p class="text-white/70 text-sm mt-6">
+        The patient will be notified of the document request status.
+      </p>
+
+      <div class="mt-12 flex justify-end">
+        <button id="rejectedResultClose"
+          class="bg-gray-200 text-gray-800 px-8 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition">
+          Close
         </button>
       </div>
     </div>
@@ -1898,6 +1963,83 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Rejected:", patient, "Notes:", notes);
 
     closeModal();
+  });
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Confirm modals you already have
+  const approveConfirmModal = document.getElementById("approveModal");   // <-- change if your approve modal has different id
+  const rejectConfirmModal  = document.getElementById("rejectModal");
+
+  // Result modals (new)
+  const approvedResultModal = document.getElementById("approvedResultModal");
+  const rejectedResultModal = document.getElementById("rejectedResultModal");
+
+  const approvedCloseBtn = document.getElementById("approvedResultClose");
+  const rejectedCloseBtn = document.getElementById("rejectedResultClose");
+
+  const approvedFrom  = document.getElementById("approvedFrom");
+  const approvedUntil = document.getElementById("approvedUntil");
+
+  // Your confirm buttons (from the confirm modals)
+  const approveConfirmBtn = document.getElementById("approveConfirmBtn"); // <-- ensure your approve confirm button uses this id
+  const rejectConfirmBtn  = document.getElementById("rejectConfirmBtn");
+
+  function openModal(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.remove("hidden");
+    modalEl.classList.add("flex");
+    document.body.classList.add("overflow-hidden");
+  }
+
+  function closeModal(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.add("hidden");
+    modalEl.classList.remove("flex");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  // Click outside closes
+  function enableOutsideClick(modalEl, onClose) {
+    modalEl?.addEventListener("click", (e) => {
+      if (e.target === modalEl) onClose();
+    });
+  }
+
+  // Close buttons
+  approvedCloseBtn?.addEventListener("click", () => closeModal(approvedResultModal));
+  rejectedCloseBtn?.addEventListener("click", () => closeModal(rejectedResultModal));
+
+  enableOutsideClick(approvedResultModal, () => closeModal(approvedResultModal));
+  enableOutsideClick(rejectedResultModal, () => closeModal(rejectedResultModal));
+
+  // ESC closes whichever result modal is open
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (approvedResultModal && !approvedResultModal.classList.contains("hidden")) closeModal(approvedResultModal);
+    if (rejectedResultModal && !rejectedResultModal.classList.contains("hidden")) closeModal(rejectedResultModal);
+  });
+
+  // ✅ When APPROVE is confirmed -> show Approved Result modal
+  approveConfirmBtn?.addEventListener("click", () => {
+    // close confirm modal first
+    if (approveConfirmModal) closeModal(approveConfirmModal);
+
+    // optional: set default dates
+    const today = new Date().toISOString().slice(0, 10);
+    if (approvedFrom) approvedFrom.value = today;
+    if (approvedUntil) approvedUntil.value = "";
+
+    openModal(approvedResultModal);
+  });
+
+  // ✅ When REJECT is confirmed -> show Rejected Result modal
+  rejectConfirmBtn?.addEventListener("click", () => {
+    // close confirm modal first
+    if (rejectConfirmModal) closeModal(rejectConfirmModal);
+
+    openModal(rejectedResultModal);
   });
 });
 </script>
