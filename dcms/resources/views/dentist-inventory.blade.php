@@ -13,13 +13,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Inter'; }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
 
     /* Fade-in animation */
     @keyframes fadeIn {
@@ -38,6 +39,7 @@
       animation: fadeIn 0.6s ease-out forwards;
     }
 
+    /* ── SIDEBAR (UNCHANGED) ── */
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -46,11 +48,11 @@
 
     #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
-      padding-left: 0.25rem;
+      padding-left: .25rem;
     }
 
     #sidebar.expanded .sidebar-link i {
-      margin-right: 0.75rem;
+      margin-right: .75rem;
     }
 
     #sidebar.expanded .sidebar-link:hover {
@@ -91,39 +93,12 @@
     }
 
     .section-label {
-      font-size: 0.65rem;
+      font-size: .65rem;
       font-weight: 500;
-      letter-spacing: 0.08em;
+      letter-spacing: .08em;
       color: #757575;
       text-transform: uppercase;
-      margin-bottom: 0.25rem;
-    }
-
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(0.95) !important;
-      pointer-events: none !important;
-    }
-
-    body,
-    #sidebar,
-    main,
-    .card,
-    .modal-box {
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    #sidebar.collapsed .section-label {
-      display: none;
-    }
-
-    #sidebar.expanded .section-label {
-      display: block;
+      margin-bottom: .25rem;
     }
 
     #sidebar.collapsed .sidebar-link {
@@ -132,30 +107,14 @@
       padding-right: 0;
     }
 
-    #sidebar.collapsed .sidebar-link span:first-of-type {
-      margin: 0 auto;
-    }
-
     #sidebar.collapsed .sidebar-link i {
       margin-right: 0 !important;
       width: 100%;
       text-align: center;
     }
 
-    #sidebar.expanded .sidebar-link {
-      justify-content: flex-start;
-    }
-
-    #sidebar.expanded .sidebar-link i {
-      margin-right: 0.75rem;
-    }
-
     #sidebar.expanded .sidebar-link span i {
       margin-right: 0 !important;
-    }
-
-    #sidebar.expanded .sidebar-link:hover {
-      transform: translateX(4px);
     }
 
     #sidebar.collapsed .sidebar-tooltip {
@@ -167,9 +126,23 @@
     }
 
     .sidebar-link.bg-\[\#8B0000\] {
-      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+      box-shadow: 0 0 12px rgba(139, 0, 0, .45);
     }
 
+    /* ── NOTIFICATIONS (UNCHANGED) ── */
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(.95) !important;
+      pointer-events: none !important;
+    }
+
+    /* ── THEME TOGGLE (UNCHANGED) ── */
     .theme-toggle-container {
       position: relative;
       display: flex;
@@ -180,7 +153,7 @@
       background: #F5F5F5;
       border: 1px solid #E0E0E0;
       border-radius: 24px;
-      transition: all 0.3s ease;
+      transition: all .3s ease;
     }
 
     #sidebar.collapsed .theme-toggle-container {
@@ -208,7 +181,7 @@
       border: none;
       cursor: pointer;
       color: #9CA3AF;
-      transition: color 0.2s ease;
+      transition: color .2s ease;
       border-radius: 8px;
     }
 
@@ -234,8 +207,8 @@
       position: absolute;
       background: white;
       border-radius: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      transition: all .3s cubic-bezier(.4, 0, .2, 1);
       pointer-events: none;
     }
 
@@ -263,14 +236,11 @@
       transform: translateY(calc(100% + 4px));
     }
 
-    /* DARK MODE STYLES */
+    /* ── DARK MODE (UNCHANGED) ── */
     [data-theme="dark"] body {
       background-color: #000D1A;
       color: #E5E7EB;
     }
-    [data-theme="dark"] #sidebar { background-color: #1F2933; }
-    [data-theme="dark"] .bg-white { background-color: #1F2937 !important; }
-    [data-theme="dark"] .text-\[\#333333\] { color: #E5E7EB !important; }
 
     [data-theme="dark"] #sidebar {
       background-color: #000D1A;
@@ -278,14 +248,6 @@
 
     [data-theme="dark"] .bg-white {
       background-color: #000D1A !important;
-    }
-    .filter-radio::after{
-      content:"";
-      width: 11px;
-      height: 11px;
-      border-radius: 9999px;
-      background: #8B1A1A;
-      display: none;
     }
 
     [data-theme="dark"] .theme-toggle-container {
@@ -303,14 +265,837 @@
 
     [data-theme="dark"] .theme-indicator {
       background: #2A2A2A;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+    }
+
+    /* ══════════════════════════════════════
+       NEW INVENTORY STYLES
+    ══════════════════════════════════════ */
+
+    /* ── STAT CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 22px;
+      border: 1px solid #E8E4DE;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .09);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .stat-card.s-total::before {
+      background: linear-gradient(90deg, #660000, #8B0000);
+    }
+
+    .stat-card.s-medicine::before {
+      background: linear-gradient(90deg, #1565C0, #42A5F5);
+    }
+
+    .stat-card.s-supplies::before {
+      background: linear-gradient(90deg, #2E7D32, #66BB6A);
+    }
+
+    .stat-card.s-low::before {
+      background: linear-gradient(90deg, #E65100, #FFA726);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: #9A9490;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-card.s-total .stat-value {
+      color: #8B0000;
+    }
+
+    .stat-card.s-medicine .stat-value {
+      color: #1565C0;
+    }
+
+    .stat-card.s-supplies .stat-value {
+      color: #2E7D32;
+    }
+
+    .stat-card.s-low .stat-value {
+      color: #E65100;
+    }
+
+    .stat-footer {
+      font-size: 11px;
+      color: #ADA9A5;
+      margin-top: 8px;
+    }
+
+    .stat-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .stat-card.s-total .stat-icon {
+      background: #FFF0F0;
+      color: #8B0000;
+    }
+
+    .stat-card.s-medicine .stat-icon {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+
+    .stat-card.s-supplies .stat-icon {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .stat-card.s-low .stat-icon {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+
+    /* ── SEARCH (UPDATED) ── */
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FAFAF9;
+      border: 1.5px solid #E0DDD8;
+      border-radius: 12px;
+      padding: 0 16px;
+      height: 40px;
+      transition: border-color .2s, box-shadow .2s;
+      width: 288px;
+    }
+
+    .search-wrap:focus-within {
+      border-color: #8B0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+    }
+
+    .search-wrap i {
+      color: #8B0000;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .search-wrap input {
+      border: none;
+      background: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-wrap input::placeholder {
+      color: #B0ABA6;
+    }
+
+    .search-clear-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: #E0DDD8;
+      color: #7A7370;
+      font-size: 10px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+      padding: 0;
+    }
+
+    .search-clear-btn:hover {
+      background: #8b000076;
+      color: #fff;
+    }
+
+    .search-clear-btn.visible {
+      display: flex;
+    }
+
+    /* ── CATEGORY TABS ── */
+    .tab-group {
+      display: flex;
+      background: #F5F2EE;
+      border: 1px solid #E8E4DE;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .tab-btn {
+      padding: 6px 16px;
+      border-radius: 7px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9A9490;
+      transition: all .2s;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn.active {
+      background: #8B0000;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(139, 0, 0, .3);
+    }
+
+    /* ── FILTER BTN (UPDATED) ── */
+    .btn-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: 1.5px solid #E0DDD8;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B6661;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-filter:hover {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #FFF8F8;
+    }
+
+    /* ── ADD ITEM BTN (UPDATED) ── */
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: 10px;
+      border: none;
+      background: #8B0000;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 3px 10px rgba(139, 0, 0, .3);
+    }
+
+    .btn-add:hover {
+      background: #660000;
+      box-shadow: 0 4px 14px rgba(139, 0, 0, .4);
+      transform: translateY(-1px);
+    }
+
+    .btn-add .add-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    /* ── TABLE (UPDATED) ── */
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .inv-table thead tr {
+      background: #FAFAF9;
+      border-bottom: 2px solid #EDE9E4;
+    }
+
+    .inv-table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #8B0000;
+      white-space: nowrap;
+    }
+
+    .inv-table th:last-child {
+      text-align: center;
+    }
+
+    .inv-table tbody tr {
+      border-bottom: 1px solid #F0ECE8;
+      transition: background .15s;
+    }
+
+    .inv-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .inv-table tbody tr:hover {
+      background: #FFF8F8;
+    }
+
+    .inv-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #333;
+      vertical-align: middle;
+    }
+
+    .inv-table td:last-child {
+      text-align: center;
+    }
+
+    .stock-no {
+      font-size: 12px;
+      font-weight: 500;
+      background: #F5F2EE;
+      border: 1px solid #E8E4DE;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #7A7370;
+      display: inline-block;
+      font-family: monospace;
+    }
+
+    .supply-name {
+      font-weight: 600;
+      color: #1A1614;
+    }
+
+    .supply-cat {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 2px 8px;
+      border-radius: 5px;
+      margin-top: 3px;
+    }
+
+    .supply-cat.medicine {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+
+    .supply-cat.supplies {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    /* Balance chips */
+    .bal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .bal-chip::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .bal-chip.ok {
+      background: #D4EDDA;
+      color: #1A6B34;
+    }
+
+    .bal-chip.low {
+      background: #FFF3CD;
+      color: #92600A;
+    }
+
+    .bal-chip.critical {
+      background: #FFE5E5;
+      color: #C0392B;
+    }
+
+    /* Action buttons */
+    .act-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+    }
+
+    .act-btn.edit {
+      background: #FFF0F0;
+      color: #8B0000;
+    }
+
+    .act-btn.edit:hover {
+      background: #8B0000;
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    .act-btn.delete {
+      background: #FFF0F0;
+      color: #C0392B;
+    }
+
+    .act-btn.delete:hover {
+      background: #C0392B;
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    /* Row count */
+    .row-count {
+      font-size: 12px;
+      color: #9A9490;
+    }
+
+    /* Table footer / pagination */
+    .table-footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid #EDE9E4;
+      background: #FAFAF9;
+      border-radius: 0 0 12px 12px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 72px 0;
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #FFF0F0, #FFE0E0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #8B0000;
+      margin: 0 auto 14px;
+    }
+
+    .empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: #9A9490;
+    }
+
+    /* ── SLIDE-IN FILTER PANEL ── */
+    .filter-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 190;
+      background: rgba(0, 0, 0, .35);
+      backdrop-filter: blur(2px);
+    }
+
+    .filter-overlay.open {
+      display: block;
+    }
+
+    .filter-panel {
+      position: fixed;
+      right: -360px;
+      top: 0;
+      bottom: 0;
+      width: 340px;
+      z-index: 200;
+      background: #fff;
+      border-left: 1px solid #E8E4DE;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, .1);
+      display: flex;
+      flex-direction: column;
+      transition: right .3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .filter-panel.open {
+      right: 0;
+    }
+
+    .fp-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid #EDE9E4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fp-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #8B0000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fp-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid #E8E4DE;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9A9490;
+      font-size: 14px;
+      transition: all .2s;
+    }
+
+    .fp-close-btn:hover {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #FFF8F8;
+    }
+
+    .fp-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .fp-section {
+      margin-bottom: 22px;
+    }
+
+    .fp-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #9A9490;
+      margin-bottom: 10px;
+    }
+
+    .fp-radio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background .15s;
+      margin-bottom: 2px;
+    }
+
+    .fp-radio-item:hover {
+      background: #FFF5F5;
+    }
+
+    .fp-radio-item input[type="radio"] {
+      accent-color: #8B0000;
+      width: 16px;
+      height: 16px;
+    }
+
+    .fp-radio-item label {
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .fp-date-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .fp-date-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .fp-date-label {
+      font-size: 11px;
+      color: #9A9490;
+      font-weight: 600;
+    }
+
+    .fp-date-input {
+      height: 38px;
+      padding: 0 12px;
+      border: 1.5px solid #E0DDD8;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+      background: #FAFAF9;
+      color: #333;
+    }
+
+    .fp-date-input:focus {
+      border-color: #8B0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
+    }
+
+    .fp-footer {
+      padding: 14px 24px;
+      border-top: 1px solid #EDE9E4;
+      display: flex;
+      gap: 10px;
+    }
+
+    .fp-btn-clear {
+      flex: 1;
+      height: 40px;
+      border-radius: 10px;
+      border: 1.5px solid #E0DDD8;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8B0000;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+    }
+
+    .fp-btn-clear:hover {
+      background: #FFF8F8;
+    }
+
+    .fp-btn-apply {
+      flex: 2;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: #8B0000;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+      box-shadow: 0 3px 10px rgba(139, 0, 0, .3);
+    }
+
+    .fp-btn-apply:hover {
+      background: #660000;
+    }
+
+    /* ── MODAL UPDATES ── */
+    .modal-box-custom {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px;
+      width: 500px;
+      max-width: 95vw;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .15);
+    }
+
+    .modal-header-custom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .modal-icon-custom {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #660000, #8B0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      color: #fff;
+    }
+
+    .modal-title-custom {
+      font-size: 18px;
+      font-weight: 700;
+      color: #660000;
+    }
+
+    .modal-sub-custom {
+      font-size: 12px;
+      color: #9A9490;
+      margin-top: 1px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group-custom {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group-custom.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label-custom {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #8B0000;
+    }
+
+    .form-input-custom,
+    .form-select-custom {
+      height: 40px;
+      padding: 0 13px;
+      border-radius: 9px;
+      border: 1.5px solid #E0DDD8;
+      background: #FAFAF9;
+      font-size: 13px;
+      color: #333;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .form-input-custom:focus,
+    .form-select-custom:focus {
+      border-color: #8B0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+    }
+
+    .form-input-custom[readonly] {
+      background: #F2F0EC;
+      color: #9A9490;
+      cursor: not-allowed;
+    }
+
+    .modal-footer-custom {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn-modal-cancel {
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 9px;
+      border: 1.5px solid #E0DDD8;
+      background: #F5F2EE;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B6661;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+    }
+
+    .btn-modal-cancel:hover {
+      background: #EDE9E4;
+    }
+
+    .btn-modal-save {
+      height: 40px;
+      padding: 0 22px;
+      border-radius: 9px;
+      border: none;
+      background: #8B0000;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+      box-shadow: 0 3px 10px rgba(139, 0, 0, .3);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn-modal-save:hover {
+      background: #660000;
     }
   </style>
 </head>
 
 <body class="bg-[#F4F4F4] min-h-screen flex flex-col">
 
-  <!-- HEADER (TOP BAR) -->
+  <!-- ════════════════════════════
+       HEADER (UNCHANGED)
+  ════════════════════════════ -->
   <div class="fixed top-0 left-0 right-0 z-50
             bg-gradient-to-r from-[#660000] to-[#8B0000]
             text-[#F4F4F4] px-6 py-4
@@ -325,38 +1110,27 @@
       </div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-    <div class="w-12 rounded-full">
-      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-    </div>
-    <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
-  </div>
 
     <div class="flex items-center gap-8">
       @php
-      // Pass $notifications from controller, or leave it empty for now
-      // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
       $notifications = collect($notifications ?? []);
       $notifCount = $notifications->count();
       @endphp
 
       <div id="notifDropdown" class="relative">
-
-        <button id="notifBtn" type="button"
-          class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-
+        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
           @if($notifCount > 0)
           <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
             {{ $notifCount }}
           </span>
           @endif
-
           <i class="fa-regular fa-bell text-lg"></i>
         </button>
 
         <div id="notifMenu"
           class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-         opacity-0 scale-95 pointer-events-none
-         transition-all duration-200 ease-out origin-top-right">
+              opacity-0 scale-95 pointer-events-none
+              transition-all duration-200 ease-out origin-top-right">
 
           <div class="p-4 border-b flex items-center justify-between">
             <span class="font-bold text-[#8B0000]">Notifications</span>
@@ -365,29 +1139,22 @@
           <div class="max-h-80 overflow-y-auto">
             @forelse($notifications as $n)
             <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
+              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))
-              <div class="text-xs text-[#ADADAD] mt-0.5">
-                {{ $n['message'] }}
-              </div>
+              <div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>
               @endif
               @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
+              <div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>
               @endif
             </a>
             @empty
             <div class="px-4 py-10 text-center justify-items-center">
               <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
               <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
             </div>
             @endforelse
           </div>
-
         </div>
       </div>
 
@@ -401,7 +1168,9 @@
     </div>
   </div>
 
-  <!-- SIDEBAR -->
+  <!-- ════════════════════════════
+       SIDEBAR (UNCHANGED)
+  ════════════════════════════ -->
   <aside id="sidebar"
     class="fixed left-0 top-[72px]
          h-[calc(100vh-72px)]
@@ -413,8 +1182,6 @@
 
     <!-- TOP -->
     <div class="pt-4">
-
-      <!-- Toggle Button -->
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()"
           id="sidebarToggleBtn"
@@ -425,144 +1192,94 @@
         </button>
       </div>
 
-      <!-- NAVIGATION LABEL -->
       <div class="section-label px-4 mb-6">Navigation</div>
 
-      <!-- MENU -->
       <nav class="space-y-2 px-3 text-gray-600">
 
-        <!-- DASHBOARD -->
         <a href="{{ route('dentist.dashboard') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
             <i class="fa-solid fa-chart-line text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Dashboard
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Dashboard
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Dashboard</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dashboard</span>
         </a>
 
-        <!-- PATIENTS -->
         <a href="{{ route('dentist.patients') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
             <i class="fa-solid fa-users text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Patients
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Patients
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Patients</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Patients</span>
         </a>
 
-        <!-- APPOINTMENTS -->
         <a href="{{ route('dentist.appointments') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
             <i class="fa-solid fa-calendar-check text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Appointments
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Appointments
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Appointments</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointments</span>
         </a>
 
-        <!-- Document Requests -->
         <a href="{{ route('dentist.documentrequests') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
             <i class="fa-solid fa-file-circle-check text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Document Requests
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Document Requests
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Document Requests</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Document Requests</span>
         </a>
 
-        <!-- INVENTORY -->
         <a href="{{ route('dentist.inventory') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
             <i class="fa-solid fa-box text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Inventory
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Inventory
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Inventory</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Inventory</span>
         </a>
 
-        <!-- REPORTS -->
         <a href="{{ route('dentist.report') }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
+                transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
                 {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
                 {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
-
           <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
             <i class="fa-solid fa-file text-lg"></i>
           </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Reports
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Reports
-          </span>
+          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Reports</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Reports</span>
         </a>
+
       </nav>
     </div>
 
     <!-- BOTTOM -->
     <div class="px-3 pb-5 space-y-4">
       <div class="section-label">Settings</div>
-
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
           <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
@@ -574,401 +1291,139 @@
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
-
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button
-          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
              text-red-600 hover:bg-red-100 transition-all duration-200">
           <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
             <i class="fa-solid fa-right-from-bracket text-sm"></i>
           </div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
-            Log out
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Log out
-          </span>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
         </button>
       </form>
-
     </div>
   </aside>
 
-    <!-- Scrollable content -->
-    <div class="flex-1 overflow-y-auto">
+  <!-- ════════════════════════════
+       MAIN CONTENT (REDESIGNED)
+  ════════════════════════════ -->
+  <main id="mainContent" class="pt-[88px] px-6 pb-6 min-h-screen fade-in">
+    <div class="max-w-7xl mt-4 mx-auto">
 
-      <!-- Sort -->
-      <div class="px-7 py-7 border-b">
-        <div class="text-[15px] text-[#555] mb-5">Sort</div>
+      <!-- PAGE TITLE -->
+      <div class="mb-6">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-[#C9A84C] mb-1">
+          <i class="fa-solid fa-box mr-1"></i> Stock Management
+        </p>
+        <h1 class="text-2xl font-extrabold text-[#660000] leading-tight">Inventory</h1>
+        <p class="text-sm text-gray-400 mt-1">Track and manage dental supplies &amp; medicines</p>
+      </div>
 
-        <div class="flex flex-col gap-4">
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_sort" value="az">
-            <span class="filter-radio"></span>
-            A-Z
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_sort" value="za">
-            <span class="filter-radio"></span>
-            Z-A
-          </label>
+      <!-- STAT CARDS -->
+      <div class="stat-grid">
+        <div class="stat-card s-total">
+          <div class="stat-label">Total Items</div>
+          <div class="stat-value" id="statTotal">—</div>
+          <div class="stat-footer">across all categories</div>
+          <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        </div>
+        <div class="stat-card s-medicine">
+          <div class="stat-label">Medicines</div>
+          <div class="stat-value" id="statMedicine">—</div>
+          <div class="stat-footer">pharmaceutical items</div>
+          <div class="stat-icon"><i class="fa-solid fa-pills"></i></div>
+        </div>
+        <div class="stat-card s-supplies">
+          <div class="stat-label">Dental Supplies</div>
+          <div class="stat-value" id="statSupplies">—</div>
+          <div class="stat-footer">consumable supplies</div>
+          <div class="stat-icon"><i class="fa-solid fa-syringe"></i></div>
+        </div>
+        <div class="stat-card s-low">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="statLow">—</div>
+          <div class="stat-footer">need restocking soon</div>
+          <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
         </div>
       </div>
 
-      <!-- Date Received -->
-      <div class="px-7 py-7 border-b">
-        <div class="text-[15px] text-[#555] mb-5">Date Received</div>
+      <!-- TABLE CARD -->
+      <div class="bg-white rounded-xl shadow-sm border border-[#EDE9E4] overflow-hidden">
 
-        <div class="flex items-start gap-6 flex-wrap">
-          <div class="flex flex-col gap-2">
-            <span class="text-[15px] text-[#333]">From:</span>
-            <input id="fp_dateFrom" type="date" class="filter-date">
-          </div>
+        <!-- TOOLBAR -->
+        <div class="flex justify-between items-center px-5 py-4 border-b border-[#EDE9E4] flex-wrap gap-3">
 
-          <div class="flex flex-col gap-2">
-            <span class="text-[15px] text-[#333]">To:</span>
-            <input id="fp_dateTo" type="date" class="filter-date">
-          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <!-- Search -->
+            <div class="search-wrap">
+              <i class="fa fa-search"></i>
+              <input
+                id="searchInput"
+                placeholder="Search Stock No., Name…"
+                oninput="renderTable(); toggleSearchClear(this)" />
+              <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" title="Clear search">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
 
-          <div class="flex flex-col gap-4 pt-9">
-            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="asc">
-              <span class="filter-radio"></span>
-              Ascending
-            </label>
-
-            <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-              <input class="filter-input hidden" type="radio" name="fp_dateOrder" value="desc">
-              <span class="filter-radio"></span>
-              Descending
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Item Type -->
-      <div class="px-7 py-7 border-b">
-        <div class="text-[15px] text-[#555] mb-5">Item Type</div>
-
-        <div class="flex gap-14 flex-wrap">
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_itemType" value="medicine">
-            <span class="filter-radio"></span>
-            Medicine
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_itemType" value="supplies">
-            <span class="filter-radio"></span>
-            Dental Supplies
-          </label>
-        </div>
-      </div>
-
-      <!-- Stock Level -->
-      <div class="px-7 py-7 border-b">
-        <div class="text-[15px] text-[#555] mb-5">Stock Level</div>
-
-        <div class="flex gap-14 flex-wrap">
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_stock" value="low-high">
-            <span class="filter-radio"></span>
-            Lowest to Highest
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer select-none text-[15px] text-[#333]">
-            <input class="filter-input hidden" type="radio" name="fp_stock" value="high-low">
-            <span class="filter-radio"></span>
-            Highest to Lowest
-          </label>
-        </div>
-      </div>
-
-    </div> <!-- ✅ CLOSE SCROLLABLE CONTENT HERE -->
-
-    <!-- Footer (STICKY / NOT SCROLLING) -->
-    <div class="px-7 py-4 border-t flex items-center justify-between bg-white shrink-0">
-      <button type="button" onclick="clearFilterPanel()"
-        class="bg-transparent border-none font-semibold text-[16px]"
-        style="color:#8B1A1A;">
-        Clear
-      </button>
-
-      <button type="button" onclick="saveFilterPanel()"
-        class="btn border-none"
-        style="background:#8B1A1A; color:white; border-radius:8px; padding:12px 52px; font-weight:600;">
-        Save
-      </button>
-    </div>
-
-  </div>
-</dialog>
-
-<!-- ADD MODAL -->
-<dialog id="addModal" class="modal">
-  <div class="modal-box max-w-xl bg-white rounded-lg">
-
-    <h3 class="font-bold text-lg text-[#8B0000] mb-6">
-      Add Inventory Item
-    </h3>
-
-    <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
-
-      <!-- CATEGORY -->
-      <label class="text-sm text-[#8B0000]">Category</label>
-      <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
-        <option disabled selected>Select Category</option>
-        <option value="Medicine">Medicine</option>
-        <option value="Supplies">Supplies</option>
-      </select>
-
-      <!-- DATE -->
-      <label class="text-sm text-[#8B0000]">Date Received</label>
-      <input
-        id="addDate"
-        type="date"
-        class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-      />
-
-      <!-- STOCK -->
-      <label class="text-sm text-[#8B0000]">Stock Number</label>
-      <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
-
-      <!-- NAME -->
-      <label class="text-sm text-[#8B0000]">Supply Name</label>
-      <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="ex. Nitrile Gloves Large">
-
-      <!-- UNIT -->
-      <label class="text-sm text-[#8B0000]">Units</label>
-      <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-        placeholder="e.g. Box / Pack / Bottle / Piece">
-
-      <!-- QTY -->
-      <label class="text-sm text-[#8B0000]">Quantity</label>
-      <input id="addQty" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()">
-
-      <!-- USED -->
-      <label class="text-sm text-[#8B0000]">Consumed</label>
-      <input id="addUsed" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeAddBalance()">
-
-      <!-- BALANCE -->
-      <label class="text-sm text-[#8B0000]">Balance</label>
-      <input id="addBalance"
-        class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
-        readonly>
-
-              <input id="searchInput" class="ml-3 outline-none w-full text-sm
-        bg-white text-gray-800 placeholder-gray-400"
-                placeholder="Search Stock No., Name" oninput="renderTable()" />
+            <!-- Category Tabs -->
+            <div class="tab-group">
+              <button class="tab-btn active" onclick="setTab('all', this)">All</button>
+              <button class="tab-btn" onclick="setTab('medicine', this)">Medicine</button>
+              <button class="tab-btn" onclick="setTab('supplies', this)">Supplies</button>
             </div>
           </div>
 
-          <div class="flex gap-2">
+          <div class="flex items-center gap-2">
+            <span class="row-count" id="rowCount"></span>
 
-            <!-- SHOW SELECT -->
-            <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-              <select
-                id="showSelect"
-                class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-                onchange="renderTable()">
-                <option value="all">Show: All Products</option>
-                <option value="medicine">Medicine</option>
-                <option value="supplies">Supplies</option>
-              </select>
-            </div>
-
-            <!-- SORT SELECT -->
-            <div class="rounded-full p-[2px] bg-gradient-to-r from-[#660000] to-[#FFD700]">
-              <select
-                id="sortSelect"
-                class="select select-sm rounded-full bg-white text-[#660000] w-full focus:outline-none"
-                onchange="renderTable()">
-                <option value="">Sort: Default</option>
-                <option value="qty_asc">Quantity (Lowest to Highest)</option>
-                <option value="alphabetical">Alphabetical (A–Z)</option>
-                <option value="date_received">Date Received</option>
-              </select>
-            </div>
-
-
-            <button onclick="resetAddForm(); addModal.showModal()"
-              class="btn btn-sm hover:bg-[#660000] rounded-full border-none bg-[#8B0000] text-white">
-              <i class="fa fa-plus mr-1"></i> Add Item
+            <button type="button" onclick="openFilterPanel()" class="btn-filter">
+              <i class="fa-solid fa-sliders"></i> Filter
             </button>
 
+            <button onclick="resetAddForm(); document.getElementById('addModal').showModal()" class="btn-add">
+              <span class="add-icon"><i class="fa-solid fa-plus"></i></span>
+              Add Item
+            </button>
           </div>
         </div>
 
         <!-- TABLE -->
         <div class="overflow-x-auto">
-          <table class="table table-sm w-full">
+          <table class="inv-table">
             <thead>
-              <tr class="text-[#8B0000] text-xs uppercase">
+              <tr>
                 <th>Date</th>
                 <th>Stock No.</th>
-                <th>Supplies</th>
+                <th>Supply / Medicine</th>
                 <th>Unit</th>
                 <th>Qty</th>
                 <th>Used</th>
                 <th>Balance</th>
-                <th class="text-center">Action</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
         </div>
 
-        <!-- EMPTY STATE -->
-        <div
-          id="emptyState"
-          class="hidden flex-1 flex items-center justify-center text-gray-400 text-lg font-medium">
-          No items in the inventory
+        <!-- EMPTY STATE (dynamic) -->
+        <div id="emptyState" style="display:none;"></div>
+
+        <!-- TABLE FOOTER -->
+        <div class="table-footer-bar">
+          <span class="text-xs text-gray-400" id="pageInfo"></span>
+          <div></div>
         </div>
 
       </div>
-
+    </div>
   </main>
 
-  <!-- ADD MODAL -->
-  <dialog id="addModal" class="modal">
-    <div class="modal-box max-w-xl bg-white rounded-lg">
-
-      <h3 class="font-bold text-lg text-[#8B0000] mb-6">
-        Add Inventory Item
-      </h3>
-
-      <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center">
-
-        <!-- CATEGORY -->
-        <label class="text-sm text-[#8B0000]">Category</label>
-        <select id="addCategory" class="select select-bordered w-48 bg-white border-[#D9D9D9] text-[#333333]">
-          <option disabled selected>Select Category</option>
-          <option value="Medicine">Medicine</option>
-          <option value="Supplies">Supplies</option>
-        </select>
-
-        <!-- DATE (AUTO / DROPDOWN) -->
-        <label class="text-sm text-[#8B0000]">Date Received</label>
-        <input
-          id="addDate"
-          type="date"
-          class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" />
-
-        <!-- STOCK -->
-        <label class="text-sm text-[#8B0000]">Stock Number</label>
-        <input id="addStock" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]" placeholder="00 - 000">
-
-        <!-- NAME -->
-        <label class="text-sm text-[#8B0000]">Supply Name</label>
-        <input id="addName" class="input input-bordered w-100 bg-white border-[#D9D9D9] text-[#333333]"
-          placeholder="ex. Nitrile Gloves Large">
-
-        <!-- UNIT -->
-        <label class="text-sm text-[#8B0000]">Units</label>
-        <input id="addUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-          placeholder="e.g. Box / Pack / Bottle / Piece">
-
-        <!-- QTY -->
-        <label class="text-sm text-[#8B0000]">Quantity</label>
-        <input id="addQty" type="number"
-          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-          oninput="computeAddBalance()">
-
-        <!-- USED -->
-        <label class="text-sm text-[#8B0000]">Consumed</label>
-        <input id="addUsed" type="number"
-          class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-          oninput="computeAddBalance()">
-
-        <!-- BALANCE -->
-        <label class="text-sm text-[#8B0000]">Balance</label>
-        <input id="addBalance"
-          class="input input-bordered w-28 bg-[#F4F4F4] text-[#333333]"
-          readonly>
-
-      </div>
-
-      <div class="modal-action mt-6">
-        <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="addModal.close()">Back</button>
-        <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="addItem()">Save</button>
-      </div>
-
-    </div>
-  </dialog>
-
-  <!-- EDIT MODAL -->
-  <dialog id="editModal" class="modal">
-    <div class="modal-box max-w-xl bg-white rounded-lg">
-
-      <h3 class="font-bold text-lg text-[#8B0000] mb-6">
-        Edit Inventory Item
-      </h3>
-
-      <div class="grid grid-cols-[150px_1fr] gap-y-4 items-center text-[#8B0000]">
-        <label>Category</label>
-        <select id="editCategory" class="select select-bordered w-48 bg-white text-[#333333]">
-          <option value="Medicine">Medicine</option>
-          <option value="Supplies">Supplies</option>
-        </select>
-
-        <label>Date Received</label>
-        <input id="editDate" type="date"
-          class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]">
-
-        <label>Stock Number</label>
-        <input id="editStock" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
-
-        <label>Supply Name</label>
-        <input id="editName" class="input input-bordered bg-white border-[#D9D9D9] text-[#333333]">
-
-        <label class="text-sm text-[#8B0000]">Units</label>
-        <input id="editUnit" class="input input-bordered w-40 bg-white border-[#D9D9D9] text-[#333333]"
-          placeholder="e.g. Box / Pack / Bottle / Piece">
-
-
-      <label>Quantity</label>
-      <input id="editQty" type="number"
-        class="input input-bordered w-28 bg-white border-[#D9D9D9] text-[#333333]"
-        oninput="computeEditBalance()">
-
-        <label>Balance</label>
-        <input id="editBalance"
-          class="input input-bordered w-28 bg-[#F4F4F4] border-[#D9D9D9] text-[#333333]"
-          readonly>
-
-      </div>
-
-      <div class="modal-action mt-6">
-        <button class="btn bg-[#F4F4F4] hover:bg-[#333333] hover:text-[#F4F4F4] text-[#333333] border-[#333333]" onclick="editModal.close()">Back</button>
-        <button class="btn bg-[#8B0000] hover:bg-[#F55E5E] hover:text-[#8B0000] text-[#F4F4F4] border-none" onclick="saveEdit()">Save</button>
-      </div>
-
-    </div>
-  </dialog>
-
-  </div>
-</dialog>
-
-<!-- DELETE CONFIRMATION MODAL -->
-<dialog id="deleteModal" class="modal">
-  <div class="modal-box max-w-md bg-white rounded-lg text-center">
-    <h3 class="font-bold text-lg text-[#8B0000] mb-4">Confirm Deletion</h3>
-    <p class="mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
-
-    <div class="modal-action justify-center gap-4">
-      <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="deleteModal.close()">Cancel</button>
-      <button id="confirmDeleteBtn" class="btn bg-[#8B0000] text-white">Delete</button>
-    </div>
-  </dialog>
-
-  <!-- Footer -->
+  <!-- ════════════════════════════
+       FOOTER (UNCHANGED)
+  ════════════════════════════ -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
       <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
@@ -979,102 +1434,226 @@
     </div>
   </footer>
 
-  <script>
-    /*let inventory = [
-  {
-    category: "Supplies",
-    date: "01/20/25",
-    stock: "18-001",
-    name: "Disposable Dental Needles",
-    unit: "Piece",
-    qty: 42,
-    used: 8
-  },
-  {
-    category: "Medicine",
-    date: "01/21/25",
-    stock: "18-002",
-    name: "Amoxicillin 500mg",
-    unit: "Box",
-    qty: 30,
-    used: 5
-  },
-  {
-    category: "Supplies",
-    date: "01/22/25",
-    stock: "18-003",
-    name: "Latex Examination Gloves",
-    unit: "Box",
-    qty: 50,
-    used: 12
-  },
-  {
-    category: "Medicine",
-    date: "01/23/25",
-    stock: "18-004",
-    name: "Paracetamol 500mg",
-    unit: "Box",
-    qty: 40,
-    used: 10
-  },
-  {
-    category: "Supplies",
-    date: "01/24/25",
-    stock: "18-005",
-    name: "Dental Cotton Rolls",
-    unit: "Pack",
-    qty: 60,
-    used: 15
-  },
-  {
-    category: "Supplies",
-    date: "01/25/25",
-    stock: "18-006",
-    name: "Disposable Mouth Mirrors",
-    unit: "Piece",
-    qty: 25,
-    used: 5
-  },
-  {
-    category: "Medicine",
-    date: "01/26/25",
-    stock: "18-007",
-    name: "Ibuprofen 400mg",
-    unit: "Box",
-    qty: 35,
-    used: 7
-  },
-  {
-    category: "Supplies",
-    date: "01/27/25",
-    stock: "18-008",
-    name: "Cotton Swabs",
-    unit: "Pack",
-    qty: 80,
-    used: 20
-  },
-  {
-    category: "Medicine",
-    date: "01/28/25",
-    stock: "18-009",
-    name: "Chlorhexidine Mouthwash 0.12%",
-    unit: "Bottle",
-    qty: 20,
-    used: 4
-  },
-  {
-    category: "Supplies",
-    date: "01/29/25",
-    stock: "18-010",
-    name: "Dental Floss Packs",
-    unit: "Pack",
-    qty: 50,
-    used: 10
-  }
-];*/
+  <!-- ════════════════════════════
+       FILTER SLIDE-IN PANEL
+  ════════════════════════════ -->
+  <div class="filter-overlay" id="filterOverlay" onclick="closeFilterPanel()"></div>
 
+  <div class="filter-panel" id="filterPanel">
+    <div class="fp-header">
+      <span class="fp-title"><i class="fa-solid fa-sliders"></i> Filter</span>
+      <button class="fp-close-btn" onclick="closeFilterPanel()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="fp-body">
+
+      <!-- Sort -->
+      <div class="fp-section">
+        <div class="fp-section-title">Sort by Name</div>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_sort" value="az">
+          <label>A → Z</label>
+        </label>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_sort" value="za">
+          <label>Z → A</label>
+        </label>
+      </div>
+
+      <!-- Date Received -->
+      <div class="fp-section">
+        <div class="fp-section-title">Date Received</div>
+        <div class="fp-date-row">
+          <div class="fp-date-group">
+            <span class="fp-date-label">From</span>
+            <input id="fp_dateFrom" type="date" class="fp-date-input">
+          </div>
+          <div class="fp-date-group">
+            <span class="fp-date-label">To</span>
+            <input id="fp_dateTo" type="date" class="fp-date-input">
+          </div>
+        </div>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_dateOrder" value="asc">
+          <label>Ascending</label>
+        </label>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_dateOrder" value="desc">
+          <label>Descending</label>
+        </label>
+      </div>
+
+      <!-- Stock Level -->
+      <div class="fp-section">
+        <div class="fp-section-title">Stock Level</div>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_stock" value="low-high">
+          <label>Lowest → Highest</label>
+        </label>
+        <label class="fp-radio-item">
+          <input type="radio" name="fp_stock" value="high-low">
+          <label>Highest → Lowest</label>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="fp-footer">
+      <button class="fp-btn-clear" onclick="clearFilterPanel()">Clear All</button>
+      <button class="fp-btn-apply" onclick="saveFilterPanel()"><i class="fa-solid fa-check mr-1"></i> Apply</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       ADD MODAL
+  ════════════════════════════ -->
+  <dialog id="addModal" class="modal">
+    <div class="modal-box-custom">
+
+      <div class="modal-header-custom">
+        <div class="modal-icon-custom"><i class="fa-solid fa-plus"></i></div>
+        <div>
+          <div class="modal-title-custom">Add Inventory Item</div>
+          <div class="modal-sub-custom">Fill in the details for the new item</div>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group-custom">
+          <div class="form-label-custom">Category</div>
+          <select id="addCategory" class="form-select-custom">
+            <option disabled selected>Select…</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Supplies">Supplies</option>
+          </select>
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Date Received</div>
+          <input id="addDate" type="date" class="form-input-custom">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Stock Number</div>
+          <input id="addStock" class="form-input-custom" placeholder="00-000">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Unit</div>
+          <input id="addUnit" class="form-input-custom" placeholder="Box / Bottle / Pack">
+        </div>
+        <div class="form-group-custom full">
+          <div class="form-label-custom">Supply / Medicine Name</div>
+          <input id="addName" class="form-input-custom" placeholder="e.g. Nitrile Gloves Large">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Quantity</div>
+          <input id="addQty" type="number" class="form-input-custom" placeholder="0" oninput="computeAddBalance()">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Consumed</div>
+          <input id="addUsed" type="number" class="form-input-custom" placeholder="0" oninput="computeAddBalance()">
+        </div>
+        <div class="form-group-custom full">
+          <div class="form-label-custom">Balance (auto-calculated)</div>
+          <input id="addBalance" class="form-input-custom" readonly placeholder="—">
+        </div>
+      </div>
+
+      <div class="modal-footer-custom">
+        <button class="btn-modal-cancel" onclick="document.getElementById('addModal').close()">Cancel</button>
+        <button class="btn-modal-save" onclick="addItem()"><i class="fa-solid fa-floppy-disk"></i> Save Item</button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- ════════════════════════════
+       EDIT MODAL
+  ════════════════════════════ -->
+  <dialog id="editModal" class="modal">
+    <div class="modal-box-custom">
+
+      <div class="modal-header-custom">
+        <div class="modal-icon-custom" style="background: linear-gradient(135deg,#1a4a8a,#2563EB);"><i class="fa-solid fa-pen"></i></div>
+        <div>
+          <div class="modal-title-custom">Edit Inventory Item</div>
+          <div class="modal-sub-custom">Update the details for this item</div>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group-custom">
+          <div class="form-label-custom">Category</div>
+          <select id="editCategory" class="form-select-custom">
+            <option value="Medicine">Medicine</option>
+            <option value="Supplies">Supplies</option>
+          </select>
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Date Received</div>
+          <input id="editDate" type="date" class="form-input-custom">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Stock Number</div>
+          <input id="editStock" class="form-input-custom">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Unit</div>
+          <input id="editUnit" class="form-input-custom" placeholder="Box / Bottle / Pack">
+        </div>
+        <div class="form-group-custom full">
+          <div class="form-label-custom">Supply / Medicine Name</div>
+          <input id="editName" class="form-input-custom">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Quantity</div>
+          <input id="editQty" type="number" class="form-input-custom" oninput="computeEditBalance()">
+        </div>
+        <div class="form-group-custom">
+          <div class="form-label-custom">Consumed</div>
+          <input id="editUsed" type="number" class="form-input-custom" oninput="computeEditBalance()">
+        </div>
+        <div class="form-group-custom full">
+          <div class="form-label-custom">Balance (auto-calculated)</div>
+          <input id="editBalance" class="form-input-custom" readonly>
+        </div>
+      </div>
+
+      <div class="modal-footer-custom">
+        <button class="btn-modal-cancel" onclick="document.getElementById('editModal').close()">Cancel</button>
+        <button class="btn-modal-save" onclick="saveEdit()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- ════════════════════════════
+       DELETE MODAL
+  ════════════════════════════ -->
+  <dialog id="deleteModal" class="modal">
+    <div class="modal-box-custom" style="max-width:400px; text-align:center;">
+      <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#FFE5E5,#FFCDD2);
+                  display:flex;align-items:center;justify-content:center;font-size:26px;
+                  color:#C0392B;margin:0 auto 14px;">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+      <div style="font-size:18px;font-weight:700;color:#1A1614;margin-bottom:8px;">Delete Item?</div>
+      <div style="font-size:13px;color:#9A9490;margin-bottom:24px;">
+        This action cannot be undone. The item will be permanently removed from your inventory.
+      </div>
+      <div class="modal-footer-custom" style="justify-content:center;">
+        <button class="btn-modal-cancel" onclick="document.getElementById('deleteModal').close()">Cancel</button>
+        <button id="confirmDeleteBtn" class="btn-modal-save" style="background:#C0392B;box-shadow:0 3px 10px rgba(192,57,43,.3);">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ════════════════════════════
+       SCRIPTS
+  ════════════════════════════ -->
+  <script>
     // =========================
-    // THEME TOGGLE 
+    // THEME TOGGLE (UNCHANGED)
     // =========================
     const html = document.documentElement;
     const themeToggleContainer = document.getElementById("themeToggle");
@@ -1084,69 +1663,45 @@
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-
-      themeOptions.forEach(option => {
-        if (option.getAttribute("data-theme") === theme) {
-          option.classList.add("active");
-        } else {
-          option.classList.remove("active");
-        }
-      });
-
-      if (theme === "dark") {
-        themeIndicator.classList.add("dark-mode");
-      } else {
-        themeIndicator.classList.remove("dark-mode");
-      }
+      themeOptions.forEach(o => o.classList.toggle("active", o.getAttribute("data-theme") === theme));
+      themeIndicator.classList.toggle("dark-mode", theme === "dark");
     }
-
     applyTheme(localStorage.getItem("theme") || "light");
+    themeOptions.forEach(o => o.addEventListener("click", () => applyTheme(o.getAttribute("data-theme"))));
 
-    themeOptions.forEach(option => {
-      option.addEventListener("click", () => {
-        const theme = option.getAttribute("data-theme");
-        applyTheme(theme);
-      });
-    });
-
+    // =========================
+    // SIDEBAR TOGGLE (UNCHANGED)
+    // =========================
     let sidebarOpen = true;
 
-    function applyLayout(sidebarWidth) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      sidebar.style.width = sidebarWidth;
-      main.style.marginLeft = sidebarWidth;
+    function applyLayout(w) {
+      document.getElementById('sidebar').style.width = w;
+      document.getElementById('mainContent').style.marginLeft = w;
     }
 
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const texts = document.querySelectorAll('.sidebar-text');
       const icon = document.getElementById('sidebarIcon');
-      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
+      const tw = document.getElementById('sidebarToggleWrapper');
       sidebarOpen = !sidebarOpen;
-
       if (sidebarOpen) {
         applyLayout('220px');
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.add('expanded');
+        sidebar.classList.replace('collapsed', 'expanded');
         texts.forEach(t => {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
+        tw.classList.replace('justify-center', 'justify-end');
         icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
+        sidebar.classList.replace('expanded', 'collapsed');
         texts.forEach(t => {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
+        tw.classList.replace('justify-end', 'justify-center');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
       applyTheme(localStorage.getItem("theme") || "light");
@@ -1157,466 +1712,435 @@
       applyLayout('220px');
     });
 
-    // NOTIFICATION
+    // =========================
+    // NOTIFICATIONS (UNCHANGED)
+    // =========================
     document.addEventListener("DOMContentLoaded", () => {
       const btn = document.getElementById("notifBtn");
       const menu = document.getElementById("notifMenu");
-
       let isOpen = false;
-
-  } else {
-    applyLayout('72px');
-
-      // Toggle when clicking bell
-      btn.addEventListener("click", (e) => {
+      const openMenu = () => {
+        isOpen = true;
+        menu.classList.replace("notif-close", "notif-open");
+      };
+      const closeMenu = () => {
+        isOpen = false;
+        menu.classList.replace("notif-open", "notif-close");
+      };
+      btn.addEventListener("click", e => {
         e.stopPropagation();
         isOpen ? closeMenu() : openMenu();
       });
-
-      // Keep open when clicking inside menu
-      menu.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      // Close when clicking outside
+      menu.addEventListener("click", e => e.stopPropagation());
       document.addEventListener("click", () => {
         if (isOpen) closeMenu();
       });
-
-      // Close on ESC
-      document.addEventListener("keydown", (e) => {
+      document.addEventListener("keydown", e => {
         if (e.key === "Escape" && isOpen) closeMenu();
       });
-
-      // Start closed
       closeMenu();
     });
 
+    /* =========================
+       INVENTORY DATA
+    ========================= */
     let inventory = [];
+    let activeTab = 'all';
 
-    toggleBtn.classList.remove('translate-x-2');
-    icon.classList.replace('fa-xmark', 'fa-bars');
-  }
-}
+    async function loadInventory() {
+      const res = await fetch('/dentist/inventory/data', {
+        cache: 'no-store'
+      });
+      const ct = res.headers.get("content-type") || "";
+      if (!ct.includes("application/json")) {
+        console.error("Inventory data is not JSON.");
+        return;
+      }
+      inventory = await res.json();
+      renderTable();
+    }
+    loadInventory();
 
-// ✅ INITIAL STATE SYNC (CRITICAL FIX)
-document.addEventListener('DOMContentLoaded', () => {
-  sidebarOpen = false;
-  applyLayout('72px');
-});
+    /* =========================
+       STAT CARDS
+    ========================= */
+    function updateStats() {
+      document.getElementById('statTotal').textContent = inventory.length;
+      document.getElementById('statMedicine').textContent = inventory.filter(i => i.category === 'Medicine').length;
+      document.getElementById('statSupplies').textContent = inventory.filter(i => i.category === 'Supplies').length;
+      document.getElementById('statLow').textContent = inventory.filter(i => (Number(i.qty) - Number(i.used)) <= 5).length;
+    }
 
-/* =========================
-   INVENTORY DATA LOAD
-let inventory = [];
+    /* =========================
+       CATEGORY TABS
+    ========================= */
+    function setTab(tab, btn) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    }
 
-async function loadInventory() {
-  const res = await fetch('/dentist/inventory/data', { cache: 'no-store' });
+    /* =========================
+       FILTER STATE
+    ========================= */
+    const activeFilters = {
+      sort: "",
+      dateFrom: "",
+      dateTo: "",
+      dateOrder: "",
+      stock: ""
+    };
 
-  // if backend accidentally returns HTML (like login page), this prevents silent failure
-  const ct = res.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    console.error("Inventory data is not JSON. Check if route is protected or returning HTML.");
-    return;
-  }
+    function openFilterPanel() {
+      setRadio("fp_sort", activeFilters.sort);
+      setRadio("fp_dateOrder", activeFilters.dateOrder);
+      setRadio("fp_stock", activeFilters.stock);
+      document.getElementById("fp_dateFrom").value = activeFilters.dateFrom || "";
+      document.getElementById("fp_dateTo").value = activeFilters.dateTo || "";
+      document.getElementById('filterPanel').classList.add('open');
+      document.getElementById('filterOverlay').classList.add('open');
+    }
 
-  inventory = await res.json();
-  renderTable();
-}
-loadInventory();
+    function closeFilterPanel() {
+      document.getElementById('filterPanel').classList.remove('open');
+      document.getElementById('filterOverlay').classList.remove('open');
+    }
 
-async function addItem() {
-  if (
-    addCategory.selectedIndex === 0 ||
-    !addDate.value ||
-    !addStock.value ||
-    !addName.value ||
-    !addUnit.value ||
-    addQty.value === ''
-  ) {
-    alert('Please complete all required fields.');
-    return;
-  }
+    function setRadio(name, val) {
+      document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = (val && r.value === val));
+    }
 
-  const res = await fetch('/dentist/inventory', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      'Accept': 'application/json' // ✅ important: prevents Laravel from redirecting
-    },
-    body: JSON.stringify({
-      category: addCategory.value,
-      date_received: addDate.value,
-      stock_no: addStock.value.trim(),
-      name: addName.value.trim(),
-      unit: addUnit.value.trim(),
-      qty: Number(addQty.value),
-      used: Number(addUsed.value || 0)
-    })
-  });
+    function getRadio(name) {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : "";
+    }
 
-  if (!res.ok) {
-    // Laravel validation errors will be JSON if Accept is application/json
-    const text = await res.text();
-    console.error("ADD FAILED:", text);
-    alert("Add failed — check console");
-    return;
-  }
+    function clearFilterPanel() {
+      ['fp_sort', 'fp_dateOrder', 'fp_stock'].forEach(n => setRadio(n, ""));
+      document.getElementById("fp_dateFrom").value = "";
+      document.getElementById("fp_dateTo").value = "";
+      Object.keys(activeFilters).forEach(k => activeFilters[k] = "");
+      closeFilterPanel();
+      renderTable();
+    }
 
-  addModal.close();
-  resetAddForm();
+    function saveFilterPanel() {
+      activeFilters.sort = getRadio("fp_sort");
+      activeFilters.dateOrder = getRadio("fp_dateOrder");
+      activeFilters.stock = getRadio("fp_stock");
+      activeFilters.dateFrom = document.getElementById("fp_dateFrom").value || "";
+      activeFilters.dateTo = document.getElementById("fp_dateTo").value || "";
+      closeFilterPanel();
+      renderTable();
+    }
 
-  // ✅ make sure UI refresh happens AFTER the DB is updated
-  await loadInventory();
-}
+    /* =========================
+       TABLE RENDER
+    ========================= */
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      let data = [...inventory];
 
-/* =========================
-   DELETE
-let deleteId = null;
+      // Category tab filter
+      if (activeTab === 'medicine') data = data.filter(i => i.category === 'Medicine');
+      if (activeTab === 'supplies') data = data.filter(i => i.category === 'Supplies');
 
+      // Search
+      const q = (document.getElementById('searchInput').value || '').toLowerCase();
+      if (q) data = data.filter(i =>
+        String(i.stock_no || "").toLowerCase().includes(q) ||
+        String(i.name || "").toLowerCase().includes(q)
+      );
+
+      // Date range
+      const from = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null;
+      const to = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null;
+      if (from) {
+        from.setHours(0, 0, 0, 0);
+        data = data.filter(i => i.date_received && new Date(i.date_received) >= from);
+      }
+      if (to) {
+        to.setHours(23, 59, 59, 999);
+        data = data.filter(i => i.date_received && new Date(i.date_received) <= to);
+      }
+
+      // Sort
+      const n = v => {
+        const x = Number(v);
+        return isFinite(x) ? x : 0;
+      };
+      const dt = v => {
+        if (!v) return 0;
+        const t = new Date(v).getTime();
+        return isFinite(t) ? t : 0;
+      };
+      if (activeFilters.stock === "low-high") data.sort((a, b) => (n(a.qty) - n(a.used)) - (n(b.qty) - n(b.used)));
+      else if (activeFilters.stock === "high-low") data.sort((a, b) => (n(b.qty) - n(b.used)) - (n(a.qty) - n(a.used)));
+      else if (activeFilters.sort === "az") data.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+      else if (activeFilters.sort === "za") data.sort((a, b) => String(b.name || "").localeCompare(String(a.name || "")));
+      else if (activeFilters.dateOrder === "asc") data.sort((a, b) => dt(a.date_received) - dt(b.date_received));
+      else if (activeFilters.dateOrder === "desc") data.sort((a, b) => dt(b.date_received) - dt(a.date_received));
+
+      // Stats always reflect full inventory
+      updateStats();
+
+      // Row count
+      document.getElementById('rowCount').textContent = `${data.length} item${data.length !== 1 ? 's' : ''}`;
+      document.getElementById('pageInfo').textContent = `Showing ${data.length} of ${inventory.length} items`;
+
+      const emptyState = document.getElementById("emptyState");
+
+      if (!data.length) {
+        emptyState.style.display = 'block';
+
+        const searchKeyword = q;
+        const isSearching = searchKeyword.length > 0;
+        const hasFilters = activeFilters.sort || activeFilters.dateFrom || activeFilters.dateTo ||
+          activeFilters.dateOrder || activeFilters.stock;
+
+        const emptyMessages = {
+          all: {
+            icon: 'fa-box-open',
+            title: 'No items in the inventory',
+            sub: 'Add your first item using the "Add Item" button above.'
+          },
+          medicine: {
+            icon: 'fa-pills',
+            title: 'No medicines in the inventory',
+            sub: 'Add a medicine item using the "Add Item" button above.'
+          },
+          supplies: {
+            icon: 'fa-syringe',
+            title: 'No dental supplies in the inventory',
+            sub: 'Add a supply item using the "Add Item" button above.'
+          },
+        };
+
+        let icon, title, sub, extraHtml = "";
+
+        if (isSearching) {
+          icon = "fa-magnifying-glass";
+          title = `No results for "${searchKeyword}"`;
+          sub = "Try a different stock number or supply name.";
+          extraHtml = `<button onclick="clearSearch()"
+            class="mt-3 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-sm text-gray-400
+                   hover:border-[#8B0000] hover:text-[#8B0000] hover:bg-[#8B0000]/5 transition-all duration-200">
+            <i class="fa-solid fa-xmark mr-1.5 text-xs"></i> Clear search</button>`;
+        } else if (hasFilters) {
+          icon = "fa-sliders";
+          title = "No matches for your filters";
+          sub = "Try removing or adjusting your filter criteria.";
+          extraHtml = `<button onclick="clearFilterPanel()"
+            class="mt-3 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-sm text-gray-400
+                   hover:border-[#8B0000] hover:text-[#8B0000] hover:bg-[#8B0000]/5 transition-all duration-200">
+            <i class="fa-solid fa-xmark mr-1.5 text-xs"></i> Clear filters</button>`;
+        } else {
+          const msg = emptyMessages[activeTab] || emptyMessages.all;
+          icon = msg.icon;
+          title = msg.title;
+          sub = msg.sub;
+        }
+
+        emptyState.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-20 text-center gap-2">
+            <div class="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">
+              <i class="fa-solid ${icon} text-3xl text-gray-300"></i>
+            </div>
+            <p class="text-base font-semibold text-gray-500">${title}</p>
+            <p class="text-sm text-gray-400 max-w-xs">${sub}</p>
+            ${extraHtml}
+          </div>`;
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      data.forEach(item => {
+        const balance = n(item.qty) - n(item.used);
+        const balClass = balance <= 0 ? 'critical' : balance <= 5 ? 'low' : 'ok';
+        const balLabel = balance <= 0 ? 'Out of stock' : balance <= 5 ? 'Low stock' : 'In stock';
+        const catClass = item.category === 'Medicine' ? 'medicine' : 'supplies';
+
+        tbody.innerHTML += `
+        <tr>
+          <td style="color:#9A9490;font-size:12px;white-space:nowrap;">${item.formatted_date ?? ''}</td>
+          <td><span class="stock-no">${item.stock_no ?? ''}</span></td>
+          <td>
+            <div class="supply-name">${item.name ?? ''}</div>
+            <span class="supply-cat ${catClass}">${item.category ?? ''}</span>
+          </td>
+          <td style="color:#9A9490;">${item.unit ?? ''}</td>
+          <td style="font-weight:700;">${item.qty ?? 0}</td>
+          <td style="color:#9A9490;">${item.used ?? 0}</td>
+          <td><span class="bal-chip ${balClass}">${balance} <span style="font-weight:400;font-size:10px;">${balLabel}</span></span></td>
+          <td>
+            <div style="display:flex;justify-content:center;gap:6px;">
+              <button class="act-btn edit" title="Edit" onclick="openEdit(${item.id})">
+                <i class="fa fa-pen"></i>
+              </button>
+              <button class="act-btn delete" title="Delete" onclick="deleteItem(${item.id})">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+      });
+    }
+
+    /* =========================
+       SEARCH CLEAR
+    ========================= */
+    function toggleSearchClear(input) {
+      const btn = document.getElementById('searchClearBtn');
+      btn.classList.toggle('visible', input.value.length > 0);
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      document.getElementById('searchClearBtn').classList.remove('visible');
+      renderTable();
+      input.focus();
+    }
+
+    /* =========================
+       ADD
+    ========================= */
+    function resetAddForm() {
+      document.getElementById('addCategory').selectedIndex = 0;
+      ['addDate', 'addStock', 'addName', 'addUnit', 'addQty', 'addUsed', 'addBalance']
+      .forEach(id => document.getElementById(id).value = '');
+    }
+
+    async function addItem() {
+      const addCategory = document.getElementById('addCategory');
+      const addDate = document.getElementById('addDate');
+      const addStock = document.getElementById('addStock');
+      const addName = document.getElementById('addName');
+      const addUnit = document.getElementById('addUnit');
+      const addQty = document.getElementById('addQty');
+      const addUsed = document.getElementById('addUsed');
+
+      if (addCategory.selectedIndex === 0 || !addDate.value || !addStock.value || !addName.value || !addUnit.value || addQty.value === '') {
+        alert('Please complete all required fields.');
+        return;
+      }
+
+      const res = await fetch('/dentist/inventory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          category: addCategory.value,
+          date_received: addDate.value,
+          stock_no: addStock.value.trim(),
+          name: addName.value.trim(),
+          unit: addUnit.value.trim(),
+          qty: Number(addQty.value),
+          used: Number(addUsed.value || 0)
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.errors ? Object.values(err.errors).join('\n') : 'Add failed — check console');
+        return;
+      }
+
+      document.getElementById('addModal').close();
+      resetAddForm();
+      loadInventory();
+    }
+
+    /* =========================
+       DELETE
+    ========================= */
+    let deleteId = null;
+
+    function deleteItem(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').showModal();
+    }
+
+    document.getElementById("confirmDeleteBtn").onclick = async () => {
+      if (!deleteId) return;
       await fetch(`/dentist/inventory/${deleteId}`, {
         method: 'DELETE',
         headers: {
-          'X-CSRF-TOKEN': document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute('content')
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         }
       });
-
-      deleteModal.close();
+      document.getElementById('deleteModal').close();
       deleteId = null;
       loadInventory();
     };
 
-  await fetch(`/dentist/inventory/${deleteId}`, {
-    method: 'DELETE',
-    headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    /* =========================
+       EDIT
+    ========================= */
+    let editId = null;
+
+    function openEdit(id) {
+      editId = id;
+      const i = inventory.find(item => item.id === id);
+      if (!i) return;
+      document.getElementById('editCategory').value = i.category;
+      document.getElementById('editStock').value = i.stock_no;
+      document.getElementById('editName').value = i.name;
+      document.getElementById('editUnit').value = i.unit;
+      document.getElementById('editQty').value = i.qty;
+      document.getElementById('editUsed').value = i.used;
+      document.getElementById('editDate').value = i.date_received?.slice(0, 10);
+      computeEditBalance();
+      document.getElementById('editModal').showModal();
     }
-  });
 
-    const emptyState = document.getElementById("emptyState");
+    async function saveEdit() {
+      if (!editId) return;
+      const res = await fetch(`/dentist/inventory/${editId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          category: document.getElementById('editCategory').value,
+          date_received: document.getElementById('editDate').value,
+          stock_no: document.getElementById('editStock').value,
+          name: document.getElementById('editName').value,
+          unit: document.getElementById('editUnit').value,
+          qty: Number(document.getElementById('editQty').value),
+          used: Number(document.getElementById('editUsed').value)
+        })
+      });
+      if (!res.ok) {
+        alert('Edit failed — check console');
+        return;
+      }
+      document.getElementById('editModal').close();
+      editId = null;
+      loadInventory();
+    }
 
-/* =========================
-   FILTER PANEL STATE (NEW)
-const activeFilters = {
-  sort: "",        // "az" | "za"
-  dateFrom: "",
-  dateTo: "",
-  dateOrder: "",   // "asc" | "desc"
-  itemType: "",    // "medicine" | "supplies"
-  stock: ""        // "low-high" | "high-low"
-};
+    /* =========================
+       BALANCE HELPERS
+    ========================= */
+    function computeAddBalance() {
+      const q = Number(document.getElementById('addQty').value || 0);
+      const u = Number(document.getElementById('addUsed').value || 0);
+      document.getElementById('addBalance').value = q - u;
+    }
 
-function openFilterModal() {
-  // sync UI with activeFilters before opening
-  setRadioByNameValue("fp_sort", activeFilters.sort);
-  setRadioByNameValue("fp_dateOrder", activeFilters.dateOrder);
-  setRadioByNameValue("fp_itemType", activeFilters.itemType);
-  setRadioByNameValue("fp_stock", activeFilters.stock);
-
-  document.getElementById("fp_dateFrom").value = activeFilters.dateFrom || "";
-  document.getElementById("fp_dateTo").value = activeFilters.dateTo || "";
-
-  filterModal.showModal();
-}
-
-function setRadioByNameValue(name, value) {
-  const radios = document.querySelectorAll(`input[name="${name}"]`);
-  radios.forEach(r => r.checked = (value && r.value === value));
-  if (!value) radios.forEach(r => r.checked = false);
-}
-
-function getCheckedValue(name) {
-  const el = document.querySelector(`input[name="${name}"]:checked`);
-  return el ? el.value : "";
-}
-
-function clearFilterPanel() {
-  // clear modal fields
-  setRadioByNameValue("fp_sort", "");
-  setRadioByNameValue("fp_dateOrder", "");
-  setRadioByNameValue("fp_itemType", "");
-  setRadioByNameValue("fp_stock", "");
-  document.getElementById("fp_dateFrom").value = "";
-  document.getElementById("fp_dateTo").value = "";
-
-  // clear active filters immediately
-  activeFilters.sort = "";
-  activeFilters.dateFrom = "";
-  activeFilters.dateTo = "";
-  activeFilters.dateOrder = "";
-  activeFilters.itemType = "";
-  activeFilters.stock = "";
-
-  filterModal.close();
-  renderTable();
-}
-
-function saveFilterPanel() {
-  activeFilters.sort = getCheckedValue("fp_sort");
-  activeFilters.dateOrder = getCheckedValue("fp_dateOrder");
-  activeFilters.itemType = getCheckedValue("fp_itemType");
-  activeFilters.stock = getCheckedValue("fp_stock");
-
-  activeFilters.dateFrom = document.getElementById("fp_dateFrom").value || "";
-  activeFilters.dateTo = document.getElementById("fp_dateTo").value || "";
-
-  filterModal.close();
-  renderTable();
-}
-
-/* =========================
-   TABLE RENDER
-const emptyState = document.getElementById("emptyState");
-
-      const show = showSelect.value;
-
-  let data = [...inventory];
-
-  // Item Type filter
-  if (activeFilters.itemType === "medicine") {
-    data = data.filter(item => item.category === "Medicine");
-  }
-  if (activeFilters.itemType === "supplies") {
-    data = data.filter(item => item.category === "Supplies");
-  }
-
-  // Search
-  const search = searchInput.value.toLowerCase();
-  if (search) {
-    data = data.filter(i =>
-      String(i.stock_no || "").toLowerCase().includes(search) ||
-      String(i.name || "").toLowerCase().includes(search)
-    );
-  }
-
-  // Date range filter (by date_received)
-  const from = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null;
-  const to = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null;
-
-  if (from) from.setHours(0,0,0,0);
-  if (to)   to.setHours(23,59,59,999);
-
-  if (from) data = data.filter(i => i.date_received && new Date(i.date_received) >= from);
-  if (to)   data = data.filter(i => i.date_received && new Date(i.date_received) <= to);
-
-  // Sorting (priority: Stock Level > Sort A-Z/Z-A > Date Order)
-  const toNum = (v) => {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  };
-  const toTime = (v) => {
-    if (!v) return 0;
-    const t = new Date(v).getTime();
-    return Number.isFinite(t) ? t : 0;
-  };
-
-  if (activeFilters.stock === "low-high") {
-    data.sort((a,b) => toNum(a.qty) - toNum(b.qty));
-  } else if (activeFilters.stock === "high-low") {
-    data.sort((a,b) => toNum(b.qty) - toNum(a.qty));
-  } else if (activeFilters.sort === "az") {
-    data.sort((a,b) => String(a.name || "").localeCompare(String(b.name || "")));
-  } else if (activeFilters.sort === "za") {
-    data.sort((a,b) => String(b.name || "").localeCompare(String(a.name || "")));
-  } else if (activeFilters.dateOrder === "asc") {
-    data.sort((a,b) => toTime(a.date_received) - toTime(b.date_received));
-  } else if (activeFilters.dateOrder === "desc") {
-    data.sort((a,b) => toTime(b.date_received) - toTime(a.date_received));
-  }
-
-  if (data.length === 0) {
-    emptyState.classList.remove("hidden");
-    return;
-  } else {
-    emptyState.classList.add("hidden");
-  }
-
-  data.forEach((item) => {
-    const balance = toNum(item.qty) - toNum(item.used);
-
-    tbody.innerHTML += `
-      <tr class="text-gray-800">
-        <td class="text-[#333333]">${item.formatted_date ?? ''}</td>
-        <td class="text-[#333333]">${item.stock_no ?? ''}</td>
-        <td class="text-[#333333]">${item.name ?? ''}</td>
-        <td class="text-[#333333]">${item.unit ?? ''}</td>
-        <td class="text-[#333333]">${item.qty ?? 0}</td>
-        <td class="text-[#333333]">${item.used ?? 0}</td>
-        <td class="text-[#333333]">${balance}</td>
-        <td class="flex justify-center gap-2">
-          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
-            onclick="openEdit(${item.id})">
-            <i class="fa fa-pen"></i>
-          </button>
-          <button class="btn btn-xs bg-[#8B0000] text-white hover:bg-[#660000] border-none"
-            onclick="deleteItem(${item.id})">
-            <i class="fa fa-trash"></i>
-          </button>
-        </td>
-      </tr>`;
-  });
-}
-
-/* =========================
-   ADD
-function resetAddForm() {
-  addCategory.selectedIndex = 0;
-  addDate.value = '';
-  addStock.value = '';
-  addName.value = '';
-  addUnit.value = '';
-  addQty.value = '';
-  addUsed.value = '';
-  addBalance.value = '';
-}
-
-async function addItem() {
-  if (
-    addCategory.selectedIndex === 0 ||
-    !addDate.value ||
-    !addStock.value ||
-    !addName.value ||
-    !addUnit.value ||
-    addQty.value === ''
-  ) {
-    alert('Please complete all required fields.');
-    return;
-  }
-
-  const res = await fetch('/dentist/inventory', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    },
-    body: JSON.stringify({
-      category: addCategory.value,
-      date_received: addDate.value,
-      stock_no: addStock.value.trim(),
-      name: addName.value.trim(),
-      unit: addUnit.value,
-      qty: Number(addQty.value),
-      used: Number(addUsed.value || 0)
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    console.error(err);
-    alert(Object.values(err.errors).join('\n'));
-    return;
-  }
-
-  addModal.close();
-  resetAddForm();
-  loadInventory();
-}
-
-/* =========================
-   EDIT
-let editId = null;
-
-function openEdit(id) {
-  editId = id;
-  const i = inventory.find(item => item.id === id);
-  if (!i) return;
-
-  editCategory.value = i.category;
-  editStock.value = i.stock_no;
-  editName.value = i.name;
-  editUnit.value = i.unit;
-  editQty.value = i.qty;
-  editUsed.value = i.used;
-  editDate.value = i.date_received?.slice(0, 10);
-
-  computeEditBalance();
-  editModal.showModal();
-}
-
-async function saveEdit() {
-  if (!editId) return;
-
-  const res = await fetch(`/dentist/inventory/${editId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    },
-    body: JSON.stringify({
-      category: editCategory.value,
-      date_received: editDate.value,
-      stock_no: editStock.value,
-      name: editName.value,
-      unit: editUnit.value,
-      qty: Number(editQty.value),
-      used: Number(editUsed.value)
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.error(err);
-    alert('EDIT FAILED — check console');
-    return;
-  }
-
-  editModal.close();
-  editId = null;
-  loadInventory();
-}
-
-/* =========================
-   BALANCE
-function computeAddBalance() {
-  const qty = Number(addQty.value || 0);
-  const used = Number(addUsed.value || 0);
-  addBalance.value = qty - used;
-}
-
-function computeEditBalance() {
-  editBalance.value = Number(editQty.value || 0) - Number(editUsed.value || 0);
-}
-
-/* =========================
-   NOTIFICATION
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("notifBtn");
-  const menu = document.getElementById("notifMenu");
-
-  let isOpen = false;
-
-  function openMenu() {
-    isOpen = true;
-    menu.classList.remove("notif-close");
-    menu.classList.add("notif-open");
-  }
-
-  function closeMenu() {
-    isOpen = false;
-    menu.classList.remove("notif-open");
-    menu.classList.add("notif-close");
-  }
-
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    isOpen ? closeMenu() : openMenu();
-  });
-
-  menu.addEventListener("click", (e) => e.stopPropagation());
-
-  document.addEventListener("click", () => {
-    if (isOpen) closeMenu();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen) closeMenu();
-  });
-
-  closeMenu();
-});
-</script>
+    function computeEditBalance() {
+      const q = Number(document.getElementById('editQty').value || 0);
+      const u = Number(document.getElementById('editUsed').value || 0);
+      document.getElementById('editBalance').value = q - u;
+    }
+  </script>
 
 </body>
+
 </html>
