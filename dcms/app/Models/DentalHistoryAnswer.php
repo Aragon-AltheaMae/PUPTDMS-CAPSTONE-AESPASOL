@@ -4,20 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DentalHistory extends Model
+class DentalHistoryAnswer extends Model
 {
     protected $fillable = [
         'patient_id',
-        'last_dental_visit',
-        'previous_dentist',
+        'condition_id',
+        'answer',
     ];
 
     protected $casts = [
-        'last_dental_visit' => 'date',
+        'answer' => 'boolean',
     ];
 
     public function patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function condition()
+    {
+        return $this->belongsTo(DentalHistoryCondition::class, 'condition_id');
     }
 }
