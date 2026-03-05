@@ -1085,102 +1085,102 @@
 
               <!-- LEFT COLUMN -->
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="AIDS/HIV" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="AIDS/HIV" class="checkbox checkbox-sm border-[#8B0000]">
                 AIDS / HIV
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Fainting/Dizzy Spells" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Fainting/Dizzy Spells" class="checkbox checkbox-sm border-[#8B0000]">
                 Fainting / Dizzy Spells
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Alcohol or Chemical Dependency" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Alcohol or Chemical Dependency" class="checkbox checkbox-sm border-[#8B0000]">
                 Alcohol or Chemical Dependency
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="High/Low Blood Pressure" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="High/Low Blood Pressure" class="checkbox checkbox-sm border-[#8B0000]">
                 High / Low Blood Pressure
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Arthritis/Rheumatism" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Arthritis/Rheumatism" class="checkbox checkbox-sm border-[#8B0000]">
                 Arthritis / Rheumatism
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Hyper/Hypoglycemia" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Hyper/Hypoglycemia" class="checkbox checkbox-sm border-[#8B0000]">
                 Hyper / Hypoglycemia
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Artificial Joints or Valves" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Artificial Joints or Valves" class="checkbox checkbox-sm border-[#8B0000]">
                 Artificial Joints or Valves
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Kidney Disease" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Kidney Disease" class="checkbox checkbox-sm border-[#8B0000]">
                 Kidney Disease
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Asthma" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Asthma" class="checkbox checkbox-sm border-[#8B0000]">
                 Asthma
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Liver Disease" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Liver Disease" class="checkbox checkbox-sm border-[#8B0000]">
                 Liver Disease (Hepatitis / Jaundice)
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Blood Transfusion" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Blood Transfusion" class="checkbox checkbox-sm border-[#8B0000]">
                 Blood Transfusion
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Mental/Nervous Disorder" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Mental/Nervous Disorder" class="checkbox checkbox-sm border-[#8B0000]">
                 Mental / Nervous Disorder
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Cancer/Radiotherapy/Chemotherapy" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Cancer/Radiotherapy/Chemotherapy" class="checkbox checkbox-sm border-[#8B0000]">
                 Cancer / Radiotherapy / Chemotherapy
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Stomach Ulcers" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]"value="Stomach Ulcers" class="checkbox checkbox-sm border-[#8B0000]">
                 Stomach Ulcers
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Diabetes" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Diabetes" class="checkbox checkbox-sm border-[#8B0000]">
                 Diabetes
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Stroke" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Stroke" class="checkbox checkbox-sm border-[#8B0000]">
                 Stroke
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Eating Disorders" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Eating Disorders" class="checkbox checkbox-sm border-[#8B0000]">
                 Eating Disorders
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Tuberculosis" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Tuberculosis" class="checkbox checkbox-sm border-[#8B0000]">
                 Tuberculosis
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Epilepsy/Seizures" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Epilepsy/Seizures" class="checkbox checkbox-sm border-[#8B0000]">
                 Epilepsy / Seizures
               </label>
 
               <label class="flex items-center gap-2">
-                <input type="checkbox" name="conditions[]" value="Venereal/Communicable Disease" class="checkbox checkbox-sm border-[#8B0000]">
+                <input type="checkbox" name="diseases[]" value="Venereal/Communicable Disease" class="checkbox checkbox-sm border-[#8B0000]">
                 Venereal / Communicable Disease
               </label>
             </div>
@@ -2456,7 +2456,7 @@
         <p><b>Allergy (Food):</b> ${get("allergy_food")}</p>
         <p><b>Medication:</b> ${get("medication")}</p>
         <p><b>Medical Conditions:</b><br>
-          ${getAll("conditions[]").length ? getAll("conditions[]").join(", ") : "None"}
+          ${getAll("diseases[]").length ? getAll("diseases[]").join(", ") : "None"}
         </p>
         <p><b>Tobacco Use:</b> ${get("tobacco_use")}</p>
       `)}
@@ -2556,15 +2556,24 @@
 
           const medicalExamRadios = document.querySelectorAll('input[name="had_medical_exam"]');
           const medicalExamBox = document.getElementById("medical_exam_box");
+          const medicalExamDate = document.getElementById("medicalExamDate");
 
-          if (medicalExamRadios.length && medicalExamBox) {
-            medicalExamRadios.forEach((radio) => {
-              radio.addEventListener("change", () => {
-                if (radio.value === "YES" && radio.checked) medicalExamBox.classList.remove("hidden");
-                if (radio.value === "NO" && radio.checked) medicalExamBox.classList.add("hidden");
-              });
-            });
+          function syncMedicalExamBox() {
+            const selected = document.querySelector('input[name="had_medical_exam"]:checked');
+            if (!selected || !medicalExamBox || !medicalExamDate) return;
+
+            if (selected.value === "YES") {
+              medicalExamBox.classList.remove("hidden");
+              medicalExamDate.required = true;
+            } else {
+              medicalExamBox.classList.add("hidden");
+              medicalExamDate.required = false;
+              medicalExamDate.value = "";
+            }
           }
+
+          medicalExamRadios.forEach(r => r.addEventListener("change", syncMedicalExamBox));
+          syncMedicalExamBox();
 
           const relationSelect = document.getElementById("emergency_relation");
           const otherInput = document.getElementById("relation_other");
