@@ -242,6 +242,12 @@ Route::prefix('dentist')->group(function () {
     Route::get('/appointments', [DentistAppointmentController::class, 'index'])
         ->name('dentist.appointments');
 
+    Route::get('/dentist/appointments/{id}/reschedule', [AppointmentController::class, 'reschedule'])
+        ->name('dentist.appointments.reschedule');
+
+    Route::put('/dentist/appointments/{id}/reschedule', [AppointmentController::class, 'updateReschedule'])
+        ->name('dentist.appointments.reschedule.update');
+
     // Patient Profile Route
     Route::get('/patient', function () {
         if (session('role') !== 'dentist') {
