@@ -1082,107 +1082,15 @@
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-10 text-sm">
-
-              <!-- LEFT COLUMN -->
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="AIDS/HIV" class="checkbox checkbox-sm border-[#8B0000]">
-                AIDS / HIV
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Fainting/Dizzy Spells" class="checkbox checkbox-sm border-[#8B0000]">
-                Fainting / Dizzy Spells
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Alcohol or Chemical Dependency" class="checkbox checkbox-sm border-[#8B0000]">
-                Alcohol or Chemical Dependency
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="High/Low Blood Pressure" class="checkbox checkbox-sm border-[#8B0000]">
-                High / Low Blood Pressure
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Arthritis/Rheumatism" class="checkbox checkbox-sm border-[#8B0000]">
-                Arthritis / Rheumatism
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Hyper/Hypoglycemia" class="checkbox checkbox-sm border-[#8B0000]">
-                Hyper / Hypoglycemia
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Artificial Joints or Valves" class="checkbox checkbox-sm border-[#8B0000]">
-                Artificial Joints or Valves
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Kidney Disease" class="checkbox checkbox-sm border-[#8B0000]">
-                Kidney Disease
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Asthma" class="checkbox checkbox-sm border-[#8B0000]">
-                Asthma
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Liver Disease" class="checkbox checkbox-sm border-[#8B0000]">
-                Liver Disease (Hepatitis / Jaundice)
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Blood Transfusion" class="checkbox checkbox-sm border-[#8B0000]">
-                Blood Transfusion
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Mental/Nervous Disorder" class="checkbox checkbox-sm border-[#8B0000]">
-                Mental / Nervous Disorder
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Cancer/Radiotherapy/Chemotherapy" class="checkbox checkbox-sm border-[#8B0000]">
-                Cancer / Radiotherapy / Chemotherapy
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]"value="Stomach Ulcers" class="checkbox checkbox-sm border-[#8B0000]">
-                Stomach Ulcers
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Diabetes" class="checkbox checkbox-sm border-[#8B0000]">
-                Diabetes
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Stroke" class="checkbox checkbox-sm border-[#8B0000]">
-                Stroke
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Eating Disorders" class="checkbox checkbox-sm border-[#8B0000]">
-                Eating Disorders
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Tuberculosis" class="checkbox checkbox-sm border-[#8B0000]">
-                Tuberculosis
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Epilepsy/Seizures" class="checkbox checkbox-sm border-[#8B0000]">
-                Epilepsy / Seizures
-              </label>
-
-              <label class="flex items-center gap-2">
-                <input type="checkbox" name="diseases[]" value="Venereal/Communicable Disease" class="checkbox checkbox-sm border-[#8B0000]">
-                Venereal / Communicable Disease
-              </label>
+              @foreach($diseases as $d)
+                <label class="flex items-center gap-2">
+                  <input type="checkbox"
+                        name="diseases[]"
+                        value="{{ $d->code }}"
+                        class="checkbox checkbox-sm border-[#8B0000]">
+                  {{ $d->label }}
+                </label>
+              @endforeach
             </div>
 
             <hr class="border-[#8B0000] border-2 my-8">
@@ -1731,6 +1639,7 @@
           const apptSlotCounts = @json($appointmentCountsPerSlot ?? []);
           const unavailableDates = @json($unavailableDates ?? []);
           const holidaysMap = @json($philippineHolidays ?? []);
+          const diseaseLabelByCode = @json($diseases->pluck('label','code'));
 
 
           /* =========================
@@ -2456,7 +2365,7 @@
         <p><b>Allergy (Food):</b> ${get("allergy_food")}</p>
         <p><b>Medication:</b> ${get("medication")}</p>
         <p><b>Medical Conditions:</b><br>
-          ${getAll("diseases[]").length ? getAll("diseases[]").join(", ") : "None"}
+          ${getAll("diseases[]").length ? getAll("diseases[]").map(c => diseaseLabelByCode?.[c] ?? c).join(", "): "None"}
         </p>
         <p><b>Tobacco Use:</b> ${get("tobacco_use")}</p>
       `)}

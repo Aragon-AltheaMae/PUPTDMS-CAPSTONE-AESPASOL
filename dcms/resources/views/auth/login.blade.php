@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,9 +13,9 @@
   <!-- DaisyUI -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Font Inter -->
+  <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -23,7 +24,9 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] }
+          fontFamily: {
+            inter: ['Inter', 'sans-serif']
+          }
         }
       }
     }
@@ -31,12 +34,10 @@
 
   <style>
     .shine-text {
-      background: linear-gradient(
-        90deg,
-        #8B0000,
-        #FFD700,
-        #8B0000
-      );
+      background: linear-gradient(90deg,
+          #8B0000,
+          #FFD700,
+          #8B0000);
 
       background-size: 200% auto;
       -webkit-background-clip: text;
@@ -49,6 +50,7 @@
       0% {
         background-position: 200% center;
       }
+
       100% {
         background-position: -200% center;
       }
@@ -66,6 +68,7 @@
         opacity: 0;
         transform: translateY(10px);
       }
+
       100% {
         opacity: 1;
         transform: translateY(0);
@@ -74,126 +77,145 @@
 
     .fade-up {
       animation: fadeUp 0.6s ease-out forwards;
-  }
-
+    }
   </style>
 </head>
 
 <body class="font-inter min-h-screen animated-bg bg-gradient-to-r from-[#8B0000] to-[#FFD700] flex items-center justify-center">
-<canvas id="stars"></canvas>
-<div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl relative z-10 fade-up">
-  <div class="flex w-full lg:w-[1100px]
+  <canvas id="stars"></canvas>
+  <div class="bg-[#8B0000] rounded-[1.75rem] shadow-2xl relative z-10 fade-up">
+    <div class="flex w-full lg:w-[1100px]
             h-auto lg:h-[650px]
             bg-white rounded-xl lg:rounded-[1.5rem]
             overflow-hidden
             flex-col lg:flex-row">
 
-    <!-- Left Image -->
-    <div class="flex-[0.85] h-52 sm:h-64 lg:h-auto">
-      <img src="/images/PUP TAGUIG CAMPUS.jpg" class="w-full h-full object-cover">
-    </div>
+      <!-- Left Image -->
+      <div class="flex-[0.85] h-52 sm:h-64 lg:h-auto">
+        <img src="/images/PUP TAGUIG CAMPUS.jpg" class="w-full h-full object-cover">
+      </div>
 
-    <!-- Right Panel -->
-    <div class="flex-[0.9]
+      <!-- Right Panel -->
+      <div class="flex-[0.9]
             px-6 sm:px-8 lg:px-10
             py-8 lg:py-0
             flex flex-col justify-center fade-up">
-      <h1 class="text-center tracking-wide drop-shadow-lg">
-        <span class="block text-3xl sm:text-4xl lg:text-5xl font-extrabold shine-text">
-          PUP-TAGUIG
-        </span>
-        <span class="block text-xl sm:text-2xl lg:text-3xl mt-2 font-extrabold shine-text">
-          DENTAL MANAGEMENT SYSTEM
-        </span>
-    </h1>
+        <h1 class="text-center tracking-wide drop-shadow-lg">
+          <span class="block text-3xl sm:text-4xl lg:text-5xl font-extrabold shine-text">
+            PUP-TAGUIG
+          </span>
+          <span class="block text-xl sm:text-2xl lg:text-3xl mt-2 font-extrabold shine-text">
+            DENTAL MANAGEMENT SYSTEM
+          </span>
+        </h1>
 
-      <p class="text-center text-[#757575] mt-4 mb-6">Log In to your account</p>
+        <p class="text-center text-[#757575] mt-4 mb-6">Log In to your account</p>
 
-      {{-- Login Form --}}
-      <form method="POST" action="{{ route('login') }}">
-        @csrf
+        {{-- Login Form --}}
+        <form method="POST" action="{{ route('login') }}">
+          @csrf
 
-        <label class="text-sm text-[#333333] font-medium mb-4">Email</label>
-        <input type="email" name="email" required
-          class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] mb-6 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
+          <label class="text-sm text-[#333333] font-medium mb-4">Email</label>
+          <input type="email" name="email" required
+            class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] mb-6 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
 
-        <label class="text-sm text-[#333333] font-medium">Password</label>
-        <div class="relative mb-2">
-        <input
-          id="password"
-          type="password"
-          name="password"
-          required
-          class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] pr-12 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
+          <label class="text-sm text-[#333333] font-medium">Password</label>
+          <div class="relative mb-2">
+            <input
+              id="password"
+              type="password"
+              name="password"
+              required
+              class="w-full px-4 py-3 rounded-lg bg-[#F4F4F4] border border-[#D9D9D9] pr-12 focus:outline-none focus:ring-1 focus:ring-[#8B0000]">
 
-          <!-- Eye Icon -->
-          <button
-            type="button"
-            onclick="togglePassword()"
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+            <!-- Eye Icon -->
+            <button
+              type="button"
+              onclick="togglePassword()"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
                   -1.274 4.057-5.064 7-9.542 7
                   -4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-          </button>
-        </div>
+              </svg>
+            </button>
+          </div>
 
-      <!-- LOGIN ERROR ALERT -->
-      @if(session('error'))
-        <div class="rounded-lg bg-red-100 border border-red-400 text-[#8B0000] mt-4 mb-2 px-4 py-2 text-sm">
-          {{ session('error') }}
-        </div>
-      @endif
+          <!-- LOGIN ERROR ALERT -->
+          @if(session('error'))
+          <div class="rounded-lg bg-red-100 border border-red-400 text-[#8B0000] mt-4 mb-2 px-4 py-2 text-sm">
+            {{ session('error') }}
+          </div>
+          @endif
 
-        <button type="submit"
-          class="mt-2 w-full py-3 rounded-xl
+          <button type="submit"
+            class="mt-2 w-full py-3 rounded-xl
           bg-[#8B0000] text-[#F4F4F4] font-bold
           hover:bg-[#660000]
           transition active:scale-[0.98]">
-          Log In
-        </button>
-      </form>
+            Log In
+          </button>
+        </form>
 
-      <a href="{{ route('dentist.login') }}"
-      class="mt-4 w-full py-3 rounded-xl
-              bg-gradient-to-r from-[#FFD166] to-[#8B0000]
-              text-[#F4F4F4] font-bold
-              flex items-center justify-center gap-3
-              transition-all duration-300 ease-in-out
-              hover:opacity-90 hover:gap-4
-              active:scale-[0.98]">
+        <!-- Dentist + Admin Login -->
+<div class="mt-4 grid grid-cols-2 gap-3">
 
-        <i class="fa-solid fa-user-doctor text-xl transition-transform duration-300 ease-in-out"></i>
-        <span>Log in as Dentist</span>
-      </a>
+  <!-- Dentist -->
+  <a href="{{ route('dentist.login') }}"
+  class="py-3 rounded-xl
+          bg-gradient-to-r from-[#FFD166] to-[#8B0000]
+          text-[#F4F4F4] font-bold
+          flex items-center justify-center gap-2
+          transition-all duration-300 ease-in-out
+          hover:opacity-90 hover:gap-3
+          active:scale-[0.98]">
+
+    <i class="fa-solid fa-user-doctor text-lg"></i>
+    <span>Dentist</span>
+  </a>
+
+  <!-- Admin -->
+  <a href="{{ route('admin.login') }}"
+  class="py-3 rounded-xl
+          bg-gradient-to-r from-[#FFD166] to-[#8B0000]
+          text-[#F4F4F4] font-bold
+          flex items-center justify-center gap-2
+          transition-all duration-300 ease-in-out
+          hover:opacity-90 hover:gap-3
+          active:scale-[0.98]">
+
+    <i class="fa-solid fa-user-shield text-lg"></i>
+    <span>Admin</span>
+  </a>
+
+</div>
 
         <!-- New: Redirect to Registration -->
         <p class="mt-6 text-center text-sm text-[#757575]">
-        Don't have an account?
-        <a href="/register" class="text-[#8B0000] font-bold hover:underline">Register here</a>
+          Don't have an account?
+          <a href="/register" class="text-[#8B0000] font-bold hover:underline">Register here</a>
         </p>
 
-</p>
+        </p>
 
-    </div>
+      </div>
     </div>
   </div>
-</div>
+  </div>
 
-<script>
-/* ===== PASSWORD ===== */
-function togglePassword() {
-  const passwordInput = document.getElementById('password');
-  const eyeIcon = document.getElementById('eyeIcon');
+  <script>
+    /* ===== PASSWORD ===== */
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
 
-  if (passwordInput.type === 'password') {
-    passwordInput.type = 'text';
-    eyeIcon.innerHTML = `
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = `
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M13.875 18.825A10.05 10.05 0 0112 19
            c-4.478 0-8.268-2.943-9.542-7
@@ -205,9 +227,9 @@ function togglePassword() {
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M3 3l18 18" />
     `;
-  } else {
-    passwordInput.type = 'password';
-    eyeIcon.innerHTML = `
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = `
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -216,49 +238,52 @@ function togglePassword() {
            -1.274 4.057-5.064 7-9.542 7
            -4.477 0-8.268-2.943-9.542-7z" />
     `;
-  }
-}
-/* ===== CANVAS STARS ===== */
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-
-let w, h;
-let stars = [];
-
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-  stars = Array.from({ length: 180 }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    r: Math.random() * 1.5 + 0.5,
-    v: Math.random() * 0.3 + 0.1
-  }));
-}
-
-function draw() {
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(255,255,220,0.9)";
-
-  for (const s of stars) {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-
-    s.y -= s.v;
-    if (s.y < 0) {
-      s.y = h;
-      s.x = Math.random() * w;
+      }
     }
-  }
+    /* ===== CANVAS STARS ===== */
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
 
-  requestAnimationFrame(draw);
-}
+    let w, h;
+    let stars = [];
 
-window.addEventListener("resize", resize);
-resize();
-draw();
-</script>
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      stars = Array.from({
+        length: 180
+      }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.5,
+        v: Math.random() * 0.3 + 0.1
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(255,255,220,0.9)";
+
+      for (const s of stars) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        s.y -= s.v;
+        if (s.y < 0) {
+          s.y = h;
+          s.x = Math.random() * w;
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    draw();
+  </script>
 
 </body>
+
 </html>
