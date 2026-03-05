@@ -304,139 +304,6 @@
       color: #a16207;
     }
 
-    /* ── HEADER ── */
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
-      padding: 0 2rem;
-      height: 62px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-    }
-
-    .header-logo {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-    }
-
-    .header-title {
-      font-size: .95rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: .01em;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-
-    .notif-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .12);
-      border: none;
-      cursor: pointer;
-      color: #fff;
-      font-size: .95rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s;
-      position: relative;
-    }
-
-    .notif-btn:hover {
-      background: rgba(255, 255, 255, .22);
-    }
-
-    .notif-badge {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      background: #ff6b6b;
-      color: #fff;
-      font-size: .6rem;
-      font-weight: 700;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #8B0000;
-    }
-
-    .header-user {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .header-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, .4);
-      object-fit: cover;
-    }
-
-    .header-name {
-      font-size: .82rem;
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.2;
-    }
-
-    .header-role {
-      font-size: .7rem;
-      color: rgba(255, 255, 255, .7);
-      font-style: italic;
-    }
-
-    /* Notif dropdown */
-    #notifMenu {
-      position: absolute;
-      right: 0;
-      top: calc(100% + 10px);
-      width: 300px;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
-      border: 1px solid #f0e6e6;
-      opacity: 0;
-      transform: scale(.95) translateY(-6px);
-      pointer-events: none;
-      transition: all .2s;
-      transform-origin: top right;
-      z-index: 100;
-    }
-
-    #notifMenu.open {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      pointer-events: auto;
-    }
-
-    #notifDropdown {
-      position: relative;
-    }
-
     /* Sidebar */
     .sidebar-link {
       display: flex;
@@ -525,6 +392,18 @@
 
     .sidebar-link.bg-\[\#8B0000\] {
       box-shadow: 0 0 12px rgba(139, 0, 0, .45);
+    }
+
+    .notif-open {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      pointer-events: auto !important;
+    }
+
+    .notif-close {
+      opacity: 0 !important;
+      transform: scale(.95) !important;
+      pointer-events: none !important;
     }
 
     /* Theme toggle */
@@ -658,44 +537,54 @@
 <body class="bg-[#f4f4f6] min-h-screen flex flex-col">
 
   <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
-      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
-      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
+  <div class="fixed top-0 left-0 right-0 z-50
+              bg-gradient-to-r from-[#660000] to-[#8B0000]
+              text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-12 rounded-full ml-5"><img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" /></div>
+      <div class="w-12 rounded-full"><img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" /></div>
+      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-    <div class="header-right">
-      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
-      <div id="notifDropdown">
-        <button class="notif-btn" id="notifBtn">
-          <i class="fa-regular fa-bell"></i>
-          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
+    <div class="flex items-center gap-8">
+      @php
+      $notifications = collect($notifications ?? []);
+      $notifCount = $notifications->count();
+      @endphp
+      <div id="notifDropdown" class="relative">
+        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+          @if($notifCount > 0)
+          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">{{ $notifCount }}</span>
+          @endif
+          <i class="fa-regular fa-bell text-lg"></i>
         </button>
-        <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:var(--red); font-size:.82rem; border-bottom:1px solid #f5e8e8;">
-            Notifications
-          </div>
-          <div style="max-height:260px; overflow-y:auto;">
+        <div id="notifMenu" class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50 opacity-0 scale-95 pointer-events-none transition-all duration-200 ease-out origin-top-right">
+          <div class="p-4 border-b"><span class="font-bold text-[#8B0000]">Notifications</span></div>
+          <div class="max-h-80 overflow-y-auto">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
-              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
+              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
             </a>
             @empty
-            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
+            </div>
             @endforelse
           </div>
         </div>
       </div>
-      <div class="header-user">
-        <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
+      <div class="flex items-center gap-3">
+        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
         <div>
-          <div class="header-name">Dr. Nelson Angeles</div>
-          <div class="header-role">Dentist</div>
+          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
         </div>
       </div>
     </div>
-  </header>
+  </div>
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
@@ -782,7 +671,7 @@
       <!-- PAGE TITLE ROW -->
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-[#660000]">Reports &amp; Analytics</h1>
+          <h1 class="text-xl font-bold text-[#660000]">Reports &amp; Analytics</h1>
           <p class="text-xs text-gray-500 mt-0.5">Overview of clinic data, trends, and inventory status</p>
         </div>
         <span class="text-xs text-gray-400 font-medium">
@@ -968,6 +857,74 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- RECENT REPORTS TABLE -->
+      <div class="chart-card mb-5">
+        <div class="chart-card-header mb-3">
+          <span class="chart-title text-base"><i class="fa-solid fa-clock-rotate-left mr-1.5 opacity-70"></i>Recent Reports</span>
+          <button class="text-xs font-semibold text-[#8B0000] hover:underline">View All</button>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-gray-100">
+          <table class="reports-table w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="text-left">Report Name</th>
+                <th class="text-left">Type</th>
+                <th class="text-left">Date Range</th>
+                <th class="text-left">Generated By</th>
+                <th class="text-left">Status</th>
+                <th class="text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-semibold">GAD Monthly Report</td>
+                <td>GAD Report</td>
+                <td>Dec 1–31, 2025</td>
+                <td>Dr. Nelson Angeles</td>
+                <td><span class="status-badge status-ready">Ready</span></td>
+                <td>
+                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
+                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Medicine Supply — Nov</td>
+                <td>Medicine Supply</td>
+                <td>Nov 1–30, 2025</td>
+                <td>Dr. Nelson Angeles</td>
+                <td><span class="status-badge status-ready">Ready</span></td>
+                <td>
+                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
+                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Daily Treatment Record</td>
+                <td>Daily Treatment</td>
+                <td>Dec 15, 2025</td>
+                <td>Dr. Nelson Angeles</td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="text-gray-300 text-xs font-semibold mr-3 cursor-not-allowed"><i class="fa-solid fa-download mr-1"></i>Download</button>
+                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Dental Services — Q4</td>
+                <td>Dental Services</td>
+                <td>Oct 1 – Dec 31, 2025</td>
+                <td>Dr. Nelson Angeles</td>
+                <td><span class="status-badge status-ready">Ready</span></td>
+                <td>
+                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
+                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1502,12 +1459,32 @@
 
       }, 150);
 
-      /* ── NOTIF TOGGLE ── */
-      document.getElementById("notifBtn").addEventListener("click", e => {
+      // 4. Notifications
+      const notifBtn = document.getElementById("notifBtn");
+      const notifMenu = document.getElementById("notifMenu");
+      let notifOpen = false;
+      const openNotif = () => {
+        notifOpen = true;
+        notifMenu.classList.remove("notif-close");
+        notifMenu.classList.add("notif-open");
+      };
+      const closeNotif = () => {
+        notifOpen = false;
+        notifMenu.classList.remove("notif-open");
+        notifMenu.classList.add("notif-close");
+      };
+      notifBtn.addEventListener("click", e => {
         e.stopPropagation();
-        document.getElementById("notifMenu").classList.toggle("open");
+        notifOpen ? closeNotif() : openNotif();
       });
-      document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
+      notifMenu.addEventListener("click", e => e.stopPropagation());
+      document.addEventListener("click", () => {
+        if (notifOpen) closeNotif();
+      });
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && notifOpen) closeNotif();
+      });
+      closeNotif();
 
       // 5. Submit validation
       const todayStr = new Date().toISOString().split('T')[0];
