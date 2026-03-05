@@ -89,7 +89,7 @@ Route::post('/dentist/login', function (Request $request) {
             'dentist_email' => 'dentist',
         ]);
 
-        return view('dentist-dashboard');
+        return redirect()->route('dentist.dashboard');
     }
 
     return back()->with('error', 'Invalid dentist credentials');
@@ -165,17 +165,82 @@ Route::prefix('dentist')->group(function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
-        return view('dentist-dashboard');
+
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        $todayAppointments = \App\Models\Appointment::with('patient')
+            ->whereDate('appointment_date', $today)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['pending', 'confirmed'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $philippineHolidays = [
+            // 2026 Regular Holidays
+            '2026-01-01' => "New Year's Day",
+            '2026-04-02' => 'Maundy Thursday',
+            '2026-04-03' => 'Good Friday',
+            '2026-04-04' => 'Black Saturday',
+            '2026-04-09' => 'Araw ng Kagitingan',
+            '2026-05-01' => 'Labor Day',
+            '2026-06-12' => 'Independence Day',
+            '2026-08-31' => 'National Heroes Day',
+            '2026-11-30' => 'Bonifacio Day',
+            '2026-12-25' => 'Christmas Day',
+            '2026-12-30' => 'Rizal Day',
+
+            // 2026 Special Non-Working Holidays
+            '2026-02-25' => 'EDSA People Power Revolution Anniversary',
+            '2026-08-21' => 'Ninoy Aquino Day',
+            '2026-11-01' => "All Saints' Day",
+            '2026-11-02' => "All Souls' Day",
+            '2026-12-08' => 'Feast of the Immaculate Conception',
+            '2026-12-24' => 'Christmas Eve',
+            '2026-12-31' => "New Year's Eve",
+
+            // 2025 (for backward calendar navigation)
+            '2025-01-01' => "New Year's Day",
+            '2025-04-17' => 'Maundy Thursday',
+            '2025-04-18' => 'Good Friday',
+            '2025-04-19' => 'Black Saturday',
+            '2025-04-09' => 'Araw ng Kagitingan',
+            '2025-05-01' => 'Labor Day',
+            '2025-06-12' => 'Independence Day',
+            '2025-08-25' => 'National Heroes Day',
+            '2025-11-30' => 'Bonifacio Day',
+            '2025-12-25' => 'Christmas Day',
+            '2025-12-30' => 'Rizal Day',
+            '2025-08-21' => 'Ninoy Aquino Day',
+            '2025-11-01' => "All Saints' Day",
+            '2025-11-02' => "All Souls' Day",
+            '2025-12-08' => 'Feast of the Immaculate Conception',
+            '2025-12-24' => 'Christmas Eve',
+            '2025-12-31' => "New Year's Eve",
+        ];
+
+        $notifications = collect([]);
+
+        return view('dentist-dashboard', compact(
+            'todayAppointments',
+            'appointmentCountsPerDay',
+            'philippineHolidays',
+            'notifications'
+        ));
     })->name('dentist.dashboard');
 
     // Patients Route
-   Route::get('/dentist/patients', [DentistPatientController::class, 'index'])
-    ->name('dentist.patients');
+    Route::get('/dentist/patients', [DentistPatientController::class, 'index'])
+        ->name('dentist.patients');
 
     // Appointments Route
-   // Appointments Route (Controller)
-Route::get('/appointments', [DentistAppointmentController::class, 'index'])
-    ->name('dentist.appointments');
+    // Appointments Route (Controller)
+    Route::get('/appointments', [DentistAppointmentController::class, 'index'])
+        ->name('dentist.appointments');
 
     // Patient Profile Route
     Route::get('/patient', function () {
