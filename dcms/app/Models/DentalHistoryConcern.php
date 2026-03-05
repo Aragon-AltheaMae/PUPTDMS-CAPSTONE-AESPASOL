@@ -4,16 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DentalHistory extends Model
+class DentalHistoryConcern extends Model
 {
     protected $fillable = [
         'patient_id',
-        'last_dental_visit',
-        'previous_dentist',
-    ];
-
-    protected $casts = [
-        'last_dental_visit' => 'date',
+        'additional_concerns',
     ];
 
     public function patient()
