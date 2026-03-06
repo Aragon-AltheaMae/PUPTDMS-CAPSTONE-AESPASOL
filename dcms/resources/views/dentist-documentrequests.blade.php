@@ -53,7 +53,7 @@
     }
 
     #sidebar.expanded .sidebar-tooltip {
-      display: none;
+    display: none;
     }
 
     #sidebar.expanded .section-label {
@@ -262,7 +262,7 @@
     /* DARK MODE STYLES */
     [data-theme="dark"] body {
       background-color: #000D1A;
-      color: #E5E7EB;
+    color: #E5E7EB;
     }
 
     [data-theme="dark"] #sidebar {
@@ -506,13 +506,15 @@
     cursor:pointer;
     font-weight: 900;
     color:#8b1a0e;
-  }
+    }
 
     body,
     #sidebar,
     main,
     .card {
       transition: background-color 0.3s ease, color 0.3s ease;
+    
+    }
     [data-theme="dark"] .theme-toggle-container {
       background: #1F1F1F;
       border-color: #2A2A2A;
@@ -530,273 +532,214 @@
       background: #2A2A2A;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
+
+    main,
+    #mainContent,
+    #requestContainer,
+    .request-item,
+    .request-entry,
+    .request-summary,
+    .request-details {
+      min-width: 0;
+    }
+
+    .req-tab {
+      min-width: 0;
+    }
+
+    .dr-page,
+    .fade-in {
+      max-width: 100%;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
   </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- HEADER (TOP BAR) -->
-  <div class="fixed top-0 left-0 right-0 z-50
+<!-- HEADER (TOP BAR) -->
+<div class="fixed top-0 left-0 right-0 z-50
             bg-gradient-to-r from-[#660000] to-[#8B0000]
             text-[#F4F4F4] px-6 py-4
             flex items-center justify-between">
 
     <div class="flex items-center gap-3">
       <div class="w-12 rounded-full ml-5">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
+          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
       </div>
       <div class="w-12 rounded-full">
-        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
+          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
       </div>
       <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
     </div>
 
-    <div class="flex items-center gap-8">
+  <div class="flex items-center gap-8">
       @php
-      // Pass $notifications from controller, or leave it empty for now
-      // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
+  // Pass $notifications from controller, or leave it empty for now
+  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+  @endphp
 
-      <div id="notifDropdown" class="relative">
+  <div id="notifDropdown" class="relative">
+    
+  <button id="notifBtn" type="button"
+    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
 
-        <button id="notifBtn" type="button"
-          class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
+    @if($notifCount > 0)
+      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+        {{ $notifCount }}
+      </span>
+    @endif
 
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-            {{ $notifCount }}
-          </span>
-          @endif
+    <i class="fa-regular fa-bell text-lg"></i>
+  </button>
 
-          <i class="fa-regular fa-bell text-lg"></i>
-        </button>
-
-        <div id="notifMenu"
-          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
+  <div id="notifMenu"
+  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
          opacity-0 scale-95 pointer-events-none
          transition-all duration-200 ease-out origin-top-right">
 
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
-          </div>
+    <div class="p-4 border-b flex items-center justify-between">
+      <span class="font-bold text-[#8B0000]">Notifications</span>
+    </div>
 
-          <div class="max-h-80 overflow-y-auto">
-            @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
-              @if(!empty($n['message']))
-              <div class="text-xs text-[#ADADAD] mt-0.5">
-                {{ $n['message'] }}
-              </div>
-              @endif
-              @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">
-                {{ $n['time'] }}
-              </div>
-              @endif
-            </a>
-            @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+    <div class="max-h-80 overflow-y-auto">
+      @forelse($notifications as $n)
+        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+          <div class="text-sm font-semibold text-gray-900">
+            {{ $n['title'] ?? 'Notification' }}
+          </div>
+          @if(!empty($n['message']))
+            <div class="text-xs text-[#ADADAD] mt-0.5">
+              {{ $n['message'] }}
             </div>
-            @endforelse
-          </div>
-
+          @endif
+          @if(!empty($n['time']))
+            <div class="text-[11px] text-gray-400 mt-1">
+              {{ $n['time'] }}
+            </div>
+          @endif
+        </a>
+      @empty
+        <div class="px-4 py-10 text-center justify-items-center">
+          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+          <div class="text-sm font-semibold text-gray-800">No notifications</div>
+          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
         </div>
-      </div>
+      @endforelse
+    </div>
 
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-        <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
-        </div>
+  </div>
+</div>
+
+    <div class="flex items-center gap-3">
+      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div>
+        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
+        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- SIDEBAR -->
-  <aside id="sidebar"
-    class="fixed left-0 top-[72px]
-         h-[calc(100vh-72px)]
-         bg-white
-         drop-shadow-xl
-         transition-all duration-300
-         flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
-
-    <!-- TOP -->
-    <div class="pt-4">
-
-      <!-- Toggle Button -->
-      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
-        <button onclick="toggleSidebar()"
-          id="sidebarToggleBtn"
-          class="w-8 h-8 flex items-center justify-center
-              rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#F0F0F0] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <!-- NAVIGATION LABEL -->
-      <div class="section-label px-4 mb-6">Navigation</div>
-
-      <!-- MENU -->
-      <nav class="space-y-2 px-3 text-gray-600">
-
-        <!-- DASHBOARD -->
-        <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-chart-line text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Dashboard
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Dashboard
-          </span>
-        </a>
-
-        <!-- PATIENTS -->
-        <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
-            <i class="fa-solid fa-users text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Patients
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Patients
-          </span>
-        </a>
-
-        <!-- APPOINTMENTS -->
-        <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-calendar-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Appointments
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Appointments
-          </span>
-        </a>
-
-        <!-- Document Requests -->
-        <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file-circle-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Document Requests
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Document Requests
-          </span>
-        </a>
-
-        <!-- INVENTORY -->
-        <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-box text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Inventory
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Inventory
-          </span>
-        </a>
-
-        <!-- REPORTS -->
-        <a href="{{ route('dentist.report') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Reports
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Reports
-          </span>
-        </a>
-      </nav>
+<aside id="sidebar"
+  class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
+         transition-all duration-300 flex flex-col justify-between z-40 expanded"
+  style="width: 200px;">
+  <div class="pt-4">
+    <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
+      <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+        class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
+               hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
+      </button>
     </div>
 
+    <div class="section-label px-4 mb-6">Navigation</div>
+
+    <nav class="space-y-2 px-3 text-gray-600">
+      @php
+      $navLinks = [
+        ['route' => 'dentist.dashboard', 'icon' => 'fa-chart-line', 'label' => 'Dashboard', 'ml' => 'ml-1'],
+        ['route' => 'dentist.patients', 'icon' => 'fa-users', 'label' => 'Patients', 'ml' => 'ml-1.5'],
+        ['route' => 'dentist.appointments', 'icon' => 'fa-calendar-check', 'label' => 'Appointments', 'ml' => 'ml-1'],
+        ['route' => 'dentist.documentrequests', 'icon' => 'fa-file-circle-check', 'label' => 'Document Requests', 'ml' => 'ml-1'],
+        ['route' => 'dentist.inventory', 'icon' => 'fa-box', 'label' => 'Inventory', 'ml' => 'ml-1'],
+        ['route' => 'dentist.report', 'icon' => 'fa-file', 'label' => 'Reports', 'ml' => 'ml-1'],
+      ];
+      @endphp
+
+      @foreach($navLinks as $nav)
+      <a href="{{ route($nav['route']) }}"
+        class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
+               transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
+               {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+        <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
+                     {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 {{ $nav['ml'] }}">
+          <i class="fa-solid {{ $nav['icon'] }} text-lg"></i>
+        </span>
+
+        <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
+          {{ $nav['label'] }}
+        </span>
+
+        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+          {{ $nav['label'] }}
+        </span>
+      </a>
+      @endforeach
+    </nav>
+  </div>
+
+  <div class="px-3 pb-5 space-y-4">
+    <div class="section-label">Settings</div>
+
+    <div class="w-full px-3">
+      <div id="themeToggle" class="theme-toggle-container">
+        <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+          <i class="fa-regular fa-moon"></i>
+        </button>
+        <div class="theme-indicator" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <form action="{{ route('logout') }}" method="POST">
+      @csrf
+      <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
+                     text-red-600 hover:bg-red-100 transition-all duration-200">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i>
+        </div>
+        <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
+          Log out
+        </span>
+        <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+          Log out
+        </span>
+      </button>
+    </form>
   </div>
 </aside>
 
 <!-- MAIN CONTENT -->
-<main
-  id="mainContent"
-  class="flex-1 pt-[100px]
-         px-6 pb-10
-         w-full
-         transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
+<main id="mainContent" class="pt-[100px] px-6 py-6 min-h-screen min-w-0 overflow-x-hidden">
 
-  <div class="max-w-7xl mt-4 mx-auto fade-in">
-  <div class="px-2 md:px-6">
+  <div class="w-full mt-4 fade-in min-w-0">
+    <div class="px-2 md:px-4 min-w-0">
 
     <!-- Title + Generate + Search/Filter (same vibe as Patient List) -->
     <div class="flex flex-col gap-4 mb-6">
       <!-- Header Section -->
-      <div class="flex flex-col md:flex-row md:justify-between gap-6 mb-6">
+      <div class="flex flex-col xl:flex-row xl:justify-between gap-6 mb-6 min-w-0">
 
         <!-- LEFT SIDE -->
         <div>
@@ -804,25 +747,24 @@
           <p class="text-gray-500 mt-1">Review and manage requested documents</p>
         </div>
 
-        <!-- RIGHT SIDE (Button + Search stacked) -->
+         <!-- RIGHT SIDE (Button + Search stacked) -->
         <div class="flex flex-col items-end gap-4 w-full md:w-auto">
 
           <!-- Generate Button -->
           <button
             type="button"
             class="bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000] active:scale-[0.99]"
-          >
-            + Generate Document
+          > + Generate Document
           </button>
 
           <!-- Search + Filter + Clear -->
-          <div class="flex items-center gap-4 w-full md:w-auto">
+          <div class="flex items-center gap-4 w-full">
 
-            <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full md:w-auto">
-              <div class="flex items-center bg-white rounded-full overflow-hidden w-full">
+            <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full min-w-0 xl:w-auto">
+              <div class="flex items-center bg-white rounded-full overflow-hidden w-full min-w-0">
 
                 <!-- Search -->
-                <div class="flex items-center gap-2 pl-3 pr-6 py-2 flex-1">
+                <div class="flex items-center gap-2 pl-3 pr-4 py-2 flex-1 min-w-0">
                   <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
                     <i class="fa-solid fa-magnifying-glass text-white text-[11px]"></i>
                   </span>
@@ -831,7 +773,7 @@
                     id="searchInput"
                     type="text"
                     placeholder="Search"
-                    class="w-full md:w-80 bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none"
+                    class="w-full min-w-0 xl:w-80 bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none"
                   />
                 </div>
 
@@ -856,104 +798,16 @@
               id="clearBtn"
               type="button"
               class="text-[#8B0000] text-sm font-medium hover:underline"
-            >
-              Clear
-            </button>
-    <!-- BOTTOM -->
-    <div class="px-3 pb-5 space-y-4">
-      <div class="section-label">Settings</div>
-
-      <div class="w-full px-3">
-        <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-            <i class="fa-solid fa-sun"></i>
-          </button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-            <i class="fa-regular fa-moon"></i>
-          </button>
-          <div class="theme-indicator" aria-hidden="true"></div>
+            >Clear</button>
+          </div>
         </div>
       </div>
-
-      <form action="{{ route('logout') }}" method="POST">
-        @csrf
-        <button
-          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
-             text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
-            <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          </div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
-            Log out
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Log out
-          </span>
-        </button>
-      </form>
-
     </div>
-  </aside>
-
-  <!-- ================= MAIN ================= -->
-  <main
-    id="mainContent"
-    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
-
-    <div class="max-w-7xl mt-4 mx-auto fade-in">
-
-      <!-- MAIN WHITE CARD -->
-      <div class="bg-white rounded-3xl shadow-xl p-8 border border-[#8B0000]/30">
-
-        <!-- HEADER ROW -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <h2 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-400 bg-clip-text text-transparent">
-            Document Requests
-          </h2>
-
-          <!-- SEARCH / FILTER -->
-          <div class="flex items-center gap-6 w-full md:w-auto">
-            <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full md:w-auto">
-              <div class="flex items-center bg-white rounded-full overflow-hidden w-full">
-
-                <div class="flex items-center gap-2 pl-3 pr-5 py-2 flex-1">
-                  <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
-                    <i class="fa-solid fa-magnifying-glass text-white text-[11px]"></i>
-                  </span>
-
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    class="w-full md:w-72 bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none" />
-                </div>
-
-                <div class="w-[2px] self-stretch bg-[#F2C94C]"></div>
-
-                <button
-                  type="button"
-                  class="flex items-center gap-2 px-6 py-2 text-sm font-medium text-[#8B0000] bg-white hover:bg-[#FFF7E6]">
-                  <i class="fa-solid fa-sliders text-[13px]"></i>
-                  <span>Filter</span>
-                </button>
-
-              </div>
-            </div>
-
-            <button class="text-[#8B0000] text-sm font-medium hover:underline">
-              Clear
-            </button>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-
     <!-- Floating Tabs (like Patient List) -->
-    <div class="w-full max-w-6xl mx-auto">
+    <div class="w-full min-w-0">
       <div class="mx-4 relative">
 
-        <div class="flex gap-4 px-6 relative z-20">
+        <div class="flex flex-wrap gap-4 px-6 relative z-20 min-w-0">
 
           <button
             class="req-tab bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-6 py-4 w-[210px] text-left hover:opacity-90 transition-all duration-200"
@@ -990,9 +844,9 @@
         </div>
 
         <!-- White container like patient list -->
-        <div class="mx-4 shadow-lg rounded-lg bg-white overflow-hidden relative">
+        <div class="mx-4 shadow-lg rounded-lg bg-white overflow-hidden relative min-w-0 w-full">
 
-          <div id="requestContainer" class="space-y-4 px-6 pb-6 pt-14 -mt-8 rounded-t-none">
+          <div id="requestContainer" class="space-y-4 px-6 pb-6 pt-14 -mt-8 rounded-t-none min-w-0">
 
             <!-- REQUEST CARD -->
             <a href="#"
@@ -1008,9 +862,9 @@
                   <div class="col-span-4">
                     <p class="font-semibold text-[#333333] text-sm">Capilitan, Beyonce</p>
                     <p class="text-gray-500 text-xs">BSIT 3-1</p>
-                  </div>
+              </div>
 
-                  <!-- Date -->
+              <!-- Date -->
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
                       <i class="fa-regular fa-calendar text-green-600"></i>
@@ -1019,13 +873,13 @@
                       <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
                       <p class="font-semibold text-[#333333]">December 25, 2025</p>
                     </div>
-                  </div>
+              </div>
 
-                  <!-- Document -->
+              <!-- Document -->
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
                       <i class="fa-regular fa-file-lines text-green-600"></i>
-                    </div>
+              </div>
                     <div class="text-sm">
                       <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
                       <p class="font-semibold text-[#333333]">Dental Clearance</p>
@@ -1033,14 +887,14 @@
                         Approved
                       </span>
                     </div>
-                  </div>
+              </div>
 
                   <!-- Action -->
                     <div class="col-span-2 flex justify-end">
                       <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
+                  View
+                </button>
+              </div>
                 </div>
               </div>
             </a>
@@ -1066,8 +920,8 @@
                     <div class="text-sm">
                       <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
                       <p class="font-semibold text-[#333333]">December 25, 2025</p>
-                    </div>
-                  </div>
+            </div>
+          </div>
 
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
@@ -1103,7 +957,7 @@
                   <div class="col-span-4">
                     <p class="font-semibold text-[#333333] text-sm">Lopez, Hoshea</p>
                     <p class="text-gray-500 text-xs">Administrative</p>
-                  </div>
+              </div>
 
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
@@ -1113,7 +967,7 @@
                       <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
                       <p class="font-semibold text-[#333333]">December 25, 2025</p>
                     </div>
-                  </div>
+              </div>
 
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
@@ -1126,13 +980,13 @@
                         Rejected
                       </span>
                     </div>
-                  </div>
+              </div>
 
                     <div class="col-span-2 flex justify-end">
                       <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
                         View
                       </button>
-                    </div>
+              </div>
                 </div>
               </div>
             </a>
@@ -1181,25 +1035,25 @@
 
                     <div class="col-span-2 flex justify-end">
                       <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
+                  View
+                </button>
+              </div>
 
                   </div>
-                </div>
-              </div>
+            </div>
+          </div>
 
 
               <!-- EXPANDED VIEW -->
               <div class="request-details hidden border border-orange-300 mt-3 bg-white rounded-xl bg-white overflow-hidden">
-                
+
                 <!-- NEW HEADER -->
                 <div class="flex items-cente justify-between px-8 py-6 bg-gray-50">
 
                   <div>
                     <p class="font-semibold text-[#333333]">Aragon, Althea</p>
-                    <p class="text-sm text-gray-500">Administrative</p>
-                  </div>
+                <p class="text-sm text-gray-500">Administrative</p>
+              </div>
 
                   <div class="flex items-center gap-6">
                     <div>
@@ -1207,13 +1061,13 @@
                       <span class="px-5 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-semibold">
                         Pending
                       </span>
-                    </div>
+              </div>
 
                     <button class="close-btn bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm">
                       Close
                     </button>
                   </div>
-                </div>
+              </div>
 
                 <!-- BODY -->
                 <div class="px-10 py-8">
@@ -1225,7 +1079,7 @@
                       <div>
                         <p class="text-xs text-[#8B0000]">Office / Department</p>
                         <p class="text-lg font-semibold text-[#8B0000] mt-1">Admission</p>
-                      </div>
+              </div>
 
                       <!-- Date + Last Visit -->
                       <div>
@@ -1322,9 +1176,9 @@
 
                     <div class="col-span-2 flex justify-end">
                       <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
+                  View
+                </button>
+              </div>
                 </div>
               </div>
             </a>
@@ -1350,8 +1204,8 @@
                     <div class="text-sm">
                       <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
                       <p class="font-semibold text-[#333333]">January 10, 2026</p>
-                    </div>
-                  </div>
+            </div>
+          </div>
 
                   <div class="col-span-3 flex items-start gap-3">
                     <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
@@ -1421,7 +1275,7 @@
               </div>
             </a>
 
-          </div>
+        </div>
 
           <!-- Pagination (use your patient list style) -->
           <div id="pagination" class="flex items-center justify-center gap-4 py-8 text-sm text-gray-600">
@@ -1442,7 +1296,19 @@
 
   </div>
 </div>
+
 </main>
+
+<!-- Footer  -->
+<footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+    <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+    <span class="hidden sm:inline">|</span>
+    <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+    <span class="hidden sm:inline">|</span>
+    <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+  </div>
+</footer> 
 
 <!-- ✅ APPROVAL MODAL -->
 <div id="approveModal"
@@ -1597,417 +1463,141 @@
 
 
 <script>
+
   // =========================
-// DARK MODE TOGGLE
-// =========================
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-const html = document.documentElement;
+  // THEME TOGGLE
+  // =========================
+  const html = document.documentElement;
+  const themeToggleContainer = document.getElementById("themeToggle");
+  const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+  const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
 
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-updateThemeIcon(savedTheme);
+  function applyTheme(theme) {
+    html.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
 
-// Toggle on click
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  updateThemeIcon(newTheme);
-});
-
-// Icon switch
-function updateThemeIcon(theme) {
-  if (theme === 'dark') {
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
-  } else {
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
-  }
-}
-
-let sidebarOpen = false;
-
-function applyLayout(sidebarWidth) {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('mainContent');
-
-  sidebar.style.width = sidebarWidth;
-  main.style.marginLeft = sidebarWidth;
-  main.style.width = `auto`;
-}
-
-function toggleSidebar() {
-  const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
-  const texts = document.querySelectorAll('.sidebar-text');
-  const icon = document.getElementById('sidebarIcon');
-
-  sidebarOpen = !sidebarOpen;
-
-  if (sidebarOpen) {
-    // EXPAND
-    applyLayout('16rem');
-
-    texts.forEach(t => {
-      t.classList.remove('opacity-0', 'w-0');
-      t.classList.add('opacity-100', 'w-auto');
+    themeOptions.forEach(option => {
+      if (option.getAttribute("data-theme") === theme) {
+        option.classList.add("active");
+      } else {
+        option.classList.remove("active");
+      }
     });
 
-    toggleWrapper.classList.remove('justify-center');
-    toggleWrapper.classList.add('justify-right');
+    if (theme === "dark") {
+      themeIndicator.classList.add("dark-mode");
+    } else {
+      themeIndicator.classList.remove("dark-mode");
+    }
+  }
 
-    toggleBtn.classList.add('translate-x-2');
-    icon.classList.replace('fa-bars', 'fa-xmark');
-        <!-- TABS CONTAINER -->
-        <div class="mx-4 border border-gray-200 rounded-2xl bg-white overflow-hidden">
+  applyTheme(localStorage.getItem("theme") || "light");
 
-          <div class="flex gap-4 flex-wrap px-4 pt-4 -mb-px">
+  themeOptions.forEach(option => {
+    option.addEventListener("click", () => {
+      const theme = option.getAttribute("data-theme");
+      applyTheme(theme);
+    });
+  });
 
-            <!-- ALL -->
-            <button class="bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow">
-              <h3 class="text-4xl font-medium mb-2">9</h3>
-              <p class="text-base">All Requests</p>
-            </button>
+  // ------------------------------------------------------------------------------------
+  let sidebarOpen = true;
 
-            <!-- PENDING -->
-            <button class="bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow">
-              <h3 class="text-4xl font-medium mb-2">3</h3>
-              <p class="text-base">Pending Requests</p>
-            </button>
+  function applyLayout(sidebarWidth) {
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('mainContent');
+    sidebar.style.width = sidebarWidth;
+    main.style.marginLeft = sidebarWidth;
+  }
 
-            <!-- APPROVED -->
-            <button class="bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow">
-              <h3 class="text-4xl font-medium mb-2">3</h3>
-              <p class="text-base">Approved Requests</p>
-            </button>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const texts = document.querySelectorAll('.sidebar-text');
+    const icon = document.getElementById('sidebarIcon');
+    const toggleWrapper = document.getElementById('sidebarToggleWrapper');
 
-            <!-- REJECTED -->
-            <button class="bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-7 py-6 w-[210px] text-left shadow">
-              <h3 class="text-4xl font-medium mb-2">3</h3>
-              <p class="text-base">Rejected Requests</p>
-            </button>
+    sidebarOpen = !sidebarOpen;
 
-          </div>
-
-          <!-- SECTION LABEL -->
-          <div class="px-6 py-4 text-[22px] font-medium text-gray-700">
-            Click to Access Document Request
-          </div>
-
-          <!-- REQUEST LIST -->
-          <div class="space-y-4 px-6 pb-6">
-
-            <!-- APPROVED -->
-            <div class="relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm">
-              <div class="absolute left-0 top-0 h-full w-2 bg-green-600 rounded-l-md"></div>
-
-              <div class="flex items-center w-full px-6 py-6 pl-10">
-                <div class="grid grid-cols-12 gap-6 items-center w-full">
-
-                  <div class="col-span-3">
-                    <p class="text-[#8B0000] font-semibold">Capilitan, Beyonce</p>
-                    <p class="text-sm text-gray-600">BSIT 3-1</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Date Requested</p>
-                    <p class="font-medium">December 25, 2025</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Document</p>
-                    <p class="font-medium">Dental Clearance</p>
-                  </div>
-
-                  <div class="col-span-2">
-                    <p class="text-xs text-gray-400">Status</p>
-                    <p class="font-semibold text-green-600">APPROVED</p>
-                  </div>
-
-                  <div class="col-span-1 flex justify-end">
-                    <button class="bg-[#8B0000] text-white px-4 py-1 rounded-md hover:bg-[#760000]">
-                      View
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- PENDING -->
-            <div class="relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm">
-              <div class="absolute left-0 top-0 h-full w-2 bg-orange-500 rounded-l-md"></div>
-
-              <div class="flex items-center w-full px-6 py-6 pl-10">
-                <div class="grid grid-cols-12 gap-6 items-center w-full">
-
-                  <div class="col-span-3">
-                    <p class="text-[#8B0000] font-semibold">Romero, Dianna</p>
-                    <p class="text-sm text-gray-600">Faculty</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Date Requested</p>
-                    <p class="font-medium">December 25, 2025</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Document</p>
-                    <p class="font-medium">Annual Dental Clearance</p>
-                  </div>
-
-                  <div class="col-span-2">
-                    <p class="text-xs text-gray-400">Status</p>
-                    <p class="font-semibold text-orange-500">PENDING</p>
-                  </div>
-
-                  <div class="col-span-1 flex justify-end">
-                    <button class="bg-[#8B0000] text-white px-4 py-1 rounded-md hover:bg-[#760000]">
-                      View
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- REJECTED -->
-            <div class="relative bg-[#EAEAEA] border border-gray-300 rounded-md shadow-sm">
-              <div class="absolute left-0 top-0 h-full w-2 bg-red-600 rounded-l-md"></div>
-
-              <div class="flex items-center w-full px-6 py-6 pl-10">
-                <div class="grid grid-cols-12 gap-6 items-center w-full">
-
-                  <div class="col-span-3">
-                    <p class="text-[#8B0000] font-semibold">Lopez, Hoshea</p>
-                    <p class="text-sm text-blue-600 underline">Administrative</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Date Requested</p>
-                    <p class="font-medium">December 25, 2025</p>
-                  </div>
-
-                  <div class="col-span-3">
-                    <p class="text-xs text-gray-400">Document</p>
-                    <p class="font-medium">Dental Health Record</p>
-                  </div>
-
-                  <div class="col-span-2">
-                    <p class="text-xs text-gray-400">Status</p>
-                    <p class="font-semibold text-red-600">REJECTED</p>
-                  </div>
-
-                  <div class="col-span-1 flex justify-end">
-                    <button class="bg-[#8B0000] text-white px-4 py-1 rounded-md hover:bg-[#760000]">
-                      View
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div class="flex items-center justify-center gap-4 mt-8 text-sm">
-        <span class="text-gray-300">‹ Previous</span>
-        <span class="text-[#8B0000] font-semibold">1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>…</span>
-        <span>50</span>
-        <button class="text-[#8B0000] hover:underline">Next ›</button>
-      </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
-      <span class="hidden sm:inline">|</span>
-      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
-    </div>
-  </footer>
-
-  <script>
-    // =========================
-    // THEME TOGGLE 
-    // =========================
-    const html = document.documentElement;
-    const themeToggleContainer = document.getElementById("themeToggle");
-    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
-
-    function applyTheme(theme) {
-      html.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-
-      themeOptions.forEach(option => {
-        if (option.getAttribute("data-theme") === theme) {
-          option.classList.add("active");
-        } else {
-          option.classList.remove("active");
-        }
+    if (sidebarOpen) {
+      applyLayout('220px');
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.add('expanded');
+      texts.forEach(t => {
+        t.classList.remove('opacity-0', 'w-0');
+        t.classList.add('opacity-100');
       });
-
-      if (theme === "dark") {
-        themeIndicator.classList.add("dark-mode");
-      } else {
-        themeIndicator.classList.remove("dark-mode");
-      }
+      toggleWrapper.classList.remove('justify-center');
+      toggleWrapper.classList.add('justify-end');
+      icon.classList.replace('fa-bars', 'fa-xmark');
+    } else {
+      applyLayout('72px');
+      sidebar.classList.remove('expanded');
+      sidebar.classList.add('collapsed');
+      texts.forEach(t => {
+        t.classList.add('opacity-0', 'w-0');
+        t.classList.remove('opacity-100');
+      });
+      toggleWrapper.classList.remove('justify-end');
+      toggleWrapper.classList.add('justify-center');
+      icon.classList.replace('fa-xmark', 'fa-bars');
     }
 
     applyTheme(localStorage.getItem("theme") || "light");
-
-    themeOptions.forEach(option => {
-      option.addEventListener("click", () => {
-        const theme = option.getAttribute("data-theme");
-        applyTheme(theme);
-      });
-    });
-
-    toggleWrapper.classList.remove('justify-right');
-    toggleWrapper.classList.add('justify-center');
-
-    toggleBtn.classList.remove('translate-x-2');
-    icon.classList.replace('fa-xmark', 'fa-bars');
   }
-}
 
-  // ✅ INITIAL STATE SYNC (CRITICAL FIX)
   document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = false;        // ensure state is correct
-    applyLayout('72px');        // collapsed layout on load
+    sidebarOpen = true;
+    applyLayout('220px');
   });
 
+  // ------------------------------------------------------------------------------------
   // NOTIFICATION
   document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("notifBtn");
     const menu = document.getElementById("notifMenu");
 
     let isOpen = false;
-    let sidebarOpen = true;
 
-    function applyLayout(sidebarWidth) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      sidebar.style.width = sidebarWidth;
-      main.style.marginLeft = sidebarWidth;
+    function openMenu() {
+      isOpen = true;
+      menu.classList.remove("notif-close");
+      menu.classList.add("notif-open");
     }
 
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const texts = document.querySelectorAll('.sidebar-text');
-      const icon = document.getElementById('sidebarIcon');
-      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
-      sidebarOpen = !sidebarOpen;
-
-      if (sidebarOpen) {
-        applyLayout('220px');
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.add('expanded');
-        texts.forEach(t => {
-          t.classList.remove('opacity-0', 'w-0');
-          t.classList.add('opacity-100');
-        });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
-        icon.classList.replace('fa-bars', 'fa-xmark');
-      } else {
-        applyLayout('72px');
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
-        texts.forEach(t => {
-          t.classList.add('opacity-0', 'w-0');
-          t.classList.remove('opacity-100');
-        });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
-        icon.classList.replace('fa-xmark', 'fa-bars');
-      }
-      applyTheme(localStorage.getItem("theme") || "light");
+    function closeMenu() {
+      isOpen = false;
+      menu.classList.remove("notif-open");
+      menu.classList.add("notif-close");
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      sidebarOpen = true;
-      applyLayout('220px');
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      isOpen ? closeMenu() : openMenu();
     });
 
-    // NOTIFICATION
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("notifBtn");
-      const menu = document.getElementById("notifMenu");
-
-      let isOpen = false;
-
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
-
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
-
-      // Toggle when clicking bell
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      // Keep open when clicking inside menu
-      menu.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      // Close when clicking outside
-      document.addEventListener("click", () => {
-        if (isOpen) closeMenu();
-      });
-
-      // Close on ESC
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen) closeMenu();
-      });
-
-      // Start closed
-      closeMenu();
+    menu.addEventListener("click", (e) => {
+      e.stopPropagation();
     });
 
-    // Close when clicking outside
     document.addEventListener("click", () => {
       if (isOpen) closeMenu();
     });
 
-    // Close on ESC
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && isOpen) closeMenu();
     });
 
-    // Start closed
     closeMenu();
   });
+// ------------------------------------------------------------------------------------
+  
 
-
-  document.addEventListener("DOMContentLoaded", () => {
+// DROP DOWN --------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("requestContainer");
   if (!container) return;
 
+  const allItems = Array.from(container.querySelectorAll(".request-item"));
   const tabs = document.querySelectorAll(".req-tab");
   const searchInput = document.getElementById("searchInput");
   const clearBtn = document.getElementById("clearBtn");
@@ -2056,7 +1646,7 @@ function toggleSidebar() {
     return allEntries.filter(entry => {
       if (activeTab !== "all" && !entryHasStatus(entry, activeTab)) return false;
       if (activeSearch && !getNameText(entry).includes(activeSearch)) return false;
-      return true;
+    return true;
     });
   }
 
@@ -2092,7 +1682,7 @@ function toggleSidebar() {
           render();
         });
         pageNumbers.appendChild(b);
-      }
+  }
     }
   }
 
