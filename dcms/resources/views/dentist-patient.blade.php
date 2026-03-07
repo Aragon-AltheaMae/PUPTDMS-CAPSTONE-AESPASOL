@@ -1264,8 +1264,9 @@
                 $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? 'Upcoming · '.ucfirst($status) : ucfirst($status ?: 'Pending')))));
                 @endphp
 
-                <a href="{{ route('dentist.patient.profile') }}"
+                <a href="{{ route('dentist.patient.profile', ['patient' => $appt->patient_id]) }}"
                   class="patient-card patient-item all {{ $tabClass }} block">
+
                   <div class="accent-bar {{ $accentClass }}"></div>
                   <div class="flex items-center gap-5 px-8 py-4 pl-10">
 
