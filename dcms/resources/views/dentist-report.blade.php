@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PUP Taguig Dental Clinic | Reports</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -14,7 +13,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
   <script>
     tailwind.config = {
       daisyui: {
@@ -31,26 +29,26 @@
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(6px)
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0)
       }
     }
 
     .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
+      animation: fadeIn .6s ease-out forwards;
     }
 
     @keyframes shimmer {
       0% {
-        transform: translateX(-100%) skewX(-15deg);
+        transform: translateX(-100%) skewX(-15deg)
       }
 
       100% {
-        transform: translateX(300%) skewX(-15deg);
+        transform: translateX(300%) skewX(-15deg)
       }
     }
 
@@ -66,7 +64,7 @@
       left: 0;
       width: 40%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
       animation: shimmer 2.4s infinite;
     }
 
@@ -78,15 +76,15 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
       border: 1.5px solid #f0f0f0;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform .2s, box-shadow .2s;
       text-decoration: none;
     }
 
     .kpi-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(139, 0, 0, 0.10);
+      box-shadow: 0 8px 24px rgba(139, 0, 0, .10);
     }
 
     .kpi-icon {
@@ -108,16 +106,16 @@
     }
 
     .kpi-label {
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 500;
       color: #888;
       margin-top: 3px;
-      letter-spacing: 0.03em;
+      letter-spacing: .03em;
       text-transform: uppercase;
     }
 
     .kpi-delta {
-      font-size: 0.7rem;
+      font-size: .7rem;
       font-weight: 600;
       margin-top: 4px;
     }
@@ -133,7 +131,7 @@
     .kpi-arrow {
       margin-left: auto;
       color: #ccc;
-      font-size: 0.75rem;
+      font-size: .75rem;
       align-self: center;
     }
 
@@ -145,7 +143,7 @@
     .chart-card {
       background: white;
       border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
       border: 1.5px solid #f0f0f0;
       padding: 20px;
     }
@@ -158,13 +156,13 @@
     }
 
     .chart-title {
-      font-size: 0.88rem;
+      font-size: .88rem;
       font-weight: 700;
       color: #8B0000;
     }
 
     .period-select {
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 600;
       color: #8B0000;
       background: #fff5f5;
@@ -194,23 +192,23 @@
       gap: 8px;
       color: white;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: .85rem;
       text-align: center;
       padding: 16px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(139, 0, 0, 0.25);
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(139, 0, 0, .25);
       text-decoration: none;
     }
 
     .quick-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 28px rgba(139, 0, 0, 0.35);
+      box-shadow: 0 10px 28px rgba(139, 0, 0, .35);
     }
 
     .quick-btn .qb-icon {
       width: 40px;
       height: 40px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, .15);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -225,7 +223,7 @@
       right: -20%;
       width: 100px;
       height: 100px;
-      background: rgba(255, 215, 0, 0.12);
+      background: rgba(255, 215, 0, .12);
       border-radius: 50%;
     }
 
@@ -236,7 +234,7 @@
     }
 
     .stock-name {
-      font-size: 0.78rem;
+      font-size: .78rem;
       font-weight: 600;
       color: #333;
       margin-bottom: 6px;
@@ -255,60 +253,192 @@
     .stock-bar-fill {
       height: 100%;
       border-radius: 10px;
-      transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+      transition: width .8s cubic-bezier(.4, 0, .2, 1);
     }
 
-    /* Table */
-    .reports-table th {
-      font-size: 0.7rem;
+    /* Chart empty state */
+    .chart-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      color: #bbb;
+    }
+
+    .chart-empty i {
+      font-size: 2rem;
+    }
+
+    .chart-empty p {
+      font-size: .8rem;
+      font-weight: 600;
+    }
+
+    .chart-empty span {
+      font-size: .72rem;
+      color: #ccc;
+    }
+
+    /* Chart loading spinner */
+    .chart-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .chart-loading i {
+      font-size: 1.5rem;
+      color: #8B0000;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
       font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 10px 14px;
-      background: #fafafa;
+      color: #fff;
+      letter-spacing: .01em;
     }
 
-    .reports-table td {
-      font-size: 0.8rem;
-      padding: 11px 14px;
-      border-bottom: 1px solid #f5f5f5;
-      color: #333;
-      vertical-align: middle;
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
     }
 
-    .reports-table tr:last-child td {
-      border-bottom: none;
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
     }
 
-    .reports-table tr:hover td {
-      background: #fff8f8;
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
     }
 
-    .status-badge {
-      font-size: 0.67rem;
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
       font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      display: inline-block;
-      letter-spacing: 0.04em;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
     }
 
-    .status-ready {
-      background: #dcfce7;
-      color: #15803d;
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
     }
 
-    .status-pending {
-      background: #fef9c3;
-      color: #a16207;
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    /* Notif dropdown */
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
     }
 
     /* Sidebar */
     .sidebar-link {
       display: flex;
       align-items: center;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: background-color .2s ease, transform .2s ease;
     }
 
     #sidebar.expanded .sidebar-link {
@@ -382,28 +512,8 @@
       margin-right: 0 !important;
     }
 
-    #sidebar.collapsed .sidebar-tooltip {
-      display: block;
-    }
-
-    #sidebar.expanded .sidebar-tooltip {
-      display: none;
-    }
-
     .sidebar-link.bg-\[\#8B0000\] {
       box-shadow: 0 0 12px rgba(139, 0, 0, .45);
-    }
-
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(.95) !important;
-      pointer-events: none !important;
     }
 
     /* Theme toggle */
@@ -537,59 +647,47 @@
 <body class="bg-[#f4f4f6] min-h-screen flex flex-col">
 
   <!-- HEADER -->
-  <div class="fixed top-0 left-0 right-0 z-50
-              bg-gradient-to-r from-[#660000] to-[#8B0000]
-              text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5"><img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" /></div>
-      <div class="w-12 rounded-full"><img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" /></div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-    <div class="flex items-center gap-8">
-      @php
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
-      <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">{{ $notifCount }}</span>
-          @endif
-          <i class="fa-regular fa-bell text-lg"></i>
+    <div class="header-right">
+      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
-        <div id="notifMenu" class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50 opacity-0 scale-95 pointer-events-none transition-all duration-200 ease-out origin-top-right">
-          <div class="p-4 border-b"><span class="font-bold text-[#8B0000]">Notifications</span></div>
-          <div class="max-h-80 overflow-y-auto">
+        <div id="notifMenu">
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
-              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
             @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
-            </div>
+            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="header-user">
+        <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
         <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+          <div class="header-name">Dr. Nelson Angeles</div>
+          <div class="header-role">Dentist</div>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
     class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
-    style="width: 220px;">
+    style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()" id="sidebarToggleBtn"
@@ -599,48 +697,22 @@
       </div>
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
-        <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-chart-line text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Dashboard</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dashboard</span>
+        @foreach([
+        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
+        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ] as $nav)
+        <a href="{{ route($nav['route']) }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
         </a>
-        <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1.5"><i class="fa-solid fa-users text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Patients</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Patients</span>
-        </a>
-        <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-calendar-check text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Appointments</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointments</span>
-        </a>
-        <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-file-circle-check text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Document Requests</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Document Requests</span>
-        </a>
-        <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-box text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Inventory</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Inventory</span>
-        </a>
-        <a href="{{ route('dentist.report') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid fa-file text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">Reports</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Reports</span>
-        </a>
+        @endforeach
       </nav>
     </div>
     <div class="px-3 pb-5 space-y-4">
@@ -663,15 +735,14 @@
     </div>
   </aside>
 
-  <!-- ═══ MAIN ═══ -->
-  {{-- FIX 1: Set margin-left inline via style to match sidebar width immediately on render --}}
-  <main id="mainContent" class="pt-[100px] px-6 py-6 min-h-screen fade-in" style="margin-left: 220px;">
+  <!-- MAIN -->
+  <main id="mainContent" class="pt-[100px] px-6 py-6 min-h-screen fade-in" style="margin-left:220px;">
     <div class="max-w-7xl mt-4 mx-auto">
 
-      <!-- PAGE TITLE ROW -->
+      <!-- PAGE TITLE -->
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-xl font-bold text-[#660000]">Reports &amp; Analytics</h1>
+          <h1 class="text-2xl font-bold text-[#660000]">Reports &amp; Analytics</h1>
           <p class="text-xs text-gray-500 mt-0.5">Overview of clinic data, trends, and inventory status</p>
         </div>
         <span class="text-xs text-gray-400 font-medium">
@@ -682,308 +753,278 @@
       <!-- KPI STRIP -->
       <div class="grid grid-cols-4 gap-4 mb-7">
 
-        {{-- Patients This Month — clickable, goes to patients page --}}
         <a href="{{ route('dentist.patients') }}" class="kpi-card">
-          <div class="kpi-icon" style="background:#fff0f0;">
-            <i class="fa-solid fa-users" style="color:#8B0000;"></i>
-          </div>
+          <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-users" style="color:#8B0000;"></i></div>
           <div class="flex-1">
-            <div class="kpi-value">248</div>
+            <div class="kpi-value">{{ $patientsThisMonth }}</div>
             <div class="kpi-label">Patients This Month</div>
-            <div class="kpi-delta up"><i class="fa-solid fa-arrow-up text-[10px]"></i> 12% vs last month</div>
+            @if(!is_null($patientsDelta))
+            <div class="kpi-delta {{ $patientsDelta >= 0 ? 'up' : 'down' }}">
+              <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }} text-[10px]"></i> {{ abs($patientsDelta) }}% vs last month
+            </div>
+            @else
+            <div class="kpi-delta" style="color:#888;">No data last month</div>
+            @endif
           </div>
           <i class="fa-solid fa-chevron-right kpi-arrow"></i>
         </a>
 
-        {{-- Appointments Today — clickable, goes to appointments page --}}
         <a href="{{ route('dentist.appointments') }}" class="kpi-card">
-          <div class="kpi-icon" style="background:#fffbeb;">
-            <i class="fa-solid fa-calendar-check" style="color:#d97706;"></i>
-          </div>
+          <div class="kpi-icon" style="background:#fffbeb;"><i class="fa-solid fa-calendar-check" style="color:#d97706;"></i></div>
           <div class="flex-1">
-            <div class="kpi-value">34</div>
+            <div class="kpi-value">{{ $appointmentsToday }}</div>
             <div class="kpi-label">Appointments Today</div>
-            <div class="kpi-delta up"><i class="fa-solid fa-arrow-up text-[10px]"></i> 5 more than yesterday</div>
+            @if($appointmentsDelta > 0)
+            <div class="kpi-delta up"><i class="fa-solid fa-arrow-up text-[10px]"></i> {{ $appointmentsDelta }} more than yesterday</div>
+            @elseif($appointmentsDelta < 0)
+              <div class="kpi-delta down"><i class="fa-solid fa-arrow-down text-[10px]"></i> {{ abs($appointmentsDelta) }} fewer than yesterday
           </div>
-          <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-        </a>
+          @else
+          <div class="kpi-delta" style="color:#888;">Same as yesterday</div>
+          @endif
+      </div>
+      <i class="fa-solid fa-chevron-right kpi-arrow"></i>
+      </a>
 
-        {{-- Dental Cases --}}
-        <div class="kpi-card">
-          <div class="kpi-icon" style="background:#f0fdf4;">
-            <i class="fa-solid fa-tooth" style="color:#16a34a;"></i>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#f0fdf4;"><i class="fa-solid fa-tooth" style="color:#16a34a;"></i></div>
+        <div>
+          <div class="kpi-value">{{ $casesThisMonth }}</div>
+          <div class="kpi-label">Dental Cases ({{ now()->format('M') }})</div>
+          @if(!is_null($casesDelta))
+          <div class="kpi-delta {{ $casesDelta >= 0 ? 'up' : 'down' }}">
+            <i class="fa-solid fa-arrow-{{ $casesDelta >= 0 ? 'up' : 'down' }} text-[10px]"></i> {{ abs($casesDelta) }}% vs last month
           </div>
-          <div>
-            <div class="kpi-value">91</div>
-            <div class="kpi-label">Dental Cases (Dec)</div>
-            <div class="kpi-delta down"><i class="fa-solid fa-arrow-down text-[10px]"></i> 3% vs Nov</div>
-          </div>
+          @else
+          <div class="kpi-delta" style="color:#888;">No data last month</div>
+          @endif
         </div>
-
-        {{-- Low Stock — clickable, goes to inventory page --}}
-        <a href="{{ route('dentist.inventory') }}" class="kpi-card" style="border-color:#fee2e2;">
-          <div class="kpi-icon" style="background:#fff0f0;">
-            <i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;"></i>
-          </div>
-          <div class="flex-1">
-            <div class="kpi-value" style="color:#dc2626;">5</div>
-            <div class="kpi-label">Low Stock Items</div>
-            <div class="kpi-delta down"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> Requires reorder</div>
-          </div>
-          <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-        </a>
-
       </div>
 
-      <!-- CREATE REPORT BUTTON -->
-      <div class="flex justify-center mb-7">
-        <button onclick="document.getElementById('createReportModal').showModal()"
-          class="btn-shimmer w-full max-w-4xl bg-gradient-to-r from-[#8B0000] via-[#b30000] to-[#FFD700]
+      <a href="{{ route('dentist.inventory') }}" class="kpi-card" style="border-color:#fee2e2;">
+        <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;"></i></div>
+        <div class="flex-1">
+          <div class="kpi-value" style="color:#dc2626;">{{ $lowStockItems }}</div>
+          <div class="kpi-label">Low Stock Items</div>
+          @if($lowStockItems > 0)
+          <div class="kpi-delta down"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> Requires reorder</div>
+          @else
+          <div class="kpi-delta up"><i class="fa-solid fa-circle-check text-[10px]"></i> All stocked up</div>
+          @endif
+        </div>
+        <i class="fa-solid fa-chevron-right kpi-arrow"></i>
+      </a>
+
+    </div>
+
+    <!-- CREATE REPORT BUTTON -->
+    <div class="flex justify-center mb-7">
+      <button onclick="document.getElementById('createReportModal').showModal()"
+        class="btn-shimmer w-full max-w-4xl bg-gradient-to-r from-[#8B0000] via-[#b30000] to-[#FFD700]
                  text-white py-4 rounded-2xl flex items-center justify-center gap-4
                  text-base font-bold shadow-lg hover:opacity-90 transition-opacity">
-          <i class="fa-solid fa-file-circle-plus text-xl"></i>
-          <span>Create New Report</span>
-          <span class="bg-white text-[#8B0000] w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold leading-none">+</span>
-        </button>
-      </div>
+        <i class="fa-solid fa-file-circle-plus text-xl"></i>
+        <span>Create New Report</span>
+        <span class="bg-white text-[#8B0000] w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold leading-none">+</span>
+      </button>
+    </div>
 
-      <!-- CHARTS + QUICK BUTTONS -->
-      {{-- FIX 2: Use explicit pixel heights on chart containers, not flex-1 --}}
-      <div class="grid grid-cols-12 gap-5 mb-5">
+    <!-- CHARTS + QUICK BUTTONS -->
+    <div class="grid grid-cols-12 gap-5 mb-5">
 
-        <!-- GAD REPORT -->
-        <div class="col-span-5 chart-card">
-          <div class="chart-card-header">
-            <span class="chart-title"><i class="fa-solid fa-chart-column mr-1.5 opacity-70"></i>GAD Report</span>
-            <select class="period-select">
-              <option>Dec 2025</option>
-              <option>Nov 2025</option>
-              <option>Oct 2025</option>
-            </select>
-          </div>
-          {{-- FIX: Give the chart div an explicit height in px --}}
-          <div style="height: 300px; width: 100%;"><canvas id="gadChart"></canvas></div>
+      <!-- GAD REPORT -->
+      <div class="col-span-5 chart-card">
+        <div class="chart-card-header">
+          <span class="chart-title"><i class="fa-solid fa-chart-column mr-1.5 opacity-70"></i>GAD Report</span>
+          <select class="period-select" id="gadPeriodSelect">
+            @foreach($periodOptions as $opt)
+            <option>{{ $opt }}</option>
+            @endforeach
+          </select>
         </div>
-
-        <!-- WEEKLY DENTAL CASES -->
-        <div class="col-span-5 chart-card">
-          <div class="chart-card-header">
-            <span class="chart-title"><i class="fa-solid fa-chart-line mr-1.5 opacity-70"></i>Weekly Dental Cases</span>
-            <select class="period-select">
-              <option>Dec 2025</option>
-              <option>Nov 2025</option>
-              <option>Oct 2025</option>
-            </select>
+        {{-- wrapper toggles between canvas and empty state --}}
+        <div id="gadChartWrap" style="height:300px; width:100%; position:relative;">
+          <canvas id="gadChart"></canvas>
+          <div id="gadEmptyState" class="chart-empty" style="display:none; position:absolute; inset:0;">
+            <i class="fa-solid fa-chart-column" style="color:#e5e7eb;"></i>
+            <p>No GAD records found</p>
+            <span>for the selected period</span>
           </div>
-          {{-- FIX: Give the chart div an explicit height in px --}}
-          <div style="height: 300px; width: 100%;"><canvas id="weeklyDentalCasesChart"></canvas></div>
-        </div>
-
-        <!-- QUICK BUTTONS -->
-        <div class="col-span-2 flex flex-col gap-4" style="min-height: 360px;">
-          <a href="{{ route('dentist.report.dental-services') }}" class="quick-btn">
-            <div class="qb-icon"><i class="fa-solid fa-tooth"></i></div>
-            <span>Dental Services</span>
-          </a>
-          <a href="{{ route('dentist.report.daily-treatment') }}" class="quick-btn">
-            <div class="qb-icon"><i class="fa-solid fa-notes-medical"></i></div>
-            <span style="line-height:1.3;">Daily Treatment<br>Record</span>
-          </a>
-        </div>
-
-      </div>
-
-      <!-- INVENTORY ANALYTICS -->
-      <div class="chart-card mb-5" style="border: 1.5px solid #fde68a;">
-        <div class="chart-card-header mb-4">
-          <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked mr-1.5 opacity-70"></i>Inventory Analytics</span>
-          <a href="{{ route('dentist.inventory') }}" class="text-xs font-semibold text-[#8B0000] hover:underline">
-            View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </a>
-        </div>
-        <div class="grid grid-cols-12 gap-6 items-start">
-
-          <!-- PIE CHARTS -->
-          <div class="col-span-7 grid grid-cols-2 gap-6">
-            <div>
-              <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medicine Inventory</h3>
-              {{-- FIX: Explicit height --}}
-              <div style="height: 280px; width: 100%;"><canvas id="medicinePieChart"></canvas></div>
-            </div>
-            <div>
-              <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medical Supplies Inventory</h3>
-              {{-- FIX: Explicit height --}}
-              <div style="height: 280px; width: 100%;"><canvas id="suppliesPieChart"></canvas></div>
-            </div>
+          <div id="gadLoadingState" class="chart-loading" style="display:none; position:absolute; inset:0; background:white;">
+            <i class="fa-solid fa-spinner"></i>
           </div>
-
-          <!-- LOW STOCK -->
-          <div class="col-span-5">
-            <div class="flex items-center gap-2 mb-3">
-              <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i>
-              <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Low Stock Alerts</span>
-            </div>
-            <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Medicine</p>
-            <div class="stock-row">
-              <div class="stock-name"><span>Amoxicillin 500mg</span><span class="text-red-500 font-bold text-[11px]">25 / 100</span></div>
-              <div class="stock-bar-bg">
-                <div class="stock-bar-fill bg-red-400" style="width:25%"></div>
-              </div>
-            </div>
-            <div class="stock-row">
-              <div class="stock-name"><span>Paracetamol 500mg</span><span class="text-red-500 font-bold text-[11px]">30 / 100</span></div>
-              <div class="stock-bar-bg">
-                <div class="stock-bar-fill bg-orange-400" style="width:30%"></div>
-              </div>
-            </div>
-            <div class="stock-row">
-              <div class="stock-name"><span>Chlorhexidine Mouthwash</span><span class="text-red-500 font-bold text-[11px]">16 / 60</span></div>
-              <div class="stock-bar-bg">
-                <div class="stock-bar-fill bg-red-400" style="width:27%"></div>
-              </div>
-            </div>
-            <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2">Medical Supplies</p>
-            <div class="stock-row">
-              <div class="stock-name"><span>Disposable Dental Needles</span><span class="text-red-500 font-bold text-[11px]">34 / 120</span></div>
-              <div class="stock-bar-bg">
-                <div class="stock-bar-fill bg-red-400" style="width:28%"></div>
-              </div>
-            </div>
-            <div class="stock-row">
-              <div class="stock-name"><span>Disposable Mouth Mirrors</span><span class="text-red-500 font-bold text-[11px]">20 / 80</span></div>
-              <div class="stock-bar-bg">
-                <div class="stock-bar-fill bg-orange-400" style="width:25%"></div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      <!-- RECENT REPORTS TABLE -->
-      <div class="chart-card mb-5">
-        <div class="chart-card-header mb-3">
-          <span class="chart-title text-base"><i class="fa-solid fa-clock-rotate-left mr-1.5 opacity-70"></i>Recent Reports</span>
-          <button class="text-xs font-semibold text-[#8B0000] hover:underline">View All</button>
+      <!-- WEEKLY DENTAL CASES -->
+      <div class="col-span-5 chart-card">
+        <div class="chart-card-header">
+          <span class="chart-title"><i class="fa-solid fa-chart-line mr-1.5 opacity-70"></i>Weekly Dental Cases</span>
+          <select class="period-select" id="weeklyPeriodSelect">
+            @foreach($periodOptions as $opt)
+            <option>{{ $opt }}</option>
+            @endforeach
+          </select>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-gray-100">
-          <table class="reports-table w-full border-collapse">
-            <thead>
-              <tr>
-                <th class="text-left">Report Name</th>
-                <th class="text-left">Type</th>
-                <th class="text-left">Date Range</th>
-                <th class="text-left">Generated By</th>
-                <th class="text-left">Status</th>
-                <th class="text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="font-semibold">GAD Monthly Report</td>
-                <td>GAD Report</td>
-                <td>Dec 1–31, 2025</td>
-                <td>Dr. Nelson Angeles</td>
-                <td><span class="status-badge status-ready">Ready</span></td>
-                <td>
-                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
-                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="font-semibold">Medicine Supply — Nov</td>
-                <td>Medicine Supply</td>
-                <td>Nov 1–30, 2025</td>
-                <td>Dr. Nelson Angeles</td>
-                <td><span class="status-badge status-ready">Ready</span></td>
-                <td>
-                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
-                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="font-semibold">Daily Treatment Record</td>
-                <td>Daily Treatment</td>
-                <td>Dec 15, 2025</td>
-                <td>Dr. Nelson Angeles</td>
-                <td><span class="status-badge status-pending">Pending</span></td>
-                <td>
-                  <button class="text-gray-300 text-xs font-semibold mr-3 cursor-not-allowed"><i class="fa-solid fa-download mr-1"></i>Download</button>
-                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="font-semibold">Dental Services — Q4</td>
-                <td>Dental Services</td>
-                <td>Oct 1 – Dec 31, 2025</td>
-                <td>Dr. Nelson Angeles</td>
-                <td><span class="status-badge status-ready">Ready</span></td>
-                <td>
-                  <button class="text-[#8B0000] hover:text-red-700 text-xs font-semibold mr-3"><i class="fa-solid fa-download mr-1"></i>Download</button>
-                  <button class="text-gray-400 hover:text-gray-600 text-xs font-semibold"><i class="fa-solid fa-eye mr-1"></i>View</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div id="weeklyChartWrap" style="height:300px; width:100%; position:relative;">
+          <canvas id="weeklyDentalCasesChart"></canvas>
+          <div id="weeklyEmptyState" class="chart-empty" style="display:none; position:absolute; inset:0;">
+            <i class="fa-solid fa-chart-line" style="color:#e5e7eb;"></i>
+            <p>No appointment data found</p>
+            <span>for the selected period</span>
+          </div>
+          <div id="weeklyLoadingState" class="chart-loading" style="display:none; position:absolute; inset:0; background:white;">
+            <i class="fa-solid fa-spinner"></i>
+          </div>
         </div>
       </div>
+
+      <!-- QUICK BUTTONS -->
+      <div class="col-span-2 flex flex-col gap-4" style="min-height:360px;">
+        <a href="{{ route('dentist.report.dental-services') }}" class="quick-btn">
+          <div class="qb-icon"><i class="fa-solid fa-tooth"></i></div>
+          <span>Dental Services</span>
+        </a>
+        <a href="{{ route('dentist.report.daily-treatment') }}" class="quick-btn">
+          <div class="qb-icon"><i class="fa-solid fa-notes-medical"></i></div>
+          <span style="line-height:1.3;">Daily Treatment<br>Record</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- INVENTORY ANALYTICS -->
+    <div class="chart-card mb-5" style="border:1.5px solid #fde68a;">
+      <div class="chart-card-header mb-4">
+        <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked mr-1.5 opacity-70"></i>Inventory Analytics</span>
+        <a href="{{ route('dentist.inventory') }}" class="text-xs font-semibold text-[#8B0000] hover:underline">
+          View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+      <div class="grid grid-cols-12 gap-6 items-start">
+
+        <!-- PIE CHARTS -->
+        <div class="col-span-7 grid grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medicine Inventory</h3>
+            <div style="height:280px; width:100%; position:relative;">
+              @if($medicineItems->count() > 0)
+              <canvas id="medicinePieChart"></canvas>
+              @else
+              <div class="chart-empty" style="position:absolute; inset:0;">
+                <i class="fa-solid fa-capsules" style="color:#e5e7eb;"></i>
+                <p>No medicine items</p>
+                <span>Add inventory to see chart</span>
+              </div>
+              @endif
+            </div>
+          </div>
+          <div>
+            <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medical Supplies Inventory</h3>
+            <div style="height:280px; width:100%; position:relative;">
+              @if($suppliesItems->count() > 0)
+              <canvas id="suppliesPieChart"></canvas>
+              @else
+              <div class="chart-empty" style="position:absolute; inset:0;">
+                <i class="fa-solid fa-box-open" style="color:#e5e7eb;"></i>
+                <p>No supply items</p>
+                <span>Add inventory to see chart</span>
+              </div>
+              @endif
+            </div>
+          </div>
+        </div>
+
+        <!-- LOW STOCK PANEL -->
+        <div class="col-span-5">
+          <div class="flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i>
+            <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Low Stock Alerts</span>
+          </div>
+
+          @if($lowStockMedicine->count() > 0)
+          <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Medicine</p>
+          @foreach($lowStockMedicine as $item)
+          @php
+          $remaining = $item->qty - $item->used;
+          $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+          $barClass = $pct <= 15 ? 'bg-red-400' : 'bg-orange-400' ;
+            @endphp
+            <div class="stock-row">
+            <div class="stock-name">
+              <span>{{ $item->name }}</span>
+              <span class="text-red-500 font-bold text-[11px]">{{ $remaining }} / {{ $item->qty }}</span>
+            </div>
+            <div class="stock-bar-bg">
+              <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+            </div>
+        </div>
+        @endforeach
+        @endif
+
+        @if($lowStockSupplies->count() > 0)
+        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2">Medical Supplies</p>
+        @foreach($lowStockSupplies as $item)
+        @php
+        $remaining = $item->qty - $item->used;
+        $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+        $barClass = $pct <= 15 ? 'bg-red-400' : 'bg-orange-400' ;
+          @endphp
+          <div class="stock-row">
+          <div class="stock-name">
+            <span>{{ $item->name }}</span>
+            <span class="text-red-500 font-bold text-[11px]">{{ $remaining }} / {{ $item->qty }}</span>
+          </div>
+          <div class="stock-bar-bg">
+            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+          </div>
+      </div>
+      @endforeach
+      @endif
+
+      @if($lowStockMedicine->count() === 0 && $lowStockSupplies->count() === 0)
+      <div class="flex flex-col items-center justify-center py-8 text-center">
+        <i class="fa-solid fa-circle-check text-green-400 text-3xl mb-2"></i>
+        <p class="text-sm font-semibold text-green-600">All items are well stocked!</p>
+        <p class="text-xs text-gray-400 mt-1">No reorder needed at this time.</p>
+      </div>
+      @endif
+    </div>
+
+    </div>
+    </div>
 
     </div>
   </main>
 
-  <!-- ── CREATE REPORT MODAL ── -->
+  <!-- CREATE REPORT MODAL -->
   <dialog id="createReportModal" class="modal">
-    {{-- max-h + flex column so the footer buttons are ALWAYS visible --}}
-    <div class="modal-box max-w-xl p-0 rounded-2xl overflow-hidden bg-white shadow-2xl flex flex-col"
-      style="max-height: min(90vh, 640px);">
-
-      <!-- Sticky Header -->
+    <div class="modal-box max-w-xl p-0 rounded-2xl overflow-hidden bg-white shadow-2xl flex flex-col" style="max-height:min(90vh,640px);">
       <div class="bg-gradient-to-r from-[#8B0000] to-[#660000] px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fa-solid fa-file-circle-plus text-white text-base"></i>
-          </div>
+          <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-file-circle-plus text-white text-base"></i></div>
           <div>
             <h2 class="text-base font-bold text-white leading-tight">Create New Report</h2>
             <p class="text-white/65 text-[11px] mt-0.5">Fields marked <span class="text-yellow-300 font-bold">*</span> are required</p>
           </div>
         </div>
-        <button type="button" onclick="closeCreateModal()"
-          class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center text-white transition-all flex-shrink-0">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
+        <button type="button" onclick="closeCreateModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center text-white transition-all flex-shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
       </div>
-
-      <!-- Scrollable Body -->
       <div class="overflow-y-auto flex-1 px-6 py-5">
         <form id="reportForm" class="space-y-4" novalidate>
-
-          <!-- Report Name -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider">
-                Report Name <span class="text-red-500">*</span>
-              </label>
+              <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider">Report Name <span class="text-red-500">*</span></label>
               <span id="reportNameCounter" class="text-[11px] font-semibold text-gray-400">0 / 100</span>
             </div>
-            <input id="reportName" type="text" maxlength="100"
-              placeholder="e.g. GAD Monthly Report — Dec 2025"
-              class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm
-                     focus:outline-none focus:border-[#8B0000] transition-colors placeholder-gray-300" />
-            <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation"></i> Report name is required.
-            </p>
+            <input id="reportName" type="text" maxlength="100" placeholder="e.g. GAD Monthly Report — Dec 2025"
+              class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors placeholder-gray-300" />
+            <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Report name is required.</p>
           </div>
-
-          <!-- Report Type -->
           <div>
-            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">
-              Report Type <span class="text-red-500">*</span>
-            </label>
+            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">Report Type <span class="text-red-500">*</span></label>
             <div class="relative">
-              <select id="reportType"
-                class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm
-                       focus:outline-none focus:border-[#8B0000] transition-colors appearance-none pr-10 text-gray-500">
+              <select id="reportType" class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors appearance-none pr-10 text-gray-500">
                 <option value="" disabled selected>Select a report type...</option>
                 <option class="text-gray-800">GAD Report</option>
                 <option class="text-gray-800">Medicine Supply Report</option>
@@ -993,108 +1034,59 @@
               </select>
               <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8B0000] text-xs pointer-events-none"></i>
             </div>
-            <p id="reportTypeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation"></i> Please select a report type.
-            </p>
+            <p id="reportTypeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Please select a report type.</p>
           </div>
-
-          <!-- Date Range -->
           <div>
-            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">
-              Date Range <span class="text-red-500">*</span>
-            </label>
+            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">Date Range <span class="text-red-500">*</span></label>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">
-                  From <span class="text-red-400">*</span>
-                </p>
-                <input id="dateFrom" type="date"
-                  class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm
-                         focus:outline-none focus:border-[#8B0000] transition-colors" />
+                <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">From <span class="text-red-400">*</span></p>
+                <input id="dateFrom" type="date" class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
               </div>
               <div>
-                <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">
-                  To <span class="text-gray-400 normal-case font-normal">(optional)</span>
-                </p>
-                <input id="dateTo" type="date"
-                  class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm
-                         focus:outline-none focus:border-[#8B0000] transition-colors" />
+                <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">To <span class="text-gray-400 normal-case font-normal">(optional)</span></p>
+                <input id="dateTo" type="date" class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
               </div>
             </div>
-            <p class="text-[10px] text-gray-400 mt-1">
-              <i class="fa-solid fa-circle-info mr-1"></i>Leave "To" empty to report on a single date.
-            </p>
-            <p id="dateFromErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation"></i> Start date is required.
-            </p>
-            <p id="dateFutureErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation"></i> Dates cannot be in the future.
-            </p>
-            <p id="dateRangeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-              <i class="fa-solid fa-circle-exclamation"></i> End date must be on or after start date.
-            </p>
+            <p class="text-[10px] text-gray-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>Leave "To" empty to report on a single date.</p>
+            <p id="dateFromErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Start date is required.</p>
+            <p id="dateFutureErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Dates cannot be in the future.</p>
+            <p id="dateRangeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> End date must be on or after start date.</p>
           </div>
-
-          <!-- Quantity -->
           <div>
-            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">
-              Quantity <span class="text-red-500">*</span>
-            </label>
+            <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">Quantity <span class="text-red-500">*</span></label>
             <input id="reportQty" type="number" min="1" max="100" step="1" placeholder="1 – 100"
-              class="w-36 px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm
-                     focus:outline-none focus:border-[#8B0000] transition-colors" />
+              class="w-36 px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
             <span class="text-[11px] text-gray-400 ml-2">Whole numbers only (1–100)</span>
             <p id="reportQtyErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
               <i class="fa-solid fa-circle-exclamation"></i> <span id="reportQtyErrMsg">Quantity must be between 1 and 100.</span>
             </p>
           </div>
-
-          <!-- Global error banner -->
-          <div id="formErrorBanner"
-            class="hidden items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2.5 text-sm font-medium">
+          <div id="formErrorBanner" class="hidden items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2.5 text-sm font-medium">
             <i class="fa-solid fa-triangle-exclamation text-red-400 flex-shrink-0"></i>
             Please complete all required fields before downloading.
           </div>
-
         </form>
       </div>
-
-      <!-- Sticky Footer — always visible -->
       <div class="flex-shrink-0 border-t border-gray-100 px-6 py-4 flex justify-end gap-3 bg-white">
-        <button type="button" onclick="closeCreateModal()"
-          class="px-5 py-2 rounded-xl border-2 border-gray-200 text-gray-500 text-sm font-semibold
-                 hover:bg-gray-50 hover:border-gray-300 transition-all">
-          Cancel
-        </button>
-        <button type="button" id="downloadReportBtn"
-          class="px-6 py-2 rounded-xl bg-[#8B0000] hover:bg-[#7a0000] text-white text-sm font-bold
-                 flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
-          <i class="fa-solid fa-download"></i>
-          Download Report
+        <button type="button" onclick="closeCreateModal()" class="px-5 py-2 rounded-xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all">Cancel</button>
+        <button type="button" id="downloadReportBtn" class="px-6 py-2 rounded-xl bg-[#8B0000] hover:bg-[#7a0000] text-white text-sm font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
+          <i class="fa-solid fa-download"></i> Download Report
         </button>
       </div>
-
     </div>
     <form method="dialog" class="modal-backdrop"><button onclick="closeCreateModal()"></button></form>
   </dialog>
 
-  <!-- ── DOWNLOAD COMPLETE MODAL ── -->
+  <!-- DOWNLOAD COMPLETE MODAL -->
   <dialog id="downloadCompleteModal" class="modal">
     <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-sm">
       <div class="h-1.5 bg-gradient-to-r from-[#8B0000] to-[#FFD700] w-full"></div>
       <div class="px-8 py-10 text-center">
-        <div class="w-16 h-16 bg-green-50 border-2 border-green-200 rounded-full flex items-center justify-center mx-auto mb-5">
-          <i class="fa-solid fa-check text-green-500 text-2xl"></i>
-        </div>
+        <div class="w-16 h-16 bg-green-50 border-2 border-green-200 rounded-full flex items-center justify-center mx-auto mb-5"><i class="fa-solid fa-check text-green-500 text-2xl"></i></div>
         <h3 class="text-xl font-bold text-[#8B0000] mb-2">Download Complete!</h3>
-        <p class="text-gray-400 text-sm leading-relaxed mb-7">
-          Your report has been successfully generated and downloaded.
-        </p>
-        <button onclick="closeDownloadModal()"
-          class="px-8 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#7A0000] text-white font-bold text-sm
-                 shadow-md hover:shadow-lg transition-all duration-300">
-          Done
-        </button>
+        <p class="text-gray-400 text-sm leading-relaxed mb-7">Your report has been successfully generated and downloaded.</p>
+        <button onclick="closeDownloadModal()" class="px-8 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#7A0000] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300">Done</button>
       </div>
     </div>
   </dialog>
@@ -1110,18 +1102,35 @@
     </div>
   </footer>
 
+  {{-- PHP → JS data bridge --}}
   <script>
-    // ── Theme & Sidebar (defined first so DOMContentLoaded can call them) ──
+    const GAD_DATA = {
+      labels: @json($gadLabels),
+      female: @json($gadFemale),
+      male: @json($gadMale)
+    };
+    const WEEKLY_DATA = {
+      labels: @json($weekLabels),
+      datasets: @json($weeklyDatasets)
+    };
+    const MEDICINE_ITEMS = @json($medicineItems);
+    const SUPPLIES_ITEMS = @json($suppliesItems);
+    const AJAX_GAD_URL = "{{ route('dentist.report.gad-data') }}";
+    const AJAX_WEEKLY_URL = "{{ route('dentist.report.weekly-data') }}";
+    const PIE_COLORS = ['#8B0000', '#b30000', '#cc3333', '#e06666', '#f4cccc', '#d9534f', '#c0392b', '#922b21', '#641e16', '#f1948a'];
+  </script>
+
+  <script>
+    // ── Theme & Sidebar ──────────────────────────────────────────────────────
     const html = document.documentElement;
 
     function applyTheme(theme) {
-      html.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      document.querySelectorAll(".theme-option").forEach(o =>
-        o.getAttribute("data-theme") === theme ? o.classList.add("active") : o.classList.remove("active")
-      );
-      const ind = document.querySelector(".theme-indicator");
-      if (ind) theme === "dark" ? ind.classList.add("dark-mode") : ind.classList.remove("dark-mode");
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      document.querySelectorAll('.theme-option').forEach(o =>
+        o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active'));
+      const ind = document.querySelector('.theme-indicator');
+      if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
     }
 
     let sidebarOpen = true;
@@ -1135,7 +1144,7 @@
       const sidebar = document.getElementById('sidebar');
       const texts = document.querySelectorAll('.sidebar-text');
       const icon = document.getElementById('sidebarIcon');
-      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+      const wrapper = document.getElementById('sidebarToggleWrapper');
       sidebarOpen = !sidebarOpen;
       if (sidebarOpen) {
         applyLayout('220px');
@@ -1144,7 +1153,7 @@
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-center', 'justify-end');
+        wrapper.classList.replace('justify-center', 'justify-end');
         icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
@@ -1153,19 +1162,18 @@
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-end', 'justify-center');
+        wrapper.classList.replace('justify-end', 'justify-center');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
-      applyTheme(localStorage.getItem("theme") || "light");
+      applyTheme(localStorage.getItem('theme') || 'light');
     }
 
-    // ── Modal helpers ──
+    // ── Modal helpers ────────────────────────────────────────────────────────
     function closeCreateModal() {
       document.getElementById('createReportModal').close();
       document.getElementById('reportForm').reset();
       document.getElementById('reportNameCounter').textContent = '0 / 100';
-      document.getElementById('reportNameCounter').classList.remove('text-red-500');
-      document.getElementById('reportNameCounter').classList.add('text-gray-400');
+      document.getElementById('reportNameCounter').classList.replace('text-red-500', 'text-gray-400');
       ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr', 'formErrorBanner']
       .forEach(id => {
         document.getElementById(id).classList.add('hidden');
@@ -1182,318 +1190,312 @@
       document.getElementById('downloadCompleteModal').close();
     }
 
-    // ── Single DOMContentLoaded ──
+    // ── Chart instances (so we can destroy/recreate on period change) ────────
+    let gadChartInstance = null;
+    let weeklyChartInstance = null;
+
+    // ── Chart helpers ────────────────────────────────────────────────────────
+    function showGadEmpty() {
+      document.getElementById('gadChart').style.display = 'none';
+      document.getElementById('gadEmptyState').style.display = 'flex';
+      document.getElementById('gadLoadingState').style.display = 'none';
+    }
+
+    function showGadLoading() {
+      document.getElementById('gadChart').style.display = 'none';
+      document.getElementById('gadEmptyState').style.display = 'none';
+      document.getElementById('gadLoadingState').style.display = 'flex';
+    }
+
+    function showGadChart() {
+      document.getElementById('gadChart').style.display = 'block';
+      document.getElementById('gadEmptyState').style.display = 'none';
+      document.getElementById('gadLoadingState').style.display = 'none';
+    }
+
+    function showWeeklyEmpty() {
+      document.getElementById('weeklyDentalCasesChart').style.display = 'none';
+      document.getElementById('weeklyEmptyState').style.display = 'flex';
+      document.getElementById('weeklyLoadingState').style.display = 'none';
+    }
+
+    function showWeeklyLoading() {
+      document.getElementById('weeklyDentalCasesChart').style.display = 'none';
+      document.getElementById('weeklyEmptyState').style.display = 'none';
+      document.getElementById('weeklyLoadingState').style.display = 'flex';
+    }
+
+    function showWeeklyChart() {
+      document.getElementById('weeklyDentalCasesChart').style.display = 'block';
+      document.getElementById('weeklyEmptyState').style.display = 'none';
+      document.getElementById('weeklyLoadingState').style.display = 'none';
+    }
+
+    function buildGadChart(labels, female, male) {
+      if (gadChartInstance) {
+        gadChartInstance.destroy();
+        gadChartInstance = null;
+      }
+      gadChartInstance = new Chart(document.getElementById('gadChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+              label: 'Female',
+              data: female,
+              backgroundColor: '#FFC0CB',
+              borderRadius: 4
+            },
+            {
+              label: 'Male',
+              data: male,
+              backgroundColor: '#89CFF0',
+              borderRadius: 4
+            },
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  family: 'Inter',
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x} cases`
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: {
+                borderDash: [4, 4]
+              },
+              title: {
+                display: true,
+                text: 'Number of Cases',
+                font: {
+                  family: 'Inter'
+                }
+              }
+            },
+            y: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  family: 'Inter'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function buildWeeklyChart(labels, datasets) {
+      if (weeklyChartInstance) {
+        weeklyChartInstance.destroy();
+        weeklyChartInstance = null;
+      }
+      weeklyChartInstance = new Chart(document.getElementById('weeklyDentalCasesChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  family: 'Inter',
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} cases`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  family: 'Inter'
+                }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                borderDash: [4, 4]
+              },
+              ticks: {
+                precision: 0,
+                font: {
+                  family: 'Inter'
+                }
+              },
+              title: {
+                display: true,
+                text: 'Dental Cases',
+                font: {
+                  family: 'Inter'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function makePieChart(canvasId, items) {
+      if (!items || items.length === 0) return;
+      new Chart(document.getElementById(canvasId), {
+        type: 'doughnut',
+        data: {
+          labels: items.map(i => i.name),
+          datasets: [{
+            data: items.map(i => Math.max(0, i.qty - i.used)),
+            backgroundColor: PIE_COLORS.slice(0, items.length),
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '50%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: {
+                  family: 'Inter',
+                  size: 10
+                },
+                boxWidth: 12,
+                padding: 8
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} remaining`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // ── Period dropdown AJAX ─────────────────────────────────────────────────
+    async function reloadGadChart(period) {
+      showGadLoading();
+      try {
+        const res = await fetch(`${AJAX_GAD_URL}?period=${encodeURIComponent(period)}`);
+        const data = await res.json();
+        if (data.empty) {
+          showGadEmpty();
+          return;
+        }
+        showGadChart();
+        buildGadChart(data.labels, data.female, data.male);
+      } catch (e) {
+        showGadEmpty();
+      }
+    }
+
+    async function reloadWeeklyChart(period) {
+      showWeeklyLoading();
+      try {
+        const res = await fetch(`${AJAX_WEEKLY_URL}?period=${encodeURIComponent(period)}`);
+        const data = await res.json();
+        if (data.empty || !data.datasets || data.datasets.length === 0) {
+          showWeeklyEmpty();
+          return;
+        }
+        showWeeklyChart();
+        buildWeeklyChart(data.labels, data.datasets);
+      } catch (e) {
+        showWeeklyEmpty();
+      }
+    }
+
+    // ── DOMContentLoaded ─────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
-
-      // 1. Apply layout first so chart containers have correct width
       applyLayout('220px');
-
-      // 2. Apply saved theme
-      applyTheme(localStorage.getItem("theme") || "light");
-      document.querySelectorAll(".theme-option").forEach(o =>
-        o.addEventListener("click", () => applyTheme(o.getAttribute("data-theme")))
+      applyTheme(localStorage.getItem('theme') || 'light');
+      document.querySelectorAll('.theme-option').forEach(o =>
+        o.addEventListener('click', () => applyTheme(o.getAttribute('data-theme')))
       );
 
-      // 3. Init charts after a short delay so browser paints layout first
       setTimeout(function() {
 
-        // ── GAD REPORT — Grouped Bar Chart ──
-        new Chart(document.getElementById('gadChart'), {
-          type: 'bar',
-          data: {
-            labels: ['Student', 'Administrative', 'Faculty', 'Dependent'],
-            datasets: [{
-                label: 'Female',
-                data: [25, 10, 15, 8],
-                backgroundColor: '#FFC0CB',
-                borderRadius: 4
-              },
-              {
-                label: 'Male',
-                data: [20, 15, 12, 10],
-                backgroundColor: '#89CFF0',
-                borderRadius: 4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'top',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 12
-                  }
-                }
-              },
-              tooltip: {
-                callbacks: {
-                  label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x} cases`
-                }
-              }
-            },
-            indexAxis: 'y',
-            scales: {
-              x: {
-                beginAtZero: true,
-                grid: {
-                  borderDash: [4, 4]
-                },
-                title: {
-                  display: true,
-                  text: 'Number of Cases',
-                  font: {
-                    family: 'Inter'
-                  }
-                }
-              },
-              y: {
-                grid: {
-                  display: false
-                },
-                ticks: {
-                  font: {
-                    family: 'Inter'
-                  }
-                }
-              }
-            }
-          }
-        });
+        // Initial GAD chart
+        const gadHasData = GAD_DATA.female.reduce((a, b) => a + b, 0) + GAD_DATA.male.reduce((a, b) => a + b, 0) > 0;
+        if (gadHasData) {
+          showGadChart();
+          buildGadChart(GAD_DATA.labels, GAD_DATA.female, GAD_DATA.male);
+        } else {
+          showGadEmpty();
+        }
 
-        // ── WEEKLY DENTAL CASES — Line Chart ──
-        new Chart(document.getElementById('weeklyDentalCasesChart'), {
-          type: 'line',
-          data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-            datasets: [{
-                label: 'Dental Cleaning',
-                data: [12, 15, 9, 14],
-                borderColor: '#8B0000',
-                backgroundColor: 'rgba(139,0,0,0.08)',
-                tension: 0.4,
-                pointRadius: 5,
-                fill: true
-              },
-              {
-                label: 'Tooth Extraction',
-                data: [5, 7, 6, 8],
-                borderColor: '#F59E0B',
-                backgroundColor: 'rgba(245,158,11,0.08)',
-                tension: 0.4,
-                pointRadius: 5,
-                fill: true
-              },
-              {
-                label: 'Consultation',
-                data: [8, 10, 11, 13],
-                borderColor: '#3B82F6',
-                backgroundColor: 'rgba(59,130,246,0.08)',
-                tension: 0.4,
-                pointRadius: 5,
-                fill: true
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'top',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 12
-                  }
-                }
-              },
-              tooltip: {
-                callbacks: {
-                  label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} cases`
-                }
-              }
-            },
-            scales: {
-              x: {
-                grid: {
-                  display: false
-                },
-                ticks: {
-                  font: {
-                    family: 'Inter'
-                  }
-                }
-              },
-              y: {
-                beginAtZero: true,
-                grid: {
-                  borderDash: [4, 4]
-                },
-                ticks: {
-                  precision: 0,
-                  font: {
-                    family: 'Inter'
-                  }
-                },
-                title: {
-                  display: true,
-                  text: 'Dental Cases',
-                  font: {
-                    family: 'Inter'
-                  }
-                }
-              }
-            }
-          }
-        });
+        // Initial Weekly chart
+        if (WEEKLY_DATA.datasets && WEEKLY_DATA.datasets.length > 0) {
+          showWeeklyChart();
+          buildWeeklyChart(WEEKLY_DATA.labels, WEEKLY_DATA.datasets);
+        } else {
+          showWeeklyEmpty();
+        }
 
-        // ── INVENTORY PIE CHARTS ──
-        const inventory = [{
-            category: "Supplies",
-            name: "Disposable Dental Needles",
-            qty: 42,
-            used: 8
-          },
-          {
-            category: "Medicine",
-            name: "Amoxicillin 500mg",
-            qty: 30,
-            used: 5
-          },
-          {
-            category: "Supplies",
-            name: "Latex Examination Gloves",
-            qty: 50,
-            used: 12
-          },
-          {
-            category: "Medicine",
-            name: "Paracetamol 500mg",
-            qty: 40,
-            used: 10
-          },
-          {
-            category: "Supplies",
-            name: "Dental Cotton Rolls",
-            qty: 60,
-            used: 15
-          },
-          {
-            category: "Supplies",
-            name: "Disposable Mouth Mirrors",
-            qty: 25,
-            used: 5
-          },
-          {
-            category: "Medicine",
-            name: "Ibuprofen 400mg",
-            qty: 35,
-            used: 7
-          },
-          {
-            category: "Supplies",
-            name: "Cotton Swabs",
-            qty: 80,
-            used: 20
-          },
-          {
-            category: "Medicine",
-            name: "Chlorhexidine Mouthwash 0.12%",
-            qty: 20,
-            used: 4
-          },
-          {
-            category: "Supplies",
-            name: "Dental Floss Packs",
-            qty: 50,
-            used: 10
-          }
-        ];
-        const medicineItems = inventory.filter(i => i.category === "Medicine");
-        const suppliesItems = inventory.filter(i => i.category === "Supplies");
-
-        const pieColors = ['#8B0000', '#b30000', '#cc3333', '#e06666', '#f4cccc', '#d9534f', '#c0392b', '#922b21', '#641e16', '#f1948a'];
-
-        const makePie = (canvasId, items) => new Chart(document.getElementById(canvasId), {
-          type: 'doughnut',
-          data: {
-            labels: items.map(i => i.name),
-            datasets: [{
-              data: items.map(i => i.qty - i.used),
-              backgroundColor: pieColors.slice(0, items.length),
-              borderWidth: 2,
-              borderColor: '#fff'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '50%',
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 10
-                  },
-                  boxWidth: 12,
-                  padding: 8
-                }
-              },
-              tooltip: {
-                callbacks: {
-                  label: ctx => ` ${ctx.label}: ${ctx.parsed} remaining`
-                }
-              }
-            }
-          }
-        });
-
-        makePie('medicinePieChart', medicineItems);
-        makePie('suppliesPieChart', suppliesItems);
+        // Inventory pies
+        makePieChart('medicinePieChart', MEDICINE_ITEMS);
+        makePieChart('suppliesPieChart', SUPPLIES_ITEMS);
 
       }, 150);
 
-      // 4. Notifications
-      const notifBtn = document.getElementById("notifBtn");
-      const notifMenu = document.getElementById("notifMenu");
-      let notifOpen = false;
-      const openNotif = () => {
-        notifOpen = true;
-        notifMenu.classList.remove("notif-close");
-        notifMenu.classList.add("notif-open");
-      };
-      const closeNotif = () => {
-        notifOpen = false;
-        notifMenu.classList.remove("notif-open");
-        notifMenu.classList.add("notif-close");
-      };
-      notifBtn.addEventListener("click", e => {
-        e.stopPropagation();
-        notifOpen ? closeNotif() : openNotif();
+      // Period dropdowns
+      document.getElementById('gadPeriodSelect').addEventListener('change', function() {
+        reloadGadChart(this.value);
       });
-      notifMenu.addEventListener("click", e => e.stopPropagation());
-      document.addEventListener("click", () => {
-        if (notifOpen) closeNotif();
+      document.getElementById('weeklyPeriodSelect').addEventListener('change', function() {
+        reloadWeeklyChart(this.value);
       });
-      document.addEventListener("keydown", e => {
-        if (e.key === "Escape" && notifOpen) closeNotif();
-      });
-      closeNotif();
 
-      // 5. Submit validation
+      // Notif toggle
+      document.getElementById('notifBtn').addEventListener('click', e => {
+        e.stopPropagation();
+        document.getElementById('notifMenu').classList.toggle('open');
+      });
+      document.addEventListener('click', () => document.getElementById('notifMenu').classList.remove('open'));
+
+      // ── Modal validation ──
       const todayStr = new Date().toISOString().split('T')[0];
       document.getElementById('dateFrom').setAttribute('max', todayStr);
       document.getElementById('dateTo').setAttribute('max', todayStr);
 
       function setError(inputId, errId, show) {
-        const input = document.getElementById(inputId);
-        const err = document.getElementById(errId);
+        const input = document.getElementById(inputId),
+          err = document.getElementById(errId);
         if (!input || !err) return;
         if (show) {
           err.classList.remove('hidden');
@@ -1507,10 +1509,7 @@
           input.classList.add('border-gray-200');
         }
       }
-
-      function clearError(inputId, errId) {
-        setError(inputId, errId, false);
-      }
+      const clearError = (a, b) => setError(a, b, false);
 
       document.getElementById('downloadReportBtn').addEventListener('click', function() {
         const name = document.getElementById('reportName').value.trim();
@@ -1522,11 +1521,9 @@
 
         setError('reportName', 'reportNameErr', !name);
         if (!name) valid = false;
-
         setError('reportType', 'reportTypeErr', !type);
         if (!type) valid = false;
 
-        // Reset all date errors
         ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
           document.getElementById(id).classList.add('hidden');
           document.getElementById(id).classList.remove('flex');
@@ -1543,8 +1540,8 @@
           document.getElementById('dateFrom').classList.remove('border-gray-200');
           valid = false;
         } else {
-          const fromFuture = from > todayStr;
-          const toFuture = to && to > todayStr;
+          const fromFuture = from > todayStr,
+            toFuture = to && to > todayStr;
           if (fromFuture || toFuture) {
             document.getElementById('dateFutureErr').classList.remove('hidden');
             document.getElementById('dateFutureErr').classList.add('flex');
@@ -1567,8 +1564,7 @@
         }
 
         const qtyInvalid = isNaN(qty) || qty < 1 || qty > 100;
-        const errMsg = document.getElementById('reportQtyErrMsg');
-        errMsg.textContent = (isNaN(qty) || qty < 1) ? 'Quantity must be between 1 and 100.' : 'Quantity cannot exceed 100.';
+        document.getElementById('reportQtyErrMsg').textContent = (isNaN(qty) || qty < 1) ? 'Quantity must be between 1 and 100.' : 'Quantity cannot exceed 100.';
         setError('reportQty', 'reportQtyErr', qtyInvalid);
         if (qtyInvalid) valid = false;
 
@@ -1588,36 +1584,30 @@
           document.getElementById('reportNameCounter').textContent = '0 / 100';
           document.getElementById('reportNameCounter').classList.remove('text-red-500');
           document.getElementById('reportNameCounter').classList.add('text-gray-400');
-          ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr']
-          .forEach(id => {
+          ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
             document.getElementById(id).classList.remove('flex');
           });
         }
       });
 
-      // 6. Real-time validation
-      // Report name counter
       document.getElementById('reportName').addEventListener('input', function() {
-        const len = this.value.length;
-        const counter = document.getElementById('reportNameCounter');
+        const len = this.value.length,
+          counter = document.getElementById('reportNameCounter');
         counter.textContent = `${len} / 100`;
         counter.classList.toggle('text-red-500', len >= 90);
         counter.classList.toggle('text-gray-400', len < 90);
         if (this.value.trim()) clearError('reportName', 'reportNameErr');
         document.getElementById('formErrorBanner').classList.add('hidden');
       });
-
-      // Report type
       document.getElementById('reportType').addEventListener('change', function() {
         if (this.value) clearError('reportType', 'reportTypeErr');
         document.getElementById('formErrorBanner').classList.add('hidden');
       });
 
-      // Date real-time check
       function checkDates() {
-        const from = document.getElementById('dateFrom').value;
-        const to = document.getElementById('dateTo').value;
+        const from = document.getElementById('dateFrom').value,
+          to = document.getElementById('dateTo').value;
         ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
           document.getElementById(id).classList.add('hidden');
           document.getElementById(id).classList.remove('flex');
@@ -1627,8 +1617,8 @@
           document.getElementById(id).classList.add('border-gray-200');
         });
         if (!from && !to) return;
-        const fromFuture = from && from > todayStr;
-        const toFuture = to && to > todayStr;
+        const fromFuture = from && from > todayStr,
+          toFuture = to && to > todayStr;
         if (fromFuture || toFuture) {
           document.getElementById('dateFutureErr').classList.remove('hidden');
           document.getElementById('dateFutureErr').classList.add('flex');
@@ -1653,9 +1643,8 @@
       document.getElementById('dateFrom').addEventListener('change', checkDates);
       document.getElementById('dateTo').addEventListener('change', checkDates);
 
-      // Quantity restrictions
       const qtyInput = document.getElementById('reportQty');
-      qtyInput.addEventListener('keydown', function(e) {
+      qtyInput.addEventListener('keydown', e => {
         if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
       });
       qtyInput.addEventListener('input', function() {
@@ -1666,15 +1655,13 @@
         if (!isNaN(qty) && qty >= 1 && qty <= 100) clearError('reportQty', 'reportQtyErr');
         document.getElementById('formErrorBanner').classList.add('hidden');
       });
-      qtyInput.addEventListener('paste', function(e) {
+      qtyInput.addEventListener('paste', e => {
         e.preventDefault();
         const num = parseInt((e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, ''), 10);
-        if (!isNaN(num)) this.value = Math.min(Math.max(num, 1), 100);
+        if (!isNaN(num)) qtyInput.value = Math.min(Math.max(num, 1), 100);
       });
-
-    }); // end DOMContentLoaded
+    });
   </script>
-
 
 </body>
 

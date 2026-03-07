@@ -441,7 +441,7 @@ class AppointmentController extends Controller
                         [
                             'answer_bool' => null,
                             'answer_text' => null,
-                            'answer_date' => $date, 
+                            'answer_date' => $date,
                         ]
                     );
 
@@ -455,15 +455,15 @@ class AppointmentController extends Controller
                 ->whereNull('answer_date')
                 ->where(function ($q) {
                     $q->whereNull('answer_text')
-                    ->orWhereRaw("TRIM(answer_text) = ''");
+                        ->orWhereRaw("TRIM(answer_text) = ''");
                 })
                 ->delete();
 
             // 4) DISEASES (selected codes from form)
             $selectedDiseaseCodes = $request->input('diseases', []);
             $selectedDiseaseIds = Disease::whereIn('code', $selectedDiseaseCodes)
-                    ->pluck('id')
-                    ->all();
+                ->pluck('id')
+                ->all();
 
             MedicalHistoryDiseaseAnswer::where('medical_history_id', $medicalHistory->id)->delete();
 
@@ -529,5 +529,94 @@ class AppointmentController extends Controller
         $holidays[$lastMondayAug->format('Y-m-d')] = 'National Heroes Day';
 
         return $holidays;
+    }
+
+    public function reschedule($id)
+    {
+        $appointment = Appointment::with('patient')->findOrFail($id);
+
+        $appointmentCountsPerDay = Appointment::where('status', '!=', 'cancelled')
+            ->selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+
+        $appointmentCountsPerSlot = Appointment::where('status', '!=', 'cancelled')
+            ->selectRaw('DATE(appointment_date) as date, appointment_time, COUNT(*) as count')
+            ->groupBy('date', 'appointment_time')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->date;
+            })
+            ->map(function ($group) {
+                return $group->pluck('count', 'appointment_time')->toArray();
+            })
+            ->toArray();
+
+        $unavailableDates = [];
+
+        $philippineHolidays = [
+            '2026-01-01' => 'New Year\'s Day',
+            '2026-02-25' => 'EDSA Revolution',
+            '2026-04-09' => 'Araw ng Kagitingan',
+            '2026-05-01' => 'Labor Day',
+            '2026-06-12' => 'Independence Day',
+            '2026-08-31' => 'National Heroes Day',
+            '2026-11-30' => 'Bonifacio Day',
+            '2026-12-25' => 'Christmas Day',
+            '2026-12-30' => 'Rizal Day',
+        ];
+
+        return view('dentist-reschedule', compact(
+            'appointment',
+            'appointmentCountsPerDay',
+            'appointmentCountsPerSlot',
+            'unavailableDates',
+            'philippineHolidays'
+        ));
+    }
+
+    /**
+     * Update the rescheduled appointment
+     */
+    public function updateReschedule(Request $request, $id)
+    {
+        $request->validate([
+            'new_appointment_date' => 'required|date|after_or_equal:today',
+            'new_appointment_time' => 'required',
+            'service_type' => 'required|string',
+            'reschedule_reason' => 'nullable|string|max:500',
+        ]);
+
+        $appointment = Appointment::findOrFail($id);
+
+        try {
+            $mysqlTime = $this->toMysqlTime($request->new_appointment_time);
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Invalid time format. Please pick a valid time slot.');
+        }
+
+        $slotTaken = Appointment::where('appointment_date', $request->new_appointment_date)
+            ->where('appointment_time', $mysqlTime)
+            ->where('id', '!=', $id)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+
+        if ($slotTaken) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sorry, that time slot is already taken. Please choose another time.');
+        }
+
+        $appointment->update([
+            'appointment_date' => $request->new_appointment_date,
+            'appointment_time' => $mysqlTime,
+            'service_type' => $request->service_type,
+            'reschedule_reason' => $request->reschedule_reason,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }
