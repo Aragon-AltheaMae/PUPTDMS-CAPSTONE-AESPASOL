@@ -279,7 +279,7 @@
       padding: 3px 10px;
       border-radius: 20px;
     }
-    .appt-badge-pending   { background: #FEF3E2; color: #E67E22; }
+    .appt-badge-upcoming   { background: #FEF3E2; color: #E67E22; }
     .appt-badge-confirmed { background: #E8F8EE; color: #27AE60; }
     .appt-badge-completed { background: #EAF0FB; color: #3B6CC7; }
     .appt-badge-cancelled { background: #F5F5F5; color: #999999; }
@@ -677,11 +677,11 @@
 
                 $rawStatus  = strtolower($appt->status ?? 'scheduled');
                 $badgeClass = match($rawStatus) {
-                  'pending'   => 'appt-badge-pending',
+                  'upcoming'   => 'appt-badge-upcoming',
                   'confirmed' => 'appt-badge-confirmed',
                   default     => 'appt-badge-scheduled',
                 };
-                $showDot    = in_array($rawStatus, ['pending', 'scheduled']);
+                $showDot    = in_array($rawStatus, ['upcoming', 'scheduled']);
               @endphp
               <div class="appt-card-new">
                 {{-- Date --}}
@@ -1046,7 +1046,7 @@ $badgeClass = 'appt-badge-completed';
 
         if (s === 'completed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
         else if (s === 'confirmed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
-        else if (s === 'pending' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
+        else if (s === 'upcoming' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
         else if (s === 'cancelled') statusEl.classList.add('bg-gray-200', 'text-gray-700');
         else statusEl.classList.add('bg-gray-200', 'text-gray-800');
       }
