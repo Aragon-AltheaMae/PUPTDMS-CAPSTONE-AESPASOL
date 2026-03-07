@@ -56,7 +56,7 @@ class AppointmentController extends Controller
         // ✅ FUTURE VISITS:
         // pending/confirmed AND (date > today OR (date == today AND time >= now))
         $futureVisits = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereDate('appointment_date', '>', $today)
                     ->orWhere(function ($q2) use ($today, $nowTime) {
@@ -96,7 +96,7 @@ class AppointmentController extends Controller
 
         // ✅ IMPORTANT:
         // Availability should only count pending/confirmed
-        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -139,14 +139,14 @@ class AppointmentController extends Controller
         $patient = Patient::findOrFail($patientId);
 
         // ✅ counts should only include pending/confirmed
-        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
         // ✅ counts per slot should only include pending/confirmed
-        $appointmentCountsPerSlot = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
             ->groupBy('appointment_date', 'appointment_time')
             ->get()
@@ -213,7 +213,7 @@ class AppointmentController extends Controller
 
         // Full day check (only pending/confirmed should block)
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
 
         if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
@@ -225,7 +225,7 @@ class AppointmentController extends Controller
         // Slot check (only pending/confirmed should block)
         $timeTaken = Appointment::where('appointment_date', $request->appointment_date)
             ->where('appointment_time', $mysqlTime)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->exists();
 
         if ($timeTaken) {
@@ -247,7 +247,7 @@ class AppointmentController extends Controller
                     : null,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $mysqlTime,
-                'status'           => 'pending',
+                'status'           => 'upcoming',
             ]);
 
             // 2) DENTAL HISTORY (patient-based)
@@ -535,13 +535,13 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::with('patient')->findOrFail($id);
 
-        $appointmentCountsPerDay = Appointment::where('status', '!=', 'cancelled')
+        $appointmentCountsPerDay = Appointment::where('status', '!=', 'rescheduled')
             ->selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
 
-        $appointmentCountsPerSlot = Appointment::where('status', '!=', 'cancelled')
+        $appointmentCountsPerSlot = Appointment::where('status', '!=', 'rescheduled')
             ->selectRaw('DATE(appointment_date) as date, appointment_time, COUNT(*) as count')
             ->groupBy('date', 'appointment_time')
             ->get()
@@ -585,7 +585,6 @@ class AppointmentController extends Controller
             'new_appointment_date' => 'required|date|after_or_equal:today',
             'new_appointment_time' => 'required',
             'service_type' => 'required|string',
-            'reschedule_reason' => 'nullable|string|max:500',
         ]);
 
         $appointment = Appointment::findOrFail($id);
@@ -601,7 +600,7 @@ class AppointmentController extends Controller
         $slotTaken = Appointment::where('appointment_date', $request->new_appointment_date)
             ->where('appointment_time', $mysqlTime)
             ->where('id', '!=', $id)
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', 'rescheduled')
             ->exists();
 
         if ($slotTaken) {
@@ -614,7 +613,7 @@ class AppointmentController extends Controller
             'appointment_date' => $request->new_appointment_date,
             'appointment_time' => $mysqlTime,
             'service_type' => $request->service_type,
-            'reschedule_reason' => $request->reschedule_reason,
+            'status' => 'rescheduled',
         ]);
 
         return response()->json(['success' => true]);
