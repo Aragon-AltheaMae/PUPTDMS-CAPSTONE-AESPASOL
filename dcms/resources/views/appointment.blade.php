@@ -408,7 +408,6 @@
     }
     .appt-empty img { width: 80px; height: 80px; margin: 0 auto 12px; opacity: 0.6; }
     .appt-empty-title {
-      font-family: 'DM Serif Display', serif;
       font-size: 18px;
       color: #8A8A9A;
       margin-bottom: 4px;
