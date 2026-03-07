@@ -1039,6 +1039,12 @@
 
                   <!-- Actions — horizontal row -->
                   <div class="action-row justify-end">
+
+                    <a href="{{ route('dentist.appointments.patientProfile', $appt->id) }}"
+                      class="action-btn border border-[#8B0000]/30 bg-white text-[#8B0000] hover:bg-[#8B0000] hover:text-white">
+                      <i class="fa-regular fa-user text-[9px]"></i> View
+                    </a>
+                    
                     <button type="button"
                       class="action-btn action-btn-start"
                       onclick="openStartProcedureModal(this)"
