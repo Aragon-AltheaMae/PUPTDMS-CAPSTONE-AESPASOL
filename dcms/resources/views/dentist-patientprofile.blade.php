@@ -191,10 +191,17 @@
               @php
               $age = $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->age : null;
               $birthdateFormatted = $patient->birthdate ? \Carbon\Carbon::parse($patient->birthdate)->format('F d, Y') : 'N/A';
+              $patientName = $patient->name ?? 'Unknown Patient';
               @endphp
-              <img src="https://i.pravatar.cc/180" class="w-28 h-28 rounded-full object-cover border-4 border-white/30 shadow-md mb-4">
+
+              <img
+                src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=8B0000&color=FFFFFF&rounded=true&size=256' }}"
+                class="w-28 h-28 rounded-full object-cover border-4 border-white/30 shadow-md mb-4"
+                alt="{{ $patientName }}">
+
               <p class="font-bold text-xl text-center leading-tight">{{ $patient->name }}</p>
-              <p class="text-sm opacity-75 mt-1">BSIT 3-1</p>
+              <p class="text-sm opacity-75 mt-1">{{ $patient->course_year ?? 'BSIT 3-1' }}</p>
+
               <!-- ID badge -->
               <span class="mt-3 bg-yellow-500 text-white text-xs font-bold px-4 py-1 rounded-full tracking-wide">
                 {{ $patient->student_id ?? '2023-0010-TO-S' }}

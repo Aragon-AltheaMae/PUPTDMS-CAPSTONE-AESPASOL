@@ -505,15 +505,14 @@
   </div>
 
   <!-- SIDEBAR -->
-  <aside id="sidebar" class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
-                             transition-all duration-300 flex flex-col justify-between z-40 expanded"
-         style="width: 200px;">
+  <aside id="sidebar"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded">
+    <!-- TOP -->
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-                class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
-                       hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
