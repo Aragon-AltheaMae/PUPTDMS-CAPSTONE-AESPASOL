@@ -686,7 +686,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -983,9 +983,9 @@
       @endif
 
       @if($lowStockMedicine->count() === 0 && $lowStockSupplies->count() === 0)
-      <div class="flex flex-col items-center justify-center py-8 text-center">
+      <div class="flex flex-col items-center justify-center h-full py-8 text-center min-h-[200px]">
         <i class="fa-solid fa-circle-check text-green-400 text-3xl mb-2"></i>
-        <p class="text-sm font-semibold text-green-600">All items are well stocked!</p>
+        <p class="text-sm font-semibold text-green-600">No low stock items found.</p>
         <p class="text-xs text-gray-400 mt-1">No reorder needed at this time.</p>
       </div>
       @endif
