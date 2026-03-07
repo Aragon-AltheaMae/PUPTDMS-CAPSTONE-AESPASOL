@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -53,6 +54,36 @@ class DentistPatientController extends Controller
             'todayCount',
             'rescheduledCount',
             'allCount',
+            'notifications'
+        ));
+    }
+
+    public function profile(Patient $patient)
+    {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+
+        $today = Carbon::today()->toDateString();
+
+        $futureVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '>=', $today)
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $pastVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '<', $today)
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
+
+        $notifications = collect([]);
+
+        return view('dentist-patientprofile', compact(
+            'patient',
+            'futureVisits',
+            'pastVisits',
             'notifications'
         ));
     }

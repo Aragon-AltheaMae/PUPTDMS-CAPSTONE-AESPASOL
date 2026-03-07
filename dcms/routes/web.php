@@ -294,15 +294,15 @@ Route::prefix('dentist')->group(function () {
         ));
     })->name('dentist.dashboard');
 
-    // Patients Route
-    Route::get('/dentist/patients', [DentistPatientController::class, 'index'])
-        ->name('dentist.patients');
-
-    // Appointments Route
-    // Appointments Route (Controller)
     Route::get('/appointments', [DentistAppointmentController::class, 'index'])
         ->name('dentist.appointments');
 
+    // Patients Route
+    Route::get('/appointments/{appointment}/patient-profile', [DentistAppointmentController::class, 'patientProfile'])
+        ->name('dentist.appointments.patientProfile');
+
+    Route::get('/patients', [DentistPatientController::class, 'index'])
+        ->name('dentist.patients');
     Route::get('/dentist/appointments/{id}/reschedule', [AppointmentController::class, 'reschedule'])
         ->name('dentist.appointments.reschedule');
 
@@ -313,13 +313,16 @@ Route::prefix('dentist')->group(function () {
         ->name('dentist.appointments.cancel');
 
     // Patient Profile Route
-    Route::get('/patient', function () {
+    /*Route::get('/patient', function () {
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
         return view('dentist-patientprofile');
-    })->name('dentist.patient.profile');
+    })->name('dentist.patient.profile');*/
 
+    Route::get('/patients/{patient}/profile', [DentistPatientController::class, 'profile'])
+    ->name('dentist.patient.profile');
+    
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
         ->name('dentist.report');
