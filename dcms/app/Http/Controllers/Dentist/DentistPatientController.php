@@ -7,40 +7,25 @@ use App\Models\Appointment;
 use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Helpers\PhilippineHolidays;
 
 class DentistPatientController extends Controller
 {
     public function index()
     {
-        // simple session check (same style you used)
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
 
         $today = Carbon::today()->toDateString();
 
-        // Fetch upcoming + today appointments, include patient info
         $appointments = Appointment::with('patient')
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // Optional counts for your tabs
-        $todayCount = $appointments->where('appointment_date', $today)->count();
-
-        // you don't have "rescheduled" status in DB, so we'll treat pending future as "upcoming"
-        // (you can change this later if you add a rescheduled column/status)
-        $rescheduledCount = $appointments
-            ->where('status', 'pending')
-            ->where('appointment_date', '>', $today)
-            ->count();
-
-        $allCount = $appointments->count();
-
-        $notifications = []; // keep as-is for now
-
         $upcomingAppointments = $appointments->filter(function ($a) use ($today) {
-            return in_array($a->status, ['pending', 'confirmed', 'rescheduled'], true)
+            return in_array($a->status, ['upcoming', 'rescheduled'], true)
                 && $a->appointment_date >= $today;
         });
 
@@ -49,10 +34,25 @@ class DentistPatientController extends Controller
                 || $a->appointment_date < $today;
         });
 
+        $todayCount      = $appointments->where('appointment_date', $today)
+            ->whereIn('status', ['upcoming', 'rescheduled'])->count();
+        $upcomingCount   = $upcomingAppointments->where('appointment_date', '>', $today)->count();
+        $rescheduledCount = $appointments->where('status', 'rescheduled')->count();
+        $cancelledCount  = $appointments->where('status', 'cancelled')->count();
+        $completedCount  = $appointments->where('status', 'completed')->count();
+        $allCount        = $appointments->count();
+
+        $notifications = [];
+
         return view('dentist-patient', compact(
             'appointments',
+            'upcomingAppointments',
+            'pastAppointments',
             'todayCount',
+            'upcomingCount',
             'rescheduledCount',
+            'cancelledCount',
+            'completedCount',
             'allCount',
             'notifications'
         ));
@@ -68,7 +68,7 @@ class DentistPatientController extends Controller
 
         $futureVisits = Appointment::where('patient_id', $patient->id)
             ->whereDate('appointment_date', '>=', $today)
-            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
@@ -76,7 +76,7 @@ class DentistPatientController extends Controller
         $pastVisits = Appointment::where('patient_id', $patient->id)
             ->where(function ($query) use ($today) {
                 $query->whereDate('appointment_date', '<', $today)
-                    ->orWhere('status', 'completed');
+                    ->orWhereIn('status', ['completed', 'cancelled']);
             })
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
@@ -85,6 +85,17 @@ class DentistPatientController extends Controller
         $totalVisits = $pastVisits->count();
         $lastVisit = $pastVisits->first();
         $nextAppointment = $futureVisits->first();
+
+        $philippineHolidays = PhilippineHolidays::range(1, 1);
+
+        $appointmentCountsPerDay = Appointment::where('patient_id', $patient->id)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $unavailableDates = [];
 
         $notifications = collect([]);
 
@@ -95,7 +106,10 @@ class DentistPatientController extends Controller
             'totalVisits',
             'lastVisit',
             'nextAppointment',
-            'notifications'
+            'notifications',
+            'philippineHolidays',
+            'appointmentCountsPerDay',
+            'unavailableDates'
         ));
     }
 }

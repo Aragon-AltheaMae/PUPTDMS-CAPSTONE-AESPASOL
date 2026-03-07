@@ -1244,6 +1244,25 @@ $badgeClass = 'appt-badge-completed';
             </div>
             <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
             <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
+
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-gray-100">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0 ring-2 ring-[#008440]/30 ring-offset-1"></span>
+                  My Appointment
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0 ring-2 ring-blue-400/30 ring-offset-1"></span>
+                  Holiday
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0 ring-2 ring-red-500/30 ring-offset-1"></span>
+                  Fully Booked
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0 ring-2 ring-[#8B0000]/30 ring-offset-1"></span>
+                  Today
+                </div>
+              </div>
           </div>`;
       }
 
