@@ -68,15 +68,23 @@ class DentistPatientController extends Controller
 
         $futureVisits = Appointment::where('patient_id', $patient->id)
             ->whereDate('appointment_date', '>=', $today)
+            ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
         $pastVisits = Appointment::where('patient_id', $patient->id)
-            ->whereDate('appointment_date', '<', $today)
+            ->where(function ($query) use ($today) {
+                $query->whereDate('appointment_date', '<', $today)
+                    ->orWhere('status', 'completed');
+            })
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
+
+        $totalVisits = $pastVisits->count();
+        $lastVisit = $pastVisits->first();
+        $nextAppointment = $futureVisits->first();
 
         $notifications = collect([]);
 
@@ -84,6 +92,9 @@ class DentistPatientController extends Controller
             'patient',
             'futureVisits',
             'pastVisits',
+            'totalVisits',
+            'lastVisit',
+            'nextAppointment',
             'notifications'
         ));
     }
