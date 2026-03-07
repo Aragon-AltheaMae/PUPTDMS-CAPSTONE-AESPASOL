@@ -86,6 +86,8 @@ class DentistAppointmentController extends Controller
             'pastVisits',
             'notifications'
         ));
+    }
+    
     public function cancel(Request $request, $id)
     {
         $appointment = Appointment::findOrFail($id);
