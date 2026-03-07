@@ -27,6 +27,10 @@ class AppointmentController extends Controller
 
     /* =======================
        SHOW PATIENT APPOINTMENTS
+       - Provides:
+         $appointments   (for calendar dots)
+         $futureVisits   (for Future Visits tab)
+         $pastVisits     (for Past Visits tab)
     ======================= */
     public function index()
     {
@@ -38,10 +42,45 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // Appointments list (basic)
-        $appointments = Appointment::where('patient_id', $patient->id)
+        // Use server time
+        $now = now();
+        $today = $now->toDateString();
+        $nowTime = $now->format('H:i:s');
+
+        // For calendar: show ALL of this patient's appointments
+        $appointments = Appointment::where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        // ✅ FUTURE VISITS:
+        // pending/confirmed AND (date > today OR (date == today AND time >= now))
+        $futureVisits = Appointment::where('patient_id', $patientId)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where(function ($q) use ($today, $nowTime) {
+                $q->whereDate('appointment_date', '>', $today)
+                    ->orWhere(function ($q2) use ($today, $nowTime) {
+                        $q2->whereDate('appointment_date', '=', $today)
+                            ->whereTime('appointment_time', '>=', $nowTime);
+                    });
+            })
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        // ✅ PAST VISITS:
+        // completed/cancelled OR already passed datetime (even if still pending)
+        $pastVisits = Appointment::where('patient_id', $patientId)
+            ->where(function ($q) use ($today, $nowTime) {
+                $q->whereIn('status', ['completed', 'cancelled'])
+                    ->orWhereDate('appointment_date', '<', $today)
+                    ->orWhere(function ($q2) use ($today, $nowTime) {
+                        $q2->whereDate('appointment_date', '=', $today)
+                            ->whereTime('appointment_time', '<', $nowTime);
+                    });
+            })
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
             ->get();
 
         // Patient-based histories (since you save by patient_id)
@@ -55,13 +94,17 @@ class AppointmentController extends Controller
             'medicalHistory.diseaseAnswers.disease',
         ]);
 
-        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+        // ✅ IMPORTANT:
+        // Availability should only count pending/confirmed
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
         $unavailableDates = [];
 
+        // Holidays (5 years)
         $currentYear = now()->year;
         $philippineHolidays = [];
         for ($year = $currentYear; $year <= $currentYear + 4; $year++) {
@@ -72,6 +115,8 @@ class AppointmentController extends Controller
 
         return view('appointment', compact(
             'appointments',
+            'futureVisits',
+            'pastVisits',
             'patient',
             'appointmentCountsPerDay',
             'unavailableDates',
@@ -93,12 +138,16 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+        // ✅ counts should only include pending/confirmed
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
-        $appointmentCountsPerSlot = Appointment::selectRaw('appointment_date, appointment_time, COUNT(*) as count')
+        // ✅ counts per slot should only include pending/confirmed
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['pending', 'confirmed'])
+            ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
             ->groupBy('appointment_date', 'appointment_time')
             ->get()
             ->groupBy('appointment_date')
@@ -162,17 +211,21 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid time format. Please pick a valid time slot.');
         }
 
-        // Full day check
-        $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)->count();
+        // Full day check (only pending/confirmed should block)
+        $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->count();
+
         if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
         }
 
-        // Slot check
+        // Slot check (only pending/confirmed should block)
         $timeTaken = Appointment::where('appointment_date', $request->appointment_date)
             ->where('appointment_time', $mysqlTime)
+            ->whereIn('status', ['pending', 'confirmed'])
             ->exists();
 
         if ($timeTaken) {
@@ -186,7 +239,7 @@ class AppointmentController extends Controller
         DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId) {
 
             // 1) APPOINTMENT
-            $appointment = Appointment::create([
+            Appointment::create([
                 'patient_id'       => $patientId,
                 'service_type'     => $request->service_type,
                 'other_services'   => $request->service_type === 'Others'
@@ -254,9 +307,7 @@ class AppointmentController extends Controller
 
             foreach ($dentalAnswerMap as $code => $rawValue) {
                 $conditionId = $conditionIdsByCode[$code] ?? null;
-                if (!$conditionId) {
-                    continue;
-                }
+                if (!$conditionId) continue;
 
                 DentalHistoryAnswer::updateOrCreate(
                     [
@@ -270,7 +321,6 @@ class AppointmentController extends Controller
             }
 
             // 3) MEDICAL HISTORY (patient-based)
-            // ✅ FIXED updateOrCreate: 1st arg = where, 2nd arg = values
             $medicalHistory = MedicalHistory::updateOrCreate(
                 ['patient_id' => $patientId],
                 [
