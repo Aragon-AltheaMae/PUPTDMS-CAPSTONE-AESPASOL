@@ -19,6 +19,7 @@ class DentistAppointmentController extends Controller
 
         // Fetch all appointments with patient info
         $appointments = Appointment::with('patient')
+            ->whereDate('appointment_date', '>=', $today)  
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
@@ -42,6 +43,46 @@ class DentistAppointmentController extends Controller
             'upcomingAppointments',
             'pastAppointments',
             'today',
+            'notifications'
+        ));
+    }
+
+    public function patientProfile(Appointment $appointment)
+    {
+        if (session('role') !== 'dentist') {
+            return redirect('/login');
+        }
+
+        $appointment->load('patient');
+
+        $patient = $appointment->patient;
+
+        if (!$patient) {
+            return redirect()->route('dentist.appointments')
+                ->with('error', 'Patient not found for this appointment.');
+        }
+
+        $today = Carbon::today()->toDateString();
+
+        $futureVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '>=', $today)
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $pastVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '<', $today)
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
+
+        $notifications = collect([]);
+
+        return view('dentist-patientprofile', compact(
+            'patient',
+            'appointment',
+            'futureVisits',
+            'pastVisits',
             'notifications'
         ));
     }
