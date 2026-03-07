@@ -15,6 +15,9 @@ use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\Dentist\DentistPatientController;
 use App\Http\Controllers\Dentist\DentistAppointmentController;
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Helpers\PhilippineHolidays;
+
 
 
 // -------------------
@@ -95,6 +98,31 @@ Route::post('/dentist/login', function (Request $request) {
     return back()->with('error', 'Invalid dentist credentials');
 })->name('dentist.login.submit');
 
+/*
+|--------------------------------------------------------------------------
+| ADMIN AUTH
+|--------------------------------------------------------------------------
+*/
+
+// Show admin login page
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+
+// Process admin login
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+// Admin dashboard (protected)
+Route::get('/admin/dashboard', function () {
+
+    if (!session('admin_logged_in')) {
+        return redirect('/admin/login');
+    }
+
+    return view('admin-dashboard');
+})->name('admin.dashboard');
+
+// Admin logout
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
 // Logout (all roles)
 Route::post('/logout', function () {
     session()->flush();
@@ -166,8 +194,10 @@ Route::prefix('dentist')->group(function () {
             return redirect('/login');
         }
 
-        $today = \Carbon\Carbon::today()->toDateString();
+        $now   = \Carbon\Carbon::now();
+        $today = $now->toDateString();
 
+        // ── Today's appointments ──────────────────────────────────────────────
         $todayAppointments = \App\Models\Appointment::with('patient')
             ->whereDate('appointment_date', $today)
             ->whereIn('status', ['pending', 'confirmed'])
@@ -180,48 +210,70 @@ Route::prefix('dentist')->group(function () {
             ->pluck('count', 'appointment_date')
             ->toArray();
 
-        $philippineHolidays = [
-            // 2026 Regular Holidays
-            '2026-01-01' => "New Year's Day",
-            '2026-04-02' => 'Maundy Thursday',
-            '2026-04-03' => 'Good Friday',
-            '2026-04-04' => 'Black Saturday',
-            '2026-04-09' => 'Araw ng Kagitingan',
-            '2026-05-01' => 'Labor Day',
-            '2026-06-12' => 'Independence Day',
-            '2026-08-31' => 'National Heroes Day',
-            '2026-11-30' => 'Bonifacio Day',
-            '2026-12-25' => 'Christmas Day',
-            '2026-12-30' => 'Rizal Day',
+        // ── KPI: Dental Cases this month ──────────────────────────────────────
+        $dentalCasesThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
+            ->whereMonth('appointment_date', $now->month)
+            ->where('status', 'completed')
+            ->count();
 
-            // 2026 Special Non-Working Holidays
-            '2026-02-25' => 'EDSA People Power Revolution Anniversary',
-            '2026-08-21' => 'Ninoy Aquino Day',
-            '2026-11-01' => "All Saints' Day",
-            '2026-11-02' => "All Souls' Day",
-            '2026-12-08' => 'Feast of the Immaculate Conception',
-            '2026-12-24' => 'Christmas Eve',
-            '2026-12-31' => "New Year's Eve",
+        $lastMonth = $now->copy()->subMonth();
+        $dentalCasesLastMonth = \App\Models\Appointment::whereYear('appointment_date', $lastMonth->year)
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->where('status', 'completed')
+            ->count();
 
-            // 2025 (for backward calendar navigation)
-            '2025-01-01' => "New Year's Day",
-            '2025-04-17' => 'Maundy Thursday',
-            '2025-04-18' => 'Good Friday',
-            '2025-04-19' => 'Black Saturday',
-            '2025-04-09' => 'Araw ng Kagitingan',
-            '2025-05-01' => 'Labor Day',
-            '2025-06-12' => 'Independence Day',
-            '2025-08-25' => 'National Heroes Day',
-            '2025-11-30' => 'Bonifacio Day',
-            '2025-12-25' => 'Christmas Day',
-            '2025-12-30' => 'Rizal Day',
-            '2025-08-21' => 'Ninoy Aquino Day',
-            '2025-11-01' => "All Saints' Day",
-            '2025-11-02' => "All Souls' Day",
-            '2025-12-08' => 'Feast of the Immaculate Conception',
-            '2025-12-24' => 'Christmas Eve',
-            '2025-12-31' => "New Year's Eve",
-        ];
+        $dentalCasesDelta = $dentalCasesLastMonth > 0
+            ? round((($dentalCasesThisMonth - $dentalCasesLastMonth) / $dentalCasesLastMonth) * 100)
+            : null;
+
+        // ── KPI: Total Appointments this month ───────────────────────────────
+        $totalApptsThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
+            ->whereMonth('appointment_date', $now->month)
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->count();
+
+        $totalApptsLastMonth = \App\Models\Appointment::whereYear('appointment_date', $lastMonth->year)
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->count();
+
+        $totalApptsDelta = $totalApptsLastMonth > 0
+            ? round((($totalApptsThisMonth - $totalApptsLastMonth) / $totalApptsLastMonth) * 100)
+            : null;
+
+        // ── Inventory tables ──────────────────────────────────────────────────
+        $medicalSupplies = \Illuminate\Support\Facades\DB::table('inventory_items')
+            ->where('category', 'Supplies')
+            ->orderByRaw('(qty - used) ASC')
+            ->limit(3)
+            ->get();
+
+        $medicineSupplies = \Illuminate\Support\Facades\DB::table('inventory_items')
+            ->where('category', 'Medicine')
+            ->orderByRaw('(qty - used) ASC')
+            ->limit(3)
+            ->get();
+
+        // ── GAD chart ─────────────────────────────────────────────────────────
+        $gadRaw = \Illuminate\Support\Facades\DB::table('daily_treatment_records')
+            ->whereYear('treatment_date', $now->year)
+            ->whereMonth('treatment_date', $now->month)
+            ->select('office_type', 'gender', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+            ->groupBy('office_type', 'gender')
+            ->get();
+
+        $gadLabels = ['Student', 'Administrative', 'Faculty', 'Dependent'];
+        $gadFemale = [];
+        $gadMale   = [];
+        foreach ($gadLabels as $label) {
+            $key       = $label === 'Student' ? null : $label;
+            $gadFemale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Female')->sum('total');
+            $gadMale[]   = (int) $gadRaw->where('office_type', $key)->where('gender', 'Male')->sum('total');
+        }
+
+        // ── Philippine Holidays — dynamic for any year ────────────────────────
+        // Covers current year ± 1 so the calendar works when navigating months.
+        $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
 
         $notifications = collect([]);
 
@@ -229,7 +281,16 @@ Route::prefix('dentist')->group(function () {
             'todayAppointments',
             'appointmentCountsPerDay',
             'philippineHolidays',
-            'notifications'
+            'notifications',
+            'dentalCasesThisMonth',
+            'dentalCasesDelta',
+            'totalApptsThisMonth',
+            'totalApptsDelta',
+            'medicalSupplies',
+            'medicineSupplies',
+            'gadLabels',
+            'gadFemale',
+            'gadMale'
         ));
     })->name('dentist.dashboard');
 
@@ -242,6 +303,14 @@ Route::prefix('dentist')->group(function () {
 
     Route::get('/patients', [DentistPatientController::class, 'index'])
         ->name('dentist.patients');
+    Route::get('/dentist/appointments/{id}/reschedule', [AppointmentController::class, 'reschedule'])
+        ->name('dentist.appointments.reschedule');
+
+    Route::put('/dentist/appointments/{id}/reschedule', [AppointmentController::class, 'updateReschedule'])
+        ->name('dentist.appointments.reschedule.update');
+
+    Route::post('/appointments/{id}/cancel', [DentistAppointmentController::class, 'cancel'])
+        ->name('dentist.appointments.cancel');
 
     // Patient Profile Route
     /*Route::get('/patient', function () {
@@ -255,12 +324,20 @@ Route::prefix('dentist')->group(function () {
     ->name('dentist.patient.profile');
     
     // Report Page
-    Route::get('/report', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-report');
-    })->name('dentist.report');
+    Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
+        ->name('dentist.report');
+
+    Route::get('/report/gad-data', [\App\Http\Controllers\Dentist\DentistReportController::class, 'gadData'])
+        ->name('dentist.report.gad-data');
+
+    Route::get('/report/weekly-data', [\App\Http\Controllers\Dentist\DentistReportController::class, 'weeklyData'])
+        ->name('dentist.report.weekly-data');
+    // Route::get('/report', function () {
+    //     if (session('role') !== 'dentist') {
+    //         return redirect('/login');
+    //     }
+    //     return view('dentist-report');
+    // })->name('dentist.report');
 
     // Document Requests Page
     Route::get('/document-requests', function () {
@@ -286,12 +363,15 @@ Route::prefix('dentist')->group(function () {
 
 Route::prefix('report')->group(function () {
 
-    Route::get('/', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-report');
-    })->name('dentist.report');
+    Route::get('/', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
+        ->name('dentist.report');
+
+    // Route::get('/', function () {
+    //     if (session('role') !== 'dentist') {
+    //         return redirect('/login');
+    //     }
+    //     return view('dentist-report');
+    // })->name('dentist.report');
 
     // DAILY TREATMENT RECORD
     Route::get('/daily-treatment-record', function () {

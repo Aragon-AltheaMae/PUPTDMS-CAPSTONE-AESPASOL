@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dentist;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DentistAppointmentController extends Controller
 {
@@ -85,5 +86,19 @@ class DentistAppointmentController extends Controller
             'pastVisits',
             'notifications'
         ));
+    public function cancel(Request $request, $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        if (!in_array($appointment->status, ['pending', 'confirmed'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This appointment cannot be cancelled.',
+            ], 422);
+        }
+
+        $appointment->update(['status' => 'cancelled']);
+
+        return response()->json(['success' => true]);
     }
 }
