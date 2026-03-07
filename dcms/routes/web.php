@@ -339,13 +339,24 @@ Route::prefix('dentist')->group(function () {
     //     return view('dentist-report');
     // })->name('dentist.report');
 
-    // Document Requests Page
-    Route::get('/document-requests', function () {
-        if (session('role') !== 'dentist') {
-            return redirect('/login');
-        }
-        return view('dentist-documentrequests');
-    })->name('dentist.documentrequests');
+    // Document Requests – list page
+    Route::get('/document-requests', [DocumentRequestController::class, 'dentistIndex'])
+        ->name('dentist.documentrequests');
+
+    // Approve (AJAX POST)
+    Route::post('/document-requests/{id}/approve', [DocumentRequestController::class, 'approve'])
+        ->name('dentist.documentrequests.approve');
+
+    // Reject (AJAX POST)
+    Route::post('/document-requests/{id}/reject', [DocumentRequestController::class, 'reject'])
+        ->name('dentist.documentrequests.reject');
+
+    Route::get('/document-requests/data', [DocumentRequestController::class, 'dentistData'])
+        ->name('dentist.documentrequests.data');
+
+    // Generate (AJAX POST)
+    Route::post('/document-requests/generate', [DocumentRequestController::class, 'generate'])
+        ->name('dentist.documentrequests.generate');
 
     // View Odontogram Page
     Route::get('/dentist/view-odontogram', function () {
