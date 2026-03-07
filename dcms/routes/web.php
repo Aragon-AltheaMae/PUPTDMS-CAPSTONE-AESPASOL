@@ -200,11 +200,11 @@ Route::prefix('dentist')->group(function () {
         // ── Today's appointments ──────────────────────────────────────────────
         $todayAppointments = \App\Models\Appointment::with('patient')
             ->whereDate('appointment_date', $today)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -229,7 +229,7 @@ Route::prefix('dentist')->group(function () {
         // ── KPI: Total Appointments this month ───────────────────────────────
         $totalApptsThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
             ->whereMonth('appointment_date', $now->month)
-            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->whereIn('status', ['upcoming', 'rescheduled', 'completed', 'cancelled'])
             ->count();
 
         $totalApptsLastMonth = \App\Models\Appointment::whereYear('appointment_date', $lastMonth->year)
@@ -321,8 +321,8 @@ Route::prefix('dentist')->group(function () {
     })->name('dentist.patient.profile');*/
 
     Route::get('/patients/{patient}/profile', [DentistPatientController::class, 'profile'])
-    ->name('dentist.patient.profile');
-    
+        ->name('dentist.patient.profile');
+
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
         ->name('dentist.report');

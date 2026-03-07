@@ -1072,14 +1072,14 @@
         use Carbon\Carbon;
         $today = Carbon::today()->toDateString();
         $appts = ($appointments instanceof \Illuminate\Pagination\AbstractPaginator)
-        ? collect($appointments->items()) : collect($appointments);
+            ? collect($appointments->items()) : collect($appointments);
 
-        $todayCount = $appts->filter(fn($a) => $a->appointment_date === $today && !in_array(strtolower($a->status ?? ''), ['cancelled','completed']))->count();
-        $upcomingCount = $appts->filter(fn($a) => $a->appointment_date > $today && in_array(strtolower($a->status ?? ''), ['pending','confirmed']))->count();
-        $rescheduledCount= $appts->filter(fn($a) => strtolower($a->status ?? '') === 'rescheduled')->count();
-        $cancelledCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'cancelled')->count();
-        $completedCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'completed')->count();
-        $allCount = $appts->count();
+        $todayCount       = $todayCount      ?? 0;
+        $upcomingCount    = $upcomingCount   ?? 0;
+        $rescheduledCount = $rescheduledCount ?? 0;
+        $cancelledCount   = $cancelledCount  ?? 0;
+        $completedCount   = $completedCount  ?? 0;
+        $allCount         = $allCount        ?? 0;
         @endphp
 
         <!-- Title + Search / Filter -->
@@ -1232,7 +1232,7 @@
                 $isCompleted = $status === 'completed';
                 $isRescheduled= $status === 'rescheduled';
                 $isToday = ($appt->appointment_date === $today) && !$isCancelled && !$isCompleted;
-                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['pending','confirmed'], true);
+                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['upcoming','rescheduled','pending','confirmed'], true);
 
                 $tabClass = $isCancelled ? 'cancelled' :
                 ($isCompleted ? 'completed' :
