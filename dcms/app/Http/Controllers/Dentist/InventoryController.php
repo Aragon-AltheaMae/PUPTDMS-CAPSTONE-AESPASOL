@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dentist;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
+use App\Helpers\AuditLogger;
 
 class InventoryController extends Controller
 {
@@ -30,6 +31,12 @@ class InventoryController extends Controller
             'used' => 'required|integer|min:0',
         ]));
 
+        AuditLogger::log(
+            'create_inventory',
+            'inventory',
+            'Dentist added inventory item: ' . $request->name
+        );
+
         return response()->json(['success' => true]);
     }
 
@@ -45,12 +52,23 @@ class InventoryController extends Controller
             'used' => 'required|integer|min:0',
         ]));
 
+        AuditLogger::log(
+            'update_inventory',
+            'inventory',
+            'Dentist updated inventory item ID ' . $inventory->id
+        );
+
         return response()->json(['success' => true]);
     }
 
     public function destroy(Inventory $inventory)
     {
         $inventory->delete();
+        AuditLogger::log(
+            'delete_inventory',
+            'inventory',
+            'Dentist deleted inventory item ID ' . $inventory->id
+        );
         return response()->json(['success' => true]);
     }
 }

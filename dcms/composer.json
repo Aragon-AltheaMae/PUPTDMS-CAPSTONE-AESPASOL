@@ -29,7 +29,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/PhilippineHolidays.php"
+            "app/Helpers/PhilippineHolidays.php",
+            "app/Helpers/AuditLogger.php"
         ]
     },
     "autoload-dev": {
