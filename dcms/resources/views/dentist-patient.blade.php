@@ -75,6 +75,139 @@
       transform: scale(1);
     }
 
+    /* ── HEADER ── */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    /* Notif dropdown */
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
+    }
+
     /* ── SIDEBAR ── */
     .sidebar-link {
       display: flex;
@@ -135,18 +268,6 @@
       color: #757575;
       text-transform: uppercase;
       margin-bottom: 0.25rem;
-    }
-
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(0.95) !important;
-      pointer-events: none !important;
     }
 
     body,
@@ -852,127 +973,89 @@
 <body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
   <!-- HEADER -->
-  <div class="fixed top-0 left-0 right-0 z-50
-              bg-gradient-to-r from-[#660000] to-[#8B0000]
-              text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5"><img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" /></div>
-      <div class="w-12 rounded-full"><img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" /></div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-
-    <div class="flex items-center gap-8">
-      @php
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
-      <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">{{ $notifCount }}</span>
-          @endif
-          <i class="fa-regular fa-bell text-lg"></i>
+    <div class="header-right">
+      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
-        <div id="notifMenu" class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-             opacity-0 scale-95 pointer-events-none transition-all duration-200 ease-out origin-top-right">
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
+        <div id="notifMenu">
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:var(--red); font-size:.82rem; border-bottom:1px solid #f5e8e8;">
+            Notifications
           </div>
-          <div class="max-h-80 overflow-y-auto">
+          <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
-              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
             @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
-            </div>
+            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
       </div>
-
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="header-user">
+        <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
         <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+          <div class="header-name">Dr. Nelson Angeles</div>
+          <div class="header-role">Dentist</div>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
-           transition-all duration-300 flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
-                 hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
           <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
-
-        @php
-        $navLinks = [
-        ['route' => 'dentist.dashboard', 'icon' => 'fa-chart-line', 'label' => 'Dashboard', 'ml' => 'ml-1'],
-        ['route' => 'dentist.patients', 'icon' => 'fa-users', 'label' => 'Patients', 'ml' => 'ml-1.5'],
-        ['route' => 'dentist.appointments', 'icon' => 'fa-calendar-check', 'label' => 'Appointments', 'ml' => 'ml-1'],
-        ['route' => 'dentist.documentrequests', 'icon' => 'fa-file-circle-check', 'label' => 'Document Requests', 'ml' => 'ml-1'],
-        ['route' => 'dentist.inventory', 'icon' => 'fa-box', 'label' => 'Inventory', 'ml' => 'ml-1'],
-        ['route' => 'dentist.report', 'icon' => 'fa-file', 'label' => 'Reports', 'ml' => 'ml-1'],
-        ];
-        @endphp
-
-        @foreach($navLinks as $nav)
+        @foreach([
+        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
+        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ] as $nav)
         <a href="{{ route($nav['route']) }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                 {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                       {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 {{ $nav['ml'] }}">
-            <i class="fa-solid {{ $nav['icon'] }} text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            {{ $nav['label'] }}
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            {{ $nav['label'] }}
-          </span>
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
         </a>
         @endforeach
-
       </nav>
     </div>
-
     <div class="px-3 pb-5 space-y-4">
       <div class="section-label">Settings</div>
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-            <i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-            <i class="fa-regular fa-moon"></i></button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
-                       text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
-            <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          </div>
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
           <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
           <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
         </button>
@@ -991,18 +1074,18 @@
         $appts = ($appointments instanceof \Illuminate\Pagination\AbstractPaginator)
         ? collect($appointments->items()) : collect($appointments);
 
-        $todayCount = $appts->filter(fn($a) => $a->appointment_date === $today && !in_array(strtolower($a->status ?? ''), ['cancelled','completed']))->count();
-        $upcomingCount = $appts->filter(fn($a) => $a->appointment_date > $today && in_array(strtolower($a->status ?? ''), ['pending','confirmed']))->count();
-        $rescheduledCount= $appts->filter(fn($a) => strtolower($a->status ?? '') === 'rescheduled')->count();
-        $cancelledCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'cancelled')->count();
-        $completedCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'completed')->count();
-        $allCount = $appts->count();
+        $todayCount = $todayCount ?? 0;
+        $upcomingCount = $upcomingCount ?? 0;
+        $rescheduledCount = $rescheduledCount ?? 0;
+        $cancelledCount = $cancelledCount ?? 0;
+        $completedCount = $completedCount ?? 0;
+        $allCount = $allCount ?? 0;
         @endphp
 
         <!-- Title + Search / Filter -->
         <div class="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
           <div class="mb-2">
-            <h2 class="text-2xl font-extrabold text-[#660000]">Patient List</h2>
+            <h2 class="text-2xl font-bold text-[#660000]">Patient List</h2>
             <p class="text-gray-500 mt-1 text-sm">Click to Access Patient Information</p>
 
             <!-- Page summary tags -->
@@ -1149,7 +1232,7 @@
                 $isCompleted = $status === 'completed';
                 $isRescheduled= $status === 'rescheduled';
                 $isToday = ($appt->appointment_date === $today) && !$isCancelled && !$isCompleted;
-                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['pending','confirmed'], true);
+                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['upcoming','rescheduled','pending','confirmed'], true);
 
                 $tabClass = $isCancelled ? 'cancelled' :
                 ($isCompleted ? 'completed' :
@@ -1162,11 +1245,6 @@
                 $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                 $serviceLabel = ($appt->service_type === 'Others')
                 ? ($appt->other_services ?: 'Others') : $appt->service_type;
-
-                $nameParts = explode(' ', trim($patientName));
-                $initials = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
-                $avatarColors = ['#8B0000','#1565C0','#2E7D32','#E65100','#6A1B9A','#00695C','#AD1457'];
-                $avatarColor = $avatarColors[crc32($patientName) % count($avatarColors)];
 
                 $accentClass = $isCancelled ? 'accent-cancelled' :
                 ($isCompleted ? 'accent-completed' :
@@ -1181,28 +1259,25 @@
                 $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? 'Upcoming · '.ucfirst($status) : ucfirst($status ?: 'Pending')))));
                 @endphp
 
-                <a href="{{ route('dentist.patient.profile') }}"
+                <a href="{{ route('dentist.patient.profile', ['patient' => $appt->patient_id]) }}"
                   class="patient-card patient-item all {{ $tabClass }} block">
+
                   <div class="accent-bar {{ $accentClass }}"></div>
                   <div class="flex items-center gap-5 px-8 py-4 pl-10">
 
-                    <!-- Avatar with initials fallback -->
+                    <!-- Avatar -->
                     <div class="relative flex-shrink-0">
-                      <img src="https://i.pravatar.cc/80?u={{ $appt->patient_id }}"
+                      <img
+                        src="{{ $appt->patient->profile_image ? asset('storage/'.$appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
                         class="w-14 h-14 rounded-2xl object-cover shadow-sm border-2 border-gray-100"
-                        alt="{{ $patientName }}"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                      <div class="avatar-initials w-14 h-14 rounded-2xl hidden"
-                        style="background: {{ $avatarColor }}; display: none;">
-                        {{ $initials }}
-                      </div>
+                        alt="{{ $patientName }}" />
                     </div>
 
                     <!-- Name + ID -->
                     <div class="w-44 flex-shrink-0">
                       <p class="font-semibold text-[#1a1a1a] text-sm leading-tight">{{ $patientName }}</p>
                       <span class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-gray-100
-                                     text-gray-500 text-[11px] font-medium">
+                       text-gray-500 text-[11px] font-medium">
                         ID #{{ $appt->patient_id }}
                       </span>
                       <span class="patient-info hidden">N/A|N/A|N/A|{{ $appt->appointment_date }}|N/A</span>
@@ -1257,25 +1332,26 @@
                 @endforelse
 
               </div>
-
-              <!-- Pagination -->
-              <div id="pagination" class="flex items-center justify-center gap-4 py-6 text-sm text-gray-600 border-t border-gray-100">
-                <button id="prevPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-300 cursor-not-allowed" disabled>
-                  <span>‹</span> Previous
-                </button>
-                <div id="pageNumbers" class="flex items-center gap-2"></div>
-                <button id="nextPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#8B0000] hover:bg-[#8B0000]/5 transition">
-                  Next <span>›</span>
-                </button>
-              </div>
-
             </div>
-            <!-- /patient container -->
+
+            <!-- Pagination -->
+            <div id="pagination" class="flex items-center justify-center gap-4 py-6 text-sm text-gray-600 border-t border-gray-100">
+              <button id="prevPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-300 cursor-not-allowed" disabled>
+                <span>‹</span> Previous
+              </button>
+              <div id="pageNumbers" class="flex items-center gap-2"></div>
+              <button id="nextPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#8B0000] hover:bg-[#8B0000]/5 transition">
+                Next <span>›</span>
+              </button>
+            </div>
 
           </div>
-        </div>
+          <!-- /patient container -->
 
+        </div>
       </div>
+
+    </div>
     </div>
     <div class="pb-24"></div>
   </main>
@@ -1469,44 +1545,12 @@
       applyLayout('220px');
     });
 
-    // NOTIFICATION
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("notifBtn");
-      const menu = document.getElementById("notifMenu");
-
-      let isOpen = false;
-
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
-
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      menu.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      document.addEventListener("click", () => {
-        if (isOpen) closeMenu();
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen) closeMenu();
-      });
-
-      closeMenu();
+    /* ── NOTIF TOGGLE ── */
+    document.getElementById("notifBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("notifMenu").classList.toggle("open");
     });
+    document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
 
     /* TAB ACTIVE STATE */
     document.querySelectorAll('.filter-btn').forEach(btn => {

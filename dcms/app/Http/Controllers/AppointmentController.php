@@ -20,18 +20,12 @@ use App\Models\Disease;
 use App\Models\MedicalHistoryDiseaseAnswer;
 
 use App\Models\Patient;
+use App\Helpers\PhilippineHolidays;
 
 class AppointmentController extends Controller
 {
     const MAX_APPOINTMENTS_PER_DAY = 5;
 
-    /* =======================
-       SHOW PATIENT APPOINTMENTS
-       - Provides:
-         $appointments   (for calendar dots)
-         $futureVisits   (for Future Visits tab)
-         $pastVisits     (for Past Visits tab)
-    ======================= */
     public function index()
     {
         $patientId = session('patient_id');
@@ -42,21 +36,17 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // Use server time
         $now = now();
         $today = $now->toDateString();
         $nowTime = $now->format('H:i:s');
 
-        // For calendar: show ALL of this patient's appointments
         $appointments = Appointment::where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // ✅ FUTURE VISITS:
-        // pending/confirmed AND (date > today OR (date == today AND time >= now))
         $futureVisits = Appointment::where('patient_id', $patientId)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereDate('appointment_date', '>', $today)
                     ->orWhere(function ($q2) use ($today, $nowTime) {
@@ -68,8 +58,6 @@ class AppointmentController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // ✅ PAST VISITS:
-        // completed/cancelled OR already passed datetime (even if still pending)
         $pastVisits = Appointment::where('patient_id', $patientId)
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereIn('status', ['completed', 'cancelled'])
@@ -83,7 +71,6 @@ class AppointmentController extends Controller
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        // Patient-based histories (since you save by patient_id)
         $patient->load([
             'dentalHistory',
             'dentalHistoryDates',
@@ -94,9 +81,7 @@ class AppointmentController extends Controller
             'medicalHistory.diseaseAnswers.disease',
         ]);
 
-        // ✅ IMPORTANT:
-        // Availability should only count pending/confirmed
-        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -104,12 +89,8 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        // Holidays (5 years)
-        $currentYear = now()->year;
-        $philippineHolidays = [];
-        for ($year = $currentYear; $year <= $currentYear + 4; $year++) {
-            $philippineHolidays = array_merge($philippineHolidays, $this->getPhilippineHolidays($year));
-        }
+        // ✅ REPLACE: Use PhilippineHolidays helper
+        $philippineHolidays = PhilippineHolidays::range(1, 3);
 
         $notifications = [];
 
@@ -125,9 +106,6 @@ class AppointmentController extends Controller
         ));
     }
 
-    /* =======================
-       SHOW BOOKING FORM
-    ======================= */
     public function create()
     {
         $patientId = session('patient_id');
@@ -138,15 +116,13 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // ✅ counts should only include pending/confirmed
-        $appointmentCountsPerDay = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
-        // ✅ counts per slot should only include pending/confirmed
-        $appointmentCountsPerSlot = Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
             ->groupBy('appointment_date', 'appointment_time')
             ->get()
@@ -158,11 +134,8 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        $currentYear = now()->year;
-        $philippineHolidays = array_merge(
-            $this->getPhilippineHolidays($currentYear),
-            $this->getPhilippineHolidays($currentYear + 1)
-        );
+        // ✅ REPLACE: Use PhilippineHolidays helper (current year + next year for booking)
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
 
         $diseases = Disease::orderBy('sort_order')->get();
 
@@ -211,9 +184,8 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid time format. Please pick a valid time slot.');
         }
 
-        // Full day check (only pending/confirmed should block)
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
 
         if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
@@ -222,10 +194,9 @@ class AppointmentController extends Controller
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
         }
 
-        // Slot check (only pending/confirmed should block)
         $timeTaken = Appointment::where('appointment_date', $request->appointment_date)
             ->where('appointment_time', $mysqlTime)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->exists();
 
         if ($timeTaken) {
@@ -247,7 +218,7 @@ class AppointmentController extends Controller
                     : null,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $mysqlTime,
-                'status'           => 'pending',
+                'status'           => 'upcoming',
             ]);
 
             // 2) DENTAL HISTORY (patient-based)
@@ -441,7 +412,7 @@ class AppointmentController extends Controller
                         [
                             'answer_bool' => null,
                             'answer_text' => null,
-                            'answer_date' => $date, 
+                            'answer_date' => $date,
                         ]
                     );
 
@@ -455,15 +426,15 @@ class AppointmentController extends Controller
                 ->whereNull('answer_date')
                 ->where(function ($q) {
                     $q->whereNull('answer_text')
-                    ->orWhereRaw("TRIM(answer_text) = ''");
+                        ->orWhereRaw("TRIM(answer_text) = ''");
                 })
                 ->delete();
 
             // 4) DISEASES (selected codes from form)
             $selectedDiseaseCodes = $request->input('diseases', []);
             $selectedDiseaseIds = Disease::whereIn('code', $selectedDiseaseCodes)
-                    ->pluck('id')
-                    ->all();
+                ->pluck('id')
+                ->all();
 
             MedicalHistoryDiseaseAnswer::where('medical_history_id', $medicalHistory->id)->delete();
 
@@ -499,35 +470,81 @@ class AppointmentController extends Controller
         return 'NO';
     }
 
-    private function getPhilippineHolidays(int $year): array
+    public function reschedule($id)
     {
-        $holidays = [
-            "$year-01-01" => "New Year's Day",
-            "$year-04-09" => "Day of Valor",
-            "$year-05-01" => "Labor Day",
-            "$year-06-12" => "Independence Day",
-            "$year-11-30" => "Bonifacio Day",
-            "$year-12-25" => "Christmas Day",
-            "$year-12-30" => "Rizal Day",
+        $appointment = Appointment::with('patient')->findOrFail($id);
 
-            "$year-02-25" => "EDSA People Power Anniversary",
-            "$year-08-21" => "Ninoy Aquino Day",
-            "$year-11-01" => "All Saints' Day",
-            "$year-11-02" => "All Souls' Day",
-            "$year-12-08" => "Feast of the Immaculate Conception",
-            "$year-12-24" => "Christmas Eve",
-            "$year-12-31" => "New Year's Eve",
-        ];
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
 
-        $easter = Carbon::createFromTimestamp(easter_date($year));
-        $holidays[$easter->copy()->subDays(4)->format('Y-m-d')] = 'Holy Wednesday';
-        $holidays[$easter->copy()->subDays(3)->format('Y-m-d')] = 'Maundy Thursday';
-        $holidays[$easter->copy()->subDays(2)->format('Y-m-d')] = 'Good Friday';
-        $holidays[$easter->copy()->subDays(1)->format('Y-m-d')] = 'Black Saturday';
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('DATE(appointment_date) as date, appointment_time, COUNT(*) as count')
+            ->groupBy('date', 'appointment_time')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->date;
+            })
+            ->map(function ($group) {
+                return $group->pluck('count', 'appointment_time')->toArray();
+            })
+            ->toArray();
 
-        $lastMondayAug = Carbon::create($year, 8, 31)->modify('last monday');
-        $holidays[$lastMondayAug->format('Y-m-d')] = 'National Heroes Day';
+        $unavailableDates = [];
 
-        return $holidays;
+        $philippineHolidays = PhilippineHolidays::current();
+
+        return view('dentist-reschedule', compact(
+            'appointment',
+            'appointmentCountsPerDay',
+            'appointmentCountsPerSlot',
+            'unavailableDates',
+            'philippineHolidays'
+        ));
+    }
+
+    /**
+     * Update the rescheduled appointment
+     */
+    public function updateReschedule(Request $request, $id)
+    {
+        $request->validate([
+            'new_appointment_date' => 'required|date|after_or_equal:today',
+            'new_appointment_time' => 'required',
+            'service_type' => 'required|string',
+        ]);
+
+        $appointment = Appointment::findOrFail($id);
+
+        try {
+            $mysqlTime = $this->toMysqlTime($request->new_appointment_time);
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Invalid time format. Please pick a valid time slot.');
+        }
+
+        $slotTaken = Appointment::where('appointment_date', $request->new_appointment_date)
+            ->where('appointment_time', $mysqlTime)
+            ->where('id', '!=', $id)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->exists();
+
+        if ($slotTaken) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sorry, that time slot is already taken. Please choose another time.');
+        }
+
+        $appointment->update([
+            'appointment_date' => $request->new_appointment_date,
+            'appointment_time' => $mysqlTime,
+            'service_type' => $request->service_type,
+            'status' => 'rescheduled',
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }

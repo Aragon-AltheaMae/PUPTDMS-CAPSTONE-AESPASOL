@@ -48,4 +48,9 @@ class Patient extends Authenticatable
     {
         return $this->hasOne(\App\Models\MedicalHistory::class);
     }
+
+     public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'patient_id');
+    }
 }
