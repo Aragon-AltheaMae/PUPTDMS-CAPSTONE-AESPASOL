@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\Patient;
-
+use App\Helpers\AuditLogger;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dentist\InventoryController;
 use App\Http\Controllers\DocumentRequestController;
@@ -18,6 +18,8 @@ use App\Http\Controllers\Dentist\DentistAppointmentController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Helpers\PhilippineHolidays;
+use App\Http\Controllers\Admin\SystemLogController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +65,8 @@ Route::post('/register', function (Request $request) {
         'password' => 'required|string|min:6|confirmed',
     ]);
 
+    
+
     Patient::create([
         'name' => $request->name,
         'email' => $request->email,
@@ -86,6 +90,12 @@ Route::post('/login', function (Request $request) {
             'email' => $patient->email,
         ]);
 
+        AuditLogger::log(
+            'login',
+            'authentication',
+            'Patient logged into the system'
+        );
+
         return redirect()->route('homepage');
     }
 
@@ -100,6 +110,12 @@ Route::post('/dentist/login', function (Request $request) {
             'dentist_email' => 'dentist',
         ]);
 
+        AuditLogger::log(
+            'login',
+            'authentication',
+            'Dentist logged into the system'
+        );
+
         return redirect()->route('dentist.dashboard');
     }
 
@@ -111,6 +127,12 @@ Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.
 
 // Logout (all roles)
 Route::post('/logout', function () {
+    AuditLogger::log(
+        'logout',
+        'authentication',
+        'User logged out of the system'
+    );
+
     session()->flush();
     Auth::logout();
 
@@ -145,6 +167,9 @@ Route::prefix('admin')->group(function () {
 
     Route::post('/role-permissions/reset', [RolePermissionController::class, 'reset'])
         ->name('admin.role_permissions.reset');
+
+    Route::get('/system-logs', [SystemLogController::class, 'index'])
+    ->name('admin.system_logs');
 });
 
 
@@ -362,8 +387,6 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.patient.profile');
 
-    // Reports
-        ->name('dentist.patient.profile');
 
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
@@ -433,6 +456,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])
         ->middleware('permission:manage_inventory')
         ->name('dentist.inventory.destroy');
+
 });
 
 
