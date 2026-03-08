@@ -521,10 +521,7 @@
       <!-- GREETING -->
       <div class="flex justify-between items-center mb-6">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
-            <p id="currentDate" class="text-sm text-[#757575]"></p>
-          </div>
+          <div class="flex items-center gap-2 mb-1"></div>
           <h1 class="text-4xl font-extrabold mb-8 flex items-center gap-3 fade-in">
             <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
               Good Morning, <span id="dentistName"></span>
@@ -543,7 +540,7 @@
       </div>
 
       <!-- KPI CARDS -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
 
         {{-- KPI 1: Dental Cases (real data) --}}
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#660000] text-white p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
@@ -616,7 +613,31 @@
           <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-red-50/50"></div>
         </div>
 
-        {{-- KPI 4: Clinic Status (unchanged) --}}
+        {{-- KPI 4: Live Clock --}}
+        <div class="relative overflow-hidden rounded-2xl p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+             style="background: linear-gradient(135deg, #7b0c0c 0%, #4a0606 100%);">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest opacity-60 mb-2 text-white flex items-center gap-1.5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse flex-shrink-0"></span>
+                Live Time
+              </p>
+              <p class="leading-none text-white">
+                <span id="kpi-clock-hhmm" class="text-3xl font-extrabold tracking-tight" style="font-variant-numeric:tabular-nums;">12:00</span><span id="kpi-clock-ss" class="text-xl font-semibold opacity-50" style="font-variant-numeric:tabular-nums;">:00</span><span id="kpi-clock-ampm" class="text-xs font-bold opacity-60 ml-1 align-super">AM</span>
+              </p>
+              <p class="text-xs mt-2 text-white opacity-60 flex items-center gap-1.5">
+                <i id="kpi-clock-dayicon" class="fa-solid fa-sun text-yellow-300 text-xs flex-shrink-0"></i>
+                <span id="kpi-clock-date"></span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+              <i id="kpi-clock-icon" class="fa-solid fa-sun text-yellow-300 text-lg"></i>
+            </div>
+          </div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-white/5"></div>
+        </div>
+
+        {{-- KPI 5: Clinic Status (unchanged) --}}
         <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
           <div class="flex items-start justify-between">
             <div>
@@ -633,7 +654,7 @@
           </button>
           <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-green-50/50"></div>
         </div>
-
+        
       </div>
 
       <!-- ROW 2: CALENDAR + SCHEDULE -->
@@ -888,6 +909,50 @@
     const GAD_LABELS = {!! json_encode($gadLabels ?? ['Student', 'Administrative', 'Faculty', 'Dependent']) !!};
     const GAD_FEMALE = {!! json_encode($gadFemale ?? [0, 0, 0, 0]) !!};
     const GAD_MALE = {!! json_encode($gadMale ?? [0, 0, 0, 0]) !!};
+
+    // ── Live Clock ────────────────────────────────────────────────────────────
+    (function () {
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      
+      function tickClock() {
+        const now = new Date();
+        let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+        
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const isDaytime = ampm === 'AM';
+        
+        const displayHour = h % 12 || 12;
+
+        document.getElementById('kpi-clock-hhmm').textContent = 
+          String(displayHour).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+
+        document.getElementById('kpi-clock-ss').textContent = 
+          ':' + String(s).padStart(2,'0');
+
+        document.getElementById('kpi-clock-ampm').textContent = ampm;
+
+        document.getElementById('kpi-clock-date').textContent = 
+          days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+
+        const dayicon = document.getElementById('kpi-clock-dayicon');
+        const bigicon = document.getElementById('kpi-clock-icon');
+
+        dayicon.className = isDaytime
+          ? 'fa-solid fa-sun text-xs flex-shrink-0' 
+          : 'fa-solid fa-moon text-xs flex-shrink-0';
+
+        dayicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
+
+        bigicon.className = isDaytime 
+        ? 'fa-solid fa-sun text-lg' 
+        : 'fa-solid fa-moon text-lg';
+
+        bigicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
+      }
+      tickClock();
+      setInterval(tickClock, 1000);
+    })();
     
     // ── Theme & Sidebar ──────────────────────────────────────────────────────
     const html = document.documentElement;
@@ -937,12 +1002,12 @@
 
     // ── Greeting ─────────────────────────────────────────────────────────────
     document.getElementById("dentistName").textContent = "Dr. Nelson!";
-    document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    // document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", {
+    //   weekday: "long",
+    //   year: "numeric",
+    //   month: "long",
+    //   day: "numeric"
+    // });
     (function() {
       const h = new Date().getHours();
       const greeting = h < 12 ? 'Good Morning,' : h < 18 ? 'Good Afternoon,' : 'Good Evening,';
