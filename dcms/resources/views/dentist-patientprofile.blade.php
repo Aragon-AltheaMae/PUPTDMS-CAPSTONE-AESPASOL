@@ -156,10 +156,10 @@
             <div>
               <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Last Visit</p>
               <p class="text-2xl font-bold text-gray-500 leading-tight">
-                {{ $lastVisit ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('M d') : 'No Existing Appointments' }}
+                {{ $lastVisit?->appointment_date ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('M d') : 'No Existing Appointments' }}
               </p>
               <p class="text-[11px] text-gray-400">
-                {{ $lastVisit ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('Y') . ' · ' . ($lastVisit->service_type ?? $lastVisit->service ?? 'Visit') : 'No visit yet' }}
+                {{ $lastVisit?->appointment_date ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('Y') . ' · ' . ($lastVisit->service_type ?? 'Visit') : 'No visit yet' }}
               </p>
             </div>
           </div>
@@ -172,10 +172,10 @@
             <div>
               <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Next Appointment</p>
               <p class="text-2xl font-bold text-gray-900 leading-tight">
-                {{ $nextAppointment ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('M d') : 'No Existing Appointments' }}
+                {{ $nextAppointment?->appointment_date ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('M d') : 'No Existing Appointments' }}
               </p>
               <p class="text-[11px] text-gray-400">
-                {{ $nextAppointment ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('Y') . ' · ' . ($nextAppointment->service_type ?? $nextAppointment->service ?? 'Appointment') : 'No upcoming appointment' }}
+                {{ $nextAppointment?->appointment_date ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('Y') . ' · ' . ($nextAppointment->service_type ?? 'Appointment') : 'No upcoming appointment' }}
               </p>
             </div>
           </div>
@@ -458,55 +458,55 @@
 
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
- <script>
-  function showFuture() {
-    document.getElementById('futureContent').classList.remove('hidden');
-    document.getElementById('pastContent').classList.add('hidden');
+  <script>
+    function showFuture() {
+      document.getElementById('futureContent').classList.remove('hidden');
+      document.getElementById('pastContent').classList.add('hidden');
 
-    document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
-    document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
+      document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
 
-    document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
-    document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
-  }
-
-  function showPast() {
-    document.getElementById('pastContent').classList.remove('hidden');
-    document.getElementById('futureContent').classList.add('hidden');
-
-    document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
-    document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
-
-    document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
-    document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
-  }
-
-  function openStartModal() {
-    document.getElementById('startModal').classList.remove('hidden');
-  }
-
-  function closeStartModal() {
-    document.getElementById('startModal').classList.add('hidden');
-  }
-
-  function confirmStart() {
-    closeStartModal();
-
-    // temporary behavior
-    alert('Procedure started successfully.');
-  }
-
-  // close modal when clicking outside the modal box
-  document.getElementById('startModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeStartModal();
+      document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
     }
-  });
 
-  // optional: press ESC to close modal
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeStartModal();
+    function showPast() {
+      document.getElementById('pastContent').classList.remove('hidden');
+      document.getElementById('futureContent').classList.add('hidden');
+
+      document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
+
+      document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
     }
-  });
-</script>
+
+    function openStartModal() {
+      document.getElementById('startModal').classList.remove('hidden');
+    }
+
+    function closeStartModal() {
+      document.getElementById('startModal').classList.add('hidden');
+    }
+
+    function confirmStart() {
+      closeStartModal();
+
+      // temporary behavior
+      alert('Procedure started successfully.');
+    }
+
+    // close modal when clicking outside the modal box
+    document.getElementById('startModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeStartModal();
+      }
+    });
+
+    // optional: press ESC to close modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeStartModal();
+      }
+    });
+  </script>
