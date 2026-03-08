@@ -20,22 +20,26 @@ class DentistAppointmentController extends Controller
 
         // Fetch all appointments with patient info
         $appointments = Appointment::with('patient')
-            ->whereDate('appointment_date', '>=', $today)  
+            ->whereDate('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
         // Upcoming appointments (today and future) + statuses you consider upcoming
         $upcomingAppointments = $appointments->filter(function ($a) use ($today) {
-            return in_array($a->status, ['pending', 'confirmed', 'rescheduled'], true)
+            return in_array($a->status, ['upcoming', 'rescheduled'], true)
                 && $a->appointment_date >= $today;
         })->values();
 
         // Past appointments (completed/cancelled OR date already passed)
-        $pastAppointments = $appointments->filter(function ($a) use ($today) {
-            return in_array($a->status, ['completed', 'cancelled'], true)
-                || $a->appointment_date < $today;
-        })->values();
+        $pastAppointments = Appointment::with('patient')
+            ->where(function ($q) use ($today) {
+                $q->whereIn('status', ['completed', 'cancelled'])
+                    ->orWhereDate('appointment_date', '<', $today);
+            })
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
 
         $notifications = collect($notifications ?? []);
 
@@ -87,12 +91,12 @@ class DentistAppointmentController extends Controller
             'notifications'
         ));
     }
-    
+
     public function cancel(Request $request, $id)
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!in_array($appointment->status, ['pending', 'confirmed'])) {
+        if (!in_array($appointment->status, ['upcoming', 'rescheduled', 'pending', 'confirmed'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'This appointment cannot be cancelled.',

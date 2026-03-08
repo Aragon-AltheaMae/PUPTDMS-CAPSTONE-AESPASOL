@@ -1014,7 +1014,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -1074,12 +1074,12 @@
         $appts = ($appointments instanceof \Illuminate\Pagination\AbstractPaginator)
         ? collect($appointments->items()) : collect($appointments);
 
-        $todayCount = $appts->filter(fn($a) => $a->appointment_date === $today && !in_array(strtolower($a->status ?? ''), ['cancelled','completed']))->count();
-        $upcomingCount = $appts->filter(fn($a) => $a->appointment_date > $today && in_array(strtolower($a->status ?? ''), ['pending','confirmed']))->count();
-        $rescheduledCount= $appts->filter(fn($a) => strtolower($a->status ?? '') === 'rescheduled')->count();
-        $cancelledCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'cancelled')->count();
-        $completedCount = $appts->filter(fn($a) => strtolower($a->status ?? '') === 'completed')->count();
-        $allCount = $appts->count();
+        $todayCount = $todayCount ?? 0;
+        $upcomingCount = $upcomingCount ?? 0;
+        $rescheduledCount = $rescheduledCount ?? 0;
+        $cancelledCount = $cancelledCount ?? 0;
+        $completedCount = $completedCount ?? 0;
+        $allCount = $allCount ?? 0;
         @endphp
 
         <!-- Title + Search / Filter -->
@@ -1232,7 +1232,7 @@
                 $isCompleted = $status === 'completed';
                 $isRescheduled= $status === 'rescheduled';
                 $isToday = ($appt->appointment_date === $today) && !$isCancelled && !$isCompleted;
-                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['pending','confirmed'], true);
+                $isUpcoming = ($appt->appointment_date > $today) && in_array($status, ['upcoming','rescheduled','pending','confirmed'], true);
 
                 $tabClass = $isCancelled ? 'cancelled' :
                 ($isCompleted ? 'completed' :
@@ -1245,11 +1245,6 @@
                 $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                 $serviceLabel = ($appt->service_type === 'Others')
                 ? ($appt->other_services ?: 'Others') : $appt->service_type;
-
-                $nameParts = explode(' ', trim($patientName));
-                $initials = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
-                $avatarColors = ['#8B0000','#1565C0','#2E7D32','#E65100','#6A1B9A','#00695C','#AD1457'];
-                $avatarColor = $avatarColors[crc32($patientName) % count($avatarColors)];
 
                 $accentClass = $isCancelled ? 'accent-cancelled' :
                 ($isCompleted ? 'accent-completed' :
@@ -1270,23 +1265,19 @@
                   <div class="accent-bar {{ $accentClass }}"></div>
                   <div class="flex items-center gap-5 px-8 py-4 pl-10">
 
-                    <!-- Avatar with initials fallback -->
+                    <!-- Avatar -->
                     <div class="relative flex-shrink-0">
-                      <img src="https://i.pravatar.cc/80?u={{ $appt->patient_id }}"
+                      <img
+                        src="{{ $appt->patient->profile_image ? asset('storage/'.$appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
                         class="w-14 h-14 rounded-2xl object-cover shadow-sm border-2 border-gray-100"
-                        alt="{{ $patientName }}"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                      <div class="avatar-initials w-14 h-14 rounded-2xl hidden"
-                        style="background: {{ $avatarColor }}; display: none;">
-                        {{ $initials }}
-                      </div>
+                        alt="{{ $patientName }}" />
                     </div>
 
                     <!-- Name + ID -->
                     <div class="w-44 flex-shrink-0">
                       <p class="font-semibold text-[#1a1a1a] text-sm leading-tight">{{ $patientName }}</p>
                       <span class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-gray-100
-                                     text-gray-500 text-[11px] font-medium">
+                       text-gray-500 text-[11px] font-medium">
                         ID #{{ $appt->patient_id }}
                       </span>
                       <span class="patient-info hidden">N/A|N/A|N/A|{{ $appt->appointment_date }}|N/A</span>
@@ -1341,25 +1332,26 @@
                 @endforelse
 
               </div>
-
-              <!-- Pagination -->
-              <div id="pagination" class="flex items-center justify-center gap-4 py-6 text-sm text-gray-600 border-t border-gray-100">
-                <button id="prevPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-300 cursor-not-allowed" disabled>
-                  <span>‹</span> Previous
-                </button>
-                <div id="pageNumbers" class="flex items-center gap-2"></div>
-                <button id="nextPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#8B0000] hover:bg-[#8B0000]/5 transition">
-                  Next <span>›</span>
-                </button>
-              </div>
-
             </div>
-            <!-- /patient container -->
+
+            <!-- Pagination -->
+            <div id="pagination" class="flex items-center justify-center gap-4 py-6 text-sm text-gray-600 border-t border-gray-100">
+              <button id="prevPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-300 cursor-not-allowed" disabled>
+                <span>‹</span> Previous
+              </button>
+              <div id="pageNumbers" class="flex items-center gap-2"></div>
+              <button id="nextPage" class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#8B0000] hover:bg-[#8B0000]/5 transition">
+                Next <span>›</span>
+              </button>
+            </div>
 
           </div>
-        </div>
+          <!-- /patient container -->
 
+        </div>
       </div>
+
+    </div>
     </div>
     <div class="pb-24"></div>
   </main>

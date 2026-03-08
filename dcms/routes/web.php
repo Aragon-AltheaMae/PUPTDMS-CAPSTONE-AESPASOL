@@ -243,11 +243,11 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
         $todayAppointments = \App\Models\Appointment::with('patient')
             ->whereDate('appointment_date', $today)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['pending', 'confirmed'])
+        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -271,7 +271,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
         $totalApptsThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
             ->whereMonth('appointment_date', $now->month)
-            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->whereIn('status', ['upcoming', 'rescheduled', 'completed', 'cancelled'])
             ->count();
 
         $totalApptsLastMonth = \App\Models\Appointment::whereYear('appointment_date', $lastMonth->year)
@@ -363,6 +363,9 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->name('dentist.patient.profile');
 
     // Reports
+        ->name('dentist.patient.profile');
+
+    // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
         ->middleware('permission:manage_reports')
         ->name('dentist.report');
@@ -379,6 +382,31 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::get('/document-requests', function () {
         return view('dentist-documentrequests');
     })->middleware('permission:manage_document_requests')->name('dentist.documentrequests');
+    // Route::get('/report', function () {
+    //     if (session('role') !== 'dentist') {
+    //         return redirect('/login');
+    //     }
+    //     return view('dentist-report');
+    // })->name('dentist.report');
+
+    // Document Requests – list page
+    Route::get('/document-requests', [DocumentRequestController::class, 'dentistIndex'])
+        ->name('dentist.documentrequests');
+
+    // Approve (AJAX POST)
+    Route::post('/document-requests/{id}/approve', [DocumentRequestController::class, 'approve'])
+        ->name('dentist.documentrequests.approve');
+
+    // Reject (AJAX POST)
+    Route::post('/document-requests/{id}/reject', [DocumentRequestController::class, 'reject'])
+        ->name('dentist.documentrequests.reject');
+
+    Route::get('/document-requests/data', [DocumentRequestController::class, 'dentistData'])
+        ->name('dentist.documentrequests.data');
+
+    // Generate (AJAX POST)
+    Route::post('/document-requests/generate', [DocumentRequestController::class, 'generate'])
+        ->name('dentist.documentrequests.generate');
 
     // View Odontogram
     Route::get('/view-odontogram', function () {

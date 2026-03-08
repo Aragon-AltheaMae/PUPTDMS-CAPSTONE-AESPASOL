@@ -20,8 +20,8 @@ return new class extends Migration {
         $table->date('appointment_date');
         $table->time('appointment_time');
 
-        $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])
-              ->default('pending');
+        $table->enum('status', ['upcoming', 'rescheduled', 'completed', 'cancelled'])
+              ->default('upcoming');
 
         $table->unique(['patient_id', 'appointment_date', 'appointment_time']);
 

@@ -1316,7 +1316,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">

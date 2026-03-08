@@ -353,26 +353,26 @@
 <body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
   @php
-    use Carbon\Carbon;
+  use Carbon\Carbon;
 
-    // Notifications safe defaults
-    $notifications = collect($notifications ?? []);
-    $notifCount = $notifications->count();
+  // Notifications safe defaults
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
 
-    // Prepare records for safe JSON use
-    $homeRecords = ($records ?? collect())->map(function ($r) {
-      return [
-        'service' => $r->service_type,
-        'date' => $r->appointment_date ? Carbon::parse($r->appointment_date)->format('F d, Y') : '',
-        'time' => $r->appointment_time ?? '',
-        'status' => 'completed',
-        'duration' => $r->duration ?? '',
-        'remarks' => $r->remarks ?? '',
-        'oral' => $r->oral_examination ?? '',
-        'diagnosis' => $r->diagnosis ?? '',
-        'prescription' => $r->prescription ?? '',
-      ];
-    })->values();
+  // Prepare records for safe JSON use
+  $homeRecords = ($records ?? collect())->map(function ($r) {
+  return [
+  'service' => $r->service_type,
+  'date' => $r->appointment_date ? Carbon::parse($r->appointment_date)->format('F d, Y') : '',
+  'time' => $r->appointment_time ?? '',
+  'status' => 'completed',
+  'duration' => $r->duration ?? '',
+  'remarks' => $r->remarks ?? '',
+  'oral' => $r->oral_examination ?? '',
+  'diagnosis' => $r->diagnosis ?? '',
+  'prescription' => $r->prescription ?? '',
+  ];
+  })->values();
   @endphp
 
   <!-- HEADER -->
@@ -393,9 +393,9 @@
       <div id="notifDropdown" class="relative">
         <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
           @if($notifCount > 0)
-            <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-              {{ $notifCount }}
-            </span>
+          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
+            {{ $notifCount }}
+          </span>
           @endif
           <i class="fa-regular fa-bell text-lg"></i>
         </button>
@@ -410,23 +410,23 @@
 
           <div class="max-h-80 overflow-y-auto">
             @forelse($notifications as $n)
-              <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-                <div class="text-sm font-semibold text-gray-900">
-                  {{ $n['title'] ?? 'Notification' }}
-                </div>
-                @if(!empty($n['message']))
-                  <div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>
-                @endif
-                @if(!empty($n['time']))
-                  <div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>
-                @endif
-              </a>
-            @empty
-              <div class="px-4 py-10 text-center justify-items-center">
-                <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-                <div class="text-sm font-semibold text-gray-800">No notifications</div>
-                <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
+              <div class="text-sm font-semibold text-gray-900">
+                {{ $n['title'] ?? 'Notification' }}
               </div>
+              @if(!empty($n['message']))
+              <div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>
+              @endif
+              @if(!empty($n['time']))
+              <div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>
+              @endif
+            </a>
+            @empty
+            <div class="px-4 py-10 text-center justify-items-center">
+              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
+              <div class="text-sm font-semibold text-gray-800">No notifications</div>
+              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
+            </div>
             @endforelse
           </div>
         </div>
@@ -598,363 +598,364 @@
                 <div class="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
                 <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px;">
                   @for($i = 0; $i < 35; $i++)
-                    <div class="h-9 bg-gray-200 rounded-lg"></div>
-                  @endfor
+                    <div class="h-9 bg-gray-200 rounded-lg">
+                </div>
+                @endfor
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+    </section>
+
+    <!-- RECORDS -->
+    <div class="bg-white rounded-2xl shadow-lg mb-8 fade-up overflow-hidden">
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b">
+        <h2 class="text-xl font-extrabold text-[#8B0000]">My Dental Records</h2>
+        <div id="viewAllContainer" class="hidden">
+          <a href="{{ route('record') }}"
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8B0000] border border-[#8B0000] px-4 py-1.5 rounded-lg hover:bg-[#8B0000] hover:text-white transition-colors duration-200">
+            View Full Record <i class="fa-solid fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+      </div>
+      <div class="px-6 py-4">
+        <div id="recordsInnerContainer" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- RECORD MODAL -->
+    <dialog id="record_modal" class="modal">
+      <div class="modal-box p-0 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-[#F3F3F3]">
+        <div class="bg-gradient-to-r from-[#5A0000] to-[#8B0000] px-8 py-6 text-white">
+          <h3 id="m_service" class="text-3xl font-extrabold leading-tight">—</h3>
+          <div class="mt-2 flex items-center gap-3 text-white/95">
+            <i class="fa-regular fa-calendar"></i>
+            <p class="text-base font-medium">
+              <span id="m_date">—</span>
+              <span class="mx-2">·</span>
+              <span id="m_time">—</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="px-8 py-8 space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 min-h-[90px] flex flex-col justify-center">
+              <div class="flex items-center gap-2 text-xs font-bold tracking-widest text-black-600">
+                <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800">
+                  <i class="fa-solid fa-check text-white text-[8px]"></i>
+                </span>
+                STATUS
+              </div>
+              <div class="mt-3 ml-4">
+                <span id="m_status" class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 min-h-[90px] flex flex-col justify-center">
+              <div class="flex items-center gap-2 text-xs font-bold tracking-widest text-black-600">
+                <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800">
+                  <i class="fa-solid fa-check text-white text-[8px]"></i>
+                </span>
+                DURATION
+              </div>
+              <div class="mt-3 ml-4">
+                <span id="m_duration" class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-4 mb-3">
+              <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">TREATMENT</span>
+              <div class="h-px flex-1 bg-gray-300"></div>
+            </div>
+            <div class="bg-white rounded-md overflow-hidden">
+              <div class="grid grid-cols-[6px_1fr]">
+                <div class="bg-gray-300"></div>
+                <div class="p-6 text-gray-700 text-sm leading-relaxed">
+                  <span id="m_remarks">—</span>
                 </div>
               </div>
             </div>
           </div>
 
-        </div>
-      </section>
-
-      <!-- RECORDS -->
-      <div class="bg-white rounded-2xl shadow-lg mb-8 fade-up overflow-hidden">
-        <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b">
-          <h2 class="text-xl font-extrabold text-[#8B0000]">My Dental Records</h2>
-          <div id="viewAllContainer" class="hidden">
-            <a href="{{ route('record') }}"
-              class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8B0000] border border-[#8B0000] px-4 py-1.5 rounded-lg hover:bg-[#8B0000] hover:text-white transition-colors duration-200">
-              View Full Record <i class="fa-solid fa-arrow-right text-xs"></i>
-            </a>
+          <div>
+            <div class="flex items-center gap-4 mb-3">
+              <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">ORAL EXAMINATION</span>
+              <div class="h-px flex-1 bg-gray-300"></div>
+            </div>
+            <div class="bg-white rounded-md overflow-hidden">
+              <div class="grid grid-cols-[6px_1fr]">
+                <div class="bg-gray-300"></div>
+                <div class="p-6 text-gray-700 text-sm leading-relaxed">
+                  <span id="m_oral">—</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="px-6 py-4">
-          <div id="recordsInnerContainer" class="space-y-3"></div>
+
+          <div>
+            <div class="flex items-center gap-4 mb-3">
+              <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">DIAGNOSIS</span>
+              <div class="h-px flex-1 bg-gray-300"></div>
+            </div>
+            <div class="bg-white rounded-md overflow-hidden">
+              <div class="grid grid-cols-[6px_1fr]">
+                <div class="bg-gray-300"></div>
+                <div class="p-6 text-gray-700 text-sm leading-relaxed">
+                  <span id="m_diagnosis">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-4 mb-3">
+              <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">PRESCRIPTION</span>
+              <div class="h-px flex-1 bg-gray-300"></div>
+            </div>
+            <div class="bg-white rounded-md overflow-hidden">
+              <div class="grid grid-cols-[6px_1fr]">
+                <div class="bg-gray-300"></div>
+                <div class="p-6 text-gray-700 text-sm leading-relaxed">
+                  <span id="m_prescription">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <form method="dialog">
+              <button class="px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">Close</button>
+            </form>
+          </div>
         </div>
       </div>
 
-      <!-- RECORD MODAL -->
-      <dialog id="record_modal" class="modal">
-        <div class="modal-box p-0 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-[#F3F3F3]">
-          <div class="bg-gradient-to-r from-[#5A0000] to-[#8B0000] px-8 py-6 text-white">
-            <h3 id="m_service" class="text-3xl font-extrabold leading-tight">—</h3>
-            <div class="mt-2 flex items-center gap-3 text-white/95">
-              <i class="fa-regular fa-calendar"></i>
-              <p class="text-base font-medium">
-                <span id="m_date">—</span>
-                <span class="mx-2">·</span>
-                <span id="m_time">—</span>
-              </p>
-            </div>
-          </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
 
-          <div class="px-8 py-8 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 min-h-[90px] flex flex-col justify-center">
-                <div class="flex items-center gap-2 text-xs font-bold tracking-widest text-black-600">
-                  <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800">
-                    <i class="fa-solid fa-check text-white text-[8px]"></i>
-                  </span>
-                  STATUS
-                </div>
-                <div class="mt-3 ml-4">
-                  <span id="m_status" class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
-                </div>
-              </div>
+    <!-- REQUEST CLEARANCE MODAL -->
+    <dialog id="dentalClearanceModal" class="modal">
+      <form
+        id="clearanceRequestForm"
+        method="POST"
+        action="{{ route('document.requests.store') }}"
+        class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+        novalidate>
+        @csrf
 
-              <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 min-h-[90px] flex flex-col justify-center">
-                <div class="flex items-center gap-2 text-xs font-bold tracking-widest text-black-600">
-                  <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800">
-                    <i class="fa-solid fa-check text-white text-[8px]"></i>
-                  </span>
-                  DURATION
-                </div>
-                <div class="mt-3 ml-4">
-                  <span id="m_duration" class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center gap-4 mb-3">
-                <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">TREATMENT</span>
-                <div class="h-px flex-1 bg-gray-300"></div>
-              </div>
-              <div class="bg-white rounded-md overflow-hidden">
-                <div class="grid grid-cols-[6px_1fr]">
-                  <div class="bg-gray-300"></div>
-                  <div class="p-6 text-gray-700 text-sm leading-relaxed">
-                    <span id="m_remarks">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center gap-4 mb-3">
-                <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">ORAL EXAMINATION</span>
-                <div class="h-px flex-1 bg-gray-300"></div>
-              </div>
-              <div class="bg-white rounded-md overflow-hidden">
-                <div class="grid grid-cols-[6px_1fr]">
-                  <div class="bg-gray-300"></div>
-                  <div class="p-6 text-gray-700 text-sm leading-relaxed">
-                    <span id="m_oral">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center gap-4 mb-3">
-                <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">DIAGNOSIS</span>
-                <div class="h-px flex-1 bg-gray-300"></div>
-              </div>
-              <div class="bg-white rounded-md overflow-hidden">
-                <div class="grid grid-cols-[6px_1fr]">
-                  <div class="bg-gray-300"></div>
-                  <div class="p-6 text-gray-700 text-sm leading-relaxed">
-                    <span id="m_diagnosis">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center gap-4 mb-3">
-                <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">PRESCRIPTION</span>
-                <div class="h-px flex-1 bg-gray-300"></div>
-              </div>
-              <div class="bg-white rounded-md overflow-hidden">
-                <div class="grid grid-cols-[6px_1fr]">
-                  <div class="bg-gray-300"></div>
-                  <div class="p-6 text-gray-700 text-sm leading-relaxed">
-                    <span id="m_prescription">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-end pt-2">
-              <form method="dialog">
-                <button class="px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">Close</button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <form method="dialog" class="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
-
-      <!-- REQUEST CLEARANCE MODAL -->
-      <dialog id="dentalClearanceModal" class="modal">
-        <form
-          id="clearanceRequestForm"
-          method="POST"
-          action="{{ route('document.requests.store') }}"
-          class="modal-box rounded-2xl bg-[#F4F4F4] relative"
-          novalidate>
-          @csrf
-
-          <div
-            id="clearanceWarning"
-            class="hidden absolute top-4 left-1/2 -translate-x-1/2
+        <div
+          id="clearanceWarning"
+          class="hidden absolute top-4 left-1/2 -translate-x-1/2
               px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4]
               text-xs font-semibold shadow-lg">
-            Please complete all required fields
-          </div>
+          Please complete all required fields
+        </div>
 
-          <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
-            Request Clearance
-          </h3>
+        <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+          Request Clearance
+        </h3>
 
-          <p class="text-sm text-[#333333] mb-5">
-            Please allow up to three (3) working days for processing.
-          </p>
+        <p class="text-sm text-[#333333] mb-5">
+          Please allow up to three (3) working days for processing.
+        </p>
 
-          <div class="mb-5">
-            <label class="block text-sm font-bold text-[#8B0000] mb-1">
-              Type of Clearance
-            </label>
-            <select
-              name="document_type"
-              required
-              class="select select-bordered w-full rounded-xl
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-[#8B0000] mb-1">
+            Type of Clearance
+          </label>
+          <select
+            name="document_type"
+            required
+            class="select select-bordered w-full rounded-xl
                  bg-[#F4F4F4] text-[#333333]
                  focus:outline-none focus:ring-0 focus:border-[#8B0000]">
-              <option value="" disabled selected>Select type of clearance</option>
-              <option value="Dental Clearance">Dental Clearance</option>
-              <option value="Annual Dental Clearance">Annual Dental Clearance</option>
-            </select>
-          </div>
+            <option value="" disabled selected>Select type of clearance</option>
+            <option value="Dental Clearance">Dental Clearance</option>
+            <option value="Annual Dental Clearance">Annual Dental Clearance</option>
+          </select>
+        </div>
 
-          <div class="mb-5">
-            <label class="block text-sm font-bold text-[#8B0000] mb-1">
-              Purpose
-            </label>
-            <select
-              name="purpose"
-              required
-              class="select select-bordered w-full rounded-xl
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-[#8B0000] mb-1">
+            Purpose
+          </label>
+          <select
+            name="purpose"
+            required
+            class="select select-bordered w-full rounded-xl
                  bg-[#F4F4F4] text-[#333333]
                  focus:outline-none focus:ring-0 focus:border-[#8B0000]">
-              <option value="" disabled selected>Select purpose</option>
-              <option value="On-the-Job Training (OJT)">On-the-Job Training (OJT)</option>
-              <option value="Employment Requirement">Employment Requirement</option>
-              <option value="Academic Requirement">Academic Requirement</option>
-            </select>
-          </div>
+            <option value="" disabled selected>Select purpose</option>
+            <option value="On-the-Job Training (OJT)">On-the-Job Training (OJT)</option>
+            <option value="Employment Requirement">Employment Requirement</option>
+            <option value="Academic Requirement">Academic Requirement</option>
+          </select>
+        </div>
 
-          <div class="modal-action flex justify-between">
-            <button type="button"
-              onclick="dentalClearanceModal.close()"
-              class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
-              Back
-            </button>
+        <div class="modal-action flex justify-between">
+          <button type="button"
+            onclick="dentalClearanceModal.close()"
+            class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+            Back
+          </button>
 
-            <button type="submit"
-              class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
-              Save
-            </button>
-          </div>
-        </form>
-      </dialog>
+          <button type="submit"
+            class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
+            Save
+          </button>
+        </div>
+      </form>
+    </dialog>
 
-      <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
-      <dialog id="dentalHealthRecordModal" class="modal">
-        <form
-          id="healthRecordRequestForm"
-          method="POST"
-          action="{{ route('document.requests.store') }}"
-          class="modal-box rounded-2xl bg-[#F4F4F4] relative"
-          novalidate>
-          @csrf
+    <!-- REQUEST DENTAL HEALTH RECORD MODAL -->
+    <dialog id="dentalHealthRecordModal" class="modal">
+      <form
+        id="healthRecordRequestForm"
+        method="POST"
+        action="{{ route('document.requests.store') }}"
+        class="modal-box rounded-2xl bg-[#F4F4F4] relative"
+        novalidate>
+        @csrf
 
-          <div
-            id="healthRecordWarning"
-            class="hidden absolute top-4 left-1/2 -translate-x-1/2
+        <div
+          id="healthRecordWarning"
+          class="hidden absolute top-4 left-1/2 -translate-x-1/2
               px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4]
               text-xs font-semibold shadow-lg">
-            Please complete all required fields
-          </div>
+          Please complete all required fields
+        </div>
 
-          <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
-            Request Dental Health Record
-          </h3>
+        <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">
+          Request Dental Health Record
+        </h3>
 
-          <p class="text-sm mb-5 text-[#333333]">
-            Please allow up to three (3) working days for processing.
-          </p>
+        <p class="text-sm mb-5 text-[#333333]">
+          Please allow up to three (3) working days for processing.
+        </p>
 
-          <div class="mb-5">
-            <label class="block text-sm font-bold text-[#8B0000] mb-1">
-              Type of Dental Health Record
-            </label>
-            <select
-              name="document_type"
-              required
-              class="select select-bordered w-full rounded-xl
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-[#8B0000] mb-1">
+            Type of Dental Health Record
+          </label>
+          <select
+            name="document_type"
+            required
+            class="select select-bordered w-full rounded-xl
                  bg-[#F4F4F4] text-[#333333]
                  focus:outline-none focus:ring-0 focus:border-[#8B0000]">
-              <option value="" disabled selected>Select type</option>
-              <option value="All Dental Records">All Dental Records</option>
-              <option value="Medical Records">Medical Records</option>
-              <option value="Diagnosis and Treatment">Diagnosis and Treatment</option>
-            </select>
-          </div>
+            <option value="" disabled selected>Select type</option>
+            <option value="All Dental Records">All Dental Records</option>
+            <option value="Medical Records">Medical Records</option>
+            <option value="Diagnosis and Treatment">Diagnosis and Treatment</option>
+          </select>
+        </div>
 
-          <div class="mb-5">
-            <label class="block text-sm font-bold text-[#8B0000] mb-1">
-              Purpose
-            </label>
-            <select
-              name="purpose"
-              required
-              class="select select-bordered w-full rounded-xl
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-[#8B0000] mb-1">
+            Purpose
+          </label>
+          <select
+            name="purpose"
+            required
+            class="select select-bordered w-full rounded-xl
                  bg-[#F4F4F4] text-[#333333]
                  focus:outline-none focus:ring-0 focus:border-[#8B0000]">
-              <option value="" disabled selected>Select purpose</option>
-              <option value="Personal Record">Personal Record</option>
-              <option value="Academic Requirement">Academic Requirement</option>
-              <option value="Employment Requirement">Employment Requirement</option>
-            </select>
-          </div>
-
-          <div class="modal-action flex justify-between">
-            <button type="button"
-              onclick="dentalHealthRecordModal.close()"
-              class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
-              Back
-            </button>
-
-            <button type="submit"
-              class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
-              Save
-            </button>
-          </div>
-        </form>
-      </dialog>
-
-      <!-- CONFIRM SAVE MODAL (kept, but not used by this file unless you wire it) -->
-      <dialog id="confirmSaveModal" class="modal">
-        <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-          <h3 class="font-bold text-lg mb-2">Confirm</h3>
-          <p id="confirmSaveText" class="mb-6">Are you sure?</p>
-          <div class="modal-action flex justify-between">
-            <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
-            <button onclick="submitConfirmedForm?.()" class="btn btn-error text-[#F4F4F4]">Yes, Submit</button>
-          </div>
+            <option value="" disabled selected>Select purpose</option>
+            <option value="Personal Record">Personal Record</option>
+            <option value="Academic Requirement">Academic Requirement</option>
+            <option value="Employment Requirement">Employment Requirement</option>
+          </select>
         </div>
-      </dialog>
 
-      <!-- SUBMITTED INFO MODAL (kept) -->
-      <dialog id="submittedInfoModal" class="modal">
-        <div class="modal-box rounded-2xl bg-[#F4F4F4]">
-          <h3 class="font-bold text-lg mb-2">Submitted!</h3>
-          <p>Your request has been submitted.</p>
-          <div class="modal-action">
-            <button onclick="submittedInfoModal.close()" class="btn btn-error text-[#F4F4F4]">OK</button>
-          </div>
+        <div class="modal-action flex justify-between">
+          <button type="button"
+            onclick="dentalHealthRecordModal.close()"
+            class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold">
+            Back
+          </button>
+
+          <button type="submit"
+            class="px-6 py-2 rounded-xl bg-[#8B0000] text-[#F4F4F4] font-semibold">
+            Save
+          </button>
         </div>
-      </dialog>
+      </form>
+    </dialog>
 
-      <!-- ACTIVE APPOINTMENT MODAL (FIXED HTML) -->
-      <dialog id="activeAppointmentModal" class="modal">
-        <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
-          <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
-            <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
-          </div>
-
-          <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">Active Appointment Detected</h3>
-          <p class="text-sm text-gray-600 mb-6">
-            You already have an active appointment. Please complete or cancel it before booking a new one.
-          </p>
-
-          <div class="modal-action justify-center gap-3">
-            <a href="{{ route('appointment.index') }}" class="btn bg-[#8B0000] text-[#F4F4F4] hover:bg-[#7A0000] transition-colors duration-200">
-              View My Appointments
-            </a>
-            <button id="closeActiveApptModalBtn" type="button" class="btn btn-ghost">Close</button>
-          </div>
+    <!-- CONFIRM SAVE MODAL (kept, but not used by this file unless you wire it) -->
+    <dialog id="confirmSaveModal" class="modal">
+      <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+        <h3 class="font-bold text-lg mb-2">Confirm</h3>
+        <p id="confirmSaveText" class="mb-6">Are you sure?</p>
+        <div class="modal-action flex justify-between">
+          <button onclick="confirmSaveModal.close()" class="btn">Cancel</button>
+          <button onclick="submitConfirmedForm?.()" class="btn btn-error text-[#F4F4F4]">Yes, Submit</button>
         </div>
-      </dialog>
+      </div>
+    </dialog>
+
+    <!-- SUBMITTED INFO MODAL (kept) -->
+    <dialog id="submittedInfoModal" class="modal">
+      <div class="modal-box rounded-2xl bg-[#F4F4F4]">
+        <h3 class="font-bold text-lg mb-2">Submitted!</h3>
+        <p>Your request has been submitted.</p>
+        <div class="modal-action">
+          <button onclick="submittedInfoModal.close()" class="btn btn-error text-[#F4F4F4]">OK</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ACTIVE APPOINTMENT MODAL (FIXED HTML) -->
+    <dialog id="activeAppointmentModal" class="modal">
+      <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
+        <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
+          <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
+        </div>
+
+        <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">Active Appointment Detected</h3>
+        <p class="text-sm text-gray-600 mb-6">
+          You already have an active appointment. Please complete or cancel it before booking a new one.
+        </p>
+
+        <div class="modal-action justify-center gap-3">
+          <a href="{{ route('appointment.index') }}" class="btn bg-[#8B0000] text-[#F4F4F4] hover:bg-[#7A0000] transition-colors duration-200">
+            View My Appointments
+          </a>
+          <button id="closeActiveApptModalBtn" type="button" class="btn btn-ghost">Close</button>
+        </div>
+      </div>
+    </dialog>
 
     </div> <!-- /max-w -->
   </main>
 
   <!-- ACTIVE APPOINTMENT MODAL SCRIPT -->
   @if(session('activeAppointmentModal'))
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const modal = document.getElementById("activeAppointmentModal");
-        const closeBtn = document.getElementById("closeActiveApptModalBtn");
-        if (!modal) return;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("activeAppointmentModal");
+      const closeBtn = document.getElementById("closeActiveApptModalBtn");
+      if (!modal) return;
 
-        modal.showModal();
+      modal.showModal();
 
-        modal.addEventListener('click', (e) => {
-          const box = modal.querySelector('.modal-box');
-          if (!box) return;
-          if (!box.contains(e.target)) e.preventDefault();
-        });
-
-        modal.addEventListener('cancel', (e) => e.preventDefault());
-        if (closeBtn) closeBtn.addEventListener("click", () => modal.close());
+      modal.addEventListener('click', (e) => {
+        const box = modal.querySelector('.modal-box');
+        if (!box) return;
+        if (!box.contains(e.target)) e.preventDefault();
       });
-    </script>
+
+      modal.addEventListener('cancel', (e) => e.preventDefault());
+      if (closeBtn) closeBtn.addEventListener("click", () => modal.close());
+    });
+  </script>
   @endif
 
   <script>
@@ -1204,7 +1205,27 @@
       const container = document.getElementById("upcomingAppointment");
 
       @if(isset($upcomingAppointment) && $upcomingAppointment)
-        container.innerHTML = `
+      const rawTime = "{{ $upcomingAppointment->appointment_time }}";
+      const formattedTime = (() => {
+        try {
+          const [h, m] = rawTime.split(':').map(Number);
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          const hour = h % 12 || 12;
+          return `${hour}:${String(m).padStart(2,'0')} ${ampm}`;
+        } catch (e) {
+          return rawTime;
+        }
+      })();
+
+      const rawStatus = "{{ strtolower($upcomingAppointment->status ?? 'upcoming') }}";
+      const isConfirmed = rawStatus === 'confirmed';
+      const badgeClass = isConfirmed ?
+        'bg-green-50 text-green-600 border border-green-200' :
+        'bg-yellow-50 text-yellow-600 border border-yellow-200';
+      const dotClass = isConfirmed ? 'bg-green-500' : 'bg-yellow-500';
+      const statusLabel = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+
+      container.innerHTML = `
           <div class="bg-white rounded-2xl shadow-lg px-6 py-4 flex items-center gap-6 fade-up">
             <div class="w-12 h-12 bg-[#FFF0F0] rounded-xl flex items-center justify-center flex-shrink-0">
               <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
@@ -1219,7 +1240,7 @@
                 <p class="text-[10px] uppercase font-semibold text-gray-400 mb-0.5">Date & Time</p>
                 <p class="font-bold text-sm text-[#333333]">
                   {{ Carbon::parse($upcomingAppointment->appointment_date)->format('F d, Y') }}
-                  &bull; {{ $upcomingAppointment->appointment_time }}
+                  &bull; ${formattedTime}
                 </p>
               </div>
               <div>
@@ -1229,18 +1250,15 @@
             </div>
 
             <div class="flex-shrink-0">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                {{ ($upcomingAppointment->status ?? '') === 'Confirmed'
-                  ? 'bg-green-50 text-green-600 border border-green-200'
-                  : 'bg-yellow-50 text-yellow-600 border border-yellow-200' }}">
-                <span class="w-1.5 h-1.5 rounded-full {{ ($upcomingAppointment->status ?? '') === 'Confirmed' ? 'bg-green-500' : 'bg-yellow-500' }}"></span>
-                {{ $upcomingAppointment->status ?? 'Pending' }}
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${badgeClass}">
+                <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
+                ${statusLabel}
               </span>
             </div>
           </div>
         `;
       @else
-        container.innerHTML = `
+      container.innerHTML = `
           <div class="bg-white rounded-2xl shadow-sm px-6 py-5 flex items-center gap-4 fade-up">
             <div class="w-10 h-10 bg-[#FFF0F0] rounded-xl flex items-center justify-center flex-shrink-0">
               <i class="fa-regular fa-calendar text-[#8B0000]"></i>
@@ -1253,61 +1271,58 @@
       @endif
     }
 
-    // =========================
-    // Calendar (FIXED: removed "- >" typo + fixed counts object)
-    // =========================
     function loadCalendar() {
-      const MAX_PER_DAY = 5;
+    const MAX_PER_DAY = 5;
 
-      const myAppointments = {
-        @if(isset($appointments) && $appointments->count() > 0)
-          @foreach($appointments as $appt)
-            "{{ Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
-          @endforeach
-        @endif
-      };
-
-      const apptCounts = {
-        @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
-          @foreach($appointmentCountsPerDay as $date => $count)
-            "{{ $date }}": {{ (int) $count }},
-          @endforeach
-        @endif
-      };
-
-      const unavailableDates = [
-        @foreach(($unavailableDates ?? []) as $d)
-          "{{ $d }}",
+    const myAppointments = {
+      @if(isset($appointments) && $appointments->count() > 0)
+        @foreach($appointments as $appt)
+          "{{ Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ $appt->appointment_time }}",
         @endforeach
-      ];
+      @endif
+    };
 
-      const allHolidays = {
-        @foreach(($philippineHolidays ?? []) as $date => $name)
-          "{{ $date }}": "{{ addslashes($name) }}",
+    const apptCounts = {
+      @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
+        @foreach($appointmentCountsPerDay as $date => $count)
+          "{{ $date }}": {{ (int) $count }},
         @endforeach
-      };
+      @endif
+    };
 
-      const today = new Date();
-      let currentYear = today.getFullYear();
-      let currentMonth = today.getMonth();
+    const unavailableDates = [
+      @foreach(($unavailableDates ?? []) as $d)
+        "{{ $d }}",
+      @endforeach
+    ];
 
-      function pad(n) {
-        return String(n).padStart(2, '0');
-      }
+    const allHolidays = {
+      @foreach(($philippineHolidays ?? []) as $date => $name)
+        "{{ $date }}": "{{ addslashes($name) }}",
+      @endforeach
+    };
 
-      function isWeekend(year, month, day) {
-        const dow = new Date(year, month, day).getDay();
-        return dow === 0 || dow === 6;
-      }
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
 
-      function getHolidaysForMonth(year, month) {
-        const filtered = {};
-        Object.keys(allHolidays).forEach(dateStr => {
-          const [y, m] = dateStr.split('-').map(Number);
-          if (y === year && m === month + 1) filtered[dateStr] = allHolidays[dateStr];
-        });
-        return filtered;
-      }
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function isWeekend(year, month, day) {
+      const dow = new Date(year, month, day).getDay();
+      return dow === 0 || dow === 6;
+    }
+
+    function getHolidaysForMonth(year, month) {
+      const filtered = {};
+      Object.keys(allHolidays).forEach(dateStr => {
+        const [y, m] = dateStr.split('-').map(Number);
+        if (y === year && m === month + 1) filtered[dateStr] = allHolidays[dateStr];
+      });
+      return filtered;
+    }
 
       function renderCalendar(year, month) {
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1371,19 +1386,19 @@
           }
 
           const tooltipHtml = tooltipTxt ? `
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
-              ${tooltipTxt}
-              <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div>
-            </div>` : '';
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+            ${tooltipTxt}
+            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div>
+          </div>` : '';
 
           cells += `
-            <div class="relative group flex items-center justify-center">
-              ${tooltipHtml}
-              <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} cursor-default">
-                ${d}
-                ${dotHtml}
-              </div>
-            </div>`;
+          <div class="relative group flex items-center justify-center">
+            ${tooltipHtml}
+            <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} cursor-default">
+              ${d}
+              ${dotHtml}
+            </div>
+          </div>`;
         }
 
         const headerHtml = dayLabels.map((l, i) => {
@@ -1392,33 +1407,50 @@
         }).join('');
 
         document.getElementById("calendarSkeletonContainer").innerHTML = `
-          <div class="h-full flex flex-col select-none">
-            <div class="flex items-center justify-center gap-2 mb-3">
-              <i class="fa-regular fa-calendar-check text-[#333333] text-xl"></i>
-              <h2 class="text-xl font-extrabold text-[#333333]">Dental Clinic Schedule</h2>
-            </div>
-            <hr class="border-t border-gray-200 mb-4">
-
-            <div class="flex items-center justify-between mt-6 mb-5">
-              <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-              </button>
-              <div class="text-center">
-                <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
-                <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
-              </div>
-              <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
-            </div>
-
-            <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
-            <div class="grid grid-cols-7 gap-2 flex-1 content-start">${cells}</div>
+        <div class="h-full flex flex-col select-none">
+          <div class="flex items-center justify-center gap-2 mb-3">
+            <i class="fa-regular fa-calendar-check text-[#333333] text-xl"></i>
+            <h2 class="text-xl font-extrabold text-[#333333]">Dental Clinic Schedule</h2>
           </div>
-        `;
+          <hr class="border-t border-gray-200 mb-4">
+
+          <div class="flex items-center justify-between mt-6 mb-5">
+            <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <div class="text-center">
+              <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+              <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+            </div>
+            <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
+          <div class="grid grid-cols-7 gap-2 flex-1 content-start">${cells}</div>
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0 ring-2 ring-[#008440]/30 ring-offset-1"></span>
+            My Appointment
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0 ring-2 ring-blue-400/30 ring-offset-1"></span>
+            Holiday
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0 ring-2 ring-red-500/30 ring-offset-1"></span>
+            Fully Booked
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0 ring-2 ring-[#8B0000]/30 ring-offset-1"></span>
+            Today
+          </div>
+        </div>
+      `;
       }
 
-      window.changeMonth = function (dir) {
+      window.changeMonth = function(dir) {
         currentMonth += dir;
         if (currentMonth > 11) {
           currentMonth = 0;
@@ -1580,7 +1612,7 @@
     });
 
     // Dynamic greeting
-    (function () {
+    (function() {
       const hour = new Date().getHours();
       let greeting, iconClasses, animClass;
 
