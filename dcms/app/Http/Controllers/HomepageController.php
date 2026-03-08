@@ -64,7 +64,7 @@ class HomepageController extends Controller
         // Notifications
         $notifications = [];
 
-        return view('index', compact(
+        return view('patient.index', compact(
             'patient',
             'appointments',
             'upcomingAppointment',

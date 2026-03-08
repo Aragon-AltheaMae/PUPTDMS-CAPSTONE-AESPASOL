@@ -218,7 +218,7 @@ tailwind.config = {
   <nav class="flex justify-end items-center">
 
 
-    <a href="{{ route('dentist.report') }}"
+    <a href="{{ route('dentist.dentist.report') }}"
        class="bg-white text-[#8B0000] px-5 py-2 rounded-lg text-sm font-semibold shadow hover:bg-gray-100">
       ← Back to Report Dashboard
     </a>

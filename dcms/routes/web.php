@@ -116,7 +116,7 @@ Route::post('/dentist/login', function (Request $request) {
             'Dentist logged into the system'
         );
 
-        return redirect()->route('dentist.dashboard');
+        return redirect()->route('dentist.dentist.dashboard');
     }
 
     return back()->with('error', 'Invalid dentist credentials');
@@ -156,8 +156,8 @@ Route::prefix('admin')->group(function () {
             return redirect('/admin/login');
         }
 
-        return view('admin-dashboard');
-    })->name('admin.dashboard');
+        return view('admin.admin-dashboard');
+    })->name('admin.admin.dashboard');
 
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
         ->name('admin.role_permissions');
@@ -187,30 +187,30 @@ Route::middleware(['role:patient'])->group(function () {
 
     Route::get('/book-appointment', [AppointmentController::class, 'create'])
         ->middleware('permission:book_appointments')
-        ->name('book.appointment');
+        ->name('patient.book.appointment');
 
     Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
         ->middleware('permission:book_appointments')
-        ->name('appointments.available-slots');
+        ->name('patient.appointments.available-slots');
 
     Route::post('/document-requests', [DocumentRequestController::class, 'store'])
         ->middleware('permission:request_documents')
-        ->name('document.requests.store');
+        ->name('patient.document.requests.store');
 
     Route::get('/document-requests', [DocumentRequestController::class, 'index'])
         ->middleware('permission:request_documents')
-        ->name('document.requests.index');
+        ->name('patient.document.requests.index');
 
     Route::post('/document-requests/{id}/status', [DocumentRequestController::class, 'updateStatus'])
         ->middleware('permission:request_documents')
-        ->name('document.requests.updateStatus');
+        ->name('patient.document.requests.updateStatus');
 
     Route::get('/record', [RecordController::class, 'index'])
         ->middleware('permission:view_own_records')
-        ->name('record');
+        ->name('patient.record');
 
-    Route::get('/about-us', fn() => view('about-us'))
-        ->name('about.us');
+    Route::get('/about-us', fn() => view('patient.about-us'))
+        ->name('patient.about.us');
 });
 
 
@@ -229,7 +229,7 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
 
     Route::get('/appointment', [AppointmentController::class, 'index'])
         ->middleware('permission:view_own_appointments')
-        ->name('appointment.index');
+        ->name('patient.appointment.index');
 
     Route::get('/appointment/create', [AppointmentController::class, 'create'])
         ->middleware('permission:book_appointments')
@@ -340,7 +340,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
         $notifications = collect([]);
 
-        return view('dentist-dashboard', compact(
+        return view('dentist.dentist-dashboard', compact(
             'todayAppointments',
             'appointmentCountsPerDay',
             'philippineHolidays',
@@ -355,51 +355,51 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
             'gadFemale',
             'gadMale'
         ));
-    })->middleware('permission:access_dentist_dashboard')->name('dentist.dashboard');
+    })->middleware('permission:access_dentist_dashboard')->name('dentist.dentist.dashboard');
 
     // Appointments
     Route::get('/appointments', [DentistAppointmentController::class, 'index'])
         ->middleware('permission:manage_appointments')
-        ->name('dentist.appointments');
+        ->name('dentist.dentist.appointments');
 
     Route::get('/appointments/{appointment}/patient-profile', [DentistAppointmentController::class, 'patientProfile'])
         ->middleware('permission:manage_patient_profiles')
-        ->name('dentist.appointments.patientProfile');
+        ->name('dentist.dentist.appointments.patientProfile');
 
     Route::get('/appointments/{id}/reschedule', [AppointmentController::class, 'reschedule'])
         ->middleware('permission:manage_appointments')
-        ->name('dentist.appointments.reschedule');
+        ->name('dentist.dentist.appointments.reschedule');
 
     Route::put('/appointments/{id}/reschedule', [AppointmentController::class, 'updateReschedule'])
         ->middleware('permission:manage_appointments')
-        ->name('dentist.appointments.reschedule.update');
+        ->name('dentist.dentist.appointments.reschedule.update');
 
     Route::post('/appointments/{id}/cancel', [DentistAppointmentController::class, 'cancel'])
         ->middleware('permission:manage_appointments')
-        ->name('dentist.appointments.cancel');
+        ->name('dentist.dentist.appointments.cancel');
 
     // Patients
     Route::get('/patients', [DentistPatientController::class, 'index'])
         ->middleware('permission:manage_patient_profiles')
-        ->name('dentist.patients');
+        ->name('dentist.dentist.patients');
 
     Route::get('/patients/{patient}/profile', [DentistPatientController::class, 'profile'])
         ->middleware('permission:manage_patient_profiles')
-        ->name('dentist.patient.profile');
+        ->name('dentist.dentist.patient.profile');
 
 
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
         ->middleware('permission:manage_reports')
-        ->name('dentist.report');
+        ->name('dentist.dentist.report');
 
     Route::get('/report/gad-data', [\App\Http\Controllers\Dentist\DentistReportController::class, 'gadData'])
         ->middleware('permission:manage_reports')
-        ->name('dentist.report.gad-data');
+        ->name('dentist.dentist.report.gad-data');
 
     Route::get('/report/weekly-data', [\App\Http\Controllers\Dentist\DentistReportController::class, 'weeklyData'])
         ->middleware('permission:manage_reports')
-        ->name('dentist.report.weekly-data');
+        ->name('dentist.dentist.report.weekly-data');
 
     // Document Requests
     Route::get('/document-requests', function () {
@@ -414,22 +414,22 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
     // Document Requests – list page
     Route::get('/document-requests', [DocumentRequestController::class, 'dentistIndex'])
-        ->name('dentist.documentrequests');
+        ->name('dentist.dentist.documentrequests');
 
     // Approve (AJAX POST)
     Route::post('/document-requests/{id}/approve', [DocumentRequestController::class, 'approve'])
-        ->name('dentist.documentrequests.approve');
+        ->name('dentist.dentist.documentrequests.approve');
 
     // Reject (AJAX POST)
     Route::post('/document-requests/{id}/reject', [DocumentRequestController::class, 'reject'])
-        ->name('dentist.documentrequests.reject');
+        ->name('dentist.dentist.documentrequests.reject');
 
     Route::get('/document-requests/data', [DocumentRequestController::class, 'dentistData'])
-        ->name('dentist.documentrequests.data');
+        ->name('dentist.dentist.documentrequests.data');
 
     // Generate (AJAX POST)
     Route::post('/document-requests/generate', [DocumentRequestController::class, 'generate'])
-        ->name('dentist.documentrequests.generate');
+        ->name('dentist.dentist.documentrequests.generate');
 
     // View Odontogram
     Route::get('/view-odontogram', function () {
@@ -439,23 +439,23 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])
         ->middleware('permission:manage_inventory')
-        ->name('dentist.inventory');
+        ->name('dentist.dentist.inventory');
 
     Route::get('/inventory/data', [InventoryController::class, 'fetch'])
         ->middleware('permission:manage_inventory')
-        ->name('dentist.inventory.data');
+        ->name('dentist.dentist.inventory.data');
 
     Route::post('/inventory', [InventoryController::class, 'store'])
         ->middleware('permission:manage_inventory')
-        ->name('dentist.inventory.store');
+        ->name('dentist.dentist.inventory.store');
 
     Route::put('/inventory/{inventory}', [InventoryController::class, 'update'])
         ->middleware('permission:manage_inventory')
-        ->name('dentist.inventory.update');
+        ->name('dentist.dentist.inventory.update');
 
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])
         ->middleware('permission:manage_inventory')
-        ->name('dentist.inventory.destroy');
+        ->name('dentist.dentist.inventory.destroy');
 
 });
 
@@ -472,10 +472,10 @@ Route::prefix('report')->middleware(['role:dentist', 'permission:manage_reports'
         ->name('dentist.report.legacy');
 
     Route::get('/daily-treatment-record', function () {
-        return view('daily-treatment');
-    })->name('dentist.report.daily-treatment');
+        return view('dentist.daily-treatment');
+    })->name('dentist.dentist.report.daily-treatment');
 
     Route::get('/dental-services', function () {
-        return view('dental-services');
-    })->name('dentist.report.dental-services');
+        return view('dentist.dental-services');
+    })->name('dentist.dentist.report.dental-services');
 });

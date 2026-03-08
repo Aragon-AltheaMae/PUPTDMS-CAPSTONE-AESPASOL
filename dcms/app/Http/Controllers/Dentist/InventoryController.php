@@ -11,7 +11,7 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        return view('dentist-inventory');
+        return view('dentist.dentist-inventory');
     }
 
     public function fetch()
