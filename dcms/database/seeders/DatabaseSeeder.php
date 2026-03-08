@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             DentalHistoryConditionSeeder::class,
             MedicalHistoryQuestionSeeder::class,
             DiseaseSeeder::class,
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }
