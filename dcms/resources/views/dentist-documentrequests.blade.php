@@ -5,26 +5,34 @@
   <meta charset="UTF-8" />
   <title>PUP Taguig Dental Clinic | Document Requests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
 
   <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Inter';
+      font-family: 'Inter', sans-serif;
+      background: #f2f2f0;
+      overflow-x: hidden;
     }
 
-    .fade-in {
-      animation: fadeIn .4s ease-out both;
+    .fade-up {
+      animation: fadeUp .45s ease both;
     }
 
-    @keyframes fadeIn {
+    @keyframes fadeUp {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(10px);
       }
 
       to {
@@ -33,19 +41,152 @@
       }
     }
 
+    /* ════ HEADER ════ */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
+    }
+
+    /* ════ SIDEBAR ════ */
     .sidebar-link {
       display: flex;
       align-items: center;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: background-color .2s ease, transform .2s ease;
     }
 
     #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
-      padding-left: 0.25rem;
+      padding-left: .25rem;
     }
 
     #sidebar.expanded .sidebar-link i {
-      margin-right: 0.75rem;
+      margin-right: .75rem;
     }
 
     #sidebar.expanded .sidebar-link:hover {
@@ -53,7 +194,7 @@
     }
 
     #sidebar.expanded .sidebar-tooltip {
-    display: none;
+      display: none;
     }
 
     #sidebar.expanded .section-label {
@@ -80,56 +221,10 @@
       display: none;
     }
 
-    .sidebar-link:hover .sidebar-tooltip {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-    }
-
-    .section-label {
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      color: #757575;
-      text-transform: uppercase;
-      margin-bottom: 0.25rem;
-    }
-
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(0.95) !important;
-      pointer-events: none !important;
-    }
-
-    body,
-    #sidebar,
-    main,
-    .card,
-    .modal-box {
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    #sidebar.collapsed .section-label {
-      display: none;
-    }
-
-    #sidebar.expanded .section-label {
-      display: block;
-    }
-
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
       padding-left: 0;
       padding-right: 0;
-    }
-
-    #sidebar.collapsed .sidebar-link span:first-of-type {
-      margin: 0 auto;
     }
 
     #sidebar.collapsed .sidebar-link i {
@@ -138,32 +233,32 @@
       text-align: center;
     }
 
-    #sidebar.expanded .sidebar-link {
-      justify-content: flex-start;
-    }
-
-    #sidebar.expanded .sidebar-link i {
-      margin-right: 0.75rem;
-    }
-
     #sidebar.expanded .sidebar-link span i {
       margin-right: 0 !important;
     }
 
-    #sidebar.expanded .sidebar-link:hover {
-      transform: translateX(4px);
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
     }
 
-    #sidebar.collapsed .sidebar-tooltip {
-      display: block;
+    .section-label {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
     }
 
-    #sidebar.expanded .sidebar-tooltip {
-      display: none;
+    body,
+    #sidebar,
+    main {
+      transition: background-color .3s ease, color .3s ease;
     }
 
     .sidebar-link.bg-\[\#8B0000\] {
-      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+      box-shadow: 0 0 12px rgba(139, 0, 0, .45);
     }
 
     .theme-toggle-container {
@@ -176,7 +271,7 @@
       background: #F5F5F5;
       border: 1px solid #E0E0E0;
       border-radius: 24px;
-      transition: all 0.3s ease;
+      transition: all .3s ease;
     }
 
     #sidebar.collapsed .theme-toggle-container {
@@ -204,7 +299,7 @@
       border: none;
       cursor: pointer;
       color: #9CA3AF;
-      transition: color 0.2s ease;
+      transition: color .2s ease;
       border-radius: 8px;
     }
 
@@ -230,8 +325,8 @@
       position: absolute;
       background: white;
       border-radius: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      transition: all .3s cubic-bezier(.4, 0, .2, 1);
       pointer-events: none;
     }
 
@@ -259,262 +354,20 @@
       transform: translateY(calc(100% + 4px));
     }
 
-    /* DARK MODE STYLES */
+    /* ── Dark mode ── */
     [data-theme="dark"] body {
       background-color: #000D1A;
-    color: #E5E7EB;
+      color: #E5E7EB;
     }
 
     [data-theme="dark"] #sidebar {
-      background-color: #000D1A;
+      background-color: #111827;
     }
 
     [data-theme="dark"] .bg-white {
-      background-color: #000D1A !important;
+      background-color: #111827 !important;
     }
 
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
-    }
-
-    :root{
-    --maroon:#7b0000;
-    --maroon-dark:#5d0000;
-    --border:#d9d9d9;
-    --bg:#f6f6f6;
-    --text:#2b2b2b;
-    --muted:#8a8a8a;
-    --label:#8b0000;
-    --pending:#ff8c1a;
-    --approved:#1f9d4a;
-    --rejected:#d80000;
-  }
-
-  .dr-page{
-    max-width: 1200px;
-    margin: 28px auto;
-    padding: 0 16px 32px;
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
-  /* Top bar */
-  .dr-topbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-    margin-bottom: 14px;
-  }
-  .dr-title{
-    margin:0;
-    font-size: 34px;
-    font-weight: 800;
-    color: #8b1a0e;
-  }
-
-  .dr-btn{
-    border:none;
-    cursor:pointer;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-weight: 700;
-  }
-  .dr-btn-generate{
-    background: var(--maroon);
-    color:#fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,.18);
-  }
-  .dr-btn-generate:hover{ background: var(--maroon-dark); }
-
-  /* Controls row */
-  .dr-controls{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap: 18px;
-    margin-bottom: 14px;
-    flex-wrap:wrap;
-  }
-
-  /* Stat cards */
-  .dr-stats{
-    display:flex;
-    gap: 14px;
-    flex-wrap:wrap;
-  }
-  .dr-stat{
-    width: 160px;
-    height: 84px;
-    background: var(--maroon);
-    color:#fff;
-    border-radius: 6px;
-    padding: 12px 14px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  .dr-stat-num{ font-size: 34px; font-weight: 900; line-height: 1; }
-  .dr-stat-label{ margin-top: 6px; font-size: 13px; opacity:.95; }
-
-  /* Search/Filter */
-  .dr-searchbar{
-    display:flex;
-    align-items:center;
-    gap: 14px;
-  }
-  .dr-searchgroup{
-    display:flex;
-    align-items:center;
-    border: 2px solid #f0b43a;
-    border-radius: 24px;
-    overflow:hidden;
-    background:#fff;
-    min-width: 420px;
-    height: 42px;
-  }
-  .dr-searchicon{
-    width: 44px;
-    height: 42px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: var(--maroon);
-    color:#fff;
-    font-size: 16px;
-  }
-  .dr-searchinput{
-    flex:1;
-    border:none;
-    outline:none;
-    padding: 0 12px;
-    height: 42px;
-    font-weight: 600;
-  }
-  .dr-btn-filter{
-    height: 42px;
-    background:#fff;
-    color: #8b1a0e;
-    border-left: 2px solid #f0b43a;
-    border-radius: 0;
-    padding: 0 18px;
-    font-weight: 800;
-  }
-  .dr-clear{
-    background: transparent;
-    border:none;
-    cursor:pointer;
-    font-weight: 800;
-    color:#8b1a0e;
-  }
-
-  /* List wrapper */
-  .dr-listwrap{
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background:#fff;
-    padding: 14px;
-  }
-
-  /* Request row */
-  .dr-row{
-    position:relative;
-    display:flex;
-    align-items:center;
-    gap: 18px;
-    background: #ececec;
-    border-radius: 6px;
-    padding: 16px 16px 16px 0;
-    margin-bottom: 12px;
-  }
-  .dr-row:last-child{ margin-bottom:0; }
-
-  .dr-accent{
-    width: 8px;
-    height: 100%;
-    border-radius: 6px 0 0 6px;
-  }
-  .dr-accent-green{ background: #00c853; }
-  .dr-accent-orange{ background: #ff9f2d; }
-  .dr-accent-red{ background: #d80000; }
-
-  .dr-col{ min-width: 170px; }
-  .dr-col-name{ min-width: 230px; padding-left: 12px; }
-  .dr-name{ font-weight: 900; font-size: 18px; }
-  .dr-sub{ margin-top: 4px; font-weight: 700; color:#4a4a4a; }
-  .dr-link{ color:#1a66ff; text-decoration:none; font-weight:800; }
-
-  .dr-meta-label{
-    font-size: 12px;
-    font-weight: 900;
-    color: var(--label);
-    margin-bottom: 6px;
-  }
-  .dr-meta-value{
-    font-size: 15px;
-    font-weight: 800;
-    color:#2d2d2d;
-  }
-
-  .dr-col-status{ min-width: 140px; }
-  .dr-status{
-    font-weight: 900;
-    letter-spacing: .5px;
-  }
-  .dr-status-approved{ color: var(--approved); }
-  .dr-status-pending{ color: var(--pending); }
-  .dr-status-rejected{ color: var(--rejected); }
-
-  .dr-col-action{
-    margin-left:auto;
-    min-width: 110px;
-    display:flex;
-    justify-content:flex-end;
-    padding-right: 10px;
-  }
-  .dr-btn-view{
-    background: var(--maroon);
-    color:#fff;
-    padding: 10px 18px;
-    border-radius: 6px;
-  }
-  .dr-btn-view:hover{ background: var(--maroon-dark); }
-
-  /* Pagination */
-  .dr-pagination{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap: 10px;
-    margin-top: 16px;
-    color:#5a5a5a;
-  }
-  .dr-pagebtn{
-    border:none;
-    background:transparent;
-    cursor:pointer;
-    font-weight: 800;
-    padding: 6px 10px;
-    border-radius: 6px;
-  }
-  .dr-pagebtn:disabled{ opacity:.4; cursor:not-allowed; }
-  .dr-pagebtn-active{ color: #8b1a0e; }
-  .dr-ellipsis{ padding: 0 6px; font-weight: 900; }
-  .dr-next{
-    border:none;
-    background:transparent;
-    cursor:pointer;
-    font-weight: 900;
-    color:#8b1a0e;
-    }
-
-    body,
-    #sidebar,
-    main,
-    .card {
-      transition: background-color 0.3s ease, color 0.3s ease;
-    
-    }
     [data-theme="dark"] .theme-toggle-container {
       background: #1F1F1F;
       border-color: #2A2A2A;
@@ -530,1496 +383,1771 @@
 
     [data-theme="dark"] .theme-indicator {
       background: #2A2A2A;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
     }
 
-    main,
-    #mainContent,
-    #requestContainer,
-    .request-item,
-    .request-entry,
-    .request-summary,
-    .request-details {
-      min-width: 0;
+    [data-theme="dark"] .table-card {
+      background: #111827 !important;
+      border-color: #2a3244 !important;
     }
 
-    .req-tab {
-      min-width: 0;
+    [data-theme="dark"] .toolbar-wrap {
+      background: #1a2234 !important;
+      border-color: #2a3244 !important;
     }
 
-    .dr-page,
-    .fade-in {
-      max-width: 100%;
+    [data-theme="dark"] .req-row {
+      background: #111827;
+      border-bottom-color: #2a3244 !important;
     }
 
-    body {
-      overflow-x: hidden;
+    [data-theme="dark"] .req-row:hover {
+      background: #1e2535 !important;
+    }
+
+    [data-theme="dark"] .detail-panel {
+      background: #161e2e !important;
+      border-top-color: #2a3244 !important;
+    }
+
+    [data-theme="dark"] .search-wrap {
+      background: #1e2535;
+      border-color: #2a3244;
+    }
+
+    [data-theme="dark"] .search-wrap input {
+      color: #e5e7eb;
+      background: transparent;
+    }
+
+    [data-theme="dark"] .modal-box-inner {
+      background: #1e2535;
+    }
+
+    [data-theme="dark"] .form-input {
+      background: #161e2e;
+      border-color: #2a3244;
+      color: #e5e7eb;
+    }
+
+    [data-theme="dark"] .btn-close-modal {
+      background: #2a3244;
+      color: #aaa;
+    }
+
+    [data-theme="dark"] .tfoot-bar {
+      background: #1a2234 !important;
+      border-color: #2a3244 !important;
+    }
+
+    [data-theme="dark"] .dv {
+      color: #e5e7eb;
+    }
+
+    /* ════ PAGE STYLES ════ */
+
+    /* Stat cards */
+    .stat-card {
+      background: #8B0000;
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem;
+      color: #fff;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s, box-shadow .18s, background .18s;
+      text-decoration: none;
+      display: block;
+      border: 2px solid transparent;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      right: -16px;
+      top: -16px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      bottom: -20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(139, 0, 0, .3);
+    }
+
+    .stat-card.stat-active {
+      background: #6b0000;
+      border-color: rgba(255, 255, 255, .2);
+      box-shadow: 0 6px 20px rgba(139, 0, 0, .45);
+    }
+
+    .stat-num {
+      font-size: 2.5rem;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: .75rem;
+      font-weight: 700;
+      opacity: .8;
+      margin-top: .3rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .stat-icon {
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.7rem;
+      opacity: .15;
+    }
+
+    /* Search — inventory style */
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FAFAF9;
+      border: 1.5px solid #E0DDD8;
+      border-radius: 12px;
+      padding: 0 16px;
+      height: 40px;
+      transition: border-color .2s, box-shadow .2s;
+      width: 288px;
+    }
+
+    .search-wrap:focus-within {
+      border-color: #8B0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+    }
+
+    .search-wrap i.search-icon {
+      color: #8B0000;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .search-wrap input {
+      border: none;
+      background: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 100%;
+    }
+
+    .search-wrap input::placeholder {
+      color: #B0ABA6;
+    }
+
+    .search-clear-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: #E0DDD8;
+      color: #7A7370;
+      font-size: 10px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+      padding: 0;
+    }
+
+    .search-clear-btn:hover {
+      background: rgba(139, 0, 0, .47);
+      color: #fff;
+    }
+
+    .search-clear-btn.visible {
+      display: flex;
+    }
+
+    .row-count {
+      font-size: 12px;
+      color: #9A9490;
+    }
+
+    /* Table card */
+    .table-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #EDE9E4;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+      overflow: hidden;
+    }
+
+    .toolbar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid #EDE9E4;
+      background: #FAFAF9;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+
+    /* Request rows */
+    .req-row {
+      position: relative;
+      background: #fff;
+      border-bottom: 1px solid #F0ECE8;
+      overflow: hidden;
+      transition: background .15s;
+    }
+
+    .req-row:hover {
+      background: #FFF8F8;
+    }
+
+    .req-row:last-child {
+      border-bottom: none;
+    }
+
+    .accent-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .req-inner {
+      padding: 1rem 1.3rem 1rem 1.5rem;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .22rem .7rem;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .7;
+    }
+
+    .badge-approved {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-pending {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .badge-rejected {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Detail panel */
+    .detail-panel {
+      border-top: 1px solid #f3f3f3;
+      background: #fafafa;
+      padding: 1.2rem 1.5rem;
+      display: none;
+    }
+
+    .detail-panel.open {
+      display: block;
+    }
+
+    .dl {
+      font-size: .67rem;
+      font-weight: 700;
+      color: #8B0000;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: .2rem;
+    }
+
+    .dv {
+      font-size: .88rem;
+      font-weight: 600;
+      color: #222;
+    }
+
+    /* Buttons */
+    .btn-approve {
+      background: #15803d;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: .5rem 1.2rem;
+      font-weight: 700;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      transition: background .15s, transform .1s;
+    }
+
+    .btn-approve:hover {
+      background: #166534;
+      transform: scale(1.02);
+    }
+
+    .btn-reject {
+      background: #fff;
+      color: #b91c1c;
+      border: 2px solid #fca5a5;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: .5rem 1.2rem;
+      font-weight: 700;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      transition: all .15s;
+    }
+
+    .btn-reject:hover {
+      background: #b91c1c;
+      color: #fff;
+      border-color: #b91c1c;
+    }
+
+    .btn-view {
+      background: #8B0000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: .45rem 1.1rem;
+      font-weight: 700;
+      font-size: .78rem;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+
+    .btn-view:hover {
+      background: #6b0000;
+    }
+
+    .btn-close-detail {
+      background: #f3f3f3;
+      color: #666;
+      border: none;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: .45rem .9rem;
+      font-weight: 600;
+      font-size: .78rem;
+      transition: background .15s;
+    }
+
+    .btn-close-detail:hover {
+      background: #e8e8e8;
+    }
+
+    /* ════ FILTER BUTTON ════ */
+    .btn-filter-open {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .42rem 1rem;
+      background: #fff;
+      border: 2px solid #e8e0e0;
+      border-radius: 10px;
+      font-size: .8rem;
+      font-weight: 700;
+      color: #555;
+      cursor: pointer;
+      transition: all .18s;
+      position: relative;
+    }
+
+    .btn-filter-open:hover {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #fff8f8;
+    }
+
+    .btn-filter-open.has-filters {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #fff1f1;
+    }
+
+    .filter-badge {
+      min-width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #8B0000;
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      margin-left: .1rem;
+    }
+
+    /* ════ FILTER TAGS (pill toggles) ════ */
+    .ftag {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .38rem .9rem;
+      border-radius: 999px;
+      border: 2px solid #e8e0e0;
+      background: #fafafa;
+      color: #666;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .ftag:hover {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #fff8f8;
+    }
+
+    .ftag.ftag-active {
+      background: #8B0000;
+      border-color: #8B0000;
+      color: #fff;
+    }
+
+    .ftag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .ftag.ftag-active .ftag-dot {
+      background: rgba(255, 255, 255, .8) !important;
+    }
+
+    /* dark mode for filter tags */
+    [data-theme="dark"] .ftag {
+      background: #1e2535;
+      border-color: #2a3244;
+      color: #aaa;
+    }
+
+    [data-theme="dark"] .ftag:hover {
+      border-color: #8B0000;
+      color: #fca5a5;
+    }
+
+    [data-theme="dark"] .btn-filter-open {
+      background: #1e2535;
+      border-color: #2a3244;
+      color: #aaa;
+    }
+
+    [data-theme="dark"] .btn-filter-open:hover,
+    [data-theme="dark"] .btn-filter-open.has-filters {
+      border-color: #8B0000;
+      color: #fca5a5;
+      background: #1e2535;
+    }
+
+    /* ════ EMPTY STATE ════ */
+    .state-box {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #ccc;
+    }
+
+    .state-box i {
+      font-size: 2.5rem;
+      margin-bottom: .75rem;
+      display: block;
+    }
+
+    .state-box strong {
+      display: block;
+      font-size: .95rem;
+      font-weight: 700;
+      color: #bbb;
+      margin-bottom: .3rem;
+    }
+
+    .state-box span {
+      font-size: .8rem;
+    }
+
+    /* Clear filter button inside empty state */
+    .btn-clear-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: 1.1rem;
+      padding: .5rem 1.3rem;
+      background: #fff;
+      color: #8B0000;
+      border: 2px solid #f3c6c6;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      letter-spacing: .02em;
+    }
+
+    .btn-clear-filter:hover {
+      background: #8B0000;
+      color: #fff;
+      border-color: #8B0000;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 0, 0, .2);
+    }
+
+    .btn-clear-filter i {
+      font-size: .72rem;
+      display: inline !important;
+      margin: 0 !important;
+    }
+
+    /* Tfoot bar */
+    .tfoot-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid #EDE9E4;
+      background: #FAFAF9;
+    }
+
+    /* Pagination */
+    .pag-btn {
+      padding: .38rem .8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: .8rem;
+      border: none;
+      cursor: pointer;
+      transition: all .15s;
+      background: transparent;
+      color: #888;
+    }
+
+    .pag-btn:disabled {
+      color: #ddd;
+      cursor: not-allowed;
+    }
+
+    .pag-btn.pag-active {
+      background: #8B0000;
+      color: #fff;
+    }
+
+    .pag-btn:not(.pag-active):not(:disabled):hover {
+      background: #f3e8e8;
+      color: #8B0000;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box-inner {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .2);
+      animation: popIn .25s cubic-bezier(.34, 1.56, .64, 1) both;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(.9)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .modal-hd {
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-bd {
+      padding: 1.1rem 1.5rem;
+    }
+
+    .modal-ft {
+      padding: .75rem 1.5rem 1.3rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: .65rem;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+    }
+
+    .modal-x {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #bbb;
+      font-size: .95rem;
+      padding: .25rem;
+      border-radius: 6px;
+      transition: color .15s;
+    }
+
+    .modal-x:hover {
+      color: #333;
+    }
+
+    .form-label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: .3rem;
+      letter-spacing: .03em;
+    }
+
+    .form-input {
+      width: 100%;
+      border: 2px solid #ebebeb;
+      border-radius: 9px;
+      padding: .58rem .9rem;
+      font-size: .87rem;
+      outline: none;
+      transition: border-color .2s;
+      background: #fff;
+    }
+
+    .form-input:focus {
+      border-color: #8B0000;
+    }
+
+    .btn-close-modal {
+      background: #f3f3f3;
+      color: #555;
+      border: none;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: .55rem 1.2rem;
+      font-weight: 600;
+      font-size: .82rem;
+      transition: background .15s;
+    }
+
+    .btn-close-modal:hover {
+      background: #e8e8e8;
+    }
+
+    /* Skeleton shimmer */
+    @keyframes shimmer {
+      0% {
+        background-position: -468px 0
+      }
+
+      100% {
+        background-position: 468px 0
+      }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 936px 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
     }
   </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body>
 
-<!-- HEADER (TOP BAR) -->
-<div class="fixed top-0 left-0 right-0 z-50
-            bg-gradient-to-r from-[#660000] to-[#8B0000]
-            text-[#F4F4F4] px-6 py-4
-            flex items-center justify-between">
-
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-          <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  {{-- ══════════════ HEADER ══════════════ --}}
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-
-  <div class="flex items-center gap-8">
-      @php
-  // Pass $notifications from controller, or leave it empty for now
-  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
-  @endphp
-
-  <div id="notifDropdown" class="relative">
-    
-  <button id="notifBtn" type="button"
-    class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-
-    @if($notifCount > 0)
-      <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-        {{ $notifCount }}
-      </span>
-    @endif
-
-    <i class="fa-regular fa-bell text-lg"></i>
-  </button>
-
-  <div id="notifMenu"
-  class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-         opacity-0 scale-95 pointer-events-none
-         transition-all duration-200 ease-out origin-top-right">
-
-    <div class="p-4 border-b flex items-center justify-between">
-      <span class="font-bold text-[#8B0000]">Notifications</span>
-    </div>
-
-    <div class="max-h-80 overflow-y-auto">
-      @forelse($notifications as $n)
-        <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-          <div class="text-sm font-semibold text-gray-900">
-            {{ $n['title'] ?? 'Notification' }}
+    <div class="header-right">
+      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
+        </button>
+        <div id="notifMenu">
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div style="max-height:260px; overflow-y:auto;">
+            @forelse($notifications as $n)
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
+            </a>
+            @empty
+            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
+            @endforelse
           </div>
-          @if(!empty($n['message']))
-            <div class="text-xs text-[#ADADAD] mt-0.5">
-              {{ $n['message'] }}
-            </div>
-          @endif
-          @if(!empty($n['time']))
-            <div class="text-[11px] text-gray-400 mt-1">
-              {{ $n['time'] }}
-            </div>
-          @endif
-        </a>
-      @empty
-        <div class="px-4 py-10 text-center justify-items-center">
-          <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-          <div class="text-sm font-semibold text-gray-800">No notifications</div>
-          <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
         </div>
-      @endforelse
-    </div>
-
-  </div>
-</div>
-
-    <div class="flex items-center gap-3">
-      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-      <div>
-        <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-        <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
       </div>
-    </div>
-  </div>
-</div>
-
-<aside id="sidebar"
-  class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
-         transition-all duration-300 flex flex-col justify-between z-40 expanded"
-  style="width: 200px;">
-  <div class="pt-4">
-    <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
-      <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-        class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
-               hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
-        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-      </button>
-    </div>
-
-    <div class="section-label px-4 mb-6">Navigation</div>
-
-    <nav class="space-y-2 px-3 text-gray-600">
-      @php
-      $navLinks = [
-        ['route' => 'dentist.dashboard', 'icon' => 'fa-chart-line', 'label' => 'Dashboard', 'ml' => 'ml-1'],
-        ['route' => 'dentist.patients', 'icon' => 'fa-users', 'label' => 'Patients', 'ml' => 'ml-1.5'],
-        ['route' => 'dentist.appointments', 'icon' => 'fa-calendar-check', 'label' => 'Appointments', 'ml' => 'ml-1'],
-        ['route' => 'dentist.documentrequests', 'icon' => 'fa-file-circle-check', 'label' => 'Document Requests', 'ml' => 'ml-1'],
-        ['route' => 'dentist.inventory', 'icon' => 'fa-box', 'label' => 'Inventory', 'ml' => 'ml-1'],
-        ['route' => 'dentist.report', 'icon' => 'fa-file', 'label' => 'Reports', 'ml' => 'ml-1'],
-      ];
-      @endphp
-
-      @foreach($navLinks as $nav)
-      <a href="{{ route($nav['route']) }}"
-        class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-               transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4]
-               {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-        <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                     {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
-
-        <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 {{ $nav['ml'] }}">
-          <i class="fa-solid {{ $nav['icon'] }} text-lg"></i>
-        </span>
-
-        <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-          {{ $nav['label'] }}
-        </span>
-
-        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-          {{ $nav['label'] }}
-        </span>
-      </a>
-      @endforeach
-    </nav>
-  </div>
-
-  <div class="px-3 pb-5 space-y-4">
-    <div class="section-label">Settings</div>
-
-    <div class="w-full px-3">
-      <div id="themeToggle" class="theme-toggle-container">
-        <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-          <i class="fa-solid fa-sun"></i>
-        </button>
-        <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-          <i class="fa-regular fa-moon"></i>
-        </button>
-        <div class="theme-indicator" aria-hidden="true"></div>
-      </div>
-    </div>
-
-    <form action="{{ route('logout') }}" method="POST">
-      @csrf
-      <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
-                     text-red-600 hover:bg-red-100 transition-all duration-200">
-        <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
-          <i class="fa-solid fa-right-from-bracket text-sm"></i>
-        </div>
-        <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
-          Log out
-        </span>
-        <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-          Log out
-        </span>
-      </button>
-    </form>
-  </div>
-</aside>
-
-<!-- MAIN CONTENT -->
-<main id="mainContent" class="pt-[100px] px-6 py-6 min-h-screen min-w-0 overflow-x-hidden">
-
-  <div class="w-full mt-4 fade-in min-w-0">
-    <div class="px-2 md:px-4 min-w-0">
-
-    <!-- Title + Generate + Search/Filter (same vibe as Patient List) -->
-    <div class="flex flex-col gap-4 mb-6">
-      <!-- Header Section -->
-      <div class="flex flex-col xl:flex-row xl:justify-between gap-6 mb-6 min-w-0">
-
-        <!-- LEFT SIDE -->
+      <div class="header-user">
+        <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
         <div>
-          <h2 class="text-3xl font-bold text-[#8B0000]">Document Requests</h2>
-          <p class="text-gray-500 mt-1">Review and manage requested documents</p>
-        </div>
-
-         <!-- RIGHT SIDE (Button + Search stacked) -->
-        <div class="flex flex-col items-end gap-4 w-full md:w-auto">
-
-          <!-- Generate Button -->
-          <button
-            type="button"
-            class="bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm font-medium shadow hover:bg-[#760000] active:scale-[0.99]"
-          > + Generate Document
-          </button>
-
-          <!-- Search + Filter + Clear -->
-          <div class="flex items-center gap-4 w-full">
-
-            <div class="flex items-center bg-gradient-to-r from-[#8B0000] to-[#F2C94C] p-[2px] rounded-full w-full min-w-0 xl:w-auto">
-              <div class="flex items-center bg-white rounded-full overflow-hidden w-full min-w-0">
-
-                <!-- Search -->
-                <div class="flex items-center gap-2 pl-3 pr-4 py-2 flex-1 min-w-0">
-                  <span class="w-7 h-7 rounded-full bg-[#8B0000] flex items-center justify-center">
-                    <i class="fa-solid fa-magnifying-glass text-white text-[11px]"></i>
-                  </span>
-
-                  <input
-                    id="searchInput"
-                    type="text"
-                    placeholder="Search"
-                    class="w-full min-w-0 xl:w-80 bg-transparent text-sm text-gray-700 placeholder:text-gray-300 focus:outline-none"
-                  />
-                </div>
-
-                <!-- Divider -->
-                <div class="w-[2px] self-stretch bg-[#F2C94C]"></div>
-
-                <!-- Filter -->
-                <button
-                  id="openFilter"
-                  type="button"
-                  class="flex items-center gap-2 px-6 py-2 text-sm font-medium text-[#8B0000] bg-white hover:bg-[#FFF7E6] active:bg-[#FFEFC8]"
-                >
-                  <i class="fa-solid fa-sliders text-[13px]"></i>
-                  <span>Filter</span>
-                </button>
-
-              </div>
-            </div>
-
-            <!-- Clear -->
-            <button
-              id="clearBtn"
-              type="button"
-              class="text-[#8B0000] text-sm font-medium hover:underline"
-            >Clear</button>
-          </div>
+          <div class="header-name">Dr. Nelson Angeles</div>
+          <div class="header-role">Dentist</div>
         </div>
       </div>
     </div>
-    <!-- Floating Tabs (like Patient List) -->
-    <div class="w-full min-w-0">
-      <div class="mx-4 relative">
+  </header>
 
-        <div class="flex flex-wrap gap-4 px-6 relative z-20 min-w-0">
-
-          <button
-            class="req-tab bg-[#8B0000] text-white rounded-t-2xl rounded-b-none px-6 py-4 w-[210px] text-left hover:opacity-90 transition-all duration-200"
-            data-filter="all"
-            type="button">
-            <h3 class="req-count text-4xl font-medium leading-none mb-2">9</h3>
-            <p class="text-base">All Requests</p>
-          </button>
-
-          <button
-            class="req-tab bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-6 py-4 w-[210px] text-left hover:opacity-90 transition-all duration-200"
-            data-filter="pending"
-            type="button">
-            <h3 class="req-count text-4xl font-medium leading-none mb-2">3</h3>
-            <p class="text-base">Pending Requests</p>
-          </button>
-
-          <button
-            class="req-tab bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-6 py-4 w-[210px] text-left hover:opacity-90 transition-all duration-200"
-            data-filter="approved"
-            type="button">
-            <h3 class="req-count text-4xl font-medium leading-none mb-2">3</h3>
-            <p class="text-base">Approved Requests</p>
-          </button>
-
-          <button
-            class="req-tab bg-[#660000] text-white/75 rounded-t-2xl rounded-b-none px-6 py-4 w-[210px] text-left hover:opacity-90 transition-all duration-200"
-            data-filter="rejected"
-            type="button">
-            <h3 class="req-count text-4xl font-medium leading-none mb-2">3</h3>
-            <p class="text-base">Rejected Requests</p>
-          </button>
-
+  {{-- ══════════════ SIDEBAR ══════════════ --}}
+  <aside id="sidebar"
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    style="width:220px;">
+    <div class="pt-4">
+      <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
+        <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+      <div class="section-label px-4 mb-6">Navigation</div>
+      <nav class="space-y-2 px-3 text-gray-600">
+        @foreach([
+        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ] as $nav)
+        <a href="{{ route($nav['route']) }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
+        </a>
+        @endforeach
+      </nav>
+    </div>
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark"><i class="fa-regular fa-moon"></i></button>
+          <div class="theme-indicator" aria-hidden="true"></div>
         </div>
-
-        <!-- White container like patient list -->
-        <div class="mx-4 shadow-lg rounded-lg bg-white overflow-hidden relative min-w-0 w-full">
-
-          <div id="requestContainer" class="space-y-4 px-6 pb-6 pt-14 -mt-8 rounded-t-none min-w-0">
-
-            <!-- REQUEST CARD -->
-            <a href="#"
-              class="request-item approved block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <!-- Accent bar -->
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-green-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <!-- Name + Role -->
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">Capilitan, Beyonce</p>
-                    <p class="text-gray-500 text-xs">BSIT 3-1</p>
-              </div>
-
-              <!-- Date -->
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-green-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">December 25, 2025</p>
-                    </div>
-              </div>
-
-              <!-- Document -->
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-green-600"></i>
-              </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Dental Clearance</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                        Approved
-                      </span>
-                    </div>
-              </div>
-
-                  <!-- Action -->
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                  View
-                </button>
-              </div>
-                </div>
-              </div>
-            </a>
-
-            <!-- REQUEST CARD -->
-            <a href="#"
-              class="request-item pending block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">Romero, Dianna</p>
-                    <p class="text-gray-500 text-xs">Faculty</p>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-orange-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">December 25, 2025</p>
-            </div>
-          </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-orange-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Annual Dental Clearance</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
-                        Pending
-                      </span>
-                    </div>
-                  </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
-                </div>
-              </div>
-            </a>
-
-            <!-- REQUEST CARD -->
-            <a href="#"
-              class="request-item rejected block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-red-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">Lopez, Hoshea</p>
-                    <p class="text-gray-500 text-xs">Administrative</p>
-              </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-red-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">December 25, 2025</p>
-                    </div>
-              </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-red-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Dental Health Record</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">
-                        Rejected
-                      </span>
-                    </div>
-              </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-              </div>
-                </div>
-              </div>
-            </a>
-
-            <!-- ✅ CLEAN, REUSABLE REQUEST ENTRY (works with filter/search + dropdown) -->
-            <!-- Put this INSIDE #requestContainer -->
-
-            <!-- ✅ ARAGON ENTRY (CARD + DROPDOWN styled like your screenshot) -->
-            <div class="request-entry pending">
-
-              <!-- COMPACT CARD (default) -->
-              <div class="request-summary request-item relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
-                
-                <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-                <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                  <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                    <div class="col-span-4">
-                      <p class="font-semibold text-[#333333] text-sm">Aragon, Althea</p>
-                      <p class="text-gray-500 text-xs">Administrative</p>
-                    </div>
-
-                    <div class="col-span-3 flex items-start gap-3">
-                      <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <i class="fa-regular fa-calendar text-orange-600"></i>
-                      </div>
-                      <div class="text-sm">
-                        <p class="text-gray-400 text-xs uppercase">Date Requested</p>
-                        <p class="font-semibold text-[#333333]">December 25, 2025</p>
-                      </div>
-                    </div>
-
-                    <div class="col-span-3 flex items-start gap-3">
-                      <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <i class="fa-regular fa-file-lines text-orange-600"></i>
-                      </div>
-                      <div class="text-sm">
-                        <p class="text-gray-400 text-xs uppercase">Document</p>
-                        <p class="font-semibold text-[#333333]">Odontogram Chart</p>
-                        <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
-                          Pending
-                        </span>
-                      </div>
-                    </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                  View
-                </button>
-              </div>
-
-                  </div>
-            </div>
-          </div>
-
-
-              <!-- EXPANDED VIEW -->
-              <div class="request-details hidden border border-orange-300 mt-3 bg-white rounded-xl bg-white overflow-hidden">
-
-                <!-- NEW HEADER -->
-                <div class="flex items-cente justify-between px-8 py-6 bg-gray-50">
-
-                  <div>
-                    <p class="font-semibold text-[#333333]">Aragon, Althea</p>
-                <p class="text-sm text-gray-500">Administrative</p>
-              </div>
-
-                  <div class="flex items-center gap-6">
-                    <div>
-                      <p class="text-xs text-gray-400">STATUS</p>
-                      <span class="px-5 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-semibold">
-                        Pending
-                      </span>
-              </div>
-
-                    <button class="close-btn bg-[#8B0000] text-white px-6 py-2 rounded-md text-sm">
-                      Close
-                    </button>
-                  </div>
-              </div>
-
-                <!-- BODY -->
-                <div class="px-10 py-8">
-                  <div class="grid grid-cols-12 items-start gap-10">
-
-                    <!-- LEFT GROUP (Office + Date + Last Visit) -->
-                    <div class="col-span-5 grid grid-cols-2 gap-10">
-                      <!-- Office -->
-                      <div>
-                        <p class="text-xs text-[#8B0000]">Office / Department</p>
-                        <p class="text-lg font-semibold text-[#8B0000] mt-1">Admission</p>
-              </div>
-
-                      <!-- Date + Last Visit -->
-                      <div>
-                        <p class="text-xs text-[#8B0000]">Date Requested</p>
-                        <p class="text-l font-semibold text-[#8B0000] mt-1">December 25, 2025</p>
-
-                        <div class="mt-6">
-                          <p class="text-xs text-[#8B0000]">Last Dental Visit</p>
-                          <p class="text-l font-semibold text-[#8B0000] mt-1">November 30, 2025</p>
-
-                          <button type="button"
-                            class="mt-3 bg-[#8B0000] text-white px-6 py-2 rounded-md text-xs hover:bg-[#6e0000] transition">
-                            View Dental Record
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- CENTER LINE -->
-                    <div class="col-span-1 flex justify-center">
-                      <div class="w-px h-full bg-gray-300"></div>
-                    </div>
-
-                    <!-- RIGHT GROUP (Document + Purpose + Buttons) -->
-                    <div class="col-span-6 flex items-start justify-between">
-                      <!-- Text -->
-                      <div>
-                        <p class="text-xs text-[#8B0000]">Document</p>
-                        <p class="text-l font-bold text-[#8B0000] mt-1">Dental Record</p>
-                        <p class="text-sm text-gray-500">September 25, 2025</p>
-
-                        <div class="mt-6">
-                          <p class="text-xs text-[#8B0000]">Purpose</p>
-                          <p class="text-l font-bold text-[#8B0000] mt-1">Personal Record</p>
-                        </div>
-                      </div>
-
-                      <!-- Buttons (far right) -->
-                      <div class="flex flex-col gap-4">
-                        <button type="button"
-                          class="approve-btn bg-green-600 text-white px-12 py-3 rounded-md font-semibold hover:bg-green-700 transition">
-                          Approve
-                        </button>
-
-                        <button type="button"
-                          class="reject-btn bg-red-600 text-white px-12 py-3 rounded-md font-semibold hover:bg-red-700 transition">
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-            <!-- REQUEST CARD (REJECTED) - Lim, Grace -->
-            <a href="#"
-              class="request-item rejected block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-red-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">Lim, Grace</p>
-                    <p class="text-gray-500 text-xs">BSIT 3-1</p>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-red-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">December 25, 2025</p>
-                    </div>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-red-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Dental Health Record</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">
-                        Rejected
-                      </span>
-                    </div>
-                  </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                  View
-                </button>
-              </div>
-                </div>
-              </div>
-            </a>
-
-            <!-- NEW REQUEST (APPROVED) -->
-            <a href="#"
-              class="request-item approved block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-green-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">Santos, John</p>
-                    <p class="text-gray-500 text-xs">BSIT 2-2</p>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-green-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">January 10, 2026</p>
-            </div>
-          </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-green-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Dental Clearance</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                        Approved
-                      </span>
-                    </div>
-                  </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
-                </div>
-              </div>
-            </a>
-
-            <!-- NEW REQUEST (PENDING) -->
-            <a href="#"
-              class="request-item pending block relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer">
-
-              <div class="absolute left-0 top-0 h-full w-[6px] bg-orange-500 rounded-l-xl"></div>
-
-              <div class="flex items-center gap-6 px-8 py-6 pl-12">
-                <div class="flex-1 grid grid-cols-12 items-center gap-6">
-
-                  <div class="col-span-4">
-                    <p class="font-semibold text-[#333333] text-sm">De Vera, Angela</p>
-                    <p class="text-gray-500 text-xs">Faculty</p>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                      <i class="fa-regular fa-calendar text-orange-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Date Requested</p>
-                      <p class="font-semibold text-[#333333]">January 11, 2026</p>
-                    </div>
-                  </div>
-
-                  <div class="col-span-3 flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                      <i class="fa-regular fa-file-lines text-orange-600"></i>
-                    </div>
-                    <div class="text-sm">
-                      <p class="text-gray-400 text-xs uppercase tracking-wide">Document</p>
-                      <p class="font-semibold text-[#333333]">Annual Dental Clearance</p>
-                      <span class="inline-block mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-medium">
-                        Pending
-                      </span>
-                    </div>
-                  </div>
-
-                    <div class="col-span-2 flex justify-end">
-                      <button class="view-btn bg-[#8B0000] text-white text-sm px-5 py-2 rounded-md">
-                        View
-                      </button>
-                    </div>
-                </div>
-              </div>
-            </a>
-
-        </div>
-
-          <!-- Pagination (use your patient list style) -->
-          <div id="pagination" class="flex items-center justify-center gap-4 py-8 text-sm text-gray-600">
-            <button id="prevPage" class="flex items-center gap-1 px-2 py-1 text-gray-300 cursor-not-allowed" disabled>
-              <span>‹</span> Previous
-            </button>
-
-            <div id="pageNumbers" class="flex items-center gap-2"></div>
-
-            <button id="nextPage" class="flex items-center gap-1 px-2 py-1 text-[#8B0000] hover:underline">
-              Next <span>›</span>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  {{-- ══════════════ MAIN ══════════════ --}}
+  <main id="mainContent" class="pt-[62px] min-h-screen pb-10" style="margin-left:220px;">
+    <div class="max-w-7xl mx-auto px-6 py-8 fade-up">
+
+      {{-- Page heading --}}
+      <div style="margin-bottom:1.75rem;">
+        <h1 style="font-size:1.9rem; font-weight:800; color:#8B0000; line-height:1.1; margin:0;">Document Requests</h1>
+        <p style="color:#999; font-size:.83rem; margin:.3rem 0 0;">Review, approve or reject patient document requests</p>
+      </div>
+
+      {{-- Stat cards --}}
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:.9rem; margin-bottom:1.75rem;" id="statCards">
+        <button class="stat-card stat-active" data-filter="all" onclick="setFilter('all')">
+          <div class="stat-num" id="statAll">—</div>
+          <div class="stat-label">All Requests</div>
+          <i class="fa-solid fa-layer-group stat-icon"></i>
+        </button>
+        <button class="stat-card" data-filter="pending" onclick="setFilter('pending')">
+          <div class="stat-num" id="statPending">—</div>
+          <div class="stat-label">Pending</div>
+          <i class="fa-solid fa-hourglass-half stat-icon"></i>
+        </button>
+        <button class="stat-card" data-filter="approved" onclick="setFilter('approved')">
+          <div class="stat-num" id="statApproved">—</div>
+          <div class="stat-label">Approved</div>
+          <i class="fa-solid fa-circle-check stat-icon"></i>
+        </button>
+        <button class="stat-card" data-filter="rejected" onclick="setFilter('rejected')">
+          <div class="stat-num" id="statRejected">—</div>
+          <div class="stat-label">Rejected</div>
+          <i class="fa-solid fa-circle-xmark stat-icon"></i>
+        </button>
+      </div>
+
+      {{-- Table card --}}
+      <div class="table-card">
+
+        {{-- Toolbar --}}
+        <div class="toolbar-wrap">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input id="searchInput" type="text" placeholder="Search by patient name…"
+              oninput="onSearch(this)" />
+            <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" title="Clear">
+              <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
+          <div style="display:flex; align-items:center; gap:.75rem;">
+            <span class="row-count" id="rowCount"></span>
+            <button id="filterBtn" onclick="openFilterModal()" class="btn-filter-open">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Filter</span>
+              <span id="filterBadge" class="filter-badge" style="display:none;"></span>
+            </button>
+          </div>
+        </div>
 
+        {{-- Request list --}}
+        <div id="requestContainer"></div>
+
+        {{-- Footer / pagination --}}
+        <div class="tfoot-bar">
+          <span style="font-size:12px; color:#9A9490;" id="pageInfo"></span>
+          <div style="display:flex; align-items:center; gap:.4rem;" id="pagControls"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  {{-- ══════════════ FOOTER ══════════════ --}}
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
+
+  {{-- ══════════ FILTER MODAL ══════════ --}}
+  <div id="filterModal" class="modal-overlay">
+    <div class="modal-box-inner" style="max-width:480px;">
+      <div class="modal-hd" style="background:linear-gradient(135deg,#6b0000,#8B0000); border-bottom:none;">
+        <div>
+          <div class="modal-title" style="color:#fff; font-weight:800;">
+            <i class="fa-solid fa-sliders" style="margin-right:.45rem; font-size:1rem;"></i>Filter Requests
+          </div>
+          <div style="font-size:.74rem; color:rgba(255,255,255,.65); margin-top:.18rem;">Narrow down the list by applying filters below</div>
+        </div>
+        <button class="modal-x" id="filterCloseBtn" style="color:rgba(255,255,255,.6);" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,.6)'">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-bd" style="padding:1.4rem 1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+
+        {{-- Status --}}
+        <div>
+          <label class="form-label" style="margin-bottom:.55rem;">Status</label>
+          <div style="display:flex; gap:.5rem; flex-wrap:wrap;" id="fStatusGroup">
+            <button class="ftag ftag-active" data-val="all">All</button>
+            <button class="ftag" data-val="pending">
+              <span class="ftag-dot" style="background:#c2410c;"></span> Pending
+            </button>
+            <button class="ftag" data-val="approved">
+              <span class="ftag-dot" style="background:#15803d;"></span> Approved
+            </button>
+            <button class="ftag" data-val="rejected">
+              <span class="ftag-dot" style="background:#b91c1c;"></span> Rejected
+            </button>
+          </div>
+        </div>
+
+        {{-- Document type --}}
+        <div>
+          <label class="form-label" style="margin-bottom:.55rem;">Document Type</label>
+          <div style="position:relative;">
+            <i class="fa-solid fa-file-lines" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
+            <select id="fDocType" class="form-input" style="padding-left:2rem; appearance:none; cursor:pointer; background-image:url(\" data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B0000' stroke-width='2.5' %3E%3Cpath d='M6 9l6 6 6-6' /%3E%3C/svg%3E\"); background-repeat:no-repeat; background-position:right 12px center;">
+              <option value="">All Document Types</option>
+              <option>Dental Clearance</option>
+              <option>Dental Health Record</option>
+              <option>Annual Dental Clearance</option>
+              <option>Medical Certificate</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        {{-- Date range --}}
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:.75rem;">
+          <div>
+            <label class="form-label">Date From</label>
+            <div style="position:relative;">
+              <i class="fa-regular fa-calendar" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
+              <input id="fDateFrom" type="date" class="form-input" style="padding-left:2rem; cursor:pointer;">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Date To</label>
+            <div style="position:relative;">
+              <i class="fa-regular fa-calendar" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
+              <input id="fDateTo" type="date" class="form-input" style="padding-left:2rem; cursor:pointer;">
+            </div>
+          </div>
+        </div>
+
+        {{-- Sort --}}
+        <div>
+          <label class="form-label" style="margin-bottom:.55rem;">Sort By</label>
+          <div style="display:flex; gap:.5rem; flex-wrap:wrap;" id="fSortGroup">
+            <button class="ftag ftag-active" data-val="newest">
+              <i class="fa-solid fa-arrow-down-short-wide" style="font-size:.7rem;"></i> Newest First
+            </button>
+            <button class="ftag" data-val="oldest">
+              <i class="fa-solid fa-arrow-up-short-wide" style="font-size:.7rem;"></i> Oldest First
+            </button>
+            <button class="ftag" data-val="name_asc">
+              <i class="fa-solid fa-arrow-down-a-z" style="font-size:.7rem;"></i> Name A–Z
+            </button>
+            <button class="ftag" data-val="name_desc">
+              <i class="fa-solid fa-arrow-up-a-z" style="font-size:.7rem;"></i> Name Z–A
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-ft" style="justify-content:space-between;">
+        <button id="filterResetBtn" class="btn-close-modal" style="display:flex;align-items:center;gap:.4rem;">
+          <i class="fa-solid fa-rotate-left" style="font-size:.75rem;"></i> Reset All
+        </button>
+        <div style="display:flex;gap:.6rem;">
+          <button class="btn-close-modal" id="filterCancelBtn">Cancel</button>
+          <button id="filterApplyBtn" class="btn-approve" style="padding:.55rem 1.6rem;">
+            <i class="fa-solid fa-check"></i> Apply Filters
+          </button>
         </div>
       </div>
     </div>
-
   </div>
-</div>
 
-</main>
-
-<!-- Footer  -->
-<footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-    <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
-    <span class="hidden sm:inline">|</span>
-    <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
-    <span class="hidden sm:inline">|</span>
-    <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
-  </div>
-</footer> 
-
-<!-- ✅ APPROVAL MODAL -->
-<div id="approveModal"
-  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
-
-  <div class="w-full max-w-3xl rounded-2xl overflow-hidden bg-white shadow-2xl">
-    <!-- Header -->
-    <div class="bg-green-700 text-white text-center py-5 text-2xl font-extrabold">
-      Approve Document Request
-    </div>
-
-    <!-- Body -->
-    <div class="p-10 text-center">
-      <h3 class="text-green-700 text-2xl font-extrabold mb-6">
-        Approve the following request of<br>the patient?:
-      </h3>
-
-      <div id="approvePatientName"
-        class="mx-auto max-w-2xl border-2 border-gray-400 rounded-lg py-6 px-6
-               text-4xl font-extrabold text-gray-700">
-        —
+  {{-- ══════════ APPROVE MODAL ══════════ --}}
+  <div id="approveModal" class="modal-overlay">
+    <div class="modal-box-inner">
+      <div class="modal-hd" style="background:#f0fdf4; border-bottom:1px solid #dcfce7;">
+        <div>
+          <div class="modal-title" style="color:#15803d;">Approve Request</div>
+          <div style="font-size:.75rem; color:#86efac; margin-top:.15rem;">Patient will be notified upon approval</div>
+        </div>
+        <button class="modal-x" id="approveCancelBtn"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <p class="mt-8 text-gray-500 text-sm">
-        The document requested will be printed after the confirmation of approval.
-      </p>
-
-      <div class="mt-10 flex justify-end gap-5">
-        <button id="approveCancelBtn"
-          class="bg-gray-300 text-gray-800 px-10 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
-          Cancel
-        </button>
-
-        <button id="approveConfirmBtn"
-          class="bg-green-700 text-white px-12 py-3 rounded-lg font-extrabold hover:bg-green-800 transition">
-          APPROVE
+      <div class="modal-bd">
+        <p style="font-size:.85rem; color:#666; margin-bottom:.9rem;">Approving document request for:</p>
+        <div style="background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px; padding:.9rem 1.1rem; text-align:center;">
+          <div id="approvePatientName" style="font-size:1.35rem; color:#15803d;">—</div>
+        </div>
+        <p style="font-size:.75rem; color:#bbb; margin-top:.8rem; text-align:center;">The document will be prepared for printing and signing.</p>
+      </div>
+      <div class="modal-ft">
+        <button class="btn-close-modal" id="approveCancelBtn2">Cancel</button>
+        <button class="btn-approve" id="approveConfirmBtn" style="padding:.55rem 1.6rem;">
+          <i class="fa-solid fa-check"></i> Confirm Approval
         </button>
       </div>
     </div>
   </div>
-</div>
+  <input type="hidden" id="approveRequestId">
 
-<!-- ✅ REJECT MODAL -->
-<div id="rejectModal"
-  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
-
-  <div class="w-full max-w-3xl rounded-2xl overflow-hidden bg-white shadow-2xl">
-    <!-- Header -->
-    <div class="bg-[#8B0000] text-white text-center py-5 text-2xl font-extrabold">
-      Reject Document Request
-    </div>
-
-    <!-- Body -->
-    <div class="p-10 text-center">
-      <h3 class="text-gray-700 text-2xl font-extrabold mb-2">
-        Reject the following request of the patient?
-      </h3>
-      <p class="text-gray-500 text-sm mb-6">This action cannot be undone.</p>
-
-      <div id="rejectPatientName"
-        class="mx-auto max-w-2xl border-2 border-gray-500 rounded-lg py-6 px-6
-               text-4xl font-extrabold text-gray-700 bg-gray-50">
-        —
+  {{-- ══════════ REJECT MODAL ══════════ --}}
+  <div id="rejectModal" class="modal-overlay">
+    <div class="modal-box-inner">
+      <div class="modal-hd" style="background:#fef2f2; border-bottom:1px solid #fee2e2;">
+        <div>
+          <div class="modal-title" style="color:#b91c1c;">Reject Request</div>
+          <div style="font-size:.75rem; color:#fca5a5; margin-top:.15rem;">This action cannot be undone</div>
+        </div>
+        <button class="modal-x" id="rejectCancelBtn"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <div class="max-w-2xl mx-auto text-left mt-6">
-        <p class="text-sm font-semibold text-gray-700 mb-2">Notes for Rejection:</p>
-        <textarea id="rejectNotes"
-          class="w-full min-h-[110px] rounded-lg bg-gray-100 p-4 text-sm outline-none focus:ring-2 focus:ring-[#8B0000]/40"
-          placeholder="Add notes here..."></textarea>
+      <div class="modal-bd">
+        <p style="font-size:.85rem; color:#666; margin-bottom:.9rem;">Rejecting document request for:</p>
+        <div style="background:#fef2f2; border:2px solid #fecaca; border-radius:12px; padding:.9rem 1.1rem; text-align:center; margin-bottom:.9rem;">
+          <div id="rejectPatientName" style="font-size:1.35rem; color:#b91c1c;">—</div>
+        </div>
+        <label class="form-label">Reason <span style="color:#bbb; font-weight:400;">(optional)</span></label>
+        <textarea id="rejectNotes" class="form-input" rows="3" placeholder="Add a note for the patient…" style="resize:vertical;"></textarea>
       </div>
-
-      <div class="mt-8 flex justify-end gap-5">
-        <button id="rejectCancelBtn"
-          class="bg-gray-300 text-gray-800 px-10 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
-          Cancel
-        </button>
-
+      <div class="modal-ft">
+        <button class="btn-close-modal" id="rejectCancelBtn2">Cancel</button>
         <button id="rejectConfirmBtn"
-          class="bg-[#8B0000] text-white px-12 py-3 rounded-lg font-extrabold hover:bg-[#6e0000] transition">
-          REJECT
+          style="background:#b91c1c; color:#fff; border:none; cursor:pointer; border-radius:9px; padding:.55rem 1.6rem; font-weight:700; font-size:.82rem; display:flex; align-items:center; gap:.35rem; transition:background .15s;">
+          <i class="fa-solid fa-xmark"></i> Confirm Rejection
         </button>
       </div>
     </div>
   </div>
-</div>
+  <input type="hidden" id="rejectRequestId">
 
-
-<!-- ✅ APPROVED RESULT MODAL -->
-<div id="approvedResultModal"
-  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
-  <div class="w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl bg-[#0B7A3B]">
-    <div class="px-10 py-12 text-center text-white">
-      <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
-        This request has been<br/>approved.
-      </h2>
-
-      <p class="text-white/80 text-sm mt-6 leading-relaxed">
-        The document will now be printed for signing and validation.<br/>
-        The patient will be notified for the claiming of the document.
-      </p>
-
-      <div class="mt-7 text-white/90 text-sm font-semibold">Claiming Validity:</div>
-
-      <div class="mt-4 flex flex-col items-center gap-3">
-        <div class="flex items-center gap-3">
-          <span class="w-12 text-right text-white/80 text-sm">From:</span>
-          <input id="approvedFrom" type="date"
-            class="w-40 h-8 rounded bg-white/90 text-gray-900 px-3 text-sm outline-none focus:ring-2 focus:ring-white/60">
+  {{-- ══════════ APPROVED RESULT ══════════ --}}
+  <div id="approvedResultModal" class="modal-overlay">
+    <div class="modal-box-inner">
+      <div style="background:linear-gradient(135deg,#15803d,#16a34a); padding:2.5rem 2rem; text-align:center; color:#fff;">
+        <div style="width:58px;height:58px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;">
+          <i class="fa-solid fa-circle-check" style="font-size:1.7rem;"></i>
         </div>
-
-        <div class="flex items-center gap-3">
-          <span class="w-12 text-right text-white/80 text-sm">Until:</span>
-          <input id="approvedUntil" type="date"
-            class="w-40 h-8 rounded bg-white/90 text-gray-900 px-3 text-sm outline-none focus:ring-2 focus:ring-white/60">
-        </div>
-      </div>
-
-      <div class="mt-10 flex justify-end">
+        <div style="font-size:1.55rem;margin-bottom:.5rem;">Request Approved!</div>
+        <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The document has been approved and will be<br>prepared for printing. The patient will be notified.</p>
         <button id="approvedResultClose"
-          class="bg-gray-200 text-gray-800 px-8 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition">
-          Close
+          style="margin-top:1.4rem;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:9px;padding:.5rem 1.5rem;font-weight:700;cursor:pointer;font-size:.83rem;">
+          Done
         </button>
       </div>
     </div>
   </div>
-</div>
 
-
-<!-- ✅ REJECTED RESULT MODAL -->
-<div id="rejectedResultModal"
-  class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/50 p-4">
-  <div class="w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl bg-[#7B0000]">
-    <div class="px-10 py-14 text-center text-white">
-      <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
-        This request has been<br/>rejected.
-      </h2>
-
-      <p class="text-white/70 text-sm mt-6">
-        The patient will be notified of the document request status.
-      </p>
-
-      <div class="mt-12 flex justify-end">
+  {{-- ══════════ REJECTED RESULT ══════════ --}}
+  <div id="rejectedResultModal" class="modal-overlay">
+    <div class="modal-box-inner">
+      <div style="background:linear-gradient(135deg,#991b1b,#b91c1c); padding:2.5rem 2rem; text-align:center; color:#fff;">
+        <div style="width:58px;height:58px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;">
+          <i class="fa-solid fa-circle-xmark" style="font-size:1.7rem;"></i>
+        </div>
+        <div style="font-size:1.55rem;margin-bottom:.5rem;">Request Rejected</div>
+        <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The request has been rejected. The patient<br>will be notified of the decision.</p>
         <button id="rejectedResultClose"
-          class="bg-gray-200 text-gray-800 px-8 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition">
-          Close
+          style="margin-top:1.4rem;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:9px;padding:.5rem 1.5rem;font-weight:700;cursor:pointer;font-size:.83rem;">
+          Done
         </button>
       </div>
     </div>
   </div>
-</div>
 
+  {{-- ══════════ SCRIPTS ══════════ --}}
+  <script>
+    const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+    const html = document.documentElement;
 
-<script>
-
-  // =========================
-  // THEME TOGGLE
-  // =========================
-  const html = document.documentElement;
-  const themeToggleContainer = document.getElementById("themeToggle");
-  const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-  const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
-
-  function applyTheme(theme) {
-    html.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-
-    themeOptions.forEach(option => {
-      if (option.getAttribute("data-theme") === theme) {
-        option.classList.add("active");
-      } else {
-        option.classList.remove("active");
-      }
-    });
-
-    if (theme === "dark") {
-      themeIndicator.classList.add("dark-mode");
-    } else {
-      themeIndicator.classList.remove("dark-mode");
-    }
-  }
-
-  applyTheme(localStorage.getItem("theme") || "light");
-
-  themeOptions.forEach(option => {
-    option.addEventListener("click", () => {
-      const theme = option.getAttribute("data-theme");
-      applyTheme(theme);
-    });
-  });
-
-  // ------------------------------------------------------------------------------------
-  let sidebarOpen = true;
-
-  function applyLayout(sidebarWidth) {
-    const sidebar = document.getElementById('sidebar');
-    const main = document.getElementById('mainContent');
-    sidebar.style.width = sidebarWidth;
-    main.style.marginLeft = sidebarWidth;
-  }
-
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const texts = document.querySelectorAll('.sidebar-text');
-    const icon = document.getElementById('sidebarIcon');
-    const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
-    sidebarOpen = !sidebarOpen;
-
-    if (sidebarOpen) {
-      applyLayout('220px');
-      sidebar.classList.remove('collapsed');
-      sidebar.classList.add('expanded');
-      texts.forEach(t => {
-        t.classList.remove('opacity-0', 'w-0');
-        t.classList.add('opacity-100');
-      });
-      toggleWrapper.classList.remove('justify-center');
-      toggleWrapper.classList.add('justify-end');
-      icon.classList.replace('fa-bars', 'fa-xmark');
-    } else {
-      applyLayout('72px');
-      sidebar.classList.remove('expanded');
-      sidebar.classList.add('collapsed');
-      texts.forEach(t => {
-        t.classList.add('opacity-0', 'w-0');
-        t.classList.remove('opacity-100');
-      });
-      toggleWrapper.classList.remove('justify-end');
-      toggleWrapper.classList.add('justify-center');
-      icon.classList.replace('fa-xmark', 'fa-bars');
+    /* ── Theme ── */
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      document.querySelectorAll(".theme-option").forEach(o =>
+        o.getAttribute("data-theme") === theme ? o.classList.add("active") : o.classList.remove("active"));
+      const ind = document.querySelector(".theme-indicator");
+      if (ind) theme === "dark" ? ind.classList.add("dark-mode") : ind.classList.remove("dark-mode");
     }
 
-    applyTheme(localStorage.getItem("theme") || "light");
-  }
+    /* ── Sidebar ── */
+    let sidebarOpen = true;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    sidebarOpen = true;
-    applyLayout('220px');
-  });
-
-  // ------------------------------------------------------------------------------------
-  // NOTIFICATION
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("notifBtn");
-    const menu = document.getElementById("notifMenu");
-
-    let isOpen = false;
-
-    function openMenu() {
-      isOpen = true;
-      menu.classList.remove("notif-close");
-      menu.classList.add("notif-open");
+    function applyLayout(w) {
+      document.getElementById('sidebar').style.width = w;
+      document.getElementById('mainContent').style.marginLeft = w;
     }
 
-    function closeMenu() {
-      isOpen = false;
-      menu.classList.remove("notif-open");
-      menu.classList.add("notif-close");
-    }
-
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-
-    document.addEventListener("click", () => {
-      if (isOpen) closeMenu();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) closeMenu();
-    });
-
-    closeMenu();
-  });
-// ------------------------------------------------------------------------------------
-  
-
-// DROP DOWN --------------------------------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("requestContainer");
-  if (!container) return;
-
-  const allItems = Array.from(container.querySelectorAll(".request-item"));
-  const tabs = document.querySelectorAll(".req-tab");
-  const searchInput = document.getElementById("searchInput");
-  const clearBtn = document.getElementById("clearBtn");
-
-  const prevBtn = document.getElementById("prevPage");
-  const nextBtn = document.getElementById("nextPage");
-  const pageNumbers = document.getElementById("pageNumbers");
-
-  // ✅ IMPORTANT: Only take TOP LEVEL children
-  // - .request-entry (Aragon wrapper)
-  // - direct child .request-item (your <a> cards)
-  const allEntries = Array.from(container.children).filter(el =>
-    el.classList.contains("request-entry") || el.classList.contains("request-item")
-  );
-
-  let activeTab = "all";
-  let activeSearch = "";
-  let currentPage = 1;
-
-  const perPage = 5; // ✅ change this freely now (2,3,4,10...) and it will work
-
-  function setActiveTabUI(btn) {
-    btn.classList.remove("bg-[#660000]", "text-white/75");
-    btn.classList.add("bg-[#8B0000]", "text-white");
-  }
-  function setInactiveTabUI(btn) {
-    btn.classList.remove("bg-[#8B0000]", "text-white");
-    btn.classList.add("bg-[#660000]", "text-white/75");
-  }
-
-  function getNameText(entry) {
-    // works for both <a.request-item> and .request-entry wrapper
-    const name =
-      entry.querySelector(".col-span-4 .font-semibold")?.textContent ||
-      entry.querySelector(".font-semibold")?.textContent ||
-      "";
-    return name.trim().toLowerCase();
-  }
-
-  function entryHasStatus(entry, status) {
-    // wrapper has pending/approved/rejected OR direct card has it
-    return entry.classList.contains(status);
-  }
-
-  function getFilteredEntries() {
-    return allEntries.filter(entry => {
-      if (activeTab !== "all" && !entryHasStatus(entry, activeTab)) return false;
-      if (activeSearch && !getNameText(entry).includes(activeSearch)) return false;
-    return true;
-    });
-  }
-
-  function render() {
-    const filtered = getFilteredEntries();
-    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-
-    // keep currentPage valid
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const start = (currentPage - 1) * perPage;
-    const pageItems = filtered.slice(start, start + perPage);
-
-    // re-render list
-    container.innerHTML = "";
-    pageItems.forEach(el => container.appendChild(el));
-
-    // prev/next state
-    if (prevBtn) prevBtn.disabled = currentPage === 1;
-    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
-
-    if (pageNumbers) {
-      pageNumbers.innerHTML = "";
-      for (let i = 1; i <= totalPages; i++) {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.textContent = i;
-        b.className =
-          "px-3 py-1 rounded-md font-semibold " +
-          (i === currentPage ? "text-[#8B0000]" : "text-gray-400 hover:text-[#8B0000]");
-        b.addEventListener("click", () => {
-          currentPage = i;
-          render();
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const texts = document.querySelectorAll('.sidebar-text');
+      const icon = document.getElementById('sidebarIcon');
+      const wrapper = document.getElementById('sidebarToggleWrapper');
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) {
+        applyLayout('220px');
+        sidebar.classList.replace('collapsed', 'expanded');
+        texts.forEach(t => {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
         });
-        pageNumbers.appendChild(b);
-  }
+        wrapper.classList.replace('justify-center', 'justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        applyLayout('72px');
+        sidebar.classList.replace('expanded', 'collapsed');
+        texts.forEach(t => {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        wrapper.classList.replace('justify-end', 'justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
+      }
+      applyTheme(localStorage.getItem("theme") || "light");
     }
-  }
 
-  function updateTabCounts() {
-  const counts = { all: 0, pending: 0, approved: 0, rejected: 0 };
+    /* ════════════════════════════════════
+       DATA + RENDER ENGINE
+    ════════════════════════════════════ */
+    let allRequests = [];
+    let activeFilter = 'all';
+    let searchQuery = '';
+    const PER_PAGE = 8;
+    let currentPage = 1;
 
-  allEntries.forEach(entry => {
-    counts.all++;
+    /* ── Advanced filter state ── */
+    let filterStatus = 'all'; // mirrors activeFilter but set via modal
+    let filterDocType = '';
+    let filterDateFrom = '';
+    let filterDateTo = '';
+    let filterSort = 'newest';
 
-    if (entry.classList.contains("pending")) counts.pending++;
-    if (entry.classList.contains("approved")) counts.approved++;
-    if (entry.classList.contains("rejected")) counts.rejected++;
-  });
+    async function loadData() {
+      showSkeleton();
+      try {
+        const res = await fetch('/dentist/document-requests/data', {
+          cache: 'no-store'
+        });
+        const json = await res.json();
+        allRequests = json.requests || [];
+        updateStats(json.stats || {});
+        renderList();
+      } catch (e) {
+        document.getElementById('requestContainer').innerHTML = `
+      <div class="state-box">
+        <i class="fa-solid fa-circle-exclamation" style="color:#fca5a5;"></i>
+        <strong>Failed to load</strong>
+        <span>Could not fetch requests. Please refresh.</span>
+      </div>`;
+      }
+    }
 
-  document.querySelectorAll(".req-tab").forEach(tab => {
-    const key = tab.dataset.filter; // all/pending/approved/rejected
-    const h3 = tab.querySelector(".req-count");
-    if (h3 && counts[key] !== undefined) h3.textContent = counts[key];
-  });
-}
+    function showSkeleton() {
+      let html = '';
+      for (let i = 0; i < 4; i++) {
+        html += `<div class="req-row">
+      <div class="req-inner" style="display:grid; grid-template-columns:1fr 1fr 1.4fr auto; align-items:center; gap:1rem;">
+        <div style="display:flex;align-items:center;gap:.8rem;">
+          <div class="skeleton" style="width:40px;height:40px;border-radius:11px;flex-shrink:0;"></div>
+          <div>
+            <div class="skeleton" style="height:13px;width:110px;margin-bottom:6px;"></div>
+            <div class="skeleton" style="height:10px;width:70px;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="skeleton" style="height:10px;width:60px;margin-bottom:5px;"></div>
+          <div class="skeleton" style="height:13px;width:80px;"></div>
+        </div>
+        <div>
+          <div class="skeleton" style="height:10px;width:55px;margin-bottom:5px;"></div>
+          <div class="skeleton" style="height:13px;width:120px;margin-bottom:6px;"></div>
+          <div class="skeleton" style="height:18px;width:60px;border-radius:999px;"></div>
+        </div>
+        <div class="skeleton" style="height:32px;width:70px;border-radius:9px;"></div>
+      </div>
+    </div>`;
+      }
+      document.getElementById('requestContainer').innerHTML = html;
+      document.getElementById('rowCount').textContent = '';
+      document.getElementById('pageInfo').textContent = '';
+      document.getElementById('pagControls').innerHTML = '';
+    }
 
-  // tabs
-  tabs.forEach(btn => {
-    btn.addEventListener("click", () => {
-      activeTab = btn.dataset.filter;
-      currentPage = 1; // ✅ reset to page 1 (prevents “missing” feeling)
-      tabs.forEach(setInactiveTabUI);
-      setActiveTabUI(btn);
-      render();
+    function updateStats(stats) {
+      document.getElementById('statAll').textContent = stats.all ?? 0;
+      document.getElementById('statPending').textContent = stats.pending ?? 0;
+      document.getElementById('statApproved').textContent = stats.approved ?? 0;
+      document.getElementById('statRejected').textContent = stats.rejected ?? 0;
+    }
+
+    function getFiltered() {
+      let data = allRequests;
+
+      // Status (stat card OR filter modal — they stay in sync)
+      if (activeFilter !== 'all') data = data.filter(r => r.status === activeFilter);
+
+      // Search
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        data = data.filter(r => r.patient_name.toLowerCase().includes(q));
+      }
+
+      // Document type
+      if (filterDocType) {
+        data = data.filter(r => r.document_type === filterDocType);
+      }
+
+      // Date range
+      if (filterDateFrom) {
+        const from = new Date(filterDateFrom);
+        data = data.filter(r => new Date(r.request_date) >= from);
+      }
+      if (filterDateTo) {
+        const to = new Date(filterDateTo);
+        to.setHours(23, 59, 59, 999);
+        data = data.filter(r => new Date(r.request_date) <= to);
+      }
+
+      // Sort
+      data = [...data].sort((a, b) => {
+        if (filterSort === 'oldest') return new Date(a.request_date) - new Date(b.request_date);
+        if (filterSort === 'name_asc') return a.patient_name.localeCompare(b.patient_name);
+        if (filterSort === 'name_desc') return b.patient_name.localeCompare(a.patient_name);
+        return new Date(b.request_date) - new Date(a.request_date); // newest
+      });
+
+      return data;
+    }
+
+    /* ── Determine what active filters are in play ── */
+    function hasActiveFilters() {
+      return searchQuery !== '' || activeFilter !== 'all' || filterDocType !== '' || filterDateFrom !== '' || filterDateTo !== '' || filterSort !== 'newest';
+    }
+
+    /* ── Count advanced modal filters (for badge) ── */
+    function countAdvancedFilters() {
+      let n = 0;
+      if (filterStatus !== 'all') n++;
+      if (filterDocType) n++;
+      if (filterDateFrom || filterDateTo) n++;
+      if (filterSort !== 'newest') n++;
+      return n;
+    }
+
+    /* ── Update filter button appearance ── */
+    function updateFilterBtn() {
+      const btn = document.getElementById('filterBtn');
+      const badge = document.getElementById('filterBadge');
+      const count = countAdvancedFilters();
+      if (count > 0) {
+        btn.classList.add('has-filters');
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+      } else {
+        btn.classList.remove('has-filters');
+        badge.style.display = 'none';
+      }
+    }
+
+    /* ── Build the "Clear Filter" button HTML shown in the empty state ── */
+    function buildClearFilterBtn() {
+      const parts = [];
+      if (searchQuery) parts.push(`"${searchQuery}"`);
+      if (activeFilter !== 'all') parts.push(activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1));
+      if (filterDocType) parts.push(filterDocType);
+      if (filterDateFrom || filterDateTo) parts.push('Date range');
+      if (filterSort !== 'newest') parts.push('Sort');
+
+      const label = parts.length ?
+        `Clear filter${parts.length > 1 ? 's' : ''} (${parts.join(', ')})` :
+        'Clear filters';
+
+      return `
+        <div style="margin-top:1.25rem;">
+          <button class="btn-clear-filter" onclick="resetAllFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            ${label}
+          </button>
+        </div>`;
+    }
+
+    /* ── Reset both search and status filter ── */
+    function resetAllFilters() {
+      // Clear search
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchClearBtn').classList.remove('visible');
+      searchQuery = '';
+
+      // Reset to "All" filter
+      activeFilter = 'all';
+      filterStatus = 'all';
+      filterDocType = '';
+      filterDateFrom = '';
+      filterDateTo = '';
+      filterSort = 'newest';
+
+      document.querySelectorAll('#statCards .stat-card').forEach(c =>
+        c.getAttribute('data-filter') === 'all' ?
+        c.classList.add('stat-active') :
+        c.classList.remove('stat-active'));
+
+      updateFilterBtn();
+      currentPage = 1;
+      renderList();
+    }
+
+    function renderList() {
+      const filtered = getFiltered();
+      const total = filtered.length;
+      const lastPage = Math.max(1, Math.ceil(total / PER_PAGE));
+      if (currentPage > lastPage) currentPage = lastPage;
+      const start = (currentPage - 1) * PER_PAGE;
+      const page = filtered.slice(start, start + PER_PAGE);
+
+      document.getElementById('rowCount').textContent =
+        `${total} ${total === 1 ? 'request' : 'requests'}`;
+
+      document.getElementById('pageInfo').textContent =
+        total === 0 ? '' :
+        `Showing ${start + 1}–${Math.min(start + PER_PAGE, total)} of ${total} requests`;
+
+      renderPagination(total, lastPage);
+
+      const container = document.getElementById('requestContainer');
+
+      if (!page.length) {
+        /* ── Differentiate: search miss vs filter miss vs truly empty ── */
+        const isSearchMiss = searchQuery !== '' && activeFilter === 'all';
+        const isFilterMiss = searchQuery === '' && activeFilter !== 'all';
+        const isCombinedMiss = searchQuery !== '' && activeFilter !== 'all';
+        const isDataEmpty = allRequests.length === 0;
+
+        let icon, title, subtitle, showClear;
+
+        if (isDataEmpty) {
+          icon = 'fa-regular fa-folder-open';
+          title = 'No requests yet';
+          subtitle = 'Incoming document requests will appear here.';
+          showClear = false;
+        } else if (isSearchMiss) {
+          icon = 'fa-solid fa-magnifying-glass';
+          title = `No results for "${esc(searchQuery)}"`;
+          subtitle = 'Try a different name or spelling.';
+          showClear = true;
+        } else if (isFilterMiss) {
+          icon = 'fa-regular fa-folder-open';
+          title = `No ${activeFilter} requests`;
+          subtitle = `There are no ${activeFilter} document requests at the moment.`;
+          showClear = true;
+        } else if (isCombinedMiss) {
+          icon = 'fa-solid fa-magnifying-glass';
+          title = 'No matching requests';
+          subtitle = `No ${activeFilter} requests found for "${esc(searchQuery)}".`;
+          showClear = true;
+        } else {
+          icon = 'fa-regular fa-folder-open';
+          title = 'No requests found';
+          subtitle = 'Try adjusting your filters.';
+          showClear = hasActiveFilters();
+        }
+
+        container.innerHTML = `
+          <div class="state-box">
+            <i class="${icon}"></i>
+            <strong>${title}</strong>
+            <span>${subtitle}</span>
+            ${showClear ? buildClearFilterBtn() : ''}
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = page.map(r => buildRow(r)).join('');
+    }
+
+    function buildRow(r) {
+      const accentHex = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
+      const avatarBg = r.status === 'approved' ? '#dcfce7' : r.status === 'rejected' ? '#fee2e2' : '#fff7ed';
+      const avatarCol = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
+      const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+      const sub = r.sub_label ?
+        `<div style="font-size:.72rem; color:#aaa; margin-top:.08rem;">${esc(r.sub_label)}</div>` :
+        `<div style="font-size:.72rem; color:#ddd;">—</div>`;
+
+      const nameCol = `
+    <div style="display:flex; align-items:center; gap:.8rem;">
+      <div style="width:40px;height:40px;border-radius:11px;background:${avatarBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-user" style="color:${avatarCol};font-size:.88rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:.88rem;color:#1a1a1a;line-height:1.25;">${esc(r.patient_name)}</div>
+        ${sub}
+      </div>
+    </div>`;
+
+      const dateCol = `
+    <div>
+      <div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Date Requested</div>
+      <div style="font-size:.85rem;font-weight:600;color:#333;">${esc(r.request_date)}</div>
+      <div style="font-size:.72rem;color:#ccc;">${esc(r.request_time)}</div>
+    </div>`;
+
+      const docCol = `
+    <div>
+      <div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Document</div>
+      <div style="font-size:.85rem;font-weight:600;color:#333;margin-bottom:.35rem;">${esc(r.document_type)}</div>
+      <span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
+    </div>`;
+
+      if (r.status === 'pending') {
+        const actionCol = `<button class="btn-view" data-id="${r.id}" onclick="toggleDetail(this, ${r.id})"><i class="fa-solid fa-eye"></i> View</button>`;
+        const detail = `
+      <div class="detail-panel" id="detail-${r.id}">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.1rem;">
+          <div style="font-size:.8rem;color:#888;">Pending request from <strong style="color:#333;">${esc(r.patient_name)}</strong></div>
+          <div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;">
+            <button class="btn-approve" onclick="openApprove(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-check"></i> Approve</button>
+            <button class="btn-reject"  onclick="openReject(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-xmark"></i> Reject</button>
+            <button class="btn-close-detail" onclick="closeDetail(${r.id})">Close</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1.1rem;padding-top:.9rem;border-top:1px solid #f0f0f0;">
+          <div><div class="dl">Patient</div><div class="dv">${esc(r.patient_name)}</div></div>
+          ${r.sub_label ? `<div><div class="dl">Department</div><div class="dv">${esc(r.sub_label)}</div></div>` : ''}
+          <div><div class="dl">Date</div><div class="dv">${esc(r.request_date)}</div></div>
+          <div><div class="dl">Time</div><div class="dv">${esc(r.request_time)}</div></div>
+          <div><div class="dl">Document</div><div class="dv">${esc(r.document_type)}</div></div>
+          <div><div class="dl">Purpose</div><div class="dv">${esc(r.purpose)}</div></div>
+        </div>
+      </div>`;
+
+        return `<div class="req-row" id="row-${r.id}">
+      <div class="accent-bar" style="background:${accentHex};"></div>
+      <div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">
+        ${nameCol}${dateCol}${docCol}${actionCol}
+      </div>${detail}
+    </div>`;
+      }
+
+      // Approved / Rejected — read-only
+      const purposeCol = `
+    <div style="text-align:right;">
+      <div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Purpose</div>
+      <div style="font-size:.8rem;color:#666;">${esc(r.purpose)}</div>
+    </div>`;
+
+      return `<div class="req-row">
+    <div class="accent-bar" style="background:${accentHex};"></div>
+    <div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">
+      ${nameCol}${dateCol}${docCol}${purposeCol}
+    </div>
+  </div>`;
+    }
+
+    function renderPagination(total, lastPage) {
+      const ctrl = document.getElementById('pagControls');
+      if (lastPage <= 1) {
+        ctrl.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const prev = currentPage > 1;
+      const next = currentPage < lastPage;
+
+      html += `<button class="pag-btn" ${prev?'':'disabled'} onclick="goPage(${currentPage-1})">‹ Prev</button>`;
+      for (let p = 1; p <= lastPage; p++) {
+        html += `<button class="pag-btn ${p===currentPage?'pag-active':''}" onclick="goPage(${p})">${p}</button>`;
+      }
+      html += `<button class="pag-btn" ${next?'':'disabled'} onclick="goPage(${currentPage+1})">Next ›</button>`;
+      ctrl.innerHTML = html;
+    }
+
+    function goPage(p) {
+      currentPage = p;
+      renderList();
+      document.getElementById('requestContainer').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+
+    /* ── Filter / Search ── */
+    function setFilter(f) {
+      activeFilter = f;
+      currentPage = 1;
+      document.querySelectorAll('#statCards .stat-card').forEach(c =>
+        c.getAttribute('data-filter') === f ? c.classList.add('stat-active') : c.classList.remove('stat-active'));
+      renderList();
+    }
+
+    function onSearch(input) {
+      searchQuery = input.value.trim();
+      currentPage = 1;
+      document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0);
+      renderList();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchClearBtn').classList.remove('visible');
+      searchQuery = '';
+      currentPage = 1;
+      renderList();
+    }
+
+    /* ── Detail panel ── */
+    function toggleDetail(btn, id) {
+      const panel = document.getElementById(`detail-${id}`);
+      const opening = !panel.classList.contains('open');
+      panel.classList.toggle('open');
+      btn.innerHTML = opening ?
+        '<i class="fa-solid fa-eye-slash"></i> Hide' :
+        '<i class="fa-solid fa-eye"></i> View';
+    }
+
+    function closeDetail(id) {
+      const panel = document.getElementById(`detail-${id}`);
+      if (panel) panel.classList.remove('open');
+      const row = document.getElementById(`row-${id}`);
+      if (row) {
+        const vb = row.querySelector('.btn-view');
+        if (vb) vb.innerHTML = '<i class="fa-solid fa-eye"></i> View';
+      }
+    }
+
+    /* ── XSS escape ── */
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* ── Modal helpers ── */
+    function openModal(el) {
+      el.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(el) {
+      el.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function outside(el) {
+      el.addEventListener('click', e => {
+        if (e.target === el) closeModal(el);
+      });
+    }
+
+    function openApprove(id, name) {
+      document.getElementById('approvePatientName').textContent = name;
+      document.getElementById('approveRequestId').value = id;
+      openModal(document.getElementById('approveModal'));
+    }
+
+    function openReject(id, name) {
+      document.getElementById('rejectPatientName').textContent = name;
+      document.getElementById('rejectRequestId').value = id;
+      document.getElementById('rejectNotes').value = '';
+      openModal(document.getElementById('rejectModal'));
+      setTimeout(() => document.getElementById('rejectNotes').focus(), 60);
+    }
+
+    /* ── Filter modal ── */
+    function openFilterModal() {
+      // Sync UI to current state
+      syncFilterTagGroup('fStatusGroup', filterStatus);
+      syncFilterTagGroup('fSortGroup', filterSort);
+      document.getElementById('fDocType').value = filterDocType;
+      document.getElementById('fDateFrom').value = filterDateFrom;
+      document.getElementById('fDateTo').value = filterDateTo;
+      openModal(document.getElementById('filterModal'));
+    }
+
+    function syncFilterTagGroup(groupId, activeVal) {
+      document.querySelectorAll(`#${groupId} .ftag`).forEach(btn => {
+        btn.getAttribute('data-val') === activeVal ?
+          btn.classList.add('ftag-active') :
+          btn.classList.remove('ftag-active');
+      });
+    }
+
+    function applyFilterModal() {
+      // Read status tag
+      const statusActive = document.querySelector('#fStatusGroup .ftag.ftag-active');
+      filterStatus = statusActive ? statusActive.getAttribute('data-val') : 'all';
+      activeFilter = filterStatus;
+
+      // Sync stat cards
+      document.querySelectorAll('#statCards .stat-card').forEach(c =>
+        c.getAttribute('data-filter') === activeFilter ?
+        c.classList.add('stat-active') :
+        c.classList.remove('stat-active'));
+
+      // Read sort tag
+      const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+      filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
+
+      filterDocType = document.getElementById('fDocType').value;
+      filterDateFrom = document.getElementById('fDateFrom').value;
+      filterDateTo = document.getElementById('fDateTo').value;
+
+      updateFilterBtn();
+      currentPage = 1;
+      closeModal(document.getElementById('filterModal'));
+      renderList();
+    }
+
+    function resetFilterModal() {
+      filterStatus = 'all';
+      filterDocType = '';
+      filterDateFrom = '';
+      filterDateTo = '';
+      filterSort = 'newest';
+      syncFilterTagGroup('fStatusGroup', 'all');
+      syncFilterTagGroup('fSortGroup', 'newest');
+      document.getElementById('fDocType').value = '';
+      document.getElementById('fDateFrom').value = '';
+      document.getElementById('fDateTo').value = '';
+    }
+
+    /* ── DOMContentLoaded ── */
+    document.addEventListener("DOMContentLoaded", () => {
+      applyLayout('220px');
+      applyTheme(localStorage.getItem("theme") || "light");
+      document.querySelectorAll(".theme-option").forEach(o =>
+        o.addEventListener("click", () => applyTheme(o.getAttribute("data-theme"))));
+
+      document.getElementById("notifBtn").addEventListener("click", e => {
+        e.stopPropagation();
+        document.getElementById("notifMenu").classList.toggle("open");
+      });
+      document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
+
+      // Escape closes modals
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        ['approveModal', 'rejectModal', 'approvedResultModal', 'rejectedResultModal', 'filterModal']
+        .forEach(id => {
+          const m = document.getElementById(id);
+          if (m?.classList.contains('open')) closeModal(m);
+        });
+      });
+
+      // Click-outside modals
+      ['approveModal', 'rejectModal', 'approvedResultModal', 'rejectedResultModal', 'filterModal']
+      .forEach(id => outside(document.getElementById(id)));
+
+      // ── Filter modal wiring ──
+      const filterModal = document.getElementById('filterModal');
+      document.getElementById('filterCloseBtn').addEventListener('click', () => closeModal(filterModal));
+      document.getElementById('filterCancelBtn').addEventListener('click', () => closeModal(filterModal));
+      document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
+      document.getElementById('filterResetBtn').addEventListener('click', resetFilterModal);
+
+      // Tag group toggle (single-select pills)
+      ['fStatusGroup', 'fSortGroup'].forEach(groupId => {
+        document.getElementById(groupId).addEventListener('click', e => {
+          const btn = e.target.closest('.ftag');
+          if (!btn) return;
+          document.querySelectorAll(`#${groupId} .ftag`).forEach(b => b.classList.remove('ftag-active'));
+          btn.classList.add('ftag-active');
+        });
+      });
+
+      // Approve modal buttons
+      const approveModal = document.getElementById('approveModal');
+      const approvedModal = document.getElementById('approvedResultModal');
+      ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
+        document.getElementById(id)?.addEventListener('click', () => closeModal(approveModal)));
+      document.getElementById('approvedResultClose').addEventListener('click', () => {
+        closeModal(approvedModal);
+        loadData();
+      });
+      document.getElementById('approveConfirmBtn').addEventListener('click', async () => {
+        const id = document.getElementById('approveRequestId').value;
+        const btn = document.getElementById('approveConfirmBtn');
+        if (!id) return;
+        btn.disabled = true;
+        const res = await fetch(`/dentist/document-requests/${id}/approve`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': CSRF
+          },
+          body: '{}'
+        });
+        btn.disabled = false;
+        if (res.ok) {
+          closeModal(approveModal);
+          openModal(approvedModal);
+        } else alert('Something went wrong.');
+      });
+
+      // Reject modal buttons
+      const rejectModal = document.getElementById('rejectModal');
+      const rejectedModal = document.getElementById('rejectedResultModal');
+      ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
+        document.getElementById(id)?.addEventListener('click', () => closeModal(rejectModal)));
+      document.getElementById('rejectedResultClose').addEventListener('click', () => {
+        closeModal(rejectedModal);
+        loadData();
+      });
+      document.getElementById('rejectConfirmBtn').addEventListener('click', async () => {
+        const id = document.getElementById('rejectRequestId').value;
+        const btn = document.getElementById('rejectConfirmBtn');
+        const notes = document.getElementById('rejectNotes').value.trim();
+        if (!id) return;
+        btn.disabled = true;
+        const res = await fetch(`/dentist/document-requests/${id}/reject`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': CSRF
+          },
+          body: JSON.stringify({
+            rejection_notes: notes
+          })
+        });
+        btn.disabled = false;
+        if (res.ok) {
+          closeModal(rejectModal);
+          openModal(rejectedModal);
+        } else alert('Something went wrong.');
+      });
+
+      // Initial load
+      loadData();
     });
-  });
-
-  // search
-  searchInput?.addEventListener("input", () => {
-    activeSearch = searchInput.value.trim().toLowerCase();
-    currentPage = 1;
-    render();
-  });
-
-  // clear
-  clearBtn?.addEventListener("click", () => {
-    if (!searchInput) return;
-    searchInput.value = "";
-    searchInput.dispatchEvent(new Event("input"));
-  });
-
-  // prev/next
-  prevBtn?.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      render();
-    }
-  });
-
-  nextBtn?.addEventListener("click", () => {
-    const totalPages = Math.max(1, Math.ceil(getFilteredEntries().length / perPage));
-    if (currentPage < totalPages) {
-      currentPage++;
-      render();
-    }
-  });
-
-  // default tab UI
-  const defaultTab = document.querySelector('.req-tab[data-filter="all"]');
-  if (defaultTab) setActiveTabUI(defaultTab);
-
-  updateTabCounts();
-  render();
-});
-
-
-/* ✅ DROPDOWN (opens ONLY when View is clicked; hover only affects card) */
-/* ✅ Dropdown toggle ONLY for Aragon (only if its View button has class="view-btn") */
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("requestContainer");
-
-  container.addEventListener("click", (e) => {
-
-    const view = e.target.closest(".view-btn");
-    const close = e.target.closest(".close-btn");
-
-    if (view) {
-      const entry = view.closest(".request-entry");
-      entry.querySelector(".request-summary").classList.add("hidden");
-      entry.querySelector(".request-details").classList.remove("hidden");
-    }
-
-    if (close) {
-      const entry = close.closest(".request-entry");
-      entry.querySelector(".request-summary").classList.remove("hidden");
-      entry.querySelector(".request-details").classList.add("hidden");
-    }
-
-  });
-});
-
-// ✅ APPROVAL MODAL (works even with pagination because we use event delegation)
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("approveModal");
-  const nameBox = document.getElementById("approvePatientName");
-  const cancelBtn = document.getElementById("approveCancelBtn");
-  const confirmBtn = document.getElementById("approveConfirmBtn");
-  const container = document.getElementById("requestContainer");
-
-  if (!modal || !nameBox || !cancelBtn || !confirmBtn || !container) return;
-
-  let activeEntry = null; // store which request we are approving
-
-  function getPatientName(fromEl) {
-    // Works for your Aragon request-entry (summary + details)
-    return (
-      fromEl.querySelector(".request-summary .col-span-4 .font-semibold")?.textContent ||
-      fromEl.querySelector(".request-details .font-semibold")?.textContent ||
-      fromEl.querySelector(".col-span-4 .font-semibold")?.textContent ||
-      "Patient"
-    ).trim();
-  }
-
-  function openModal(entryEl) {
-    activeEntry = entryEl;
-    nameBox.textContent = getPatientName(entryEl);
-
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-
-    // Optional: prevent page scroll while modal open
-    document.body.classList.add("overflow-hidden");
-  }
-
-  function closeModal() {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    activeEntry = null;
-
-    document.body.classList.remove("overflow-hidden");
-  }
-
-  // Open modal when Approve is clicked
-  container.addEventListener("click", (e) => {
-    const approveBtn = e.target.closest(".approve-btn");
-    if (!approveBtn) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const entry = approveBtn.closest(".request-entry") || approveBtn.closest(".request-item");
-    if (!entry) return;
-
-    openModal(entry);
-  });
-
-  // Cancel closes modal
-  cancelBtn.addEventListener("click", closeModal);
-
-  // Click outside the dialog closes modal
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  // ESC closes modal
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-  });
-
-  // Confirm (placeholder — connect to backend later)
-  confirmBtn.addEventListener("click", () => {
-    if (!activeEntry) return;
-
-    const patient = getPatientName(activeEntry);
-
-    // TODO: Replace this with your real approve action (fetch/ajax/form submit)
-    console.log("Approved:", patient);
-
-    closeModal();
-  });
-});
-
-// ✅ REJECT MODAL (event delegation so it survives pagination re-render)
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rejectModal");
-  const nameBox = document.getElementById("rejectPatientName");
-  const notesEl = document.getElementById("rejectNotes");
-  const cancelBtn = document.getElementById("rejectCancelBtn");
-  const confirmBtn = document.getElementById("rejectConfirmBtn");
-  const container = document.getElementById("requestContainer");
-
-  if (!modal || !nameBox || !notesEl || !cancelBtn || !confirmBtn || !container) return;
-
-  let activeEntry = null;
-
-  function getPatientName(fromEl) {
-    return (
-      fromEl.querySelector(".request-summary .col-span-4 .font-semibold")?.textContent ||
-      fromEl.querySelector(".request-details .font-semibold")?.textContent ||
-      fromEl.querySelector(".col-span-4 .font-semibold")?.textContent ||
-      "Patient"
-    ).trim();
-  }
-
-  function openModal(entryEl) {
-    activeEntry = entryEl;
-    nameBox.textContent = getPatientName(entryEl);
-    notesEl.value = "";
-
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    document.body.classList.add("overflow-hidden");
-
-    // focus cursor in textarea
-    setTimeout(() => notesEl.focus(), 0);
-  }
-
-  function closeModal() {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    activeEntry = null;
-    document.body.classList.remove("overflow-hidden");
-  }
-
-  // Open on Reject click
-  container.addEventListener("click", (e) => {
-    const rejectBtn = e.target.closest(".reject-btn");
-    if (!rejectBtn) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const entry = rejectBtn.closest(".request-entry") || rejectBtn.closest(".request-item");
-    if (!entry) return;
-
-    openModal(entry);
-  });
-
-  // Cancel
-  cancelBtn.addEventListener("click", closeModal);
-
-  // Click outside
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  // ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-  });
-
-  // Confirm (placeholder)
-  confirmBtn.addEventListener("click", () => {
-    if (!activeEntry) return;
-
-    const patient = getPatientName(activeEntry);
-    const notes = notesEl.value.trim();
-
-    // TODO: replace with backend action
-    console.log("Rejected:", patient, "Notes:", notes);
-
-    closeModal();
-  });
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Confirm modals you already have
-  const approveConfirmModal = document.getElementById("approveModal");   // <-- change if your approve modal has different id
-  const rejectConfirmModal  = document.getElementById("rejectModal");
-
-  // Result modals (new)
-  const approvedResultModal = document.getElementById("approvedResultModal");
-  const rejectedResultModal = document.getElementById("rejectedResultModal");
-
-  const approvedCloseBtn = document.getElementById("approvedResultClose");
-  const rejectedCloseBtn = document.getElementById("rejectedResultClose");
-
-  const approvedFrom  = document.getElementById("approvedFrom");
-  const approvedUntil = document.getElementById("approvedUntil");
-
-  // Your confirm buttons (from the confirm modals)
-  const approveConfirmBtn = document.getElementById("approveConfirmBtn"); // <-- ensure your approve confirm button uses this id
-  const rejectConfirmBtn  = document.getElementById("rejectConfirmBtn");
-
-  function openModal(modalEl) {
-    if (!modalEl) return;
-    modalEl.classList.remove("hidden");
-    modalEl.classList.add("flex");
-    document.body.classList.add("overflow-hidden");
-  }
-
-  function closeModal(modalEl) {
-    if (!modalEl) return;
-    modalEl.classList.add("hidden");
-    modalEl.classList.remove("flex");
-    document.body.classList.remove("overflow-hidden");
-  }
-
-  // Click outside closes
-  function enableOutsideClick(modalEl, onClose) {
-    modalEl?.addEventListener("click", (e) => {
-      if (e.target === modalEl) onClose();
-    });
-  }
-
-  // Close buttons
-  approvedCloseBtn?.addEventListener("click", () => closeModal(approvedResultModal));
-  rejectedCloseBtn?.addEventListener("click", () => closeModal(rejectedResultModal));
-
-  enableOutsideClick(approvedResultModal, () => closeModal(approvedResultModal));
-  enableOutsideClick(rejectedResultModal, () => closeModal(rejectedResultModal));
-
-  // ESC closes whichever result modal is open
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    if (approvedResultModal && !approvedResultModal.classList.contains("hidden")) closeModal(approvedResultModal);
-    if (rejectedResultModal && !rejectedResultModal.classList.contains("hidden")) closeModal(rejectedResultModal);
-  });
-
-  // ✅ When APPROVE is confirmed -> show Approved Result modal
-  approveConfirmBtn?.addEventListener("click", () => {
-    // close confirm modal first
-    if (approveConfirmModal) closeModal(approveConfirmModal);
-
-    // optional: set default dates
-    const today = new Date().toISOString().slice(0, 10);
-    if (approvedFrom) approvedFrom.value = today;
-    if (approvedUntil) approvedUntil.value = "";
-
-    openModal(approvedResultModal);
-  });
-
-  // ✅ When REJECT is confirmed -> show Rejected Result modal
-  rejectConfirmBtn?.addEventListener("click", () => {
-    // close confirm modal first
-    if (rejectConfirmModal) closeModal(rejectConfirmModal);
-
-    openModal(rejectedResultModal);
-  });
-});
-</script>
+  </script>
 
 </body>
 

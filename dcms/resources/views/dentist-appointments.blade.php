@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <title>Appointments | PUP Taguig Dental Clinic</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
@@ -47,6 +48,139 @@
 
     .fade-in {
       animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    /* Notif dropdown */
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
     }
 
     /* ── SIDEBAR ── */
@@ -137,19 +271,6 @@
 
     .sidebar-link.bg-\[\#8B0000\] {
       box-shadow: 0 0 12px rgba(139, 0, 0, .45);
-    }
-
-    /* ── NOTIFICATIONS ── */
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(.95) !important;
-      pointer-events: none !important;
     }
 
     /* ── THEME TOGGLE ── */
@@ -591,70 +712,382 @@
       border-color: rgba(255, 255, 255, .35);
       font-weight: 700;
     }
+
+    /* ══════════════════════════════════════
+       CANCEL MODAL — ENHANCED
+    ══════════════════════════════════════ */
+
+    /* Animated backdrop */
+    #cancelAppointmentModal {
+      animation: none;
+    }
+
+    #cancelAppointmentModal.showing {
+      animation: backdropIn .2s ease forwards;
+    }
+
+    @keyframes backdropIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Modal panel slide-up entrance */
+    .cancel-modal-panel {
+      animation: modalSlideUp .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Warning icon pulse ring */
+    .cancel-icon-ring {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cancel-icon-ring::before,
+    .cancel-icon-ring::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(220, 38, 38, .35);
+      animation: ringPulse 2s ease-out infinite;
+    }
+
+    .cancel-icon-ring::after {
+      animation-delay: .7s;
+    }
+
+    @keyframes ringPulse {
+      0% {
+        transform: scale(.85);
+        opacity: .8;
+      }
+
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .cancel-icon-core {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      border: 2px solid #fca5a5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, .2);
+      z-index: 1;
+    }
+
+    /* Reason radio chips */
+    .reason-chip input[type="radio"] {
+      display: none;
+    }
+
+    .reason-chip label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1.5px solid #e5e7eb;
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all .15s ease;
+      background: white;
+      user-select: none;
+    }
+
+    .reason-chip label:hover {
+      border-color: #fca5a5;
+      color: #9f1239;
+      background: #fff1f2;
+    }
+
+    .reason-chip input[type="radio"]:checked+label {
+      border-color: #dc2626;
+      background: #fef2f2;
+      color: #dc2626;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, .15);
+    }
+
+    /* Confirm button shake on click */
+    @keyframes btnShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-4px);
+      }
+
+      40% {
+        transform: translateX(4px);
+      }
+
+      60% {
+        transform: translateX(-3px);
+      }
+
+      80% {
+        transform: translateX(3px);
+      }
+    }
+
+    .btn-shake {
+      animation: btnShake .35s ease;
+    }
+
+    /* ══════════════════════════════════════
+       RESCHEDULE MODAL
+    ══════════════════════════════════════ */
+    .reschedule-modal-panel {
+      animation: modalSlideUp .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
+    }
+
+    /* Reason error shake */
+    @keyframes errorShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-5px);
+      }
+
+      40% {
+        transform: translateX(5px);
+      }
+
+      60% {
+        transform: translateX(-3px);
+      }
+
+      80% {
+        transform: translateX(3px);
+      }
+    }
+
+    .chips-error-shake {
+      animation: errorShake .35s ease;
+    }
+
+    /* Reason chips invalid state */
+    #cancelReasonChips.invalid .reason-chip label {
+      border-color: #fca5a5;
+      background: #fff5f5;
+    }
+
+    #toastContainer {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #1a1a1a;
+      border: 1px solid #2d2d2d;
+      border-radius: 14px;
+      padding: 14px 16px;
+      min-width: 320px;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .35), 0 2px 8px rgba(0, 0, 0, .2);
+      pointer-events: auto;
+      position: relative;
+      overflow: hidden;
+      animation: toastSlideIn .4s cubic-bezier(.34, 1.56, .64, 1) forwards;
+    }
+
+    .toast-item.toast-exit {
+      animation: toastSlideOut .35s ease forwards;
+    }
+
+    @keyframes toastSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(60px) scale(.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    @keyframes toastSlideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        max-height: 100px;
+        margin-bottom: 0;
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(60px) scale(.95);
+        max-height: 0;
+        margin-bottom: -10px;
+      }
+    }
+
+    /* Progress bar at bottom */
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 0 0 14px 14px;
+      background: linear-gradient(90deg, #dc2626, #f87171);
+      animation: toastProgress linear forwards;
+    }
+
+    @keyframes toastProgress {
+      from {
+        width: 100%;
+      }
+
+      to {
+        width: 0%;
+      }
+    }
+
+    .toast-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .toast-icon-cancel {
+      background: rgba(220, 38, 38, .15);
+      border: 1px solid rgba(220, 38, 38, .25);
+    }
+
+    .toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f3f4f6;
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+
+    .toast-message {
+      font-size: 12px;
+      color: #9ca3af;
+      line-height: 1.4;
+    }
+
+    .toast-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .06);
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s, color .15s;
+    }
+
+    .toast-close:hover {
+      background: rgba(255, 255, 255, .12);
+      color: #e5e7eb;
+    }
   </style>
 </head>
 
 <body class="bg-[#F4F4F4] text-[#333333] font-normal min-h-screen flex flex-col">
 
   <!-- HEADER -->
-  <div class="fixed top-0 left-0 right-0 z-50
-              bg-gradient-to-r from-[#660000] to-[#8B0000]
-              text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5"><img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" /></div>
-      <div class="w-12 rounded-full"><img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" /></div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-
-    <div class="flex items-center gap-8">
-      @php
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
-
-      <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">{{ $notifCount }}</span>
-          @endif
-          <i class="fa-regular fa-bell text-lg"></i>
+    <div class="header-right">
+      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
-        <div id="notifMenu" class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-             opacity-0 scale-95 pointer-events-none transition-all duration-200 ease-out origin-top-right">
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
+        <div id="notifMenu">
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:var(--red); font-size:.82rem; border-bottom:1px solid #f5e8e8;">
+            Notifications
           </div>
-          <div class="max-h-80 overflow-y-auto">
+          <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>@endif
-              @if(!empty($n['time']))<div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>@endif
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
             @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You're all caught up.</div>
-            </div>
+            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
       </div>
-
-      <div class="flex items-center gap-3">
-        <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
+      <div class="header-user">
+        <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
         <div>
-          <p class="text-l font-semibold text-[#F4F4F4]">Dr. Nelson Angeles</p>
-          <p class="italic text-xs text-[#F4F4F4]/80">Dentist</p>
+          <div class="header-name">Dr. Nelson Angeles</div>
+          <div class="header-role">Dentist</div>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- ══════════════════════════════════════
-       SUMMARY BAR
-  ══════════════════════════════════════ -->
   @php
   $upcomingAppointments = $upcomingAppointments ?? collect();
   $pastAppointments = $pastAppointments ?? collect();
@@ -675,205 +1108,59 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px]
-         h-[calc(100vh-72px)]
-         bg-white
-         drop-shadow-xl
-         transition-all duration-300
-         flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
-
-    <!-- TOP -->
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    style="width:220px;">
     <div class="pt-4">
-
-      <!-- Toggle Button -->
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
-        <button onclick="toggleSidebar()"
-          id="sidebarToggleBtn"
-          class="w-8 h-8 flex items-center justify-center
-              rounded-full text-[#757575] hover:text-[#8B0000]
-              hover:bg-[#F0F0F0] transition-all duration-300">
+        <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
           <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
-
-      <!-- NAVIGATION LABEL -->
       <div class="section-label px-4 mb-6">Navigation</div>
-
-      <!-- MENU -->
       <nav class="space-y-2 px-3 text-gray-600">
-
-        <!-- DASHBOARD -->
-        <a href="{{ route('dentist.dashboard') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.dashboard') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.dashboard') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-chart-line text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Dashboard
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Dashboard
-          </span>
+        @foreach([
+        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
+        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ] as $nav)
+        <a href="{{ route($nav['route']) }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
         </a>
-
-        <!-- PATIENTS -->
-        <a href="{{ route('dentist.patients') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.patients') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.patients') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1.5">
-            <i class="fa-solid fa-users text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Patients
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Patients
-          </span>
-        </a>
-
-        <!-- APPOINTMENTS -->
-        <a href="{{ route('dentist.appointments') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.appointments') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.appointments') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-calendar-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Appointments
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Appointments
-          </span>
-        </a>
-
-        <!-- Document Requests -->
-        <a href="{{ route('dentist.documentrequests') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.documentrequests') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.documentrequests') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file-circle-check text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Document Requests
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Document Requests
-          </span>
-        </a>
-
-        <!-- INVENTORY -->
-        <a href="{{ route('dentist.inventory') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.inventory') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.inventory') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-box text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Inventory
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Inventory
-          </span>
-        </a>
-
-        <!-- REPORTS -->
-        <a href="{{ route('dentist.report') }}"
-          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8
-                transition-all duration-200
-                hover:bg-[#8B0000] hover:text-[#F4F4F4]
-                {{ request()->routeIs('dentist.report') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2
-                h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-                {{ request()->routeIs('dentist.report') ? 'opacity-100' : 'opacity-0' }}"></span>
-
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ml-1">
-            <i class="fa-solid fa-file text-lg"></i>
-          </span>
-          <span class="sidebar-text ml-2 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">
-            Reports
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Reports
-          </span>
-        </a>
+        @endforeach
       </nav>
     </div>
-
-    <!-- BOTTOM -->
     <div class="px-3 pb-5 space-y-4">
       <div class="section-label">Settings</div>
-
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-            <i class="fa-solid fa-sun"></i>
-          </button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-            <i class="fa-regular fa-moon"></i>
-          </button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
-
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button
-          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm
-             text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-all duration-200 ml-2">
-            <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          </div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">
-            Log out
-          </span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
-            Log out
-          </span>
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
         </button>
       </form>
-
     </div>
   </aside>
 
   <!-- ================= MAIN ================= -->
-  <main
-    id="mainContent"
-    class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+  <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
     <div class="max-w-7xl mt-4 mx-auto fade-in">
 
-      <!-- Summary bar — inline, above title -->
       <div class="summary-bar rounded-2xl px-6 py-3 flex items-center gap-3 flex-wrap mb-6">
         <i class="fa-solid fa-circle-info text-white/60 text-sm ml-1"></i>
         <span class="text-white/70 text-xs font-medium">Today's snapshot:</span>
@@ -903,18 +1190,14 @@
         </span>
       </div>
 
-      <!-- Page title row -->
       <div class="flex items-end justify-between mt-6 mb-10 px-1">
         <div>
-          <h1 class="text-4xl font-extrabold text-[#8B0000]">Appointments</h1>
-
+          <h1 class="text-2xl font-bold text-[#660000]">Appointments</h1>
           <div class="flex items-center gap-2 mt-2">
             <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
             <p id="currentDate" class="text-sm text-[#757575]"></p>
           </div>
         </div>
-
-        <!-- Improved tab toggle with counts -->
         <div class="tab-toggle-wrap">
           <button id="btnUpcoming" class="tab-btn-toggle active">
             <i class="fa-solid fa-calendar-clock text-xs"></i>
@@ -929,13 +1212,10 @@
         </div>
       </div>
 
-      <!-- ═══════ UPCOMING SECTION ═══════ -->
+      <!-- UPCOMING SECTION -->
       <section id="upcomingSection" class="pb-16">
-
         @forelse($upcomingGrouped as $month => $items)
         <div class="mb-14">
-
-          <!-- Month heading with improved timeline dot -->
           <div class="flex items-center gap-4 mb-5">
             <div class="timeline-dot"></div>
             <h2 class="text-xl font-bold text-[#8b0000]">{{ $month }}</h2>
@@ -943,12 +1223,8 @@
               {{ $items->count() }} {{ Str::plural('appointment', $items->count()) }}
             </span>
           </div>
-
-          <!-- Left timeline line + cards -->
           <div class="relative pl-10">
             <div class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#8b0000]/30 to-[#8b0000]/05 rounded-full"></div>
-
-            <!-- Column headers -->
             <div class="grid grid-cols-[180px_130px_180px_180px_130px_120px_60px]
             text-[11px] font-semibold uppercase tracking-wider text-gray-600
             pb-2 border-b border-gray-200 mb-3 px-5">
@@ -960,8 +1236,6 @@
               <span>Status</span>
               <span class="text-right">Actions</span>
             </div>
-
-            <!-- Cards -->
             <div class="space-y-2.5">
               @foreach($items as $i => $appt)
               @php
@@ -982,63 +1256,41 @@
               elseif (str_contains($serviceLower, 'whiten'))$badgeClass = 'service-badge-whitening';
               elseif (str_contains($serviceLower, 'extrac'))$badgeClass = 'service-badge-extraction';
               @endphp
-
-              <div class="appt-card {{ $isToday ? 'is-today' : '' }}" style="animation-delay:{{ $i * 0.04 }}s">
-                <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr_0.9fr_1.6fr]
-                            items-center px-5 py-3.5 gap-2">
-
-                  <!-- Date -->
+              <div class="appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}" style="animation-delay:{{ $i * 0.04 }}s">
+                <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr_0.9fr_1.6fr] items-center px-5 py-3.5 gap-2">
                   <div>
                     <p class="text-[13px] font-semibold text-gray-800">{{ $dateLabel }}</p>
                     <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
                     @if($isToday)
-                    <span class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide
-                                 bg-green-500 text-white px-2 py-0.5 rounded-md shadow-sm">Today</span>
+                    <span class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide bg-green-500 text-white px-2 py-0.5 rounded-md shadow-sm">Today</span>
                     @endif
                   </div>
-
-                  <!-- Time -->
-                  <div>
-                    <span class="time-chip">
-                      <i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}
-                    </span>
-                  </div>
-
-                  <!-- Service -->
-                  <div>
-                    <span class="service-badge {{ $badgeClass }}">{{ $serviceLabel }}</span>
-                  </div>
-
-                  <!-- Patient -->
+                  <div><span class="time-chip"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}</span></div>
+                  <div><span class="service-badge {{ $badgeClass }}">{{ $serviceLabel }}</span></div>
                   <div>
                     <p class="text-[13px] font-semibold text-gray-800">{{ $patientName }}</p>
                   </div>
-
-                  <!-- Program -->
                   <div>
                     @if($program === '—')
                     <span class="text-[12px] text-gray-400">—</span>
                     @else
-                    <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-medium
-                                 px-2.5 py-1 rounded-full border border-gray-200">{{ $program }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200">{{ $program }}</span>
                     @endif
                   </div>
-
-                  <!-- Status -->
                   <div>
                     @if($isToday)
-                    <span class="status-pill status-confirmed">
-                      <span class="status-dot"></span>Confirmed
-                    </span>
+                    <span class="status-pill status-confirmed"><span class="status-dot"></span>Confirmed</span>
                     @else
-                    <span class="status-pill status-pending">
-                      <span class="status-dot"></span>Upcoming
-                    </span>
+                    <span class="status-pill status-pending"><span class="status-dot"></span>Upcoming</span>
                     @endif
                   </div>
-
-                  <!-- Actions — horizontal row -->
                   <div class="action-row justify-end">
+
+                    <a href="{{ route('dentist.appointments.patientProfile', $appt->id) }}"
+                      class="action-btn border border-[#8B0000]/30 bg-white text-[#8B0000] hover:bg-[#8B0000] hover:text-white">
+                      <i class="fa-regular fa-user text-[9px]"></i> View
+                    </a>
+                    
                     <button type="button"
                       class="action-btn action-btn-start"
                       onclick="openStartProcedureModal(this)"
@@ -1066,14 +1318,12 @@
                       <i class="fa-solid fa-xmark text-[9px]"></i> Cancel
                     </button>
                   </div>
-
                 </div>
               </div>
               @endforeach
             </div>
           </div>
         </div>
-
         @empty
         <div class="flex flex-col items-center justify-center py-24 text-gray-400">
           <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-gray-300"></i>
@@ -1081,15 +1331,12 @@
           <p class="text-sm mt-1">New appointments will appear here once scheduled.</p>
         </div>
         @endforelse
-
       </section>
 
-      <!-- ═══════ PAST SECTION ═══════ -->
+      <!-- PAST SECTION -->
       <section id="pastSection" class="pb-16 hidden">
-
         @forelse($pastGrouped as $month => $items)
         <div class="mb-14">
-
           <div class="flex items-center gap-4 mb-5 pl-2">
             <div class="timeline-dot-past"></div>
             <h2 class="text-xl font-bold text-gray-400">{{ $month }}</h2>
@@ -1097,11 +1344,8 @@
               {{ $items->count() }} {{ Str::plural('appointment', $items->count()) }}
             </span>
           </div>
-
           <div class="relative pl-10">
             <div class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gray-200 rounded-full"></div>
-
-            <!-- Column headers -->
             <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr]
                         text-[11px] font-semibold uppercase tracking-wider text-gray-400
                         pb-2 border-b border-gray-200 mb-3 px-5">
@@ -1111,7 +1355,6 @@
               <span>Patient</span>
               <span>Program</span>
             </div>
-
             <div class="space-y-2.5">
               @foreach($items as $i => $appt)
               @php
@@ -1131,10 +1374,8 @@
               elseif (str_contains($serviceLower, 'whiten'))$badgeClass = 'service-badge-whitening';
               elseif (str_contains($serviceLower, 'extrac'))$badgeClass = 'service-badge-extraction';
               @endphp
-
               <div class="appt-card opacity-70" style="animation-delay:{{ $i * 0.04 }}s">
-                <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr]
-                            items-center px-5 py-3.5 gap-2">
+                <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr] items-center px-5 py-3.5 gap-2">
                   <div>
                     <p class="text-[13px] font-semibold text-gray-500">{{ $dateLabel }}</p>
                     <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
@@ -1148,8 +1389,7 @@
                     @if($program === '—')
                     <span class="text-[12px] text-gray-400">—</span>
                     @else
-                    <span class="inline-block bg-gray-100 text-gray-400 text-[11px] font-medium
-                                 px-2.5 py-1 rounded-full border border-gray-200">{{ $program }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-400 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200">{{ $program }}</span>
                     @endif
                   </div>
                 </div>
@@ -1158,7 +1398,6 @@
             </div>
           </div>
         </div>
-
         @empty
         <div class="flex flex-col items-center justify-center py-24 text-gray-400">
           <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-gray-300"></i>
@@ -1166,7 +1405,6 @@
           <p class="text-sm mt-1">Completed appointments will appear here.</p>
         </div>
         @endforelse
-
       </section>
 
       <div class="pb-16"></div>
@@ -1184,36 +1422,101 @@
     </div>
   </footer>
 
-  <!-- ═══════════════ MODALS ═══════════════ -->
+  <!-- ═══════════════════════════════════
+       TOAST CONTAINER
+  ═══════════════════════════════════ -->
+  <div id="toastContainer"></div>
 
-  <!-- Reschedule Modal -->
-  <div id="rescheduleModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-[9999]">
-    <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
-      <div class="bg-amber-400 px-8 py-5 text-center">
-        <h2 class="text-xl font-bold text-gray-800">Reschedule Appointment</h2>
-      </div>
-      <div class="px-10 py-7 bg-gray-50">
-        <p class="text-base font-bold text-gray-900 mb-1 text-center">You are about to reschedule this appointment.</p>
-        <p class="text-sm text-gray-500 mb-5 text-center">You will be able to select a new date and time.</p>
-        <div class="bg-white border border-gray-200 rounded-2xl px-8 py-5 text-center mb-4 shadow-sm">
-          <div class="flex items-center justify-center gap-2 text-gray-700 text-sm font-bold mb-3">
-            <i class="fa-regular fa-circle-user text-lg"></i><span>Appointment Details</span>
+  <!-- ═══════════════════════════════════
+       RESCHEDULE MODAL — REDESIGNED
+  ═══════════════════════════════════ -->
+  <div id="rescheduleModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm hidden z-[9999]"
+    onclick="handleRescheduleBackdropClick(event)">
+
+    <div class="reschedule-modal-panel bg-white w-[580px] rounded-2xl overflow-hidden shadow-2xl">
+
+      <!-- Two-tone header -->
+      <div class="relative overflow-hidden">
+        <!-- Background geometric accent -->
+        <div class="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500"></div>
+        <div class="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10"></div>
+        <div class="absolute -right-4 top-6 w-24 h-24 rounded-full bg-white/08"></div>
+        <div class="absolute left-40 -bottom-6 w-28 h-28 rounded-full bg-black/08"></div>
+
+        <div class="relative px-8 pt-6 pb-6 flex items-center gap-5">
+          <!-- Icon -->
+          <div class="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <i class="fa-solid fa-calendar-pen text-white text-xl"></i>
           </div>
-          <p class="text-sm text-gray-800">Patient Name: <span class="font-bold" id="resPatientName">—</span></p>
-          <p class="text-sm text-gray-600 mt-1" id="resAppointmentDate">—</p>
-        </div>
-        <div class="flex justify-end gap-3">
+          <div class="flex-1">
+            <h2 class="text-white font-bold text-xl leading-tight">Reschedule Appointment</h2>
+            <p class="text-white/70 text-xs mt-0.5">The patient will be notified of the new schedule.</p>
+          </div>
           <button onclick="closeRescheduleModal()"
-            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">Cancel</button>
+            class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/80 hover:text-white
+                         flex items-center justify-center transition text-sm flex-shrink-0">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="px-8 py-6 bg-gray-50">
+
+        <!-- Current appointment card -->
+        <div class="bg-white border border-amber-100 rounded-xl p-4 mb-5 shadow-sm">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-3">Current Appointment</p>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
+              <i class="fa-regular fa-circle-user text-amber-400 text-base"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-[13px] font-bold text-gray-800" id="resPatientName">—</p>
+              <p class="text-[11px] text-gray-400 mt-0.5" id="resAppointmentDate">—</p>
+            </div>
+            <!-- Arrow to new -->
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-px bg-dashed border-t-2 border-dashed border-amber-300"></div>
+              <div class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-right text-amber-500 text-[10px]"></i>
+              </div>
+              <span class="text-[11px] text-amber-600 font-semibold">New schedule</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info notice -->
+        <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
+          <i class="fa-solid fa-circle-info text-amber-500 text-sm mt-0.5 flex-shrink-0"></i>
+          <p class="text-[12px] text-amber-700 leading-relaxed">
+            You'll be taken to the scheduling page where you can pick a new date and time slot for this patient.
+          </p>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center gap-3">
+          <button onclick="closeRescheduleModal()"
+            class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 bg-white
+                   text-gray-600 font-semibold hover:bg-gray-50 transition text-sm shadow-sm">
+            <i class="fa-solid fa-xmark text-xs mr-1.5 text-gray-400"></i>Cancel
+          </button>
           <button onclick="confirmReschedule()"
-            class="px-6 py-2 rounded-lg bg-amber-400 text-gray-800 font-semibold hover:bg-amber-500 transition text-sm shadow-sm">Reschedule</button>
+            class="flex-[2] px-5 py-2.5 rounded-xl font-bold text-sm transition
+                   bg-gradient-to-r from-amber-500 to-orange-500
+                   hover:from-amber-600 hover:to-orange-600
+                   text-white shadow-md shadow-amber-500/25 active:scale-[.98]">
+            <i class="fa-solid fa-calendar-pen text-xs mr-1.5"></i>Proceed to Reschedule
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Start Procedure Modal -->
-  <div id="startProcedureModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-[9999]">
+  <!-- ═══════════════════════════════════
+       START PROCEDURE MODAL (unchanged)
+  ═══════════════════════════════════ -->
+  <div id="startProcedureModal" class="fixed inset-0 bg-black/50 flex items-center backdrop-blur-sm justify-center hidden z-[9999]">
     <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
       <div class="bg-green-700 px-8 py-5 text-center">
         <h2 class="text-xl font-bold text-white">Confirm Procedure Start</h2>
@@ -1229,36 +1532,113 @@
           <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">—</p>
         </div>
         <div class="flex justify-end gap-3">
-          <button onclick="closeStartProcedureModal()"
-            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">Cancel</button>
-          <button onclick="confirmStartProcedure()"
-            class="px-6 py-2 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 transition text-sm shadow-sm">Start Procedure</button>
+          <button onclick="closeStartProcedureModal()" class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">Cancel</button>
+          <button onclick="confirmStartProcedure()" class="px-6 py-2 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 transition text-sm shadow-sm">Start Procedure</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Cancel Modal -->
-  <div id="cancelAppointmentModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-[9999]">
-    <div class="bg-white w-[560px] rounded-2xl overflow-hidden shadow-2xl">
-      <div class="bg-[#8b0000] px-8 py-5 text-center">
-        <h2 class="text-xl font-bold text-white">Cancel Appointment</h2>
-      </div>
-      <div class="px-10 py-7 bg-gray-50">
-        <p class="text-base font-bold text-gray-900 mb-1 text-center">You are about to cancel this appointment.</p>
-        <p class="text-sm text-gray-500 mb-5 text-center">This action cannot be undone.</p>
-        <div class="bg-white border border-gray-200 rounded-2xl px-8 py-5 text-center mb-4 shadow-sm">
-          <div class="flex items-center justify-center gap-2 text-gray-700 text-sm font-bold mb-3">
-            <i class="fa-regular fa-calendar-check text-lg"></i><span>Appointment Details</span>
+  <!-- ═══════════════════════════════════
+       CANCEL MODAL — ENHANCED
+  ═══════════════════════════════════ -->
+  <div id="cancelAppointmentModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm hidden z-[9999]"
+    onclick="handleCancelBackdropClick(event)">
+
+    <div class="cancel-modal-panel bg-white w-[620px] rounded-2xl overflow-hidden shadow-2xl">
+
+      <!-- Header strip -->
+      <div class="relative bg-gradient-to-r from-[#7f0000] to-[#b91c1c] px-8 pt-6 pb-8">
+        <!-- Close X -->
+        <button onclick="closeCancelAppointmentModal()"
+          class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20
+                       text-white/70 hover:text-white flex items-center justify-center transition text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Pulsing warning icon -->
+        <div class="flex justify-center mb-3">
+          <div class="cancel-icon-ring">
+            <div class="cancel-icon-core">
+              <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i>
+            </div>
           </div>
-          <p class="text-sm text-gray-800">Patient Name: <span class="font-bold" id="cancelPatientName">—</span></p>
-          <p class="text-sm text-gray-600 mt-1" id="cancelAppointmentDate">—</p>
         </div>
-        <div class="flex justify-end gap-3">
+
+        <h2 class="text-center text-white font-bold text-lg leading-tight">Cancel Appointment</h2>
+        <p class="text-center text-white/60 text-xs mt-1">This action cannot be undone.</p>
+      </div>
+
+      <!-- Body -->
+      <div class="px-8 py-6 bg-gray-50">
+
+        <!-- Patient detail card -->
+        <div class="bg-white border border-gray-100 rounded-xl px-5 py-4 mb-5 shadow-sm">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+              <i class="fa-regular fa-circle-user text-red-400 text-sm"></i>
+            </div>
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Patient</p>
+              <p class="text-[14px] font-bold text-gray-800" id="cancelPatientName">—</p>
+            </div>
+            <div class="ml-auto text-right">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Scheduled</p>
+              <p class="text-[12px] font-medium text-gray-600" id="cancelAppointmentDate">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason selector -->
+        <div class="mb-5">
+          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide mb-2.5">
+            Reason for cancellation <span class="text-red-400 font-normal normal-case">* required</span>
+          </p>
+          <div class="flex flex-wrap gap-2" id="cancelReasonChips" onchange="clearReasonError()">
+            <div class="reason-chip">
+              <input type="radio" name="cancelReason" id="r1" value="Patient no-show">
+              <label for="r1"><i class="fa-regular fa-circle-xmark text-[11px]"></i> Patient no-show</label>
+            </div>
+            <div class="reason-chip">
+              <input type="radio" name="cancelReason" id="r2" value="Doctor unavailable">
+              <label for="r2"><i class="fa-solid fa-user-doctor text-[11px]"></i> Doctor unavailable</label>
+            </div>
+            <div class="reason-chip">
+              <input type="radio" name="cancelReason" id="r3" value="Patient request">
+              <label for="r3"><i class="fa-regular fa-hand text-[11px]"></i> Patient request</label>
+            </div>
+            <div class="reason-chip">
+              <input type="radio" name="cancelReason" id="r4" value="Emergency">
+              <label for="r4"><i class="fa-solid fa-bolt text-[11px]"></i> Emergency</label>
+            </div>
+            <div class="reason-chip">
+              <input type="radio" name="cancelReason" id="r5" value="Rescheduled">
+              <label for="r5"><i class="fa-solid fa-rotate text-[11px]"></i> Rescheduled</label>
+            </div>
+          </div>
+          <!-- Validation error -->
+          <div id="reasonError" class="hidden mt-2.5 flex items-center gap-1.5 text-red-500 text-[12px] font-semibold">
+            <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+            Please select a reason before cancelling.
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-between gap-3">
           <button onclick="closeCancelAppointmentModal()"
-            class="px-6 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition text-sm shadow-sm">Keep Appointment</button>
-          <button onclick="confirmCancelAppointment()"
-            class="px-6 py-2 rounded-lg bg-[#8b0000] text-white font-semibold hover:bg-[#6f0000] transition text-sm shadow-sm">Cancel Appointment</button>
+            class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 bg-white
+                   text-gray-600 font-semibold hover:bg-gray-50 transition text-sm shadow-sm">
+            <i class="fa-solid fa-arrow-left text-xs mr-1.5"></i>Keep Appointment
+          </button>
+
+          <button id="confirmCancelBtn" onclick="confirmCancelAppointment()"
+            class="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#8b0000] to-[#c0392b]
+                   text-white font-bold hover:from-[#6f0000] hover:to-[#a93226]
+                   transition text-sm shadow-md shadow-red-900/20
+                   active:scale-[.98]">
+            <i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel Appointment
+          </button>
         </div>
       </div>
     </div>
@@ -1273,9 +1653,7 @@
         day: "numeric"
       });
 
-    // =========================
-    // THEME TOGGLE 
-    // =========================
+    // ── THEME TOGGLE ──
     const html = document.documentElement;
     const themeToggleContainer = document.getElementById("themeToggle");
     const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
@@ -1284,38 +1662,19 @@
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-
-      themeOptions.forEach(option => {
-        if (option.getAttribute("data-theme") === theme) {
-          option.classList.add("active");
-        } else {
-          option.classList.remove("active");
-        }
-      });
-
-      if (theme === "dark") {
-        themeIndicator.classList.add("dark-mode");
-      } else {
-        themeIndicator.classList.remove("dark-mode");
-      }
+      themeOptions.forEach(opt => opt.classList.toggle("active", opt.getAttribute("data-theme") === theme));
+      themeIndicator.classList.toggle("dark-mode", theme === "dark");
     }
 
     applyTheme(localStorage.getItem("theme") || "light");
+    themeOptions.forEach(opt => opt.addEventListener("click", () => applyTheme(opt.getAttribute("data-theme"))));
 
-    themeOptions.forEach(option => {
-      option.addEventListener("click", () => {
-        const theme = option.getAttribute("data-theme");
-        applyTheme(theme);
-      });
-    });
-
+    // ── SIDEBAR ──
     let sidebarOpen = true;
 
     function applyLayout(sidebarWidth) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      sidebar.style.width = sidebarWidth;
-      main.style.marginLeft = sidebarWidth;
+      document.getElementById('sidebar').style.width = sidebarWidth;
+      document.getElementById('mainContent').style.marginLeft = sidebarWidth;
     }
 
     function toggleSidebar() {
@@ -1323,30 +1682,24 @@
       const texts = document.querySelectorAll('.sidebar-text');
       const icon = document.getElementById('sidebarIcon');
       const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
       sidebarOpen = !sidebarOpen;
-
       if (sidebarOpen) {
         applyLayout('220px');
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.add('expanded');
+        sidebar.classList.replace('collapsed', 'expanded');
         texts.forEach(t => {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
+        toggleWrapper.classList.replace('justify-center', 'justify-end');
         icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
+        sidebar.classList.replace('expanded', 'collapsed');
         texts.forEach(t => {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
+        toggleWrapper.classList.replace('justify-end', 'justify-center');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
       applyTheme(localStorage.getItem("theme") || "light");
@@ -1357,69 +1710,86 @@
       applyLayout('220px');
     });
 
-    // NOTIFICATION
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("notifBtn");
-      const menu = document.getElementById("notifMenu");
-
-      let isOpen = false;
-
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
-
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      menu.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      document.addEventListener("click", () => {
-        if (isOpen) closeMenu();
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen) closeMenu();
-      });
-
-      closeMenu();
+    // ── NOTIF ──
+    document.getElementById("notifBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("notifMenu").classList.toggle("open");
     });
+    document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
 
     // ── TABS ──
     const btnUpcoming = document.getElementById('btnUpcoming');
     const btnPast = document.getElementById('btnPast');
-    const upcomingSection = document.getElementById('upcomingSection');
-    const pastSection = document.getElementById('pastSection');
 
     function setActiveTab(tab) {
       const isUpcoming = tab === 'upcoming';
-      upcomingSection?.classList.toggle('hidden', !isUpcoming);
-      pastSection?.classList.toggle('hidden', isUpcoming);
+      document.getElementById('upcomingSection')?.classList.toggle('hidden', !isUpcoming);
+      document.getElementById('pastSection')?.classList.toggle('hidden', isUpcoming);
       btnUpcoming?.classList.toggle('active', isUpcoming);
       btnPast?.classList.toggle('active', !isUpcoming);
     }
     btnUpcoming?.addEventListener('click', () => setActiveTab('upcoming'));
     btnPast?.addEventListener('click', () => setActiveTab('past'));
 
-    // ── MODALS ──
+    // ═══════════════════════════
+    // TOAST SYSTEM
+    // ═══════════════════════════
+    function showToast({
+      title = '',
+      message = '',
+      type = 'cancel',
+      duration = 4000
+    }) {
+      const container = document.getElementById('toastContainer');
+
+      const toast = document.createElement('div');
+      toast.className = 'toast-item';
+      toast.innerHTML = `
+        <div class="toast-icon-wrap toast-icon-cancel">
+          <i class="fa-solid fa-ban text-red-400 text-sm"></i>
+        </div>
+        <div class="toast-body">
+          <div class="toast-title">${title}</div>
+          ${message ? `<div class="toast-message">${message}</div>` : ''}
+        </div>
+        <button class="toast-close" onclick="dismissToast(this.closest('.toast-item'))">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="toast-progress" style="animation-duration: ${duration}ms;"></div>
+      `;
+
+      container.appendChild(toast);
+
+      // Auto-dismiss
+      setTimeout(() => dismissToast(toast), duration);
+    }
+
+    function dismissToast(toast) {
+      if (!toast || toast.classList.contains('toast-exit')) return;
+      toast.classList.add('toast-exit');
+      setTimeout(() => toast.remove(), 350);
+    }
+
+    // ═══════════════════════════
+    // MODALS
+    // ═══════════════════════════
     let selectedApptId = null;
 
+    // ── RESCHEDULE ──
     function openRescheduleModal(btn) {
       selectedApptId = btn.dataset.id;
       document.getElementById('resPatientName').textContent = btn.dataset.name || '—';
       document.getElementById('resAppointmentDate').textContent = btn.dataset.datetime || '—';
-      document.getElementById('rescheduleModal').classList.remove('hidden');
+
+      const modal = document.getElementById('rescheduleModal');
+      modal.classList.remove('hidden');
+
+      // Re-trigger entrance animation
+      const panel = modal.querySelector('.reschedule-modal-panel');
+      panel.style.animation = 'none';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        panel.style.animation = '';
+      }));
     }
 
     function closeRescheduleModal() {
@@ -1427,10 +1797,16 @@
       selectedApptId = null;
     }
 
-    function confirmReschedule() {
-      window.location.href = `/dentist/appointments/${selectedApptId}/reschedule`;
+    function handleRescheduleBackdropClick(e) {
+      if (e.target === document.getElementById('rescheduleModal')) closeRescheduleModal();
     }
 
+    function confirmReschedule() {
+      const url = "{{ route('dentist.appointments.reschedule', ['id' => ':id']) }}".replace(':id', selectedApptId);
+      window.location.href = url;
+    }
+
+    // ── START PROCEDURE ──
     function openStartProcedureModal(btn) {
       selectedApptId = btn.dataset.id;
       document.getElementById('startPatientName').textContent = btn.dataset.name || '—';
@@ -1447,11 +1823,32 @@
       window.location.href = `/dentist/appointments/${selectedApptId}/start`;
     }
 
+    // ── CANCEL MODAL ──
+    let cancelPatientNameCache = '';
+
     function openCancelAppointmentModal(btn) {
       selectedApptId = btn.dataset.id;
+      cancelPatientNameCache = btn.dataset.name || 'this patient';
+
       document.getElementById('cancelPatientName').textContent = btn.dataset.name || '—';
       document.getElementById('cancelAppointmentDate').textContent = btn.dataset.datetime || '—';
-      document.getElementById('cancelAppointmentModal').classList.remove('hidden');
+
+      // Reset form + clear validation
+      document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
+      clearReasonError();
+
+      // Reset confirm button
+      const btn2 = document.getElementById('confirmCancelBtn');
+      btn2.disabled = false;
+      btn2.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel Appointment';
+
+      const modal = document.getElementById('cancelAppointmentModal');
+      modal.classList.remove('hidden');
+      const panel = modal.querySelector('.cancel-modal-panel');
+      panel.style.animation = 'none';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        panel.style.animation = '';
+      }));
     }
 
     function closeCancelAppointmentModal() {
@@ -1459,8 +1856,138 @@
       selectedApptId = null;
     }
 
+    function handleCancelBackdropClick(e) {
+      if (e.target === document.getElementById('cancelAppointmentModal')) closeCancelAppointmentModal();
+    }
+
+    // Real-time validation helpers
+    function clearReasonError() {
+      const chips = document.getElementById('cancelReasonChips');
+      const error = document.getElementById('reasonError');
+      chips.classList.remove('invalid', 'chips-error-shake');
+      error.classList.add('hidden');
+
+      // Re-enable the confirm button if it was blocked by validation
+      const btn = document.getElementById('confirmCancelBtn');
+      if (!btn.disabled || btn.innerHTML.includes('fa-ban')) return;
+      // only re-enable if disabled due to validation, not mid-redirect
+    }
+
+    // Listen for any reason radio change to immediately clear error
+    document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+      r.addEventListener('change', clearReasonError);
+    });
+
     function confirmCancelAppointment() {
-      window.location.href = `/dentist/appointments/${selectedApptId}/cancel`;
+      const selectedReason = document.querySelector('input[name="cancelReason"]:checked')?.value || null;
+
+      // ── VALIDATION: reason is required ──
+      if (!selectedReason) {
+        const chips = document.getElementById('cancelReasonChips');
+        const error = document.getElementById('reasonError');
+        error.classList.remove('hidden');
+        chips.classList.add('invalid');
+        chips.classList.remove('chips-error-shake');
+        void chips.offsetWidth;
+        chips.classList.add('chips-error-shake');
+        return;
+      }
+
+      const btn = document.getElementById('confirmCancelBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1.5"></i>Cancelling…';
+
+      const patientName = cancelPatientNameCache;
+      const apptId = selectedApptId;
+
+      closeCancelAppointmentModal();
+
+      // ── AJAX cancel — no page reload ──
+      fetch(`/dentist/appointments/${apptId}/cancel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+          },
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // ── Remove card from DOM with animation ──
+            const card = document.querySelector(`[data-appt-id="${apptId}"]`);
+            if (card) {
+              card.style.transition = 'all 0.35s cubic-bezier(.4,0,.2,1)';
+              card.style.transformOrigin = 'top';
+              card.style.overflow = 'hidden';
+              // Animate out
+              requestAnimationFrame(() => {
+                card.style.maxHeight = card.offsetHeight + 'px';
+                requestAnimationFrame(() => {
+                  card.style.maxHeight = '0';
+                  card.style.opacity = '0';
+                  card.style.transform = 'scaleY(0.85) translateX(-8px)';
+                  card.style.marginBottom = '0';
+                  card.style.paddingTop = '0';
+                  card.style.paddingBottom = '0';
+                });
+              });
+              setTimeout(() => {
+                card.remove();
+
+                // Check if the group is now empty → show empty state
+                const list = document.querySelector('.space-y-2\\.5, .space-y-3');
+                const remaining = list ? list.querySelectorAll('[data-appt-id]') : [];
+                if (remaining.length === 0) {
+                  const container = list ? list.parentElement : null;
+                  if (container) {
+                    container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-24 text-gray-400">
+                      <i class="fa-regular fa-calendar-xmark text-5xl mb-4 text-gray-300"></i>
+                      <p class="text-base font-semibold text-gray-500">No upcoming appointments</p>
+                      <p class="text-sm mt-1">Cancelled appointments are moved to Past Visits.</p>
+                    </div>`;
+                  }
+                }
+
+                // ── Update patient badge in patients.blade (if sidebar/badge exists) ──
+                const patientBadge = document.querySelector(`[data-patient-appt-badge="${apptId}"]`);
+                if (patientBadge) patientBadge.remove();
+
+                // ── Update today's snapshot bar count ──
+                const countEl = document.getElementById('todayApptCount');
+                if (countEl) {
+                  const cur = parseInt(countEl.textContent) || 0;
+                  if (cur > 0) countEl.textContent = cur - 1;
+                }
+              }, 380);
+            }
+
+            showToast({
+              title: 'Appointment Cancelled',
+              message: `${patientName}'s appointment has been successfully cancelled.`,
+              duration: 5000,
+            });
+
+          } else {
+            // Server returned failure
+            showToast({
+              title: 'Cancel Failed',
+              message: data.message || 'Something went wrong. Please try again.',
+              duration: 4000,
+              type: 'error',
+            });
+            // Re-enable button in case user wants to retry (reopen modal)
+          }
+        })
+        .catch(() => {
+          showToast({
+            title: 'Network Error',
+            message: 'Could not reach the server. Please check your connection.',
+            duration: 4000,
+            type: 'error',
+          });
+        });
     }
   </script>
 

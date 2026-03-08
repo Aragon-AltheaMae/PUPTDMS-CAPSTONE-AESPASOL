@@ -279,7 +279,7 @@
       padding: 3px 10px;
       border-radius: 20px;
     }
-    .appt-badge-pending   { background: #FEF3E2; color: #E67E22; }
+    .appt-badge-upcoming   { background: #FEF3E2; color: #E67E22; }
     .appt-badge-confirmed { background: #E8F8EE; color: #27AE60; }
     .appt-badge-completed { background: #EAF0FB; color: #3B6CC7; }
     .appt-badge-cancelled { background: #F5F5F5; color: #999999; }
@@ -408,7 +408,6 @@
     }
     .appt-empty img { width: 80px; height: 80px; margin: 0 auto 12px; opacity: 0.6; }
     .appt-empty-title {
-      font-family: 'DM Serif Display', serif;
       font-size: 18px;
       color: #8A8A9A;
       margin-bottom: 4px;
@@ -506,15 +505,14 @@
   </div>
 
   <!-- SIDEBAR -->
-  <aside id="sidebar" class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl
-                             transition-all duration-300 flex flex-col justify-between z-40 expanded"
-         style="width: 200px;">
+  <aside id="sidebar"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded">
+    <!-- TOP -->
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
         <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-                class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
-                       hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
-          <i id="sidebarIcon" class="fa-solid fa-bars text-base"></i>
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+          <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
@@ -677,11 +675,11 @@
 
                 $rawStatus  = strtolower($appt->status ?? 'scheduled');
                 $badgeClass = match($rawStatus) {
-                  'pending'   => 'appt-badge-pending',
+                  'upcoming'   => 'appt-badge-upcoming',
                   'confirmed' => 'appt-badge-confirmed',
                   default     => 'appt-badge-scheduled',
                 };
-                $showDot    = in_array($rawStatus, ['pending', 'scheduled']);
+                $showDot    = in_array($rawStatus, ['upcoming', 'scheduled']);
               @endphp
               <div class="appt-card-new">
                 {{-- Date --}}
@@ -1046,7 +1044,7 @@ $badgeClass = 'appt-badge-completed';
 
         if (s === 'completed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
         else if (s === 'confirmed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
-        else if (s === 'pending' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
+        else if (s === 'upcoming' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
         else if (s === 'cancelled') statusEl.classList.add('bg-gray-200', 'text-gray-700');
         else statusEl.classList.add('bg-gray-200', 'text-gray-800');
       }
@@ -1245,6 +1243,25 @@ $badgeClass = 'appt-badge-completed';
             </div>
             <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
             <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
+
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-gray-100">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0 ring-2 ring-[#008440]/30 ring-offset-1"></span>
+                  My Appointment
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0 ring-2 ring-blue-400/30 ring-offset-1"></span>
+                  Holiday
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0 ring-2 ring-red-500/30 ring-offset-1"></span>
+                  Fully Booked
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0 ring-2 ring-[#8B0000]/30 ring-offset-1"></span>
+                  Today
+                </div>
+              </div>
           </div>`;
       }
 

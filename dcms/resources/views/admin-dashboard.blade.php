@@ -537,6 +537,13 @@
           Roles
         </span>
       </a>
+     <a href="{{ route('admin.role_permissions') }}" class="sidebar-link hover:bg-[#8B0000] hover:text-[#F4F4F4]">
+  <i class="fa-solid fa-user-shield text-lg"></i>
+  <span class="sidebar-text opacity-0 w-0 overflow-hidden transition-all duration-300 delay-150">Roles</span>
+  <span class="sidebar-tooltip absolute left-full ml-8 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">
+    Roles
+  </span>
+</a>
     </nav>
   </div>
 
