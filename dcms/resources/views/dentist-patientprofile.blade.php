@@ -124,7 +124,7 @@
             <span class="text-gray-600 font-medium">Patient Profile</span>
           </p>
           <div class="flex items-center gap-3">
-            <a href="/dentist/patients"
+            <a href="{{ route('dentist.appointments') }}"
               class="flex items-center gap-1 text-sm text-gray-600 border 
               border-gray-300 rounded-md px-3 py-1.5 hover:bg-gray-100 transition">
               <i class="fa-solid fa-arrow-left text-xs"></i>
@@ -458,27 +458,55 @@
 
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-  <script>
-    function showFuture() {
-      document.getElementById('futureContent').classList.remove('hidden');
-      document.getElementById('pastContent').classList.add('hidden');
-      document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
-      document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
-      document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
-      document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
-    }
+ <script>
+  function showFuture() {
+    document.getElementById('futureContent').classList.remove('hidden');
+    document.getElementById('pastContent').classList.add('hidden');
 
-    function showPast() {
-      document.getElementById('pastContent').classList.remove('hidden');
-      document.getElementById('futureContent').classList.add('hidden');
-      document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
-      document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
-      document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
-      document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
-    }
+    document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+    document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
 
-    function openStartModal() {
-      document.getElementById('startModal').classList.remove('hidden');
-    }
+    document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
+    document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+  }
 
-    function clo
+  function showPast() {
+    document.getElementById('pastContent').classList.remove('hidden');
+    document.getElementById('futureContent').classList.add('hidden');
+
+    document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+    document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
+
+    document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
+    document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+  }
+
+  function openStartModal() {
+    document.getElementById('startModal').classList.remove('hidden');
+  }
+
+  function closeStartModal() {
+    document.getElementById('startModal').classList.add('hidden');
+  }
+
+  function confirmStart() {
+    closeStartModal();
+
+    // temporary behavior
+    alert('Procedure started successfully.');
+  }
+
+  // close modal when clicking outside the modal box
+  document.getElementById('startModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeStartModal();
+    }
+  });
+
+  // optional: press ESC to close modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeStartModal();
+    }
+  });
+</script>
