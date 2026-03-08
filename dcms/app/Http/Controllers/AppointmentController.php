@@ -21,6 +21,7 @@ use App\Models\MedicalHistoryDiseaseAnswer;
 
 use App\Models\Patient;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\AuditLogger;
 
 class AppointmentController extends Controller
 {
@@ -447,6 +448,12 @@ class AppointmentController extends Controller
                 ]);
             }
         });
+
+        AuditLogger::log(
+            'create_appointment',
+            'appointments',
+            'Patient booked an appointment for ' . $request->appointment_date . ' at ' . $request->appointment_time
+        );
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
     }

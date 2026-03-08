@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\AuditLogger;
+
 
 class AdminAuthController extends Controller
 {
@@ -16,21 +18,26 @@ class AdminAuthController extends Controller
 
     // Handle admin login
     public function login(Request $request)
-{
-    $email = $request->input('email');
-    $password = $request->input('password');
+    {
+        $email = $request->input('email');
+        $password = $request->input('password');
 
-    // Hardcoded admin credentials
-    if ($email === 'admin' && $password === 'admin123') {
+        // Hardcoded admin credentials
+        if ($email === 'admin' && $password === 'admin123') {
 
-        // store admin session
-        session(['admin_logged_in' => true]);
+            session(['admin_logged_in' => true]);
 
-        return redirect()->route('admin.dashboard');
+            AuditLogger::log(
+                'login',
+                'authentication',
+                'Admin logged into the system'
+            );
+
+            return redirect()->route('admin.dashboard');
+        }
+
+        return back()->with('error', 'Invalid admin credentials');
     }
-
-    return back()->with('error', 'Invalid admin credentials');
-}
 
     // Logout
     public function logout(Request $request)
