@@ -970,6 +970,11 @@
   </style>
 </head>
 
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
+
 <body class="bg-[#F4F4F4] text-[#333333] font-normal">
 
   <!-- HEADER -->
@@ -980,7 +985,6 @@
       <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
     <div class="header-right">
-      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
       <div id="notifDropdown">
         <button class="notif-btn" id="notifBtn">
           <i class="fa-regular fa-bell"></i>
@@ -1014,7 +1018,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -1026,12 +1030,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -1259,7 +1263,7 @@
                 $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? 'Upcoming · '.ucfirst($status) : ucfirst($status ?: 'Pending')))));
                 @endphp
 
-                <a href="{{ route('dentist.patient.profile', ['patient' => $appt->patient_id]) }}"
+                <a href="{{ route('dentist.dentist.patient.profile', ['patient' => $appt->patient_id]) }}"
                   class="patient-card patient-item all {{ $tabClass }} block">
 
                   <div class="accent-bar {{ $accentClass }}"></div>

@@ -1104,11 +1104,14 @@
   $pastGrouped = $pastAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'));
   $upcomingTotal = $upcomingAppointments->count();
   $pastTotal = $pastAppointments->count();
+
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
   @endphp
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -1120,12 +1123,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -1286,11 +1289,11 @@
                   </div>
                   <div class="action-row justify-end">
 
-                    <a href="{{ route('dentist.appointments.patientProfile', $appt->id) }}"
+                    <a href="{{ route('dentist.dentist.appointments.patientProfile', $appt->id) }}"
                       class="action-btn border border-[#8B0000]/30 bg-white text-[#8B0000] hover:bg-[#8B0000] hover:text-white">
                       <i class="fa-regular fa-user text-[9px]"></i> View
                     </a>
-                    
+
                     <button type="button"
                       class="action-btn action-btn-start"
                       onclick="openStartProcedureModal(this)"
@@ -1802,7 +1805,7 @@
     }
 
     function confirmReschedule() {
-      const url = "{{ route('dentist.appointments.reschedule', ['id' => ':id']) }}".replace(':id', selectedApptId);
+      const url = "{{ route('dentist.dentist.appointments.reschedule', ['id' => ':id']) }}".replace(':id', selectedApptId);
       window.location.href = url;
     }
 

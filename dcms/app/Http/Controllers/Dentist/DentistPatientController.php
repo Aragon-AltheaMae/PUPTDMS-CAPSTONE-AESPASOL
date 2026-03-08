@@ -44,7 +44,7 @@ class DentistPatientController extends Controller
 
         $notifications = [];
 
-        return view('dentist-patient', compact(
+        return view('dentist.dentist-patient', compact(
             'appointments',
             'upcomingAppointments',
             'pastAppointments',
@@ -99,7 +99,7 @@ class DentistPatientController extends Controller
 
         $notifications = collect([]);
 
-        return view('dentist-patientprofile', compact(
+        return view('dentist.dentist-patientprofile', compact(
             'patient',
             'futureVisits',
             'pastVisits',
