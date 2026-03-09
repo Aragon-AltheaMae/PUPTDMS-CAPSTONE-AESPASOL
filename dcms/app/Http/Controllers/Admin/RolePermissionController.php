@@ -9,14 +9,15 @@ use Illuminate\Http\Request;
 
 class RolePermissionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Auto-seed defaults if any core role has no permissions yet
         $this->seedDefaultsIfEmpty();
 
         $roles = Role::with('permissions')->get();
         $permissions = Permission::orderBy('module')->orderBy('name')->get();
         $groupedPermissions = $permissions->groupBy('module');
+
+        $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
 
         return view('admin.role-permissions', compact('roles', 'groupedPermissions'));
     }
@@ -50,6 +51,7 @@ class RolePermissionController extends Controller
                 'manage_reports',
                 'manage_patient_profiles',
                 'manage_appointments',
+                'manage_dental_records',
                 'set_academic_year',
                 'set_archive_records',
                 'set_report_periods',
@@ -87,14 +89,38 @@ class RolePermissionController extends Controller
 
     public function update(Request $request)
     {
-        $roles = Role::all();
+        $request->validate([
+            'role_id' => ['required', 'exists:roles,id'],
+        ]);
 
-        foreach ($roles as $role) {
-            $permissionIds = $request->input("permissions.{$role->id}", []);
-            $role->permissions()->sync($permissionIds);
-        }
+        $role = Role::findOrFail($request->role_id);
 
-        return back()->with('success', 'Role permissions updated successfully.');
+        $permissionIds = $request->input("permissions.{$role->id}", []);
+        $permissionIds = array_map('intval', $permissionIds);
+
+        $role->permissions()->sync($permissionIds);
+
+        $savedPermissions = Permission::whereIn('id', $permissionIds)
+            ->get(['id', 'name', 'slug', 'module'])
+            ->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'slug' => $permission->slug,
+                    'module' => $permission->module,
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        return redirect()
+            ->route('admin.role_permissions')
+            ->with('success', 'Role permissions updated successfully.')
+            ->with('saved_view_as', [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'permissions' => $savedPermissions,
+            ]);
     }
 
     public function reset()
@@ -162,20 +188,21 @@ class RolePermissionController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
             'slug' => ['required', 'string', 'max:255', 'unique:roles,slug',
-                       'regex:/^[a-z0-9]+(?:_[a-z0-9]+)*$/'],
+                    'regex:/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/'],
         ], [
             'name.unique' => 'A role with this name already exists.',
             'slug.unique' => 'A role with this slug already exists.',
-            'slug.regex'  => 'Slug may only contain lowercase letters, numbers, and underscores.',
+            'slug.regex'  => 'Slug may only contain lowercase letters, numbers, hyphens, and underscores.',
         ]);
 
-        Role::create([
+        $role = Role::create([
             'name' => $request->name,
             'slug' => $request->slug,
         ]);
 
         return redirect()
-            ->route('admin.role_permissions')
-            ->with('success', "Role \"{$request->name}\" created successfully. You can now assign permissions.");
+            ->route('admin.role_permissions', ['highlight_role' => $role->id])
+            ->with('success', "Role \"{$request->name}\" created successfully. You can now assign permissions.")
+            ->with('new_role_id', $role->id);
     }
 }
