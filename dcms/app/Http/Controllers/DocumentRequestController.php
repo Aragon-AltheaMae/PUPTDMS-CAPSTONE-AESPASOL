@@ -64,7 +64,7 @@ class DocumentRequestController extends Controller
 
         $notifications = collect([]);
 
-        return view('dentist-documentrequests', compact('notifications'));
+        return view('dentist.dentist-documentrequests', compact('notifications'));
     }
 
     public function dentistData(Request $request)

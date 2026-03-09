@@ -25,6 +25,6 @@ class RecordController extends Controller
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        return view('record', compact('patient', 'records'));
+        return view('patient.record', compact('patient', 'records'));
     }
 }

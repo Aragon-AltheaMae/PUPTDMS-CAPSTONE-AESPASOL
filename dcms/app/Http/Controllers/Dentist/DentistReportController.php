@@ -91,7 +91,7 @@ class DentistReportController extends Controller
 
         $notifications = collect([]);
 
-        return view('dentist-report', compact(
+        return view('dentist.dentist-report', compact(
             'patientsThisMonth',
             'patientsDelta',
             'appointmentsToday',

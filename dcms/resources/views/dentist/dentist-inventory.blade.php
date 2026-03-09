@@ -1269,6 +1269,11 @@
   </style>
 </head>
 
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
+
 <body class="bg-[#F4F4F4] min-h-screen flex flex-col">
 
   <!-- TOAST CONTAINER -->
@@ -1289,9 +1294,7 @@
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">
-            Notifications
-          </div>
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
           <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
             <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
@@ -1316,7 +1319,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -1328,12 +1331,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests','icon'=>'fa-file-circle-check','label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
