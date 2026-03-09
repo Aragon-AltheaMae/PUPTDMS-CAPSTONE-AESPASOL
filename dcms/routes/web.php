@@ -390,6 +390,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.dentist.patient.profile');
 
+    // Reports
+        
 
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
