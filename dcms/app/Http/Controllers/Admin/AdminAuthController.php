@@ -33,7 +33,7 @@ class AdminAuthController extends Controller
                 'Admin logged into the system'
             );
 
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.admin.dashboard');
         }
 
         return back()->with('error', 'Invalid admin credentials');
