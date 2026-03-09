@@ -167,6 +167,9 @@ Route::prefix('admin')->group(function () {
 
     Route::post('/role-permissions/reset', [RolePermissionController::class, 'reset'])
         ->name('admin.role_permissions.reset');
+    
+    Route::post('/role-permissions/store-role', [RolePermissionController::class, 'storeRole'])
+        ->name('admin.role_permissions.store_role');
 
     Route::get('/system-logs', [SystemLogController::class, 'index'])
     ->name('admin.system_logs');
