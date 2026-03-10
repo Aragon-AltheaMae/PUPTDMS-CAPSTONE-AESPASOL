@@ -25,7 +25,12 @@ class AdminAuthController extends Controller
         // Hardcoded admin credentials
         if ($email === 'admin' && $password === 'admin123') {
 
-            session(['admin_logged_in' => true]);
+            session([
+                    'admin_logged_in' => true,
+                    'role' => 'super_admin',
+                    'admin_id' => 1,
+                    'admin_email' => $email,
+                ]);
 
             AuditLogger::log(
                 'login',
