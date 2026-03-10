@@ -787,14 +787,14 @@
         <div class="group-body open" id="body-sys">
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-database"></i> Data Backup</a>
           <a href="{{ route('admin.system_logs') }}" class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-gear"></i> System Settings</a>
+          <a href="{{ route('admin.user_management') }}" class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> System Settings</a>
           <a href="{{ route('admin.role_permissions') }}" class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
         </div>
         <div class="flyout-panel" id="flyout-sys">
           <div class="flyout-title">System</div>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-database"></i> Data Backup</a>
           <a href="{{ route('admin.system_logs') }}" class="flyout-link"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-gear"></i> System Settings</a>
+          <a href="{{ route('admin.user_management') }}" class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> System Settings</a>
           <a href="{{ route('admin.role_permissions') }}" class="flyout-link"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
         </div>
       </div>
