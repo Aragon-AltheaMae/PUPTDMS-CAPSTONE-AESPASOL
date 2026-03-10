@@ -12,7 +12,7 @@ class RecordController extends Controller
 {
         public function index()
     {
-        $patientId = session('patient_id');
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')->with('error', 'Please login first!');

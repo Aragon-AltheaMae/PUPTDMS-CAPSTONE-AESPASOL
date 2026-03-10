@@ -11,28 +11,30 @@ class PermissionMiddleware
 {
     public function handle(Request $request, Closure $next, string $permission): Response
     {
-        // 1. Check if logged in via session
         if (!session()->has('role')) {
             return redirect('/login');
         }
 
-        $roleSlug = session('role');
+        $originalRoleSlug = session('role');
+        $activeRoleSlug = session('impersonated_role') ?: $originalRoleSlug;
 
-        // 2. Find role from roles table
-        $role = Role::with('permissions')->where('slug', $roleSlug)->first();
+        // Super Admin override: allow everything
+        if ($originalRoleSlug === 'super_admin') {
+            return $next($request);
+        }
+
+        $role = Role::with('permissions')->where('slug', $activeRoleSlug)->first();
 
         if (!$role) {
             abort(403, 'No valid role assigned.');
         }
 
-        // 3. Check if role has the required permission
         $hasPermission = $role->permissions->contains('slug', $permission);
 
         if (!$hasPermission) {
             abort(403, 'Unauthorized.');
         }
 
-        // 4. Continue request
         return $next($request);
     }
 }
