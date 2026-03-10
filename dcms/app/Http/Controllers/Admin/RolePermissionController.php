@@ -39,6 +39,7 @@ class RolePermissionController extends Controller
         $map = [
             'super_admin' => [
                 'access_super_admin_dashboard',
+                'access_patient_dashboard',
                 'receive_notifications',
                 'manage_user_accounts',
                 'manage_user_roles',
@@ -132,6 +133,7 @@ class RolePermissionController extends Controller
         $superAdminPermissions = Permission::whereIn('slug', [
             'access_super_admin_dashboard',
             'access_dentist_dashboard',
+            'access_patient_dashboard',
             'receive_notifications',
             'manage_system_settings',
             'manage_audit_trail',

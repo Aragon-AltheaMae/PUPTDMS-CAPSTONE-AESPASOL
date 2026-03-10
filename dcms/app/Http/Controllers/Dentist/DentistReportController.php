@@ -12,7 +12,9 @@ class DentistReportController extends Controller
 {
     public function index()
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -116,7 +118,9 @@ class DentistReportController extends Controller
     // ── AJAX: GAD chart for selected period 
     public function gadData(Request $request)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -139,7 +143,9 @@ class DentistReportController extends Controller
     // ── AJAX: Weekly dental cases for selected period 
     public function weeklyData(Request $request)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
