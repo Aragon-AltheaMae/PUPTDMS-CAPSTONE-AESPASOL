@@ -38,93 +38,456 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+
+    /* ── HEADER ── */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    /* Notif dropdown */
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+      padding-left: 0.25rem;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-text {
+      opacity: 1;
+      width: auto;
+      overflow: visible;
+    }
+
+    #sidebar.collapsed .sidebar-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    .sidebar-link:hover .sidebar-tooltip {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    body,
+    #sidebar,
+    main,
+    .card,
+    .modal-box {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    #sidebar.expanded .section-label {
+      display: block;
+    }
+
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link span:first-of-type {
+      margin: 0 auto;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    #sidebar.expanded .sidebar-link {
+      justify-content: flex-start;
+    }
+
+    #sidebar.expanded .sidebar-link i {
+      margin-right: 0.75rem;
+    }
+
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
+    #sidebar.expanded .sidebar-link:hover {
+      transform: translateX(4px);
+    }
+
+    #sidebar.collapsed .sidebar-tooltip {
+      display: block;
+    }
+
+    #sidebar.expanded .sidebar-tooltip {
+      display: none;
+    }
+
+    .sidebar-link.bg-\[\#8B0000\] {
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+    }
+
+    /* ── THEME ── */
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+      border-radius: 8px;
+    }
+
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    /* ── DARK MODE ── */
+    [data-theme="dark"] body {
+      background-color: #000D1A;
+      color: #E5E7EB;
+    }
+
+    [data-theme="dark"] #sidebar {
+      background-color: #000D1A;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #000D1A !important;
+    }
+
+    [data-theme="dark"] .text-\[\#333333\] {
+      color: #E5E7EB !important;
+    }
+
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
+    }
+
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
+    }
+
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
+    }
+
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
+
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
 
 <body class="bg-gray-100 min-h-screen">
 
   <!-- ===== APP SHELL ===== -->
   <div class="flex min-h-screen">
 
-    <!-- ===== TOP HEADER ===== -->
-    <div class="flex-1 flex flex-col">
-      <header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white 
-      px-8 py-3 flex justify-between items-center sticky top-0 z-30">
-        <div class="flex items-center gap-3 font-bold text-sm">
-          <img src="{{ asset('images/PUP.png') }}"
-            alt="PUP Logo"
-            class="w-8 h-8 object-contain">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}"
-            alt="DMS Logo"
-            class="w-8 h-8 object-contain">
-          <span class="tracking-wide">PUP TAGUIG DENTAL CLINIC</span>
-        </div>
-
-        <div class="flex items-center gap-6">
-          @php
-          $notifications = collect($notifications ?? []);
-          $notifCount = $notifications->count();
-          @endphp
-
-          <!-- Bell -->
-          <div class="dropdown dropdown-end">
-            <label tabindex="0" class="btn btn-ghost btn-circle indicator text-white">
-              @if($notifCount > 0)
-              <span class="indicator-item badge badge-sm bg-yellow-400 
-                border-none text-[#660000] font-bold">{{ $notifCount }}
-              </span>
-              @endif
-              <i class="fa-regular fa-bell text-lg"></i>
-            </label>
-            <div tabindex="0" class="dropdown-content z-50 mt-3 w-80 
-            rounded-2xl bg-white shadow-xl border border-gray-100">
-              <div class="p-4 border-b flex items-center justify-between">
-                <span class="font-bold text-[#8B0000]">Notifications</span>
-              </div>
-              <div class="max-h-80 overflow-y-auto">
-
-                @forelse($notifications as $n)
-                <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-                  <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-                  @if(!empty($n['message']))<div class="text-xs text-gray-400 mt-0.5">{{ $n['message'] }}</div>@endif
-                </a>
-                @empty
-
-                <div class="px-4 py-10 text-center">
-                  <div class="text-sm font-semibold text-gray-800">No notifications</div>
-                  <div class="text-xs text-gray-500 mt-1">You're all caught up.</div>
-                </div>
-                @endforelse
-              </div>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+        <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
+      </div>
+      <div class="header-right">
+        <div id="notifDropdown">
+          <button class="notif-btn" id="notifBtn">
+            <i class="fa-regular fa-bell"></i>
+            @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
+          </button>
+          <div id="notifMenu">
+            <div style="padding:.85rem 1rem .65rem; font-weight:700; color:var(--red); font-size:.82rem; border-bottom:1px solid #f5e8e8;">
+              Notifications
             </div>
-          </div>
-
-          <!-- Divider -->
-          <div class="h-8 w-px bg-white/30"></div>
-
-          <!-- User -->
-          <div class="flex items-center gap-3">
-            <img src="https://i.pravatar.cc/40" class="rounded-full w-9 h-9 object-cover border-2 border-white/40">
-            <div class="text-sm leading-tight">
-              <p class="font-semibold">Dr. Nelson Angeles</p>
-              <p class="text-xs opacity-75">Dentist</p>
+            <div style="max-height:260px; overflow-y:auto;">
+              @forelse($notifications as $n)
+              <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+                <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+                @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
+              </a>
+              @empty
+              <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
+              @endforelse
             </div>
           </div>
         </div>
-      </header>
+        <div class="header-user">
+          <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
+          <div>
+            <div class="header-name">Dr. Nelson Angeles</div>
+            <div class="header-role">Dentist</div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-      <!-- ===== PAGE CONTENT ===== -->
-      <main class="flex-1 px-8 py-6 space-y-6">
+    <!-- ===== PAGE CONTENT ===== -->
+    <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+      <div class="max-w-7xl mt-4 mx-auto fade-in">
 
         <!-- Breadcrumb + Title -->
         <div>
           <p class="text-xs text-gray-400 mb-2">
-            <a href="{{ route('dentist.appointments') }}" class="hover:underline">Appointments</a>
+            <a href="{{ route('dentist.dentist.appointments') }}" class="hover:underline">Appointments</a>
             <span class="mx-1">›</span>
             <span class="text-gray-600 font-medium">Patient Profile</span>
           </p>
           <div class="flex items-center gap-3">
-            <a href="{{ route('dentist.appointments') }}"
+            <a href="{{ route('dentist.dentist.appointments') }}"
               class="flex items-center gap-1 text-sm text-gray-600 border 
               border-gray-300 rounded-md px-3 py-1.5 hover:bg-gray-100 transition">
               <i class="fa-solid fa-arrow-left text-xs"></i>
@@ -422,16 +785,16 @@
 
           </div>
         </div>
+      </div>
+    </main><!-- /main -->
 
-      </main><!-- /main -->
-
-      <!-- ===== FOOTER ===== -->
-      <footer class="bg-[#660000] text-[#F4F4F4] px-10 
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-[#660000] text-[#F4F4F4] px-10 
       py-6 text-xs text-center opacity-90">
-        © {{ date('Y') }} PUP Taguig Dental Clinic. All rights reserved.
-      </footer>
+      © {{ date('Y') }} PUP Taguig Dental Clinic. All rights reserved.
+    </footer>
 
-    </div><!-- /right column -->
+  </div><!-- /right column -->
   </div><!-- /app shell -->
 
 
@@ -459,6 +822,7 @@
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script>
+<<<<<<< HEAD:dcms/resources/views/dentist-patientprofile.blade.php
     function showFuture() {
       document.getElementById('futureContent').classList.remove('hidden');
       document.getElementById('pastContent').classList.add('hidden');
@@ -481,6 +845,94 @@
       document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
     }
 
+=======
+    // ── THEME TOGGLE ──
+    const html = document.documentElement;
+    const themeToggleContainer = document.getElementById("themeToggle");
+    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
+
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      themeOptions.forEach(opt => opt.classList.toggle("active", opt.getAttribute("data-theme") === theme));
+      themeIndicator.classList.toggle("dark-mode", theme === "dark");
+    }
+
+    applyTheme(localStorage.getItem("theme") || "light");
+    themeOptions.forEach(opt => opt.addEventListener("click", () => applyTheme(opt.getAttribute("data-theme"))));
+
+    // ── SIDEBAR ──
+    let sidebarOpen = true;
+
+    function applyLayout(sidebarWidth) {
+      document.getElementById('sidebar').style.width = sidebarWidth;
+      document.getElementById('mainContent').style.marginLeft = sidebarWidth;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const texts = document.querySelectorAll('.sidebar-text');
+      const icon = document.getElementById('sidebarIcon');
+      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) {
+        applyLayout('220px');
+        sidebar.classList.replace('collapsed', 'expanded');
+        texts.forEach(t => {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
+        });
+        toggleWrapper.classList.replace('justify-center', 'justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        applyLayout('72px');
+        sidebar.classList.replace('expanded', 'collapsed');
+        texts.forEach(t => {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        toggleWrapper.classList.replace('justify-end', 'justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
+      }
+      applyTheme(localStorage.getItem("theme") || "light");
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      sidebarOpen = true;
+      applyLayout('220px');
+    });
+
+    // ── NOTIF ──
+    document.getElementById("notifBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("notifMenu").classList.toggle("open");
+    });
+    document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
+
+    function showFuture() {
+      document.getElementById('futureContent').classList.remove('hidden');
+      document.getElementById('pastContent').classList.add('hidden');
+
+      document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
+
+      document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+    }
+
+    function showPast() {
+      document.getElementById('pastContent').classList.remove('hidden');
+      document.getElementById('futureContent').classList.add('hidden');
+
+      document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
+
+      document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+    }
+
+>>>>>>> main:dcms/resources/views/dentist/dentist-patientprofile.blade.php
     function openStartModal() {
       document.getElementById('startModal').classList.remove('hidden');
     }

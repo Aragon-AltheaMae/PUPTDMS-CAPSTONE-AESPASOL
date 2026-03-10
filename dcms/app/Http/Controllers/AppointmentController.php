@@ -95,7 +95,7 @@ class AppointmentController extends Controller
 
         $notifications = [];
 
-        return view('appointment', compact(
+        return view('patient.appointment', compact(
             'appointments',
             'futureVisits',
             'pastVisits',
@@ -140,7 +140,7 @@ class AppointmentController extends Controller
 
         $diseases = Disease::orderBy('sort_order')->get();
 
-        return view('book-appointment', compact(
+        return view('patient.book-appointment', compact(
             'patient',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',

@@ -422,6 +422,36 @@
     }
   </style>
 </head>
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+
+$dentalCasesThisMonth = $dentalCasesThisMonth ?? 0;
+$totalApptsThisMonth = $totalApptsThisMonth ?? 0;
+
+$dentalCasesDelta = $dentalCasesDelta ?? null;
+$totalApptsDelta = $totalApptsDelta ?? null;
+
+$gadLabels = $gadLabels ?? ['Student', 'Administrative', 'Faculty', 'Dependent'];
+$gadFemale = $gadFemale ?? [0, 0, 0, 0];
+$gadMale = $gadMale ?? [0, 0, 0, 0];
+
+$appointmentCountsPerDay = $appointmentCountsPerDay ?? [];
+$unavailableDates = $unavailableDates ?? [];
+$philippineHolidays = $philippineHolidays ?? [];
+$todayAppointments = $todayAppointments ?? collect();
+
+$medicalSupplies = $medicalSupplies ?? collect();
+$medicineSupplies = $medicineSupplies ?? collect();
+
+$calendarAppointmentCounts = $appointmentCountsPerDay;
+
+if (empty($calendarAppointmentCounts) && $todayAppointments->count() > 0) {
+$calendarAppointmentCounts = [
+\Carbon\Carbon::today()->format('Y-m-d') => $todayAppointments->count(),
+];
+}
+@endphp
 
 <body class="bg-white text-[#333333] font-normal">
 
@@ -433,7 +463,6 @@
       <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
     <div class="header-right">
-      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
       <div id="notifDropdown">
         <button class="notif-btn" id="notifBtn">
           <i class="fa-regular fa-bell"></i>
@@ -477,12 +506,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -615,7 +644,7 @@
 
         {{-- KPI 4: Live Clock --}}
         <div class="relative overflow-hidden rounded-2xl p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
-             style="background: linear-gradient(135deg, #7b0c0c 0%, #4a0606 100%);">
+          style="background: linear-gradient(135deg, #7b0c0c 0%, #4a0606 100%);">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest opacity-60 mb-2 text-white flex items-center gap-1.5">
@@ -654,7 +683,7 @@
           </button>
           <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-green-50/50"></div>
         </div>
-        
+
       </div>
 
       <!-- ROW 2: CALENDAR + SCHEDULE -->
@@ -680,7 +709,7 @@
                 <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
               </h2>
               <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">
-                {{ $todayAppointments->count() }} {{ Str::plural('patient', $todayAppointments->count()) }}
+                {{ $todayAppointments->count() }} {{ \Illuminate\Support\Str::plural('patient', $todayAppointments->count()) }}
               </span>
             </div>
             <div class="space-y-2 flex-1 overflow-y-auto pr-1">
@@ -693,7 +722,7 @@
               : $appointment->service_type;
               $isConfirmed = $appointment->status === 'confirmed';
               @endphp
-              <a href="{{ route('dentist.appointments') }}"
+              <a href="{{ route('dentist.dentist.appointments') }}"
                 class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]">
                 <div class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {{ strtoupper(substr($name, 0, 1)) }}
@@ -719,7 +748,7 @@
               </div>
               @endforelse
             </div>
-            <a href="{{ route('dentist.appointments') }}"
+            <a href="{{ route('dentist.dentist.appointments') }}"
               class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
               View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -763,7 +792,7 @@
                 <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
                   <i class="fa-solid fa-boxes"></i> Medical Supplies
                 </h3>
-                <a href="{{ route('dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
                   View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
               </div>
@@ -818,7 +847,7 @@
                 <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
                   <i class="fa-solid fa-pills"></i> Medicine Supplies
                 </h3>
-                <a href="{{ route('dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
                   View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
               </div>
@@ -906,54 +935,65 @@
   </footer>
 
   <script>
-    const GAD_LABELS = {!! json_encode($gadLabels ?? ['Student', 'Administrative', 'Faculty', 'Dependent']) !!};
-    const GAD_FEMALE = {!! json_encode($gadFemale ?? [0, 0, 0, 0]) !!};
-    const GAD_MALE = {!! json_encode($gadMale ?? [0, 0, 0, 0]) !!};
+    const dashboardData = {
+      gadLabels: @json($gadLabels),
+      gadFemale: @json($gadFemale),
+      gadMale: @json($gadMale),
+      apptCounts: @json($calendarAppointmentCounts),
+      unavailableDates: @json($unavailableDates),
+      holidays: @json($philippineHolidays),
+    };
+
+    const GAD_LABELS = dashboardData.gadLabels;
+    const GAD_FEMALE = dashboardData.gadFemale;
+    const GAD_MALE = dashboardData.gadMale;
 
     // ── Live Clock ────────────────────────────────────────────────────────────
-    (function () {
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      
+    (function() {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
       function tickClock() {
         const now = new Date();
-        let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-        
+        let h = now.getHours(),
+          m = now.getMinutes(),
+          s = now.getSeconds();
+
         const ampm = h >= 12 ? 'PM' : 'AM';
-        const isDaytime = ampm === 'AM';
-        
+        const isDaytime = h >= 6 && h < 18;
+
         const displayHour = h % 12 || 12;
 
-        document.getElementById('kpi-clock-hhmm').textContent = 
-          String(displayHour).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+        document.getElementById('kpi-clock-hhmm').textContent =
+          String(displayHour).padStart(2, '0') + ':' + String(m).padStart(2, '0');
 
-        document.getElementById('kpi-clock-ss').textContent = 
-          ':' + String(s).padStart(2,'0');
+        document.getElementById('kpi-clock-ss').textContent =
+          ':' + String(s).padStart(2, '0');
 
         document.getElementById('kpi-clock-ampm').textContent = ampm;
 
-        document.getElementById('kpi-clock-date').textContent = 
+        document.getElementById('kpi-clock-date').textContent =
           days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
 
         const dayicon = document.getElementById('kpi-clock-dayicon');
         const bigicon = document.getElementById('kpi-clock-icon');
 
-        dayicon.className = isDaytime
-          ? 'fa-solid fa-sun text-xs flex-shrink-0' 
-          : 'fa-solid fa-moon text-xs flex-shrink-0';
+        dayicon.className = isDaytime ?
+          'fa-solid fa-sun text-xs flex-shrink-0' :
+          'fa-solid fa-moon text-xs flex-shrink-0';
 
         dayicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
 
-        bigicon.className = isDaytime 
-        ? 'fa-solid fa-sun text-lg' 
-        : 'fa-solid fa-moon text-lg';
+        bigicon.className = isDaytime ?
+          'fa-solid fa-sun text-lg' :
+          'fa-solid fa-moon text-lg';
 
         bigicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
       }
       tickClock();
       setInterval(tickClock, 1000);
     })();
-    
+
     // ── Theme & Sidebar ──────────────────────────────────────────────────────
     const html = document.documentElement;
 
@@ -1206,23 +1246,10 @@
     // ── Calendar ──
     function loadDentistCalendar() {
       const MAX_PER_DAY = 5;
-      const apptCounts = {
-        @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay ?? []) > 0)
-          @foreach($appointmentCountsPerDay as $date => $count)
-            "{{ $date }}": {{ $count }},
-          @endforeach
-        @else
-          @if(isset($todayAppointments) && $todayAppointments->count() > 0)
-            "{{ \Carbon\Carbon::today()->format('Y-m-d') }}": {{ $todayAppointments->count() }},
-          @endif
-        @endif
-      };
-      const unavailableDates = [
-        @foreach(($unavailableDates ?? []) as $d) "{{ $d }}", @endforeach
-      ];
-      const allHolidays = {
-        @foreach(($philippineHolidays ?? []) as $date => $name) "{{ $date }}": "{{ addslashes($name) }}", @endforeach
-      };
+
+      const apptCounts = @json($calendarAppointmentCounts);
+      const unavailableDates = @json($unavailableDates);
+      const allHolidays = @json($philippineHolidays);
 
       const today = new Date();
       let currentYear = today.getFullYear(),
@@ -1249,44 +1276,66 @@
       function renderDentistCalendar(year, month) {
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const firstDow = new Date(year, month, 1).getDay(),
-          totalDays = new Date(year, month + 1, 0).getDate();
+        const firstDow = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
         const holidays = getHolidaysForMonth(year, month);
-        const headerHtml = dayLabels.map((l, i) => `<div class="text-center text-[10px] font-bold ${(i===0||i===6)?'text-[#8B0000]/40':'text-[#555]'} uppercase tracking-widest">${l}</div>`).join('');
+
+        const headerHtml = dayLabels.map((l, i) =>
+          `<div class="text-center text-[10px] font-bold ${(i === 0 || i === 6) ? 'text-[#8B0000]/40' : 'text-[#555]'} uppercase tracking-widest">${l}</div>`
+        ).join('');
+
         let cells = '';
-        for (let i = 0; i < firstDow; i++) cells += `<div></div>`;
+
+        for (let i = 0; i < firstDow; i++) {
+          cells += `<div></div>`;
+        }
+
         for (let d = 1; d <= totalDays; d++) {
-          const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
+          const dateStr = `${year}-${pad(month + 1)}-${pad(d)}`;
           const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-          const weekend = isWeekend(year, month, d),
-            holiday = holidays[dateStr] || null;
-          const count = apptCounts[dateStr] || 0,
-            isFull = count >= MAX_PER_DAY;
-          const isUnavail = unavailableDates.includes(dateStr) || weekend,
-            hasAppts = count > 0;
-          let dotHtml = '',
-            badgeHtml = '',
-            tooltipTxt = '';
+          const weekend = isWeekend(year, month, d);
+          const holiday = holidays[dateStr] || null;
+          const count = apptCounts[dateStr] || 0;
+          const isFull = count >= MAX_PER_DAY;
+          const isUnavail = unavailableDates.includes(dateStr) || weekend;
+          const hasAppts = count > 0;
+
+          let dotHtml = '';
+          let badgeHtml = '';
+          let tooltipTxt = '';
+
           if (holiday) {
             dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
             tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
           }
+
           if (hasAppts && !isUnavail) {
             if (isFull) {
               dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
               tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked — ${count} patients`;
             } else {
-              dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isToday?'bg-white':'bg-[#8B0000]'}"></span>`;
-              tooltipTxt = `<i class="fa-solid fa-user-clock mr-1 text-yellow-300"></i>${count} patient${count>1?'s':''} scheduled`;
+              dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-[#8B0000]'}"></span>`;
+              tooltipTxt = `<i class="fa-solid fa-user-clock mr-1 text-yellow-300"></i>${count} patient${count > 1 ? 's' : ''} scheduled`;
             }
-            const pillColor = isFull ? 'bg-red-500 text-white' : (isToday ? 'bg-white text-[#8B0000]' : 'bg-[#8B0000] text-white');
+
+            const pillColor = isFull ?
+              'bg-red-500 text-white' :
+              (isToday ? 'bg-white text-[#8B0000]' : 'bg-[#8B0000] text-white');
+
             badgeHtml = `<span class="absolute -top-1.5 -right-1.5 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ${pillColor} shadow">${count}</span>`;
           }
-          if (isUnavail && !holiday && !hasAppts) tooltipTxt = weekend ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed` : `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
-          let bgClass = '',
-            textClass = 'text-[#333]',
-            ringClass = '',
-            cursor = 'cursor-default';
+
+          if (isUnavail && !holiday && !hasAppts) {
+            tooltipTxt = weekend ?
+              `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed` :
+              `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+          }
+
+          let bgClass = '';
+          let textClass = 'text-[#333]';
+          let ringClass = '';
+          let cursor = 'cursor-default';
+
           if (isToday) {
             bgClass = 'bg-[#8B0000]';
             textClass = 'text-white font-extrabold';
@@ -1307,17 +1356,38 @@
           } else {
             bgClass = 'hover:bg-gray-100';
           }
-          const tooltipHtml = tooltipTxt ? `<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">${tooltipTxt}<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>` : '';
-          cells += `<div class="relative group flex items-center justify-center">${tooltipHtml}<div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}">${d}${dotHtml}${badgeHtml}</div></div>`;
+
+          const tooltipHtml = tooltipTxt ?
+            `<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">${tooltipTxt}<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>` :
+            '';
+
+          cells += `
+            <div class="relative group flex items-center justify-center">
+              ${tooltipHtml}
+              <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}">
+                ${d}${dotHtml}${badgeHtml}
+              </div>
+            </div>`;
         }
+
         document.getElementById('dentistCalendarContainer').innerHTML = `
           <div class="h-full flex flex-col select-none">
-            <div class="flex items-center justify-center gap-2 mb-3"><i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i><h2 class="text-lg font-extrabold text-[#333]">Clinic Appointment Schedule</h2></div>
+            <div class="flex items-center justify-center gap-2 mb-3">
+              <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
+              <h2 class="text-lg font-extrabold text-[#333]">Clinic Appointment Schedule</h2>
+            </div>
             <hr class="border-t border-gray-200 mb-2">
             <div class="flex items-center justify-between my-4">
-              <button onclick="changeDentistMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-              <div class="text-center"><p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p><p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p></div>
-              <button onclick="changeDentistMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+              <button onclick="changeDentistMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <div class="text-center">
+                <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+                <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+              </div>
+              <button onclick="changeDentistMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
             </div>
             <div class="grid grid-cols-7 gap-2 mb-2">${headerHtml}</div>
             <div class="grid grid-cols-7 gap-2" style="row-gap:1.2rem;">${cells}</div>
@@ -1330,6 +1400,7 @@
             </div>
           </div>`;
       }
+
       window.changeDentistMonth = function(dir) {
         currentMonth += dir;
         if (currentMonth > 11) {
@@ -1342,6 +1413,7 @@
         }
         renderDentistCalendar(currentYear, currentMonth);
       };
+
       renderDentistCalendar(currentYear, currentMonth);
     }
   </script>

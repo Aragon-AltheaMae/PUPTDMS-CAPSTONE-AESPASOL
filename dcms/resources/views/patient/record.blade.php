@@ -164,16 +164,146 @@
       animation: wave 2.5s ease-in-out infinite;
     }
 
-    /* Sidebar base */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
+    }
+
     .sidebar-link {
       display: flex;
       align-items: center;
       transition: background-color .2s ease, transform .2s ease;
     }
 
-    /* EXPANDED state */
     #sidebar.expanded .sidebar-link {
       justify-content: flex-start;
+      padding-left: .25rem;
     }
 
     #sidebar.expanded .sidebar-link i {
@@ -188,7 +318,7 @@
       display: none;
     }
 
-    #sidebar.expanded .nav-section-label {
+    #sidebar.expanded .section-label {
       display: block;
     }
 
@@ -196,11 +326,6 @@
       opacity: 1;
       width: auto;
       overflow: visible;
-    }
-
-    /* COLLAPSED state */
-    #sidebar.collapsed .sidebar-link {
-      justify-content: center;
     }
 
     #sidebar.collapsed .sidebar-text {
@@ -213,54 +338,22 @@
       display: block;
     }
 
-    #sidebar.collapsed .nav-section-label {
+    #sidebar.collapsed .section-label {
       display: none;
     }
 
-    /* Tooltip style */
     .sidebar-link:hover .sidebar-tooltip {
       opacity: 1 !important;
       transform: scale(1) !important;
     }
 
-    .nav-section-label {
+    .section-label {
       font-size: .65rem;
-      font-weight: 700;
+      font-weight: 500;
       letter-spacing: .08em;
-      color: #9CA3AF;
+      color: #757575;
       text-transform: uppercase;
       margin-bottom: .25rem;
-    }
-
-    /* Notification dropdown animation */
-    .notif-open {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .notif-close {
-      opacity: 0 !important;
-      transform: scale(.95) !important;
-      pointer-events: none !important;
-    }
-
-    /* DARK MODE */
-    [data-theme="dark"] body {
-      background-color: #111827;
-      color: #E5E7EB;
-    }
-
-    [data-theme="dark"] #sidebar {
-      background-color: #1F2933;
-    }
-
-    [data-theme="dark"] .bg-white {
-      background-color: #1F2937 !important;
-    }
-
-    [data-theme="dark"] .text-\[\#333333\] {
-      color: #E5E7EB !important;
     }
 
     body,
@@ -273,7 +366,7 @@
 
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
-      padding-left: 10px;
+      padding-left: 0;
       padding-right: 0;
     }
 
@@ -283,206 +376,241 @@
       text-align: center;
     }
 
-    /* Active nav glow */
+    #sidebar.expanded .sidebar-link span i {
+      margin-right: 0 !important;
+    }
+
     .sidebar-link.bg-\[\#8B0000\] {
-      box-shadow: 0 0 12px rgba(139, 0, 0, 0.45);
+      box-shadow: 0 0 12px rgba(139, 0, 0, .45);
+    }
+
+    .theme-toggle-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      background: #F5F5F5;
+      border: 1px solid #E0E0E0;
+      border-radius: 24px;
+      transition: all .3s ease;
+    }
+
+    #sidebar.collapsed .theme-toggle-container {
+      flex-direction: column;
+      width: 35px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 4px;
+    }
+
+    #sidebar.collapsed .w-full {
+      display: flex;
+      justify-content: center;
+    }
+
+    .theme-option {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color .2s ease;
+      border-radius: 8px;
+    }
+
+    #sidebar.collapsed .theme-option {
+      width: 35px;
+      height: 40px;
+      flex: none;
+    }
+
+    .theme-option i {
+      font-size: 16px;
+    }
+
+    #sidebar.collapsed .theme-option i {
+      font-size: 15px;
+    }
+
+    .theme-option.active {
+      color: #374151;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      transition: all .3s cubic-bezier(.4, 0, .2, 1);
+      pointer-events: none;
+    }
+
+    #sidebar.expanded .theme-indicator {
+      width: calc(50% - 2px);
+      height: calc(100% - 8px);
+      left: 4px;
+      top: 4px;
+      border-radius: 20px;
+    }
+
+    #sidebar.expanded .theme-indicator.dark-mode {
+      transform: translateX(calc(100% + 0px));
+    }
+
+    #sidebar.collapsed .theme-indicator {
+      width: calc(100% - 8px);
+      height: calc(50% - 6px);
+      left: 4px;
+      top: 4px;
+      border-radius: 16px;
+    }
+
+    #sidebar.collapsed .theme-indicator.dark-mode {
+      transform: translateY(calc(100% + 4px));
+    }
+
+    [data-theme="dark"] body {
+      background-color: #000D1A;
+      color: #E5E7EB;
+    }
+
+    [data-theme="dark"] #sidebar {
+      background-color: #000D1A;
+    }
+
+    [data-theme="dark"] .bg-white {
+      background-color: #000D1A !important;
+    }
+
+    [data-theme="dark"] .text-\[\#333333\] {
+      color: #E5E7EB !important;
+    }
+
+    [data-theme="dark"] .theme-toggle-container {
+      background: #1F1F1F;
+      border-color: #2A2A2A;
+    }
+
+    [data-theme="dark"] .theme-option {
+      color: #6B7280;
+    }
+
+    [data-theme="dark"] .theme-option.active {
+      color: #F3F4F6;
+    }
+
+    [data-theme="dark"] .theme-indicator {
+      background: #2A2A2A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
     }
   </style>
 </head>
 
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
+
 <body class="bg-white text-[#333333] font-normal">
 
-  <!-- HEADER (TOP BAR) -->
-  <div class="fixed top-0 left-0 right-0 z-50
-            bg-gradient-to-r from-[#660000] to-[#8B0000]
-            text-[#F4F4F4] px-6 py-4
-            flex items-center justify-between">
-
-    <div class="flex items-center gap-3">
-      <div class="w-12 rounded-full ml-5">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" />
-      </div>
-      <div class="w-12 rounded-full">
-        <a href="{{ route('homepage') }}">
-          <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" />
-        </a>
-      </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
     </div>
-
-    <div class="flex items-center gap-8">
-      @php
-      $notifications = collect($notifications ?? []);
-      $notifCount = $notifications->count();
-      @endphp
-
-      <div id="notifDropdown" class="relative">
-        <button id="notifBtn" type="button" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-          @if($notifCount > 0)
-          <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-            {{ $notifCount }}
-          </span>
-          @endif
-          <i class="fa-regular fa-bell text-lg"></i>
+    <div class="header-right">
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
-
-        <div id="notifMenu"
-          class="absolute right-0 mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100 z-50
-               opacity-0 scale-95 pointer-events-none
-               transition-all duration-200 ease-out origin-top-right">
-
-          <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-[#8B0000]">Notifications</span>
-          </div>
-
-          <div class="max-h-80 overflow-y-auto">
+        <div id="notifMenu">
+          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))
-              <div class="text-xs text-[#ADADAD] mt-0.5">{{ $n['message'] }}</div>
-              @endif
-              @if(!empty($n['time']))
-              <div class="text-[11px] text-gray-400 mt-1">{{ $n['time'] }}</div>
-              @endif
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
             @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-[#757575] mt-1">You’re all caught up.</div>
-            </div>
+            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
       </div>
-
-      <div class="w-px h-8 bg-white/30"></div>
-
-      <div class="flex items-center gap-3">
-        <div class="avatar">
-          <div class="w-10 rounded-full overflow-hidden">
-            <img
-              src="{{ $patient->profile_image
-                  ? asset('storage/'.$patient->profile_image)
-                  : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
-              alt="Profile" />
-          </div>
-        </div>
-        <div class="leading-tight">
-          <div class="text-l font-semibold text-[#F4F4F4]">
-            {{ ucwords(strtolower($patient->name)) }}
-          </div>
-          <div class="italic text-xs text-[#F4F4F4]/80">Student</div>
+      <div class="header-user">
+        <img src="{{ $patient->profile_image
+                ? asset('storage/'.$patient->profile_image)
+                : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          alt="Profile" />
+        <div>
+          <div class="header-name">{{ ucwords(strtolower($patient->name)) }}</div>
+          <div class="header-role">Student</div>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px]
-         h-[calc(100vh-72px)]
-         bg-white drop-shadow-xl
-         transition-all duration-300
-         flex flex-col justify-between z-40 expanded"
-    style="width: 200px;">
-
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    style="width:220px;">
     <div class="pt-4">
-
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
-        <button onclick="toggleSidebar()"
-          id="sidebarToggleBtn"
-          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575]
-               hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
+        <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+          class="w-8 h-8 flex items-center justify-center rounded-full text-[#757575] hover:text-[#8B0000] hover:bg-[#F0F0F0] transition-all duration-300">
           <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
-
-      <div class="nav-section-label px-4 mb-6">Navigation</div>
-
+      <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
-
-        <a href="{{ route('homepage') }}"
-          class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl mt-8
-               transition-all duration-200
-               hover:bg-[#8B0000] hover:text-[#F4F4F4]
-               {{ request()->routeIs('homepage') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-              {{ request()->routeIs('homepage') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-house text-base w-5"></i>
-          <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Home</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Home</span>
+        @foreach([
+        ['route'=>'homepage', 'icon'=>'fa-house', 'label'=>'Home'],
+        ['route'=>'patient.appointment.index', 'icon'=>'fa-calendar', 'label'=>'Patients'],
+        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Record'],
+        ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check', 'label'=>'About Us'],
+        ] as $nav)
+        <a href="{{ route($nav['route']) }}"
+          class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
+          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
         </a>
-
-        <a href="{{ route('appointment.index') }}"
-          class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
-               transition-all duration-200
-               hover:bg-[#8B0000] hover:text-[#F4F4F4]
-               {{ request()->routeIs('appointment.index*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-              {{ request()->routeIs('appointment.index*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-regular fa-calendar text-base w-5"></i>
-          <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Appointment</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Appointment</span>
-        </a>
-
-        <a href="{{ route('record') }}"
-          class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
-               transition-all duration-200
-               hover:bg-[#8B0000] hover:text-[#F4F4F4]
-               {{ request()->routeIs('record*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-              {{ request()->routeIs('record*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-regular fa-folder-open text-base w-5"></i>
-          <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Record</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Record</span>
-        </a>
-
-        <a href="{{ route('about.us') }}"
-          class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl
-               transition-all duration-200
-               hover:bg-[#8B0000] hover:text-[#F4F4F4]
-               {{ request()->routeIs('about.us*') ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] transition-opacity duration-300
-              {{ request()->routeIs('about.us*') ? 'opacity-100' : 'opacity-0' }}"></span>
-          <i class="fa-solid fa-circle-info text-base w-5"></i>
-          <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">About Us</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">About Us</span>
-        </a>
-
+        @endforeach
       </nav>
     </div>
-
-    <div class="px-3 pb-5 space-y-2">
-      <a href="#"
-        class="sidebar-link relative flex items-center px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 text-gray-500">
-        <i class="fa-regular fa-circle-question text-base w-5"></i>
-        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Help</span>
-        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Help</span>
-      </a>
-
-      <button id="themeToggle"
-        class="sidebar-link relative flex items-center w-full px-3 py-2.5 rounded-xl
-             bg-[#7B6CF6] text-[#F4F4F4] transition-all duration-200 hover:scale-105"
-        aria-label="Toggle dark mode">
-        <i id="themeIcon" class="fa-regular fa-moon text-base w-5"></i>
-        <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Dark Mode</span>
-        <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Dark Mode</span>
-      </button>
-
+    <div class="px-3 pb-5 space-y-4">
+      <div class="section-label">Settings</div>
+      <div class="w-full px-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="sidebar-link w-full relative flex items-center px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
-          <i class="fa-solid fa-right-from-bracket text-base w-5"></i>
-          <span class="sidebar-text ml-3 text-sm font-semibold opacity-100 whitespace-nowrap overflow-hidden transition-all duration-300">Log Out</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log Out</span>
+        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
+          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
         </button>
       </form>
     </div>
   </aside>
 
-  <!-- ================= MAIN CONTENT ================= -->
+  <!-- CONTENT -->
   <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
     <div class="max-w-7xl mt-4 mx-auto">
 
@@ -565,6 +693,17 @@
 
     </div>
   </main>
+
+  <!-- Footer -->
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
 
   <!-- ================= RECORD DETAILS MODAL ================= -->
   <dialog id="record_modal" class="modal">
@@ -736,45 +875,28 @@
   </dialog>
 
   <script>
-    /* =========================
-   DARK MODE TOGGLE
-========================= */
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
+    // ── THEME TOGGLE ──
     const html = document.documentElement;
+    const themeToggleContainer = document.getElementById("themeToggle");
+    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
 
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeIcon(newTheme);
-    });
-
-    function updateThemeIcon(theme) {
-      if (theme === 'dark') {
-        themeIcon.classList.remove('fa-moon');
-        themeIcon.classList.add('fa-sun');
-      } else {
-        themeIcon.classList.remove('fa-sun');
-        themeIcon.classList.add('fa-moon');
-      }
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      themeOptions.forEach(opt => opt.classList.toggle("active", opt.getAttribute("data-theme") === theme));
+      themeIndicator.classList.toggle("dark-mode", theme === "dark");
     }
 
-    /* =========================
-       SIDEBAR TOGGLE
-    ========================= */
+    applyTheme(localStorage.getItem("theme") || "light");
+    themeOptions.forEach(opt => opt.addEventListener("click", () => applyTheme(opt.getAttribute("data-theme"))));
+
+    // ── SIDEBAR ──
     let sidebarOpen = true;
 
     function applyLayout(sidebarWidth) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      sidebar.style.width = sidebarWidth;
-      main.style.marginLeft = sidebarWidth;
+      document.getElementById('sidebar').style.width = sidebarWidth;
+      document.getElementById('mainContent').style.marginLeft = sidebarWidth;
     }
 
     function toggleSidebar() {
@@ -782,76 +904,40 @@
       const texts = document.querySelectorAll('.sidebar-text');
       const icon = document.getElementById('sidebarIcon');
       const toggleWrapper = document.getElementById('sidebarToggleWrapper');
-
       sidebarOpen = !sidebarOpen;
-
       if (sidebarOpen) {
-        applyLayout('200px');
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.add('expanded');
+        applyLayout('220px');
+        sidebar.classList.replace('collapsed', 'expanded');
         texts.forEach(t => {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-center');
-        toggleWrapper.classList.add('justify-end');
+        toggleWrapper.classList.replace('justify-center', 'justify-end');
         icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
+        sidebar.classList.replace('expanded', 'collapsed');
         texts.forEach(t => {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.remove('justify-end');
-        toggleWrapper.classList.add('justify-center');
+        toggleWrapper.classList.replace('justify-end', 'justify-center');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
+      applyTheme(localStorage.getItem("theme") || "light");
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       sidebarOpen = true;
-      applyLayout('200px');
+      applyLayout('220px');
     });
 
-    /* =========================
-       NOTIFICATION DROPDOWN
-    ========================= */
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("notifBtn");
-      const menu = document.getElementById("notifMenu");
-      let isOpen = false;
-
-      function openMenu() {
-        isOpen = true;
-        menu.classList.remove("notif-close");
-        menu.classList.add("notif-open");
-      }
-
-      function closeMenu() {
-        isOpen = false;
-        menu.classList.remove("notif-open");
-        menu.classList.add("notif-close");
-      }
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      menu.addEventListener("click", (e) => e.stopPropagation());
-
-      document.addEventListener("click", () => {
-        if (isOpen) closeMenu();
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen) closeMenu();
-      });
-
-      closeMenu();
+    // ── NOTIF ──
+    document.getElementById("notifBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("notifMenu").classList.toggle("open");
     });
+    document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
 
     // View details in record modal
     function openRecordModal(btn) {
