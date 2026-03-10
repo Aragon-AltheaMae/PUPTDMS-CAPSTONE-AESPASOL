@@ -453,9 +453,13 @@ $calendarAppointmentCounts = [
 }
 @endphp
 
+
+
+
 <body class="bg-white text-[#333333] font-normal">
 
   <!-- HEADER -->
+
   <header class="header">
     <div class="header-left">
       <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
@@ -491,6 +495,8 @@ $calendarAppointmentCounts = [
       </div>
     </div>
   </header>
+
+
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
@@ -546,6 +552,25 @@ $calendarAppointmentCounts = [
   <!-- CONTENT -->
   <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
     <div class="max-w-7xl mt-4 mx-auto fade-in">
+
+    
+  <!--impersonating header-->
+
+@if(session('impersonated_role') && session('impersonator_role') === 'super_admin')
+  <div style="background:#DBEAFE;border:1px solid #93C5FD;color:#1E40AF;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <div>
+      <strong>You are viewing as {{ ucfirst(session('impersonated_role')) }}</strong><br>
+      <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
+    </div>
+    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
+      @csrf
+      <button type="submit" style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">
+        Return to Admin
+      </button>
+    </form>
+  </div>
+@endif
+
 
       <!-- GREETING -->
       <div class="flex justify-between items-center mb-6">
