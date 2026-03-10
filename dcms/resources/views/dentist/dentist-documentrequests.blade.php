@@ -21,7 +21,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #f2f2f0;
+      background: #f4f4f4;
       overflow-x: hidden;
     }
 
@@ -1004,6 +1004,7 @@
       background: #fff;
       border-radius: 20px;
       overflow: hidden;
+      position: relative;
       box-shadow: 0 24px 64px rgba(0, 0, 0, .2);
       animation: popIn .25s cubic-bezier(.34, 1.56, .64, 1) both;
     }
@@ -1099,7 +1100,477 @@
       background: #e8e8e8;
     }
 
-    /* Skeleton shimmer */
+    /* ════ REDESIGNED APPROVE MODAL ════ */
+    .approve-hero {
+      background: linear-gradient(145deg, #052e16 0%, #14532d 40%, #166534 100%);
+      padding: 2.2rem 1.75rem 1.8rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .approve-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .approve-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: -20px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .approve-icon-ring {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      position: relative;
+      z-index: 1;
+      border: 2px solid rgba(255, 255, 255, .15);
+    }
+
+    .approve-icon-inner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .approve-icon-inner i {
+      font-size: 1.3rem;
+      color: #86efac;
+    }
+
+    .approve-hero-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: .3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .approve-hero-sub {
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .55);
+      position: relative;
+      z-index: 1;
+    }
+
+    .approve-patient-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 14px;
+      padding: .9rem 1.1rem;
+    }
+
+    .approve-patient-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .approve-patient-avatar i {
+      color: #15803d;
+      font-size: 1rem;
+    }
+
+    .approve-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: .55rem;
+      background: #f0fdf4;
+      border-radius: 10px;
+      padding: .65rem .85rem;
+      margin-top: .85rem;
+      font-size: .75rem;
+      color: #166534;
+      line-height: 1.5;
+    }
+
+    .approve-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.75rem 1.5rem;
+      margin-top: 1.25rem;
+      border-top: 1px solid #f0f0f0;
+      background: #fafaf9;
+    }
+
+    /* ════ REDESIGNED REJECT MODAL ════ */
+    .reject-hero {
+      background: linear-gradient(145deg, #450a0a 0%, #7f1d1d 40%, #991b1b 100%);
+      padding: 2.2rem 1.75rem 1.8rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reject-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .reject-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: -20px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .reject-icon-ring {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      position: relative;
+      z-index: 1;
+      border: 2px solid rgba(255, 255, 255, .15);
+    }
+
+    .reject-icon-inner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reject-icon-inner i {
+      font-size: 1.3rem;
+      color: #fca5a5;
+    }
+
+    .reject-hero-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: .3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .reject-hero-sub {
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .reject-patient-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #fff5f5;
+      border: 1.5px solid #fecaca;
+      border-radius: 14px;
+      padding: .9rem 1.1rem;
+    }
+
+    .reject-patient-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #fee2e2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .reject-patient-avatar i {
+      color: #b91c1c;
+      font-size: 1rem;
+    }
+
+    .reject-field-label {
+      display: block;
+      font-size: .72rem;
+      font-weight: 700;
+      color: #6b2020;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: .45rem;
+    }
+
+    .reject-textarea {
+      width: 100%;
+      border: 2px solid #fecaca;
+      border-radius: 12px;
+      padding: .7rem .9rem;
+      font-size: .85rem;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      background: #fff5f5;
+      color: #450a0a;
+      transition: border-color .2s, box-shadow .2s;
+      line-height: 1.5;
+    }
+
+    .reject-textarea::placeholder {
+      color: #d1a3a3;
+    }
+
+    .reject-textarea:focus {
+      border-color: #b91c1c;
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, .1);
+      background: #fff;
+    }
+
+    .reject-warning-row {
+      display: flex;
+      align-items: flex-start;
+      gap: .55rem;
+      background: #fff5f5;
+      border-radius: 10px;
+      padding: .65rem .85rem;
+      margin-top: .85rem;
+      font-size: .75rem;
+      color: #991b1b;
+      line-height: 1.5;
+    }
+
+    .reject-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.75rem 1.5rem;
+      margin-top: 1.25rem;
+      border-top: 1px solid #fef2f2;
+      background: #fffafa;
+    }
+
+    /* ── Shared modal button styles ── */
+    .modal-float-x {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: rgba(255, 255, 255, .7);
+      font-size: .8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+
+    .modal-float-x:hover {
+      background: rgba(255, 255, 255, .28);
+      color: #fff;
+    }
+
+    .modal-btn-ghost {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      background: transparent;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      color: #777;
+      font-size: .8rem;
+      font-weight: 700;
+      padding: .55rem 1.1rem;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+    }
+
+    .modal-btn-ghost:hover {
+      border-color: #aaa;
+      color: #444;
+    }
+
+    .modal-btn-ghost--red {
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .modal-btn-ghost--red:hover {
+      border-color: #b91c1c;
+      background: #fff5f5;
+    }
+
+    .modal-btn-confirm-approve {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: .6rem 1.4rem;
+      font-size: .85rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .18s;
+      box-shadow: 0 4px 14px rgba(21, 128, 61, .3);
+    }
+
+    .modal-btn-confirm-approve:hover {
+      background: linear-gradient(135deg, #166534, #15803d);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(21, 128, 61, .4);
+    }
+
+    .modal-btn-confirm-approve:active {
+      transform: translateY(0);
+    }
+
+    .modal-btn-confirm-approve:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .modal-btn-confirm-reject {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      background: linear-gradient(135deg, #991b1b, #b91c1c);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: .6rem 1.4rem;
+      font-size: .85rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .18s;
+      box-shadow: 0 4px 14px rgba(185, 28, 28, .3);
+    }
+
+    .modal-btn-confirm-reject:hover {
+      background: linear-gradient(135deg, #7f1d1d, #991b1b);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(185, 28, 28, .4);
+    }
+
+    .modal-btn-confirm-reject:active {
+      transform: translateY(0);
+    }
+
+    .modal-btn-confirm-reject:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-confirm-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      flex-shrink: 0;
+    }
+
+    /* dark mode adjustments */
+    [data-theme="dark"] .approve-patient-card {
+      background: #0f2d1a;
+      border-color: #166534;
+    }
+
+    [data-theme="dark"] .approve-info-row {
+      background: #0f2d1a;
+      color: #86efac;
+    }
+
+    [data-theme="dark"] .approve-footer {
+      background: #161e2e;
+      border-color: #2a3244;
+    }
+
+    [data-theme="dark"] .reject-patient-card {
+      background: #2d0f0f;
+      border-color: #7f1d1d;
+    }
+
+    [data-theme="dark"] .reject-textarea {
+      background: #2d0f0f;
+      border-color: #7f1d1d;
+      color: #fecaca;
+    }
+
+    [data-theme="dark"] .reject-textarea:focus {
+      background: #1a0808;
+    }
+
+    [data-theme="dark"] .reject-warning-row {
+      background: #2d0f0f;
+      color: #fca5a5;
+    }
+
+    [data-theme="dark"] .reject-footer {
+      background: #161e2e;
+      border-color: #2a3244;
+    }
+
+    [data-theme="dark"] .modal-btn-ghost {
+      border-color: #2a3244;
+      color: #aaa;
+    }
+
+    [data-theme="dark"] .modal-btn-ghost:hover {
+      border-color: #666;
+      color: #ddd;
+    }
+
+    /* ════ SKELETON ════ */
     @keyframes shimmer {
       0% {
         background-position: -468px 0
@@ -1118,6 +1589,11 @@
     }
   </style>
 </head>
+
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
 
 <body>
 
@@ -1159,9 +1635,9 @@
     </div>
   </header>
 
-  {{-- ══════════════ SIDEBAR ══════════════ --}}
+  <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -1173,12 +1649,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -1194,8 +1670,8 @@
       <div class="section-label">Settings</div>
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light"><i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark"><i class="fa-regular fa-moon"></i></button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
@@ -1331,7 +1807,7 @@
           <label class="form-label" style="margin-bottom:.55rem;">Document Type</label>
           <div style="position:relative;">
             <i class="fa-solid fa-file-lines" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
-            <select id="fDocType" class="form-input" style="padding-left:2rem; appearance:none; cursor:pointer; background-image:url(\" data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B0000' stroke-width='2.5' %3E%3Cpath d='M6 9l6 6 6-6' /%3E%3C/svg%3E\"); background-repeat:no-repeat; background-position:right 12px center;">
+            <select id="fDocType" class="form-input" style="padding-left:2rem; appearance:none; cursor:pointer; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%238B0000%22 stroke-width=%222.5%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 12px center;">
               <option value="">All Document Types</option>
               <option>Dental Clearance</option>
               <option>Dental Health Record</option>
@@ -1395,58 +1871,129 @@
     </div>
   </div>
 
-  {{-- ══════════ APPROVE MODAL ══════════ --}}
+  {{-- ══════════ APPROVE MODAL (redesigned) ══════════ --}}
   <div id="approveModal" class="modal-overlay">
-    <div class="modal-box-inner">
-      <div class="modal-hd" style="background:#f0fdf4; border-bottom:1px solid #dcfce7;">
-        <div>
-          <div class="modal-title" style="color:#15803d;">Approve Request</div>
-          <div style="font-size:.75rem; color:#86efac; margin-top:.15rem;">Patient will be notified upon approval</div>
+    <div class="modal-box-inner" style="max-width:440px; border-radius:24px; overflow:hidden;">
+
+      {{-- Close button (floating) --}}
+      <button class="modal-float-x" id="approveCancelBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      {{-- Hero section --}}
+      <div class="approve-hero">
+        <div class="approve-icon-ring">
+          <div class="approve-icon-inner">
+            <i class="fa-solid fa-file-circle-check"></i>
+          </div>
         </div>
-        <button class="modal-x" id="approveCancelBtn"><i class="fa-solid fa-xmark"></i></button>
+        <div class="approve-hero-title">Approve Request</div>
+        <div class="approve-hero-sub">The patient will be notified once approved</div>
       </div>
-      <div class="modal-bd">
-        <p style="font-size:.85rem; color:#666; margin-bottom:.9rem;">Approving document request for:</p>
-        <div style="background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px; padding:.9rem 1.1rem; text-align:center;">
-          <div id="approvePatientName" style="font-size:1.35rem; color:#15803d;">—</div>
+
+      {{-- Body --}}
+      <div style="padding:1.5rem 1.75rem 0;">
+
+        {{-- Patient card --}}
+        <div class="approve-patient-card">
+          <div class="approve-patient-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <div style="font-size:.68rem; font-weight:700; color:#15803d; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.2rem;">Patient</div>
+            <div id="approvePatientName" style="font-size:1.05rem; font-weight:800; color:#14532d; line-height:1.2;">—</div>
+          </div>
         </div>
-        <p style="font-size:.75rem; color:#bbb; margin-top:.8rem; text-align:center;">The document will be prepared for printing and signing.</p>
+
+        {{-- Info row --}}
+        <div class="approve-info-row">
+          <i class="fa-solid fa-circle-info" style="color:#86efac; font-size:.8rem; flex-shrink:0; margin-top:1px;"></i>
+          <span>The document will be queued for printing and signing. This action <strong>cannot be undone.</strong></span>
+        </div>
+
       </div>
-      <div class="modal-ft">
-        <button class="btn-close-modal" id="approveCancelBtn2">Cancel</button>
-        <button class="btn-approve" id="approveConfirmBtn" style="padding:.55rem 1.6rem;">
-          <i class="fa-solid fa-check"></i> Confirm Approval
+
+      {{-- Footer --}}
+      <div class="approve-footer">
+        <button class="modal-btn-ghost" id="approveCancelBtn2">
+          <i class="fa-solid fa-arrow-left" style="font-size:.72rem;"></i> Cancel
+        </button>
+        <button class="modal-btn-confirm-approve" id="approveConfirmBtn">
+          <span class="btn-confirm-icon"><i class="fa-solid fa-check"></i></span>
+          Confirm Approval
         </button>
       </div>
+
     </div>
   </div>
   <input type="hidden" id="approveRequestId">
 
-  {{-- ══════════ REJECT MODAL ══════════ --}}
+  {{-- ══════════ REJECT MODAL (redesigned) ══════════ --}}
   <div id="rejectModal" class="modal-overlay">
-    <div class="modal-box-inner">
-      <div class="modal-hd" style="background:#fef2f2; border-bottom:1px solid #fee2e2;">
-        <div>
-          <div class="modal-title" style="color:#b91c1c;">Reject Request</div>
-          <div style="font-size:.75rem; color:#fca5a5; margin-top:.15rem;">This action cannot be undone</div>
+    <div class="modal-box-inner" style="max-width:440px; border-radius:24px; overflow:hidden;">
+
+      {{-- Close button (floating) --}}
+      <button class="modal-float-x modal-float-x--red" id="rejectCancelBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      {{-- Hero section --}}
+      <div class="reject-hero">
+        <div class="reject-icon-ring">
+          <div class="reject-icon-inner">
+            <i class="fa-solid fa-file-circle-xmark"></i>
+          </div>
         </div>
-        <button class="modal-x" id="rejectCancelBtn"><i class="fa-solid fa-xmark"></i></button>
+        <div class="reject-hero-title">Reject Request</div>
+        <div class="reject-hero-sub">This action is permanent and cannot be undone</div>
       </div>
-      <div class="modal-bd">
-        <p style="font-size:.85rem; color:#666; margin-bottom:.9rem;">Rejecting document request for:</p>
-        <div style="background:#fef2f2; border:2px solid #fecaca; border-radius:12px; padding:.9rem 1.1rem; text-align:center; margin-bottom:.9rem;">
-          <div id="rejectPatientName" style="font-size:1.35rem; color:#b91c1c;">—</div>
+
+      {{-- Body --}}
+      <div style="padding:1.5rem 1.75rem 0;">
+
+        {{-- Patient card --}}
+        <div class="reject-patient-card">
+          <div class="reject-patient-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <div style="font-size:.68rem; font-weight:700; color:#b91c1c; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.2rem;">Patient</div>
+            <div id="rejectPatientName" style="font-size:1.05rem; font-weight:800; color:#7f1d1d; line-height:1.2;">—</div>
+          </div>
         </div>
-        <label class="form-label">Reason <span style="color:#bbb; font-weight:400;">(optional)</span></label>
-        <textarea id="rejectNotes" class="form-input" rows="3" placeholder="Add a note for the patient…" style="resize:vertical;"></textarea>
+
+        {{-- Reason field --}}
+        <div style="margin-top:1.1rem;">
+          <label class="reject-field-label">
+            Reason for rejection
+            <span style="font-weight:400; color:#d1a3a3; margin-left:.3rem;">(optional)</span>
+          </label>
+          <div style="position:relative;">
+            <textarea id="rejectNotes" class="reject-textarea" rows="3"
+              placeholder="Provide a reason so the patient understands the decision…"></textarea>
+            <div class="reject-textarea-corner"></div>
+          </div>
+        </div>
+
+        {{-- Warning row --}}
+        <div class="reject-warning-row">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#fca5a5; font-size:.8rem; flex-shrink:0; margin-top:1px;"></i>
+          <span>The patient will be notified of this rejection. Make sure you've reviewed the request carefully.</span>
+        </div>
+
       </div>
-      <div class="modal-ft">
-        <button class="btn-close-modal" id="rejectCancelBtn2">Cancel</button>
-        <button id="rejectConfirmBtn"
-          style="background:#b91c1c; color:#fff; border:none; cursor:pointer; border-radius:9px; padding:.55rem 1.6rem; font-weight:700; font-size:.82rem; display:flex; align-items:center; gap:.35rem; transition:background .15s;">
-          <i class="fa-solid fa-xmark"></i> Confirm Rejection
+
+      {{-- Footer --}}
+      <div class="reject-footer">
+        <button class="modal-btn-ghost modal-btn-ghost--red" id="rejectCancelBtn2">
+          <i class="fa-solid fa-arrow-left" style="font-size:.72rem;"></i> Cancel
+        </button>
+        <button class="modal-btn-confirm-reject" id="rejectConfirmBtn">
+          <span class="btn-confirm-icon btn-confirm-icon--red"><i class="fa-solid fa-ban"></i></span>
+          Confirm Rejection
         </button>
       </div>
+
     </div>
   </div>
   <input type="hidden" id="rejectRequestId">

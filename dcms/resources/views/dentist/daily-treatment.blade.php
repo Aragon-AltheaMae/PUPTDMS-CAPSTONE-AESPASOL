@@ -183,8 +183,7 @@
   <nav class="flex justify-end items-center">
 
     <!-- BACK TO DASHBOARD BUTTON (RIGHTMOST) -->
-    <a
-      href="{{ route('dentist.report') }}"
+    <a href="{{ route('dentist.dentist.report') }}"
       class="bg-white text-[#8B0000] px-5 py-2 rounded-lg text-sm font-semibold
              hover:bg-gray-100 transition shadow">
       ← Back to Report Dashboard
@@ -529,7 +528,7 @@
 
 
 <script>
-const DTR_LIST_URL = "{{ route('dentist.reports.daily-treatment-record.list') }}";
+const DTR_LIST_URL = "{{ route('dentist.dentist.reports.daily-treatment-record.list') }}";
 /*const dailyRecords = [
   {
     date: "12/01/25",

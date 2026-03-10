@@ -644,6 +644,11 @@
   </style>
 </head>
 
+@php
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
+@endphp
+
 <body class="bg-[#f4f4f6] min-h-screen flex flex-col">
 
   <!-- HEADER -->
@@ -686,7 +691,7 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -698,12 +703,12 @@
       <div class="section-label px-4 mb-6">Navigation</div>
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
-        ['route'=>'dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.documentrequests', 'icon'=>'fa-file-circle-check','label'=>'Document Requests'],
-        ['route'=>'dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -753,7 +758,7 @@
       <!-- KPI STRIP -->
       <div class="grid grid-cols-4 gap-4 mb-7">
 
-        <a href="{{ route('dentist.patients') }}" class="kpi-card">
+        <a href="{{ route('dentist.dentist.patients') }}" class="kpi-card">
           <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-users" style="color:#8B0000;"></i></div>
           <div class="flex-1">
             <div class="kpi-value">{{ $patientsThisMonth }}</div>
@@ -769,7 +774,7 @@
           <i class="fa-solid fa-chevron-right kpi-arrow"></i>
         </a>
 
-        <a href="{{ route('dentist.appointments') }}" class="kpi-card">
+        <a href="{{ route('dentist.dentist.appointments') }}" class="kpi-card">
           <div class="kpi-icon" style="background:#fffbeb;"><i class="fa-solid fa-calendar-check" style="color:#d97706;"></i></div>
           <div class="flex-1">
             <div class="kpi-value">{{ $appointmentsToday }}</div>
@@ -801,7 +806,7 @@
         </div>
       </div>
 
-      <a href="{{ route('dentist.inventory') }}" class="kpi-card" style="border-color:#fee2e2;">
+      <a href="{{ route('dentist.dentist.inventory') }}" class="kpi-card" style="border-color:#fee2e2;">
         <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;"></i></div>
         <div class="flex-1">
           <div class="kpi-value" style="color:#dc2626;">{{ $lowStockItems }}</div>
@@ -881,11 +886,11 @@
 
       <!-- QUICK BUTTONS -->
       <div class="col-span-2 flex flex-col gap-4" style="min-height:360px;">
-        <a href="{{ route('dentist.report.dental-services') }}" class="quick-btn">
+        <a href="{{ route('dentist.dentist.report.dental-services') }}" class="quick-btn">
           <div class="qb-icon"><i class="fa-solid fa-tooth"></i></div>
           <span>Dental Services</span>
         </a>
-        <a href="{{ route('dentist.report.daily-treatment') }}" class="quick-btn">
+        <a href="{{ route('dentist.dentist.report.daily-treatment') }}" class="quick-btn">
           <div class="qb-icon"><i class="fa-solid fa-notes-medical"></i></div>
           <span style="line-height:1.3;">Daily Treatment<br>Record</span>
         </a>
@@ -897,7 +902,7 @@
     <div class="chart-card mb-5" style="border:1.5px solid #fde68a;">
       <div class="chart-card-header mb-4">
         <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked mr-1.5 opacity-70"></i>Inventory Analytics</span>
-        <a href="{{ route('dentist.inventory') }}" class="text-xs font-semibold text-[#8B0000] hover:underline">
+        <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs font-semibold text-[#8B0000] hover:underline">
           View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
         </a>
       </div>
@@ -1115,8 +1120,8 @@
     };
     const MEDICINE_ITEMS = @json($medicineItems);
     const SUPPLIES_ITEMS = @json($suppliesItems);
-    const AJAX_GAD_URL = "{{ route('dentist.report.gad-data') }}";
-    const AJAX_WEEKLY_URL = "{{ route('dentist.report.weekly-data') }}";
+    const AJAX_GAD_URL = "{{ route('dentist.dentist.report.gad-data') }}";
+    const AJAX_WEEKLY_URL = "{{ route('dentist.dentist.report.weekly-data') }}";
     const PIE_COLORS = ['#8B0000', '#b30000', '#cc3333', '#e06666', '#f4cccc', '#d9534f', '#c0392b', '#922b21', '#641e16', '#f1948a'];
   </script>
 
