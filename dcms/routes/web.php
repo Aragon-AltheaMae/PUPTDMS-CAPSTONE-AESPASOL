@@ -175,6 +175,103 @@ Route::prefix('admin')->group(function () {
     ->name('admin.system_logs');
 });
 
+// START IMPERSONATION
+    Route::post('/impersonate', function (Request $request) {
+        if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'role' => 'required|string'
+        ]);
+
+        $targetRole = strtolower(trim($request->role));
+
+        // Save original admin identity once
+        if (!session()->has('impersonator_role')) {
+            session([
+                'impersonator_role' => session('role'),
+                'impersonator_admin_logged_in' => session('admin_logged_in'),
+                'impersonator_admin_id' => session('admin_id'),
+                'impersonator_admin_email' => session('admin_email'),
+            ]);
+        }
+
+        if ($targetRole === 'dentist') {
+            session([
+                'impersonated_role' => 'dentist',
+            ]);
+
+            session()->forget(['impersonated_patient_id']);
+
+            \App\Helpers\AuditLogger::log(
+                'impersonation_started',
+                'authentication',
+                'Super Admin started impersonating Dentist dashboard'
+            );
+
+            return response()->json([
+                'redirect' => route('dentist.dentist.dashboard')
+            ]);
+        }
+
+        if ($targetRole === 'patient') {
+            $patient = \App\Models\Patient::first();
+
+            if (!$patient) {
+                return response()->json([
+                    'message' => 'No patient found to impersonate.'
+                ], 422);
+            }
+
+            session([
+                'impersonated_role' => 'patient',
+                'impersonated_patient_id' => $patient->id,
+            ]);
+
+            \App\Helpers\AuditLogger::log(
+                'impersonation_started',
+                'authentication',
+                'Super Admin started impersonating Patient dashboard'
+            );
+
+            return response()->json([
+                'redirect' => route('patient.dashboard')
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Unsupported role.'
+        ], 422);
+    })->name('admin.impersonate');
+
+    // STOP IMPERSONATION
+    Route::post('/stop-impersonation', function () {
+        if (session()->has('impersonator_role')) {
+            \App\Helpers\AuditLogger::log(
+                'impersonation_stopped',
+                'authentication',
+                'Super Admin stopped impersonation'
+            );
+        }
+
+        session()->forget([
+            'impersonated_role',
+            'impersonated_patient_id',
+            'impersonator_role',
+            'impersonator_admin_logged_in',
+            'impersonator_admin_id',
+            'impersonator_admin_email',
+        ]);
+
+        session([
+            'role' => 'super_admin',
+            'admin_logged_in' => true,
+        ]);
+
+        return redirect()->route('admin.admin.dashboard');
+    })->name('admin.stop_impersonation');
+
 
 /*
 |--------------------------------------------------------------------------
