@@ -519,10 +519,10 @@ $notifCount = $notifications->count();
             <div>
               <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Last Visit</p>
               <p class="text-2xl font-bold text-gray-500 leading-tight">
-                {{ $lastVisit ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('M d') : 'No Existing Appointments' }}
+                {{ $lastVisit?->appointment_date ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('M d') : 'No Existing Appointments' }}
               </p>
               <p class="text-[11px] text-gray-400">
-                {{ $lastVisit ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('Y') . ' · ' . ($lastVisit->service_type ?? $lastVisit->service ?? 'Visit') : 'No visit yet' }}
+                {{ $lastVisit?->appointment_date ? \Carbon\Carbon::parse($lastVisit->appointment_date)->format('Y') . ' · ' . ($lastVisit->service_type ?? 'Visit') : 'No visit yet' }}
               </p>
             </div>
           </div>
@@ -535,10 +535,10 @@ $notifCount = $notifications->count();
             <div>
               <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Next Appointment</p>
               <p class="text-2xl font-bold text-gray-900 leading-tight">
-                {{ $nextAppointment ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('M d') : 'No Existing Appointments' }}
+                {{ $nextAppointment?->appointment_date ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('M d') : 'No Existing Appointments' }}
               </p>
               <p class="text-[11px] text-gray-400">
-                {{ $nextAppointment ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('Y') . ' · ' . ($nextAppointment->service_type ?? $nextAppointment->service ?? 'Appointment') : 'No upcoming appointment' }}
+                {{ $nextAppointment?->appointment_date ? \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('Y') . ' · ' . ($nextAppointment->service_type ?? 'Appointment') : 'No upcoming appointment' }}
               </p>
             </div>
           </div>
@@ -822,6 +822,30 @@ $notifCount = $notifications->count();
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script>
+<<<<<<< HEAD:dcms/resources/views/dentist-patientprofile.blade.php
+    function showFuture() {
+      document.getElementById('futureContent').classList.remove('hidden');
+      document.getElementById('pastContent').classList.add('hidden');
+
+      document.getElementById('futureTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('futureTab').classList.remove('text-gray-400', 'border-transparent');
+
+      document.getElementById('pastTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('pastTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+    }
+
+    function showPast() {
+      document.getElementById('pastContent').classList.remove('hidden');
+      document.getElementById('futureContent').classList.add('hidden');
+
+      document.getElementById('pastTab').classList.add('text-[#8B0000]', 'border-[#8B0000]');
+      document.getElementById('pastTab').classList.remove('text-gray-400', 'border-transparent');
+
+      document.getElementById('futureTab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
+    }
+
+=======
     // ── THEME TOGGLE ──
     const html = document.documentElement;
     const themeToggleContainer = document.getElementById("themeToggle");
@@ -908,6 +932,7 @@ $notifCount = $notifications->count();
       document.getElementById('futureTab').classList.remove('text-[#8B0000]', 'border-[#8B0000]');
     }
 
+>>>>>>> main:dcms/resources/views/dentist/dentist-patientprofile.blade.php
     function openStartModal() {
       document.getElementById('startModal').classList.remove('hidden');
     }
