@@ -1536,21 +1536,47 @@ function closeViewAs() {
     if (overlay) overlay.classList.remove('open');
     document.body.style.overflow = '';
 }
-
 function redirectToRole(roleId, roleName, color) {
     closeViewAs();
+
     const ol = document.getElementById('redirectOverlay');
+
     ol.style.background = `linear-gradient(135deg,${color},${hexDarken(color)})`;
     document.getElementById('redirectText').textContent = `Redirecting to ${roleName} Dashboard…`;
     document.getElementById('redirectSub').textContent = `Loading ${roleName} view for Super Admin`;
+
     ol.classList.add('show');
 
-    setTimeout(() => {
-        ol.classList.remove('show');
-        showToast('Preview loaded!', `Now viewing as ${roleName}`);
-    }, 1200);
-}
+    fetch("{{ route('admin.impersonate') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({
+            role: roleName.toLowerCase().trim()
+        })
+    })
+    .then(async response => {
+        const data = await response.json();
 
+        if (!response.ok) {
+            throw new Error(data.message || "Unable to start impersonation.");
+        }
+
+        if (data.redirect) {
+            window.location.href = data.redirect;
+            return;
+        }
+
+        throw new Error("No redirect URL returned.");
+    })
+    .catch(error => {
+        ol.classList.remove('show');
+        showToast('Error', error.message || 'Something went wrong');
+    });
+}
 /* ══════════════════════════════════════
    NEW ROLE MODAL
 ══════════════════════════════════════ */

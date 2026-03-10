@@ -9,38 +9,31 @@ use App\Models\Patient;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * Usage example in routes:
-     * ->middleware('role:super_admin')
-     * ->middleware('role:dentist')
-     * ->middleware('role:patient')
-     * ->middleware('role:super_admin,dentist')
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // 1. Check if user has role session
         if (!session()->has('role')) {
             return redirect('/login');
         }
 
-        $userRole = session('role');
+        // If admin is impersonating, use that role for route checks
+        $userRole = session('impersonated_role') ?: session('role');
 
-        // 2. Check if role is allowed
         if (!in_array($userRole, $roles)) {
             abort(403, 'Unauthorized access.');
         }
 
-        /**
-         * 3. If patient role, automatically load patient
-         * and share to all views
-         */
+        // If viewing as patient, make sure patient data exists
         if ($userRole === 'patient') {
 
-            $patientId = session('patient_id');
+            $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
             if (!$patientId) {
+                // If this is an impersonation session, don't destroy admin login
+                if (session()->has('impersonator_role')) {
+                    return redirect()->route('admin.admin.dashboard')
+                        ->with('error', 'No patient selected for impersonation.');
+                }
+
                 session()->forget(['role', 'patient_id']);
                 return redirect('/login');
             }
@@ -48,17 +41,18 @@ class RoleMiddleware
             $patient = Patient::find($patientId);
 
             if (!$patient) {
+                if (session()->has('impersonator_role')) {
+                    return redirect()->route('admin.admin.dashboard')
+                        ->with('error', 'Impersonated patient was not found.');
+                }
+
                 session()->forget(['role', 'patient_id']);
                 return redirect('/login');
             }
 
-            // share patient data globally to blade
             view()->share('patient', $patient);
         }
 
-        /**
-         * 4. Continue request
-         */
         return $next($request);
     }
 }
