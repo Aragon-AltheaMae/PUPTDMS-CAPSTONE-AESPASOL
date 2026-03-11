@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLogger;
 
 class DentistReportController extends Controller
 {
@@ -14,7 +15,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -93,6 +94,12 @@ if ($activeRole !== 'dentist') {
 
         $notifications = collect([]);
 
+        AuditLogger::log(
+            'view',
+            'dentist_reports',
+            "Dentist viewed reports dashboard"
+        );
+
         return view('dentist.dentist-report', compact(
             'patientsThisMonth',
             'patientsDelta',
@@ -120,7 +127,7 @@ if ($activeRole !== 'dentist') {
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -131,6 +138,12 @@ if ($activeRole !== 'dentist') {
         [$labels, $female, $male] = $this->buildGadData($parsed->year, $parsed->month);
 
         $hasData = array_sum($female) + array_sum($male) > 0;
+
+        AuditLogger::log(
+            'view',
+            'dentist_reports',
+            "Dentist viewed GAD chart data"
+        );
 
         return response()->json([
             'labels' => $labels,
@@ -145,7 +158,7 @@ if ($activeRole !== 'dentist') {
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -153,6 +166,12 @@ if ($activeRole !== 'dentist') {
             ?? Carbon::createFromFormat('F Y', $request->input('period'));
 
         [$weekLabels, $datasets] = $this->buildWeeklyData($parsed->year, $parsed->month);
+
+        AuditLogger::log(
+            'view',
+            'dentist_reports',
+            "Dentist viewed weekly report data"
+        );
 
         return response()->json([
             'labels'   => $weekLabels,

@@ -7,6 +7,7 @@ use App\Models\DocumentRequest;
 use App\Models\Patient;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helpers\AuditLogger;
 
 class DocumentRequestController extends Controller
 {
@@ -35,6 +36,14 @@ class DocumentRequestController extends Controller
             return back()->with('error', 'Failed to submit request.');
         }
 
+        $patient = Patient::find(session('patient_id'));
+
+        AuditLogger::log(
+            'create',
+            'document_request',
+            "Patient submitted document request"
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Document request submitted successfully.'
@@ -50,6 +59,16 @@ class DocumentRequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $patient = Patient::find(session('patient_id'));
+
+        if ($patient) {
+            AuditLogger::log(
+                'view',
+                'document_request',
+                "Patient viewed document request history"
+            );
+        }
+
         return view('document-requests.index', compact('requests'));
     }
 
@@ -60,7 +79,7 @@ class DocumentRequestController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -73,7 +92,7 @@ if ($activeRole !== 'dentist') {
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -121,9 +140,9 @@ if ($activeRole !== 'dentist') {
     ======================= */
     public function approve(Request $request, $id)
     {
-       $activeRole = session('impersonated_role') ?: session('role');
+        $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -140,7 +159,7 @@ if ($activeRole !== 'dentist') {
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-if ($activeRole !== 'dentist') {
+        if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

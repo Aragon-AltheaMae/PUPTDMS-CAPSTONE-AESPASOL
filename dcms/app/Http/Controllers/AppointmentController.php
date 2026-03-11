@@ -95,6 +95,12 @@ class AppointmentController extends Controller
 
         $notifications = [];
 
+        AuditLogger::log(
+            'view',
+            'appointments',
+            "Patient viewed appointment page"
+        );
+
         return view('patient.appointment', compact(
             'appointments',
             'futureVisits',
@@ -109,7 +115,7 @@ class AppointmentController extends Controller
 
     public function create()
     {
-       $patientId = session('impersonated_patient_id') ?: session('patient_id');
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')->with('error', 'Please login first!');
@@ -155,6 +161,12 @@ class AppointmentController extends Controller
         $philippineHolidays = PhilippineHolidays::range(0, 1);
 
         $diseases = Disease::orderBy('sort_order')->get();
+
+        AuditLogger::log(
+            'view',
+            'appointments',
+            "Patient opened book appointment page"
+        );
 
         return view('patient.book-appointment', compact(
             'patient',
@@ -277,6 +289,7 @@ class AppointmentController extends Controller
         }
 
         $signaturePath = $request->file('patient_signature')->store('signatures', 'public');
+        $appointment = null;
 
         DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId) {
 
@@ -519,10 +532,12 @@ class AppointmentController extends Controller
             }
         });
 
+        $patient = Patient::find($patientId);
+
         AuditLogger::log(
-            'create_appointment',
+            'create',
             'appointments',
-            'Patient booked an appointment for ' . $request->appointment_date . ' at ' . $request->appointment_time
+            "Patient booked appointment"
         );
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
