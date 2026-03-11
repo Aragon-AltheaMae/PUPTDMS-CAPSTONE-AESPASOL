@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\DB;
+
 
 use App\Models\Patient;
 use App\Helpers\AuditLogger;
@@ -23,6 +27,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
 
 use App\Http\Controllers\Admin\AdminPatientController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +67,7 @@ Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name(
 Route::post('/register', function (Request $request) {
     $validated = $request->validate([
         'name'      => 'required|string|min:2|max:255',
-        'email'     => 'required|email|unique:patients,email',
+        'email'     => 'required|email|unique:patients,email|unique:users,email',
         'phone'     => 'nullable|string|max:20',
         'birthdate' => 'required|date|before:today|after:120 years ago',
         'gender'    => 'required|in:Male,Female',
@@ -74,29 +79,41 @@ Route::post('/register', function (Request $request) {
             'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',
         ],
     ], [
-        // Custom error messages
-        'name.min'          => 'Name must be at least 2 characters.',
-        'email.unique'      => 'This email is already registered.',
-        'email.email'       => 'Please enter a valid email address.',
+        'name.min'           => 'Name must be at least 2 characters.',
+        'email.unique'       => 'This email is already registered.',
+        'email.email'        => 'Please enter a valid email address.',
         'birthdate.required' => 'Birthdate is required.',
-        'birthdate.before'  => 'Birthdate cannot be in the future.',
-        'birthdate.after'   => 'Please enter a valid birthdate.',
-        'gender.required'   => 'Please select a gender.',
-        'gender.in'         => 'Gender must be Male or Female.',
-        'password.min'      => 'Password must be at least 8 characters.',
+        'birthdate.before'   => 'Birthdate cannot be in the future.',
+        'birthdate.after'    => 'Please enter a valid birthdate.',
+        'gender.required'    => 'Please select a gender.',
+        'gender.in'          => 'Gender must be Male or Female.',
+        'password.min'       => 'Password must be at least 8 characters.',
         'password.confirmed' => 'Passwords do not match.',
-        'password.regex'    => 'Password must contain at least one letter, one number, and one special character.',
+        'password.regex'     => 'Password must contain at least one letter, one number, and one special character.',
     ]);
 
     try {
-        Patient::create([
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'phone'     => $validated['phone'] ?? null,
-            'birthdate' => $validated['birthdate'] ?? null,
-            'gender'    => $validated['gender'] ?? null,
-            'password'  => Hash::make($validated['password']),
-        ]);
+        DB::transaction(function () use ($validated) {
+            $patientRole = Role::where('slug', 'patient')->firstOrFail();
+
+            $user = User::create([
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id'  => $patientRole->id,
+                'status'   => 'active',
+            ]);
+
+            Patient::create([
+                'user_id'   => $user->id,
+                'name'      => $validated['name'],
+                'email'     => $validated['email'],
+                'phone'     => $validated['phone'] ?? '',
+                'birthdate' => $validated['birthdate'],
+                'gender'    => $validated['gender'],
+                'password'  => $user->password,
+            ]);
+        });
 
         return redirect('/login')->with('success', 'Account created successfully! You can now log in.');
     } catch (\Exception $e) {
