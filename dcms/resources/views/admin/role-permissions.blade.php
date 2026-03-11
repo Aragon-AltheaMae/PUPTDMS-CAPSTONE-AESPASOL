@@ -10,8 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -186,29 +185,21 @@
             position: fixed;
             left: 0;
             top: 62px;
+            width: 240px;
             height: calc(100vh - 62px);
             background: #fff;
             box-shadow: 2px 0 20px rgba(0, 0, 0, .07);
             z-index: 40;
             display: flex;
             flex-direction: column;
-            transition: width .3s cubic-bezier(.4, 0, .2, 1);
             overflow: hidden;
-        }
-
-        #sidebar.expanded {
-            width: 240px;
-        }
-
-        #sidebar.collapsed {
-            width: 68px;
         }
 
         .sidebar-inner {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 10px 0 6px;
+            padding: 12px 0 6px;
         }
 
         .sidebar-inner::-webkit-scrollbar {
@@ -220,39 +211,7 @@
             border-radius: 4px;
         }
 
-        .sidebar-toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 6px 12px 10px;
-            border-bottom: 1px solid #f3f4f6;
-            margin-bottom: 4px;
-        }
-
-        #sidebar.collapsed .sidebar-toggle-row {
-            justify-content: center;
-        }
-
-        .toggle-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            background: #f9fafb;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .2s;
-        }
-
-        .toggle-btn:hover {
-            background: #fee2e2;
-            color: #8B0000;
-        }
-
+        /* Group header — static, not clickable for collapse */
         .nav-group {
             margin: 0 8px 2px;
         }
@@ -260,24 +219,8 @@
         .group-header {
             display: flex;
             align-items: center;
-            width: 100%;
-            border: none;
-            background: none;
-            cursor: pointer;
-            padding: 7px 8px;
-            border-radius: 10px;
-            transition: background .15s;
+            padding: 7px 8px 5px;
             color: #6b7280;
-        }
-
-        .group-header:hover {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .group-header.active-group {
-            background: #fef2f2;
-            color: #8B0000;
         }
 
         .group-icon {
@@ -289,7 +232,6 @@
             align-items: center;
             justify-content: center;
             font-size: 15px;
-            transition: all .2s;
         }
 
         .group-header.active-group .group-icon {
@@ -306,56 +248,26 @@
         }
 
         .group-label {
-            font-size: .78rem;
+            font-size: .72rem;
             font-weight: 700;
             white-space: nowrap;
             line-height: 1.2;
             display: block;
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
 
         .group-sublabel {
-            font-size: .63rem;
-            color: #9ca3af;
+            font-size: .62rem;
+            color: #b0b8c4;
             white-space: nowrap;
             display: block;
             margin-top: 1px;
         }
 
-        .group-chevron {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            transition: transform .25s;
-            flex-shrink: 0;
-        }
-
-        .group-chevron.open {
-            transform: rotate(180deg);
-        }
-
-        #sidebar.collapsed .group-label-wrap {
-            display: none;
-        }
-
-        #sidebar.collapsed .group-chevron {
-            display: none;
-        }
-
+        /* Group body always visible */
         .group-body {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height .3s cubic-bezier(.4, 0, .2, 1);
-        }
-
-        .group-body.open {
-            max-height: 500px;
-        }
-
-        #sidebar.collapsed .group-body {
-            max-height: 0 !important;
+            padding-bottom: 4px;
         }
 
         .nav-link {
@@ -399,76 +311,13 @@
         .nav-sep {
             height: 1px;
             background: #f3f4f6;
-            margin: 6px 12px;
-        }
-
-        .flyout-wrapper {
-            position: relative;
-        }
-
-        .flyout-panel {
-            position: fixed;
-            left: 76px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .13);
-            border: 1px solid #f0e6e6;
-            min-width: 200px;
-            padding: 6px;
-            opacity: 0;
-            transform: scale(.95) translateX(-6px);
-            pointer-events: none;
-            transition: all .2s cubic-bezier(.4, 0, .2, 1);
-            transform-origin: left center;
-            z-index: 999;
-        }
-
-        .flyout-panel.open {
-            opacity: 1;
-            transform: scale(1) translateX(0);
-            pointer-events: auto;
-        }
-
-        .flyout-title {
-            font-size: .68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            color: #8B0000;
-            padding: 4px 8px 6px;
-            border-bottom: 1px solid #fde8e8;
-            margin-bottom: 4px;
-        }
-
-        .flyout-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-size: .77rem;
-            font-weight: 500;
-            color: #374151;
-            text-decoration: none;
-            transition: all .15s;
-            white-space: nowrap;
-        }
-
-        .flyout-link:hover {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .flyout-link i {
-            width: 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #8B0000;
+            margin: 8px 12px;
         }
 
         .sidebar-bottom {
             padding: 8px 8px 12px;
             border-top: 1px solid #f3f4f6;
+            flex-shrink: 0;
         }
 
         .theme-toggle-container {
@@ -481,27 +330,13 @@
             background: #F5F5F5;
             border: 1px solid #E0E0E0;
             border-radius: 24px;
-            transition: all .3s ease;
-        }
-
-        #sidebar.collapsed .theme-toggle-container {
-            flex-direction: column;
-            width: 35px;
-            height: 96px;
-            border-radius: 24px;
-            padding: 4px;
-        }
-
-        #sidebar.collapsed .w-full {
-            display: flex;
-            justify-content: center;
         }
 
         .theme-option {
             position: relative;
             z-index: 2;
             flex: 1;
-            height: 40px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -513,18 +348,8 @@
             border-radius: 8px;
         }
 
-        #sidebar.collapsed .theme-option {
-            width: 35px;
-            height: 40px;
-            flex: none;
-        }
-
         .theme-option i {
             font-size: 16px;
-        }
-
-        #sidebar.collapsed .theme-option i {
-            font-size: 15px;
         }
 
         .theme-option.active {
@@ -534,34 +359,18 @@
         .theme-indicator {
             position: absolute;
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
             transition: all .3s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
-        }
-
-        #sidebar.expanded .theme-indicator {
-            width: calc(50% - 2px);
+            width: calc(50% - 4px);
             height: calc(100% - 8px);
             left: 4px;
             top: 4px;
-            border-radius: 20px;
         }
 
-        #sidebar.expanded .theme-indicator.dark-mode {
+        .theme-indicator.dark-mode {
             transform: translateX(calc(100% + 0px));
-        }
-
-        #sidebar.collapsed .theme-indicator {
-            width: calc(100% - 8px);
-            height: calc(50% - 6px);
-            left: 4px;
-            top: 4px;
-            border-radius: 16px;
-        }
-
-        #sidebar.collapsed .theme-indicator.dark-mode {
-            transform: translateY(calc(100% + 4px));
         }
 
         .logout-btn {
@@ -584,32 +393,385 @@
             background: #fef2f2;
         }
 
-        #sidebar.collapsed .logout-btn {
-            justify-content: center;
-            padding: 8px;
+        /* ── LAYOUT ── */
+        #mainContent,
+        #siteFooter {
+            margin-left: 240px;
         }
 
-        #sidebar.collapsed .logout-text {
-            display: none;
-        }
-
-        #sidebar.collapsed .settings-label {
-            display: none;
-        }
-
-        /* ── Layout transitions ── */
+        /* ── DARK MODE ── */
         body,
         main,
         footer {
             transition: background-color .3s ease, color .3s ease;
         }
 
-        #mainContent,
-        footer {
-            transition: margin-left .3s cubic-bezier(.4, 0, .2, 1);
+        [data-theme="dark"] body {
+            background-color: #000D1A;
+            color: #E5E7EB;
         }
 
-        /* ── Dark theme ── */
+        [data-theme="dark"] #sidebar {
+            background-color: #0d1117;
+            border-right: 1px solid #21262d;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: #161b22 !important;
+        }
+
+        [data-theme="dark"] .text-\[\#333333\] {
+            color: #E5E7EB !important;
+        }
+
+        [data-theme="dark"] .nav-link:hover {
+            background: rgba(139, 0, 0, .2);
+        }
+
+        [data-theme="dark"] .theme-toggle-container {
+            background: #1F1F1F;
+            border-color: #2A2A2A;
+        }
+
+        [data-theme="dark"] .theme-option {
+            color: #6B7280;
+        }
+
+        [data-theme="dark"] .theme-option.active {
+            color: #F3F4F6;
+        }
+
+        [data-theme="dark"] .theme-indicator {
+            background: #2A2A2A;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+
+        [data-theme="dark"] .nav-sep,
+        [data-theme="dark"] .sidebar-bottom {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .group-label {
+            color: #6b7280;
+        }
+
+        [data-theme="dark"] .sl-card,
+        [data-theme="dark"] .sl-stat {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .sl-page-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-toolbar-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-table thead tr {
+            background: #0d1117;
+        }
+
+        [data-theme="dark"] .sl-table tbody tr:hover {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .sl-table tbody td {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .sl-username,
+        [data-theme="dark"] .sl-date-day {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .sl-pagebar {
+            background: #0d1117;
+            border-color: #21262d;
+        }
+
+        /* ── MOBILE BOTTOM NAV ── */
+        #adminMobileNav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #fff;
+            border-top: 1px solid #f0e0e0;
+            z-index: 200;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 -4px 20px rgba(139, 0, 0, .10);
+        }
+
+        .adm-mob-item {
+            flex: 1;
+            height: 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-size: 9.5px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color .2s;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .adm-mob-item.active {
+            color: #8B0000;
+        }
+
+        .adm-mob-item i {
+            font-size: 20px;
+        }
+
+        .adm-mob-item.active i {
+            filter: drop-shadow(0 0 6px rgba(139, 0, 0, .35));
+        }
+
+        /* FAB center button */
+        #admMobFabWrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #admMobFab {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B0000, #660000);
+            color: white;
+            border: none;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(139, 0, 0, .45);
+            cursor: pointer;
+            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+            position: relative;
+            top: -10px;
+        }
+
+        #admMobFab.open {
+            transform: rotate(45deg) translateY(-10px);
+        }
+
+        /* FAB menu (quick nav) */
+        #admMobFabMenu {
+            position: fixed;
+            bottom: 86px;
+            left: 50%;
+            transform: translateX(-50%) scaleY(0);
+            transform-origin: bottom center;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(139, 0, 0, .18);
+            border: 1px solid #f5e8e8;
+            min-width: 220px;
+            overflow: hidden;
+            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), opacity .2s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 300;
+        }
+
+        #admMobFabMenu.open {
+            transform: translateX(-50%) scaleY(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .adm-fab-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            transition: background .15s;
+            border-bottom: 1px solid #fdf5f5;
+        }
+
+        .adm-fab-item:last-child {
+            border-bottom: none;
+        }
+
+        .adm-fab-item:hover {
+            background: #fff0f0;
+            color: #8B0000;
+        }
+
+        .adm-fab-item .adm-fab-icon {
+            width: 32px;
+            height: 32px;
+            background: #fef2f2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 767px) {
+            #sidebar {
+                display: none !important;
+            }
+
+            #mainContent {
+                margin-left: 0 !important;
+                padding-bottom: 86px !important;
+            }
+
+            #siteFooter {
+                margin-left: 0 !important;
+                margin-bottom: 68px;
+            }
+
+            #adminMobileNav {
+                display: flex;
+            }
+
+            .header {
+                padding: 0 1rem;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .sl-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sl-table thead th:nth-child(6),
+            .sl-table tbody td:nth-child(6),
+            .sl-table thead th:nth-child(7),
+            .sl-table tbody td:nth-child(7) {
+                display: none;
+            }
+
+            #mainContent .grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            #mainContent .grid > div:first-child {
+                width: 100%;
+            }
+
+            .accent-card {
+                margin-top: 12px;
+                display: none;
+            }
+
+            .perm-row {
+                padding: 10px 14px 10px 14px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .perm-group-header {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .perm-group-icon {
+                margin-right: 8px;
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
+            }
+
+            .dot-row {
+                display: none;
+            }
+
+            .footer-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 14px 16px;
+            }
+
+            .footer-bar > div:last-child {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-save,
+            .btn-view-as {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #roleCardList {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .role-card {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #adminMobileNav {
+                display: none !important;
+            }
+        }
+
+        /* ── DARK MOBILE ── */
+        [data-theme="dark"] #adminMobileNav {
+            background: #0a0a0a;
+            border-top-color: #1a1a1a;
+        }
+
+        [data-theme="dark"] #admMobFabMenu {
+            background: #111;
+            border-color: #222;
+        }
+
+        [data-theme="dark"] .adm-fab-item {
+            color: #E5E7EB;
+            border-bottom-color: #1a1a1a;
+        }
+
+        [data-theme="dark"] .adm-fab-item:hover {
+            background: #1a1a1a;
+        }
+
+        [data-theme="dark"] .adm-mob-item {
+            color: #4b5563;
+        }
+
+        [data-theme="dark"] .adm-mob-item.active {
+            color: #ff6b6b;
+        }
+
+        /* ── DARK MODE ── */
+        body,
+        main,
+        footer {
+            transition: background-color .3s ease, color .3s ease;
+        }
+
         [data-theme="dark"] body {
             background-color: #000D1A;
             color: #E5E7EB;
@@ -668,8 +830,40 @@
             border-color: #21262d;
         }
 
-        [data-theme="dark"] .sidebar-brand-text {
-            color: #f87171;
+        [data-theme="dark"] .sl-card,
+        [data-theme="dark"] .sl-stat {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .sl-page-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-toolbar-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-table thead tr {
+            background: #0d1117;
+        }
+
+        [data-theme="dark"] .sl-table tbody tr:hover {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .sl-table tbody td {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .sl-username,
+        [data-theme="dark"] .sl-date-day {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .sl-pagebar {
+            background: #0d1117;
+            border-color: #21262d;
         }
 
         /* ── Role cards ── */
@@ -1406,14 +1600,14 @@
         </div>
         <div class="header-right">
             @php
-                $notifications = collect($notifications ?? []);
-                $notifCount = $notifications->count();
+            $notifications = collect($notifications ?? []);
+            $notifCount = $notifications->count();
             @endphp
             <div id="notifDropdown">
                 <button class="notif-btn" id="notifBtn">
                     <i class="fa-regular fa-bell"></i>
                     @if ($notifCount > 0)
-                        <span class="notif-badge">{{ $notifCount }}</span>
+                    <span class="notif-badge">{{ $notifCount }}</span>
                     @endif
                 </button>
                 <div id="notifMenu">
@@ -1422,16 +1616,16 @@
                         Notifications</div>
                     <div style="max-height:260px; overflow-y:auto;">
                         @forelse($notifications as $n)
-                            <a href="{{ $n['url'] ?? '#' }}"
-                                style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
-                                <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-                                @if (!empty($n['message']))
-                                    <div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>
-                                @endif
-                            </a>
+                        <a href="{{ $n['url'] ?? '#' }}"
+                            style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+                            <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+                            @if (!empty($n['message']))
+                            <div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>
+                            @endif
+                        </a>
                         @empty
-                            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all
-                                caught up.</div>
+                        <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all
+                            caught up.</div>
                         @endforelse
                     </div>
                 </div>
@@ -1446,245 +1640,250 @@
         </div>
     </header>
 
-<!-- SIDEBAR -->
-  <aside id="sidebar" class="expanded">
+    <!-- ════════════ SIDEBAR ════════════ -->
+    <aside id="sidebar">
+        <div class="sidebar-inner">
 
-    <div class="sidebar-toggle-row">
-      <button class="toggle-btn" onclick="toggleSidebar()" id="sidebarToggleBtn">
-        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-      </button>
-    </div>
-
-    <div class="sidebar-inner">
-
-      <!-- ══════════════════════════════
-           GROUP 1 — CLINIC MANAGEMENT
-      ══════════════════════════════ -->
-      <div class="nav-group flyout-wrapper" id="group-cms">
-        <div class="group-header active-group" onclick="toggleGroup('cms', event)">
-          <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
-          <div class="group-label-wrap">
-            <span class="group-label">Clinic Management</span>
-            <span class="group-sublabel">Core clinical modules</span>
-          </div>
-          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-cms"></i>
-        </div>
-        <div class="group-body open" id="body-cms">
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
-            <i class="fa-solid fa-chart-line"></i> Dashboard
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-users"></i> Patients
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-calendar-check"></i> Appointments
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-tooth"></i> Dental Records
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-file-circle-check"></i> Document Request
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-file-chart-column"></i> Reports
-          </a>
-        </div>
-        <div class="flyout-panel" id="flyout-cms">
-          <div class="flyout-title">Clinic Management</div>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-users"></i> Patients</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-tooth"></i> Dental Records</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-circle-check"></i> Document Request</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-chart-column"></i> Reports</a>
-        </div>
-      </div>
-
-      <div class="nav-sep"></div>
-
-      <!-- ══════════════════════════════
-           GROUP 2 — MAINTENANCE
-      ══════════════════════════════ -->
-      <div class="nav-group flyout-wrapper" id="group-mnt">
-        <div class="group-header" onclick="toggleGroup('mnt', event)">
-          <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-          <div class="group-label-wrap">
-            <span class="group-label">Maintenance</span>
-            <span class="group-sublabel">Config &amp; scheduling</span>
-          </div>
-          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-mnt"></i>
-        </div>
-        <div class="group-body" id="body-mnt">
-          <a href="{{ route('admin.user_management') }}"
-            class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-gear"></i> User Management
-          </a>
-          <a href="{{ route('admin.role_permissions') }}"
-            class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions
-          </a>
-          <a href="{{ route('admin.academic_periods') }}"
-            class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}">
-            <i class="fa-solid fa-school"></i> Academic Periods
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-calendar-days"></i> Clinic Schedule
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-list-check"></i> Service Types
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-file-pen"></i> Document Templates
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-boxes-stacked"></i> Inventory
-          </a>
-        </div>
-        <div class="flyout-panel" id="flyout-mnt">
-          <div class="flyout-title">Maintenance</div>
-          <a href="{{ route('admin.user_management') }}" class="flyout-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-gear"></i> User Management</a>
-          <a href="{{ route('admin.role_permissions') }}" class="flyout-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
-          <a href="{{ route('admin.academic_periods') }}" class="flyout-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i class="fa-solid fa-school"></i> Academic Periods</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-list-check"></i> Service Types</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-pen"></i> Document Templates</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
-        </div>
-      </div>
-
-      <div class="nav-sep"></div>
-
-      <!-- ══════════════════════════════
-           GROUP 3 — SYSTEM
-      ══════════════════════════════ -->
-      <div class="nav-group flyout-wrapper" id="group-sys">
-        <div class="group-header" onclick="toggleGroup('sys', event)">
-          <div class="group-icon"><i class="fa-solid fa-server"></i></div>
-          <div class="group-label-wrap">
-            <span class="group-label">System</span>
-            <span class="group-sublabel">Admin &amp; configuration</span>
-          </div>
-          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-sys"></i>
-        </div>
-        <div class="group-body" id="body-sys">
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-database"></i> Data Backup
-          </a>
-          <a href="{{ route('admin.system_logs') }}"
-            class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
-            <i class="fa-solid fa-clipboard-list"></i> System Logs
-          </a>
-          <a href="{{ route('admin.admin.dashboard') }}"
-            class="nav-link {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-sliders"></i> System Settings
-          </a>
-        </div>
-        <div class="flyout-panel" id="flyout-sys">
-          <div class="flyout-title">System</div>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-database"></i> Data Backup</a>
-          <a href="{{ route('admin.system_logs') }}" class="flyout-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-sliders"></i> System Settings</a>
-        </div>
-      </div>
-
-    </div><!-- /sidebar-inner -->
-
-    <div class="sidebar-bottom">
-      <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1 settings-label">Settings</div>
-      <div class="w-full px-1 mb-3">
-        <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light"><i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark"><i class="fa-regular fa-moon"></i></button>
-          <div class="theme-indicator" aria-hidden="true"></div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST">
-        @csrf
-        <button type="submit" class="logout-btn">
-          <span style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <i class="fa-solid fa-right-from-bracket text-sm"></i>
-          </span>
-          <span class="logout-text font-semibold">Log out</span>
-        </button>
-      </form>
-    </div>
-
-  </aside>
-
-    <!-- ════════════════ MAIN ════════════════ -->
-    <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen" style="margin-left:240px;">
-        <div class="max-w-7xl mt-4 mx-auto fade-in">
-
-            @if (session('success'))
-                <div
-                    style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#166534;">
-                    <i class="fa-solid fa-circle-check" style="color:#22C55E;"></i> {{ session('success') }}
+            <!-- GROUP 1 — CLINIC MANAGEMENT -->
+            <div class="nav-group" id="group-cms">
+                <div class="group-header {{ request()->routeIs('admin.admin.dashboard') ? 'active-group' : '' }}">
+                    <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
+                    <div class="group-label-wrap">
+                        <span class="group-label">Clinic Management</span>
+                        <span class="group-sublabel">Core clinical modules</span>
+                    </div>
                 </div>
-            @endif
-
-            <!-- Page title -->
-            <div
-                style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:28px; gap:12px; flex-wrap:wrap;">
-                <div>
-                    <div
-                        style="font-size:11px; color:#B5A99A; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:600;">
-                        System Administration</div>
-                    <h1 style="margin:0; font-size:30px; font-weight:800; color:#7B0D0D; line-height:1;">Role &amp;
-                        Permissions</h1>
-                    <p style="margin:8px 0 0; font-size:14px; color:#8A7A6F;">Define what each role can see and do
-                        across the clinic system.</p>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <button onclick="document.getElementById('newRoleModal').style.display='flex'"
-                        style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(123,13,13,0.25);transition:all 0.2s;"
-                        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 24px rgba(123,13,13,0.35)'"
-                        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(123,13,13,0.25)'">
-                        <i class="fa-solid fa-plus" style="font-size:13px;"></i> New Role
-                    </button>
+                <div class="group-body">
+                    <a href="{{ route('admin.admin.dashboard') }}"
+                        class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
+                            class="fa-solid fa-chart-line"></i> Dashboard</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-users"></i> Patients</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-calendar-check"></i> Appointments</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-tooth"></i> Dental Records</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-file-circle-check"></i> Document Request</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-file"></i> Reports</a>
                 </div>
             </div>
 
+            <div class="nav-sep"></div>
+
+            <!-- GROUP 2 — MAINTENANCE -->
+            <div class="nav-group" id="group-mnt">
+                <div
+                    class="group-header {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*') ? 'active-group' : '' }}">
+                    <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <div class="group-label-wrap">
+                        <span class="group-label">Maintenance</span>
+                        <span class="group-sublabel">Configuration &amp; scheduling</span>
+                    </div>
+                </div>
+                <div class="group-body">
+                    <a href="{{ route('admin.user_management') }}"
+                        class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-gear"></i> User Management</a>
+                    <a href="{{ route('admin.role_permissions') }}"
+                        class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+                    <a href="{{ route('admin.academic_periods') }}"
+                        class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
+                            class="fa-solid fa-school"></i> Academic Periods</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-list-check"></i> Service Types</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-file-pen"></i> Document Templates</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+                </div>
+            </div>
+
+            <div class="nav-sep"></div>
+
+            <!-- GROUP 3 — SYSTEM -->
+            <div class="nav-group" id="group-sys">
+                <div class="group-header {{ request()->routeIs('admin.system_logs') ? 'active-group' : '' }}">
+                    <div class="group-icon"><i class="fa-solid fa-server"></i></div>
+                    <div class="group-label-wrap">
+                        <span class="group-label">System</span>
+                        <span class="group-sublabel">Admin &amp; configuration</span>
+                    </div>
+                </div>
+                <div class="group-body">
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-database"></i> Data Backup</a>
+                    <a href="{{ route('admin.system_logs') }}"
+                        class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
+                            class="fa-solid fa-clipboard-list"></i> System Logs</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-sliders"></i> System Settings</a>
+                </div>
+            </div>
+
+        </div><!-- /sidebar-inner -->
+
+        <div class="sidebar-bottom">
+            <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1">Settings</div>
+            <div class="w-full px-1 mb-3">
+                <div id="themeToggle" class="theme-toggle-container">
+                    <button type="button" class="theme-option active" data-theme="light"><i
+                            class="fa-solid fa-sun"></i></button>
+                    <button type="button" class="theme-option" data-theme="dark"><i
+                            class="fa-regular fa-moon"></i></button>
+                    <div class="theme-indicator" aria-hidden="true"></div>
+                </div>
+            </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <span
+                        style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    </span>
+                    <span class="font-semibold">Log out</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- ════════════ MOBILE BOTTOM NAV ════════════ -->
+    <nav id="adminMobileNav">
+        {{-- Dashboard --}}
+        <a href="{{ route('admin.admin.dashboard') }}"
+            class="adm-mob-item {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+
+        {{-- Patients --}}
+        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-users"></i>
+            <span>Patients</span>
+        </a>
+
+        {{-- FAB — Quick Actions --}}
+        <div id="admMobFabWrap">
+            <div id="admMobFabMenu">
+                <a href="{{ route('admin.admin.dashboard') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                    Appointments
+                </a>
+                <a href="{{ route('admin.system_logs') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+                    System Logs
+                </a>
+                <a href="{{ route('admin.user_management') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-user-gear"></i></span>
+                    User Management
+                </a>
+                <a href="{{ route('admin.role_permissions') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-user-shield"></i></span>
+                    Roles &amp; Permissions
+                </a>
+                <a href="{{ route('admin.academic_periods') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-school"></i></span>
+                    Academic Periods
+                </a>
+            </div>
+            <button id="admMobFab" aria-label="Quick navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        {{-- Appointments --}}
+        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Appts</span>
+        </a>
+
+        {{-- System Logs --}}
+        <a href="{{ route('admin.system_logs') }}"
+            class="adm-mob-item {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
+            <i class="fa-solid fa-clipboard-list"></i>
+            <span>Logs</span>
+        </a>
+    </nav>
+
+    <!-- ════════════ MAIN CONTENT ════════════ -->
+    @php
+    $logs = $logs ?? collect([]);
+    $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
+    $adminCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','admin')->count();
+    $dentistCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','dentist')->count();
+    $patientCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','patient')->count();
+    $loginCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->whereIn('action',['login','Login'])->count();
+    @endphp
+
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
+        <div style="max-width:1280px; margin:0 auto;">
+
+            @if (session('success'))
+            <div
+                style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#166534;">
+                <i class="fa-solid fa-circle-check" style="color:#22C55E;"></i> {{ session('success') }}
+            </div>
+            @endif
+
+            <!-- Page title -->
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
+            <div>
+                <div
+                    style="font-size:11px; color:#B5A99A; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:600;">
+                    System Administration</div>
+                <h1 style="margin:0; font-size:26px; font-weight:800; color:#7B0D0D; line-height:1;">Role &amp;
+                    Permissions</h1>
+                <p style="margin:8px 0 0; font-size:14px; color:#8A7A6F;">Define what each role can see and do
+                    across the clinic system.</p>
+            </div>
+            <div class="flex-shrink-0">
+                <button onclick="document.getElementById('newRoleModal').style.display='flex'"
+                    style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(123,13,13,0.25);transition:all 0.2s;"
+                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 24px rgba(123,13,13,0.35)'"
+                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(123,13,13,0.25)'">
+                    <i class="fa-solid fa-plus" style="font-size:13px;"></i> New Role
+                </button>
+            </div>
+        </div>
+
             <!-- Two-column grid -->
-            <div style="display:grid; grid-template-columns:280px 1fr; gap:24px; align-items:start;">
+            <div class="grid gap-6" style="grid-template-columns:280px 1fr; align-items:start;">
 
                 <!-- ══ LEFT: Role Cards ══ -->
                 <div>
                     @php
-                        function getRoleBadge($name, $slug)
-                        {
-                            $n = strtolower($name);
-                            $s = strtolower($slug);
-                            if (str_contains($n, 'super') || str_contains($s, 'super')) {
-                                return ['badgeColor' => '#7B0D0D', 'label' => 'Full Access'];
-                            }
-                            if (str_contains($n, 'dentist') || str_contains($s, 'dentist')) {
-                                return ['badgeColor' => '#B45309', 'label' => 'Clinical'];
-                            }
-                            if (str_contains($n, 'staff') || str_contains($s, 'staff') || str_contains($n, 'clinic')) {
-                                return ['badgeColor' => '#065F46', 'label' => 'Front Desk'];
-                            }
-                            if (
-                                str_contains($n, 'student') ||
-                                str_contains($s, 'student') ||
-                                str_contains($n, 'patient') ||
-                                str_contains($s, 'patient')
-                            ) {
-                                return ['badgeColor' => '#4B5563', 'label' => 'Limited'];
-                            }
-                            return ['badgeColor' => '#6B7280', 'label' => 'Custom'];
-                        }
-                        $totalPerms = $groupedPermissions->flatten()->count();
+                    function getRoleBadge($name, $slug)
+                    {
+                    $n = strtolower($name);
+                    $s = strtolower($slug);
+                    if (str_contains($n, 'super') || str_contains($s, 'super')) {
+                    return ['badgeColor' => '#7B0D0D', 'label' => 'Full Access'];
+                    }
+                    if (str_contains($n, 'dentist') || str_contains($s, 'dentist')) {
+                    return ['badgeColor' => '#B45309', 'label' => 'Clinical'];
+                    }
+                    if (str_contains($n, 'staff') || str_contains($s, 'staff') || str_contains($n, 'clinic')) {
+                    return ['badgeColor' => '#065F46', 'label' => 'Front Desk'];
+                    }
+                    if (
+                    str_contains($n, 'student') ||
+                    str_contains($s, 'student') ||
+                    str_contains($n, 'patient') ||
+                    str_contains($s, 'patient')
+                    ) {
+                    return ['badgeColor' => '#4B5563', 'label' => 'Limited'];
+                    }
+                    return ['badgeColor' => '#6B7280', 'label' => 'Custom'];
+                    }
+                    $totalPerms = $groupedPermissions->flatten()->count();
                     @endphp
 
                     <div style="font-size:11px; color:#B5A99A; letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; font-weight:600;"
@@ -1694,76 +1893,76 @@
 
                     <div style="display:flex; flex-direction:column; gap:8px;" id="roleCardList">
                         @foreach ($roles as $i => $role)
-                            @php
-                                $c = getRoleBadge($role->name, $role->slug);
-                                $granted = $role->permissions->count();
-                                $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
-                                $words = array_slice(explode(' ', $role->name), 0, 2);
-                                $initials = '';
-                                foreach ($words as $_w) {
-                                    $initials .= strtoupper($_w[0]);
-                                }
-                                $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
-                                $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
-                                $isSuperRole =
-                                    in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-                                    str_contains(strtolower($role->name), 'super');
-                            @endphp
-                            <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
-                                data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
-                                data-total="{{ $totalPerms }}" data-pct="{{ $pct }}"
-                                data-slug="{{ $role->slug }}" data-is-super="{{ $isSuperRole ? '1' : '0' }}"
-                                onclick="selectRole(this)">
+                        @php
+                        $c = getRoleBadge($role->name, $role->slug);
+                        $granted = $role->permissions->count();
+                        $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
+                        $words = array_slice(explode(' ', $role->name), 0, 2);
+                        $initials = '';
+                        foreach ($words as $_w) {
+                        $initials .= strtoupper($_w[0]);
+                        }
+                        $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
+                        $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
+                        $isSuperRole =
+                        in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+                        str_contains(strtolower($role->name), 'super');
+                        @endphp
+                        <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
+                            data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
+                            data-total="{{ $totalPerms }}" data-pct="{{ $pct }}" data-slug="{{ $role->slug }}"
+                            data-is-super="{{ $isSuperRole ? '1' : '0' }}" onclick="selectRole(this)">
 
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div class="role-avatar">{{ $initials }}</div>
-                                    <div style="flex:1;">
-                                        <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
-                                            <span style="font-weight:600; font-size:14px; color:#2D2420;"
-                                                class="role-name-label">{{ $role->name }}</span>
-                                        </div>
-                                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                            <span class="badge-pill"
-                                                style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{ $c['label'] }}</span>
-                                            <span
-                                                style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug }}</span>
-                                        </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div class="role-avatar">{{ $initials }}</div>
+                                <div style="flex:1;">
+                                    <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                                        <span style="font-weight:600; font-size:14px; color:#2D2420;"
+                                            class="role-name-label">{{ $role->name }}</span>
                                     </div>
-                                    <div class="active-dot"
-                                        style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
+                                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                        <span class="badge-pill"
+                                            style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{
+                                            $c['label'] }}</span>
+                                        <span style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug
+                                            }}</span>
                                     </div>
                                 </div>
-
-                                <div style="margin-top:12px;">
-                                    <div
-                                        style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
-                                        <span>Access level</span>
-                                        <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill"
-                                            style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
-                                        </div>
-                                    </div>
-                                    <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
-                                        {{ $granted }} of {{ $totalPerms }} permissions</div>
+                                <div class="active-dot"
+                                    style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
                                 </div>
                             </div>
+
+                            <div style="margin-top:12px;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
+                                    <span>Access level</span>
+                                    <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
+                                    </div>
+                                </div>
+                                <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
+                                    {{ $granted }} of {{ $totalPerms }} permissions</div>
+                            </div>
+                        </div>
                         @endforeach
                     </div>
 
                     <!-- Accent summary card -->
                     <div class="accent-card">
                         @php
-                            $fr = isset($highlightRoleId)
-                                ? $roles->firstWhere('id', (int) $highlightRoleId)
-                                : $roles->first();
+                        $fr = isset($highlightRoleId)
+                        ? $roles->firstWhere('id', (int) $highlightRoleId)
+                        : $roles->first();
 
-                            $fp = $fr
-                                ? ($totalPerms > 0
-                                    ? round(($fr->permissions->count() / $totalPerms) * 100)
-                                    : 0)
-                                : 0;
+                        $fp = $fr
+                        ? ($totalPerms > 0
+                        ? round(($fr->permissions->count() / $totalPerms) * 100)
+                        : 0)
+                        : 0;
                         @endphp
                         <div style="font-size:16px; font-weight:700; margin-bottom:4px;" id="accentRoleName">
                             {{ $fr->name ?? '' }}</div>
@@ -1782,24 +1981,26 @@
                 <!-- ══ RIGHT: Permission Editor ══ -->
                 <div>
                     <!-- Toolbar -->
-                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
-                        <div style="flex:1; position:relative; min-width:180px;">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <div class="relative w-full sm:flex-1" style="min-width:180px;">
                             <i class="fa-solid fa-magnifying-glass"
                                 style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#B5A99A; font-size:13px;"></i>
-                            <input type="text" id="permSearch" placeholder="Search permissions…"
-                                class="search-input" oninput="filterPerms(this.value)">
+                            <input type="text" id="permSearch" placeholder="Search permissions…" class="search-input"
+                                oninput="filterPerms(this.value)">
                         </div>
-                        <button type="button" class="btn-collapse" id="collapseBtn"
-                            onclick="toggleAllGroups()">Collapse All</button>
-                        <form action="{{ route('admin.role_permissions.reset') }}" method="POST"
-                            style="display:contents;">
-                            @csrf
-                            <button type="submit" class="btn-reset" style="border:1.5px solid #EDE8E2;">
-                                <i class="fa-solid fa-rotate-left" style="font-size:12px; margin-right:4px;"></i>
-                                Reset Defaults
-                            </button>
-                        </form>
-                    </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button type="button" class="btn-collapse" id="collapseBtn" onclick="toggleAllGroups()">Collapse
+                                All</button>
+                                <form action="{{ route('admin.role_permissions.reset') }}" method="POST"
+                                    style="display:contents;">
+                                    @csrf
+                                    <button type="submit" class="btn-reset" style="border:1.5px solid #EDE8E2;">
+                                        <i class="fa-solid fa-rotate-left" style="font-size:12px; margin-right:4px;"></i>
+                                        Reset Defaults
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
 
                     <!-- Protected banner -->
                     <div class="protected-banner" id="protectedBanner" style="display:none;">
@@ -1813,194 +2014,177 @@
 
                     <!-- Permission forms — one per role, shown/hidden by JS -->
                     @foreach ($roles as $ri => $role)
-                        @php
-                            $isSuperRole =
-                                in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-                                str_contains(strtolower($role->name), 'super');
+                    @php
+                    $isSuperRole =
+                    in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+                    str_contains(strtolower($role->name), 'super');
 
-                            $isActiveRole = isset($highlightRoleId)
-                                ? (int) $highlightRoleId === (int) $role->id
-                                : $ri === 0;
+                    $isActiveRole = isset($highlightRoleId)
+                    ? (int) $highlightRoleId === (int) $role->id
+                    : $ri === 0;
 
-                            $micons = [
-                                'Dental Records' => ['fa-notes-medical', '#7B0D0D'],
-                                'Patients' => ['fa-user-group', '#B45309'],
-                                'Appointments' => ['fa-calendar-days', '#065F46'],
-                                'Document Requests' => ['fa-envelope-open-text', '#1D4ED8'],
-                                'Document Templates' => ['fa-file-lines', '#6D28D9'],
-                                'Reports' => ['fa-chart-pie', '#6D28D9'],
-                                'General Access' => ['fa-user-shield', '#065F46'],
-                                'Inventory' => ['fa-boxes-stacked', '#EA580C'],
-                                'User Management' => ['fa-user-cog', '#DC2626'],
-                                'System Settings' => ['fa-screwdriver-wrench', '#374151'],
-                            ];
-                        @endphp
+                    $micons = [
+                    'Dental Records' => ['fa-notes-medical', '#7B0D0D'],
+                    'Patients' => ['fa-user-group', '#B45309'],
+                    'Appointments' => ['fa-calendar-days', '#065F46'],
+                    'Document Requests' => ['fa-envelope-open-text', '#1D4ED8'],
+                    'Document Templates' => ['fa-file-lines', '#6D28D9'],
+                    'Reports' => ['fa-chart-pie', '#6D28D9'],
+                    'General Access' => ['fa-user-shield', '#065F46'],
+                    'Inventory' => ['fa-boxes-stacked', '#EA580C'],
+                    'User Management' => ['fa-user-cog', '#DC2626'],
+                    'System Settings' => ['fa-screwdriver-wrench', '#374151'],
+                    ];
+                    @endphp
 
-                        <form id="form-role-{{ $role->id }}" class="role-form"
-                            data-role-id="{{ $role->id }}" action="{{ route('admin.role_permissions.update') }}"
-                            method="POST" style="display:{{ $isActiveRole ? 'block' : 'none' }};"
-                            onsubmit="onFormSubmit('{{ $role->id }}')">
+                    <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}"
+                        action="{{ route('admin.role_permissions.update') }}" method="POST"
+                        style="display:{{ $isActiveRole ? 'block' : 'none' }};"
+                        onsubmit="onFormSubmit('{{ $role->id }}')">
 
-                            @csrf
-                            <input type="hidden" name="role_id" value="{{ $role->id }}">
+                        @csrf
+                        <input type="hidden" name="role_id" value="{{ $role->id }}">
 
-                            <div style="display:flex; flex-direction:column; gap:10px;" class="groups-container">
-                                @forelse($groupedPermissions as $module => $permissions)
-                                    @php
-                                        [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#374151'];
-                                        $mSlug = Str::slug($module);
-                                        $mTotal = $permissions->count();
-                                        $roleGranted = 0;
-                                        foreach ($permissions as $_p) {
-                                            if ($role->permissions->contains('id', $_p->id)) {
-                                                $roleGranted++;
-                                            }
-                                        }
-                                        $allOn = $roleGranted === $mTotal;
-                                    @endphp
+                        <div style="display:flex; flex-direction:column; gap:10px;" class="groups-container">
+                            @forelse($groupedPermissions as $module => $permissions)
+                            @php
+                            [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#374151'];
+                            $mSlug = Str::slug($module);
+                            $mTotal = $permissions->count();
+                            $roleGranted = 0;
+                            foreach ($permissions as $_p) {
+                            if ($role->permissions->contains('id', $_p->id)) {
+                            $roleGranted++;
+                            }
+                            }
+                            $allOn = $roleGranted === $mTotal;
+                            @endphp
 
-                                    <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
+                            <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
 
-                                        <!-- Group header — uses perm-specific handler -->
-                                        <div class="perm-group-header" onclick="togglePermGroup(this)">
-                                            <div class="perm-group-icon"
-                                                style="background:{{ $icol }}15; color:{{ $icol }}; border:1px solid {{ $icol }}25;">
-                                                <i class="fa-solid {{ $ico }}"></i>
-                                            </div>
-                                            <div style="flex:1;">
-                                                <div style="font-weight:700; font-size:14px; color:#2D2420;">
-                                                    {{ $module }}</div>
-                                                <div style="font-size:12px; color:#B5A99A;" class="group-count">
-                                                    {{ $roleGranted }} of {{ $mTotal }} enabled</div>
-                                            </div>
-                                            <div style="display:flex; align-items:center; gap:14px;">
-                                                <div class="dot-row"
-                                                    id="dots-{{ $role->id }}-{{ $mSlug }}">
-                                                    @for ($d = 0; $d < $mTotal; $d++)
-                                                        <div class="dot {{ $d < $roleGranted ? 'on' : '' }}"
-                                                            style="{{ $d < $roleGranted ? 'background:' . $icol . ';' : '' }}">
-                                                        </div>
-                                                    @endfor
-                                                </div>
-                                                <div class="all-toggle-wrap"
-                                                    onclick="event.stopPropagation(); toggleGroupPerms(this, '{{ $role->id }}', '{{ $mSlug }}', {{ $allOn ? 'true' : 'false' }})">
-                                                    <span
-                                                        style="font-size:11px; color:#6B5E56; font-weight:600;">All</span>
-                                                    <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
-                                                        onclick="event.preventDefault();">
-                                                        <input type="checkbox" class="group-master"
-                                                            data-role="{{ $role->id }}"
-                                                            data-module="{{ $mSlug }}"
-                                                            {{ $allOn ? 'checked' : '' }}
-                                                            {{ $isSuperRole ? 'disabled' : '' }}>
-                                                        <span class="toggle-track"></span>
-                                                    </label>
-                                                </div>
-                                                <i class="fa-solid fa-chevron-up chevron"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="perm-group-body">
-                                            @foreach ($permissions as $permission)
-                                                @php $isGranted = $role->permissions->contains('id', $permission->id); @endphp
-                                                <div class="perm-row"
-                                                    style="{{ $isGranted ? 'background:' . $icol . '06;' : '' }}"
-                                                    data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
-                                                    <div style="flex:1;">
-                                                        <div
-                                                            style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
-                                                            <div class="perm-dot"
-                                                                style="width:7px; height:7px; border-radius:50%; flex-shrink:0; transition:background 0.2s; background:{{ $isGranted ? $icol : '#D5CEC8' }};">
-                                                            </div>
-                                                            <span
-                                                                style="font-weight:600; font-size:13px; color:{{ $isGranted ? '#2D2420' : '#8A7A6F' }};"
-                                                                class="perm-label">{{ $permission->name }}</span>
-                                                        </div>
-                                                        <div style="font-size:12px; color:#B5A99A; padding-left:15px;">
-                                                            {{ $permission->slug }}</div>
-                                                    </div>
-                                                    <div style="display:flex; align-items:center; gap:10px;">
-                                                        <span
-                                                            class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}"
-                                                            style="{{ $isGranted ? 'background:' . $icol . '18; color:' . $icol . ';' : '' }}">
-                                                            {{ $isGranted ? 'Granted' : 'Denied' }}
-                                                        </span>
-                                                        <label
-                                                            class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
-                                                            <input type="checkbox"
-                                                                name="permissions[{{ $role->id }}][]"
-                                                                value="{{ $permission->id }}" class="perm-toggle"
-                                                                data-role="{{ $role->id }}"
-                                                                data-module="{{ $mSlug }}"
-                                                                data-color="{{ $icol }}"
-                                                                data-perm-name="{{ $permission->name }}"
-                                                                data-perm-slug="{{ $permission->slug }}"
-                                                                {{ $isGranted ? 'checked' : '' }}
-                                                                {{ $isSuperRole ? 'disabled' : '' }}
-                                                                onchange="onPermChange(this)">
-                                                            <span class="toggle-track"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
+                                <!-- Group header — uses perm-specific handler -->
+                                <div class="perm-group-header" onclick="togglePermGroup(this)">
+                                    <div class="perm-group-icon"
+                                        style="background:{{ $icol }}15; color:{{ $icol }}; border:1px solid {{ $icol }}25;">
+                                        <i class="fa-solid {{ $ico }}"></i>
                                     </div>
-
-                                @empty
-                                    <div style="text-align:center; padding:60px 20px;">
-                                        <div style="font-size:40px; opacity:0.2; margin-bottom:12px;">🛡️</div>
-                                        <p style="font-size:14px; font-weight:600; color:#8A7A6F;">No permissions
-                                            found.</p>
+                                    <div style="flex:1;">
+                                        <div style="font-weight:700; font-size:14px; color:#2D2420;">
+                                            {{ $module }}</div>
+                                        <div style="font-size:12px; color:#B5A99A;" class="group-count">
+                                            {{ $roleGranted }} of {{ $mTotal }} enabled</div>
                                     </div>
-                                @endforelse
+                                    <div style="display:flex; align-items:center; gap:14px;">
+                                        <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
+                                            @for ($d = 0; $d < $mTotal; $d++) <div
+                                                class="dot {{ $d < $roleGranted ? 'on' : '' }}"
+                                                style="{{ $d < $roleGranted ? 'background:' . $icol . ';' : '' }}">
+                                        </div>
+                                        @endfor
+                                    </div>
+                                    <div class="all-toggle-wrap"
+                                        onclick="event.stopPropagation(); toggleGroupPerms(this, '{{ $role->id }}', '{{ $mSlug }}', {{ $allOn ? 'true' : 'false' }})">
+                                        <span style="font-size:11px; color:#6B5E56; font-weight:600;">All</span>
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
+                                            onclick="event.preventDefault();">
+                                            <input type="checkbox" class="group-master" data-role="{{ $role->id }}"
+                                                data-module="{{ $mSlug }}" {{ $allOn ? 'checked' : '' }} {{ $isSuperRole
+                                                ? 'disabled' : '' }}>
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-up chevron"></i>
+                                </div>
                             </div>
 
-                            @if (!$isSuperRole)
-                                <!-- ── Footer bar with View As ── -->
-                                <div class="footer-bar" id="footer-bar-{{ $role->id }}">
-                                    <div style="display:flex; flex-direction:column; gap:6px; flex:1; min-width:0;">
-                                        <div style="font-size:13px; color:#8A7A6F;"
-                                            id="footer-msg-{{ $role->id }}">
-                                            {{ $role->permissions->count() }} permissions enabled for
-                                            {{ $role->name }}
+                            <div class="perm-group-body">
+                                @foreach ($permissions as $permission)
+                                @php $isGranted = $role->permissions->contains('id', $permission->id); @endphp
+                                <div class="perm-row" style="{{ $isGranted ? 'background:' . $icol . '06;' : '' }}"
+                                    data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
+                                    <div style="flex:1;">
+                                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
+                                            <div class="perm-dot"
+                                                style="width:7px; height:7px; border-radius:50%; flex-shrink:0; transition:background 0.2s; background:{{ $isGranted ? $icol : '#D5CEC8' }};">
+                                            </div>
+                                            <span
+                                                style="font-weight:600; font-size:13px; color:{{ $isGranted ? '#2D2420' : '#8A7A6F' }};"
+                                                class="perm-label">{{ $permission->name }}</span>
                                         </div>
-                                        <!-- Pending chips appear here when toggles changed but not yet saved -->
-                                        <div class="grant-chips" id="chips-{{ $role->id }}"></div>
-                                        <!-- Hint: visible only when there are pending (unsaved) grants -->
-                                        <div class="hint-save" id="hint-{{ $role->id }}">
-                                            <i class="fa-solid fa-eye" style="font-size:11px;"></i> Save changes to
-                                            unlock "View As"
-                                        </div>
+                                        <div style="font-size:12px; color:#B5A99A; padding-left:15px;">
+                                            {{ $permission->slug }}</div>
                                     </div>
-                                    <div style="display:flex; gap:10px; align-items:center; flex-shrink:0;">
-                                        <!-- View As button — only appears after at least one save with grants -->
-                                        <button type="button" class="btn-view-as" id="viewas-{{ $role->id }}"
-                                            onclick="openViewAs()">
-                                            <i class="fa-solid fa-eye" style="font-size:13px;"></i> View As
-                                            <span class="va-count-badge" id="va-badge-{{ $role->id }}">0</span>
-                                        </button>
-                                        <button type="submit" class="btn-save">
-                                            <i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save
-                                            Changes
-                                        </button>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}"
+                                            style="{{ $isGranted ? 'background:' . $icol . '18; color:' . $icol . ';' : '' }}">
+                                            {{ $isGranted ? 'Granted' : 'Denied' }}
+                                        </span>
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
+                                            <input type="checkbox" name="permissions[{{ $role->id }}][]"
+                                                value="{{ $permission->id }}" class="perm-toggle"
+                                                data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
+                                                data-color="{{ $icol }}" data-perm-name="{{ $permission->name }}"
+                                                data-perm-slug="{{ $permission->slug }}" {{ $isGranted ? 'checked' : ''
+                                                }} {{ $isSuperRole ? 'disabled' : '' }} onchange="onPermChange(this)">
+                                            <span class="toggle-track"></span>
+                                        </label>
                                     </div>
                                 </div>
-                            @endif
-                        </form>
-                    @endforeach
+                                @endforeach
+                            </div>
+                        </div>
 
+                        @empty
+                        <div style="text-align:center; padding:60px 20px;">
+                            <div style="font-size:40px; opacity:0.2; margin-bottom:12px;">🛡️</div>
+                            <p style="font-size:14px; font-weight:600; color:#8A7A6F;">No permissions
+                                found.</p>
+                        </div>
+                        @endforelse
                 </div>
+
+                @if (!$isSuperRole)
+                <!-- ── Footer bar with View As ── -->
+                <div class="footer-bar" id="footer-bar-{{ $role->id }}">
+                    <div style="display:flex; flex-direction:column; gap:6px; flex:1; min-width:0;">
+                        <div style="font-size:13px; color:#8A7A6F;" id="footer-msg-{{ $role->id }}">
+                            {{ $role->permissions->count() }} permissions enabled for
+                            {{ $role->name }}
+                        </div>
+                        <!-- Pending chips appear here when toggles changed but not yet saved -->
+                        <div class="grant-chips" id="chips-{{ $role->id }}"></div>
+                        <!-- Hint: visible only when there are pending (unsaved) grants -->
+                        <div class="hint-save" id="hint-{{ $role->id }}">
+                            <i class="fa-solid fa-eye" style="font-size:11px;"></i> Save changes to
+                            unlock "View As"
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center; flex-shrink:0;">
+                        <!-- View As button — only appears after at least one save with grants -->
+                        <button type="button" class="btn-view-as" id="viewas-{{ $role->id }}" onclick="openViewAs()">
+                            <i class="fa-solid fa-eye" style="font-size:13px;"></i> View As
+                            <span class="va-count-badge" id="va-badge-{{ $role->id }}">0</span>
+                        </button>
+                        <button type="submit" class="btn-save">
+                            <i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save
+                            Changes
+                        </button>
+                    </div>
+                </div>
+                @endif
+                </form>
+                @endforeach
+
             </div>
+        </div>
         </div>
     </main>
 
-    <!-- ════════════════ FOOTER ════════════════ -->
-    <footer id="siteFooter" class="footer bg-[#8B0000] text-[#F4F4F4] p-6 transition-all duration-300"
-        style="margin-left:240px;">
+    <!-- ════════════ FOOTER ════════════ -->
+    <footer id="siteFooter" class="bg-[#8B0000] text-[#F4F4F4] p-6">
         <div
             class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-            <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic
-                    University of
+            <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of
                     the Philippines</span></span>
             <span class="hidden sm:inline">|</span>
             <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
@@ -2129,7 +2313,6 @@
         </div>
     </div>
 
-
     <div class="va-overlay" id="patientPickerOverlay" onclick="if(event.target===this)closePatientPicker()">
         <div class="va-panel" style="width:760px;">
             <div class="va-head">
@@ -2160,8 +2343,7 @@
                         oninput="filterPatientPicker(this.value)">
 
                     <!-- CLEAR BUTTON -->
-                    <button onclick="clearPatientSearch()"
-                        style="
+                    <button onclick="clearPatientSearch()" style="
         position:absolute;
         right:10px;
         top:50%;
@@ -2181,8 +2363,7 @@
                 <div id="patientPickerList"></div>
             </div>
 
-            <div class="va-foot"
-                style="
+            <div class="va-foot" style="
     display:flex;
     justify-content:flex-end;
     padding:18px 22px;
@@ -2190,8 +2371,7 @@
     background:#FAF8F6;
 ">
 
-                <button onclick="closePatientPicker()"
-                    style="
+                <button onclick="closePatientPicker()" style="
             background:#F5EFE9;
             color:#6B5E56;
             border:none;
@@ -2202,70 +2382,109 @@
             cursor:pointer;
             font-family:'Inter',sans-serif;
             transition:all .15s ease;
-        "
-                    onmouseover="this.style.background='#EDE6DF'" onmouseout="this.style.background='#F5EFE9'">
+        " onmouseover="this.style.background='#EDE6DF'" onmouseout="this.style.background='#F5EFE9'">
                     Cancel
                 </button>
 
             </div>
 
-            <!-- ══════════════════════════════════════
-         SCRIPTS
-    ══════════════════════════════════════ -->
             <script>
-                /* ══════════════════════════════════════
-                                                               MODULE LIST — mirrors your DB exactly
-                                                            ══════════════════════════════════════ */
+                // Notifications
+                document.getElementById('notifBtn').addEventListener('click', e => {
+                    e.stopPropagation();
+                    document.getElementById('notifMenu').classList.toggle('open');
+                });
+                document.addEventListener('click', () => {
+                    document.getElementById('notifMenu').classList.remove('open');
+                    const fabMenu = document.getElementById('admMobFabMenu');
+                    const fab = document.getElementById('admMobFab');
+                    if (fabMenu) fabMenu.classList.remove('open');
+                    if (fab) fab.classList.remove('open');
+                });
+
+                // Mobile FAB
+                document.addEventListener('DOMContentLoaded', () => {
+                    const fab = document.getElementById('admMobFab');
+                    const fabMenu = document.getElementById('admMobFabMenu');
+                    if (fab && fabMenu) {
+                        fab.addEventListener('click', e => {
+                            e.stopPropagation();
+                            const isOpen = fabMenu.classList.contains('open');
+                            fabMenu.classList.toggle('open', !isOpen);
+                            fab.classList.toggle('open', !isOpen);
+                        });
+                        fabMenu.addEventListener('click', e => e.stopPropagation());
+                    }
+                });
+
+                // Theme
+                const html = document.documentElement;
+                function applyTheme(theme) {
+                    html.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    document.querySelectorAll('.theme-option').forEach(o =>
+                        o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active')
+                    );
+                    const ind = document.querySelector('.theme-indicator');
+                    if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
+                }
+                document.addEventListener('DOMContentLoaded', () => {
+                    applyTheme(localStorage.getItem('theme') || 'light');
+                    document.querySelectorAll('.theme-option').forEach(o =>
+                        o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
+                    );
+                });
+
                 const PERM_MODULES = [{
-                        module: 'Dashboard',
-                        icon: 'fa-chart-line',
-                        color: '#7B0D0D'
-                    },
-                    {
-                        module: 'Patients',
-                        icon: 'fa-users',
-                        color: '#B45309'
-                    },
-                    {
-                        module: 'Appointments',
-                        icon: 'fa-calendar-check',
-                        color: '#065F46'
-                    },
-                    {
-                        module: 'Document Requests',
-                        icon: 'fa-file-circle-check',
-                        color: '#1D4ED8'
-                    },
-                    {
-                        module: 'Document Template',
-                        icon: 'fa-file-pen',
-                        color: '#6D28D9'
-                    },
-                    {
-                        module: 'Reports',
-                        icon: 'fa-chart-column',
-                        color: '#6D28D9'
-                    },
-                    {
-                        module: 'Academic Periods',
-                        icon: 'fa-school',
-                        color: '#065F46'
-                    },
-                    {
-                        module: 'Data Backup',
-                        icon: 'fa-database',
-                        color: '#EA580C'
-                    },
-                    {
-                        module: 'System Logs',
-                        icon: 'fa-clipboard-list',
-                        color: '#6D28D9'
-                    },
-                    {
-                        module: 'System Settings',
-                        icon: 'fa-gear',
-                        color: '#374151'
-                    },
+                    module: 'Dashboard',
+                    icon: 'fa-chart-line',
+                    color: '#7B0D0D'
+                },
+                {
+                    module: 'Patients',
+                    icon: 'fa-users',
+                    color: '#B45309'
+                },
+                {
+                    module: 'Appointments',
+                    icon: 'fa-calendar-check',
+                    color: '#065F46'
+                },
+                {
+                    module: 'Document Requests',
+                    icon: 'fa-file-circle-check',
+                    color: '#1D4ED8'
+                },
+                {
+                    module: 'Document Template',
+                    icon: 'fa-file-pen',
+                    color: '#6D28D9'
+                },
+                {
+                    module: 'Reports',
+                    icon: 'fa-chart-column',
+                    color: '#6D28D9'
+                },
+                {
+                    module: 'Academic Periods',
+                    icon: 'fa-school',
+                    color: '#065F46'
+                },
+                {
+                    module: 'Data Backup',
+                    icon: 'fa-database',
+                    color: '#EA580C'
+                },
+                {
+                    module: 'System Logs',
+                    icon: 'fa-clipboard-list',
+                    color: '#6D28D9'
+                },
+                {
+                    module: 'System Settings',
+                    icon: 'fa-gear',
+                    color: '#374151'
+                },
                 ];
 
                 function getModuleColor(module) {
@@ -2287,101 +2506,6 @@
                         slug: p.slug,
                         color: getModuleColor(p.module)
                     }));
-                }
-
-                /* ══════════════════════════════════════
-                   SIDEBAR
-                ══════════════════════════════════════ */
-                let sidebarExpanded = true;
-                let openFlyout = null;
-
-                function applyLayout(w) {
-                    document.getElementById('mainContent').style.marginLeft = w;
-                    document.getElementById('siteFooter').style.marginLeft = w;
-                }
-
-                function toggleSidebar() {
-                    sidebarExpanded = !sidebarExpanded;
-                    const sidebar = document.getElementById('sidebar');
-                    const icon = document.getElementById('sidebarIcon');
-
-                    if (sidebarExpanded) {
-                        sidebar.classList.replace('collapsed', 'expanded');
-                        applyLayout('240px');
-                        icon.className = 'fa-solid fa-xmark text-base';
-                        closeAllFlyouts();
-                    } else {
-                        sidebar.classList.replace('expanded', 'collapsed');
-                        applyLayout('68px');
-                        icon.className = 'fa-solid fa-bars text-base';
-                    }
-                }
-
-                function toggleSidebarGroup(id, e) {
-                    e.stopPropagation();
-
-                    if (!sidebarExpanded) {
-                        const flyout = document.getElementById('flyout-' + id);
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        flyout.style.top = rect.top + 'px';
-
-                        if (openFlyout && openFlyout !== flyout) {
-                            openFlyout.classList.remove('open');
-                        }
-
-                        flyout.classList.toggle('open');
-                        openFlyout = flyout.classList.contains('open') ? flyout : null;
-                        return;
-                    }
-
-                    const body = document.getElementById('body-' + id);
-                    const chevron = document.getElementById('chevron-' + id);
-                    const header = e.currentTarget;
-                    const isOpen = body.classList.contains('open');
-
-                    body.classList.toggle('open');
-                    if (chevron) chevron.classList.toggle('open');
-                    header.classList.toggle('active-group', !isOpen);
-                }
-
-                function closeAllFlyouts() {
-                    document.querySelectorAll('.flyout-panel').forEach(f => f.classList.remove('open'));
-                    openFlyout = null;
-                }
-
-                document.addEventListener('click', () => {
-                    closeAllFlyouts();
-                    const notifMenu = document.getElementById('notifMenu');
-                    if (notifMenu) notifMenu.classList.remove('open');
-                });
-
-                document.getElementById('notifBtn')?.addEventListener('click', e => {
-                    e.stopPropagation();
-                    document.getElementById('notifMenu')?.classList.toggle('open');
-                });
-
-                /* ══════════════════════════════════════
-                   THEME
-                ══════════════════════════════════════ */
-                const html = document.documentElement;
-
-                function applyTheme(theme) {
-                    html.setAttribute('data-theme', theme);
-                    localStorage.setItem('theme', theme);
-
-                    document.querySelectorAll('.theme-option').forEach(o => {
-                        if (o.getAttribute('data-theme') === theme) {
-                            o.classList.add('active');
-                        } else {
-                            o.classList.remove('active');
-                        }
-                    });
-
-                    const ind = document.querySelector('.theme-indicator');
-                    if (ind) {
-                        if (theme === 'dark') ind.classList.add('dark-mode');
-                        else ind.classList.remove('dark-mode');
-                    }
                 }
 
                 document.addEventListener('DOMContentLoaded', () => {
@@ -2899,16 +3023,16 @@ function openViewAs() {
                     ol.classList.add('show');
 
                     fetch("{{ route('admin.impersonate') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Accept": "application/json"
-                            },
-                            body: JSON.stringify({
-                                role: roleSlug
-                            })
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({
+                            role: roleSlug
                         })
+                    })
                         .then(async response => {
                             const data = await response.json();
 
@@ -2933,7 +3057,7 @@ function openViewAs() {
                 /* ══════════════════════════════════════
                    NEW ROLE MODAL
                 ══════════════════════════════════════ */
-                document.getElementById('newRoleName')?.addEventListener('input', function() {
+                document.getElementById('newRoleName')?.addEventListener('input', function () {
                     document.getElementById('newRoleSlug').value = this.value.toLowerCase().trim()
                         .replace(/[^a-z0-9\s-]/g, '')
                         .replace(/\s+/g, '-')
@@ -2991,7 +3115,7 @@ function openViewAs() {
                     card.dataset.pct = '0';
                     card.dataset.slug = slug;
                     card.dataset.isSuper = '0';
-                    card.onclick = function() {
+                    card.onclick = function () {
                         selectRole(this);
                     };
 
@@ -3165,7 +3289,7 @@ function openViewAs() {
                     }
                 });
 
-                document.getElementById('newRoleModal')?.addEventListener('click', function(e) {
+                document.getElementById('newRoleModal')?.addEventListener('click', function (e) {
                     if (e.target === this) closeNewRoleModal();
                 });
 
@@ -3189,11 +3313,11 @@ function openViewAs() {
 
                 function openPatientPicker(roleName, roleSlug, color) {
                     fetch("{{ route('admin.patients.list') }}", {
-                            method: "GET",
-                            headers: {
-                                "Accept": "application/json"
-                            }
-                        })
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    })
                         .then(async response => {
                             const data = await response.json();
 
@@ -3218,12 +3342,12 @@ function openViewAs() {
                 }
 
                 function renderPatientPicker(patients) {
-    const list = document.getElementById('patientPickerList');
+                    const list = document.getElementById('patientPickerList');
 
-    if (!list) return;
+                    if (!list) return;
 
-    if (!patients.length) {
-        list.innerHTML = `
+                    if (!patients.length) {
+                        list.innerHTML = `
             <div style="
                 text-align:center;
                 padding:32px 20px;
@@ -3233,17 +3357,17 @@ function openViewAs() {
                 No patient accounts found.
             </div>
         `;
-        return;
-    }
+                        return;
+                    }
 
-    list.innerHTML = patients.map(patient => {
-        const patientName = (patient.name || 'Patient').replace(/'/g, "\\'");
-        const patientEmail = patient.email || 'No email';
-        const patientPhone = patient.phone || '';
-        const patientInitial = (patient.name || 'P').charAt(0).toUpperCase();
-        const searchText = ((patient.name || '') + ' ' + (patient.email || '')).toLowerCase();
+                    list.innerHTML = patients.map(patient => {
+                        const patientName = (patient.name || 'Patient').replace(/'/g, "\\'");
+                        const patientEmail = patient.email || 'No email';
+                        const patientPhone = patient.phone || '';
+                        const patientInitial = (patient.name || 'P').charAt(0).toUpperCase();
+                        const searchText = ((patient.name || '') + ' ' + (patient.email || '')).toLowerCase();
 
-        return `
+                        return `
             <div class="va-role-row" data-patient-search="${searchText}">
                 <div class="va-role-avatar" style="background:linear-gradient(135deg,#065F46,#047857);color:#fff;">
                     ${patientInitial}
@@ -3269,8 +3393,8 @@ function openViewAs() {
                 </button>
             </div>
         `;
-    }).join('');
-}
+                    }).join('');
+                }
 
                 function filterPatientPicker(query) {
                     const q = query.toLowerCase().trim();
@@ -3328,17 +3452,17 @@ function openViewAs() {
                     ol.classList.add('show');
 
                     fetch("{{ route('admin.impersonate') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Accept": "application/json"
-                            },
-                            body: JSON.stringify({
-                                role: roleSlug,
-                                patient_id: patientId
-                            })
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({
+                            role: roleSlug,
+                            patient_id: patientId
                         })
+                    })
                         .then(async response => {
                             const data = await response.json();
 
@@ -3377,7 +3501,7 @@ function openViewAs() {
 
                     filterPatientPicker('');
                 }
-                document.addEventListener('keydown', function(e) {
+                document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape') {
                         closePatientPicker();
                     }
