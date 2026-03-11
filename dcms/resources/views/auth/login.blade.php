@@ -43,7 +43,6 @@
             justify-content: center;
             padding: 20px 16px;
             position: relative;
-            /* allow scroll on very small screens */
             overflow-x: hidden;
         }
 
@@ -186,7 +185,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shine 4s linear infinite;
+            animation: shine 16s linear infinite;
             display: block;
         }
 
@@ -640,6 +639,87 @@
             color: #888;
         }
 
+        /* ════════════════════════════
+        LOGIN FOOTER
+        ════════════════════════════ */
+
+        .login-footer {
+            width: 100%;
+            margin-top: 30px;
+            padding: 18px 16px 24px;
+            display: flex;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .login-footer-inner {
+            text-align: center;
+            color: rgba(255,255,255,.75);
+            font-size: 12px;
+            letter-spacing: .04em;
+        }
+
+        /* Divider */
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .footer-divider span {
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(201,168,76,.6),
+                transparent
+            );
+        }
+
+        .footer-divider i {
+            font-size: 11px;
+            color: rgba(255,215,0,.65);
+        }
+
+        /* Text */
+        .footer-text {
+            font-weight: 500;
+        }
+
+        .footer-year {
+            color: rgba(255,255,255,.45);
+        }
+
+        /* Links */
+        .footer-links {
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .footer-links a {
+            color: rgba(255,215,0,.75);
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+
+        .footer-links a:hover {
+            opacity: .7;
+        }
+
+        .footer-links .dot {
+            width: 4px;
+            height: 4px;
+            background: rgba(255,215,0,.45);
+            border-radius: 50%;
+        }
+
         @media (max-width: 640px) {
             #toastContainer {
                 left: 12px;
@@ -811,108 +891,134 @@
     <div class="glow-orb glow-orb-2"></div>
     <div id="toastContainer"></div>
 
-    <div class="login-card">
+    <main>
+        <div class="login-card">
 
-        <!-- LEFT / TOP: Photo Panel -->
-        <div class="photo-side">
-            <img src="/images/PUP TAGUIG CAMPUS.jpg" alt="PUP Taguig Campus">
+            <!-- LEFT / TOP: Photo Panel -->
+            <div class="photo-side">
+                <img src="/images/PUP TAGUIG CAMPUS.jpg" alt="PUP Taguig Campus">
 
-            <div class="photo-content">
-                <!-- Title first -->
-                <h2>
-                    <span class="shine-text photo-title-main">PUP TAGUIG</span>
-                    <span class="shine-text photo-title-sub">DENTAL MANAGEMENT SYSTEM</span>
-                </h2>
+                <div class="photo-content">
+                    <!-- Title first -->
+                    <h2>
+                        <span class="shine-text photo-title-main">PUP TAGUIG</span>
+                        <span class="shine-text photo-title-sub">DENTAL MANAGEMENT SYSTEM</span>
+                    </h2>
 
-                <!-- Divider -->
-                <div class="photo-divider">
-                    <div class="photo-divider-line"></div>
-                    <div class="photo-divider-dot"></div>
-                    <div class="photo-divider-line r"></div>
-                </div>
-
-                <!-- Logos below title -->
-                <div class="logo-row">
-                    <div class="logo-circle">
-                        <img src="{{ asset('images/PUP.png') }}" alt="PUP">
+                    <!-- Divider -->
+                    <div class="photo-divider">
+                        <div class="photo-divider-line"></div>
+                        <div class="photo-divider-dot"></div>
+                        <div class="photo-divider-line r"></div>
                     </div>
-                    <div class="logo-v-divider"></div>
-                    <div class="logo-circle">
-                        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="DMS">
+
+                    <!-- Logos below title -->
+                    <div class="logo-row">
+                        <div class="logo-circle">
+                            <img src="{{ asset('images/PUP.png') }}" alt="PUP">
+                        </div>
+                        <div class="logo-v-divider"></div>
+                        <div class="logo-circle">
+                            <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="DMS">
+                        </div>
+                    </div>
+
+                    <p class="photo-tagline">
+                        Your campus dental clinic, now fully digital.<br>
+                        Book appointments, view records, and more.
+                    </p>
+
+                    <div class="photo-badge">
+                        <i class="fa-solid fa-tooth" style="font-size:8px;"></i>
+                        Patient Portal
                     </div>
                 </div>
+            </div>
 
-                <p class="photo-tagline">
-                    Your campus dental clinic, now fully digital.<br>
-                    Book appointments, view records, and more.
-                </p>
+            <!-- RIGHT / BOTTOM: Form -->
+            <div class="form-side">
 
-                <div class="photo-badge">
-                    <i class="fa-solid fa-tooth" style="font-size:8px;"></i>
-                    Patient Portal
+                <div class="form-portal-label">
+                    <div class="form-portal-pip"></div>
+                    <span class="form-portal-text">Secure Login</span>
                 </div>
+
+                <h1 class="form-heading">Welcome <span>back.</span></h1>
+                <p class="form-sub">Sign in to access your dental appointments and records.</p>
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <div class="field">
+                        <label class="field-label">
+                            <i class="fa-solid fa-user"></i> Email or Username
+                        </label>
+                        <input type="text" name="email" required placeholder="Enter your email or username"
+                            class="field-input" autocomplete="username">
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">
+                            <i class="fa-solid fa-lock"></i> Password
+                        </label>
+                        <div class="pw-wrap">
+                            <input type="password" id="loginPw" name="password" required placeholder="••••••••"
+                                class="field-input" style="padding-right:46px;" autocomplete="current-password">
+                            <button type="button" class="pw-toggle" onclick="togglePw()">
+                                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        Sign In
+                        <div class="btn-arrow">
+                            <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                        </div>
+                    </button>
+                </form>
+
+                <div class="register-row">
+                    New patient? <a href="/register">Create an account</a>
+                </div>
+
             </div>
         </div>
+    </main>
 
-        <!-- RIGHT / BOTTOM: Form -->
-        <div class="form-side">
+    <!-- ══════ LOGIN FOOTER ══════ -->
+    <footer class="login-footer">
+    <div class="login-footer-inner">
 
-            <div class="form-portal-label">
-                <div class="form-portal-pip"></div>
-                <span class="form-portal-text">Secure Login</span>
-            </div>
-
-            <h1 class="form-heading">Welcome <span>back.</span></h1>
-            <p class="form-sub">Sign in to access your dental appointments and records.</p>
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-
-                <div class="field">
-                    <label class="field-label">
-                        <i class="fa-solid fa-user"></i> Email or Username
-                    </label>
-                    <input type="text" name="email" required placeholder="Enter your email or username"
-                        class="field-input" autocomplete="username">
-                </div>
-
-                <div class="field">
-                    <label class="field-label">
-                        <i class="fa-solid fa-lock"></i> Password
-                    </label>
-                    <div class="pw-wrap">
-                        <input type="password" id="loginPw" name="password" required placeholder="••••••••"
-                            class="field-input" style="padding-right:46px;" autocomplete="current-password">
-                        <button type="button" class="pw-toggle" onclick="togglePw()">
-                            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit">
-                    Sign In
-                    <div class="btn-arrow">
-                        <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
-                    </div>
-                </button>
-            </form>
-
-            <div class="register-row">
-                New patient? <a href="/register">Create an account</a>
-            </div>
-
+        <div class="footer-divider">
+        <span></span>
+        <i class="fa-solid fa-shield-halved"></i>
+        <span></span>
         </div>
+
+        <p class="footer-text">
+        <span class="footer-year">© 1998–2026</span>
+        <strong>Polytechnic University of the Philippines</strong>
+        </p>
+
+        <div class="footer-links">
+        <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms of Use</a>
+        <span class="dot"></span>
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>
+        </div>
+
     </div>
+    </footer>
 
     <script>
         /* STARS */
-        (function() {
+        (function () {
             const canvas = document.getElementById('stars');
             const ctx = canvas.getContext('2d');
             let w, h, stars = [];
@@ -996,33 +1102,33 @@
 
     {{-- ERROR from server --}}
     @if (session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () =>
-                showToast('Login Failed', "{{ session('error') }}", 'error')
-            );
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+            showToast('Login Failed', "{{ session('error') }}", 'error')
+        );
+    </script>
     @endif
 
     {{-- SUCCESS login toast: pass role name from controller via session('login_as') --}}
     @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () =>
-                showToast('Logged in successfully', "{{ session('success') }}", 'success')
-            );
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+            showToast('Logged in successfully', "{{ session('success') }}", 'success')
+        );
+    </script>
     @endif
 
     {{-- Login success with role name e.g. "Logged in successfully as Admin" --}}
     @if (session('login_as'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () =>
-                showToast(
-                    'Login Successful',
-                    'Logged in successfully as <strong>{{ session('login_as') }}</strong>',
-                    'success'
-                )
-            );
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+            showToast(
+                'Login Successful',
+                'Logged in successfully as <strong>{{ session('login_as') }}</strong>',
+                'success'
+            )
+        );
+    </script>
     @endif
 
 </body>
