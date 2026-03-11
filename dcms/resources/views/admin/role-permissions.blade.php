@@ -1586,6 +1586,67 @@
         .card-new {
             animation: cardSlide 0.4s cubic-bezier(.34, 1.56, .64, 1) both;
         }
+
+            /* ── Delete Role Button ── */
+            .btn-delete-role {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 26px;
+                height: 26px;
+                border-radius: 7px;
+                border: none;
+                background: transparent;
+                color: #C4B8AF;
+                font-size: 11px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: all .15s;
+                z-index: 10;
+            }
+            .role-card:hover .btn-delete-role {
+                opacity: 1;
+            }
+            .btn-delete-role:hover {
+                background: #FEE2E2;
+                color: #DC2626;
+            }
+
+            /* ── Delete confirm modal ── */
+            .delete-modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(15,5,5,0.55);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 500;
+                backdrop-filter: blur(4px);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .2s;
+            }
+            .delete-modal-overlay.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .delete-modal-box {
+                background: #fff;
+                border-radius: 20px;
+                padding: 32px 32px 24px;
+                width: 400px;
+                box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+                transform: scale(.94) translateY(12px);
+                transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+            }
+            .delete-modal-overlay.open .delete-modal-box {
+                transform: scale(1) translateY(0);
+            }
+
+
     </style>
 </head>
 
@@ -1893,6 +1954,51 @@
 
                     <div style="display:flex; flex-direction:column; gap:8px;" id="roleCardList">
                         @foreach ($roles as $i => $role)
+                            @php
+                                $c = getRoleBadge($role->name, $role->slug);
+                                $granted = $role->permissions->count();
+                                $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
+                                $words = array_slice(explode(' ', $role->name), 0, 2);
+                                $initials = '';
+                                foreach ($words as $_w) {
+                                    $initials .= strtoupper($_w[0]);
+                                }
+                                $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
+                                $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
+                                $isSuperRole =
+                                    in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+                                    str_contains(strtolower($role->name), 'super');
+                            @endphp
+                           <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
+                                data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
+                                data-total="{{ $totalPerms }}" data-pct="{{ $pct }}"
+                                data-slug="{{ $role->slug }}" data-is-super="{{ $isSuperRole ? '1' : '0' }}"
+                                onclick="selectRole(this)" style="position:relative;">
+
+                                 @php
+                                        $isProtectedRole = $isSuperRole || in_array(strtolower($role->slug), ['admin', 'patient', 'dentist']);
+                                    @endphp
+                                    @if (!$isProtectedRole)
+                                    <button type="button" class="btn-delete-role"
+                                    onclick="event.stopPropagation(); openDeleteModal('{{ $role->id }}', '{{ addslashes($role->name) }}')"
+                                    title="Delete role">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                @endif
+
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div class="role-avatar">{{ $initials }}</div>
+                                    <div style="flex:1;">
+                                        <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                                            <span style="font-weight:600; font-size:14px; color:#2D2420;"
+                                                class="role-name-label">{{ $role->name }}</span>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                            <span class="badge-pill"
+                                                style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{ $c['label'] }}</span>
+                                            <span
+                                                style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug }}</span>
+                                        </div>
                         @php
                         $c = getRoleBadge($role->name, $role->slug);
                         $granted = $role->permissions->count();
@@ -2192,6 +2298,36 @@
             <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
         </div>
     </footer>
+
+    <!-- ════ DELETE ROLE MODAL ════ -->
+<div class="delete-modal-overlay" id="deleteRoleOverlay" onclick="if(event.target===this)closeDeleteModal()">
+    <div class="delete-modal-box">
+        <div style="width:48px;height:48px;border-radius:14px;background:#FEF2F2;border:1.5px solid #FECACA;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;">
+            <i class="fa-solid fa-trash" style="color:#DC2626;"></i>
+        </div>
+        <h2 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#1E293B;">Delete Role</h2>
+        <p style="margin:0 0 6px;font-size:14px;color:#8A7A6F;">You are about to permanently delete:</p>
+        <div id="deleteRoleName" style="font-size:16px;font-weight:700;color:#DC2626;margin-bottom:6px;"></div>
+        <p style="margin:0 0 22px;font-size:13px;color:#B5A99A;">This action cannot be undone. All permissions assigned to this role will be removed.</p>
+
+        <div id="deleteRoleError" style="display:none;color:#B91C1C;font-size:13px;margin-bottom:12px;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="closeDeleteModal()"
+                style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">
+                Cancel
+            </button>
+            <form id="deleteRoleForm" action="" method="POST" style="display:contents;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" id="deleteRoleConfirmBtn"
+                    style="background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(220,38,38,0.3);">
+                    <i class="fa-solid fa-trash" style="font-size:12px;"></i> Delete Role
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
     <!-- ════ VIEW AS MODAL ════ -->
     <div class="va-overlay" id="vaOverlay" onclick="if(event.target===this)closeViewAs()">
@@ -3515,6 +3651,48 @@ function openViewAs() {
                     input.value = '';
                     filterPatientPicker('');
                 }
+
+                /* ══════════════════════════════════════
+                    DELETE ROLE MODAL
+                    ══════════════════════════════════════ */
+                    let deleteTargetRoleId = null;
+
+                   // Roles that cannot be deleted
+                        const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
+
+                        function openDeleteModal(roleId, roleName) {
+                            // Get the slug from the role card
+                            const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
+                            const slug = (card?.dataset.slug || '').toLowerCase().trim();
+
+                            if (PROTECTED_ROLE_SLUGS.includes(slug)) {
+                                showToast('Protected Role', `"${roleName}" is a built-in role and cannot be deleted.`);
+                                return;
+                            }
+
+                            deleteTargetRoleId = roleId;
+                            document.getElementById('deleteRoleName').textContent = roleName;
+                            document.getElementById('deleteRoleError').style.display = 'none';
+
+                            const form = document.getElementById('deleteRoleForm');
+                            form.action = `/admin/role-permissions/${roleId}/destroy`;
+
+                            document.getElementById('deleteRoleOverlay').classList.add('open');
+                            document.body.style.overflow = 'hidden';
+                        }
+
+                    function closeDeleteModal() {
+                        document.getElementById('deleteRoleOverlay').classList.remove('open');
+                        document.body.style.overflow = '';
+                        deleteTargetRoleId = null;
+                    }
+
+                    // Add ESC key support for delete modal
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') {
+                            closeDeleteModal();
+                        }
+                    });
             </script>
 
 </body>

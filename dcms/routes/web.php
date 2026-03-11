@@ -230,6 +230,10 @@ Route::prefix('admin')->group(function () {
     Route::post('/role-permissions/store-role', [RolePermissionController::class, 'storeRole'])
         ->name('admin.role_permissions.store_role');
 
+    Route::delete('/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
+        ->name('admin.role_permissions.destroy_role');
+
+
     // SYSTEM LOGS
     Route::get('/system-logs', [SystemLogController::class, 'index'])
         ->name('admin.system_logs');
@@ -252,6 +256,9 @@ Route::prefix('admin')->group(function () {
         return response()->json($patients);
 
     })->name('admin.patients.list');
+
+
+    
 
 });
 

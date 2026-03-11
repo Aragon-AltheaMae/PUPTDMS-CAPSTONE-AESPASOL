@@ -207,4 +207,27 @@ class RolePermissionController extends Controller
             ->with('success', "Role \"{$request->name}\" created successfully. You can now assign permissions.")
             ->with('new_role_id', $role->id);
     }
+
+    public function destroyRole($id)
+{
+    $role = Role::findOrFail($id);
+
+    // Prevent deleting super admin
+    if (in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) || 
+        str_contains(strtolower($role->name), 'super')) {
+        return redirect()->route('admin.role_permissions')
+            ->with('error', 'Cannot delete the Super Admin role.');
+    }
+
+    // Detach all permissions from this role first
+    $role->permissions()->detach();
+
+    // Delete the role from the database
+    $role->delete();
+
+    return redirect()->route('admin.role_permissions')
+        ->with('success', "Role '{$role->name}' has been deleted.");
+}
+
+        
 }
