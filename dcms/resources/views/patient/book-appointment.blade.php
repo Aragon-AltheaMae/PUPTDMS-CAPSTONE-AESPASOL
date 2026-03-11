@@ -1,1207 +1,1182 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book Appointment</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-
-  <!-- Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          },
+          colors: {
+            crimson: {
+              DEFAULT: '#8B0000',
+              dark: '#660000',
+              light: '#b30000',
+              faint: '#fff5f5',
+              muted: '#f9e8e8'
+            },
+            gold: '#c9a84c',
+          },
+          keyframes: {
+            fadeUp: {
+              from: {
+                opacity: '0',
+                transform: 'translateY(16px)'
+              },
+              to: {
+                opacity: '1',
+                transform: 'translateY(0)'
+              }
+            },
+            shake: {
+              '0%,100%': {
+                transform: 'translateX(0)'
+              },
+              '25%': {
+                transform: 'translateX(-5px)'
+              },
+              '75%': {
+                transform: 'translateX(5px)'
+              }
+            },
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.5s ease-out both',
+            'fade-up-1': 'fadeUp 0.5s 0.1s ease-out both',
+            'fade-up-2': 'fadeUp 0.5s 0.2s ease-out both',
+            shake: 'shake 0.3s ease',
+          },
+        }
+      }
+    }
+  </script>
   <style>
+    /* Minimal overrides not expressible in Tailwind utility classes */
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Inter';
+      font-family: 'Inter', sans-serif;
     }
 
-    /* Primary color scheme */
-    .primary-bg {
-      background-color: #8B0000 !important;
-      color: #F4F4F4 !important;
-    }
-
-    .primary-text {
-      color: #8B0000;
-    }
-
-    /* All buttons */
-    .btn,
-    .btn-primary,
-    .btn-success {
-      background-color: #8B0000 !important;
-      color: #F4F4F4 !important;
-      border: none !important;
-    }
-
-    .btn:hover,
-    .btn-primary:hover,
-    .btn-success:hover {
-      background-color: #6f0000 !important;
-    }
-
-    /* Disabled select */
-    select:disabled {
-      background-color: #eee;
-      color: #999;
-    }
-
-    /* STEPPER COLORS */
-    .step.step-primary::before {
-      background-color: #2563eb;
-      /* Blue */
-    }
-
-    .step.step-success::before {
-      background-color: #16a34a;
-      /* Green */
-    }
-
-    /* Blue color for the current step */
-    .step.in-progress-step::before {
-      background-color: #2563eb !important;
-      /* Blue circle */
-    }
-
-    /* Blue text for the current step */
-    .step.in-progress-step {
-      color: #2563eb !important;
-    }
-
-    .step-card {
-      background-color: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 1rem;
-      padding: 2rem;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-    }
-
-    .completed-text {
-      opacity: 0;
-      display: inline-block;
-      margin-left: 0.5rem;
-      font-weight: 600;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    .completed-text.show {
-      opacity: 1;
-    }
-
-    /*Calendar*/
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px 0;
-      text-align: center;
-    }
-
-    .cal-grid .day-header {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #333333;
-      padding: 4px 0 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .cal-grid .day-cell {
-      font-size: 0.85rem;
-      padding: 6px 2px;
-      border-radius: 0.4rem;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      user-select: none;
-      font-weight: 500;
-    }
-
-    .cal-grid .day-cell:hover:not(.disabled):not(.other-month) {
-      background: #f0d6d6;
-      color: #8B0000;
-    }
-
-    .cal-grid .day-cell.disabled {
-      color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .cal-grid .day-cell.other-month {
-      color: #ddd;
-      cursor: default;
-    }
-
-    .cal-grid .day-cell.today {
-      font-weight: 800;
-      color: #8B0000;
-    }
-
-    .cal-grid .day-cell.selected {
-      background: #8B0000 !important;
-      color: #fff !important;
-      font-weight: 700;
-    }
-
-    .cal-nav-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: background 0.15s;
-      color: #8B0000;
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .cal-nav-btn:hover {
-      background: #f0d6d6;
-    }
-
-    .slot-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.45rem 1rem;
-      border-radius: 9999px;
-      border: 1.5px solid #8B0000;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: #fff;
-      color: #8B0000;
-      transition: background 0.15s, color 0.15s;
-      user-select: none;
-    }
-
-    .slot-chip:hover:not(.full) {
-      background: #f0d6d6;
-    }
-
-    .slot-chip.selected {
-      background: #8B0000;
-      color: #fff;
-    }
-
-    .slot-chip.full {
-      border-color: #ccc;
-      color: #999;
-      cursor: not-allowed;
-      text-decoration: line-through;
-    }
-
-    .date-banner {
-      background: linear-gradient(135deg, #8B0000, #660000);
-      color: #fff;
-      border-radius: 0.75rem;
-      padding: 0.65rem 1.25rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      display: none;
-      box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
-    }
-
-    .date-banner.show {
-      display: block;
-    }
-
-    /* Fade-in for in-progress text */
-    .in-progress {
-      opacity: 0;
-      display: block;
-      margin-top: 0.25rem;
-      font-weight: 600;
-      color: #2563eb;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    .in-progress.show {
-      opacity: 1;
-    }
-
-    /* Fade-in animation for step content */
     .step-content {
       opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      transition: opacity 0.4s ease;
     }
 
     .step-content.show {
       opacity: 1;
     }
 
-    #miniTab {
-      transition: opacity 0.3s ease;
+    .step-circle {
+      transition: all 0.4s ease;
+    }
+
+    .step-connector {
+      transition: background 0.4s;
+    }
+
+    .slot-chip {
+      transition: all 0.2s;
+    }
+
+    .service-card-inner {
+      transition: all 0.25s;
+    }
+
+    .progress-fill {
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cal-tooltip {
       opacity: 0;
+      transition: opacity 0.15s;
       pointer-events: none;
     }
 
-    #miniTab.show {
+    .cal-cell-wrap:hover .cal-tooltip {
       opacity: 1;
-      pointer-events: auto;
     }
 
-    .input-error {
-      border: 2px solid #d10101ff !important;
+    .form-input:focus {
+      border-color: #8B0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
     }
 
-    .input-valid {
-      border: 2px solid #16a34a !important;
-      /* green */
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-fade-up {
-      animation: fadeUp 0.5s ease-out both;
-    }
-
-    /* Optional stagger delay */
-    .delay-1 {
-      animation-delay: 0.1s;
-    }
-
-    .delay-2 {
-      animation-delay: 0.2s;
-    }
-
-    .delay-3 {
-      animation-delay: 0.3s;
-    }
-
-    .delay-4 {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes shake {
-      0% {
-        transform: translateX(0);
-      }
-
-      25% {
-        transform: translateX(-4px);
-      }
-
-      50% {
-        transform: translateX(4px);
-      }
-
-      75% {
-        transform: translateX(-4px);
-      }
-
-      100% {
-        transform: translateX(0);
-      }
-    }
-
-    /* FORCE PERFECT CENTER */
-    dialog.modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -40%);
-      margin: 0;
-      border: none;
-      padding: 0;
-    }
-
-    /* Dark overlay */
-    dialog.modal::backdrop {
-      background: rgba(0, 0, 0, 0.6);
-    }
-
-    .shake {
-      animation: shake 0.3s ease-in-out;
-    }
-
-    /* --- Calendar status colors --- */
-    .day-cell.holiday {
-      background: #FFFBEB;
-      /* amber-50 */
-      color: #B45309;
-      /* amber-700 */
-      font-weight: 700;
-    }
-
-    .day-cell.full-slot {
-      background: #FFE4E6;
-      /* rose-100 */
-      color: #9F1239;
-      /* rose-800 */
-      font-weight: 700;
-    }
-
-    .day-cell.unavailable {
-      color: #cfcfcf;
-      cursor: not-allowed;
-    }
-
-    /* Dot indicator */
-    .day-cell {
-      position: relative;
-    }
-
-    .day-dot {
-      position: absolute;
-      bottom: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 9999px;
-    }
-
-    .dot-holiday {
-      background: #F59E0B;
-    }
-
-    .dot-full {
-      background: #EF4444;
-    }
-
-    .dot-unavail {
-      background: #9CA3AF;
-    }
-
-    label:has(input[name="service_type"]:checked) .service-row {
+    .q-radio:checked {
+      border-color: #8B0000;
       background: #8B0000;
+      box-shadow: inset 0 0 0 3px white;
+    }
+
+    .q-radio:hover:not(:checked) {
       border-color: #8B0000;
     }
 
-    label:has(input[name="service_type"]:checked) .service-title {
+    .cal-day {
+      transition: all 0.18s;
+    }
+
+    .cal-day:hover:not(.disabled):not(.other-month) {
+      background: #f9e8e8;
+      color: #8B0000;
+    }
+
+    .btn-primary-custom:hover {
+      background: #660000;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(139, 0, 0, 0.3);
+    }
+
+    .btn-secondary-custom:hover {
+      border-color: #8B0000;
+      color: #8B0000;
+      background: #fff5f5;
+    }
+
+    .service-card-label:hover .service-card-inner {
+      border-color: #8B0000;
+      background: #fff5f5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 0, 0, 0.1);
+    }
+
+    .service-card-label:has(input:checked) .service-card-inner {
+      border-color: #8B0000;
+      background: #8B0000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 0, 0, 0.25);
+    }
+
+    .service-card-label:has(input:checked) .svc-title {
       color: white;
     }
 
-    label:has(input[name="service_type"]:checked) .service-desc {
+    .service-card-label:has(input:checked) .svc-desc {
       color: rgba(255, 255, 255, 0.75);
     }
 
-    label:has(input[name="service_type"]:checked) .service-icon {
+    .service-card-label:has(input:checked) .svc-icon-wrap {
       background: rgba(255, 255, 255, 0.2);
     }
 
-    label:has(input[name="service_type"]:checked) .service-arrow {
-      color: white;
+    .service-card-label:has(input:checked) .svc-arrow {
+      color: rgba(255, 255, 255, 0.5);
     }
 
-    label:has(input[name="service_type"]) {
-      transition: transform 0.2s ease;
+    .confirm-checkbox-wrap:hover {
+      border-color: #8B0000;
     }
 
-    label:has(input[name="service_type"]):hover {
-      transform: scale(1.02);
+    .file-upload-zone:hover {
+      border-color: #8B0000;
+      background: #fff5f5;
+    }
+
+    .pika-single {
+      font-family: 'Inter', sans-serif !important;
+      border-radius: 12px !important;
+      border: 1.5px solid #e8e2dd !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .pika-button:hover {
+      background: #f9e8e8 !important;
+      color: #8B0000 !important;
+    }
+
+    .is-selected .pika-button {
+      background: #8B0000 !important;
+    }
+
+    .cal-nav-btn:hover {
+      background: #f9e8e8;
+      border-color: #8B0000;
+    }
+
+    .mini-tab {
+      bottom: 5rem;
+    }
+
+        /* ── HEADER ── */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 0 2rem;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .notif-btn:hover {
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff6b6b;
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8B0000;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .4);
+      object-fit: cover;
+    }
+
+    .header-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .header-role {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .7);
+      font-style: italic;
+    }
+
+    /* ── NOTIF MENU ── */
+    #notifMenu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      border: 1px solid #f0e6e6;
+      opacity: 0;
+      transform: scale(.95) translateY(-6px);
+      pointer-events: none;
+      transition: all .2s;
+      transform-origin: top right;
+      z-index: 100;
+    }
+
+    #notifMenu.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    #notifDropdown {
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .cal-time-layout {
+        grid-template-columns: 1fr !important;
+      }
+
+      .nav-btns-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .nav-btns-row button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .sm-grid-1col {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 767px) {
+      #sidebar {
+        display: none !important;
+      }
+
+      #mainContent {
+        margin-left: 0 !important;
+        padding-bottom: 90px;
+      }
+
+      #mobileBottomNav {
+        display: flex;
+      }
+
+      footer {
+        margin-bottom: 72px;
+      }
+
+      #desktopHeaderUser {
+        display: none !important;
+      }
+
+      #mobileProfileAccordion {
+        display: block;
+        position: fixed;
+        top: 62px;
+        left: 0;
+        right: 0;
+        z-index: 45;
+        background: white;
+        border-bottom: 1px solid #f0e0e0;
+        box-shadow: 0 4px 20px rgba(139, 0, 0, .08);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height .35s cubic-bezier(.4, 0, .2, 1), opacity .25s ease;
+        opacity: 0;
+      }
+
+      #mobileProfileAccordion.open {
+        max-height: 200px;
+        opacity: 1;
+      }
+
+      #mobileProfileToggle {
+        display: flex !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #mobileProfileToggle {
+        display: none !important;
+      }
+
+      #darkModeFab {
+        display: none !important;
+      }
+
+      #mobileBottomNav {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-title {
+        display: none;
+        font-size: .55rem;
+      }
+
+      .header-name,
+      .header-role {
+        display: none;
+      }
+
+      .header {
+        padding: 0 1rem;
+      }
     }
   </style>
 </head>
 
-<body class="bg-[#F4F4F4]">
+@php
+  $notifications = collect($notifications ?? []);
+  $notifCount = $notifications->count();
+@endphp
+
+<body class="bg-[#F4F4F4] text-[#8B0000] min-h-screen"
+  style="background-image: radial-gradient(circle at 20% 50%, rgba(139,0,0,0.03) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(201,168,76,0.04) 0%, transparent 50%);">
 
   <!-- HEADER -->
-  <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-[#F4F4F4] px-6 py-4 flex items-center justify-between">
-    <a href="{{ route('homepage') }}" class="flex items-center gap-3">
-      <div class="w-12 ml-5">
-        <img src="images/PUP.png" alt="PUP Logo">
+  <header class="header">
+    <div class="header-left">
+      <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
+      <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
+      <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
+    </div>
+    <div class="header-right">
+      <div id="notifDropdown">
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
+        </button>
+        <div id="notifMenu">
+          <div
+            style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">
+            Notifications</div>
+          <div style="max-height:260px;overflow-y:auto;">
+            @forelse($notifications as $n)
+              <a href="{{ $n['url'] ?? '#' }}"
+                style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
+                <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+                @if(!empty($n['message']))
+                <div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
+              </a>
+            @empty
+              <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all caught up.</div>
+            @endforelse
+          </div>
+        </div>
       </div>
-      <div class="w-12">
-        <img src="images/PUPT-DMS-Logo.png" alt="Clinic Logo">
+      <button id="mobileProfileToggle" onclick="toggleMobileProfile()"
+        style="display:none;align-items:center;gap:.6rem;background:none;border:none;cursor:pointer;padding:0;">
+        <img class="header-avatar"
+          src="{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          alt="Profile">
+        <i id="mobileProfileChevron"
+          class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
+      </button>
+      <div class="header-user" id="desktopHeaderUser">
+        <img class="header-avatar"
+          src="{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          alt="Profile">
+        <div>
+          <div class="header-name">{{ ucwords(strtolower($patient->name)) }}</div>
+          <div class="header-role">Student</div>
+        </div>
       </div>
-      <span class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</span>
-    </a>
+    </div>
+  </header>
 
-    <a href="{{ route('homepage') }}" class="flex items-center gap-2 bg-white text-[#8B0000] px-3 py-1 rounded-lg hover:bg-gray-100 transition">
-      <span class="font-semibold text-sm">Back to Home</span>
+  <!-- ════ PAGE HERO ════ -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4 animation animate-fade-up text-center">
+    <p class="text-xs font-semibold uppercase tracking-widest mb-2 text-[#8B0000]">
+      <i class="fa-regular fa-calendar-check mr-1"></i> Dental Appointment System
+    </p>
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000] mb-2">Book an Appointment</h1>
+    <p class="text-sm text-[#9e9690] max-w-md mx-auto">Complete all five steps to schedule your dental visit at PUP
+      Taguig Dental Clinic.</p>
+  </div>
+
+  <div class="flex items-center justify-center gap-3 mt-3">
+    <div class="hidden sm:flex items-center gap-2 flex-1 max-w-xs">
+      <span class="text-xs text-[#9e9690] font-semibold whitespace-nowrap">Step <span id="stepCounterText">1</span> of 5</span>
+      <div class="flex-1 h-[5px] rounded-full bg-[#e8e2dd] overflow-hidden">
+        <div id="headerProgressFill" class="h-full rounded-full bg-[#c9a84c] progress-fill" style="width:20%"></div>
+      </div>
+    </div>
+    <a href="{{ route('homepage') }}"
+      class="flex items-center gap-1.5 bg-[#8B0000] hover:bg-[#660000] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-[#660000] transition">
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      <span class="hidden sm:inline">Back to Home</span>
+      <span class="sm:hidden">Home</span>
     </a>
   </div>
 
-  <div class="max-w-4xl mx-auto px-6 pt-10 pb-4 text-center animate-fade-up">
-    <h1 class="text-4xl font-extrabold text-[#660000] mt-4">Book an Appointment</h1>
-    <p class="text-sm text-gray-400 mt-2 mb-6">Complete all steps to schedule your dental visit.</p>
-  </div>
+  <!-- ════ MAIN ════ -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
 
-  <div class="max-w-4xl mx-auto px-6 pb-16">
-    <div class="bg-white rounded-2xl shadow-xl p-8">
-
-      <!-- MAIN FORM -->
-      <ul class="steps w-full mb-10">
-        <li class="step step-primary" id="s1">Date & Time</li>
-        <li class="step" id="s2">Service</li>
-        <li class="step" id="s3">Dental History</li>
-        <li class="step" id="s4">Medical History</li>
-        <li class="step" id="s5">Confirmation</li>
-      </ul>
-
-      <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <!-- STEP 1 -->
-        <div class="step-content hidden">
-          <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-[1px] border-[#660000] pb-2 mb-10">
-            Select Date and Time
-          </h2>
-
-          <!-- Hidden inputs keep same names for form submission -->
-          <input type="hidden" id="appointment_date" name="appointment_date" required>
-          <input type="hidden" id="appointment_time" name="appointment_time" required>
-
-          <div class="flex flex-col gap-6">
-
-            <div class="bg-white border-[1px] border-gray-300 rounded-2xl p-8 flex-shrink-0 mx-auto" style="width: 600px;">
-              <div id="calendarSkeletonContainer"></div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                <span class="text-sm text-[#333]">Full Slot</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                <span class="text-sm text-[#333]">Holiday</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-gray-400"></span>
-                <span class="text-sm text-[#333]">Not Available</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#8B0000]">
-                </span>
-                <span class="text-sm text-[#333]">Today</span>
-              </div>
-            </div>
-
-            <!-- TIME SLOTS -->
-            <div class="flex-1 w-full">
-              <label class="text-m font-bold text-[#8B0000] block mb-3">Available Time Slots</label>
-              <div class="date-banner mb-4" id="dateBanner"></div>
-              <div id="slotContainer" class="hidden">
-                <p class="text-xs text-gray-500 mb-3 italic">Click a slot to select your preferred time.</p>
-                <div class="flex flex-wrap gap-2" id="slotGrid"></div>
-                <div id="selectedSlotDisplay" class="mt-4 text-m font-semibold text-[#8B0000] hidden">
-                  <i class="fa-regular fa-clock mr-1"></i> Selected Time: <span id="selectedSlotText" class="text-[#333333]"></span>
-                </div>
-              </div>
-              <div id="slotPlaceholder" class="text-sm text-gray-400 italic mt-2">
-                <i class="fa-regular fa-calendar-xmark mr-1"></i> Please select a date first.
-              </div>
-            </div>
-
-          </div>
+    <!-- STEPPER -->
+    <div class="w-full mt-6 mb-0 animate-fade-up-1 py-3 px-2" style="overflow: hidden;">
+      <div class="flex items-start justify-between w-full" style="padding: 6px 0;">
+        <!-- Node 1 -->
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
+          <div id="sc1"
+            class="step-circle w-10 h-10 rounded-full border-2 border-blue-600 bg-blue-600 flex items-center justify-center text-sm font-bold text-white shadow-[0_0_0_6px_rgba(37,99,235,0.12)] scale-110">
+            1</div>
+          <span id="sl1"
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-blue-600 text-center hidden sm:block mt-4">Date
+            &amp; Time</span>
         </div>
-
-        <!-- STEP 2 -->
-        <div class="step-content hidden">
-          <h2 class="text-2xl font-extrabold mb-6 text-[#660000] border-b-2 border-[#660000] pb-2">
-            Select Service Type
-          </h2>
-
-          <div class="flex flex-col gap-3 pt-4">
-
-            <!-- Card 1 -->
-            <label class="cursor-pointer">
-              <input type="radio" name="service_type" value="Oral Check-up" class="hidden peer" required>
-              <div class="service-row flex items-center gap-5 bg-[#FAFAFA] border-2 border-gray-200 rounded-xl px-6 py-4
-                  hover:border-[#8B0000] hover:bg-[#FFF5F5]
-                  transition-all duration-200 shadow-sm hover:shadow-md">
-                <div class="service-icon w-14 h-14 bg-[#8B0000] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <img src="images/oral-checkup.png" class="w-9 h-9 brightness-0 invert" />
-                </div>
-                <div class="flex-1">
-                  <p class="service-title font-bold text-[#333333] text-base">Oral Check-Up</p>
-                  <p class="service-desc text-sm text-gray-400 mt-0.5">Routine oral examination • Dental Consultation</p>
-                </div>
-                <i class="service-arrow fa-solid fa-chevron-right text-gray-300 text-sm flex-shrink-0"></i>
-              </div>
-            </label>
-
-            <!-- Card 2 -->
-            <label class="cursor-pointer">
-              <input type="radio" name="service_type" value="Dental Cleaning" class="hidden peer">
-              <div class="service-row flex items-center gap-5 bg-[#FAFAFA] border-2 border-gray-200 rounded-xl px-6 py-4
-                  hover:border-[#8B0000] hover:bg-[#FFF5F5]
-                  transition-all duration-200 shadow-sm hover:shadow-md">
-                <div class="service-icon w-14 h-14 bg-[#8B0000] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <img src="images/dental-cleaning.png" class="w-9 h-9 brightness-0 invert" />
-                </div>
-                <div class="flex-1">
-                  <p class="service-title font-bold text-[#333333] text-base">Dental Cleaning</p>
-                  <p class="service-desc text-sm text-gray-400 mt-0.5">Oral hygiene treatment • Removing surface buildup</p>
-                </div>
-                <i class="service-arrow fa-solid fa-chevron-right text-gray-300 text-sm flex-shrink-0"></i>
-              </div>
-            </label>
-
-            <!-- Card 3 -->
-            <label class="cursor-pointer">
-              <input type="radio" name="service_type" value="Restoration & Prosthesis" class="hidden peer">
-              <div class="service-row flex items-center gap-5 bg-[#FAFAFA] border-2 border-gray-200 rounded-xl px-6 py-4
-                  hover:border-[#8B0000] hover:bg-[#FFF5F5]
-                  transition-all duration-200 shadow-sm hover:shadow-md">
-                <div class="service-icon w-14 h-14 bg-[#8B0000] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <img src="images/restoration-prosthesis.png" class="w-9 h-9 brightness-0 invert" />
-                </div>
-                <div class="flex-1">
-                  <p class="service-title font-bold text-[#333333] text-base">Restoration & Prosthesis</p>
-                  <p class="service-desc text-sm text-gray-400 mt-0.5">Repairs/replaces damaged teeth • Fillings • Crowns • Bridges</p>
-                </div>
-                <i class="service-arrow fa-solid fa-chevron-right text-gray-300 text-sm flex-shrink-0"></i>
-              </div>
-            </label>
-
-            <!-- Card 4 -->
-            <label class="cursor-pointer">
-              <input type="radio" name="service_type" value="Dental Surgery" class="hidden peer">
-              <div class="service-row flex items-center gap-5 bg-[#FAFAFA] border-2 border-gray-200 rounded-xl px-6 py-4
-                  hover:border-[#8B0000] hover:bg-[#FFF5F5]
-                  transition-all duration-200 shadow-sm hover:shadow-md">
-                <div class="service-icon w-14 h-14 bg-[#8B0000] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <img src="images/dental-surgery.png" class="w-9 h-9 brightness-0 invert" />
-                </div>
-                <div class="flex-1">
-                  <p class="service-title font-bold text-[#333333] text-base">Dental Surgery</p>
-                  <p class="service-desc text-sm text-gray-400 mt-0.5">Treating dental issues surgically • Extraction • Implants</p>
-                </div>
-                <i class="service-arrow fa-solid fa-chevron-right text-gray-300 text-sm flex-shrink-0"></i>
-              </div>
-            </label>
-
-            <!-- Card 5 -->
-            <label class="cursor-pointer">
-              <input type="radio" name="service_type" value="Others" class="hidden peer">
-              <div class="service-row flex items-center gap-5 bg-[#FAFAFA] border-2 border-gray-200 rounded-xl px-6 py-4
-                  hover:border-[#8B0000] hover:bg-[#FFF5F5]
-                  transition-all duration-200 shadow-sm hover:shadow-md">
-                <div class="service-icon w-14 h-14 bg-[#8B0000] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <img src="images/dental-others.png" class="w-9 h-9 brightness-0 invert" />
-                </div>
-                <div class="flex-1">
-                  <p class="service-title font-bold text-[#333333] text-base">Others</p>
-                  <p class="service-desc text-sm text-gray-400 mt-0.5">Can't find your service? Let us know what you need.</p>
-                </div>
-                <i class="service-arrow fa-solid fa-chevron-right text-gray-300 text-sm flex-shrink-0"></i>
-              </div>
-            </label>
-
-          </div>
+        <div id="conn1" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <!-- Node 2 -->
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
+          <div id="sc2"
+            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
+            2</div>
+          <span id="sl2"
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Service</span>
         </div>
+        <div id="conn2" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <!-- Node 3 -->
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
+          <div id="sc3"
+            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
+            3</div>
+          <span id="sl3"
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Dental
+            History</span>
+        </div>
+        <div id="conn3" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <!-- Node 4 -->
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
+          <div id="sc4"
+            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
+            4</div>
+          <span id="sl4"
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Medical
+            History</span>
+        </div>
+        <div id="conn4" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <!-- Node 5 -->
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
+          <div id="sc5"
+            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
+            5</div>
+          <span id="sl5"
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Confirmation</span>
+        </div>
+      </div>
+    </div>
 
-        <!-- STEP 3 -->
-        <div class="step-content hidden">
-          <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
+    <!-- BOOKING CARD -->
+    <div
+      class="mt-6 bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.08),0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden animate-fade-up-2">
+      <div class="h-1 w-full" style="background: linear-gradient(90deg, #660000, #8B0000, #c9a84c)"></div>
+      <div class="p-6 sm:p-8">
 
-            <!-- TITLE -->
-            <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Dental History</h2>
-            <hr class="border-[#8B0000] border-2 w-full mb-4">
+        <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST"
+          enctype="multipart/form-data">
+          @csrf
 
-            <p class="text-sm text-gray-600 mb-6">
-              Share your past dental records, treatments, or concerns for better assessment.
-            </p>
+          <!-- ════ STEP 1: DATE & TIME ════ -->
+          <div class="step-content hidden">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Date &amp; Time</h2>
+            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
 
-            <!-- BASIC INFO -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div>
-                <label class="text-sm font-semibold block mb-1">Last Dental Visit:</label>
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="lastDentalVisit"
-                    name="last_dental_visit"
-                    class="input input-sm border-[#8B0000] w-60"
-                    placeholder="Select date"
-                    readonly
-                    required>
+            <input type="hidden" id="appointment_date" name="appointment_date" required>
+            <input type="hidden" id="appointment_time" name="appointment_time" required>
+
+            <div class="cal-time-layout grid gap-5 items-start" style="grid-template-columns: 1fr 280px;">
+
+              <!-- CALENDAR -->
+              <div class="border border-[#e8e2dd] rounded-2xl p-5 bg-white">
+                <div id="calendarSkeletonContainer"></div>
+                <div class="mt-4 pt-3 border-t border-[#f0ebe6] flex flex-wrap gap-x-4 gap-y-2 justify-center">
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
+                      class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span> Full Slot</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
+                      class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span> Holiday</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
+                      class="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0"></span> Unavailable</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
+                      class="w-2 h-2 rounded-full bg-[#8B0000] flex-shrink-0"></span> Today</div>
                 </div>
               </div>
 
-              <div>
-                <label class="text-sm font-semibold block mb-1">Previous Dentist: Dr.</label>
-                <input
-                  type="text"
-                  name="previous_dentist"
-                  class="input input-sm border-[#8B0000] w-full"
-                  maxlength="50"
-                  placeholder="Name">
+              <!-- TIME SLOTS -->
+              <div class="border border-[#e8e2dd] rounded-2xl p-5 bg-white flex flex-col">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-regular fa-clock text-xs"></i> Available Times
+                  <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+
+                <div id="dateBanner" class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md"
+                  style="background: linear-gradient(135deg, #660000, #8B0000)"></div>
+
+                <div id="slotContainer" class="hidden">
+                  <p class="text-xs text-[#9e9690] mb-2 italic">Select your preferred time slot.</p>
+                  <div id="slotGrid" class="flex flex-col gap-2"></div>
+                  <div id="selectedSlotDisplay"
+                    class="hidden mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#8B0000] bg-[#f9e8e8] border border-[#8B0000]/20">
+                    <i class="fa-solid fa-circle-check mr-1.5"></i>Selected: <span id="selectedSlotText"
+                      class="font-bold"></span>
+                  </div>
+                </div>
+
+                <div id="slotPlaceholder"
+                  class="flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690] flex-1">
+                  <div
+                    class="w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
+                    <i class="fa-regular fa-calendar"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-[#5c5550]">Choose a date</p>
+                    <p class="text-xs mt-1">Select an available day to see time slots.</p>
+                  </div>
+                </div>
               </div>
+
             </div>
+          </div>
 
-            <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
-              <span>
-                Please indicate <span class="font-bold">YES</span> or <span class="font-bold">NO</span> to the following:
-              </span>
-              <span class="text-center">YES</span>
-              <span class="text-center">NO</span>
-            </div>
+          <!-- ════ STEP 2: SERVICE ════ -->
+          <div class="step-content hidden">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Service Type</h2>
+            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
 
-            <!-- QUESTIONS -->
-            <div class="space-y-3 text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
 
-              <!-- REUSABLE FORMAT -->
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Do your gums bleed while brushing/flossing?</span>
-                <input type="radio" name="bleeding_gums" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="bleeding_gums" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
+              @php
+                $services = [
+                  ['value' => 'Oral Check-up', 'img' => 'oral-checkup', 'title' => 'Oral Check-Up', 'desc' => 'Routine exam • Consultation'],
+                  ['value' => 'Dental Cleaning', 'img' => 'dental-cleaning', 'title' => 'Dental Cleaning', 'desc' => 'Oral hygiene • Surface buildup'],
+                  ['value' => 'Restoration & Prosthesis', 'img' => 'restoration-prosthesis', 'title' => 'Restoration & Prosthesis', 'desc' => 'Fillings • Crowns • Bridges'],
+                  ['value' => 'Dental Surgery', 'img' => 'dental-surgery', 'title' => 'Dental Surgery', 'desc' => 'Extraction • Implants'],
+                ];
+              @endphp
 
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are your teeth sensitive to hot or cold?</span>
-                <input type="radio" name="sensitive_temp" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sensitive_temp" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are your teeth sensitive to sweets or sour?</span>
-                <input type="radio" name="sensitive_taste" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sensitive_taste" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Do you feel any pain in your teeth?</span>
-                <input type="radio" name="tooth_pain" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="tooth_pain" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Do you have any sores/lumps in or near your mouth?</span>
-                <input type="radio" name="sores" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="sores" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Have you had any head,neck, or jaw injuries?</span>
-                <input type="radio" name="injuries" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="injuries" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-            </div><!-- END QUESTIONS -->
-
-            <hr class="border-[#8B0000] border-2 my-8">
-
-            <!-- SECOND SECTION -->
-            <p class="font-semibold mb-3 text-sm">
-              Have you ever experienced any of the following?
-            </p>
-
-            <div class="space-y-3 text-sm">
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Clicking</span>
-                <input type="radio" name="clicking" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="clicking" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Pain (joint, side of the face)</span>
-                <input type="radio" name="joint_pain" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="joint_pain" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Difficulty in opening/closing</span>
-                <input type="radio" name="difficulty_moving" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="difficulty_moving" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Difficulty in chewing</span>
-                <input type="radio" name="difficulty_chewing" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="difficulty_chewing" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Frequent headaches</span>
-                <input type="radio" name="jaw_headaches" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="jaw_headaches" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Do you clench or grind your teeth?</span>
-                <input type="radio" name="clench_grind" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="clench_grind" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Frequent lips/cheek biting</span>
-                <input type="radio" name="biting" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="biting" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Have you noticed loosening your teeth?</span>
-                <input type="radio" name="teeth_loosening" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="teeth_loosening" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Does food get caught between your teeth?</span>
-                <input type="radio" name="food_teeth" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="food_teeth" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Have you ever had reaction to any kind of medicine or dental anesthetic?</span>
-                <input type="radio" name="med_reaction" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="med_reaction" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-            </div>
-
-            <p class="text-xs text-[#8B0000] mt-3 mb-6 italic">
-              <span class="text-xs italic text-[#8B0000]">If <b>YES</b>, please provide details during consultation.</span>
-            </p>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
-              <span class="text-sm">Have you had any periodontal (gum) treatment?</span>
-              <input type="radio" name="periodontal" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="periodontal" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4">
-              <span class="text-sm">Have you had a difficult tooth extraction?</span>
-              <input type="radio" name="difficult_extraction" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="difficult_extraction" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <!-- DATE BOX - only shows if YES -->
-            <div class="mt-2 ml-8 hidden" id="extraction_date_box">
-              <label class="text-xs italic text-[#8B0000]">Date of extraction:</label>
-              <div class="flex gap-2">
-                <input
-                  type="text"
-                  id="extractionDate"
-                  name="extraction_date"
-                  class="input input-sm border-[#8B0000] w-60"
-                  placeholder="Select date"
-                  readonly>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
-              <span class="text-sm">Have you had prolonged bleeding following tooth extractions before?</span>
-              <input type="radio" name="prolonged_bleeding" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="prolonged_bleeding" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
-              <span class="text-sm">Do you wear complete or partial dentures?</span>
-              <input type="radio" name="dentures" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="dentures" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div class="mt-2 ml-8 hidden" id="dentures_date_box">
-              <label class="text-xs italic text-[#8B0000]">If yes, date of placement:</label>
-              <div class="flex gap-2">
-                <input
-                  type="text"
-                  id="denturesDate"
-                  name="dentures_date"
-                  class="input input-sm border-[#8B0000] w-60"
-                  placeholder="Select date"
-                  readonly>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4 mb-4">
-              <span class="text-sm">Have you had orthodontic treatment?</span>
-              <input type="radio" name="ortho_treatment" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="ortho_treatment" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div class="mt-2 ml-8 hidden" id="ortho_date_box">
-              <label class="text-xs italic text-[#8B0000]">If yes, date of completion:</label>
-              <div class="flex gap-2">
-                <input
-                  type="text"
-                  id="orthoDate"
-                  name="ortho_date"
-                  class="input input-sm border-[#8B0000] w-60"
-                  placeholder="Select date"
-                  readonly>
-              </div>
-            </div>
-
-            <hr class="border-[#8B0000] border-2 my-8">
-
-            <!-- THIRD SECTION -->
-            <p class="font-bold mb-3 text-sm">
-              Additional Concerns
-            </p>
-
-            <textarea
-              name="additional_concerns"
-              id="additional_concerns"
-              class="w-full border-[#8B0000] rounded-md p-2 text-sm resize-none"
-              placeholder="Write any additional concerns here..."
-              rows="4">
-  </textarea>
-
-          </div><!-- END bg card -->
-        </div><!-- END step-content -->
-
-
-        <!-- STEP 4 -->
-        <div class="step-content hidden">
-          <div class="bg-[#F4F4F4] shadow-xl rounded-xl p-8">
-
-            <!-- TITLE -->
-            <h2 class="text-2xl font-bold text-[#8B0000] mb-1">Medical History</h2>
-            <hr class="border-[#8B0000] border-2 w-full mb-4">
-
-            <p class="text-sm text-gray-600 mb-6">
-              Provide important medical information to help the dentist ensure safe and proper care.
-            </p>
-
-            <!-- YES / NO HEADER -->
-            <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
-              <span>Please indicate <b>YES</b> or <b>NO</b>:</span>
-              <span class="text-center">YES</span>
-              <span class="text-center">NO</span>
-            </div>
-
-            <!-- QUESTIONS -->
-            <div class="space-y-4 text-sm">
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are you in good health?</span>
-                <input type="radio" name="good_health" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="good_health" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="ml-8 hidden" id="good_health_box">
-                <label class="text-xs italic text-[#8B0000]">If NO, please provide details:</label>
-                <input
-                  type="text"
-                  name="good_health_details"
-                  class="input input-sm border-[#8B0000] w-full"
-                  placeholder="Input here">
-              </div>
-
-              <!-- LAST MEDICAL EXAM -->
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
-                <span>When was your last medical examination?</span>
-                <input type="radio" name="had_medical_exam" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="had_medical_exam" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <!-- DATE FIELD (HIDDEN INITIALLY) -->
-              <div class="ml-8 hidden" id="medical_exam_box">
-                <label class="text-xs italic text-[#8B0000] mb-1 block">
-                  If YES, when was your last medical examination?
+              @foreach($services as $svc)
+                <label class="service-card-label block cursor-pointer">
+                  <input type="radio" name="service_type" value="{{ $svc['value'] }}" class="hidden" {{ $loop->first ? 'required' : '' }}>
+                  <div
+                    class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                    <div
+                      class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                      <img src="images/{{ $svc['img'] }}.png" class="w-6 h-6"
+                        style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $svc['title'] }}</p>
+                      <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $svc['desc'] }}</p>
+                    </div>
+                    <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                  </div>
                 </label>
-                <input
-                  type="text"
-                  id="medicalExamDate"
-                  name="medical_exam_date"
-                  class="input input-sm border-[#8B0000] w-60"
-                  placeholder="Select date"
-                  readonly>
-              </div>
+              @endforeach
 
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
-                <span>Are you currently receiving treatment for any illness?</span>
-                <input type="radio" name="under_treatment" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="under_treatment" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="ml-8 hidden" id="treatment_box">
-                <label class="text-xs italic text-[#8B0000]">If YES, please specify:</label>
-                <input
-                  type="text"
-                  name="treatment_details"
-                  class="input input-sm border-[#8B0000] w-full"
-                  placeholder="Input here">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mt-4">
-                <span>Have you ever been hospitalized?</span>
-                <input type="radio" name="hospitalized" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="hospitalized" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="ml-8 hidden" id="hospital_box">
-                <label class="text-xs italic text-[#8B0000]">If YES, please provide details:</label>
-                <input
-                  type="text"
-                  name="hospital_details"
-                  class="input input-sm border-[#8B0000] w-full"
-                  placeholder="Input here">
-              </div>
+              <label class="service-card-label block cursor-pointer sm:col-span-2">
+                <input type="radio" name="service_type" value="Others" class="hidden">
+                <div
+                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                  <div
+                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                    <img src="images/dental-others.png" class="w-6 h-6"
+                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
+                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let us know what you
+                      need.</p>
+                  </div>
+                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                </div>
+              </label>
 
             </div>
+          </div>
 
-            <hr class="border-[#8B0000] border-2 my-8">
-            <p class="font-semibold mb-3 text-sm">Are you allergic to any of the following?</p>
+          <!-- ════ STEP 3: DENTAL HISTORY ════ -->
+          <div class="step-content hidden">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Dental History</h2>
+            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+            <p class="text-sm text-[#5c5550] mb-6">Share your past dental records, treatments, or concerns for a better
+              assessment.</p>
 
-            <div class="space-y-3 text-sm">
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Medicines</span>
-                <input type="radio" name="allergy_medicine" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="allergy_medicine" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Food</span>
-                <input type="radio" name="allergy_food" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="allergy_food" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="ml-8">
-                <label class="text-xs italic text-[#8B0000]">Others (please specify):</label>
-                <input
-                  type="text"
-                  name="allergy_others"
-                  class="input input-sm border-[#8B0000] w-60"
-                  placeholder="Input here">
+            <!-- Basic Info -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-4">
+                <i class="fa-regular fa-calendar-days text-xs"></i> Basic Info <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Last Dental Visit</label>
+                  <input type="text" id="lastDentalVisit" name="last_dental_visit"
+                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Select date" readonly required>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Previous Dentist</label>
+                  <input type="text" name="previous_dentist" maxlength="50"
+                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Dr. Name">
+                </div>
               </div>
             </div>
 
-            <!-- MEDICATION -->
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 text-sm mt-4">
-              <span>Are you taking any prescription or non-prescription medication?</span>
-              <input type="radio" name="medication" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="medication" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div class="ml-8 hidden" id="medication_box">
-              <label class="text-xs italic text-[#8B0000]">If YES, please specify:</label>
-              <input
-                type="text"
-                name="medication_details"
-                class="input input-sm border-[#8B0000] w-full"
-                placeholder="Input here">
-            </div>
-
-            <hr class="border-[#8B0000] border-2 my-8">
-            <p class="text-sm font-bold text-[#8B0000] mb-4">
-              For WOMEN only:
-            </p>
-
-            <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
-              <span></span>
-              <span class="text-center">YES</span>
-              <span class="text-center">NO</span>
-            </div>
-
-            <div class="space-y-3 text-sm">
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are you pregnant?</span>
-                <input type="radio" name="pregnant" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="pregnant" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
+            <!-- Dental Symptoms -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-tooth text-xs"></i> Dental Symptoms <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
               </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are you nursing?</span>
-                <input type="radio" name="nursing" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="nursing" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Are you taking birth control pills?</span>
-                <input type="radio" name="birth_control" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="birth_control" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-            </div>
-
-            <!-- MEDICAL CONDITIONS -->
-            <hr class="border-[#8B0000] border-2 my-8">
-            <p class="text-sm font-semibold mb-4">
-              Please indicate below if you presently have or have ever had any of the following:
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-10 text-sm">
-              @foreach($diseases as $d)
-                <label class="flex items-center gap-2">
-                  <input type="checkbox"
-                        name="diseases[]"
-                        value="{{ $d->code }}"
-                        class="checkbox checkbox-sm border-[#8B0000]">
-                  {{ $d->label }}
-                </label>
+              @php
+                $dentalQ1 = [
+                  ['name' => 'bleeding_gums', 'q' => 'Do your gums bleed while brushing/flossing?'],
+                  ['name' => 'sensitive_temp', 'q' => 'Are your teeth sensitive to hot or cold?'],
+                  ['name' => 'sensitive_taste', 'q' => 'Are your teeth sensitive to sweets or sour?'],
+                  ['name' => 'tooth_pain', 'q' => 'Do you feel any pain in your teeth?'],
+                  ['name' => 'sores', 'q' => 'Do you have any sores/lumps in or near your mouth?'],
+                  ['name' => 'injuries', 'q' => 'Have you had any head, neck, or jaw injuries?'],
+                ];
+              @endphp
+              @foreach($dentalQ1 as $q)
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
+                  <span class="leading-snug">{{ $q['q'] }}</span>
+                  <input type="radio" name="{{ $q['name'] }}" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    {{ $loop->first ? 'required' : '' }}>
+                  <input type="radio" name="{{ $q['name'] }}" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
               @endforeach
             </div>
 
-            <hr class="border-[#8B0000] border-2 my-8">
-
-            <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
-              <span>Do use tobacco products or any derivatives?</span>
-              <span class="text-center">YES</span>
-              <span class="text-center">NO</span>
-            </div>
-
-            <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4 mb-4 text-sm">
-              <span></span>
-              <input type="radio" name="tobacco_use" value="YES"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-              <input type="radio" name="tobacco_use" value="NO"
-                class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-            </div>
-
-            <div id="tobacco_details" class="ml-4 space-y-2 hidden text-sm">
-              <div class="flex items-center gap-2">
-                <span class="text-xs italic text-[#8B0000]">If yes, how much per day:</span>
-                <input type="text" name="tobacco_per_day" placeholder="Input here"
-                  class="input input-sm border-[#8B0000] w-40">
+            <!-- Jaw & Bite -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-circle-dot text-xs"></i> Jaw &amp; Bite Symptoms <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
               </div>
-
-              <div class="flex items-center gap-2">
-                <span class="text-xs italic text-[#8B0000]">per week:</span>
-                <input type="text" name="tobacco_per_week" placeholder="Input here"
-                  class="input input-sm border-[#8B0000] w-40">
-              </div>
-            </div>
-
-            <hr class="border-[#8B0000] border-2 my-8">
-
-            <p class="text-sm font-semibold mb-4">Do you suffer from:</p>
-
-            <div class="grid grid-cols-[1fr_60px_60px] gap-4 text-sm font-semibold mb-2 items-center">
-              <span></span>
-              <span class="text-center">YES</span>
-              <span class="text-center">NO</span>
-            </div>
-
-            <div class="space-y-3 text-sm">
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Headaches</span>
-                <input type="radio" name="headaches" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="headaches" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Earaches</span>
-                <input type="radio" name="earaches" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="earaches" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-
-              <div class="grid grid-cols-[1fr_60px_60px] items-center gap-4">
-                <span>Neck aches</span>
-                <input type="radio" name="neck_aches" value="YES"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto" required>
-                <input type="radio" name="neck_aches" value="NO"
-                  class="appearance-none w-4 h-4 border-2 border-[#8B0000] rounded-sm checked:bg-[#8B0000] mx-auto">
-              </div>
-            </div>
-
-            <!-- EMERGENCY CONTACT -->
-            <hr class="border-[#8B0000] border-2 my-8">
-            <p class="text-sm font-bold text-[#8B0000] mb-6">
-              Emergency Contact
+              @php
+                $dentalQ2 = [
+                  ['name' => 'clicking', 'q' => 'Clicking'],
+                  ['name' => 'joint_pain', 'q' => 'Pain (joint, side of the face)'],
+                  ['name' => 'difficulty_moving', 'q' => 'Difficulty in opening/closing'],
+                  ['name' => 'difficulty_chewing', 'q' => 'Difficulty in chewing'],
+                  ['name' => 'jaw_headaches', 'q' => 'Frequent headaches'],
+                  ['name' => 'clench_grind', 'q' => 'Do you clench or grind your teeth?'],
+                  ['name' => 'biting', 'q' => 'Frequent lips/cheek biting'],
+                  ['name' => 'teeth_loosening', 'q' => 'Have you noticed loosening of your teeth?'],
+                  ['name' => 'food_teeth', 'q' => 'Does food get caught between your teeth?'],
+                  ['name' => 'med_reaction', 'q' => 'Have you ever had a reaction to any medicine or dental anesthetic?'],
+                ];
+              @endphp
+              @foreach($dentalQ2 as $q)
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
+                  <span class="leading-snug">{{ $q['q'] }}</span>
+                  <input type="radio" name="{{ $q['name'] }}" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="{{ $q['name'] }}" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+              @endforeach
+              <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
+              <i class="fa-solid fa-circle-info mr-1"></i> If <b>YES</b>, please provide details during your
+              consultation.
             </p>
+            </div>
 
-            <div class="space-y-4 text-sm">
-
-              <!-- NAME -->
-              <div class="flex items-center gap-4">
-                <label class="w-64">Person to contact in case of emergency:</label>
-                <input
-                  type="text"
-                  name="emergency_person"
-                  maxlength="50"
-                  class="input input-sm border-[#8B0000] w-80"
-                  placeholder="Name"
-                  required>
+            <!-- Dental Procedures -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-notes-medical text-xs"></i> Dental Procedures <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
               </div>
 
-              <!-- CONTACT NUMBER -->
-              <div class="flex items-center gap-4">
-                <label class="w-64">Contact Number:</label>
-                <input
-                  type="tel"
-                  id="emergency_number"
-                  name="emergency_number"
-                  maxlength="11"
-                  class="input input-sm border-[#8B0000] w-80 transition-all"
-                  placeholder="09XXXXXXXXX"
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Have you had any periodontal (gum) treatment?</span>
+                <input type="radio" name="periodontal" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
                   required>
+                <input type="radio" name="periodontal" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
               </div>
 
-              <!-- RELATION -->
-              <div class="flex items-center gap-4 relative">
-                <label class="w-64" for="emergency_relation">Relation to Patient:</label>
-                <div class="flex flex-col w-80">
-                  <div class="relative w-full">
-                    <select
-                      id="emergency_relation"
-                      name="emergency_relation"
-                      class="input input-sm border-[#8B0000] w-full appearance-none pr-8"
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Have you had a difficult tooth extraction?</span>
+                <input type="radio" name="difficult_extraction" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="difficult_extraction" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
+                <label class="text-xs text-[#8B0000] italic block mb-1">Date of extraction:</label>
+                <input type="text" id="extractionDate" name="extraction_date"
+                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
+                  placeholder="Select date" readonly>
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Have you had prolonged bleeding following tooth extractions?</span>
+                <input type="radio" name="prolonged_bleeding" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="prolonged_bleeding" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Do you wear complete or partial dentures?</span>
+                <input type="radio" name="dentures" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="dentures" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
+                <label class="text-xs text-[#8B0000] italic block mb-1">Date of placement:</label>
+                <input type="text" id="denturesDate" name="dentures_date"
+                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
+                  placeholder="Select date" readonly>
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                <span>Have you had orthodontic treatment?</span>
+                <input type="radio" name="ortho_treatment" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="ortho_treatment" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
+                <label class="text-xs text-[#8B0000] italic block mb-1">Date of completion:</label>
+                <input type="text" id="orthoDate" name="ortho_date"
+                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
+                  placeholder="Select date" readonly>
+              </div>
+            </div>
+
+            <!-- Additional Concerns -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-regular fa-comment-dots text-xs"></i> Additional Concerns <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <textarea name="additional_concerns" id="additional_concerns" rows="4"
+                class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none resize-none"
+                placeholder="Write any additional concerns here..."></textarea>
+            </div>
+          </div>
+
+          <!-- ════ STEP 4: MEDICAL HISTORY ════ -->
+          <div class="step-content hidden">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Medical History</h2>
+            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+            <p class="text-sm text-[#5c5550] mb-6">Provide important medical information to help the dentist ensure safe
+              and proper care.</p>
+
+            @php
+              function qSectionOpen(string $icon, string $label): string
+              {
+                return '<div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                                          <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                                            <i class="' . $icon . ' text-xs"></i> ' . $label . ' <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+                                          </p>
+                                          <div class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                                            <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                                          </div>';
+              }
+            @endphp
+
+            <!-- General Health -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-heart-pulse text-xs"></i> General Health <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Are you in good health?</span>
+                <input type="radio" name="good_health" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="good_health" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
+                <label class="text-xs text-[#8B0000] italic">If NO, please provide details:</label>
+                <input type="text" name="good_health_details"
+                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                  placeholder="Input here">
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>When was your last medical examination?</span>
+                <input type="radio" name="had_medical_exam" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="had_medical_exam" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
+                <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was your last medical
+                  examination?</label>
+                <input type="text" id="medicalExamDate" name="medical_exam_date"
+                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
+                  placeholder="Select date" readonly>
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Are you currently receiving treatment for any illness?</span>
+                <input type="radio" name="under_treatment" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="under_treatment" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
+                <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
+                <input type="text" name="treatment_details"
+                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                  placeholder="Input here">
+              </div>
+
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                <span>Have you ever been hospitalized?</span>
+                <input type="radio" name="hospitalized" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="hospitalized" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
+                <label class="text-xs text-[#8B0000] italic">If YES, please provide details:</label>
+                <input type="text" name="hospital_details"
+                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                  placeholder="Input here">
+              </div>
+            </div>
+
+            <!-- Allergies -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Are you allergic to any of the following?</span><span class="text-center">YES</span><span
+                  class="text-center">NO</span>
+              </div>
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                <span>Medicines</span>
+                <input type="radio" name="allergy_medicine" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="allergy_medicine" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                <span>Food</span>
+                <input type="radio" name="allergy_food" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="allergy_food" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="mt-3">
+                <label class="text-xs text-[#8B0000] italic block mb-1">Others (please specify):</label>
+                <input type="text" name="allergy_others"
+                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
+                  placeholder="Input here">
+              </div>
+            </div>
+
+            <!-- Medications -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-pills text-xs"></i> Medications <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                <span>Are you taking any prescription or non-prescription medication?</span>
+                <input type="radio" name="medication" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="medication" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
+                <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
+                <input type="text" name="medication_details"
+                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                  placeholder="Input here">
+              </div>
+            </div>
+
+            <!-- For Women -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-venus text-xs"></i> For Women Only <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>
+              @foreach([['name' => 'pregnant', 'q' => 'Are you pregnant?'], ['name' => 'nursing', 'q' => 'Are you nursing?'], ['name' => 'birth_control', 'q' => 'Are you taking birth control pills?']] as $i => $q)
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
+                  <span>{{ $q['q'] }}</span>
+                  <input type="radio" name="{{ $q['name'] }}" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="{{ $q['name'] }}" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+              @endforeach
+            </div>
+
+            <!-- Medical Conditions -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you presently have or have ever had any of
+                the following:</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
+                @foreach($diseases as $d)
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="checkbox" name="diseases[]" value="{{ $d->code }}"
+                      class="w-4 h-4 rounded border-2 border-[#e8e2dd] cursor-pointer accent-[#8B0000] flex-shrink-0">
+                    <span class="text-[0.82rem] text-[#1a1410]">{{ $d->label }}</span>
+                  </label>
+                @endforeach
+              </div>
+            </div>
+
+            <!-- Tobacco -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>
+              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                <span>Do you use tobacco products or any derivatives?</span>
+                <input type="radio" name="tobacco_use" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="tobacco_use" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
+              <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="text-xs text-[#8B0000] italic w-28">How much per day:</span>
+                  <input type="text" name="tobacco_per_day" placeholder="Input here"
+                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
+                </div>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
+                  <input type="text" name="tobacco_per_week" placeholder="Input here"
+                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
+                </div>
+              </div>
+            </div>
+
+            <!-- Suffers From -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Condition</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>
+              @foreach([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches', 'q' => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
+                  <span>{{ $q['q'] }}</span>
+                  <input type="radio" name="{{ $q['name'] }}" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="{{ $q['name'] }}" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+              @endforeach
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-4">
+                <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact <span
+                  class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Person to contact in case of
+                    emergency</label>
+                  <input type="text" name="emergency_person" maxlength="50"
+                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Full name" required>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Contact Number</label>
+                  <input type="tel" id="emergency_number" name="emergency_number" maxlength="11"
+                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[240px] w-full"
+                    placeholder="09XXXXXXXXX" required>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Relation to Patient</label>
+                  <div class="relative max-w-[280px]">
+                    <select id="emergency_relation" name="emergency_relation"
+                      class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
                       required>
                       <option value="" disabled selected>Select relation</option>
                       <option value="Mother">Mother</option>
@@ -1210,1492 +1185,1079 @@
                       <option value="Spouse">Spouse</option>
                       <option value="Others">Others</option>
                     </select>
-                    <!-- Downward arrow -->
-                    <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
+                    <div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+                      <i class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
                     </div>
                   </div>
-
-                  <input
-                    type="text"
-                    id="relation_other"
-                    name="relation_other"
-                    maxlength="30"
-                    class="input input-sm border-[#8B0000] mt-2 hidden"
+                  <input type="text" id="relation_other" name="relation_other" maxlength="30"
+                    class="form-input mt-2 hidden border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
                     placeholder="Please specify relation">
                 </div>
-              </div>
-
-              <!-- SIGNATURE -->
-              <div class="flex items-start gap-4">
-                <label class="w-64 pt-2">Patient's Signature:</label>
-
-                <div class="border-2 border-dashed border-gray-400 rounded-md p-4 w-72 text-center text-xs space-y-2">
-
-                  <p>Select your file or drag and drop</p>
-                  <p class="text-gray-500">JPG, PNG or PDF, up to 25 MB</p>
-
-                  <label
-                    class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#8B0000] text-white text-xs 
-              rounded cursor-pointer hover:bg-[#6f0000]">
-                    <span>Browse</span>
-
-                    <input
-                      type="file"
-                      name="patient_signature"
-                      id="patient_signature"
-                      class="hidden"
-                      accept=".jpg,.jpeg,.png,"
-                      required>
-                  </label>
-
-                  <p id="signature_filename" class="text-gray-600 text-xs truncate hidden"></p>
-
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- STEP 5 -->
-        <div class="step-content hidden" id="step5">
-
-          <!-- SUMMARY SECTION -->
-          <div id="summarySection">
-            <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10 mb-8">
-              <h2 class="text-3xl font-normal text-[#660000] mb-4">Summary</h2>
-              <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
-              <div id="summaryBox"></div>
-            </div>
-
-            <div class="flex justify-center gap-4">
-              <button
-                type="button"
-                id="summaryBackBtn"
-                class="min-w-[110px] px-6 py-2 rounded border border-gray-500 bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow">
-                &lsaquo; Back
-              </button>
-
-              <!-- CHANGED TO NEXT -->
-              <button
-                type="button"
-                id="goToConfirmationBtn"
-                class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white hover:bg-[#7A0000] transition shadow">
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- CONFIRMATION SECTION (HIDDEN FIRST) -->
-          <div id="confirmationSection" class="hidden">
-
-            <div class="bg-[#D9D9D9] shadow-xl rounded-xl p-10">
-              <h2 class="text-3xl font-normal text-[#660000] mb-4">Confirmation</h2>
-              <div class="h-[2px] w-full bg-[#8B0000] mb-8"></div>
-
-              <label class="flex items-start gap-3 cursor-pointer select-none">
-
-                <input
-                  id="finalConfirm"
-                  type="checkbox"
-                  class="mt-1 w-5 h-5 border border-[#8B0000] rounded bg-white accent-[#8B0000]"
-                  required />
-
-                <span class="text-gray-700 text-sm leading-5">
-                  I hereby confirm that I have reviewed my dental and medical information and accepted the
-                  <a href="/privacy-policy" class="text-[#8B0000] hover:underline">Privacy Policy</a>
-                  and
-                  <a href="/terms-of-service" class="text-[#8B0000] hover:underline">Terms of Service</a>.
-                </span>
-              </label>
-
-              <!-- BUTTONS (Back + Submit) -->
-              <div class="flex justify-center gap-4 mt-10">
-                <button
-                  type="button"
-                  id="confirmBackBtn"
-                  class="min-w-[110px] px-6 py-2 rounded border border-gray-500
-        bg-gray-200 text-[#8B0000] hover:bg-gray-300 transition shadow relative z-10">
-                  &lsaquo; Back
-                </button>
-
-                <button
-                  type="button"
-                  id="finalSubmitBtn"
-                  class="min-w-[110px] px-6 py-2 rounded bg-[#8B0000] text-white
-        hover:bg-[#7A0000] transition shadow">
-                  Submit
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- OTHERS SERVICE MODAL -->
-        <dialog id="othersModal" class="modal">
-          <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-md">
-            <div class="h-2 bg-[#8B0000] w-full"></div>
-            <div class="px-8 py-8">
-              <h3 class="text-xl font-bold text-[#8B0000] mb-1">Other Service</h3>
-              <p class="text-sm text-gray-500 mb-5">Please describe the service you need.</p>
-              <input
-                type="text"
-                id="other_services"
-                name="service_others_text"
-                class="input input-bordered border-[#8B0000] w-full mb-6"
-                placeholder="e.g. Teeth whitening, fluoride treatment..."
-                maxlength="100">
-              <div class="flex justify-end gap-3">
-                <button type="button" id="othersCancelBtn"
-                  class="px-5 py-2 rounded-lg border border-gray-400 text-[#660000] font-medium hover:bg-gray-100 transition">
-                  Cancel
-                </button>
-                <button type="button" id="othersConfirmBtn"
-                  class="px-5 py-2 rounded-lg bg-[#8B0000] text-white font-medium hover:bg-[#6f0000] transition">
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        </dialog>
-
-        <!-- MINI TAB WARNING -->
-        <div id="miniTab"
-          class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-md text-sm z-50">
-          Please complete all required fields before proceeding.
-        </div>
-
-        <!-- NAVIGATION BUTTONS (for Steps 1-4 only) -->
-        <div class="flex justify-center mt-8 gap-6" id="navBtns">
-
-          <!-- PREVIOUS -->
-          <button
-            type="button"
-            id="prevBtn"
-            class="flex items-center gap-2 px-6 py-2 rounded-lg border border-gray-400 bg-[#F4F4F4] text-[#660000]
-           font-medium hover:bg-[#ECECEC] shadow transition">
-            <span class="text-xl leading-none">&lsaquo;</span>
-            <span>Previous</span>
-          </button>
-
-          <!-- NEXT -->
-          <button
-            type="button"
-            id="nextBtn"
-            class="btn btn-primary shadow pr-10 pl-10">
-            <span>Next</span>
-            <span class="text-xl leading-none">&rsaquo;</span>
-          </button>
-
-        </div>
-
-        <!-- FINAL CONFIRMATION MODAL -->
-        <dialog id="confirmModal" class="modal">
-          <div class="modal-box p-0 rounded-2xl overflow-hidden shadow-2xl w-full max-w-[600px]">
-
-            <!-- Top red panel -->
-            <div class="bg-[#8B0000] text-white px-12 py-10 text-center">
-              <h2 class="text-2xl font-semibold mb-6">Appointment Confirmed</h2>
-
-              <p class="text-sm leading-6 mb-6" id="confirmMessage"></p>
-
-              <p class="mb-6">Thank you!</p>
-
-              <!-- OK BUTTON -->
-              <button
-                type="button"
-                id="okBtn"
-                class="inline-block bg-gray-200 text-[#8B0000] px-8 py-2 rounded shadow hover:bg-gray-300 transition">
-                Back to Home
-              </button>
-            </div>
-
-          </div>
-        </dialog>
-
-        <!-- LEAVE CONFIRM MODAL -->
-        <dialog id="leaveModal" class="modal">
-          <div class="modal-box p-0 rounded-2xl overflow-hidden shadow-2xl max-w-md">
-            <div class="bg-[#8B0000] text-white px-6 py-4">
-              <h3 class="text-lg font-bold">Unsaved changes</h3>
-              <p class="text-sm opacity-90 mt-1">
-                Save your progress as a draft, or discard changes and leave this page.
-              </p>
-            </div>
-
-            <div class="px-6 py-5 bg-white">
-              <div class="flex justify-end gap-3">
-                <button type="button" id="discardDraftBtn"
-                  class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
-                  Discard Changes
-                </button>
-
-                <button type="button" id="saveDraftBtn"
-                  class="px-5 py-2 rounded-lg bg-[#8B0000] text-white hover:bg-[#6f0000] transition">
-                  Save Draft
-                </button>
-              </div>
-            </div>
-          </div>
-        </dialog>
-
-        <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-        <script>
-          /* =========================
-     DRAFT SAVE / RESTORE
-  ========================= */
-          const DRAFT_KEY = "appointmentDraft:v1";
-
-          function saveDraft() {
-            const form = document.getElementById("appointmentForm");
-            if (!form) return;
-
-            const data = new FormData(form);
-
-            // Build a plain object (supports multiple values like conditions[])
-            const obj = {};
-            for (const [key, value] of data.entries()) {
-              // Skip file input (signature) — can't be restored for security reasons
-              if (key === "patient_signature") continue;
-
-              if (obj[key] === undefined) {
-                obj[key] = value;
-              } else if (Array.isArray(obj[key])) {
-                obj[key].push(value);
-              } else {
-                obj[key] = [obj[key], value];
-              }
-            }
-
-            // Also include step + selected date/time explicitly (safe)
-            obj.__meta = {
-              step: typeof step !== "undefined" ? step : 0,
-              savedAt: new Date().toISOString(),
-            };
-
-            localStorage.setItem(DRAFT_KEY, JSON.stringify(obj));
-          }
-
-          function clearDraft() {
-            localStorage.removeItem(DRAFT_KEY);
-          }
-
-          function restoreDraft() {
-            const raw = localStorage.getItem(DRAFT_KEY);
-            if (!raw) return;
-
-            let obj;
-            try {
-              obj = JSON.parse(raw);
-            } catch {
-              return;
-            }
-
-            const form = document.getElementById("appointmentForm");
-            if (!form) return;
-
-            // restore simple inputs/select/textarea + radio/checkbox + hidden date/time
-            Object.keys(obj).forEach((name) => {
-              if (name === "__meta") return;
-
-              const value = obj[name];
-
-              // Checkboxes (multiple values)
-              if (Array.isArray(value)) {
-                // For groups like conditions[]
-                const inputs = form.querySelectorAll(`[name="${CSS.escape(name)}"]`);
-                inputs.forEach((el) => {
-                  if (el.type === "checkbox") {
-                    el.checked = value.includes(el.value);
-                  }
-                });
-                return;
-              }
-
-              const elList = form.querySelectorAll(`[name="${CSS.escape(name)}"]`);
-              if (!elList.length) return;
-
-              elList.forEach((el) => {
-                if (el.type === "radio") {
-                  el.checked = (el.value === value);
-                } else if (el.type === "checkbox") {
-                  el.checked = (value === true || value === "on" || value === el.value);
-                } else {
-                  el.value = value;
-                }
-              });
-            });
-
-            // If relation is Others, show the textbox
-            const relationSelect = document.getElementById("emergency_relation");
-            const otherInput = document.getElementById("relation_other");
-            if (relationSelect && otherInput) {
-              if (relationSelect.value === "Others") {
-                otherInput.classList.remove("hidden");
-                otherInput.setAttribute("required", "true");
-              }
-            }
-
-            // Re-render calendar selection + slots (if date exists)
-            const restoredDate = document.getElementById("appointment_date")?.value;
-            const restoredTime = document.getElementById("appointment_time")?.value;
-
-            if (restoredDate) {
-              selectedDate = restoredDate;
-              // highlight date + render slots
-              selectDate(restoredDate);
-
-              // if time exists, select it visually (best-effort)
-              if (restoredTime) {
-                selectedTime = restoredTime;
-                const slotGrid = document.getElementById("slotGrid");
-                if (slotGrid) {
-                  [...slotGrid.querySelectorAll(".slot-chip")].forEach(chip => {
-                    if (chip.textContent.trim().startsWith(restoredTime)) {
-                      chip.classList.add("selected");
-                    }
-                  });
-                }
-                const selectedSlotText = document.getElementById("selectedSlotText");
-                const selectedSlotDisplay = document.getElementById("selectedSlotDisplay");
-                if (selectedSlotText) selectedSlotText.textContent = restoredTime;
-                if (selectedSlotDisplay) selectedSlotDisplay.classList.remove("hidden");
-              }
-            }
-
-            // Mark as dirty since draft restored
-            formIsDirty = true;
-          }
-
-          /* =========================
-            MINI TAB
-          ========================= */
-          const miniTab = document.getElementById("miniTab");
-
-          function showMiniTab(message) {
-            if (!miniTab) return;
-            miniTab.textContent = message || "Please complete all required fields before proceeding.";
-            miniTab.classList.remove("hidden");
-            miniTab.classList.add("show");
-
-            clearTimeout(window.__miniTabTimer);
-            window.__miniTabTimer = setTimeout(() => {
-              miniTab.classList.add("hidden");
-              miniTab.classList.remove("show");
-            }, 3000);
-          }
-
-          function showInputError(input) {
-            if (!input) return;
-            input.classList.add("input-error", "shake");
-            setTimeout(() => input.classList.remove("shake"), 300);
-          }
-
-          const allSlots = [{
-              t: "9:00 AM",
-              available: true
-            },
-            {
-              t: "10:00 AM",
-              available: true
-            },
-            {
-              t: "11:00 AM",
-              available: false
-            },
-            {
-              t: "12:00 PM",
-              available: false
-            },
-            {
-              t: "1:00 PM",
-              available: true
-            },
-            {
-              t: "2:00 PM",
-              available: true
-            },
-            {
-              t: "3:00 PM",
-              available: true
-            },
-            {
-              t: "4:00 PM",
-              available: true
-            },
-          ];
-
-          /* =========================
-            CALENDAR DATA
-          ========================= */
-          const MAX_PER_DAY = 5;
-
-          const apptCounts = @json($appointmentCountsPerDay ?? []);
-          const apptSlotCounts = @json($appointmentCountsPerSlot ?? []);
-          const unavailableDates = @json($unavailableDates ?? []);
-          const holidaysMap = @json($philippineHolidays ?? []);
-          const diseaseLabelByCode = @json($diseases->pluck('label','code'));
-
-
-          /* =========================
-             CALENDAR
-          ========================= */
-          let selectedDate = null,
-            selectedTime = null;
-
-          function pad(n) {
-            return String(n).padStart(2, "0");
-          }
-
-          function formatISO(y, m, d) {
-            return `${y}-${pad(m + 1)}-${pad(d)}`;
-          }
-
-          // Returns status info for a date cell (what to show + if clickable)
-          function getDateStatus(dateObj, iso) {
-            // past
-            if (dateObj < todayDate) {
-              return {
-                disabled: true,
-                cls: ["disabled"],
-                tip: "Booking Not Allowed for Past Dates",
-                dot: null
-              };
-            }
-
-            // weekend
-            const dow = dateObj.getDay();
-            if (dow === 0 || dow === 6) {
-              return {
-                disabled: true,
-                cls: ["disabled", "unavailable"],
-                tip: "Clinic Closed (Saturday & Sunday)",
-                dot: "dot-unavail",
-              };
-            }
-
-            // holiday
-            if (holidaysMap?.[iso]) {
-              return {
-                disabled: true,
-                cls: ["disabled", "holiday"],
-                tip: holidaysMap[iso], // shows the holiday name
-                dot: "dot-holiday",
-              };
-            }
-
-            // admin-defined unavailable
-            if (unavailableDates.includes(iso)) {
-              return {
-                disabled: true,
-                cls: ["disabled", "unavailable"],
-                tip: "Not available",
-                dot: "dot-unavail",
-              };
-            }
-
-            // full slot
-            const count = apptCounts?.[iso] ?? 0;
-            if (count >= MAX_PER_DAY) {
-              return {
-                disabled: true,
-                cls: ["disabled", "full-slot"],
-                tip: "Full Slot",
-                dot: "dot-full",
-              };
-            }
-
-            // selectable
-            return {
-              disabled: false,
-              cls: [],
-              tip: "",
-              dot: null
-            };
-          }
-
-          function loadCalendar() {
-            const today = new Date();
-            let currentYear = today.getFullYear();
-            let currentMonth = today.getMonth();
-
-            function pad(n) {
-              return String(n).padStart(2, "0");
-            }
-
-            function isWeekend(year, month, day) {
-              const dow = new Date(year, month, day).getDay();
-              return dow === 0 || dow === 6;
-            }
-
-            function getHolidaysForMonth(year, month) {
-              const filtered = {};
-              Object.keys(holidaysMap || {}).forEach(dateStr => {
-                const [y, m] = dateStr.split("-").map(Number);
-                if (y === year && m === month + 1) filtered[dateStr] = holidaysMap[dateStr];
-              });
-              return filtered;
-            }
-
-            function renderCalendar(year, month) {
-              const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-              const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-              const firstDow = new Date(year, month, 1).getDay();
-              const totalDays = new Date(year, month + 1, 0).getDate();
-              const leadingEmpties = firstDow;
-
-              const holidays = getHolidaysForMonth(year, month);
-
-              let cells = "";
-
-              for (let i = 0; i < leadingEmpties; i++) cells += `<div></div>`;
-
-              for (let d = 1; d <= totalDays; d++) {
-                const dateStr = `${year}-${pad(month + 1)}-${pad(d)}`;
-
-                const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
-                const weekend = isWeekend(year, month, d);
-                const holiday = holidays[dateStr] || null;
-
-                const count = apptCounts?.[dateStr] ?? 0;
-                const isFull = count >= MAX_PER_DAY;
-
-                const isUnavail = unavailableDates.includes(dateStr) || weekend;
-
-                // ── Styling ────────────────────────────────────────
-                let bgClass = "";
-                let textClass = "text-[#333333]";
-                let ringClass = "";
-                let dotHtml = "";
-                let tooltipTxt = "";
-
-                // disable clicking if full/holiday/unavailable/weekend/past (optional: add past check if you want)
-                const cellDate = new Date(year, month, d);
-                cellDate.setHours(0, 0, 0, 0);
-
-                const isPast = cellDate < todayDate; // uses your global todayDate (so add it back below)
-                const isDisabled = isPast || isUnavail || isFull || !!holiday;
-
-                if (isPast) {
-                  textClass = "text-gray-300";
-                  ringClass = "ring-1 ring-gray-200 ring-offset-1";
-                  tooltipTxt = `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Booking Not Allowed for Past Dates`;
-                }
-
-                if (isToday) {
-                  bgClass = "bg-[#8B0000]";
-                  textClass = "text-white font-extrabold";
-                  ringClass = "ring-2 ring-[#8B0000]/30 ring-offset-1";
-                } else if (holiday) {
-                  bgClass = "bg-blue-50 hover:bg-blue-100";
-                  textClass = "text-blue-700 font-semibold";
-                  ringClass = "ring-2 ring-blue-300/70 ring-offset-1";
-                } else if (isFull && !isUnavail) {
-                  bgClass = "bg-red-50 hover:bg-red-100";
-                  textClass = "text-red-700 font-semibold";
-                  ringClass = "ring-2 ring-red-300/70 ring-offset-1";
-                } else if (isUnavail) {
-                  bgClass = "";
-                  textClass = "text-gray-300";
-                  ringClass = "ring-1 ring-gray-200 ring-offset-1";
-                } else {
-                  bgClass = "hover:bg-[#FFF0F0]";
-                }
-
-                // ── Dots + Tooltip ───────────────────────────────
-                if (isFull && !holiday && !isUnavail) {
-                  dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
-                  tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Full Slot`;
-                }
-
-                if (holiday) {
-                  dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
-                  tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
-                }
-
-                if (isUnavail && !holiday) {
-                  tooltipTxt = weekend ?
-                    `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic Closed (Saturday & Sunday)` :
-                    `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
-                }
-
-                const tooltipHtml = tooltipTxt ? `
-                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50
-                            bg-[#1a1a1a] text-white text-[11px] font-medium
-                            px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl
-                            opacity-0 group-hover:opacity-100 pointer-events-none
-                            transition-opacity duration-200">
-                  ${tooltipTxt}
-                  <div class="absolute top-full left-1/2 -translate-x-1/2
-                              border-4 border-transparent border-t-[#1a1a1a]"></div>
-                </div>` : "";
-
-                cells += `
-                <div class="relative group flex items-center justify-center">
-                  ${tooltipHtml}
+                <div>
+                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Patient's Signature</label>
                   <div
-                    class="relative w-9 h-9 flex items-center justify-center
-                          text-sm rounded-full transition-all duration-150
-                          ${bgClass} ${textClass} ${ringClass}
-                          ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}"
-                    data-date="${dateStr}"
-                    data-disabled="${isDisabled ? 1 : 0}">
-                    ${d}
-                    ${dotHtml}
+                    class="file-upload-zone max-w-[320px] border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 text-center cursor-pointer">
+                    <i class="fa-regular fa-image text-2xl text-[#9e9690] mb-2 block"></i>
+                    <p class="text-xs text-[#5c5550] mb-1">Select your file or drag and drop</p>
+                    <p class="text-xs text-[#9e9690] mb-3">JPG, PNG, up to 25 MB</p>
+                    <label
+                      class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
+                      <i class="fa-solid fa-upload"></i> Browse
+                      <input type="file" name="patient_signature" id="patient_signature" class="hidden"
+                        accept=".jpg,.jpeg,.png" required>
+                    </label>
+                    <p id="signature_filename" class="text-xs text-[#5c5550] mt-2 hidden truncate"></p>
                   </div>
-                </div>`;
-              }
-
-              const headerHtml = dayLabels.map((l, i) => {
-                const labelColor = (i === 0 || i === 6) ? "text-[#8B0000]/40" : "text-[#333333]";
-                return `<div class="text-center text-[10px] font-bold ${labelColor} uppercase tracking-widest">${l}</div>`;
-              }).join("");
-
-              document.getElementById("calendarSkeletonContainer").innerHTML = `
-              <div class="h-full flex flex-col select-none">
-                <div class="flex items-center justify-between mb-8">
-                  <button onclick="changeMonth(-1)"
-                    class="w-8 h-8 flex items-center justify-center rounded-full
-                          hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                  </button>
-                  <div class="text-center">
-                    <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
-                    <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
-                  </div>
-                  <button onclick="changeMonth(1)"
-                    class="w-8 h-8 flex items-center justify-center rounded-full
-                          hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                  </button>
                 </div>
-                <hr class="border-t border-gray-200 mb-4">
-
-                <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
-                <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
               </div>
-            `;
-
-              document.querySelectorAll('#calendarSkeletonContainer [data-date]').forEach(el => {
-                el.addEventListener("click", () => {
-                  if (el.dataset.disabled === "1") return;
-
-                  const picked = el.dataset.date;
-                  selectDate(picked); // uses your existing booking flow
-                });
-              });
-            }
-
-            window.changeMonth = function(dir) {
-              currentMonth += dir;
-              if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-              }
-              if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-              }
-              renderCalendar(currentYear, currentMonth);
-            };
-
-            renderCalendar(currentYear, currentMonth);
-          }
-
-          const todayDate = new Date();
-          todayDate.setHours(0, 0, 0, 0);
-
-          function selectDate(iso) {
-            selectedDate = iso;
-            selectedTime = null;
-
-            const dateInput = document.getElementById("appointment_date");
-            const timeInput = document.getElementById("appointment_time");
-            if (dateInput) dateInput.value = iso;
-            if (timeInput) timeInput.value = "";
-
-            const banner = document.getElementById("dateBanner");
-            if (banner) {
-              const [y, m, d] = iso.split("-");
-              const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-              banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${months[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
-              banner.classList.add("show");
-            }
-
-            document.querySelectorAll("#calendarSkeletonContainer [data-date]").forEach(el => {
-              el.classList.remove("bg-[#8B0000]", "text-white", "font-extrabold");
-
-              if (el.dataset.disabled !== "1") {
-                el.classList.add("text-[#333333]");
-                el.classList.add("hover:bg-[#FFF0F0]");
-              }
-
-              if (el.dataset.date === iso) {
-                el.classList.add("bg-[#8B0000]", "text-white", "font-extrabold");
-                el.classList.remove("text-[#333333]");
-                el.classList.remove("hover:bg-[#FFF0F0]");
-              }
-            });
-
-            renderSlots();
-          }
-
-          function renderSlots() {
-            const slotPlaceholder = document.getElementById("slotPlaceholder");
-            const slotContainer = document.getElementById("slotContainer");
-            const selectedSlotDisplay = document.getElementById("selectedSlotDisplay");
-            const selectedSlotText = document.getElementById("selectedSlotText");
-            const slotGrid = document.getElementById("slotGrid");
-            const banner = document.getElementById("dateBanner");
-
-            if (!slotGrid) return;
-
-            if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
-            if (slotContainer) slotContainer.classList.remove("hidden");
-            if (selectedSlotDisplay) selectedSlotDisplay.classList.add("hidden");
-            if (selectedSlotText) selectedSlotText.textContent = "";
-            slotGrid.innerHTML = "";
-
-            const takenToday = apptCounts?.[selectedDate] ?? 0;
-            const remaining = Math.max(0, MAX_PER_DAY - takenToday);
-            const dayIsFull = remaining <= 0;
-
-            const takenTimes = apptSlotCounts?.[selectedDate] ?? {};
-
-            /* =========================
-               SHOW REMAINING IN BANNER
-            ========================= */
-            if (banner && selectedDate) {
-              const [y, m, d] = selectedDate.split("-");
-              const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-              let slotColorClass = "text-emerald-300";
-
-              if (remaining <= 3) {
-                slotColorClass = "text-yellow-300 font-semibold";
-              }
-
-              banner.innerHTML = `
-            <i class="fa-regular fa-calendar mr-2"></i>
-            ${months[parseInt(m) - 1]} ${parseInt(d)}, ${y}
-            <span class="ml-2 text-sm ${slotColorClass}">
-              (${remaining} / ${MAX_PER_DAY} slots left)
-            </span>
-          `;
-              banner.classList.add("show");
-            }
-
-            /* =========================
-               RENDER TIME CHIPS
-            ========================= */
-            allSlots.forEach(slot => {
-              const chip = document.createElement("div");
-
-              const timeIsTaken = (takenTimes?.[slot.t] ?? 0) >= 1;
-              const chipIsDisabled = dayIsFull || timeIsTaken || !slot.available;
-
-              chip.className = "slot-chip" + (chipIsDisabled ? " full" : "");
-              chip.textContent = chipIsDisabled ? `${slot.t} – Full` : slot.t;
-
-              if (!chipIsDisabled) {
-                chip.addEventListener("click", () => {
-                  slotGrid.querySelectorAll(".slot-chip").forEach(c => c.classList.remove("selected"));
-                  chip.classList.add("selected");
-
-                  selectedTime = slot.t;
-
-                  const timeInput = document.getElementById("appointment_time");
-                  if (timeInput) timeInput.value = slot.t;
-
-                  if (selectedSlotText) selectedSlotText.textContent = slot.t;
-                  if (selectedSlotDisplay) selectedSlotDisplay.classList.remove("hidden");
-                });
-              }
-
-              slotGrid.appendChild(chip);
-            });
-          }
-
-          /* =========================
-             OTHERS MODAL (SAFE)
-          ========================= */
-          const othersModal = document.getElementById("othersModal");
-          const othersInput = document.getElementById("other_services");
-          const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
-
-          if (othersRadio && othersModal && othersInput) {
-            othersRadio.addEventListener("change", function() {
-              othersInput.required = true;
-              othersModal.showModal();
-              setTimeout(() => othersInput.focus(), 100);
-            });
-          }
-
-          const othersConfirmBtn = document.getElementById("othersConfirmBtn");
-          if (othersConfirmBtn && othersModal && othersInput) {
-            othersConfirmBtn.addEventListener("click", () => {
-              if (!othersInput.value.trim()) {
-                othersInput.classList.add("input-error", "shake");
-                setTimeout(() => othersInput.classList.remove("shake"), 300);
-                return;
-              }
-              othersModal.close();
-            });
-          }
-
-          const othersCancelBtn = document.getElementById("othersCancelBtn");
-          if (othersCancelBtn && othersModal && othersInput) {
-            othersCancelBtn.addEventListener("click", () => {
-              othersInput.value = "";
-              othersInput.required = false;
-              othersModal.close();
-              if (othersRadio) othersRadio.checked = false;
-            });
-          }
-
-          /* =========================
-             DATE PICKERS
-          ========================= */
-          function initMiniDatePicker(id) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            new Pikaday({
-              field: el,
-              maxDate: new Date(),
-              yearRange: [1950, new Date().getFullYear()],
-              showMonthAfterYear: true,
-              firstDay: 1,
-              onSelect: function(date) {
-                el.value = date.toISOString().split('T')[0];
-              }
-            });
-          }
-
-          initMiniDatePicker('lastDentalVisit');
-          initMiniDatePicker('extractionDate');
-          initMiniDatePicker('denturesDate');
-          initMiniDatePicker('orthoDate');
-          initMiniDatePicker('medicalExamDate');
-
-          /* =========================
-             STEPPER LOGIC
-          ========================= */
-          let step = 0;
-          const steps = document.querySelectorAll(".step-content");
-          const indicators = document.querySelectorAll(".step");
-
-          const navBtns = document.getElementById("navBtns");
-          const prevBtn = document.getElementById("prevBtn");
-          const nextBtn = document.getElementById("nextBtn");
-
-          /* ✅ Step 5 sections */
-          const summarySection = document.getElementById("summarySection");
-          const confirmationSection = document.getElementById("confirmationSection");
-
-          /* ✅ Step 5 buttons */
-          const summaryBackBtn = document.getElementById("summaryBackBtn");
-          const goToConfirmationBtn = document.getElementById("goToConfirmationBtn");
-          const confirmationBackBtn = document.getElementById("confirmationBackBtn");
-
-          /* ✅ Final confirm + submit */
-          const finalSubmitBtn = document.getElementById("finalSubmitBtn");
-          const finalConfirm = document.getElementById("finalConfirm");
-
-          let completedSteps = [];
-
-          function resetStep5View() {
-            if (summarySection) summarySection.classList.remove("hidden");
-            if (confirmationSection) confirmationSection.classList.add("hidden");
-          }
-
-          // init
-          showStep(0);
-          setTimeout(() => steps[0]?.classList.add("show"), 50);
-
-          function showStep(i) {
-            steps.forEach((s, idx) => {
-              if (idx === i) {
-                s.classList.remove("hidden");
-                setTimeout(() => s.classList.add("show"), 50);
-              } else {
-                s.classList.remove("show");
-                s.classList.add("hidden");
-              }
-            });
-
-            indicators.forEach((ind, idx) => {
-              ind.querySelectorAll(".in-progress").forEach((el) => el.remove());
-              if (idx >= i) {
-                const completedText = ind.querySelector(".completed-text");
-                if (completedText) completedText.remove();
-              }
-
-              ind.classList.remove("step-success", "step-primary", "in-progress-step");
-              ind.style.color = "";
-              ind.style.fontWeight = "";
-
-              if (idx < i && completedSteps.includes(idx)) {
-                ind.classList.add("step-success");
-                ind.style.color = "#16a34a";
-                ind.style.fontWeight = "700";
-
-                if (!ind.querySelector(".completed-text")) {
-                  const completedText = document.createElement("span");
-                  completedText.className = "completed-text";
-                  completedText.textContent = "Completed";
-                  ind.appendChild(completedText);
-                  setTimeout(() => completedText.classList.add("show"), 50);
-                }
-              }
-
-              if (idx === i) {
-                ind.classList.add("step-primary", "in-progress-step");
-                ind.style.color = "#2563eb";
-                ind.style.fontWeight = "700";
-
-                const span = document.createElement("span");
-                span.className = "in-progress";
-                span.textContent = "In Progress";
-                ind.appendChild(span);
-                setTimeout(() => span.classList.add("show"), 50);
-              }
-            });
-
-            const isLast = i === steps.length - 1;
-
-            if (navBtns) navBtns.style.display = isLast ? "none" : "flex";
-            if (prevBtn) prevBtn.style.display = i === 0 ? "none" : "inline-flex";
-            if (nextBtn) nextBtn.style.display = isLast ? "none" : "inline-flex";
-
-            if (isLast) {
-              buildSummary();
-              resetStep5View();
-            }
-
-            document.querySelector(".max-w-4xl")?.scrollIntoView({
-              behavior: "smooth"
-            });
-            step = i;
-          }
-
-          /* =========================
-             VALIDATION
-          ========================= */
-          function isStepComplete(currentStep) {
-            const stepEl = steps[currentStep];
-            if (!stepEl) return true;
-
-            if (currentStep === 0) {
-              const dateVal = document.getElementById("appointment_date")?.value;
-              const timeVal = document.getElementById("appointment_time")?.value;
-
-              if (!dateVal) {
-                showMiniTab("Please select a date first.");
-                return false;
-              }
-              if (!timeVal) {
-                showMiniTab("Please select a time slot.");
-                return false;
-              }
-            }
-
-            const fields = stepEl.querySelectorAll(
-              "input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]"
-            );
-            for (const input of fields) {
-              if (!input.value || !input.value.trim()) return false;
-            }
-
-            const requiredCheckboxes = stepEl.querySelectorAll("input[type='checkbox'][required]");
-            for (const cb of requiredCheckboxes) {
-              if (!cb.checked) return false;
-            }
-
-            const radios = stepEl.querySelectorAll("input[type='radio']");
-            if (radios.length) {
-              const groups = [...new Set([...radios].map((r) => r.name))];
-              for (const name of groups) {
-                if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
-              }
-            }
-
-            const contactInput = stepEl.querySelector("#emergency_number");
-            if (contactInput) {
-              const value = contactInput.value.trim();
-              if (!/^\d{1,11}$/.test(value)) {
-                showMiniTab("Emergency Contact must be 1–11 digits only!");
-                contactInput.focus();
-                return false;
-              }
-            }
-
-            return true;
-          }
-
-          /* =========================
-             NEXT / PREV (Steps 1-4)
-          ========================= */
-          if (nextBtn) {
-            nextBtn.addEventListener("click", () => {
-              if (!isStepComplete(step)) {
-                showMiniTab("Please complete all required fields before proceeding.");
-                return;
-              }
-              if (!completedSteps.includes(step)) completedSteps.push(step);
-
-              const nextIndex = Math.min(step + 1, steps.length - 1);
-              showStep(nextIndex);
-            });
-          }
-
-          if (prevBtn) {
-            prevBtn.addEventListener("click", () => {
-              const prevIndex = Math.max(step - 1, 0);
-              showStep(prevIndex);
-            });
-          }
-
-          /* =========================
-             STEP 5 FLOW
-          ========================= */
-          if (summaryBackBtn) {
-            summaryBackBtn.addEventListener("click", () => {
-              showStep(3); // back to step 4
-            });
-          }
-
-          if (goToConfirmationBtn) {
-            goToConfirmationBtn.addEventListener("click", () => {
-              if (summarySection) summarySection.classList.add("hidden");
-              if (confirmationSection) confirmationSection.classList.remove("hidden");
-              confirmationSection?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              });
-            });
-          }
-
-          if (confirmationBackBtn) {
-            confirmationBackBtn.addEventListener("click", () => {
-              if (confirmationSection) confirmationSection.classList.add("hidden");
-              if (summarySection) summarySection.classList.remove("hidden");
-              summarySection?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              });
-            });
-          }
-
-          /* =========================
-             SUMMARY BUILDER
-          ========================= */
-          function buildSummary() {
-            const form = document.getElementById("appointmentForm");
-            if (!form) return;
-
-            const data = new FormData(form);
-
-            const date = document.getElementById("appointment_date")?.value || "N/A";
-            const time = document.getElementById("appointment_time")?.value || "N/A";
-
-            const get = (name) => data.get(name) || "N/A";
-            const getAll = (name) => data.getAll(name);
-
-            const selectedRelation = data.get("emergency_relation") || "";
-            const typedRelation = (data.get("relation_other") || "").trim();
-            const emergencyRelation =
-              selectedRelation === "Others" ? typedRelation || "Others" : selectedRelation || "N/A";
-
-            const signatureFile = data.get("patient_signature");
-            let signatureHTML = "Not uploaded";
-            if (signatureFile && signatureFile.size > 0) {
-              const imageUrl = URL.createObjectURL(signatureFile);
-              signatureHTML = `<img src="${imageUrl}" alt="Signature" style="max-width: 250px; max-height: 150px; border: 1px solid #8B0000; border-radius: 8px;">`;
-            }
-
-            const card = (title, body) => `
-    <div class="border-2 border-[#8B0000] rounded-xl p-4 bg-white">
-      <h3 class="font-bold text-[#8B0000] mb-3">${title}</h3>
-      <div class="space-y-1 text-sm">${body}</div>
-    </div>
-  `;
-
-            const html = `
-    <div class="space-y-6">
-      ${card("Appointment Details", `
-        <p><b>Date:</b> ${date}</p>
-        <p><b>Time:</b> ${time}</p>
-      `)}
-
-      ${card("Service", `
-        <p>${get("service_type") === "Others" ? "Others – " + (get("service_others_text") || "N/A") : get("service_type")}</p>
-      `)}
-
-      ${card("Dental History", `
-        <p><b>Last Dental Visit:</b> ${get("last_dental_visit")}</p>
-        <p><b>Bleeding Gums:</b> ${get("bleeding_gums")}</p>
-        <p><b>Sensitive to Hot/Cold:</b> ${get("sensitive_temp")}</p>
-        <p><b>Sensitive to Sweets:</b> ${get("sensitive_taste")}</p>
-        <p><b>Tooth Pain:</b> ${get("tooth_pain")}</p>
-        <p><b>Sores/Lumps:</b> ${get("sores")}</p>
-        <p><b>Jaw Injuries:</b> ${get("injuries")}</p>
-        <p><b>Clicking Jaw:</b> ${get("clicking")}</p>
-        <p><b>Joint Pain:</b> ${get("joint_pain")}</p>
-        <p><b>Difficulty Chewing:</b> ${get("difficulty_chewing")}</p>
-        <p><b>Headaches:</b> ${get("jaw_headaches")}</p>
-        <p><b>Grinding/Clenching:</b> ${get("clench_grind")}</p>
-        <p><b>Food Caught Between Teeth:</b> ${get("food_teeth")}</p>
-        <p><b>Medicine Reaction:</b> ${get("med_reaction")}</p>
-        <p><b>Additional Concerns:</b><br>${get("additional_concerns")}</p>
-      `)}
-
-      ${card("Medical History", `
-        <p><b>Good Health:</b> ${get("good_health")}</p>
-        <p><b>Last Medical Exam Date:</b> ${get("medical_exam_date")}</p>
-        <p><b>Under Treatment:</b> ${get("under_treatment")}</p>
-        <p><b>Hospitalized:</b> ${get("hospitalized")}</p>
-        <p><b>Allergy (Medicine):</b> ${get("allergy_medicine")}</p>
-        <p><b>Allergy (Food):</b> ${get("allergy_food")}</p>
-        <p><b>Medication:</b> ${get("medication")}</p>
-        <p><b>Medical Conditions:</b><br>
-          ${getAll("diseases[]").length ? getAll("diseases[]").map(c => diseaseLabelByCode?.[c] ?? c).join(", "): "None"}
-        </p>
-        <p><b>Tobacco Use:</b> ${get("tobacco_use")}</p>
-      `)}
-
-      ${card("Emergency Contact", `
-        <p><b>Name:</b> ${get("emergency_person")}</p>
-        <p><b>Contact:</b> ${get("emergency_number")}</p>
-        <p><b>Relation:</b> ${emergencyRelation}</p>
-      `)}
-
-      ${card("Signature", signatureHTML)}
-    </div>
-  `;
-
-            const summaryBox = document.getElementById("summaryBox");
-            if (summaryBox) summaryBox.innerHTML = html;
-          }
-
-          /* =========================
-             MODAL (FINAL SUBMIT)
-          ========================= */
-          const confirmModal = document.getElementById("confirmModal");
-          const confirmMessage = document.getElementById("confirmMessage");
-          const okBtn = document.getElementById("okBtn");
-
-          if (finalSubmitBtn) {
-            finalSubmitBtn.addEventListener("click", () => {
-              if (!finalConfirm || !finalConfirm.checked) {
-                showMiniTab("Please confirm before submitting.");
-                return;
-              }
-
-              const date = document.getElementById("appointment_date")?.value || "N/A";
-              const time = document.getElementById("appointment_time")?.value || "N/A";
-
-              if (confirmMessage) {
-                confirmMessage.innerHTML = `
-        Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
-        <b>${date}</b> at <b>${time}</b>.<br>
-        Please arrive on time and bring your school or office ID.
-        <br>
-      `;
-              }
-
-              // show modal first
-              confirmModal?.showModal();
-            });
-          }
-
-          if (okBtn) {
-            okBtn.addEventListener("click", () => {
-              clearDraft();
-              formSubmitting = true;
-              document.getElementById("appointmentForm").submit();
-            });
-          }
-
-          /* =========================
-             EXTRA TOGGLES
-          ========================= */
-          const questions = [{
-              name: "difficult_extraction",
-              boxId: "extraction_date_box"
-            },
-            {
-              name: "dentures",
-              boxId: "dentures_date_box"
-            },
-            {
-              name: "ortho_treatment",
-              boxId: "ortho_date_box"
-            },
-          ];
-
-          questions.forEach((q) => {
-            const radios = document.getElementsByName(q.name);
-            const box = document.getElementById(q.boxId);
-            if (!box || !radios.length) return;
-
-            const input = box.querySelector("input");
-
-            radios.forEach((radio) => {
-              radio.addEventListener("change", () => {
-                if (radio.checked && radio.value === "YES") {
-                  box.classList.remove("hidden");
-                  if (input) input.required = true;
-                } else if (radio.checked) {
-                  box.classList.add("hidden");
-                  if (input) {
-                    input.required = false;
-                    input.value = "";
-                  }
-                }
-              });
-            });
-          });
-
-          const medicalExamRadios = document.querySelectorAll('input[name="had_medical_exam"]');
-          const medicalExamBox = document.getElementById("medical_exam_box");
-          const medicalExamDate = document.getElementById("medicalExamDate");
-
-          function syncMedicalExamBox() {
-            const selected = document.querySelector('input[name="had_medical_exam"]:checked');
-            if (!selected || !medicalExamBox || !medicalExamDate) return;
-
-            if (selected.value === "YES") {
-              medicalExamBox.classList.remove("hidden");
-              medicalExamDate.required = true;
-            } else {
-              medicalExamBox.classList.add("hidden");
-              medicalExamDate.required = false;
-              medicalExamDate.value = "";
-            }
-          }
-
-          medicalExamRadios.forEach(r => r.addEventListener("change", syncMedicalExamBox));
-          syncMedicalExamBox();
-
-          const relationSelect = document.getElementById("emergency_relation");
-          const otherInput = document.getElementById("relation_other");
-
-          if (relationSelect && otherInput) {
-            relationSelect.addEventListener("change", function() {
-              if (this.value === "Others") {
-                otherInput.classList.remove("hidden");
-                otherInput.setAttribute("required", "true");
-              } else {
-                otherInput.classList.add("hidden");
-                otherInput.removeAttribute("required");
-                otherInput.value = "";
-              }
-            });
-          }
-
-          const medicalToggles = [{
-              name: "good_health",
-              boxId: "good_health_box",
-              showOn: "NO"
-            },
-            {
-              name: "under_treatment",
-              boxId: "treatment_box",
-              showOn: "YES"
-            },
-            {
-              name: "hospitalized",
-              boxId: "hospital_box",
-              showOn: "YES"
-            },
-            {
-              name: "medication",
-              boxId: "medication_box",
-              showOn: "YES"
-            },
-          ];
-
-          medicalToggles.forEach((item) => {
-            const radios = document.getElementsByName(item.name);
-            const box = document.getElementById(item.boxId);
-            if (!box || !radios.length) return;
-
-            radios.forEach((radio) => {
-              radio.addEventListener("change", () => {
-                const selected = [...radios].find((r) => r.checked);
-                const inputs = box.querySelectorAll("input");
-
-                if (selected && selected.value === item.showOn) {
-                  box.classList.remove("hidden");
-                  inputs.forEach((i) => (i.required = true));
-                } else {
-                  box.classList.add("hidden");
-                  inputs.forEach((i) => {
-                    i.required = false;
-                    i.value = "";
-                  });
-                }
-              });
-            });
-          });
-
-          // Tobacco details
-          const tobaccoRadios = document.getElementsByName("tobacco_use");
-          const tobaccoDetails = document.getElementById("tobacco_details");
-          if (tobaccoDetails && tobaccoRadios.length) {
-            tobaccoRadios.forEach((radio) => {
-              radio.addEventListener("change", () => {
-                if (radio.checked && radio.value === "YES") tobaccoDetails.classList.remove("hidden");
-                else tobaccoDetails.classList.add("hidden");
-              });
-            });
-          }
-
-          // Signature filename display
-          const signatureInput = document.getElementById("patient_signature");
-          const signatureFileName = document.getElementById("signature_filename");
-          if (signatureInput && signatureFileName) {
-            signatureInput.addEventListener("change", () => {
-              if (signatureInput.files.length > 0) {
-                signatureFileName.textContent = signatureInput.files[0].name;
-                signatureFileName.classList.remove("hidden");
-              } else {
-                signatureFileName.textContent = "";
-                signatureFileName.classList.add("hidden");
-              }
-            });
-          }
-
-          // Emergency number formatting
-          const emergencyNumber = document.getElementById("emergency_number");
-          if (emergencyNumber) {
-            emergencyNumber.addEventListener("input", (e) => {
-              const rawValue = e.target.value;
-
-              if (/[^0-9]/.test(rawValue)) {
-                showMiniTab("Contact number must contain digits only.");
-                showInputError(emergencyNumber);
-                emergencyNumber.classList.remove("input-valid");
-              }
-
-              let value = rawValue.replace(/\D/g, "");
-              if (value.startsWith("9")) value = "0" + value;
-
-              value = value.slice(0, 11);
-              emergencyNumber.value = value;
-
-              if (/^09\d{9}$/.test(value)) {
-                emergencyNumber.classList.remove("input-error");
-                emergencyNumber.classList.add("input-valid");
-              } else {
-                emergencyNumber.classList.remove("input-valid");
-              }
-            });
-
-            emergencyNumber.addEventListener("blur", () => {
-              if (emergencyNumber.value === "") {
-                emergencyNumber.classList.remove("input-error", "input-valid");
-              }
-            });
-          }
-
-          /* =========================
-  LEAVE / RELOAD WARNING (DRAFT MODAL)
-========================= */
-          let formIsDirty = false;
-          let formSubmitting = false;
-
-          const formEl = document.getElementById("appointmentForm");
-
-          const leaveModal = document.getElementById("leaveModal");
-          const saveDraftBtn = document.getElementById("saveDraftBtn");
-          const discardDraftBtn = document.getElementById("discardDraftBtn");
-
-          let pendingNavigation = null;
-
-          function markDirty() {
-            if (!formSubmitting) formIsDirty = true;
-          }
-          formEl?.addEventListener("change", markDirty);
-          formEl?.addEventListener("input", markDirty);
-
-          function openLeaveModal(onConfirm) {
-            pendingNavigation = onConfirm;
-            leaveModal?.showModal();
-          }
-
-          saveDraftBtn?.addEventListener("click", () => {
-            saveDraft();
-            leaveModal?.close();
-
-            formSubmitting = true;
-            formIsDirty = false;
-
-            if (typeof pendingNavigation === "function") pendingNavigation();
-            pendingNavigation = null;
-          });
-
-          discardDraftBtn?.addEventListener("click", () => {
-            clearDraft();
-            leaveModal?.close();
-
-            formSubmitting = true;
-            formIsDirty = false;
-
-            if (typeof pendingNavigation === "function") pendingNavigation();
-            pendingNavigation = null;
-          });
-
-          document.querySelectorAll('a[href]').forEach(link => {
-            link.addEventListener("click", (e) => {
-              const href = link.getAttribute("href") || "";
-              if (href.startsWith("#") || href.startsWith("javascript:")) return;
-
-              if (formIsDirty && !formSubmitting) {
-                e.preventDefault();
-                openLeaveModal(() => window.location.href = link.href);
-              }
-            });
-          });
-
-          (function trapBackButton() {
-            history.pushState({
-              page: "book-appointment"
-            }, "", window.location.href);
-
-            window.addEventListener("popstate", () => {
-              if (formIsDirty && !formSubmitting) {
-                openLeaveModal(() => history.back());
-                history.pushState({
-                  page: "book-appointment"
-                }, "", window.location.href);
-              }
-            });
-          })();
-
-          window.addEventListener("beforeunload", (e) => {
-            if (formIsDirty && !formSubmitting) {
-              e.preventDefault();
-              e.returnValue = "";
-            }
-          });
-
-          document.addEventListener("DOMContentLoaded", () => {
-            loadCalendar();
-            restoreDraft();
-          });
-        </script>
-
-      </form>
+            </div>
+          </div>
+
+          <!-- ════ STEP 5: SUMMARY & CONFIRMATION ════ -->
+          <div class="step-content hidden" id="step5">
+
+            <!-- SUMMARY -->
+            <div id="summarySection">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Review Your Information</h2>
+              <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+              <p class="text-sm text-[#5c5550] mb-6">Please review all the information you've provided before proceeding
+                to confirmation.</p>
+              <div id="summaryBox" class="space-y-4"></div>
+              <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                <button type="button" id="summaryBackBtn"
+                  class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                  <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                </button>
+                <button type="button" id="goToConfirmationBtn"
+                  class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                  Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- CONFIRMATION -->
+            <div id="confirmationSection" class="hidden">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Final Confirmation</h2>
+              <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+
+              <div class="bg-[#fff5f5] border border-[rgba(139,0,0,0.15)] rounded-2xl p-5 mb-2">
+                <div class="flex items-start gap-2 mb-4">
+                  <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
+                  <p class="text-sm text-[#5c5550]">By submitting, you confirm that all the information provided is
+                    accurate and complete.</p>
+                </div>
+                <label
+                  class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
+                  <input id="finalConfirm" type="checkbox"
+                    class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
+                    required>
+                  <span class="text-sm text-[#1a1410] leading-relaxed">
+                    I have reviewed my dental and medical information and I accept the
+                    <a href="/privacy-policy" class="text-[#8B0000] hover:underline font-semibold">Privacy Policy</a>
+                    and <a href="/terms-of-service" class="text-[#8B0000] hover:underline font-semibold">Terms of
+                      Service</a>.
+                  </span>
+                </label>
+              </div>
+
+              <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                <button type="button" id="confirmBackBtn"
+                  class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                  <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                </button>
+                <button type="button" id="finalSubmitBtn"
+                  class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                  <i class="fa-solid fa-check"></i> Submit Appointment
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ════ NAV BUTTONS ════ -->
+          <div id="navBtns" class="flex justify-center mt-8 gap-3 nav-btns-row">
+            <button type="button" id="prevBtn" style="display:none;"
+              class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+              <i class="fa-solid fa-chevron-left text-xs"></i> Previous
+            </button>
+            <button type="button" id="nextBtn"
+              class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-8 py-2.5 text-sm font-bold">
+              Next <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
     </div>
   </div>
 
+  <!-- ════ MINI TAB ════ -->
+  <div id="miniTab"
+    class="mini-tab fixed left-1/2 -translate-x-1/2 bg-[#1a1410] text-white px-5 py-2.5 rounded-full text-sm font-semibold z-[200] shadow-xl flex items-center gap-2 whitespace-nowrap opacity-0 pointer-events-none"
+    style="transition: opacity 0.25s;">
+    <i class="fa-solid fa-circle-exclamation text-red-400"></i>
+    <span id="miniTabText">Please complete all required fields.</span>
+  </div>
+
+  <!-- ════ OTHERS MODAL ════ -->
+  <dialog id="othersModal"
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]"
+    style="">
+    <div class="bg-[#8B0000] px-8 py-6">
+      <h3 class="text-xl font-bold text-white mb-1">Other Service</h3>
+      <p class="text-sm text-white/75">Please describe the service you need.</p>
+    </div>
+    <div class="bg-white px-8 py-6">
+      <input type="text" id="other_services" name="service_others_text"
+        class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2.5 text-sm bg-white outline-none mb-5"
+        placeholder="e.g. Teeth whitening, fluoride treatment..." maxlength="100">
+      <div class="flex justify-end gap-3">
+        <button type="button" id="othersCancelBtn"
+          class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-5 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">Cancel</button>
+        <button type="button" id="othersConfirmBtn"
+          class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ════ CONFIRM MODAL ════ -->
+  <dialog id="confirmModal"
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
+    <div class="bg-[#8B0000] px-8 py-10 text-center">
+      <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+        <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-white mb-4">Appointment Confirmed!</h2>
+      <p id="confirmMessage" class="text-white/85 text-sm leading-7 mb-6"></p>
+      <button type="button" id="okBtn"
+        class="bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Back to
+        Home</button>
+    </div>
+  </dialog>
+
+  <!-- ════ LEAVE MODAL ════ -->
+  <dialog id="leaveModal"
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
+    <div class="bg-[#8B0000] px-6 py-5">
+      <h3 class="text-lg font-bold text-white mb-0.5">Unsaved Changes</h3>
+      <p class="text-sm text-white/80">Save your progress or discard changes.</p>
+    </div>
+    <div class="bg-white px-6 py-5 flex justify-end gap-3">
+      <button type="button" id="discardDraftBtn"
+        class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-5 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">Discard
+        Changes</button>
+      <button type="button" id="saveDraftBtn"
+        class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">Save
+        Draft</button>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+  <script>
+    const MAX_PER_DAY = 5;
+    const apptCounts = @json($appointmentCountsPerDay ?? []);
+    const apptSlotCounts = @json($appointmentCountsPerSlot ?? []);
+    const unavailableDates = @json($unavailableDates ?? []);
+    const holidaysMap = @json($philippineHolidays ?? []);
+    const diseaseLabelByCode = @json($diseases->pluck('label', 'code'));
+
+    const allSlots = [{
+      t: "9:00 AM",
+      available: true
+    }, {
+      t: "10:00 AM",
+      available: true
+    },
+    {
+      t: "11:00 AM",
+      available: false
+    }, {
+      t: "12:00 PM",
+      available: false
+    },
+    {
+      t: "1:00 PM",
+      available: true
+    }, {
+      t: "2:00 PM",
+      available: true
+    },
+    {
+      t: "3:00 PM",
+      available: true
+    }, {
+      t: "4:00 PM",
+      available: true
+    },
+    ];
+
+    /* DRAFT */
+    const DRAFT_KEY = "appointmentDraft:v1";
+
+    function saveDraftData() {
+      const form = document.getElementById("appointmentForm");
+      if (!form) return;
+      const data = new FormData(form),
+        obj = {};
+      for (const [key, value] of data.entries()) {
+        if (key === "patient_signature") continue;
+        if (obj[key] === undefined) obj[key] = value;
+        else if (Array.isArray(obj[key])) obj[key].push(value);
+        else obj[key] = [obj[key], value];
+      }
+      obj.__meta = {
+        step: typeof step !== "undefined" ? step : 0,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(obj));
+    }
+
+    function clearDraft() {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+
+    function restoreDraft() {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      let obj;
+      try {
+        obj = JSON.parse(raw);
+      } catch {
+        return;
+      }
+      const form = document.getElementById("appointmentForm");
+      if (!form) return;
+      Object.keys(obj).forEach((name) => {
+        if (name === "__meta") return;
+        const value = obj[name];
+        if (Array.isArray(value)) {
+          form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
+            if (el.type === "checkbox") el.checked = value.includes(el.value);
+          });
+          return;
+        }
+        form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
+          if (el.type === "radio") el.checked = (el.value === value);
+          else if (el.type === "checkbox") el.checked = (value === true || value === "on" || value === el.value);
+          else el.value = value;
+        });
+      });
+      if (document.getElementById("emergency_relation")?.value === "Others") {
+        const other = document.getElementById("relation_other");
+        if (other) {
+          other.classList.remove("hidden");
+          other.setAttribute("required", "true");
+        }
+      }
+      const restoredDate = document.getElementById("appointment_date")?.value;
+      const restoredTime = document.getElementById("appointment_time")?.value;
+      if (restoredDate) {
+        selectedDate = restoredDate;
+        selectDate(restoredDate);
+        if (restoredTime) {
+          selectedTime = restoredTime;
+          document.querySelectorAll(".slot-chip").forEach(c => {
+            if (c.dataset.time === restoredTime) c.classList.add("selected");
+          });
+          const txt = document.getElementById("selectedSlotText");
+          const disp = document.getElementById("selectedSlotDisplay");
+          if (txt) txt.textContent = restoredTime;
+          if (disp) disp.classList.remove("hidden");
+        }
+      }
+      formIsDirty = true;
+    }
+
+    /* MINI TAB */
+    const miniTab = document.getElementById("miniTab");
+    const miniTabText = document.getElementById("miniTabText");
+
+    function showMiniTab(msg) {
+      if (!miniTab) return;
+      miniTabText.textContent = msg || "Please complete all required fields.";
+      miniTab.style.opacity = "1";
+      miniTab.style.pointerEvents = "auto";
+      clearTimeout(window.__mtTimer);
+      window.__mtTimer = setTimeout(() => {
+        miniTab.style.opacity = "0";
+        miniTab.style.pointerEvents = "none";
+      }, 3000);
+    }
+
+    function showInputError(input) {
+      if (!input) return;
+      input.classList.add("border-red-500");
+      input.style.animation = "shake 0.3s ease";
+      setTimeout(() => input.style.animation = "", 400);
+    }
+
+    /* CALENDAR */
+    let selectedDate = null,
+      selectedTime = null;
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function loadCalendar() {
+      const today = new Date();
+      let curYear = today.getFullYear(),
+        curMonth = today.getMonth();
+
+      function renderCalendar(year, month) {
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const firstDow = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        let header = DAYS.map((d, i) => `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${i === 0 || i === 6 ? 'text-[rgba(139,0,0,0.4)]' : 'text-[#9e9690]'}">${d}</div>`).join("");
+        let cells = "";
+        for (let i = 0; i < firstDow; i++) cells += `<div></div>`;
+        for (let d = 1; d <= totalDays; d++) {
+          const iso = `${year}-${pad(month + 1)}-${pad(d)}`;
+          const cellDate = new Date(year, month, d);
+          cellDate.setHours(0, 0, 0, 0);
+          const isToday = cellDate.getTime() === todayDate.getTime();
+          const isPast = cellDate < todayDate;
+          const dow = cellDate.getDay();
+          const isWeekend = dow === 0 || dow === 6;
+          const isHoliday = !!holidaysMap?.[iso];
+          const isUnavail = unavailableDates.includes(iso) || isWeekend;
+          const count = apptCounts?.[iso] ?? 0;
+          const isFull = count >= MAX_PER_DAY;
+          const isDisabled = isPast || isUnavail || isFull || isHoliday;
+          const isSelected = iso === selectedDate;
+          let cls = "cal-day w-full h-full flex items-center justify-center text-sm font-medium rounded-full cursor-pointer relative";
+          if (isSelected) cls += " bg-[#8B0000] text-white font-bold shadow-[0_2px_12px_rgba(139,0,0,0.3)]";
+          else if (isToday) cls += " bg-[#8B0000] text-white font-extrabold";
+          else if (isPast) cls += " text-[#d1ccc8] cursor-not-allowed disabled";
+          else if (isHoliday) cls += " bg-blue-50 text-blue-700 font-bold disabled";
+          else if (isFull) cls += " bg-red-50 text-red-700 font-bold disabled";
+          else if (isUnavail) cls += " text-[#d1ccc8] cursor-not-allowed unavailable disabled";
+          let dotHtml = "";
+          if (!isPast && !isToday && !isSelected) {
+            if (isHoliday) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400"></span>`;
+            else if (isFull) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-500"></span>`;
+            else if (isUnavail) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gray-400"></span>`;
+          }
+          let tip = "";
+          if (isPast) tip = "Past date — booking not allowed";
+          else if (isHoliday) tip = holidaysMap[iso];
+          else if (isFull) tip = "Full Slot";
+          else if (isWeekend) tip = "Clinic closed on weekends";
+          else if (isUnavail) tip = "Not available";
+          const tipHtml = tip ? `<div class="cal-tooltip absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 bg-[#1a1410] text-white text-[0.65rem] font-medium px-2.5 py-1.5 rounded-lg whitespace-nowrap z-50 after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-[#1a1410]">${tip}</div>` : "";
+          cells += `<div class="cal-cell-wrap relative flex items-center justify-center aspect-square">${tipHtml}<div class="${cls}" data-date="${iso}" data-disabled="${isDisabled ? 1 : 0}">${d}${dotHtml}</div></div>`;
+        }
+        document.getElementById("calendarSkeletonContainer").innerHTML = `
+          <div class="flex items-center justify-between mb-5">
+            <button type="button" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="text-center">
+              <p class="text-base font-extrabold text-[#660000]">${MONTHS[month]}</p>
+              <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
+            </div>
+            <button type="button" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <hr class="border-[#f0ebe6] mb-3">
+          <div class="grid grid-cols-7 gap-0.5">${header}${cells}</div>`;
+        document.querySelectorAll("#calendarSkeletonContainer [data-date]").forEach(el => {
+          el.addEventListener("click", () => {
+            if (el.dataset.disabled === "1") return;
+            selectDate(el.dataset.date);
+          });
+        });
+      }
+      window.changeMonth = function (dir) {
+        curMonth += dir;
+        if (curMonth > 11) {
+          curMonth = 0;
+          curYear++;
+        }
+        if (curMonth < 0) {
+          curMonth = 11;
+          curYear--;
+        }
+        renderCalendar(curYear, curMonth);
+      };
+      renderCalendar(curYear, curMonth);
+    }
+
+    function selectDate(iso) {
+      selectedDate = iso;
+      selectedTime = null;
+      document.getElementById("appointment_date").value = iso;
+      document.getElementById("appointment_time").value = "";
+      document.querySelectorAll("#calendarSkeletonContainer [data-date]").forEach(el => {
+        el.classList.remove("bg-[#8B0000]", "text-white", "font-bold", "shadow-[0_2px_12px_rgba(139,0,0,0.3)]");
+        if (el.dataset.date === iso && el.dataset.disabled !== "1") {
+          el.classList.add("bg-[#8B0000]", "text-white", "font-bold", "shadow-[0_2px_12px_rgba(139,0,0,0.3)]");
+        }
+      });
+      const banner = document.getElementById("dateBanner");
+      const [y, m, d] = iso.split("-");
+      const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const cnt = apptCounts?.[iso] ?? 0;
+      const remaining = Math.max(0, MAX_PER_DAY - cnt);
+      const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
+      banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${MAX_PER_DAY} slots left)</span>`;
+      banner.classList.remove("hidden");
+      banner.style.display = "block";
+      renderSlots();
+    }
+
+    function renderSlots() {
+      const slotPlaceholder = document.getElementById("slotPlaceholder");
+      const slotContainer = document.getElementById("slotContainer");
+      const slotGrid = document.getElementById("slotGrid");
+      const display = document.getElementById("selectedSlotDisplay");
+      const displayTxt = document.getElementById("selectedSlotText");
+      if (!slotGrid) return;
+      slotPlaceholder?.classList.add("hidden");
+      slotContainer?.classList.remove("hidden");
+      display?.classList.add("hidden");
+      if (displayTxt) displayTxt.textContent = "";
+      slotGrid.innerHTML = "";
+      const cnt = apptCounts?.[selectedDate] ?? 0;
+      const dayIsFull = cnt >= MAX_PER_DAY;
+      const takenTimes = apptSlotCounts?.[selectedDate] ?? {};
+      allSlots.forEach(slot => {
+        const taken = (takenTimes?.[slot.t] ?? 0) >= 1;
+        const disabled = dayIsFull || taken || !slot.available;
+        const chip = document.createElement("div");
+        chip.className = "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer " + (disabled ? "border-[#e8e2dd] text-[#c4bfba] line-through opacity-60 cursor-not-allowed" : "border-[#e8e2dd] bg-[#fafaf8] text-[#1a1410] hover:border-[#8B0000] hover:bg-[#fff5f5] hover:text-[#8B0000]");
+        chip.dataset.time = slot.t;
+        chip.innerHTML = disabled ? `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${slot.t} — Full</span>` : `<i class="text-xs opacity-70 fa-regular fa-clock"></i><span>${slot.t}</span>`;
+        if (!disabled) {
+          chip.addEventListener("click", () => {
+            slotGrid.querySelectorAll(".slot-chip").forEach(c => {
+              c.classList.remove("bg-[#8B0000]", "text-white", "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
+              c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
+            });
+            chip.classList.add("bg-[#8B0000]", "text-white", "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
+            chip.classList.remove("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
+            selectedTime = slot.t;
+            document.getElementById("appointment_time").value = slot.t;
+            if (displayTxt) displayTxt.textContent = slot.t;
+            display?.classList.remove("hidden");
+          });
+        }
+        slotGrid.appendChild(chip);
+      });
+    }
+
+    /* STEPPER */
+    let step = 0,
+      completedSteps = [];
+    const steps = document.querySelectorAll(".step-content");
+    const navBtns = document.getElementById("navBtns");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const summarySection = document.getElementById("summarySection");
+    const confirmationSection = document.getElementById("confirmationSection");
+
+    function updateStepperUI(i) {
+      for (let idx = 0; idx < 5; idx++) {
+        const circle = document.getElementById(`sc${idx + 1}`);
+        const label = document.getElementById(`sl${idx + 1}`);
+        const conn = document.getElementById(`conn${idx + 1}`);
+        if (!circle || !label) continue;
+        circle.className = "step-circle w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold";
+        label.className = "step-label text-[0.65rem] font-semibold uppercase tracking-wide text-center block w-full mt-4";
+        if (idx < i && completedSteps.includes(idx)) {
+          circle.className += " border-green-700 bg-green-700 text-white";
+          label.className += " text-green-700";
+          circle.innerHTML = `<i class="fa-solid fa-check text-xs"></i>`;
+        } else if (idx === i) {
+          circle.className += " border-blue-600 bg-blue-600 text-white shadow-[0_0_0_6px_rgba(37,99,235,0.12)] scale-110";
+          label.className += " text-blue-600";
+          circle.innerHTML = String(idx + 1);
+        } else {
+          circle.className += " border-[#e8e2dd] bg-white text-[#9e9690]";
+          label.className += " text-[#9e9690]";
+          circle.innerHTML = String(idx + 1);
+        }
+        if (conn) {
+          conn.className = "h-0.5 flex-shrink-0 self-start step-connector ";
+          conn.style.width = "65px";
+          conn.style.marginTop = "20px";
+          conn.className += (idx < i && completedSteps.includes(idx)) ? "bg-green-700" : (idx === i ? "bg-blue-600" : "bg-[#e8e2dd]");
+        }
+      }
+      const fill = document.getElementById("headerProgressFill");
+      if (fill) fill.style.width = (((i + 1) / 5) * 100) + "%";
+      const counter = document.getElementById("stepCounterText");
+      if (counter) counter.textContent = i + 1;
+    }
+
+    function showStep(i) {
+      steps.forEach((s, idx) => {
+        s.classList.remove("show");
+        s.classList.add("hidden");
+        if (idx === i) {
+          s.classList.remove("hidden");
+          setTimeout(() => s.classList.add("show"), 40);
+        }
+      });
+      const isLast = i === steps.length - 1;
+      navBtns.style.display = isLast ? "none" : "flex";
+      prevBtn.style.display = i === 0 ? "none" : "inline-flex";
+      nextBtn.style.display = isLast ? "none" : "inline-flex";
+      if (isLast) {
+        buildSummary();
+        resetStep5View();
+      }
+      updateStepperUI(i);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+      step = i;
+    }
+
+    function resetStep5View() {
+      summarySection?.classList.remove("hidden");
+      confirmationSection?.classList.add("hidden");
+    }
+
+    /* VALIDATION */
+    function isStepComplete(s) {
+      const stepEl = steps[s];
+      if (!stepEl) return true;
+      if (s === 0) {
+        if (!document.getElementById("appointment_date")?.value) {
+          showMiniTab("Please select a date first.");
+          return false;
+        }
+        if (!document.getElementById("appointment_time")?.value) {
+          showMiniTab("Please select a time slot.");
+          return false;
+        }
+      }
+      const fields = stepEl.querySelectorAll("input[required]:not([type='radio']):not([type='checkbox']), select[required], textarea[required]");
+      for (const input of fields) {
+        if (!input.value || !input.value.trim()) return false;
+      }
+      const radios = stepEl.querySelectorAll("input[type='radio']");
+      if (radios.length) {
+        const groups = [...new Set([...radios].map(r => r.name))];
+        for (const name of groups) {
+          if (!stepEl.querySelector(`input[name="${name}"]:checked`)) return false;
+        }
+      }
+      const phone = stepEl.querySelector("#emergency_number");
+      if (phone) {
+        const v = phone.value.trim();
+        if (!/^\d{1,11}$/.test(v)) {
+          showMiniTab("Emergency Contact must be 1–11 digits only!");
+          phone.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    nextBtn?.addEventListener("click", () => {
+      if (!isStepComplete(step)) {
+        showMiniTab("Please complete all required fields before proceeding.");
+        return;
+      }
+      if (!completedSteps.includes(step)) completedSteps.push(step);
+      showStep(Math.min(step + 1, steps.length - 1));
+    });
+    prevBtn?.addEventListener("click", () => showStep(Math.max(step - 1, 0)));
+    document.getElementById("summaryBackBtn")?.addEventListener("click", () => showStep(3));
+    document.getElementById("goToConfirmationBtn")?.addEventListener("click", () => {
+      summarySection?.classList.add("hidden");
+      confirmationSection?.classList.remove("hidden");
+      confirmationSection?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+    document.getElementById("confirmBackBtn")?.addEventListener("click", () => {
+      confirmationSection?.classList.add("hidden");
+      summarySection?.classList.remove("hidden");
+      summarySection?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+
+    /* SUMMARY BUILDER */
+    function buildSummary() {
+      const form = document.getElementById("appointmentForm");
+      if (!form) return;
+      const data = new FormData(form);
+      const get = n => data.get(n) || "N/A";
+      const getAll = n => data.getAll(n);
+      const relation = data.get("emergency_relation") || "";
+      const otherRel = (data.get("relation_other") || "").trim();
+      const emergencyRelation = relation === "Others" ? (otherRel || "Others") : (relation || "N/A");
+      const sigFile = data.get("patient_signature");
+      let sigHTML = `<span class="text-[#9e9690] italic">Not uploaded</span>`;
+      if (sigFile && sigFile.size > 0) {
+        const url = URL.createObjectURL(sigFile);
+        sigHTML = `<img src="${url}" alt="Signature" class="max-w-[220px] max-h-[130px] rounded-lg border border-[#e8e2dd]">`;
+      }
+      const card = (title, icon, body) => `
+        <div class="border border-[#e8e2dd] rounded-xl overflow-hidden bg-white">
+          <div class="bg-[#f9e8e8] px-4 py-2.5 text-xs font-bold text-[#8B0000] uppercase tracking-widest border-b border-[#e8e2dd]">
+            <i class="fa-solid ${icon} mr-2"></i>${title}
+          </div>
+          <div class="p-4 text-sm leading-7 text-[#1a1410]">${body}</div>
+        </div>`;
+      const row = (label, val) => `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val || '<span class="text-[#9e9690]">N/A</span>'}</p>`;
+      const diseases = getAll("diseases[]");
+      document.getElementById("summaryBox").innerHTML = `
+        <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+          ${card("Appointment Details", "fa-calendar-check", row("Date", get("appointment_date")) + row("Time", get("appointment_time")))}
+          ${card("Service", "fa-tooth", row("Type", get("service_type") === "Others" ? "Others – " + (get("service_others_text") || "N/A") : get("service_type")))}
+        </div>
+        ${card("Dental History", "fa-teeth", `
+          <div class="grid grid-cols-2 gap-x-8 sm-grid-1col">
+            ${row("Last Dental Visit", get("last_dental_visit"))}${row("Bleeding Gums", get("bleeding_gums"))}${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}${row("Sensitive (Sweets)", get("sensitive_taste"))}${row("Tooth Pain", get("tooth_pain"))}${row("Sores/Lumps", get("sores"))}${row("Jaw Injuries", get("injuries"))}${row("Clicking Jaw", get("clicking"))}${row("Joint Pain", get("joint_pain"))}${row("Difficulty Moving", get("difficulty_moving"))}${row("Difficulty Chewing", get("difficulty_chewing"))}${row("Headaches", get("jaw_headaches"))}${row("Grinding/Clenching", get("clench_grind"))}${row("Lips/Cheek Biting", get("biting"))}${row("Teeth Loosening", get("teeth_loosening"))}${row("Food Caught Between Teeth", get("food_teeth"))}${row("Medicine Reaction", get("med_reaction"))}${row("Periodontal Treatment", get("periodontal"))}${row("Difficult Extraction", get("difficult_extraction"))}${row("Prolonged Bleeding", get("prolonged_bleeding"))}${row("Dentures", get("dentures"))}${row("Orthodontic Treatment", get("ortho_treatment"))}
+          </div>
+          ${get("additional_concerns") !== "N/A" ? `<p class="mt-2"><b class="text-[#5c5550] font-semibold">Additional Concerns:</b><br>${get("additional_concerns")}</p>` : ""}
+        `)}
+        ${card("Medical History", "fa-heart-pulse", `
+          <div class="grid grid-cols-2 gap-x-8 sm-grid-1col">
+            ${row("Good Health", get("good_health"))}${row("Last Medical Exam", get("medical_exam_date"))}${row("Under Treatment", get("under_treatment"))}${row("Hospitalized", get("hospitalized"))}${row("Allergy (Medicine)", get("allergy_medicine"))}${row("Allergy (Food)", get("allergy_food"))}${row("Medication", get("medication"))}${row("Tobacco Use", get("tobacco_use"))}
+          </div>
+          <p class="mt-2"><b class="text-[#5c5550] font-semibold">Medical Conditions:</b> ${diseases.length ? diseases.map(c => diseaseLabelByCode?.[c] ?? c).join(", ") : "None"}</p>
+        `)}
+        <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+          ${card("Emergency Contact", "fa-phone", row("Name", get("emergency_person")) + row("Number", get("emergency_number")) + row("Relation", emergencyRelation))}
+          ${card("Signature", "fa-signature", sigHTML)}
+        </div>`;
+      document.querySelectorAll(".sm-grid-1col").forEach(el => {
+        if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
+      });
+    }
+
+    /* SUBMIT */
+    const confirmModal = document.getElementById("confirmModal");
+    const confirmMessage = document.getElementById("confirmMessage");
+    document.getElementById("finalSubmitBtn")?.addEventListener("click", () => {
+      if (!document.getElementById("finalConfirm")?.checked) {
+        showMiniTab("Please confirm before submitting.");
+        return;
+      }
+      const date = document.getElementById("appointment_date")?.value || "N/A";
+      const time = document.getElementById("appointment_time")?.value || "N/A";
+      if (confirmMessage) confirmMessage.innerHTML = `Your dental appointment at PUP Taguig Dental Clinic has been scheduled for <b>${date}</b> at <b>${time}</b>.<br><br>Please arrive on time and bring your school or office ID.`;
+      confirmModal?.showModal();
+    });
+    document.getElementById("okBtn")?.addEventListener("click", () => {
+      clearDraft();
+      formSubmitting = true;
+      document.getElementById("appointmentForm").submit();
+    });
+
+    /* ══════════════════════════════════════════════
+       THEME
+    ══════════════════════════════════════════════ */
+    var html = document.documentElement;
+    var themeToggleContainer = document.getElementById("themeToggle");
+
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      if (themeToggleContainer) {
+        themeToggleContainer.querySelectorAll(".theme-option").forEach(function(opt) {
+          opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
+        });
+        var indicator = themeToggleContainer.querySelector(".theme-indicator");
+        if (indicator) indicator.classList.toggle("dark-mode", theme === "dark");
+      }
+      var fabIcon = document.getElementById("darkModeFabIcon");
+      if (fabIcon) fabIcon.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    }
+    applyTheme(localStorage.getItem("theme") || "light");
+    if (themeToggleContainer) {
+      themeToggleContainer.querySelectorAll(".theme-option").forEach(function(opt) {
+        opt.addEventListener("click", function() {
+          applyTheme(opt.getAttribute("data-theme"));
+        });
+      });
+    }
+
+    /* ══════════════════════════════════════════════
+       DESKTOP SIDEBAR
+    ══════════════════════════════════════════════ */
+    var sidebarOpen = true;
+
+    function applyLayout(w) {
+      var sb = document.getElementById('sidebar');
+      var mc = document.getElementById('mainContent');
+      if (sb) sb.style.width = w;
+      if (mc) mc.style.marginLeft = w;
+    }
+
+    function toggleSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      var texts = document.querySelectorAll('.sidebar-text');
+      var icon = document.getElementById('sidebarIcon');
+      var wrapper = document.getElementById('sidebarToggleWrapper');
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) {
+        applyLayout('220px');
+        sidebar.classList.replace('collapsed', 'expanded');
+        texts.forEach(function(t) {
+          t.classList.remove('opacity-0', 'w-0');
+          t.classList.add('opacity-100');
+        });
+        wrapper.classList.replace('justify-center', 'justify-end');
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        applyLayout('72px');
+        sidebar.classList.replace('expanded', 'collapsed');
+        texts.forEach(function(t) {
+          t.classList.add('opacity-0', 'w-0');
+          t.classList.remove('opacity-100');
+        });
+        wrapper.classList.replace('justify-end', 'justify-center');
+        icon.classList.replace('fa-xmark', 'fa-bars');
+      }
+      applyTheme(localStorage.getItem("theme") || "light");
+    }
+
+    /* ══════════════════════════════════════════════
+       MOBILE PROFILE ACCORDION
+    ══════════════════════════════════════════════ */
+    function toggleMobileProfile() {
+      var panel = document.getElementById('mobileProfileAccordion');
+      var chevron = document.getElementById('mobileProfileChevron');
+      var isOpen = panel.classList.contains('open');
+      panel.classList.toggle('open', !isOpen);
+      if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    /* ══════════════════════════════════════════════
+       DOM READY
+    ══════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Desktop layout */
+      if (window.innerWidth >= 768) {
+        sidebarOpen = true;
+        applyLayout('220px');
+      } else {
+        var mc = document.getElementById('mainContent');
+        if (mc) mc.style.marginLeft = '0';
+      }
+
+      /* Mobile FAB */
+      var mobFab = document.getElementById('mobFab');
+      var mobFabMenu = document.getElementById('mobFabMenu');
+      if (mobFab && mobFabMenu) {
+        mobFab.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var open = mobFabMenu.classList.contains('open');
+          mobFabMenu.classList.toggle('open', !open);
+          mobFab.classList.toggle('open', !open);
+        });
+        mobFabMenu.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+      }
+
+      /* Notifications */
+      var notifBtn = document.getElementById("notifBtn");
+      var notifMenu = document.getElementById("notifMenu");
+      if (notifBtn && notifMenu) {
+        notifBtn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          notifMenu.classList.toggle("open");
+        });
+        notifMenu.addEventListener("click", function(e) {
+          e.stopPropagation();
+        });
+        document.addEventListener("keydown", function(e) {
+          if (e.key === "Escape") notifMenu.classList.remove("open");
+        });
+      }
+
+      /* Close all on outside click */
+      document.addEventListener('click', function() {
+        if (mobFabMenu) {
+          mobFabMenu.classList.remove('open');
+          if (mobFab) mobFab.classList.remove('open');
+        }
+        if (notifMenu) notifMenu.classList.remove('open');
+        var panel = document.getElementById('mobileProfileAccordion');
+        var toggle = document.getElementById('mobileProfileToggle');
+        var chevron = document.getElementById('mobileProfileChevron');
+        if (panel && toggle && !panel.contains(event.target) && !toggle.contains(event.target)) {
+          panel.classList.remove('open');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      });
+
+      /* Scroll reveal */
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        revealObserver.observe(el);
+      });
+    });
+    
+    /* OTHERS MODAL */
+    const othersModal = document.getElementById("othersModal");
+    const othersInput = document.getElementById("other_services");
+    const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
+    othersRadio?.addEventListener("change", () => {
+      othersInput.required = true;
+      othersModal?.showModal();
+      setTimeout(() => othersInput?.focus(), 100);
+    });
+    document.getElementById("othersConfirmBtn")?.addEventListener("click", () => {
+      if (!othersInput?.value.trim()) {
+        showInputError(othersInput);
+        return;
+      }
+      othersModal?.close();
+    });
+    document.getElementById("othersCancelBtn")?.addEventListener("click", () => {
+      if (othersInput) {
+        othersInput.value = "";
+        othersInput.required = false;
+      }
+      othersModal?.close();
+      if (othersRadio) othersRadio.checked = false;
+    });
+
+    /* DATE PICKERS */
+    ["lastDentalVisit", "extractionDate", "denturesDate", "orthoDate", "medicalExamDate"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      new Pikaday({
+        field: el,
+        maxDate: new Date(),
+        yearRange: [1950, new Date().getFullYear()],
+        firstDay: 1,
+        onSelect(date) {
+          el.value = date.toISOString().split("T")[0];
+        }
+      });
+    });
+
+    /* CONDITIONAL TOGGLES */
+    [{
+      name: "difficult_extraction",
+      boxId: "extraction_date_box",
+      showOn: "YES"
+    }, {
+      name: "dentures",
+      boxId: "dentures_date_box",
+      showOn: "YES"
+    }, {
+      name: "ortho_treatment",
+      boxId: "ortho_date_box",
+      showOn: "YES"
+    }].forEach(({
+      name,
+      boxId,
+      showOn
+    }) => {
+      const radios = document.getElementsByName(name);
+      const box = document.getElementById(boxId);
+      if (!box || !radios.length) return;
+      const inp = box.querySelector("input");
+      radios.forEach(r => r.addEventListener("change", () => {
+        if (r.checked && r.value === showOn) {
+          box.classList.remove("hidden");
+          if (inp) inp.required = true;
+        } else if (r.checked) {
+          box.classList.add("hidden");
+          if (inp) {
+            inp.required = false;
+            inp.value = "";
+          }
+        }
+      }));
+    });
+
+    function syncMedicalExamBox() {
+      const sel = document.querySelector('input[name="had_medical_exam"]:checked');
+      const box = document.getElementById("medical_exam_box");
+      const inp = document.getElementById("medicalExamDate");
+      if (!sel || !box || !inp) return;
+      if (sel.value === "YES") {
+        box.classList.remove("hidden");
+        inp.required = true;
+      } else {
+        box.classList.add("hidden");
+        inp.required = false;
+        inp.value = "";
+      }
+    }
+    document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change", syncMedicalExamBox));
+    syncMedicalExamBox();
+    document.getElementById("emergency_relation")?.addEventListener("change", function () {
+      const other = document.getElementById("relation_other");
+      if (!other) return;
+      if (this.value === "Others") {
+        other.classList.remove("hidden");
+        other.setAttribute("required", "true");
+      } else {
+        other.classList.add("hidden");
+        other.removeAttribute("required");
+        other.value = "";
+      }
+    });
+    [{
+      name: "good_health",
+      boxId: "good_health_box",
+      showOn: "NO"
+    }, {
+      name: "under_treatment",
+      boxId: "treatment_box",
+      showOn: "YES"
+    }, {
+      name: "hospitalized",
+      boxId: "hospital_box",
+      showOn: "YES"
+    }, {
+      name: "medication",
+      boxId: "medication_box",
+      showOn: "YES"
+    }].forEach(({
+      name,
+      boxId,
+      showOn
+    }) => {
+      const radios = document.getElementsByName(name);
+      const box = document.getElementById(boxId);
+      if (!box || !radios.length) return;
+      radios.forEach(r => r.addEventListener("change", () => {
+        const sel = [...radios].find(x => x.checked);
+        const inputs = box.querySelectorAll("input");
+        if (sel?.value === showOn) {
+          box.classList.remove("hidden");
+          inputs.forEach(i => i.required = true);
+        } else {
+          box.classList.add("hidden");
+          inputs.forEach(i => {
+            i.required = false;
+            i.value = "";
+          });
+        }
+      }));
+    });
+    [...document.getElementsByName("tobacco_use")].forEach(r => r.addEventListener("change", () => {
+      if (r.checked && r.value === "YES") document.getElementById("tobacco_details")?.classList.remove("hidden");
+      else document.getElementById("tobacco_details")?.classList.add("hidden");
+    }));
+    const sigInput = document.getElementById("patient_signature");
+    const sigName = document.getElementById("signature_filename");
+    sigInput?.addEventListener("change", () => {
+      if (sigInput.files.length > 0) {
+        sigName.textContent = sigInput.files[0].name;
+        sigName.classList.remove("hidden");
+      } else {
+        sigName.textContent = "";
+        sigName.classList.add("hidden");
+      }
+    });
+    const emergencyNumber = document.getElementById("emergency_number");
+    emergencyNumber?.addEventListener("input", e => {
+      if (/[^0-9]/.test(e.target.value)) {
+        showMiniTab("Contact number must contain digits only.");
+        showInputError(emergencyNumber);
+      }
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.startsWith("9")) v = "0" + v;
+      v = v.slice(0, 11);
+      emergencyNumber.value = v;
+      if (/^09\d{9}$/.test(v)) {
+        emergencyNumber.classList.remove("border-red-500");
+        emergencyNumber.classList.add("border-green-600");
+      } else emergencyNumber.classList.remove("border-green-600");
+    });
+    emergencyNumber?.addEventListener("blur", () => {
+      if (!emergencyNumber.value) emergencyNumber.classList.remove("border-red-500", "border-green-600");
+    });
+
+    /* LEAVE / DRAFT */
+    let formIsDirty = false,
+      formSubmitting = false;
+    const formEl = document.getElementById("appointmentForm");
+    const leaveModal = document.getElementById("leaveModal");
+    let pendingNavigation = null;
+    formEl?.addEventListener("change", () => {
+      if (!formSubmitting) formIsDirty = true;
+    });
+    formEl?.addEventListener("input", () => {
+      if (!formSubmitting) formIsDirty = true;
+    });
+
+    function openLeaveModal(cb) {
+      pendingNavigation = cb;
+      leaveModal?.showModal();
+    }
+    document.getElementById("saveDraftBtn")?.addEventListener("click", () => {
+      saveDraftData();
+      leaveModal?.close();
+      formSubmitting = true;
+      formIsDirty = false;
+      if (typeof pendingNavigation === "function") pendingNavigation();
+      pendingNavigation = null;
+    });
+    document.getElementById("discardDraftBtn")?.addEventListener("click", () => {
+      clearDraft();
+      leaveModal?.close();
+      formSubmitting = true;
+      formIsDirty = false;
+      if (typeof pendingNavigation === "function") pendingNavigation();
+      pendingNavigation = null;
+    });
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener("click", e => {
+        const href = link.getAttribute("href") || "";
+        if (href.startsWith("#") || href.startsWith("javascript:")) return;
+        if (formIsDirty && !formSubmitting) {
+          e.preventDefault();
+          openLeaveModal(() => window.location.href = link.href);
+        }
+      });
+    });
+    history.pushState({
+      page: "book-appointment"
+    }, "", window.location.href);
+    window.addEventListener("popstate", () => {
+      if (formIsDirty && !formSubmitting) {
+        openLeaveModal(() => history.back());
+        history.pushState({
+          page: "book-appointment"
+        }, "", window.location.href);
+      }
+    });
+    window.addEventListener("beforeunload", e => {
+      if (formIsDirty && !formSubmitting) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    /* INIT */
+    showStep(0);
+    loadCalendar();
+    restoreDraft();
+
+    window.addEventListener("resize", () => {
+      document.querySelectorAll(".sm-grid-1col").forEach(el => {
+        el.style.gridTemplateColumns = window.innerWidth < 640 ? "1fr" : "1fr 1fr";
+      });
+    });
+  </script>
 </body>
+
 </html>

@@ -12,7 +12,10 @@ class DentistAppointmentController extends Controller
     public function index()
     {
         // same session style you use
-        if (session('role') !== 'dentist') {
+
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -53,59 +56,54 @@ class DentistAppointmentController extends Controller
     }
 
     public function patientProfile(Appointment $appointment)
-{
-    if (session('role') !== 'dentist') {
-        return redirect('/login');
-    }
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
 
-    $appointment->load('patient');
+        if ($activeRole !== 'dentist') {
+            return redirect('/login');
+        }
 
-    $patient = $appointment->patient;
+        $appointment->load('patient');
 
-    if (!$patient) {
-        return redirect()->route('dentist.appointments')
-            ->with('error', 'Patient not found for this appointment.');
-    }
+        $patient = $appointment->patient;
 
-    $today = Carbon::today()->toDateString();
+        if (!$patient) {
+            return redirect()->route('dentist.appointments')
+                ->with('error', 'Patient not found for this appointment.');
+        }
 
-    $futureVisits = Appointment::where('patient_id', $patient->id)
-        ->whereDate('appointment_date', '>=', $today)
-        ->orderBy('appointment_date', 'asc')
-        ->orderBy('appointment_time', 'asc')
-        ->get();
+        $today = Carbon::today()->toDateString();
 
-    $pastVisits = Appointment::where('patient_id', $patient->id)
-        ->whereDate('appointment_date', '<', $today)
-        ->orderBy('appointment_date', 'desc')
-        ->orderBy('appointment_time', 'desc')
-        ->get();
+        $futureVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '>=', $today)
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
 
-    $lastVisit = $pastVisits->first();
-    $nextAppointment = $futureVisits->first();
-    $totalVisits = $pastVisits->count() + $futureVisits->count();
+        $pastVisits = Appointment::where('patient_id', $patient->id)
+            ->whereDate('appointment_date', '<', $today)
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
 
-    $notifications = collect([]);
+        $lastVisit = $pastVisits->first();
+        $nextAppointment = $futureVisits->first();
+        $totalVisits = $pastVisits->count() + $futureVisits->count();
 
-        return view('dentist.dentist-patientprofile', compact(
+        $notifications = collect([]);
+
+
+        return view('dentist-patientprofile', compact(
             'patient',
             'appointment',
             'futureVisits',
             'pastVisits',
+            'lastVisit',
+            'nextAppointment',
+            'totalVisits',
             'notifications'
         ));
     }
-    return view('dentist-patientprofile', compact(
-        'patient',
-        'appointment',
-        'futureVisits',
-        'pastVisits',
-        'lastVisit',
-        'nextAppointment',
-        'totalVisits',
-        'notifications'
-    ));
-}
 
     public function cancel(Request $request, $id)
     {
