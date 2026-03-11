@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 */
 
 Route::get('/', fn() => redirect('/login'));
+Route::get('/', fn() => redirect('/login'));
 
 // Patient Login
 Route::get('/login', function () {
@@ -57,50 +58,80 @@ Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name(
 
 // Patient Registration
 Route::post('/register', function (Request $request) {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:patients,email',
-        'phone' => 'nullable|string|max:20',
-        'birthdate' => 'nullable|date',
-        'gender' => 'nullable|string|max:10',
-        'password' => 'required|string|min:6|confirmed',
+    $validated = $request->validate([
+        'name'      => 'required|string|min:2|max:255',
+        'email'     => 'required|email|unique:patients,email',
+        'phone'     => 'nullable|string|max:20',
+        'birthdate' => 'required|date|before:today|after:120 years ago',
+        'gender'    => 'required|in:Male,Female',
+        'password'  => [
+            'required',
+            'string',
+            'min:8',
+            'confirmed',
+            'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',
+        ],
+    ], [
+        // Custom error messages
+        'name.min'          => 'Name must be at least 2 characters.',
+        'email.unique'      => 'This email is already registered.',
+        'email.email'       => 'Please enter a valid email address.',
+        'birthdate.required' => 'Birthdate is required.',
+        'birthdate.before'  => 'Birthdate cannot be in the future.',
+        'birthdate.after'   => 'Please enter a valid birthdate.',
+        'gender.required'   => 'Please select a gender.',
+        'gender.in'         => 'Gender must be Male or Female.',
+        'password.min'      => 'Password must be at least 8 characters.',
+        'password.confirmed' => 'Passwords do not match.',
+        'password.regex'    => 'Password must contain at least one letter, one number, and one special character.',
     ]);
 
+    try {
+        Patient::create([
+            'name'      => $validated['name'],
+            'email'     => $validated['email'],
+            'phone'     => $validated['phone'] ?? null,
+            'birthdate' => $validated['birthdate'] ?? null,
+            'gender'    => $validated['gender'] ?? null,
+            'password'  => Hash::make($validated['password']),
+        ]);
 
-
-    Patient::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'birthdate' => $request->birthdate,
-        'gender' => $request->gender,
-        'password' => Hash::make($request->password),
-    ]);
-
-    return redirect('/login')->with('success', 'Account created successfully!');
+        return redirect('/login')->with('success', 'Account created successfully! You can now log in.');
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withInput($request->except('password', 'password_confirmation'))
+            ->with('error', 'Something went wrong. Please try again.');
+    }
 });
 
 // Patient Login POST
 Route::post('/login', function (Request $request) {
     $patient = Patient::where('email', $request->email)->first();
 
-    if ($patient && Hash::check($request->password, $patient->password)) {
-        session([
-            'role' => 'patient',
-            'patient_id' => $patient->id,
-            'email' => $patient->email,
-        ]);
-
-        AuditLogger::log(
-            'login',
-            'authentication',
-            'Patient logged into the system'
-        );
-
-        return redirect()->route('homepage');
+    // Check if patient exists
+    if (!$patient) {
+        return back()->with('error', 'No account associated with this email. Please try again or register.');
     }
 
-    return back()->with('error', 'Invalid credentials');
+    // Check password
+    if (!Hash::check($request->password, $patient->password)) {
+        return back()->with('error', 'Incorrect password. Please try again.');
+    }
+
+    // Successful login
+    session([
+        'role' => 'patient',
+        'patient_id' => $patient->id,
+        'email' => $patient->email,
+    ]);
+
+    AuditLogger::log(
+        'login',
+        'authentication',
+        'Patient logged into the system'
+    );
+
+    return redirect()->route('homepage');
 });
 
 // Dentist Login POST (hard-coded for now)
@@ -194,13 +225,30 @@ Route::post('/impersonate', function (Request $request) {
     if (!session('admin_logged_in') || session('role') !== 'super_admin') {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
+Route::post('/impersonate', function (Request $request) {
+    if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
 
+    $request->validate([
+        'role' => 'required|string'
+    ]);
     $request->validate([
         'role' => 'required|string'
     ]);
 
     $targetRole = strtolower(trim($request->role));
+    $targetRole = strtolower(trim($request->role));
 
+    // Save original admin identity once
+    if (!session()->has('impersonator_role')) {
+        session([
+            'impersonator_role' => session('role'),
+            'impersonator_admin_logged_in' => session('admin_logged_in'),
+            'impersonator_admin_id' => session('admin_id'),
+            'impersonator_admin_email' => session('admin_email'),
+        ]);
+    }
     // Save original admin identity once
     if (!session()->has('impersonator_role')) {
         session([
@@ -215,9 +263,19 @@ Route::post('/impersonate', function (Request $request) {
         session([
             'impersonated_role' => 'dentist',
         ]);
+    if ($targetRole === 'dentist') {
+        session([
+            'impersonated_role' => 'dentist',
+        ]);
 
         session()->forget(['impersonated_patient_id']);
+        session()->forget(['impersonated_patient_id']);
 
+        \App\Helpers\AuditLogger::log(
+            'impersonation_started',
+            'authentication',
+            'Super Admin started impersonating Dentist dashboard'
+        );
         \App\Helpers\AuditLogger::log(
             'impersonation_started',
             'authentication',
@@ -228,10 +286,21 @@ Route::post('/impersonate', function (Request $request) {
             'redirect' => route('dentist.dentist.dashboard')
         ]);
     }
+        return response()->json([
+            'redirect' => route('dentist.dentist.dashboard')
+        ]);
+    }
 
     if ($targetRole === 'patient') {
         $patient = \App\Models\Patient::first();
+    if ($targetRole === 'patient') {
+        $patient = \App\Models\Patient::first();
 
+        if (!$patient) {
+            return response()->json([
+                'message' => 'No patient found to impersonate.'
+            ], 422);
+        }
         if (!$patient) {
             return response()->json([
                 'message' => 'No patient found to impersonate.'
@@ -242,8 +311,17 @@ Route::post('/impersonate', function (Request $request) {
             'impersonated_role' => 'patient',
             'impersonated_patient_id' => $patient->id,
         ]);
+        session([
+            'impersonated_role' => 'patient',
+            'impersonated_patient_id' => $patient->id,
+        ]);
 
-        \App\Helpers\AuditLogger::log(
+        AuditLogger::log(
+            'impersonation_started',
+            'authentication',
+            'Super Admin started impersonating Patient dashboard'
+        );
+        AuditLogger::log(
             'impersonation_started',
             'authentication',
             'Super Admin started impersonating Patient dashboard'
@@ -253,12 +331,29 @@ Route::post('/impersonate', function (Request $request) {
             'redirect' => route('patient.dashboard')
         ]);
     }
+        return response()->json([
+            'redirect' => route('patient.dashboard')
+        ]);
+    }
 
     return response()->json([
         'message' => 'Unsupported role.'
     ], 422);
 })->name('admin.impersonate');
+    return response()->json([
+        'message' => 'Unsupported role.'
+    ], 422);
+})->name('admin.impersonate');
 
+// STOP IMPERSONATION
+Route::post('/stop-impersonation', function () {
+    if (session()->has('impersonator_role')) {
+        \App\Helpers\AuditLogger::log(
+            'impersonation_stopped',
+            'authentication',
+            'Super Admin stopped impersonation'
+        );
+    }
 // STOP IMPERSONATION
 Route::post('/stop-impersonation', function () {
     if (session()->has('impersonator_role')) {
@@ -277,12 +372,26 @@ Route::post('/stop-impersonation', function () {
         'impersonator_admin_id',
         'impersonator_admin_email',
     ]);
+    session()->forget([
+        'impersonated_role',
+        'impersonated_patient_id',
+        'impersonator_role',
+        'impersonator_admin_logged_in',
+        'impersonator_admin_id',
+        'impersonator_admin_email',
+    ]);
 
     session([
         'role' => 'super_admin',
         'admin_logged_in' => true,
     ]);
+    session([
+        'role' => 'super_admin',
+        'admin_logged_in' => true,
+    ]);
 
+    return redirect()->route('admin.admin.dashboard');
+})->name('admin.stop_impersonation');
     return redirect()->route('admin.admin.dashboard');
 })->name('admin.stop_impersonation');
 
@@ -503,6 +612,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->name('dentist.dentist.patient.profile');
 
     // Reports
+
 
 
     // Report Page
