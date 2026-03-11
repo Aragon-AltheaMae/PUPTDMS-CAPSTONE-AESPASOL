@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+
     <script>
         tailwind.config = {
             daisyui: {
@@ -44,6 +45,7 @@
             background: #9ca3af;
         }
 
+        /* ── HEADER ── */
         .header {
             position: fixed;
             top: 0;
@@ -175,33 +177,26 @@
             position: relative;
         }
 
+        /* ── SIDEBAR ── */
         #sidebar {
             position: fixed;
             left: 0;
             top: 62px;
+            width: 240px;
             height: calc(100vh - 62px);
             background: #fff;
             box-shadow: 2px 0 20px rgba(0, 0, 0, .07);
             z-index: 40;
             display: flex;
             flex-direction: column;
-            transition: width .3s cubic-bezier(.4, 0, .2, 1);
             overflow: hidden;
-        }
-
-        #sidebar.expanded {
-            width: 240px;
-        }
-
-        #sidebar.collapsed {
-            width: 68px;
         }
 
         .sidebar-inner {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 10px 0 6px;
+            padding: 12px 0 6px;
         }
 
         .sidebar-inner::-webkit-scrollbar {
@@ -213,39 +208,7 @@
             border-radius: 4px;
         }
 
-        .sidebar-toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 6px 12px 10px;
-            border-bottom: 1px solid #f3f4f6;
-            margin-bottom: 4px;
-        }
-
-        #sidebar.collapsed .sidebar-toggle-row {
-            justify-content: center;
-        }
-
-        .toggle-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            background: #f9fafb;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .2s;
-        }
-
-        .toggle-btn:hover {
-            background: #fee2e2;
-            color: #8B0000;
-        }
-
+        /* Group header — static, not clickable for collapse */
         .nav-group {
             margin: 0 8px 2px;
         }
@@ -253,24 +216,8 @@
         .group-header {
             display: flex;
             align-items: center;
-            width: 100%;
-            border: none;
-            background: none;
-            cursor: pointer;
-            padding: 7px 8px;
-            border-radius: 10px;
-            transition: background .15s;
+            padding: 7px 8px 5px;
             color: #6b7280;
-        }
-
-        .group-header:hover {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .group-header.active-group {
-            background: #fef2f2;
-            color: #8B0000;
         }
 
         .group-icon {
@@ -282,7 +229,6 @@
             align-items: center;
             justify-content: center;
             font-size: 15px;
-            transition: all .2s;
         }
 
         .group-header.active-group .group-icon {
@@ -299,56 +245,26 @@
         }
 
         .group-label {
-            font-size: .78rem;
+            font-size: .72rem;
             font-weight: 700;
             white-space: nowrap;
             line-height: 1.2;
             display: block;
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
 
         .group-sublabel {
-            font-size: .63rem;
-            color: #9ca3af;
+            font-size: .62rem;
+            color: #b0b8c4;
             white-space: nowrap;
             display: block;
             margin-top: 1px;
         }
 
-        .group-chevron {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            transition: transform .25s;
-            flex-shrink: 0;
-        }
-
-        .group-chevron.open {
-            transform: rotate(180deg);
-        }
-
-        #sidebar.collapsed .group-label-wrap {
-            display: none;
-        }
-
-        #sidebar.collapsed .group-chevron {
-            display: none;
-        }
-
+        /* Group body always visible */
         .group-body {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height .3s cubic-bezier(.4, 0, .2, 1);
-        }
-
-        .group-body.open {
-            max-height: 500px;
-        }
-
-        #sidebar.collapsed .group-body {
-            max-height: 0 !important;
+            padding-bottom: 4px;
         }
 
         .nav-link {
@@ -392,76 +308,13 @@
         .nav-sep {
             height: 1px;
             background: #f3f4f6;
-            margin: 6px 12px;
-        }
-
-        .flyout-wrapper {
-            position: relative;
-        }
-
-        .flyout-panel {
-            position: fixed;
-            left: 76px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .13);
-            border: 1px solid #f0e6e6;
-            min-width: 200px;
-            padding: 6px;
-            opacity: 0;
-            transform: scale(.95) translateX(-6px);
-            pointer-events: none;
-            transition: all .2s cubic-bezier(.4, 0, .2, 1);
-            transform-origin: left center;
-            z-index: 999;
-        }
-
-        .flyout-panel.open {
-            opacity: 1;
-            transform: scale(1) translateX(0);
-            pointer-events: auto;
-        }
-
-        .flyout-title {
-            font-size: .68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            color: #8B0000;
-            padding: 4px 8px 6px;
-            border-bottom: 1px solid #fde8e8;
-            margin-bottom: 4px;
-        }
-
-        .flyout-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-size: .77rem;
-            font-weight: 500;
-            color: #374151;
-            text-decoration: none;
-            transition: all .15s;
-            white-space: nowrap;
-        }
-
-        .flyout-link:hover {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .flyout-link i {
-            width: 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #8B0000;
+            margin: 8px 12px;
         }
 
         .sidebar-bottom {
             padding: 8px 8px 12px;
             border-top: 1px solid #f3f4f6;
+            flex-shrink: 0;
         }
 
         .theme-toggle-container {
@@ -474,27 +327,13 @@
             background: #F5F5F5;
             border: 1px solid #E0E0E0;
             border-radius: 24px;
-            transition: all .3s ease;
-        }
-
-        #sidebar.collapsed .theme-toggle-container {
-            flex-direction: column;
-            width: 35px;
-            height: 96px;
-            border-radius: 24px;
-            padding: 4px;
-        }
-
-        #sidebar.collapsed .w-full {
-            display: flex;
-            justify-content: center;
         }
 
         .theme-option {
             position: relative;
             z-index: 2;
             flex: 1;
-            height: 40px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -504,12 +343,6 @@
             color: #9CA3AF;
             transition: color .2s ease;
             border-radius: 8px;
-        }
-
-        #sidebar.collapsed .theme-option {
-            width: 35px;
-            height: 40px;
-            flex: none;
         }
 
         .theme-option i {
@@ -523,34 +356,18 @@
         .theme-indicator {
             position: absolute;
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
             transition: all .3s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
-        }
-
-        #sidebar.expanded .theme-indicator {
-            width: calc(50% - 2px);
+            width: calc(50% - 4px);
             height: calc(100% - 8px);
             left: 4px;
             top: 4px;
-            border-radius: 20px;
         }
 
-        #sidebar.expanded .theme-indicator.dark-mode {
+        .theme-indicator.dark-mode {
             transform: translateX(calc(100% + 0px));
-        }
-
-        #sidebar.collapsed .theme-indicator {
-            width: calc(100% - 8px);
-            height: calc(50% - 6px);
-            left: 4px;
-            top: 4px;
-            border-radius: 16px;
-        }
-
-        #sidebar.collapsed .theme-indicator.dark-mode {
-            transform: translateY(calc(100% + 4px));
         }
 
         .logout-btn {
@@ -573,28 +390,424 @@
             background: #fef2f2;
         }
 
-        #sidebar.collapsed .logout-btn {
-            justify-content: center;
-            padding: 8px;
+        /* ── LAYOUT ── */
+        #mainContent,
+        #siteFooter {
+            margin-left: 240px;
         }
 
-        #sidebar.collapsed .logout-text {
-            display: none;
-        }
-
-        #sidebar.collapsed .settings-label {
-            display: none;
-        }
-
+        /* ── DARK MODE ── */
         body,
         main,
         footer {
             transition: background-color .3s ease, color .3s ease;
         }
 
-        #mainContent,
+        [data-theme="dark"] body {
+            background-color: #000D1A;
+            color: #E5E7EB;
+        }
+
+        [data-theme="dark"] #sidebar {
+            background-color: #0d1117;
+            border-right: 1px solid #21262d;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: #161b22 !important;
+        }
+
+        [data-theme="dark"] .text-\[\#333333\] {
+            color: #E5E7EB !important;
+        }
+
+        [data-theme="dark"] .nav-link:hover {
+            background: rgba(139, 0, 0, .2);
+        }
+
+        [data-theme="dark"] .theme-toggle-container {
+            background: #1F1F1F;
+            border-color: #2A2A2A;
+        }
+
+        [data-theme="dark"] .theme-option {
+            color: #6B7280;
+        }
+
+        [data-theme="dark"] .theme-option.active {
+            color: #F3F4F6;
+        }
+
+        [data-theme="dark"] .theme-indicator {
+            background: #2A2A2A;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+
+        [data-theme="dark"] .nav-sep,
+        [data-theme="dark"] .sidebar-bottom {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .group-label {
+            color: #6b7280;
+        }
+
+        [data-theme="dark"] .sl-card,
+        [data-theme="dark"] .sl-stat {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .sl-page-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-toolbar-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-table thead tr {
+            background: #0d1117;
+        }
+
+        [data-theme="dark"] .sl-table tbody tr:hover {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .sl-table tbody td {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .sl-username,
+        [data-theme="dark"] .sl-date-day {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .sl-pagebar {
+            background: #0d1117;
+            border-color: #21262d;
+        }
+
+        /* ── MOBILE BOTTOM NAV ── */
+        #adminMobileNav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #fff;
+            border-top: 1px solid #f0e0e0;
+            z-index: 200;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 -4px 20px rgba(139, 0, 0, .10);
+        }
+
+        .adm-mob-item {
+            flex: 1;
+            height: 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-size: 9.5px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color .2s;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .adm-mob-item.active {
+            color: #8B0000;
+        }
+
+        .adm-mob-item i {
+            font-size: 20px;
+        }
+
+        .adm-mob-item.active i {
+            filter: drop-shadow(0 0 6px rgba(139, 0, 0, .35));
+        }
+
+        /* FAB center button */
+        #admMobFabWrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #admMobFab {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B0000, #660000);
+            color: white;
+            border: none;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(139, 0, 0, .45);
+            cursor: pointer;
+            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+            position: relative;
+            top: -10px;
+        }
+
+        #admMobFab.open {
+            transform: rotate(45deg) translateY(-10px);
+        }
+
+        /* FAB menu (quick nav) */
+        #admMobFabMenu {
+            position: fixed;
+            bottom: 86px;
+            left: 50%;
+            transform: translateX(-50%) scaleY(0);
+            transform-origin: bottom center;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(139, 0, 0, .18);
+            border: 1px solid #f5e8e8;
+            min-width: 220px;
+            overflow: hidden;
+            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), opacity .2s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 300;
+        }
+
+        #admMobFabMenu.open {
+            transform: translateX(-50%) scaleY(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .adm-fab-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            transition: background .15s;
+            border-bottom: 1px solid #fdf5f5;
+        }
+
+        .adm-fab-item:last-child {
+            border-bottom: none;
+        }
+
+        .adm-fab-item:hover {
+            background: #fff0f0;
+            color: #8B0000;
+        }
+
+        .adm-fab-item .adm-fab-icon {
+            width: 32px;
+            height: 32px;
+            background: #fef2f2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 767px) {
+            #sidebar {
+                display: none !important;
+            }
+
+            #mainContent {
+                margin-left: 0 !important;
+                padding-bottom: 86px !important;
+            }
+
+            #siteFooter {
+                margin-left: 0 !important;
+                margin-bottom: 68px;
+            }
+
+            #adminMobileNav {
+                display: flex;
+            }
+
+            .header {
+                padding: 0 1rem;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .sl-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sl-table thead th:nth-child(6),
+            .sl-table tbody td:nth-child(6),
+            .sl-table thead th:nth-child(7),
+            .sl-table tbody td:nth-child(7) {
+                display: none;
+            }
+
+            .user-table-row td {
+                padding-top: 0.65rem;
+                padding-bottom: 0.65rem;
+            }
+
+            .action-btn {
+                padding: 5px 6px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #adminMobileNav {
+                display: none !important;
+            }
+        }
+
+        /* ── DARK MOBILE ── */
+        [data-theme="dark"] #adminMobileNav {
+            background: #0a0a0a;
+            border-top-color: #1a1a1a;
+        }
+
+        [data-theme="dark"] #admMobFabMenu {
+            background: #111;
+            border-color: #222;
+        }
+
+        [data-theme="dark"] .adm-fab-item {
+            color: #E5E7EB;
+            border-bottom-color: #1a1a1a;
+        }
+
+        [data-theme="dark"] .adm-fab-item:hover {
+            background: #1a1a1a;
+        }
+
+        [data-theme="dark"] .adm-mob-item {
+            color: #4b5563;
+        }
+
+        [data-theme="dark"] .adm-mob-item.active {
+            color: #ff6b6b;
+        }
+
+        /* ── DARK MODE ── */
+        body,
+        main,
         footer {
-            transition: margin-left .3s cubic-bezier(.4, 0, .2, 1);
+            transition: background-color .3s ease, color .3s ease;
+        }
+
+        [data-theme="dark"] body {
+            background-color: #000D1A;
+            color: #E5E7EB;
+        }
+
+        [data-theme="dark"] #sidebar {
+            background-color: #0d1117;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: #161b22 !important;
+        }
+
+        [data-theme="dark"] .text-\[\#333333\] {
+            color: #E5E7EB !important;
+        }
+
+        [data-theme="dark"] .group-header:hover,
+        [data-theme="dark"] .nav-link:hover {
+            background: rgba(139, 0, 0, .2);
+        }
+
+        [data-theme="dark"] .theme-toggle-container {
+            background: #1F1F1F;
+            border-color: #2A2A2A;
+        }
+
+        [data-theme="dark"] .theme-option {
+            color: #6B7280;
+        }
+
+        [data-theme="dark"] .theme-option.active {
+            color: #F3F4F6;
+        }
+
+        [data-theme="dark"] .theme-indicator {
+            background: #2A2A2A;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+
+        [data-theme="dark"] .flyout-panel {
+            background: #161b22;
+            border-color: #2d1a1a;
+        }
+
+        [data-theme="dark"] .flyout-link {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .nav-sep,
+        [data-theme="dark"] .sidebar-bottom {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .sidebar-toggle-row {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .sl-card,
+        [data-theme="dark"] .sl-stat {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .sl-page-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-toolbar-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .sl-table thead tr {
+            background: #0d1117;
+        }
+
+        [data-theme="dark"] .sl-table tbody tr:hover {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .sl-table tbody td {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .sl-username,
+        [data-theme="dark"] .sl-date-day {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .sl-pagebar {
+            background: #0d1117;
+            border-color: #21262d;
         }
 
         .stat-card {
@@ -889,6 +1102,7 @@
 
 <body class="bg-[#f5f5f5] text-[#333333]">
 
+    <!-- ════════════ HEADER ════════════ -->
     <header class="header">
         <div class="header-left">
             <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
@@ -896,16 +1110,11 @@
             <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
         </div>
         <div class="header-right">
-            @php
-                $notifications = collect($notifications ?? []);
-                $notifCount = $notifications->count();
-            @endphp
+            @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
             <div id="notifDropdown">
                 <button class="notif-btn" id="notifBtn">
                     <i class="fa-regular fa-bell"></i>
-                    @if ($notifCount > 0)
-                        <span class="notif-badge">{{ $notifCount }}</span>
-                    @endif
+                    @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
                 </button>
                 <div id="notifMenu">
                     <div
@@ -913,16 +1122,15 @@
                         Notifications</div>
                     <div style="max-height:260px; overflow-y:auto;">
                         @forelse($notifications as $n)
-                            <a href="{{ $n['url'] ?? '#' }}"
-                                style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
-                                <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-                                @if (!empty($n['message']))
-                                    <div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>
-                                @endif
-                            </a>
+                        <a href="{{ $n['url'] ?? '#' }}"
+                            style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+                            <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+                            @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>
+                            @endif
+                        </a>
                         @empty
-                            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all
-                                caught up.</div>
+                        <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all
+                            caught up.</div>
                         @endforelse
                     </div>
                 </div>
@@ -930,171 +1138,94 @@
             <div class="header-user">
                 <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
                 <div>
-                    <div class="header-name">{{ session('admin_email') ?? 'Admin' }}</div>
-                    <div class="header-role">{{ session('role') ?? 'Administrator' }}</div>
+                    <div class="header-name">Admin</div>
+                    <div class="header-role">Admin</div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="expanded">
-
-        <div class="sidebar-toggle-row">
-            <button class="toggle-btn" onclick="toggleSidebar()" id="sidebarToggleBtn">
-                <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-            </button>
-        </div>
-
+    <!-- ════════════ SIDEBAR ════════════ -->
+    <aside id="sidebar">
         <div class="sidebar-inner">
 
-            <!-- ══════════════════════════════
-           GROUP 1 — CLINIC MANAGEMENT
-      ══════════════════════════════ -->
-            <div class="nav-group flyout-wrapper" id="group-cms">
-                <div class="group-header active-group" onclick="toggleGroup('cms', event)">
+            <!-- GROUP 1 — CLINIC MANAGEMENT -->
+            <div class="nav-group" id="group-cms">
+                <div class="group-header {{ request()->routeIs('admin.admin.dashboard') ? 'active-group' : '' }}">
                     <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
                     <div class="group-label-wrap">
                         <span class="group-label">Clinic Management</span>
                         <span class="group-sublabel">Core clinical modules</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down group-chevron" id="chevron-cms"></i>
                 </div>
-                <div class="group-body open" id="body-cms">
+                <div class="group-body">
                     <a href="{{ route('admin.admin.dashboard') }}"
-                        class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-line"></i> Dashboard
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-users"></i> Patients
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-calendar-check"></i> Appointments
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-tooth"></i> Dental Records
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-circle-check"></i> Document Request
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-chart-column"></i> Reports
-                    </a>
-                </div>
-                <div class="flyout-panel" id="flyout-cms">
-                    <div class="flyout-title">Clinic Management</div>
-                    <a href="{{ route('admin.admin.dashboard') }}"
-                        class="flyout-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
+                        class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-users"></i> Patients</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-calendar-check"></i> Appointments</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-tooth"></i> Dental Records</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-file-circle-check"></i> Document Request</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-file-chart-column"></i> Reports</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                            class="fa-solid fa-file"></i> Reports</a>
                 </div>
             </div>
 
             <div class="nav-sep"></div>
 
-            <!-- ══════════════════════════════
-           GROUP 2 — MAINTENANCE
-      ══════════════════════════════ -->
-            <div class="nav-group flyout-wrapper" id="group-mnt">
-                <div class="group-header" onclick="toggleGroup('mnt', event)">
+            <!-- GROUP 2 — MAINTENANCE -->
+            <div class="nav-group" id="group-mnt">
+                <div
+                    class="group-header {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*') ? 'active-group' : '' }}">
                     <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
                     <div class="group-label-wrap">
                         <span class="group-label">Maintenance</span>
-                        <span class="group-sublabel">Config &amp; scheduling</span>
+                        <span class="group-sublabel">Configuration &amp; scheduling</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down group-chevron" id="chevron-mnt"></i>
                 </div>
-                <div class="group-body" id="body-mnt">
+                <div class="group-body">
                     <a href="{{ route('admin.user_management') }}"
-                        class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user-gear"></i> User Management
-                    </a>
-                    <a href="{{ route('admin.role_permissions') }}"
-                        class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions
-                    </a>
-                    <a href="{{ route('admin.academic_periods') }}"
-                        class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-school"></i> Academic Periods
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-calendar-days"></i> Clinic Schedule
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-list-check"></i> Service Types
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-pen"></i> Document Templates
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-boxes-stacked"></i> Inventory
-                    </a>
-                </div>
-                <div class="flyout-panel" id="flyout-mnt">
-                    <div class="flyout-title">Maintenance</div>
-                    <a href="{{ route('admin.user_management') }}"
-                        class="flyout-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
+                        class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-gear"></i> User Management</a>
                     <a href="{{ route('admin.role_permissions') }}"
-                        class="flyout-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
+                        class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
                     <a href="{{ route('admin.academic_periods') }}"
-                        class="flyout-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
+                        class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
                             class="fa-solid fa-school"></i> Academic Periods</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-list-check"></i> Service Types</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-file-pen"></i> Document Templates</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-boxes-stacked"></i> Inventory</a>
                 </div>
             </div>
 
             <div class="nav-sep"></div>
 
-            <!-- ══════════════════════════════
-           GROUP 3 — SYSTEM
-      ══════════════════════════════ -->
-            <div class="nav-group flyout-wrapper" id="group-sys">
-                <div class="group-header" onclick="toggleGroup('sys', event)">
+            <!-- GROUP 3 — SYSTEM -->
+            <div class="nav-group" id="group-sys">
+                <div class="group-header {{ request()->routeIs('admin.system_logs') ? 'active-group' : '' }}">
                     <div class="group-icon"><i class="fa-solid fa-server"></i></div>
                     <div class="group-label-wrap">
                         <span class="group-label">System</span>
                         <span class="group-sublabel">Admin &amp; configuration</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down group-chevron" id="chevron-sys"></i>
                 </div>
-                <div class="group-body" id="body-sys">
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-database"></i> Data Backup
-                    </a>
-                    <a href="{{ route('admin.system_logs') }}"
-                        class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
-                        <i class="fa-solid fa-clipboard-list"></i> System Logs
-                    </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}">
-                        <i class="fa-solid fa-sliders"></i> System Settings
-                    </a>
-                </div>
-                <div class="flyout-panel" id="flyout-sys">
-                    <div class="flyout-title">System</div>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                <div class="group-body">
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-database"></i> Data Backup</a>
                     <a href="{{ route('admin.system_logs') }}"
-                        class="flyout-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
+                        class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
                             class="fa-solid fa-sliders"></i> System Settings</a>
                 </div>
             </div>
@@ -1102,8 +1233,7 @@
         </div><!-- /sidebar-inner -->
 
         <div class="sidebar-bottom">
-            <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1 settings-label">
-                Settings</div>
+            <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1">Settings</div>
             <div class="w-full px-1 mb-3">
                 <div id="themeToggle" class="theme-toggle-container">
                     <button type="button" class="theme-option active" data-theme="light"><i
@@ -1120,54 +1250,126 @@
                         style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                         <i class="fa-solid fa-right-from-bracket text-sm"></i>
                     </span>
-                    <span class="logout-text font-semibold">Log out</span>
+                    <span class="font-semibold">Log out</span>
                 </button>
             </form>
         </div>
-
     </aside>
 
-    <main id="mainContent" class="pt-[100px] px-6 py-6 min-h-screen" style="margin-left:240px;">
-        <div class="max-w-7xl mt-4 mx-auto">
+    <!-- ════════════ MOBILE BOTTOM NAV ════════════ -->
+    <nav id="adminMobileNav">
+        {{-- Dashboard --}}
+        <a href="{{ route('admin.admin.dashboard') }}"
+            class="adm-mob-item {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+
+        {{-- Patients --}}
+        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-users"></i>
+            <span>Patients</span>
+        </a>
+
+        {{-- FAB — Quick Actions --}}
+        <div id="admMobFabWrap">
+            <div id="admMobFabMenu">
+                <a href="{{ route('admin.admin.dashboard') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                    Appointments
+                </a>
+                <a href="{{ route('admin.system_logs') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+                    System Logs
+                </a>
+                <a href="{{ route('admin.user_management') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-user-gear"></i></span>
+                    User Management
+                </a>
+                <a href="{{ route('admin.role_permissions') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-user-shield"></i></span>
+                    Roles &amp; Permissions
+                </a>
+                <a href="{{ route('admin.academic_periods') }}" class="adm-fab-item">
+                    <span class="adm-fab-icon"><i class="fa-solid fa-school"></i></span>
+                    Academic Periods
+                </a>
+            </div>
+            <button id="admMobFab" aria-label="Quick navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        {{-- Appointments --}}
+        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Appts</span>
+        </a>
+
+        {{-- System Logs --}}
+        <a href="{{ route('admin.system_logs') }}"
+            class="adm-mob-item {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
+            <i class="fa-solid fa-clipboard-list"></i>
+            <span>Logs</span>
+        </a>
+    </nav>
+
+    <!-- ════════════ MAIN CONTENT ════════════ -->
+    @php
+    $logs = $logs ?? collect([]);
+    $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
+    $adminCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','admin')->count();
+    $dentistCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','dentist')->count();
+    $patientCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->where('actor_role','patient')->count();
+    $loginCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
+    $logs)->whereIn('action',['login','Login'])->count();
+    @endphp
+
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
+        <div style="max-width:1280px; margin:0 auto;">
+
             <div class="mb-6">
                 <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
                     <i class="fa-solid fa-user-gear text-[#8B0000] text-xs"></i>
                     <p id="currentDate"></p>
                 </div>
-                <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">User Management</h1>
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#8B0000]">User Management</h1>
                         <p class="text-gray-500 text-sm mt-1">Manage system accounts, roles, and access permissions</p>
                     </div>
                     <button onclick="openModal('addModal')"
-                        class="flex items-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+                        class="flex items-center justify-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
                         <i class="fa-solid fa-user-plus"></i> Add New User
                     </button>
                 </div>
             </div>
 
             @if (session('success'))
-                <div class="flash-alert bg-green-50 border border-green-200 text-green-800">
-                    <i class="fa-solid fa-circle-check text-green-500"></i>
-                    {{ session('success') }}
-                    <button onclick="this.parentElement.remove()"
-                        class="ml-auto text-green-400 hover:text-green-600"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+            <div class="flash-alert bg-green-50 border border-green-200 text-green-800">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                {{ session('success') }}
+                <button onclick="this.parentElement.remove()" class="ml-auto text-green-400 hover:text-green-600"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
             @endif
 
             @if (session('error'))
-                <div class="flash-alert bg-red-50 border border-red-200 text-red-800">
-                    <i class="fa-solid fa-circle-xmark text-red-500"></i>
-                    {{ session('error') }}
-                    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i
-                            class="fa-solid fa-xmark"></i></button>
-                </div>
+            <div class="flash-alert bg-red-50 border border-red-200 text-red-800">
+                <i class="fa-solid fa-circle-xmark text-red-500"></i>
+                {{ session('error') }}
+                <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
             @endif
 
             @php
-                $totalUsers = $users->total();
-                $activeCount = \App\Models\User::where('status', 'active')->count();
-                $inactiveCount = \App\Models\User::where('status', 'inactive')->count();
+            $totalUsers = $users->total();
+            $activeCount = \App\Models\User::where('status', 'active')->count();
+            $inactiveCount = \App\Models\User::where('status', 'inactive')->count();
             @endphp
 
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -1215,52 +1417,61 @@
             </div>
 
             <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden mb-6">
-                <div
-                    class="px-5 py-4 border-b bg-gray-50 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                <div class="px-4 sm:px-5 py-4 border-b bg-gray-50 flex flex-col gap-3">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-users-gear text-[#8B0000]"></i>
                         <h2 class="font-bold text-gray-800 text-sm">All System Users</h2>
-                        <span
-                            class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers }}</span>
+                        <span class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{
+                            $totalUsers }}</span>
                     </div>
 
                     <form method="GET" action="{{ route('admin.user_management') }}"
-                        class="flex flex-wrap items-center gap-2" id="filterForm">
-                        <div class="relative">
+                        class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto"
+                        id="filterForm">
+                        <div class="relative w-full sm:w-auto">
                             <i
                                 class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                            <input type="text" name="search" value="{{ request('search') }}"
+                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}"
                                 placeholder="Search name or email…"
-                                class="field-input pl-8 pr-4 py-2 text-xs border border-gray-200 rounded-lg bg-white w-52"
-                                onchange="this.form.submit()">
+                                class="field-input pl-8 pr-8 py-2 text-xs border border-gray-200 rounded-lg bg-white w-full sm:w-52"
+                                oninput="liveFilter(this.value)" autocomplete="off">
+                            <button type="button" id="clearSearchBtn" onclick="clearLiveSearch()"
+                                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors"
+                                style="display:{{ request('search') ? 'flex' : 'none' }}; align-items:center;">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
                         </div>
 
-                        <select name="role"
-                            class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer"
-                            onchange="this.form.submit()">
-                            <option value="">All Roles</option>
-                            <option value="super_admin" {{ request('role') === 'super_admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="dentist" {{ request('role') === 'dentist' ? 'selected' : '' }}>Dentist</option>
-                            <option value="patient" {{ request('role') === 'patient' ? 'selected' : '' }}>Patient</option>
-                            </option>
-                        </select>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select name="role"
+                                class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer flex-1 sm:flex-none"
+                                onchange="this.form.submit()">
+                                <option value="">All Roles</option>
+                                <option value="super_admin" {{ request('role')==='super_admin' ? 'selected' : '' }}>
+                                    Admin</option>
+                                <option value="dentist" {{ request('role')==='dentist' ? 'selected' : '' }}>Dentist
+                                </option>
+                                <option value="patient" {{ request('role')==='patient' ? 'selected' : '' }}>Patient
+                                </option>
+                            </select>
 
-                        <select name="status"
-                            class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer"
-                            onchange="this.form.submit()">
-                            <option value="">All Status</option>
-                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active
-                            </option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive
-                            </option>
-                        </select>
+                            <select name="status"
+                                class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer flex-1 sm:flex-none"
+                                onchange="this.form.submit()">
+                                <option value="">All Status</option>
+                                <option value="active" {{ request('status')==='active' ? 'selected' : '' }}>Active
+                                </option>
+                                <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Inactive
+                                </option>
+                            </select>
 
-                        @if (request()->hasAny(['search', 'role', 'status']))
+                            @if (request()->hasAny(['search', 'role', 'status']))
                             <a href="{{ route('admin.user_management') }}"
-                                class="text-xs text-gray-400 hover:text-[#8B0000] font-semibold flex items-center gap-1 transition-colors">
+                                class="text-xs text-gray-400 hover:text-[#8B0000] font-semibold flex items-center gap-1 transition-colors whitespace-nowrap self-center">
                                 <i class="fa-solid fa-xmark"></i> Clear
                             </a>
-                        @endif
+                            @endif
+                        </div>
                     </form>
                 </div>
 
@@ -1268,7 +1479,7 @@
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50 border-b border-gray-100">
                             <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
-                                <th class="py-3 px-5 text-left w-12">#</th>
+                                <th class="py-3 px-3 sm:px-5 text-left w-12 hidden sm:table-cell">#</th>
                                 <th class="py-3 px-4 text-left">User</th>
                                 <th class="py-3 px-4 text-left">Role</th>
                                 <th class="py-3 px-4 text-center">Status</th>
@@ -1278,123 +1489,128 @@
                         </thead>
                         <tbody>
                             @forelse($users as $user)
-                                <tr class="user-table-row border-b border-gray-50 last:border-0">
-                                    <td class="py-3.5 px-5">
-                                        <span
-                                            class="text-xs text-gray-400 font-medium">{{ $users->firstItem() + $loop->index }}</span>
-                                    </td>
+                            <tr class="user-table-row border-b border-gray-50 last:border-0"
+                                data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}"
+                                data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
+                                <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
+                                    <span class="text-xs text-gray-400 font-medium">{{ $users->firstItem() +
+                                        $loop->index }}</span>
+                                </td>
 
-                                    <td class="py-3.5 px-4">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                                <td class="py-3.5 px-3 sm:px-4">
+                                    <div class="flex items-center gap-2 sm:gap-3">
+                                        <div
+                                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                                {{ $user->name }}
                                             </div>
-                                            <div>
-                                                <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                                    {{ $user->name }}</div>
-                                                <div class="text-[11px] text-gray-400 mt-0.5">{{ $user->email }}
-                                                </div>
+                                            <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
+                                                {{ $user->email }}
                                             </div>
                                         </div>
-                                    </td>
+                                    </div>
+                                </td>
 
-                                    <td class="py-3.5 px-4">
-                                        @php $roleSlug = optional($user->role)->slug; @endphp
-                                        <span class="badge-role"
-                                            style="background:
+                                <td class="py-3.5 px-4">
+                                    @php $roleSlug = optional($user->role)->slug; @endphp
+                                    <span class="badge-role" style="background:
         {{ $roleSlug === 'patient' ? '#dbeafe' : ($roleSlug === 'dentist' ? '#d1fae5' : '#fee2e2') }};
         color:
         {{ $roleSlug === 'patient' ? '#1d4ed8' : ($roleSlug === 'dentist' ? '#065f46' : '#8B0000') }};">
-                                            {{ optional($user->role)->name ?? 'No Role' }}
-                                        </span>
-                                    </td>
+                                        {{ optional($user->role)->name ?? 'No Role' }}
+                                    </span>
+                                </td>
 
-                                    <td class="py-3.5 px-4 text-center">
-                                        <span
-                                            class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
-                                            {{ ucfirst($user->status) }}
-                                        </span>
-                                    </td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <span
+                                        class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                        {{ ucfirst($user->status) }}
+                                    </span>
+                                </td>
 
-                                    <td class="py-3.5 px-4 hidden lg:table-cell">
-                                        <span
-                                            class="text-xs text-gray-400">{{ $user->created_at->format('M d, Y') }}</span>
-                                    </td>
+                                <td class="py-3.5 px-4 hidden lg:table-cell">
+                                    <span class="text-xs text-gray-400">{{ $user->created_at->format('M d, Y') }}</span>
+                                </td>
 
-                                    <td class="py-3.5 px-5">
-                                      <div class="flex items-center justify-center gap-1.5">
-                                        <button
-                                          type="button"
-                                          onclick="openEditModal(
+                                <td class="py-3.5 px-2 sm:px-5">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button type="button" onclick="openEditModal(
                                             'users',
                                             {{ $user->id }},
                                             @js($user->name),
                                             @js($user->email),
                                             @js($user->role_id),
                                             @js($user->status)
-                                          )"
-                                          class="action-btn btn-edit"
-                                          title="Edit account">
-                                          <i class="fa-solid fa-pen text-[11px]"></i>
+                                          )" class="action-btn btn-edit" title="Edit account">
+                                            <i class="fa-solid fa-pen text-[11px]"></i>
                                         </button>
 
-                                        <form method="POST" action="{{ route('admin.user_management.toggle_status', $user->id) }}" style="display:inline;">
-                                          @csrf
-                                          @method('PATCH')
-                                          <button
-                                            type="submit"
-                                            class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                            title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                            <i class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
-                                          </button>
+                                        <form method="POST"
+                                            action="{{ route('admin.user_management.toggle_status', $user->id) }}"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
+                                                title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                                <i
+                                                    class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                            </button>
                                         </form>
 
-                                        <button
-                                          type="button"
-                                          onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                          class="action-btn btn-reset"
-                                          title="Reset password">
-                                          <i class="fa-solid fa-key text-[11px]"></i>
+                                        <button type="button"
+                                            onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
+                                            class="action-btn btn-reset" title="Reset password">
+                                            <i class="fa-solid fa-key text-[11px]"></i>
                                         </button>
 
-                                        <button
-                                          type="button"
-                                          onclick="openViewModal(
+                                        <button type="button" onclick="openViewModal(
                                             @js($user->name),
                                             @js($user->email),
                                             @js(optional($user->role)->name ?? 'No Role'),
                                             @js(ucfirst($user->status)),
                                             'Users',
                                             @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                          )"
-                                          class="action-btn"
-                                          style="background:#f3f4f6;color:#374151;"
-                                          title="View details">
-                                          <i class="fa-solid fa-eye text-[11px]"></i>
+                                          )" class="action-btn" style="background:#f3f4f6;color:#374151;"
+                                            title="View details">
+                                            <i class="fa-solid fa-eye text-[11px]"></i>
                                         </button>
-                                      </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </td>
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-14">
-                                        <i class="fa-solid fa-users-slash text-5xl text-gray-300 mb-3 block"></i>
-                                        <p class="text-gray-400 text-sm">No users found</p>
-                                        @if (request()->hasAny(['search', 'role', 'status']))
-                                            <a href="{{ route('admin.user_management') }}"
-                                                class="text-xs text-[#8B0000] font-semibold hover:underline mt-2 inline-block">Clear
-                                                filters</a>
-                                        @endif
-                                    </td>
-                                </tr>
+                            <tr id="dbEmptyRow">
+                                <td colspan="6" class="text-center py-14">
+                                    <i class="fa-solid fa-users-slash text-5xl text-gray-300 mb-3 block"></i>
+                                    <p class="text-gray-400 text-sm">No users found</p>
+                                    @if (request()->hasAny(['search', 'role', 'status']))
+                                    <a href="{{ route('admin.user_management') }}"
+                                        class="text-xs text-[#8B0000] font-semibold hover:underline mt-2 inline-block">Clear
+                                        filters</a>
+                                    @endif
+                                </td>
+                            </tr>
                             @endforelse
+                            <tr id="noResultsRow" style="display:none;">
+                                <td colspan="6" class="text-center py-14">
+                                    <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 mb-3 block"></i>
+                                    <p class="text-gray-400 text-sm">No users found for "<span id="noResultsQuery"
+                                            class="font-semibold text-gray-500"></span>"</p>
+                                    <button type="button" onclick="clearLiveSearch()"
+                                        class="text-xs text-[#8B0000] font-semibold hover:underline mt-2 inline-flex items-center gap-1">
+                                        <i class="fa-solid fa-xmark"></i> Clear search
+                                    </button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div
-                    class="px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p class="text-xs text-gray-500">
                         Showing <span class="font-semibold">{{ $users->firstItem() ?? 0 }}</span>–<span
                             class="font-semibold">{{ $users->lastItem() ?? 0 }}</span>
@@ -1402,53 +1618,51 @@
                     </p>
                     <div class="flex items-center gap-1.5">
                         @if ($users->onFirstPage())
-                            <button class="page-btn" disabled><i
-                                    class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                        <button class="page-btn" disabled><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
                         @else
-                            <a href="{{ $users->previousPageUrl() }}" class="page-btn"><i
-                                    class="fa-solid fa-chevron-left text-[10px]"></i></a>
+                        <a href="{{ $users->previousPageUrl() }}" class="page-btn"><i
+                                class="fa-solid fa-chevron-left text-[10px]"></i></a>
                         @endif
 
                         @php
-                            $start = max(1, $users->currentPage() - 2);
-                            $end = min($users->lastPage(), $users->currentPage() + 2);
+                        $start = max(1, $users->currentPage() - 2);
+                        $end = min($users->lastPage(), $users->currentPage() + 2);
                         @endphp
 
                         @if ($start > 1)
-                            <a href="{{ $users->url(1) }}" class="page-btn">1</a>
-                            @if ($start > 2)
-                                <span class="text-gray-400 text-xs px-1">…</span>
-                            @endif
+                        <a href="{{ $users->url(1) }}" class="page-btn">1</a>
+                        @if ($start > 2)
+                        <span class="text-gray-400 text-xs px-1">…</span>
+                        @endif
                         @endif
 
-                        @for ($p = $start; $p <= $end; $p++)
-                            <a href="{{ $users->url($p) }}"
-                                class="page-btn {{ $p === $users->currentPage() ? 'active' : '' }}">{{ $p }}</a>
-                        @endfor
+                        @for ($p = $start; $p <= $end; $p++) <a href="{{ $users->url($p) }}"
+                            class="page-btn {{ $p === $users->currentPage() ? 'active' : '' }}">{{ $p }}</a>
+                            @endfor
 
-                        @if ($end < $users->lastPage())
-                            @if ($end < $users->lastPage() - 1)
-                                <span class="text-gray-400 text-xs px-1">…</span>
-                            @endif
-                            <a href="{{ $users->url($users->lastPage()) }}"
-                                class="page-btn">{{ $users->lastPage() }}</a>
-                        @endif
+                            @if ($end < $users->lastPage())
+                                @if ($end < $users->lastPage() - 1)
+                                    <span class="text-gray-400 text-xs px-1">…</span>
+                                    @endif
+                                    <a href="{{ $users->url($users->lastPage()) }}" class="page-btn">{{
+                                        $users->lastPage() }}</a>
+                                    @endif
 
-                        @if ($users->hasMorePages())
-                            <a href="{{ $users->nextPageUrl() }}" class="page-btn"><i
-                                    class="fa-solid fa-chevron-right text-[10px]"></i></a>
-                        @else
-                            <button class="page-btn" disabled><i
-                                    class="fa-solid fa-chevron-right text-[10px]"></i></button>
-                        @endif
+                                    @if ($users->hasMorePages())
+                                    <a href="{{ $users->nextPageUrl() }}" class="page-btn"><i
+                                            class="fa-solid fa-chevron-right text-[10px]"></i></a>
+                                    @else
+                                    <button class="page-btn" disabled><i
+                                            class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                                    @endif
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer id="siteFooter" class="footer bg-[#8B0000] text-[#F4F4F4] p-6 transition-all duration-300"
-        style="margin-left:240px;">
+    <!-- ════════════ FOOTER ════════════ -->
+    <footer id="siteFooter" class="bg-[#8B0000] text-[#F4F4F4] p-6">
         <div
             class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
             <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of
@@ -1484,19 +1698,18 @@
                 @csrf
 
                 @if ($errors->any())
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i>
-                                {{ $error }}</div>
-                        @endforeach
-                    </div>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700 space-y-1">
+                    @foreach ($errors->all() as $error)
+                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i>
+                        {{ $error }}</div>
+                    @endforeach
+                </div>
                 @endif
 
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Full Name
                         <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}"
-                        placeholder="e.g. Juan dela Cruz"
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Juan dela Cruz"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm" required>
                 </div>
 
@@ -1506,24 +1719,21 @@
                     <div class="relative">
                         <i
                             class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="email" name="email" value="{{ old('email') }}"
-                            placeholder="user@pup.edu.ph"
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="user@pup.edu.ph"
                             class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
                             required>
                     </div>
                 </div>
 
                 <div>
-                    <label
-                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
                     <select name="role_id"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
                         <option value="">— No Role —</option>
                         @foreach ($roles as $role)
-                            <option value="{{ $role->id }}"
-                                {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                {{ $role->name }}
-                            </option>
+                        <option value="{{ $role->id }}" {{ old('role_id')==$role->id ? 'selected' : '' }}>
+                            {{ $role->name }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -1533,14 +1743,13 @@
                         <span class="text-red-500">*</span></label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="status" value="active"
-                                {{ old('status', 'active') === 'active' ? 'checked' : '' }}
-                                style="accent-color:#8B0000;">
+                            <input type="radio" name="status" value="active" {{ old('status', 'active' )==='active'
+                                ? 'checked' : '' }} style="accent-color:#8B0000;">
                             <span class="text-sm text-gray-700 font-medium">Active</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="status" value="inactive"
-                                {{ old('status') === 'inactive' ? 'checked' : '' }} style="accent-color:#8B0000;">
+                            <input type="radio" name="status" value="inactive" {{ old('status')==='inactive' ? 'checked'
+                                : '' }} style="accent-color:#8B0000;">
                             <span class="text-sm text-gray-700 font-medium">Inactive</span>
                         </label>
                     </div>
@@ -1635,13 +1844,12 @@
                 </div>
 
                 <div>
-                    <label
-                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
                     <select name="role_id" id="editRole"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
                         <option value="">— No Role —</option>
                         @foreach ($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -1698,7 +1906,7 @@
                 </button>
             </div>
 
-           
+
 
             <form method="POST" id="resetForm" class="p-6 space-y-4">
                 @csrf
@@ -1750,67 +1958,67 @@
     </div>
 
 
-     <!-- View Details Modal -->
-            <div class="modal-overlay" id="viewModal" onclick="closeModalOutside(event,'viewModal')">
-                <div class="modal-box modal-sm">
+    <!-- View Details Modal -->
+    <div class="modal-overlay" id="viewModal" onclick="closeModalOutside(event,'viewModal')">
+        <div class="modal-box modal-sm">
+            <div
+                class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+                <div class="flex items-center gap-3">
                     <div
-                        class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center shadow">
-                                <i class="fa-solid fa-eye text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-gray-800 text-base">Account Details</h3>
-                                <p class="text-[10px] text-gray-500">View selected account information</p>
-                            </div>
-                        </div>
-                        <button onclick="closeModal('viewModal')"
-                            class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center shadow">
+                        <i class="fa-solid fa-eye text-white text-sm"></i>
                     </div>
-
-                    <div class="p-6 space-y-4 text-sm">
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Name</div>
-                            <div id="viewName" class="text-gray-800 font-semibold mt-1"></div>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Email</div>
-                            <div id="viewEmail" class="text-gray-800 mt-1"></div>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Role</div>
-                            <div id="viewRole" class="text-gray-800 mt-1"></div>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Status</div>
-                            <div id="viewStatus" class="text-gray-800 mt-1"></div>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Source</div>
-                            <div id="viewSource" class="text-gray-800 mt-1"></div>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Created At</div>
-                            <div id="viewCreatedAt" class="text-gray-800 mt-1"></div>
-                        </div>
-
-                        <div class="flex justify-end pt-2">
-                            <button type="button" onclick="closeModal('viewModal')"
-                                class="px-5 py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
-                                Close
-                            </button>
-                        </div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-800 text-base">Account Details</h3>
+                        <p class="text-[10px] text-gray-500">View selected account information</p>
                     </div>
                 </div>
+                <button onclick="closeModal('viewModal')"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
+
+            <div class="p-6 space-y-4 text-sm">
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Name</div>
+                    <div id="viewName" class="text-gray-800 font-semibold mt-1"></div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Email</div>
+                    <div id="viewEmail" class="text-gray-800 mt-1"></div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Role</div>
+                    <div id="viewRole" class="text-gray-800 mt-1"></div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Status</div>
+                    <div id="viewStatus" class="text-gray-800 mt-1"></div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Source</div>
+                    <div id="viewSource" class="text-gray-800 mt-1"></div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Created At</div>
+                    <div id="viewCreatedAt" class="text-gray-800 mt-1"></div>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="button" onclick="closeModal('viewModal')"
+                        class="px-5 py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
@@ -1820,67 +2028,36 @@
             day: 'numeric'
         });
 
-        let sidebarExpanded = true;
-        let openFlyout = null;
-
-        function applyLayout(w) {
-            document.getElementById('mainContent').style.marginLeft = w;
-            document.getElementById('siteFooter').style.marginLeft = w;
-        }
-
-        function toggleSidebar() {
-            sidebarExpanded = !sidebarExpanded;
-            const s = document.getElementById('sidebar');
-            const icon = document.getElementById('sidebarIcon');
-            if (sidebarExpanded) {
-                s.classList.replace('collapsed', 'expanded');
-                applyLayout('240px');
-                icon.className = 'fa-solid fa-xmark text-base';
-                closeAllFlyouts();
-            } else {
-                s.classList.replace('expanded', 'collapsed');
-                applyLayout('68px');
-                icon.className = 'fa-solid fa-bars text-base';
-            }
-        }
-
-        function toggleGroup(id, e) {
-            e.stopPropagation();
-            if (!sidebarExpanded) {
-                const btn = e.currentTarget;
-                const flyout = document.getElementById('flyout-' + id);
-                const rect = btn.getBoundingClientRect();
-                flyout.style.top = rect.top + 'px';
-                if (openFlyout && openFlyout !== flyout) openFlyout.classList.remove('open');
-                flyout.classList.toggle('open');
-                openFlyout = flyout.classList.contains('open') ? flyout : null;
-                return;
-            }
-            const body = document.getElementById('body-' + id);
-            const chevron = document.getElementById('chevron-' + id);
-            const isOpen = body.classList.contains('open');
-            body.classList.toggle('open');
-            if (chevron) chevron.classList.toggle('open');
-            e.currentTarget.classList.toggle('active-group', !isOpen);
-        }
-
-        function closeAllFlyouts() {
-            document.querySelectorAll('.flyout-panel').forEach(f => f.classList.remove('open'));
-            openFlyout = null;
-        }
-
-        document.addEventListener('click', () => {
-            closeAllFlyouts();
-            document.getElementById('notifMenu').classList.remove('open');
-        });
-
+        // Notifications
         document.getElementById('notifBtn').addEventListener('click', e => {
             e.stopPropagation();
             document.getElementById('notifMenu').classList.toggle('open');
         });
+        document.addEventListener('click', () => {
+            document.getElementById('notifMenu').classList.remove('open');
+            const fabMenu = document.getElementById('admMobFabMenu');
+            const fab = document.getElementById('admMobFab');
+            if (fabMenu) fabMenu.classList.remove('open');
+            if (fab) fab.classList.remove('open');
+        });
 
+        // Mobile FAB
+        document.addEventListener('DOMContentLoaded', () => {
+            const fab = document.getElementById('admMobFab');
+            const fabMenu = document.getElementById('admMobFabMenu');
+            if (fab && fabMenu) {
+                fab.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const isOpen = fabMenu.classList.contains('open');
+                    fabMenu.classList.toggle('open', !isOpen);
+                    fab.classList.toggle('open', !isOpen);
+                });
+                fabMenu.addEventListener('click', e => e.stopPropagation());
+            }
+        });
+
+        // Theme
         const html = document.documentElement;
-
         function applyTheme(theme) {
             html.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
@@ -1890,6 +2067,12 @@
             const ind = document.querySelector('.theme-indicator');
             if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(localStorage.getItem('theme') || 'light');
+            document.querySelectorAll('.theme-option').forEach(o =>
+                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
+            );
+        });
 
         function openModal(id) {
             document.getElementById(id).classList.add('open');
@@ -1903,7 +2086,7 @@
             if (e.target.id === id) closeModal(id);
         }
 
-        @if ($errors->any() && old('_method') !== 'PUT')
+        @if ($errors -> any() && old('_method') !== 'PUT')
             document.addEventListener('DOMContentLoaded', () => openModal('addModal'));
         @endif
 
@@ -1988,6 +2171,59 @@
                     setTimeout(() => el.remove(), 400);
                 }, 4000);
             });
+        });
+
+        // ── LIVE SEARCH ──
+        function liveFilter(query) {
+            const q = query.toLowerCase().trim();
+            const rows = document.querySelectorAll('.user-table-row');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const noResultsRow = document.getElementById('noResultsRow');
+            const noResultsQuery = document.getElementById('noResultsQuery');
+            const dbEmptyRow = document.getElementById('dbEmptyRow');
+
+            clearBtn.style.display = q ? 'flex' : 'none';
+
+            if (rows.length === 0) {
+                if (dbEmptyRow) dbEmptyRow.style.display = q ? 'none' : '';
+                if (noResultsRow) {
+                    noResultsRow.style.display = q ? '' : 'none';
+                    if (noResultsQuery) noResultsQuery.textContent = query;
+                }
+                return;
+            }
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const name = row.dataset.name || '';
+                const email = row.dataset.email || '';
+                const role = row.dataset.role || '';
+                const matches = !q || name.includes(q) || email.includes(q) || role.includes(q);
+                row.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            if (noResultsRow) {
+                noResultsRow.style.display = (visibleCount === 0 && q) ? '' : 'none';
+                if (noResultsQuery) noResultsQuery.textContent = query;
+            }
+        }
+
+        function clearLiveSearch() {
+            const input = document.getElementById('liveSearch');
+            if (!input) return;
+            input.value = '';
+            liveFilter('');
+            input.focus();
+        }
+
+        // Run on page load in case search value was pre-filled from URL
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('liveSearch');
+            if (input && input.value.trim()) {
+                liveFilter(input.value);
+            }
         });
     </script>
 
