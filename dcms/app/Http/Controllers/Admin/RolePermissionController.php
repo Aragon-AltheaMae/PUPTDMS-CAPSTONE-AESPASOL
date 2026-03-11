@@ -19,7 +19,7 @@ class RolePermissionController extends Controller
 
         $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
 
-        return view('admin.role-permissions', compact('roles', 'groupedPermissions'));
+        return view('admin.role-permissions', compact('roles', 'groupedPermissions', 'highlightRoleId'));
     }
 
     private function seedDefaultsIfEmpty(): void
