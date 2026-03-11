@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
@@ -13,126 +14,58 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserManagementController extends Controller
 {
-    public function index(Request $request)
-    {
-        $roles = Role::orderBy('name')->get();
+   public function index(Request $request)
+{
+    $roles = Role::orderBy('name')->get();
 
-        $search = trim((string) $request->get('search'));
-        $roleFilter = trim((string) $request->get('role'));
-        $statusFilter = trim((string) $request->get('status', 'active'));
+    $search = trim((string) $request->get('search'));
+    $roleFilter = trim((string) $request->get('role'));
+    $statusFilter = trim((string) $request->get('status', 'active'));
 
-        $adminUsers = User::with('role')->get()->map(function ($user) {
-            return (object) [
-                'id' => 'user_' . $user->id,
-                'real_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role_name' => optional($user->role)->name ?? 'No Role',
-                'role_key' => optional($user->role)->slug ?? optional($user->role)->name ?? '',
-                'status' => $user->status ?? 'active',
-                'created_at' => $user->created_at,
-                'source' => 'users',
-                'can_edit' => true,
-                'can_toggle' => true,
-                'can_reset_password' => true,
-            ];
+    $query = User::with(['role', 'patient']);
+
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
         });
-
-        $patients = Patient::query()->get()->map(function ($patient) {
-            return (object) [
-                'id' => 'patient_' . $patient->id,
-                'real_id' => $patient->id,
-                'name' => $patient->name,
-                'email' => $patient->email,
-                'role_name' => 'Patient',
-                'role_key' => 'patient',
-                'role_id' => null,
-                'status' => 'active',
-                'created_at' => $patient->created_at,
-                'source' => 'patients',
-                'can_edit' => true,
-                'can_toggle' => false,
-                'can_reset_password' => true,
-            ];
-        });
-
-        $dentist = collect([
-            (object) [
-                'id' => 'dentist_1',
-                'real_id' => 1,
-                'name' => 'University Dentist',
-                'email' => 'dentist',
-                'role_name' => 'Dentist',
-                'role_key' => 'dentist',
-                'role_id' => null,
-                'status' => 'active',
-                'created_at' => now(),
-                'source' => 'manual',
-                'can_edit' => false,
-                'can_toggle' => false,
-                'can_reset_password' => false,
-            ]
-        ]);
-
-        $allAccounts = $adminUsers
-            ->concat($patients)
-            ->concat($dentist);
-
-        if ($search !== '') {
-            $allAccounts = $allAccounts->filter(function ($account) use ($search) {
-                return str_contains(strtolower($account->name), strtolower($search)) ||
-                       str_contains(strtolower($account->email), strtolower($search));
-            });
-        }
-
-        if ($roleFilter !== '') {
-            $allAccounts = $allAccounts->filter(function ($account) use ($roleFilter) {
-                return strtolower($account->role_key) == strtolower($roleFilter)
-                    || strtolower($account->role_name) == strtolower($roleFilter);
-            });
-        }
-
-        if ($statusFilter !== '') {
-            $allAccounts = $allAccounts->filter(function ($account) use ($statusFilter) {
-                return strtolower($account->status) === strtolower($statusFilter);
-            });
-        }
-
-        $allAccounts = $allAccounts
-            ->sortByDesc('created_at')
-            ->values();
-
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allAccounts->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $users = new LengthAwarePaginator(
-            $currentItems,
-            $allAccounts->count(),
-            $perPage,
-            $currentPage,
-            [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
-
-        $notifications = collect([]);
-
-        return view('admin.user-management', compact('users', 'roles', 'notifications'));
     }
+
+    if ($roleFilter !== '') {
+        $query->whereHas('role', function ($q) use ($roleFilter) {
+            $q->where('slug', $roleFilter)
+              ->orWhere('name', $roleFilter);
+        });
+    }
+
+    if ($statusFilter !== '') {
+        $query->where('status', $statusFilter);
+    }
+
+    $users = $query->latest()->paginate(10)->withQueryString();
+
+    $notifications = collect([]);
+
+    return view('admin.user-management', compact('users', 'roles', 'notifications'));
+}
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-            'role_id' => 'nullable|exists:roles,id',
-            'status' => 'required|in:active,inactive',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email|unique:patients,email',
+        'password' => 'required|min:8|confirmed',
+        'role_id' => 'nullable|exists:roles,id',
+        'status' => 'required|in:active,inactive',
+        'phone' => 'nullable|string|max:20',
+        'birthdate' => 'nullable|date',
+        'gender' => 'nullable|in:Male,Female',
+    ]);
 
-        User::create([
+    DB::transaction(function () use ($request) {
+        $role = $request->role_id ? Role::find($request->role_id) : null;
+
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -140,18 +73,40 @@ class UserManagementController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('admin.user_management')
-            ->with('success', 'User created successfully.');
-    }
+        if ($role && $role->slug === 'patient') {
+            Patient::create([
+                'user_id' => $user->id,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone ?? '',
+                'birthdate' => $request->birthdate ?? now()->toDateString(),
+                'gender' => $request->gender ?? 'Male',
+                'password' => $user->password,
+            ]);
+        }
+    });
 
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role_id' => 'nullable|exists:roles,id',
-            'status' => 'required|in:active,inactive',
-        ]);
+    return redirect()->route('admin.user_management')
+        ->with('success', 'User created successfully.');
+}
+public function update(Request $request, User $user)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('users')->ignore($user->id),
+        ],
+        'role_id' => 'nullable|exists:roles,id',
+        'status' => 'required|in:active,inactive',
+        'phone' => 'nullable|string|max:20',
+        'birthdate' => 'nullable|date',
+        'gender' => 'nullable|in:Male,Female',
+    ]);
+
+    DB::transaction(function () use ($request, $user) {
+        $role = $request->role_id ? Role::find($request->role_id) : null;
 
         $user->update([
             'name' => $request->name,
@@ -160,23 +115,59 @@ class UserManagementController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('admin.user_management')
-            ->with('success', 'User updated successfully.');
-    }
+        if ($role && $role->slug === 'patient') {
+            $patient = Patient::firstOrNew(['user_id' => $user->id]);
+
+            if ($patient->exists && $patient->id) {
+                $request->validate([
+                    'email' => 'required|email|unique:patients,email,' . $patient->id,
+                ]);
+            }
+
+            $patient->fill([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone ?? ($patient->phone ?? ''),
+                'birthdate' => $request->birthdate ?? ($patient->birthdate ?? now()->toDateString()),
+                'gender' => $request->gender ?? ($patient->gender ?? 'Male'),
+                'password' => $user->password,
+            ]);
+
+            $patient->user_id = $user->id;
+            $patient->save();
+        } else {
+            Patient::where('user_id', $user->id)->delete();
+        }
+    });
+
+    return redirect()->route('admin.user_management')
+        ->with('success', 'User updated successfully.');
+}
 
     public function resetPassword(Request $request, User $user)
-    {
-        $request->validate([
-            'password' => 'required|min:8|confirmed',
-        ]);
+{
+    $request->validate([
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    DB::transaction(function () use ($request, $user) {
+        $hashedPassword = Hash::make($request->password);
 
         $user->update([
-            'password' => Hash::make($request->password),
+            'password' => $hashedPassword,
         ]);
 
-        return redirect()->route('admin.user_management')
-            ->with('success', 'Password reset successfully.');
-    }
+        $role = $user->role;
+        if ($role && $role->slug === 'patient') {
+            Patient::where('user_id', $user->id)->update([
+                'password' => $hashedPassword,
+            ]);
+        }
+    });
+
+    return redirect()->route('admin.user_management')
+        ->with('success', 'Password reset successfully.');
+}
 
     public function toggleStatus(User $user)
     {
