@@ -1953,108 +1953,74 @@
                     </div>
 
                     <div style="display:flex; flex-direction:column; gap:8px;" id="roleCardList">
-                        @foreach ($roles as $i => $role)
-                            @php
-                                $c = getRoleBadge($role->name, $role->slug);
-                                $granted = $role->permissions->count();
-                                $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
-                                $words = array_slice(explode(' ', $role->name), 0, 2);
-                                $initials = '';
-                                foreach ($words as $_w) {
-                                    $initials .= strtoupper($_w[0]);
-                                }
-                                $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
-                                $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
-                                $isSuperRole =
-                                    in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-                                    str_contains(strtolower($role->name), 'super');
-                            @endphp
-                           <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
-                                data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
-                                data-total="{{ $totalPerms }}" data-pct="{{ $pct }}"
-                                data-slug="{{ $role->slug }}" data-is-super="{{ $isSuperRole ? '1' : '0' }}"
-                                onclick="selectRole(this)" style="position:relative;">
+                  @foreach ($roles as $i => $role)
+    @php
+        $c = getRoleBadge($role->name, $role->slug);
+        $granted = $role->permissions->count();
+        $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
+        $words = array_slice(explode(' ', $role->name), 0, 2);
+        $initials = '';
+        foreach ($words as $_w) {
+            $initials .= strtoupper($_w[0]);
+        }
+        $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
+        $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
+        $isSuperRole =
+            in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+            str_contains(strtolower($role->name), 'super');
+        $isProtectedRole = $isSuperRole || in_array(strtolower($role->slug), ['admin', 'patient', 'dentist']);
+    @endphp
 
-                                 @php
-                                        $isProtectedRole = $isSuperRole || in_array(strtolower($role->slug), ['admin', 'patient', 'dentist']);
-                                    @endphp
-                                    @if (!$isProtectedRole)
-                                    <button type="button" class="btn-delete-role"
-                                    onclick="event.stopPropagation(); openDeleteModal('{{ $role->id }}', '{{ addslashes($role->name) }}')"
-                                    title="Delete role">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                                @endif
+    <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
+        data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
+        data-total="{{ $totalPerms }}" data-pct="{{ $pct }}"
+        data-slug="{{ $role->slug }}" data-is-super="{{ $isSuperRole ? '1' : '0' }}"
+        onclick="selectRole(this)" style="position:relative;">
 
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div class="role-avatar">{{ $initials }}</div>
-                                    <div style="flex:1;">
-                                        <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
-                                            <span style="font-weight:600; font-size:14px; color:#2D2420;"
-                                                class="role-name-label">{{ $role->name }}</span>
-                                        </div>
-                                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                            <span class="badge-pill"
-                                                style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{ $c['label'] }}</span>
-                                            <span
-                                                style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug }}</span>
-                                        </div>
-                        @php
-                        $c = getRoleBadge($role->name, $role->slug);
-                        $granted = $role->permissions->count();
-                        $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
-                        $words = array_slice(explode(' ', $role->name), 0, 2);
-                        $initials = '';
-                        foreach ($words as $_w) {
-                        $initials .= strtoupper($_w[0]);
-                        }
-                        $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
-                        $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
-                        $isSuperRole =
-                        in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-                        str_contains(strtolower($role->name), 'super');
-                        @endphp
-                        <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
-                            data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
-                            data-total="{{ $totalPerms }}" data-pct="{{ $pct }}" data-slug="{{ $role->slug }}"
-                            data-is-super="{{ $isSuperRole ? '1' : '0' }}" onclick="selectRole(this)">
+        @if (!$isProtectedRole)
+            <button type="button" class="btn-delete-role"
+                onclick="event.stopPropagation(); openDeleteModal('{{ $role->id }}', '{{ addslashes($role->name) }}')"
+                title="Delete role">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        @endif
 
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div class="role-avatar">{{ $initials }}</div>
-                                <div style="flex:1;">
-                                    <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
-                                        <span style="font-weight:600; font-size:14px; color:#2D2420;"
-                                            class="role-name-label">{{ $role->name }}</span>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                        <span class="badge-pill"
-                                            style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{
-                                            $c['label'] }}</span>
-                                        <span style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug
-                                            }}</span>
-                                    </div>
-                                </div>
-                                <div class="active-dot"
-                                    style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
-                                </div>
-                            </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="role-avatar">{{ $initials }}</div>
+            <div style="flex:1;">
+                <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                    <span style="font-weight:600; font-size:14px; color:#2D2420;"
+                        class="role-name-label">{{ $role->name }}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <span class="badge-pill"
+                        style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{ $c['label'] }}</span>
+                    <span style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug }}</span>
+                </div>
+            </div>
+            <div class="active-dot"
+                style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
+            </div>
+        </div>
 
-                            <div style="margin-top:12px;">
-                                <div
-                                    style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
-                                    <span>Access level</span>
-                                    <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill"
-                                        style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
-                                    </div>
-                                </div>
-                                <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
-                                    {{ $granted }} of {{ $totalPerms }} permissions</div>
-                            </div>
-                        </div>
-                        @endforeach
+        <div style="margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
+                <span>Access level</span>
+                <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
+                </div>
+            </div>
+            <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
+                {{ $granted }} of {{ $totalPerms }} permissions
+            </div>
+        </div>
+
+    </div>{{-- closes role-card --}}
+
+@endforeach
                     </div>
 
                     <!-- Accent summary card -->
