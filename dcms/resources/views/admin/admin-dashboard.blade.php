@@ -1288,7 +1288,7 @@
       <!-- GROUP 2 — MAINTENANCE -->
       <div class="nav-group" id="group-mnt">
         <div
-          class="group-header {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*') ? 'active-group' : '' }}">
+            class="group-header {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*','admin.clinic_schedule*') ? 'active-group' : '' }}">
           <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
           <div class="group-label-wrap">
             <span class="group-label">Maintenance</span>
@@ -1305,7 +1305,7 @@
           <a href="{{ route('admin.academic_periods') }}"
             class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
               class="fa-solid fa-school"></i> Academic Periods</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+          <a href="{{ route('admin.clinic_schedule') }}" class="nav-link {{ request()->routeIs('admin.clinic_schedule*') ? 'active' : '' }}"><i
               class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
               class="fa-solid fa-list-check"></i> Service Types</a>
