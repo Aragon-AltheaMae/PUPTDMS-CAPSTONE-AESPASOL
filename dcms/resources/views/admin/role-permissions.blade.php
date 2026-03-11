@@ -2778,59 +2778,102 @@
                 /* ══════════════════════════════════════
                    VIEW AS MODAL
                 ══════════════════════════════════════ */
-                function openViewAs() {
-                    const overlay = document.getElementById('vaOverlay');
-                    const list = document.getElementById('vaRoleList');
+function openViewAs() {
+    const overlay = document.getElementById('vaOverlay');
+    const list = document.getElementById('vaRoleList');
 
-                    if (!overlay || !list) return;
+    if (!overlay || !list) return;
 
-                    list.innerHTML = '';
-                    let totalPerms = 0;
-                    let totalRoles = 0;
+    list.innerHTML = '';
+    let totalPerms = 0;
+    let totalRoles = 0;
 
-                    Object.entries(savedGrants).forEach(([roleId, perms]) => {
-                        if (!perms.length) return;
+    document.querySelectorAll('.role-card').forEach(card => {
+        const roleId = card.dataset.roleId;
+        const roleName = card.dataset.roleName || 'Role';
+        const roleSlug = (card.dataset.slug || '').toLowerCase();
+        const granted = parseInt(card.dataset.granted || '0', 10);
 
-                        totalRoles++;
-                        totalPerms += perms.length;
+        if (granted <= 0) return;
 
-                        const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
-                        const roleName = card?.dataset.roleName || 'Role';
-                        const roleSlug = card?.dataset.slug || '';
-                        const words = roleName.split(' ').slice(0, 2);
-                        const initials = words.map(w => w[0].toUpperCase()).join('');
-                        const color = perms[0]?.color || '#374151';
-                        const grad = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+        const form = document.getElementById(`form-role-${roleId}`);
+        if (!form) return;
 
-                        const tags = perms.map(p => `
+        const checkedPerms = [...form.querySelectorAll('.perm-toggle:checked')].map(input => ({
+            name: input.dataset.permName || input.closest('.perm-row')?.querySelector('.perm-label')?.textContent?.trim() || 'Permission',
+            slug: input.dataset.permSlug || '',
+            color: input.dataset.color || '#374151'
+        }));
+
+        if (!checkedPerms.length) return;
+
+        totalRoles++;
+        totalPerms += checkedPerms.length;
+
+        const words = roleName.split(' ').slice(0, 2);
+        const initials = words.map(w => w[0].toUpperCase()).join('');
+        const color = checkedPerms[0]?.color || '#374151';
+        const grad = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+
+        const isSuperAdmin =
+            ['super_admin', 'super-admin', 'superadmin'].includes(roleSlug) ||
+            roleName.toLowerCase().includes('super');
+
+        const tags = checkedPerms.map(p => `
             <span class="va-perm-tag" style="background:${color}18;color:${color};border:1px solid ${color}40;">
                 <i class="fa-solid fa-circle-check" style="font-size:8px;"></i> ${p.name}
             </span>
         `).join('');
 
-                        list.innerHTML += `
-            <div class="va-role-row" onclick="redirectToRole('${roleId}','${roleName}','${roleSlug}','${color}')">
+        const goBtn = !isSuperAdmin ? `
+            <button class="va-go-btn va-redirect-btn"
+                data-role-id="${roleId}"
+                data-role-name="${roleName}"
+                data-role-slug="${roleSlug}"
+                data-color="${color}">
+                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Go to Dashboard
+            </button>` : '';
+
+        list.innerHTML += `
+            <div class="va-role-row ${!isSuperAdmin ? 'va-redirect-btn' : ''}"
+                data-role-id="${roleId}"
+                data-role-name="${roleName}"
+                data-role-slug="${roleSlug}"
+                data-color="${color}"
+                style="${isSuperAdmin ? 'cursor:default;' : ''}">
                 <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:${grad};border-radius:14px 0 0 14px;"></div>
                 <div class="va-role-avatar" style="background:${grad};color:#fff;">${initials}</div>
                 <div style="flex:1;">
                     <div style="font-size:14px;font-weight:700;color:#2D2420;margin-bottom:3px;">${roleName}</div>
-                    <div style="font-size:12px;color:#8A7A6F;">${perms.length} new permission${perms.length > 1 ? 's' : ''} granted</div>
+                    <div style="font-size:12px;color:#8A7A6F;">${checkedPerms.length} permission${checkedPerms.length > 1 ? 's' : ''} granted</div>
                     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;">${tags}</div>
                 </div>
-                <button class="va-go-btn" onclick="event.stopPropagation();redirectToRole('${roleId}','${roleName}','${roleSlug}','${color}')">
-                    <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Go to Dashboard
-                </button>
-            </div>`;
-                    });
+                ${goBtn}
+            </div>
+        `;
+    });
 
-                    document.getElementById('vaTotalPerms').textContent = totalPerms;
-                    document.getElementById('vaTotalRoles').textContent = totalRoles;
-                    document.getElementById('vaSubtitle').textContent =
-                        `${totalRoles} role${totalRoles > 1 ? 's' : ''} with newly granted access — select one to redirect`;
+    list.querySelectorAll('.va-redirect-btn').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const target = this.closest('[data-role-id]') || this;
+            redirectToRole(
+                target.dataset.roleId,
+                target.dataset.roleName,
+                target.dataset.roleSlug,
+                target.dataset.color
+            );
+        });
+    });
 
-                    overlay.classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                }
+    document.getElementById('vaTotalPerms').textContent = totalPerms;
+    document.getElementById('vaTotalRoles').textContent = totalRoles;
+    document.getElementById('vaSubtitle').textContent =
+        `${totalRoles} role${totalRoles > 1 ? 's' : ''} with granted access — select one to redirect`;
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
 
                 function closeViewAs() {
                     const overlay = document.getElementById('vaOverlay');
