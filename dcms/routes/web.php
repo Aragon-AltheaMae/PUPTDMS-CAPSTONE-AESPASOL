@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Admin\SystemLogController;
+use App\Http\Controllers\Admin\UserManagementController;
 
 
 /*
@@ -173,6 +174,19 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/system-logs', [SystemLogController::class, 'index'])
         ->name('admin.system_logs');
+});
+
+// User Management
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/user-management', [UserManagementController::class, 'index'])->name('user_management');
+    Route::post('/user-management', [UserManagementController::class, 'store'])->name('user_management.store');
+
+    Route::put('/user-management/{user}', [UserManagementController::class, 'update'])->name('user_management.update');
+    Route::put('/user-management/{user}/reset-password', [UserManagementController::class, 'resetPassword'])->name('user_management.reset_password');
+    Route::patch('/user-management/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('user_management.toggle_status');
+
+    Route::put('/user-management/patient/{patient}', [UserManagementController::class, 'updatePatient'])->name('user_management.patient.update');
+    Route::put('/user-management/patient/{patient}/reset-password', [UserManagementController::class, 'resetPatientPassword'])->name('user_management.patient.reset_password');
 });
 
 // START IMPERSONATION
