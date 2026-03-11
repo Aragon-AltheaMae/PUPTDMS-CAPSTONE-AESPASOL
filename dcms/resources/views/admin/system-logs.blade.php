@@ -196,7 +196,7 @@
             display: flex;
             align-items: center;
             padding: 7px 8px 5px;
-            color: #6b7280;
+            color: #333333;
         }
 
         .group-icon {
@@ -255,7 +255,7 @@
             margin: 1px 4px;
             font-size: .77rem;
             font-weight: 500;
-            color: #6b7280;
+            color: #333333;
             text-decoration: none;
             transition: all .15s;
             white-space: nowrap;
@@ -410,7 +410,7 @@
         }
 
         [data-theme="dark"] .theme-option {
-            color: #6B7280;
+            color: #333333;
         }
 
         [data-theme="dark"] .theme-option.active {
@@ -428,7 +428,7 @@
         }
 
         [data-theme="dark"] .group-label {
-            color: #6b7280;
+            color: #333333;
         }
 
         [data-theme="dark"] .sl-card,
@@ -759,7 +759,7 @@
         }
 
         [data-theme="dark"] .theme-option {
-            color: #6B7280;
+            color: #333333;
         }
 
         [data-theme="dark"] .theme-option.active {
@@ -1134,7 +1134,7 @@
             cursor: pointer;
             transition: all 0.15s;
             background: transparent;
-            color: #6b7280;
+            color: #333333;
             white-space: nowrap;
         }
 
@@ -1150,7 +1150,7 @@
 
         .sl-tab-count {
             background: #e5e7eb;
-            color: #6b7280;
+            color: #333333;
             font-size: 0.62rem;
             font-weight: 700;
             padding: 0.08rem 0.42rem;
@@ -1178,7 +1178,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.09em;
-            color: #9ca3af;
+            color: #161616;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
             white-space: nowrap;
@@ -1361,7 +1361,7 @@
 
         .sl-module {
             font-size: 0.74rem;
-            color: #6b7280;
+            color: #333333;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -1374,7 +1374,7 @@
         }
 
         .sl-desc {
-            color: #6b7280;
+            color: #333333;
             font-size: 0.76rem;
             max-width: 260px;
             line-height: 1.45;
