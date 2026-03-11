@@ -1446,121 +1446,181 @@
         </div>
     </header>
 
-    <!-- ════════════════ SIDEBAR ════════════════ -->
-    <aside id="sidebar" class="expanded">
-        <div class="sidebar-toggle-row">
-            <button class="toggle-btn" onclick="toggleSidebar()" id="sidebarToggleBtn">
-                <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
-            </button>
+<!-- SIDEBAR -->
+  <aside id="sidebar" class="expanded">
+
+    <div class="sidebar-toggle-row">
+      <button class="toggle-btn" onclick="toggleSidebar()" id="sidebarToggleBtn">
+        <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-inner">
+
+      <!-- ══════════════════════════════
+           GROUP 1 — CLINIC MANAGEMENT
+      ══════════════════════════════ -->
+      <div class="nav-group flyout-wrapper" id="group-cms">
+        <div class="group-header active-group" onclick="toggleGroup('cms', event)">
+          <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
+          <div class="group-label-wrap">
+            <span class="group-label">Clinic Management</span>
+            <span class="group-sublabel">Core clinical modules</span>
+          </div>
+          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-cms"></i>
         </div>
-
-        <div class="sidebar-inner">
-            <div class="nav-group flyout-wrapper" id="group-cms">
-                <div class="group-header active-group" onclick="toggleSidebarGroup('cms', event)">
-                    <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
-                    <div class="group-label-wrap">
-                        <span class="group-label">Clinic Management</span>
-                        <span class="group-sublabel">Core clinical modules</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-down group-chevron" id="chevron-cms"></i>
-                </div>
-                <div class="group-body open" id="body-cms">
-                    <a href="{{ route('admin.admin.dashboard') }}"
-                        class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
-                            class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-users"></i>
-                        Patients</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-calendar-check"></i> Appointments</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-school"></i>
-                        Academic Periods</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-file-circle-check"></i> Document Requests</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-file-pen"></i> Document Template</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i>
-                        Reports</a>
-                </div>
-                <div class="flyout-panel" id="flyout-cms">
-                    <div class="flyout-title">Clinic Management</div>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-users"></i> Patients</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-calendar-check"></i> Appointments</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-school"></i> Academic Periods</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-file-circle-check"></i> Document Requests</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-file-pen"></i> Document Template</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-file"></i> Reports</a>
-                </div>
-            </div>
-
-            <div class="nav-sep"></div>
-
-            <div class="nav-group flyout-wrapper" id="group-sys">
-                <div class="group-header active-group" onclick="toggleSidebarGroup('sys', event)">
-                    <div class="group-icon"><i class="fa-solid fa-server"></i></div>
-                    <div class="group-label-wrap">
-                        <span class="group-label">System</span>
-                        <span class="group-sublabel">Admin &amp; configuration</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-down group-chevron" id="chevron-sys"></i>
-                </div>
-                <div class="group-body open" id="body-sys">
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-database"></i> Data Backup</a>
-                    <a href="{{ route('admin.system_logs') }}"
-                        class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
-                            class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-gear"></i>
-                        System Settings</a>
-                    <a href="{{ route('admin.role_permissions') }}"
-                        class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
-                            class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
-                </div>
-                <div class="flyout-panel" id="flyout-sys">
-                    <div class="flyout-title">System</div>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-database"></i> Data Backup</a>
-                    <a href="{{ route('admin.system_logs') }}" class="flyout-link"><i
-                            class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i
-                            class="fa-solid fa-gear"></i> System Settings</a>
-                    <a href="{{ route('admin.role_permissions') }}" class="flyout-link"><i
-                            class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
-                </div>
-            </div>
+        <div class="group-body open" id="body-cms">
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-users"></i> Patients
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-check"></i> Appointments
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-tooth"></i> Dental Records
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-circle-check"></i> Document Request
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-chart-column"></i> Reports
+          </a>
         </div>
-
-        <div class="sidebar-bottom">
-            <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1 settings-label">
-                Settings</div>
-            <div class="w-full px-1 mb-3">
-                <div id="themeToggle" class="theme-toggle-container">
-                    <button type="button" class="theme-option active" data-theme="light"><i
-                            class="fa-solid fa-sun"></i></button>
-                    <button type="button" class="theme-option" data-theme="dark"><i
-                            class="fa-regular fa-moon"></i></button>
-                    <div class="theme-indicator" aria-hidden="true"></div>
-                </div>
-            </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <span
-                        style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-                    </span>
-                    <span class="logout-text font-semibold">Log out</span>
-                </button>
-            </form>
+        <div class="flyout-panel" id="flyout-cms">
+          <div class="flyout-title">Clinic Management</div>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-users"></i> Patients</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-tooth"></i> Dental Records</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-circle-check"></i> Document Request</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-chart-column"></i> Reports</a>
         </div>
-    </aside>
+      </div>
+
+      <div class="nav-sep"></div>
+
+      <!-- ══════════════════════════════
+           GROUP 2 — MAINTENANCE
+      ══════════════════════════════ -->
+      <div class="nav-group flyout-wrapper" id="group-mnt">
+        <div class="group-header" onclick="toggleGroup('mnt', event)">
+          <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+          <div class="group-label-wrap">
+            <span class="group-label">Maintenance</span>
+            <span class="group-sublabel">Config &amp; scheduling</span>
+          </div>
+          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-mnt"></i>
+        </div>
+        <div class="group-body" id="body-mnt">
+          <a href="{{ route('admin.user_management') }}"
+            class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-gear"></i> User Management
+          </a>
+          <a href="{{ route('admin.role_permissions') }}"
+            class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions
+          </a>
+          <a href="{{ route('admin.academic_periods') }}"
+            class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}">
+            <i class="fa-solid fa-school"></i> Academic Periods
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-days"></i> Clinic Schedule
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-list-check"></i> Service Types
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-pen"></i> Document Templates
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-boxes-stacked"></i> Inventory
+          </a>
+        </div>
+        <div class="flyout-panel" id="flyout-mnt">
+          <div class="flyout-title">Maintenance</div>
+          <a href="{{ route('admin.user_management') }}" class="flyout-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-gear"></i> User Management</a>
+          <a href="{{ route('admin.role_permissions') }}" class="flyout-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+          <a href="{{ route('admin.academic_periods') }}" class="flyout-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i class="fa-solid fa-school"></i> Academic Periods</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-list-check"></i> Service Types</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-pen"></i> Document Templates</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+        </div>
+      </div>
+
+      <div class="nav-sep"></div>
+
+      <!-- ══════════════════════════════
+           GROUP 3 — SYSTEM
+      ══════════════════════════════ -->
+      <div class="nav-group flyout-wrapper" id="group-sys">
+        <div class="group-header" onclick="toggleGroup('sys', event)">
+          <div class="group-icon"><i class="fa-solid fa-server"></i></div>
+          <div class="group-label-wrap">
+            <span class="group-label">System</span>
+            <span class="group-sublabel">Admin &amp; configuration</span>
+          </div>
+          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-sys"></i>
+        </div>
+        <div class="group-body" id="body-sys">
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-database"></i> Data Backup
+          </a>
+          <a href="{{ route('admin.system_logs') }}"
+            class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
+            <i class="fa-solid fa-clipboard-list"></i> System Logs
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-sliders"></i> System Settings
+          </a>
+        </div>
+        <div class="flyout-panel" id="flyout-sys">
+          <div class="flyout-title">System</div>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-database"></i> Data Backup</a>
+          <a href="{{ route('admin.system_logs') }}" class="flyout-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-sliders"></i> System Settings</a>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-inner -->
+
+    <div class="sidebar-bottom">
+      <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1 settings-label">Settings</div>
+      <div class="w-full px-1 mb-3">
+        <div id="themeToggle" class="theme-toggle-container">
+          <button type="button" class="theme-option active" data-theme="light"><i class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark"><i class="fa-regular fa-moon"></i></button>
+          <div class="theme-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="logout-btn">
+          <span style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </span>
+          <span class="logout-text font-semibold">Log out</span>
+        </button>
+      </form>
+    </div>
+
+  </aside>
 
     <!-- ════════════════ MAIN ════════════════ -->
     <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen" style="margin-left:240px;">
