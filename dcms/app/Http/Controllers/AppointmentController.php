@@ -20,12 +20,13 @@ use App\Models\Disease;
 use App\Models\MedicalHistoryDiseaseAnswer;
 
 use App\Models\Patient;
+use App\Models\BlockedDate;
+use App\Models\ClinicSchedule;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
 
 class AppointmentController extends Controller
 {
-    const MAX_APPOINTMENTS_PER_DAY = 5;
 
     public function index()
     {
@@ -147,11 +148,15 @@ class AppointmentController extends Controller
             ->get()
             ->groupBy('appointment_date')
             ->map(function ($rows) {
-                return $rows->pluck('count', 'appointment_time');
+                return $rows->pluck('count', 'appointment_time')->toArray();
             })
             ->toArray();
 
-        $unavailableDates = [];
+        $schedules = ClinicSchedule::active()->orderBy('id')->get();
+
+        $blockedDates = BlockedDate::pluck('date')
+            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->toArray();
 
         $philippineHolidays = PhilippineHolidays::range(0, 1);
 
@@ -167,7 +172,8 @@ class AppointmentController extends Controller
             'patient',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',
-            'unavailableDates',
+            'schedules',
+            'blockedDates',
             'philippineHolidays',
             'diseases'
         ));
@@ -208,11 +214,64 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid time format. Please pick a valid time slot.');
         }
 
+    $date = Carbon::parse($request->appointment_date);
+        $dayAbbr = $date->format('D');
+
+        if (BlockedDate::whereDate('date', $request->appointment_date)->exists()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'This date is blocked and unavailable for booking.');
+        }
+
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        if (isset($philippineHolidays[$request->appointment_date])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'The clinic is closed on holidays. Please choose another date.');
+        }
+
+        $schedule = ClinicSchedule::active()
+            ->get()
+            ->first(function ($rule) use ($dayAbbr) {
+                return in_array($dayAbbr, $rule->days ?? []);
+            });
+
+        if (! $schedule || $schedule->status === 'closed') {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'The clinic is closed on the selected date.');
+        }
+
+        if (! $schedule->open_time || ! $schedule->close_time) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Clinic hours are not configured properly for this date.');
+        }
+
+        if ($mysqlTime < $schedule->open_time || $mysqlTime >= $schedule->close_time) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Selected time is outside clinic operating hours.');
+        }
+
+        if (!empty($schedule->break_time) && $schedule->break_time !== 'none') {
+            [$breakStart, $breakEnd] = explode('-', $schedule->break_time);
+
+            $breakStartTime = Carbon::createFromFormat('H:i', trim($breakStart))->format('H:i:s');
+            $breakEndTime   = Carbon::createFromFormat('H:i', trim($breakEnd))->format('H:i:s');
+
+            if ($mysqlTime >= $breakStartTime && $mysqlTime < $breakEndTime) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Selected time falls within the clinic lunch break.');
+            }
+        }
+   
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
 
-        if ($appointmentCount >= self::MAX_APPOINTMENTS_PER_DAY) {
+        if ($appointmentCount >= $schedule->max_slots) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
@@ -482,6 +541,73 @@ class AppointmentController extends Controller
         );
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
+    }
+
+    public function slotsForDate(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+        ]);
+
+        $iso = $request->date;
+        $date = Carbon::parse($iso);
+        $dayAbbr = $date->format('D');
+
+        if (BlockedDate::whereDate('date', $iso)->exists()) {
+            return response()->json([
+                'slots' => [],
+                'message' => 'This date is blocked and unavailable for booking.',
+            ]);
+        }
+
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        if (isset($philippineHolidays[$iso])) {
+            return response()->json([
+                'slots' => [],
+                'message' => 'The clinic is closed on holidays.',
+            ]);
+        }
+
+        $schedule = ClinicSchedule::active()
+            ->get()
+            ->first(fn($s) => in_array($dayAbbr, $s->days ?? []));
+
+        if (! $schedule || $schedule->status === 'closed') {
+            return response()->json([
+                'slots' => [],
+                'message' => 'The clinic is closed on this day.',
+            ]);
+        }
+
+        $bookedSlotCounts = Appointment::where('appointment_date', $iso)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_time, COUNT(*) as cnt')
+            ->groupBy('appointment_time')
+            ->pluck('cnt', 'appointment_time')
+            ->toArray();
+
+        $totalBooked = array_sum($bookedSlotCounts);
+
+        if ($totalBooked >= $schedule->max_slots) {
+            return response()->json([
+                'slots' => [],
+                'message' => 'All slots for this day are fully booked.',
+                'max_slots' => $schedule->max_slots,
+                'booked' => $totalBooked,
+                'remaining' => 0,
+            ]);
+        }
+
+        return response()->json([
+            'slots'      => $schedule->availableSlots($iso, $bookedSlotCounts),
+            'max_slots'  => $schedule->max_slots,
+            'booked'     => $totalBooked,
+            'remaining'  => max(0, $schedule->max_slots - $totalBooked),
+            'open_time'  => $schedule->open_time,
+            'close_time' => $schedule->close_time,
+            'break_time' => $schedule->break_time,
+            'status'     => $schedule->status,
+        ]);
     }
 
     /* =======================

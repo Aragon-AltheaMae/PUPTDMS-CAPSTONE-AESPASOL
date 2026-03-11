@@ -25,8 +25,8 @@ use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
-
 use App\Http\Controllers\Admin\AdminPatientController;
+use App\Http\Controllers\Admin\ClinicScheduleController;
 
 
 /*
@@ -259,6 +259,7 @@ Route::prefix('admin')->group(function () {
 
         return response()->json($patients);
     })->name('admin.patients.list');
+<<<<<<< grace
 });
 
 // Academic Periods
@@ -272,6 +273,46 @@ Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::c
     ->name('admin.academic_periods.destroy');
 Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
     ->name('admin.academic_periods.set_active');
+=======
+
+    // ACADEMIC PERIODS
+    Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
+        ->name('admin.academic_periods');
+    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
+        ->name('admin.academic_periods.store');
+    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
+        ->name('admin.academic_periods.update');
+    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
+        ->name('admin.academic_periods.destroy');
+    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
+        ->name('admin.academic_periods.set_active');
+>>>>>>> main
+
+    // // CLINIC SCHEDULE
+    Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
+        ->name('admin.clinic_schedule');
+
+    Route::post('/clinic-schedule', [ClinicScheduleController::class, 'store'])
+        ->name('admin.clinic_schedule.store');
+
+    Route::put('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'update'])
+        ->name('admin.clinic_schedule.update');
+
+    Route::delete('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'destroy'])
+        ->name('admin.clinic_schedule.destroy');
+
+    Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
+        ->name('admin.clinic_schedule.block');
+
+    Route::delete('/clinic-schedule/block-date/{blockedDate}', [ClinicScheduleController::class, 'unblockDate'])
+        ->name('admin.clinic_schedule.unblock');
+
+    Route::get('/clinic-schedule/unavailable-dates', [ClinicScheduleController::class, 'unavailableDates'])
+        ->name('admin.clinic_schedule.unavailable_dates');
+
+    Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
+        ->name('admin.clinic_schedule.slots');
+});
 
 // START IMPERSONATION
 Route::post('/impersonate', function (Request $request) {
@@ -286,7 +327,8 @@ Route::post('/impersonate', function (Request $request) {
     return response()->json($patients);
 })->name('admin.patients.list');
 
-/*
+
+/*  
 |--------------------------------------------------------------------------
 | ADMIN USER MANAGEMENT ROUTES
 |--------------------------------------------------------------------------
@@ -463,6 +505,10 @@ Route::middleware(['role:patient'])->group(function () {
 
     Route::get('/about-us', fn() => view('patient.about-us'))
         ->name('patient.about.us');
+    
+    // Clinic Schedule
+    Route::get('/book-appointment/slots', [AppointmentController::class, 'slotsForDate'])
+    ->name('book.appointment.slots');
 });
 
 /*
