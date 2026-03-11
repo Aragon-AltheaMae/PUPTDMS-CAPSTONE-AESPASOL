@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Patient;
 use Carbon\Carbon;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\AuditLogger;
 
 class HomepageController extends Controller
 {
@@ -22,7 +23,11 @@ class HomepageController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // All appointments for this patient (calendar)
+        AuditLogger::log(
+            'view',
+            'patient_dashboard',
+            "Patient viewed homepage"
+        );
         $appointments = Appointment::where('patient_id', $patient->id)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
