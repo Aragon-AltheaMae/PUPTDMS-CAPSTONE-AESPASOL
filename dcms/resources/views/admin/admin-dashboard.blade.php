@@ -756,7 +756,7 @@
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-school"></i> Academic Periods</a>
+          <a href="{{ route('admin.academic_periods') }}"class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i class="fa-solid fa-school"></i> Academic Periods</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-circle-check"></i> Document Requests</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-pen"></i> Document Template</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i> Reports</a>
@@ -766,7 +766,7 @@
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-users"></i> Patients</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-school"></i> Academic Periods</a>
+          <a href="{{ route('admin.academic_periods') }}" class="flyout-link"><i class="fa-solid fa-school"></i> Academic Periods</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-circle-check"></i> Document Requests</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-pen"></i> Document Template</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file"></i> Reports</a>
