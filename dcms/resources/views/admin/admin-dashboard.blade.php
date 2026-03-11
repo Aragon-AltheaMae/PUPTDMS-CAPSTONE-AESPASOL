@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -688,10 +689,170 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 0, 0, .1);
     }
+
+    /* ── TOAST ── */
+    #toastContainer {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      bottom: unset !important;
+      left: unset !important;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      width: auto !important;
+      padding: 0 !important;
+    }
+
+    #toastContainer .toast {
+      min-width: 300px;
+      max-width: 360px;
+      background: white !important;
+      border-radius: 14px !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .18) !important;
+      padding: 14px 18px 14px 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px;
+      opacity: 0;
+      transform: translateX(340px);
+      transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
+      position: relative;
+      overflow: hidden;
+      pointer-events: all;
+      flex-direction: row !important;
+    }
+
+    #toastContainer .toast::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: none;
+    }
+
+    #toastContainer .toast.error::before {
+      background: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success::before {
+      background: #15803d !important;
+    }
+
+    #toastContainer .toast.show {
+      opacity: 1 !important;
+      transform: translateX(0) !important;
+    }
+
+    #toastContainer .toast.hide {
+      opacity: 0 !important;
+      transform: translateX(340px) !important;
+    }
+
+    #toastContainer .toast-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #toastContainer .toast.error .toast-icon-wrap {
+      background: rgba(139, 0, 0, .08);
+    }
+
+    #toastContainer .toast.success .toast-icon-wrap {
+      background: rgba(21, 128, 61, .08);
+    }
+
+    #toastContainer .toast-icon {
+      font-size: 17px;
+    }
+
+    #toastContainer .toast.error .toast-icon {
+      color: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success .toast-icon {
+      color: #15803d !important;
+    }
+
+    #toastContainer .toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #toastContainer .toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A0A0A !important;
+    }
+
+    #toastContainer .toast-msg {
+      font-size: 12px;
+      color: #888 !important;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    #toastContainer .toast-close {
+      background: none !important;
+      border: none;
+      cursor: pointer;
+      color: #CCC;
+      font-size: 13px;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      transition: color .2s;
+    }
+
+    #toastContainer .toast-close:hover {
+      color: #888;
+    }
+
+    @media(max-width:640px) {
+      #toastContainer {
+        left: 12px !important;
+        right: 12px !important;
+        top: 72px !important;
+        bottom: unset !important;
+        width: auto !important;
+      }
+
+      #toastContainer .toast {
+        min-width: unset !important;
+        width: 100% !important;
+        transform: translateY(-120px) !important;
+        border-radius: 12px !important;
+      }
+
+      #toastContainer .toast.show {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+      }
+
+      #toastContainer .toast.hide {
+        transform: translateY(-120px) !important;
+        opacity: 0 !important;
+      }
+    }
+
+    /* --- */
   </style>
 </head>
 
 <body class="bg-[#f5f5f5] text-[#333333]">
+
+  <div id="toastContainer" role="region" aria-live="polite" style="position:fixed!important;top:20px!important;right:20px!important;
+         bottom:unset!important;left:unset!important;z-index:99999;
+         display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+  </div>
 
   <!-- ════════════════ HEADER  ════════════════ -->
   <header class="header">
@@ -708,10 +869,13 @@
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div
+            style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">
+            Notifications</div>
           <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+            <a href="{{ $n['url'] ?? '#' }}"
+              style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
@@ -731,10 +895,9 @@
     </div>
   </header>
 
-  <!-- SIDEBAR -->
+<!-- SIDEBAR -->
   <aside id="sidebar" class="expanded">
 
-    <!-- Toggle pinned above scroll area -->
     <div class="sidebar-toggle-row">
       <button class="toggle-btn" onclick="toggleSidebar()" id="sidebarToggleBtn">
         <i id="sidebarIcon" class="fa-solid fa-xmark text-base"></i>
@@ -743,6 +906,9 @@
 
     <div class="sidebar-inner">
 
+      <!-- ══════════════════════════════
+           GROUP 1 — CLINIC MANAGEMENT
+      ══════════════════════════════ -->
       <div class="nav-group flyout-wrapper" id="group-cms">
         <div class="group-header active-group" onclick="toggleGroup('cms', event)">
           <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
@@ -753,30 +919,105 @@
           <i class="fa-solid fa-chevron-down group-chevron" id="chevron-cms"></i>
         </div>
         <div class="group-body open" id="body-cms">
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-          <a href="{{ route('admin.academic_periods') }}"class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i class="fa-solid fa-school"></i> Academic Periods</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-circle-check"></i> Document Requests</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-pen"></i> Document Template</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i> Reports</a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-users"></i> Patients
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-check"></i> Appointments
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-tooth"></i> Dental Records
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-circle-check"></i> Document Request
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-chart-column"></i> Reports
+          </a>
         </div>
         <div class="flyout-panel" id="flyout-cms">
           <div class="flyout-title">Clinic Management</div>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-users"></i> Patients</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-          <a href="{{ route('admin.academic_periods') }}" class="flyout-link"><i class="fa-solid fa-school"></i> Academic Periods</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-circle-check"></i> Document Requests</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-pen"></i> Document Template</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file"></i> Reports</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-tooth"></i> Dental Records</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-circle-check"></i> Document Request</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-chart-column"></i> Reports</a>
         </div>
       </div>
 
       <div class="nav-sep"></div>
 
+      <!-- ══════════════════════════════
+           GROUP 2 — MAINTENANCE
+      ══════════════════════════════ -->
+      <div class="nav-group flyout-wrapper" id="group-mnt">
+        <div class="group-header" onclick="toggleGroup('mnt', event)">
+          <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+          <div class="group-label-wrap">
+            <span class="group-label">Maintenance</span>
+            <span class="group-sublabel">Config &amp; scheduling</span>
+          </div>
+          <i class="fa-solid fa-chevron-down group-chevron" id="chevron-mnt"></i>
+        </div>
+        <div class="group-body" id="body-mnt">
+          <a href="{{ route('admin.user_management') }}"
+            class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-gear"></i> User Management
+          </a>
+          <a href="{{ route('admin.role_permissions') }}"
+            class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions
+          </a>
+          <a href="{{ route('admin.academic_periods') }}"
+            class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}">
+            <i class="fa-solid fa-school"></i> Academic Periods
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-calendar-days"></i> Clinic Schedule
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-list-check"></i> Service Types
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-file-pen"></i> Document Templates
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-boxes-stacked"></i> Inventory
+          </a>
+        </div>
+        <div class="flyout-panel" id="flyout-mnt">
+          <div class="flyout-title">Maintenance</div>
+          <a href="{{ route('admin.user_management') }}" class="flyout-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-gear"></i> User Management</a>
+          <a href="{{ route('admin.role_permissions') }}" class="flyout-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+          <a href="{{ route('admin.academic_periods') }}" class="flyout-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i class="fa-solid fa-school"></i> Academic Periods</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-list-check"></i> Service Types</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-file-pen"></i> Document Templates</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+        </div>
+      </div>
+
+      <div class="nav-sep"></div>
+
+      <!-- ══════════════════════════════
+           GROUP 3 — SYSTEM
+      ══════════════════════════════ -->
       <div class="nav-group flyout-wrapper" id="group-sys">
-        <div class="group-header active-group" onclick="toggleGroup('sys', event)">
+        <div class="group-header" onclick="toggleGroup('sys', event)">
           <div class="group-icon"><i class="fa-solid fa-server"></i></div>
           <div class="group-label-wrap">
             <span class="group-label">System</span>
@@ -784,20 +1025,28 @@
           </div>
           <i class="fa-solid fa-chevron-down group-chevron" id="chevron-sys"></i>
         </div>
-        <div class="group-body open" id="body-sys">
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-database"></i> Data Backup</a>
-          <a href="{{ route('admin.system_logs') }}" class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.user_management') }}" class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> System Settings</a>
-          <a href="{{ route('admin.role_permissions') }}" class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+        <div class="group-body" id="body-sys">
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-database"></i> Data Backup
+          </a>
+          <a href="{{ route('admin.system_logs') }}"
+            class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
+            <i class="fa-solid fa-clipboard-list"></i> System Logs
+          </a>
+          <a href="{{ route('admin.admin.dashboard') }}"
+            class="nav-link {{ false ? 'active' : '' }}">
+            <i class="fa-solid fa-sliders"></i> System Settings
+          </a>
         </div>
         <div class="flyout-panel" id="flyout-sys">
           <div class="flyout-title">System</div>
           <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-database"></i> Data Backup</a>
-          <a href="{{ route('admin.system_logs') }}" class="flyout-link"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.user_management') }}" class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i> System Settings</a>
-          <a href="{{ route('admin.role_permissions') }}" class="flyout-link"><i class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+          <a href="{{ route('admin.system_logs') }}" class="flyout-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-list"></i> System Logs</a>
+          <a href="{{ route('admin.admin.dashboard') }}" class="flyout-link"><i class="fa-solid fa-sliders"></i> System Settings</a>
         </div>
       </div>
+
     </div><!-- /sidebar-inner -->
 
     <div class="sidebar-bottom">
@@ -819,6 +1068,7 @@
         </button>
       </form>
     </div>
+
   </aside>
 
   <!-- ════════════════ MAIN  ════════════════ -->
@@ -860,7 +1110,8 @@
               <p class="text-xl font-bold text-gray-800">June 10, 2026</p>
             </div>
           </div>
-          <button class="bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all lg:flex-shrink-0">
+          <button
+            class="bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all lg:flex-shrink-0">
             <i class="fa-solid fa-gear mr-2"></i> Manage Periods
           </button>
         </div>
@@ -868,11 +1119,15 @@
 
       <!-- STATS CARDS -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-        <div class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-[#8B0000] transition-all">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#8B0000]/5 to-transparent rounded-full -mr-16 -mt-16"></div>
+        <div
+          class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-[#8B0000] transition-all">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#8B0000]/5 to-transparent rounded-full -mr-16 -mt-16">
+          </div>
           <div class="relative">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#6B0000] flex items-center justify-center shadow-lg">
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#6B0000] flex items-center justify-center shadow-lg">
                 <i class="fa-solid fa-users text-white text-xl"></i>
               </div>
               <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-3 py-1 rounded-full">All time</span>
@@ -886,11 +1141,15 @@
           </div>
         </div>
 
-        <div class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-blue-400 transition-all">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-16 -mt-16"></div>
+        <div
+          class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-blue-400 transition-all">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-16 -mt-16">
+          </div>
           <div class="relative">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <i class="fa-solid fa-calendar-check text-white text-xl"></i>
               </div>
               <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">December 2025</span>
@@ -904,11 +1163,15 @@
           </div>
         </div>
 
-        <div class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-green-400 transition-all">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/5 to-transparent rounded-full -mr-16 -mt-16"></div>
+        <div
+          class="stat-card bg-white rounded-xl p-5 shadow border border-gray-100 overflow-hidden relative group hover:border-green-400 transition-all">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/5 to-transparent rounded-full -mr-16 -mt-16">
+          </div>
           <div class="relative">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
                 <i class="fa-solid fa-file-circle-check text-white text-xl"></i>
               </div>
               <span class="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">December 2025</span>
@@ -936,31 +1199,36 @@
                 <h2 class="font-bold text-gray-800 text-sm">System Logs Overview</h2>
               </div>
               <a href="#" class="text-xs text-[#8B0000] font-semibold hover:underline flex items-center gap-1 group">
-                View All <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                View All <i
+                  class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
               </a>
             </div>
             <div class="p-5">
               <div class="grid grid-cols-5 gap-3 mb-5">
                 <div class="text-center group cursor-pointer">
-                  <div class="rounded-lg bg-purple-50 border border-purple-100 p-3 group-hover:bg-purple-100 transition-colors">
+                  <div
+                    class="rounded-lg bg-purple-50 border border-purple-100 p-3 group-hover:bg-purple-100 transition-colors">
                     <div class="text-2xl font-extrabold text-purple-700">0</div>
                     <div class="text-[9px] font-semibold text-purple-600 uppercase tracking-wide mt-1">This Month</div>
                   </div>
                 </div>
                 <div class="text-center group cursor-pointer">
-                  <div class="rounded-lg bg-blue-50 border border-blue-100 p-3 group-hover:bg-blue-100 transition-colors">
+                  <div
+                    class="rounded-lg bg-blue-50 border border-blue-100 p-3 group-hover:bg-blue-100 transition-colors">
                     <div class="text-2xl font-extrabold text-blue-700">0</div>
                     <div class="text-[9px] font-semibold text-blue-600 uppercase tracking-wide mt-1">Info</div>
                   </div>
                 </div>
                 <div class="text-center group cursor-pointer">
-                  <div class="rounded-lg bg-yellow-50 border border-yellow-100 p-3 group-hover:bg-yellow-100 transition-colors">
+                  <div
+                    class="rounded-lg bg-yellow-50 border border-yellow-100 p-3 group-hover:bg-yellow-100 transition-colors">
                     <div class="text-2xl font-extrabold text-yellow-700">0</div>
                     <div class="text-[9px] font-semibold text-yellow-600 uppercase tracking-wide mt-1">Warnings</div>
                   </div>
                 </div>
                 <div class="text-center group cursor-pointer">
-                  <div class="rounded-lg bg-green-50 border border-green-100 p-3 group-hover:bg-green-100 transition-colors">
+                  <div
+                    class="rounded-lg bg-green-50 border border-green-100 p-3 group-hover:bg-green-100 transition-colors">
                     <div class="text-2xl font-extrabold text-green-700">0</div>
                     <div class="text-[9px] font-semibold text-green-600 uppercase tracking-wide mt-1">Backups</div>
                   </div>
@@ -1005,7 +1273,8 @@
                 <a href="#" class="text-xs text-[#8B0000] font-semibold hover:underline">View</a>
               </div>
               <div class="p-5">
-                <div class="h-40 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+                <div
+                  class="h-40 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
                   <div class="text-center">
                     <i class="fa-solid fa-chart-area text-4xl text-gray-300 mb-2"></i>
                     <p class="text-xs text-gray-400">Chart Placeholder</p>
@@ -1022,7 +1291,8 @@
                 <a href="#" class="text-xs text-[#8B0000] font-semibold hover:underline">View</a>
               </div>
               <div class="p-5">
-                <div class="h-40 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+                <div
+                  class="h-40 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
                   <div class="text-center">
                     <i class="fa-solid fa-box text-4xl text-gray-300 mb-2"></i>
                     <p class="text-xs text-gray-400">Inventory Placeholder</p>
@@ -1045,35 +1315,44 @@
               </div>
             </div>
             <div class="p-4 space-y-2.5">
-              <button class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
-                <div class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
+              <button
+                class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-file-circle-plus"></i>
                 </div>
                 <div class="flex-1">
                   <div class="font-bold text-sm text-[#8B0000]">New Template</div>
                   <div class="text-[10px] text-gray-500">Create Document Format</div>
                 </div>
-                <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
+                <i
+                  class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
               </button>
-              <button class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
-                <div class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
+              <button
+                class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-file-invoice"></i>
                 </div>
                 <div class="flex-1">
                   <div class="font-bold text-sm text-[#8B0000]">Generate Report</div>
                   <div class="text-[10px] text-gray-500">Create Report Documents</div>
                 </div>
-                <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
+                <i
+                  class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
               </button>
-              <button class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
-                <div class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
+              <button
+                class="w-full flex items-center gap-3 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 border border-red-100 rounded-lg px-4 py-3 text-left transition-all group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-white border border-red-200 flex items-center justify-center text-[#8B0000] shadow-sm group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-chart-column"></i>
                 </div>
                 <div class="flex-1">
                   <div class="font-bold text-sm text-[#8B0000]">View Reports</div>
                   <div class="text-[10px] text-gray-500">All Reports</div>
                 </div>
-                <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
+                <i
+                  class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-[#8B0000] group-hover:translate-x-1 transition-all"></i>
               </button>
             </div>
           </div>
@@ -1088,11 +1367,13 @@
             <div class="p-4 space-y-3">
               <div class="rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 p-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-lg bg-white border border-green-300 flex items-center justify-center text-green-600 shadow-sm flex-shrink-0">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-white border border-green-300 flex items-center justify-center text-green-600 shadow-sm flex-shrink-0">
                     <i class="fa-solid fa-check text-lg"></i>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div class="text-[10px] text-green-700 font-semibold uppercase tracking-wide mb-0.5">Last Backup</div>
+                    <div class="text-[10px] text-green-700 font-semibold uppercase tracking-wide mb-0.5">Last Backup
+                    </div>
                     <div class="text-sm font-bold text-gray-800 truncate">December 25, 2025</div>
                     <div class="text-[10px] text-gray-600 mt-1">Status: Successful</div>
                   </div>
@@ -1107,7 +1388,8 @@
                   </div>
                 </div>
               </div>
-              <button class="w-full bg-gradient-to-r from-[#8B0000] to-[#6B0000] hover:from-[#760000] hover:to-[#5B0000] text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group">
+              <button
+                class="w-full bg-gradient-to-r from-[#8B0000] to-[#6B0000] hover:from-[#760000] hover:to-[#5B0000] text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group">
                 <i class="fa-solid fa-database group-hover:scale-110 transition-transform"></i>
                 <span>Run Backup Now</span>
               </button>
@@ -1121,9 +1403,12 @@
   </main>
 
   <!-- ════════════════ FOOTER  ════════════════ -->
-  <footer id="siteFooter" class="footer bg-[#8B0000] text-[#F4F4F4] p-6 transition-all duration-300" style="margin-left:240px;">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+  <footer id="siteFooter" class="footer bg-[#8B0000] text-[#F4F4F4] p-6 transition-all duration-300"
+    style="margin-left:240px;">
+    <div
+      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+          Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
       <span class="hidden sm:inline">|</span>
@@ -1131,7 +1416,65 @@
     </div>
   </footer>
 
+  @if(session('activeAppointmentModal'))
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var modal = document.getElementById("activeAppointmentModal");
+      var closeBtn = document.getElementById("closeActiveApptModalBtn");
+      if (!modal) return;
+      modal.showModal();
+      modal.addEventListener('click', function (e) {
+        var box = modal.querySelector('.modal-box');
+        if (box && !box.contains(e.target)) e.preventDefault();
+      });
+      modal.addEventListener('cancel', function (e) { e.preventDefault(); });
+      if (closeBtn) closeBtn.addEventListener("click", function () { modal.close(); });
+    });
+  </script>
+  @endif
+
+  @if (session('login_as'))
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      showToast(
+        'Login Successful',
+        'Logged in successfully as <strong>{{ session("login_as") }}</strong>',
+        'success'
+      );
+    });
+  </script>
+  @endif
+
+  <script>
+    /* TOAST */
+    function showToast(title, message, type) {
+      type = type || 'error';
+      var container = document.getElementById('toastContainer');
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      var icon = type === 'error' ?
+        '<i class="fa-solid fa-circle-exclamation toast-icon"></i>' :
+        '<i class="fa-solid fa-circle-check toast-icon"></i>';
+      t.innerHTML = '<div class="toast-icon-wrap">' + icon + '</div>' +
+        '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+        '<div class="toast-msg">' + message + '</div></div>' +
+        '<button class="toast-close" onclick="this.closest(\'.toast\').classList.add(\'hide\')">' +
+        '<i class="fa-solid fa-xmark"></i></button>';
+      container.appendChild(t);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          t.classList.add('show');
+        });
+      });
+      setTimeout(function () {
+        t.classList.remove('show');
+        t.classList.add('hide');
+        setTimeout(function () {
+          t.remove();
+        }, 400);
+      }, 4500);
+    }
+
     // ── Date ──
     const dateEl = document.getElementById('currentDate');
     if (dateEl) {

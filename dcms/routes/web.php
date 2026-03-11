@@ -106,58 +106,64 @@ Route::post('/register', function (Request $request) {
     }
 });
 
-// Patient Login POST
+// Single Login POST — handles patient, dentist, and admin
 Route::post('/login', function (Request $request) {
-    $patient = Patient::where('email', $request->email)->first();
 
-    // Check if patient exists
-    if (!$patient) {
-        return back()->with('error', 'No account associated with this email. Please try again or register.');
+    // ── DENTIST ──
+    if ($request->email === 'dentist' && $request->password === 'dentist123') {
+        session(['role' => 'dentist', 'dentist_email' => 'dentist']);
+        AuditLogger::log('login', 'authentication', 'Dentist logged into the system');
+        return redirect()->route('dentist.dentist.dashboard')
+            ->with('login_as', 'Dentist');
     }
 
-    // Check password
+    // ── ADMIN ──
+    if ($request->email === 'admin' && $request->password === 'admin123') {
+        session(['admin_logged_in' => true, 'role' => 'super_admin', 'admin_id' => 1, 'admin_email' => 'admin']);
+        AuditLogger::log('login', 'authentication', 'Admin logged into the system');
+        return redirect()->route('admin.admin.dashboard')
+            ->with('login_as', 'Administrator');
+    }
+
+    // ── PATIENT ──
+    $patient = Patient::where('email', $request->email)->first();
+    if (!$patient) {
+        return back()->with('error', 'No account associated with this email.');
+    }
     if (!Hash::check($request->password, $patient->password)) {
         return back()->with('error', 'Incorrect password. Please try again.');
     }
 
-    // Successful login
-    session([
-        'role' => 'patient',
-        'patient_id' => $patient->id,
-        'email' => $patient->email,
-    ]);
+    session(['role' => 'patient', 'patient_id' => $patient->id, 'email' => $patient->email]);
+    AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
-    AuditLogger::log(
-        'login',
-        'authentication',
-        'Patient logged into the system'
-    );
-
-    return redirect()->route('homepage');
+    return redirect()->route('homepage')
+        ->with('login_as', $patient->name);
 });
 
+
 // Dentist Login POST (hard-coded for now)
-Route::post('/dentist/login', function (Request $request) {
-    if ($request->email === 'dentist' && $request->password === 'dentist123') {
-        session([
-            'role' => 'dentist',
-            'dentist_email' => 'dentist',
-        ]);
+// Route::post('/dentist/login', function (Request $request) {
+//     if ($request->email === 'dentist' && $request->password === 'dentist123') {
+//         session([
+//             'role' => 'dentist',
+//             'dentist_email' => 'dentist',
+//         ]);
 
-        AuditLogger::log(
-            'login',
-            'authentication',
-            'Dentist logged into the system'
-        );
+//         AuditLogger::log(
+//             'login',
+//             'authentication',
+//             'Dentist logged into the system'
+//         );
 
-        return redirect()->route('dentist.dentist.dashboard');
-    }
+//         return redirect()->route('dentist.dentist.dashboard');
+//     }
 
-    return back()->with('error', 'Invalid dentist credentials');
-})->name('dentist.login.submit');
+//     return back()->with('error', 'Invalid dentist credentials');
+// })->name('dentist.login.submit');
 
 // Admin Login POST
-Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+// Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 
 // Logout (all roles)
 Route::post('/logout', function () {
@@ -193,7 +199,7 @@ Route::prefix('admin')->group(function () {
 
         return view('admin.admin-dashboard');
     })->name('admin.admin.dashboard');
-
+    
     // ROLE PERMISSIONS
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
         ->name('admin.role_permissions');
@@ -218,22 +224,11 @@ Route::prefix('admin')->group(function () {
     // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
     Route::get('/patients/list', function () {
 
-// Academic Periods
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])->name('academic_periods');
-    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])->name('academic_periods.store');
-    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])->name('academic_periods.update');
-    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])->name('academic_periods.destroy');
-    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])->name('academic_periods.set_active');
-});
-
-// START IMPERSONATION
-    Route::post('/impersonate', function (Request $request) {
         if (!session('admin_logged_in') || session('role') !== 'super_admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $patients = \App\Models\Patient::select('id','name','email','phone')
+        $patients = Patient::select('id','name','email','phone')
             ->orderBy('name')
             ->get();
 
@@ -242,6 +237,32 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('admin.patients.list');
 
 });
+
+// Academic Periods
+Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
+        ->name('admin.academic_periods');
+    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
+        ->name('admin.academic_periods.store');
+    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
+        ->name('admin.academic_periods.update');
+    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
+        ->name('admin.academic_periods.destroy');
+    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
+        ->name('admin.academic_periods.set_active');
+
+// START IMPERSONATION
+    Route::post('/impersonate', function (Request $request) {
+        if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $patients = Patient::select('id','name','email','phone')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($patients);
+
+    })->name('admin.patients.list');
 
 /*
 |--------------------------------------------------------------------------
@@ -326,7 +347,7 @@ Route::post('/impersonate', function (Request $request) {
             'patient_id' => 'required|exists:patients,id',
         ]);
 
-        $patient = \App\Models\Patient::find($request->patient_id);
+        $patient = Patient::find($request->patient_id);
 
         if (!$patient) {
             return response()->json([
@@ -385,8 +406,6 @@ Route::post('/stop-impersonation', function () {
 
 })->name('admin.stop_impersonation');
     
-
-
 /*
 |--------------------------------------------------------------------------
 | PATIENT-PROTECTED ROUTES
@@ -427,7 +446,6 @@ Route::middleware(['role:patient'])->group(function () {
         ->name('patient.about.us');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | PATIENT ROUTES
@@ -466,7 +484,6 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:view_own_appointments')
         ->name('book.appointment.index');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -602,10 +619,6 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.dentist.patient.profile');
 
-    // Reports
-
-
-
     // Report Page
     Route::get('/report', [\App\Http\Controllers\Dentist\DentistReportController::class, 'index'])
         ->middleware('permission:manage_reports')
@@ -627,9 +640,9 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     // })->name('dentist.report');
 
     // Document Requests – list page
-   Route::get('/document-requests', [DocumentRequestController::class, 'dentistIndex'])
-    ->middleware('permission:manage_document_requests')
-    ->name('dentist.dentist.documentrequests');
+    Route::get('/document-requests', [DocumentRequestController::class, 'dentistIndex'])
+        ->middleware('permission:manage_document_requests')
+        ->name('dentist.dentist.documentrequests');
 
     // Approve (AJAX POST)
     Route::post('/document-requests/{id}/approve', [DocumentRequestController::class, 'approve'])

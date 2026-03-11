@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <script type="module" src="https://unpkg.com/cally"></script>
 
   <script>
@@ -1431,10 +1432,13 @@ $notifCount = $notifications->count();
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div
+            style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">
+            Notifications</div>
           <div style="max-height:260px;overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
+            <a href="{{ $n['url'] ?? '#' }}"
+              style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
@@ -1451,7 +1455,8 @@ $notifCount = $notifications->count();
         <img class="header-avatar"
           src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
           alt="Profile">
-        <i id="mobileProfileChevron" class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
+        <i id="mobileProfileChevron"
+          class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
       </button>
 
       <!-- Desktop header user -->
@@ -1505,15 +1510,21 @@ $notifCount = $notifications->count();
         @foreach([
         ['route'=>'homepage', 'icon'=>'fa-house', 'label'=>'Home'],
         ['route'=>'patient.appointment.index', 'icon'=>'fa-calendar', 'label'=>'Appointment'],
-        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Record'],
+        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Dental Record'],
         ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check','label'=>'About Us'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
+          <span
+            class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i
+              class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span
+            class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{
+            $nav['label'] }}</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{
+            $nav['label'] }}</span>
         </a>
         @endforeach
       </nav>
@@ -1522,17 +1533,25 @@ $notifCount = $notifications->count();
       <div class="section-label">Settings</div>
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i
+              class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i
+              class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
+        <button
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i
+              class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span
+            class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log
+            out</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log
+            out</span>
         </button>
       </form>
     </div>
@@ -1574,13 +1593,11 @@ $notifCount = $notifications->count();
 
   <!-- ══════════════ DARK MODE FAB (mobile only) ══════════════ -->
   <button id="darkModeFab"
-    onclick="applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')"
-    style="position:fixed;bottom:88px;right:16px;width:44px;height:44px;border-radius:50%;
+    onclick="applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')" style="position:fixed;bottom:88px;right:16px;width:44px;height:44px;border-radius:50%;
            background:linear-gradient(135deg,#8B0000,#660000);color:white;border:none;font-size:18px;
            display:flex;align-items:center;justify-content:center;
            box-shadow:0 4px 16px rgba(139,0,0,.45);cursor:pointer;z-index:199;
-           transition:transform .2s cubic-bezier(.34,1.56,.64,1);"
-    aria-label="Toggle dark mode">
+           transition:transform .2s cubic-bezier(.34,1.56,.64,1);" aria-label="Toggle dark mode">
     <i id="darkModeFabIcon" class="fa-solid fa-moon"></i>
   </button>
 
@@ -1589,7 +1606,7 @@ $notifCount = $notifications->count();
     <div class="mx-auto">
 
       <!-- Breadcrumb -->
-      <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400 pt-4">
+      <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400">
         <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
         <i class="fa-solid fa-chevron-right text-[9px]"></i>
         <span class="text-[#8B0000] font-semibold">About Us</span>
@@ -1607,7 +1624,8 @@ $notifCount = $notifications->count();
             PUP Taguig Campus
           </div>
           <h1>Dental Clinic</h1>
-          <p>Providing free, professional dental care to the PUP Taguig community — students, alumni, faculty, and staff in a safe and welcoming environment.</p>
+          <p>Providing free, professional dental care to the PUP Taguig community — students, alumni, faculty, and staff
+            in a safe and welcoming environment.</p>
         </div>
         <div class="about-hero-badge">
           <i class="fa-solid fa-tooth"></i>
@@ -1640,8 +1658,10 @@ $notifCount = $notifications->count();
           <!-- Text side -->
           <div class="dentist-text-side">
             <h2>Led by an experienced professional</h2>
-            <p>The PUP Taguig Dental Clinic is headed by <strong>Dr. Nelson P. Angeles</strong>, the campus dentist, who provides professional, safe, and reliable dental care to the entire university community.</p>
-            <p>With a commitment to patient comfort and oral health excellence, Dr. Angeles oversees all dental services, consultations, and treatment plans delivered at the clinic.</p>
+            <p>The PUP Taguig Dental Clinic is headed by <strong>Dr. Nelson P. Angeles</strong>, the campus dentist, who
+              provides professional, safe, and reliable dental care to the entire university community.</p>
+            <p>With a commitment to patient comfort and oral health excellence, Dr. Angeles oversees all dental
+              services, consultations, and treatment plans delivered at the clinic.</p>
             <div class="flex flex-wrap gap-2 mt-4">
               <span class="dentist-tag"><i class="fa-solid fa-circle-check text-xs"></i> Licensed Dentist</span>
               <span class="dentist-tag"><i class="fa-solid fa-circle-check text-xs"></i> PUP Campus Dentist</span>
@@ -1653,24 +1673,29 @@ $notifCount = $notifications->count();
           <div class="dentist-profile-card">
             <div class="dentist-card-header">
               <div class="dentist-img-wrap">
-                <img src="{{ asset('images/Nelson-Angeles.png') }}" alt="Dr. Nelson P. Angeles" onerror="this.src='https://ui-avatars.com/api/?name=Nelson+Angeles&background=660000&color=FFFFFF&size=88'">
+                <img src="{{ asset('images/Nelson-Angeles.jpg') }}" alt="Dr. Nelson P. Angeles"
+                  onerror="this.src='https://ui-avatars.com/api/?name=Nelson+Angeles&background=660000&color=FFFFFF&size=88'">
               </div>
               <div class="dentist-name">Dr. Nelson P. Angeles</div>
               <div class="dentist-title">University Campus Dentist</div>
             </div>
             <div class="dentist-card-body">
-              <p class="text-sm text-[#6B7280] leading-relaxed mb-4">Serving the PUP Taguig community with dedication, Dr. Angeles ensures every patient receives attentive and comprehensive dental care.</p>
+              <p class="text-sm text-[#6B7280] leading-relaxed mb-4">Serving the PUP Taguig community with dedication,
+                Dr. Angeles ensures every patient receives attentive and comprehensive dental care.</p>
               <div class="flex flex-col gap-3">
                 <div class="flex items-center gap-3 text-sm text-[#5A5A6A]">
-                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-location-dot text-[#8B0000] text-xs"></i></span>
+                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i
+                      class="fa-solid fa-location-dot text-[#8B0000] text-xs"></i></span>
                   PUP Taguig Campus Dental Clinic
                 </div>
                 <div class="flex items-center gap-3 text-sm text-[#5A5A6A]">
-                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-regular fa-clock text-[#8B0000] text-xs"></i></span>
+                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i
+                      class="fa-regular fa-clock text-[#8B0000] text-xs"></i></span>
                   Monday – Friday, 8:00 AM – 5:00 PM
                 </div>
                 <div class="flex items-center gap-3 text-sm text-[#5A5A6A]">
-                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-users text-[#8B0000] text-xs"></i></span>
+                  <span class="w-8 h-8 bg-[#FDF1F1] rounded-lg flex items-center justify-center flex-shrink-0"><i
+                      class="fa-solid fa-users text-[#8B0000] text-xs"></i></span>
                   Students, Alumni, Faculty & Staff
                 </div>
               </div>
@@ -1683,7 +1708,8 @@ $notifCount = $notifications->count();
       <section class="services-section reveal">
         <div class="section-pill"><i class="fa-solid fa-stethoscope"></i> Services</div>
         <h2 class="text-2xl font-800 font-bold text-[#8B0000] mb-2">What We Offer</h2>
-        <p class="text-sm text-[#8A8A9A] mb-6">The clinic provides a range of preventive and restorative dental services at no cost.</p>
+        <p class="text-sm text-[#8A8A9A] mb-6">The clinic provides a range of preventive and restorative dental services
+          at no cost.</p>
         <div class="services-grid">
           <div class="service-item reveal reveal-delay-1">
             <div class="service-item-icon"><i class="fa-solid fa-hand-holding-medical"></i></div>
@@ -1729,25 +1755,35 @@ $notifCount = $notifications->count();
         @php
         $faqs = [
         ['q' => 'Who can avail of the dental services?',
-        'a' => 'All students, alumni, faculty, and staff of the Polytechnic University of the Philippines – Taguig Campus are eligible for free dental services.'],
+        'a' => 'All students, alumni, faculty, and staff of the Polytechnic University of the Philippines – Taguig
+        Campus are eligible for free dental services.'],
         ['q' => 'How do I book an appointment?',
-        'a' => 'You can book an appointment online through the Dental Management System portal. Simply log in, choose your preferred schedule, and confirm your booking.'],
+        'a' => 'You can book an appointment online through the Dental Management System portal. Simply log in, choose
+        your preferred schedule, and confirm your booking.'],
         ['q' => 'Will the dentist prescribe medications?',
-        'a' => 'Yes. Depending on your dental condition, Dr. Angeles may prescribe antibiotics, pain relievers, or other necessary medications during your visit.'],
+        'a' => 'Yes. Depending on your dental condition, Dr. Angeles may prescribe antibiotics, pain relievers, or other
+        necessary medications during your visit.'],
         ['q' => 'Can I book an appointment anytime?',
-        'a' => 'Appointments are subject to slot availability. Since the clinic operates with a single dentist and limited daily slots, early booking is highly recommended.'],
+        'a' => 'Appointments are subject to slot availability. Since the clinic operates with a single dentist and
+        limited daily slots, early booking is highly recommended.'],
         ['q' => 'How do I cancel or reschedule?',
-        'a' => 'You can cancel or reschedule through the Dental Management System portal or by contacting the clinic directly — at least three (3) days before your scheduled appointment.'],
+        'a' => 'You can cancel or reschedule through the Dental Management System portal or by contacting the clinic
+        directly — at least three (3) days before your scheduled appointment.'],
         ['q' => 'What if the dentist is unavailable on my scheduled day?',
-        'a' => 'If Dr. Angeles is unavailable, your confirmed appointment will be rescheduled to the next available slot and you will be notified accordingly.'],
+        'a' => 'If Dr. Angeles is unavailable, your confirmed appointment will be rescheduled to the next available slot
+        and you will be notified accordingly.'],
         ['q' => 'What services are available at the clinic?',
-        'a' => 'The clinic provides oral check-ups, dental cleaning, fillings, extractions, dental surgery, restoration, prosthetics, and preventive care services.'],
+        'a' => 'The clinic provides oral check-ups, dental cleaning, fillings, extractions, dental surgery, restoration,
+        prosthetics, and preventive care services.'],
         ['q' => 'Are urgent dental cases given priority?',
-        'a' => 'Yes, urgent cases may be prioritized depending on the daily schedule and the dentist\'s discretion. Contact the clinic directly for urgent concerns.'],
+        'a' => 'Yes, urgent cases may be prioritized depending on the daily schedule and the dentist\'s discretion.
+        Contact the clinic directly for urgent concerns.'],
         ['q' => 'Are there restrictions for certain treatments?',
-        'a' => 'Some advanced procedures may not be available due to the clinic\'s resources and equipment. The dentist will guide you on available alternatives if needed.'],
+        'a' => 'Some advanced procedures may not be available due to the clinic\'s resources and equipment. The dentist
+        will guide you on available alternatives if needed.'],
         ['q' => 'Are follow-up appointments required?',
-        'a' => 'Some treatments require follow-up visits. Dr. Angeles will advise you if a follow-up is necessary after your initial treatment.'],
+        'a' => 'Some treatments require follow-up visits. Dr. Angeles will advise you if a follow-up is necessary after
+        your initial treatment.'],
         ];
         @endphp
 
@@ -1777,27 +1813,25 @@ $notifCount = $notifications->count();
 
         <div class="team-grid">
           @php
-            $devs = [
-              ['img' => 'Althea-Aragon.jpg', 'name' => 'Althea Aragon', 'role' => 'Developer'],
-              ['img' => 'Grace-Lim.jpg', 'name' => 'Grace Lim', 'role' => 'Developer'],
-              ['img' => 'Hoshea-Lopez.jpg', 'name' => 'Hoshea Lopez', 'role' => 'Developer'],
-              ['img' => 'Rain-Romero.jpg', 'name' => 'Rain Romero', 'role' => 'Developer'],
-            ];
+          $devs = [
+          ['img' => 'Althea-Aragon.jpg', 'name' => 'Althea Aragon', 'role' => 'Developer'],
+          ['img' => 'Grace-Lim.jpg', 'name' => 'Grace Lim', 'role' => 'Developer'],
+          ['img' => 'Hoshea-Lopez.jpg', 'name' => 'Hoshea Lopez', 'role' => 'Developer'],
+          ['img' => 'Rain-Romero.jpg', 'name' => 'Rain Romero', 'role' => 'Developer'],
+          ];
           @endphp
 
           @foreach($devs as $i => $dev)
-            <div class="team-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
-              <div class="team-img-wrap">
-                <img
-                  src="{{ asset('images/' . $dev['img']) }}"
-                  alt="{{ $dev['name'] }}"
-                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($dev['name']) }}&background=8B0000&color=FFFFFF&size=200'">
-              </div>
-              <div class="team-info">
-                <div class="team-name">{{ $dev['name'] }}</div>
-                <span class="team-role">{{ $dev['role'] }}</span>
-              </div>
+          <div class="team-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
+            <div class="team-img-wrap">
+              <img src="{{ asset('images/' . $dev['img']) }}" alt="{{ $dev['name'] }}"
+                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($dev['name']) }}&background=8B0000&color=FFFFFF&size=200'">
             </div>
+            <div class="team-info">
+              <div class="team-name">{{ $dev['name'] }}</div>
+              <span class="team-role">{{ $dev['role'] }}</span>
+            </div>
+          </div>
           @endforeach
         </div>
       </section>
@@ -1805,7 +1839,9 @@ $notifCount = $notifications->count();
       <!-- ── CLOSING STATEMENT ── -->
       <div class="closing-banner reveal">
         <div class="closing-banner-icon"><i class="fa-solid fa-heart-pulse"></i></div>
-        <p>The <strong>PUPT Dental Management System</strong> was developed to manage records and appointments more effectively — ensuring efficient dental service while supporting the University's commitment to quality and accessible care for all.</p>
+        <p>The <strong>PUPT Dental Management System</strong> was developed to manage records and appointments more
+          effectively — ensuring efficient dental service while supporting the University's commitment to quality and
+          accessible care for all.</p>
       </div>
 
     </div>
@@ -1813,8 +1849,10 @@ $notifCount = $notifications->count();
 
   <!-- ══════════════ FOOTER ══════════════ -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+    <div
+      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+          Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
       <span class="hidden sm:inline">|</span>
@@ -1834,7 +1872,7 @@ $notifCount = $notifications->count();
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      themeOptions.forEach(function(opt) {
+      themeOptions.forEach(function (opt) {
         opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
       });
       themeIndicator.classList.toggle("dark-mode", theme === "dark");
@@ -1842,8 +1880,8 @@ $notifCount = $notifications->count();
       if (fabIcon) fabIcon.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
     applyTheme(localStorage.getItem("theme") || "light");
-    themeOptions.forEach(function(opt) {
-      opt.addEventListener("click", function() {
+    themeOptions.forEach(function (opt) {
+      opt.addEventListener("click", function () {
         applyTheme(opt.getAttribute("data-theme"));
       });
     });
@@ -1867,7 +1905,7 @@ $notifCount = $notifications->count();
       if (sidebarOpen) {
         applyLayout('220px');
         sidebar.classList.replace('collapsed', 'expanded');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
@@ -1876,7 +1914,7 @@ $notifCount = $notifications->count();
       } else {
         applyLayout('72px');
         sidebar.classList.replace('expanded', 'collapsed');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
@@ -1906,7 +1944,7 @@ $notifCount = $notifications->count();
       var isOpen = item.classList.contains('open');
 
       // close all
-      document.querySelectorAll('.faq-item-new.open').forEach(function(el) {
+      document.querySelectorAll('.faq-item-new.open').forEach(function (el) {
         el.classList.remove('open');
         el.querySelector('.faq-body').style.maxHeight = '0';
         el.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
@@ -1922,7 +1960,7 @@ $notifCount = $notifications->count();
     /* ══════════════════════════════════════════════
        DOM READY
     ══════════════════════════════════════════════ */
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       /* Desktop layout */
       if (window.innerWidth >= 768) {
         sidebarOpen = true;
@@ -1935,13 +1973,13 @@ $notifCount = $notifications->count();
       var mobFab = document.getElementById('mobFab');
       var mobFabMenu = document.getElementById('mobFabMenu');
       if (mobFab && mobFabMenu) {
-        mobFab.addEventListener('click', function(e) {
+        mobFab.addEventListener('click', function (e) {
           e.stopPropagation();
           var open = mobFabMenu.classList.contains('open');
           mobFabMenu.classList.toggle('open', !open);
           mobFab.classList.toggle('open', !open);
         });
-        mobFabMenu.addEventListener('click', function(e) {
+        mobFabMenu.addEventListener('click', function (e) {
           e.stopPropagation();
         });
       }
@@ -1950,20 +1988,20 @@ $notifCount = $notifications->count();
       var notifBtn = document.getElementById("notifBtn");
       var notifMenu = document.getElementById("notifMenu");
       if (notifBtn && notifMenu) {
-        notifBtn.addEventListener("click", function(e) {
+        notifBtn.addEventListener("click", function (e) {
           e.stopPropagation();
           notifMenu.classList.toggle("open");
         });
-        notifMenu.addEventListener("click", function(e) {
+        notifMenu.addEventListener("click", function (e) {
           e.stopPropagation();
         });
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener("keydown", function (e) {
           if (e.key === "Escape") notifMenu.classList.remove("open");
         });
       }
 
       /* Close all on outside click */
-      document.addEventListener('click', function() {
+      document.addEventListener('click', function () {
         if (mobFabMenu) {
           mobFabMenu.classList.remove('open');
           if (mobFab) mobFab.classList.remove('open');
@@ -1979,8 +2017,8 @@ $notifCount = $notifications->count();
       });
 
       /* Scroll reveal */
-      var revealObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
             revealObserver.unobserve(entry.target);
@@ -1989,7 +2027,7 @@ $notifCount = $notifications->count();
       }, {
         threshold: 0.1
       });
-      document.querySelectorAll('.reveal').forEach(function(el) {
+      document.querySelectorAll('.reveal').forEach(function (el) {
         revealObserver.observe(el);
       });
     });
