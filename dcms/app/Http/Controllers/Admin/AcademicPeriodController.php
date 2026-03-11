@@ -64,6 +64,10 @@ class AcademicPeriodController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $calendarPeriods = AcademicPeriod::query()
+            ->orderBy('start_date')
+            ->get();
+
         $activePeriod = AcademicPeriod::where('is_active', true)
             ->orderByDesc('start_date')
             ->first();
@@ -77,6 +81,7 @@ class AcademicPeriodController extends Controller
 
         return view('admin.academic-period', compact(
             'academicPeriods',
+            'calendarPeriods',
             'activePeriod',
             'holidays'
         ));
