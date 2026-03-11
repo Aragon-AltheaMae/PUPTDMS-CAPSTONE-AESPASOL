@@ -33,6 +33,11 @@ class User extends Authenticatable
         return optional($this->role)->slug === $slug;
     }
 
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
+    }
+
     public function hasAnyRole(array $slugs): bool
     {
         return in_array(optional($this->role)->slug, $slugs, true);

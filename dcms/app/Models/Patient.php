@@ -2,27 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Patient extends Authenticatable
+class Patient extends Model
 {
     use HasFactory;
 
-        protected $fillable = [
-            'name',
-            'email',
-            'phone',
-            'birthdate',
-            'gender',
-            'password',
-        ];
-
-
+    protected $fillable = [
+        'user_id',
+        'name',
+        'email',
+        'phone',
+        'birthdate',
+        'gender',
+        'password',
+    ];
 
     protected $hidden = [
         'password',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function dentalHistory()
     {
@@ -43,13 +47,13 @@ class Patient extends Authenticatable
     {
         return $this->hasMany(\App\Models\DentalHistoryAnswer::class);
     }
-    
-     public function medicalHistory()
+
+    public function medicalHistory()
     {
         return $this->hasOne(\App\Models\MedicalHistory::class);
     }
 
-     public function appointments()
+    public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
