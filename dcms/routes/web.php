@@ -115,7 +115,8 @@ Route::post('/register', function (Request $request) {
             ]);
         });
 
-        return redirect('/login')->with('success', 'Account created successfully! You can now log in.');
+        return redirect('/login')
+            ->with('success', 'Account created successfully! You can now log in.');
     } catch (\Exception $e) {
         return redirect()->back()
             ->withInput($request->except('password', 'password_confirmation'))
