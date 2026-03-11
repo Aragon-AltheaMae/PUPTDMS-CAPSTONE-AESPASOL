@@ -88,7 +88,6 @@
       font-size: 22px;
     }
 
-    /* FAB + button */
     #mobFabWrapper {
       flex: 1;
       display: flex;
@@ -124,7 +123,6 @@
       transform: rotate(45deg) translateY(-10px);
     }
 
-    /* Accordion panel above FAB */
     #mobFabMenu {
       position: fixed;
       bottom: 90px;
@@ -285,7 +283,7 @@
 
     @keyframes wave {
       0% {
-        transform: rotate(0deg);
+        transform: rotate(0);
       }
 
       20% {
@@ -305,7 +303,7 @@
       }
 
       100% {
-        transform: rotate(0deg);
+        transform: rotate(0);
       }
     }
 
@@ -316,7 +314,7 @@
 
     @keyframes spinSlow {
       from {
-        transform: rotate(0deg);
+        transform: rotate(0);
       }
 
       to {
@@ -468,7 +466,6 @@
       font-style: italic;
     }
 
-    /* ── NOTIF MENU ── */
     #notifMenu {
       position: absolute;
       right: 0;
@@ -496,7 +493,7 @@
       position: relative;
     }
 
-    /* ── DESKTOP SIDEBAR ── */
+    /* ── SIDEBAR ── */
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -544,6 +541,18 @@
       display: none;
     }
 
+    #sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .sidebar-link i {
+      margin-right: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
     .sidebar-link:hover .sidebar-tooltip {
       opacity: 1 !important;
       transform: scale(1) !important;
@@ -564,18 +573,6 @@
     .card,
     .modal-box {
       transition: background-color .3s ease, color .3s ease;
-    }
-
-    #sidebar.collapsed .sidebar-link {
-      justify-content: center;
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    #sidebar.collapsed .sidebar-link i {
-      margin-right: 0 !important;
-      width: 100%;
-      text-align: center;
     }
 
     .sidebar-link.bg-\[\#8B0000\] {
@@ -661,7 +658,7 @@
     }
 
     #sidebar.expanded .theme-indicator.dark-mode {
-      transform: translateX(calc(100% + 0px));
+      transform: translateX(calc(100%));
     }
 
     #sidebar.collapsed .theme-indicator {
@@ -755,57 +752,162 @@
       transform: translateY(0) scale(1);
     }
 
-    /* ── UPCOMING APPOINTMENT CARD ── */
-    .upcoming-card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 2px 16px rgba(139, 0, 0, .08), 0 1px 4px rgba(0, 0, 0, .04);
-      overflow: hidden;
+    /* ── TOAST ── */
+    #toastContainer {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      bottom: unset !important;
+      left: unset !important;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      width: auto !important;
+      padding: 0 !important;
     }
 
-    .upcoming-card-top {
-      background: #8B0000;
-      padding: 0.875rem 1.25rem;
+    #toastContainer .toast {
+      min-width: 300px;
+      max-width: 360px;
+      background: white !important;
+      border-radius: 14px !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .18) !important;
+      padding: 14px 18px 14px 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px;
+      opacity: 0;
+      transform: translateX(340px);
+      transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
+      position: relative;
+      overflow: hidden;
+      pointer-events: all;
+      flex-direction: row !important;
+    }
+
+    #toastContainer .toast::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: none;
+    }
+
+    #toastContainer .toast.error::before {
+      background: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success::before {
+      background: #15803d !important;
+    }
+
+    #toastContainer .toast.show {
+      opacity: 1 !important;
+      transform: translateX(0) !important;
+    }
+
+    #toastContainer .toast.hide {
+      opacity: 0 !important;
+      transform: translateX(340px) !important;
+    }
+
+    #toastContainer .toast-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .upcoming-card-body {
-      padding: 1rem 1.25rem;
+    #toastContainer .toast.error .toast-icon-wrap {
+      background: rgba(139, 0, 0, .08);
     }
 
-    .upcoming-info-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem 1rem;
+    #toastContainer .toast.success .toast-icon-wrap {
+      background: rgba(21, 128, 61, .08);
     }
 
-    @media (min-width: 640px) {
-      .upcoming-info-row {
-        grid-template-columns: repeat(3, 1fr);
+    #toastContainer .toast-icon {
+      font-size: 17px;
+    }
+
+    #toastContainer .toast.error .toast-icon {
+      color: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success .toast-icon {
+      color: #15803d !important;
+    }
+
+    #toastContainer .toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #toastContainer .toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A0A0A !important;
+    }
+
+    #toastContainer .toast-msg {
+      font-size: 12px;
+      color: #888 !important;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    #toastContainer .toast-close {
+      background: none !important;
+      border: none;
+      cursor: pointer;
+      color: #CCC;
+      font-size: 13px;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      transition: color .2s;
+    }
+
+    #toastContainer .toast-close:hover {
+      color: #888;
+    }
+
+    @media(max-width:640px) {
+      #toastContainer {
+        left: 12px !important;
+        right: 12px !important;
+        top: 72px !important;
+        bottom: unset !important;
+        width: auto !important;
+      }
+
+      #toastContainer .toast {
+        min-width: unset !important;
+        width: 100% !important;
+        transform: translateY(-120px) !important;
+        border-radius: 12px !important;
+      }
+
+      #toastContainer .toast.show {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+      }
+
+      #toastContainer .toast.hide {
+        transform: translateY(-120px) !important;
+        opacity: 0 !important;
       }
     }
 
-    .upcoming-info-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: #9CA3AF;
-      margin-bottom: 0.2rem;
-    }
-
-    .upcoming-info-value {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #1a1a1a;
-      line-height: 1.35;
-      word-break: break-word;
-    }
-
-    @media (max-width: 767px) {
+    /* --- */
+    /* ── RESPONSIVE ── */
+    @media (max-width:767px) {
       #sidebar {
         display: none !important;
       }
@@ -853,7 +955,7 @@
       }
     }
 
-    @media (min-width: 768px) {
+    @media (min-width:768px) {
       #mobileProfileToggle {
         display: none !important;
       }
@@ -867,10 +969,9 @@
       }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width:480px) {
       .header-title {
         display: none;
-        font-size: .55rem;
       }
 
       .header-name,
@@ -883,7 +984,7 @@
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width:640px) {
       .hero-tooth {
         width: 70px !important;
         opacity: .12;
@@ -892,7 +993,6 @@
       .hero-text h1 {
         font-size: 1.15rem !important;
         white-space: nowrap;
-        max-width: 100%;
       }
 
       .hero-text h2 {
@@ -910,7 +1010,11 @@
   use Carbon\Carbon;
   $notifications = collect($notifications ?? []);
   $notifCount = $notifications->count();
-  $homeRecords = ($records ?? collect())->map(function ($r) {
+  $homeRecords = ($records ?? collect())
+  ->filter(function ($r) {
+  return strtolower($r->status ?? '') === 'completed';
+  })
+  ->map(function ($r) {
   return [
   'service' => $r->service_type,
   'date' => $r->appointment_date ? Carbon::parse($r->appointment_date)->format('F d, Y') : '',
@@ -922,33 +1026,36 @@
   'diagnosis' => $r->diagnosis ?? '',
   'prescription' => $r->prescription ?? '',
   ];
-  })->values();
+  })
+  ->values();
 
   $calendarAppointments = [];
-  foreach (($appointments ?? collect()) as $appt) {
+  foreach ($appointments ?? collect() as $appt) {
   $calendarAppointments[Carbon::parse($appt->appointment_date)->format('Y-m-d')] =
   $appt->service_type . ' • ' . $appt->appointment_time;
   }
-
-  $calendarCountsSafe = $appointmentCountsPerDay ?? [];
-  $calendarUnavailableDatesSafe = $unavailableDates ?? [];
-  $calendarHolidaysSafe = $philippineHolidays ?? [];
   @endphp
 
   <script>
-    const calendarData = {{ Illuminate\Support\Js:: from([
-      'appointments' => $calendarAppointments,
-      'counts' => $appointmentCountsPerDay ?? [],
-      'unavailableDates' => $unavailableDates ?? [],
-      'holidays' => $philippineHolidays ?? [],
-    ]) }};
+    const calendarData =
+      {{ Illuminate\Support\Js:: from([
+        'appointments' => $calendarAppointments,
+        'counts' => $appointmentCountsPerDay ?? [],
+        'unavailableDates' => $unavailableDates ?? [],
+        'holidays' => $philippineHolidays ?? [],
+      ]) }};
     const calendarAppointments = calendarData.appointments;
     const calendarCounts = calendarData.counts;
     const calendarUnavailableDates = calendarData.unavailableDates;
     const calendarHolidays = calendarData.holidays;
   </script>
 
-  <!-- HEADER -->
+  <div id="toastContainer" role="region" aria-live="polite" style="position:fixed!important;top:20px!important;right:20px!important;
+         bottom:unset!important;left:unset!important;z-index:99999;
+         display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+  </div>
+
+  <!-- ══════ HEADER ══════ -->
   <header class="header">
     <div class="header-left">
       <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
@@ -959,7 +1066,9 @@
       <div id="notifDropdown">
         <button class="notif-btn" id="notifBtn">
           <i class="fa-regular fa-bell"></i>
-          @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
+          @if ($notifCount > 0)
+          <span class="notif-badge">{{ $notifCount }}</span>
+          @endif
         </button>
         <div id="notifMenu">
           <div
@@ -970,10 +1079,13 @@
             <a href="{{ $n['url'] ?? '#' }}"
               style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
+              @if (!empty($n['message']))
+              <div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>
+              @endif
             </a>
             @empty
-            <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all caught up.</div>
+            <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all
+              caught up.</div>
             @endforelse
           </div>
         </div>
@@ -981,14 +1093,14 @@
       <button id="mobileProfileToggle" onclick="toggleMobileProfile()"
         style="display:none;align-items:center;gap:.6rem;background:none;border:none;cursor:pointer;padding:0;">
         <img class="header-avatar"
-          src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          src="{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=36' }}"
           alt="Profile">
         <i id="mobileProfileChevron"
           class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
       </button>
       <div class="header-user" id="desktopHeaderUser">
         <img class="header-avatar"
-          src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          src="{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=36' }}"
           alt="Profile">
         <div>
           <div class="header-name">{{ ucwords(strtolower($patient->name)) }}</div>
@@ -998,16 +1110,15 @@
     </div>
   </header>
 
-  
-
-  <!-- MOBILE PROFILE ACCORDION -->
+  <!-- ══════ MOBILE PROFILE ACCORDION ══════ -->
   <div id="mobileProfileAccordion">
     <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100">
       <img class="w-12 h-12 rounded-full border-2 border-[#8B0000]/20 object-cover flex-shrink-0"
-        src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=96' }}"
+        src="{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=96' }}"
         alt="Profile">
       <div>
-        <p class="font-bold text-[#333333] text-base leading-tight">{{ ucwords(strtolower($patient->name)) }}</p>
+        <p class="font-bold text-[#333333] text-base leading-tight">{{ ucwords(strtolower($patient->name)) }}
+        </p>
         <p class="text-xs text-[#757575] italic">Student</p>
       </div>
     </div>
@@ -1022,7 +1133,7 @@
     </div>
   </div>
 
-  <!-- DESKTOP SIDEBAR  -->
+  <!-- ══════════════ DESKTOP SIDEBAR ══════════════ -->
   <aside id="sidebar"
     class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
@@ -1037,8 +1148,8 @@
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
         ['route'=>'homepage', 'icon'=>'fa-house', 'label'=>'Home'],
-        ['route'=>'patient.appointment.index','icon'=>'fa-calendar', 'label'=>'Appointment'],
-        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Record'],
+        ['route'=>'patient.appointment.index', 'icon'=>'fa-calendar', 'label'=>'Appointment'],
+        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Dental Record'],
         ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check','label'=>'About Us'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
@@ -1121,32 +1232,34 @@
 
   <!-- DARK MODE FAB (mobile only) -->
   <button id="darkModeFab"
-    onclick="applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')"
-    style="position:fixed;bottom:88px;right:16px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#660000);color:white;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(139,0,0,.45);cursor:pointer;z-index:199;transition:transform .2s cubic-bezier(.34,1.56,.64,1);"
-    aria-label="Toggle dark mode">
+    onclick="applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')" style="position:fixed;bottom:88px;right:16px;width:44px;height:44px;border-radius:50%;
+           background:linear-gradient(135deg,#8B0000,#660000);color:white;border:none;font-size:18px;
+           display:flex;align-items:center;justify-content:center;
+           box-shadow:0 4px 16px rgba(139,0,0,.45);cursor:pointer;z-index:199;
+           transition:transform .2s cubic-bezier(.34,1.56,.64,1);" aria-label="Toggle dark mode">
     <i id="darkModeFabIcon" class="fa-solid fa-moon"></i>
   </button>
 
-  <!-- CONTENT -->
+  <!-- ══════ MAIN CONTENT ══════ -->
   <main id="mainContent" class="pt-[100px] px-4 sm:px-6 py-6 fade-up min-h-screen">
     <div class="mx-auto">
-      
-  {{-- Impersonation banner --}}
-  @if(session('impersonated_role') === 'patient' && session('impersonator_role') === 'super_admin')
-  <div
-    style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-    <div>
-      <strong>You are viewing as Patient</strong><br>
-      <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
-    </div>
-    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
-      @csrf
-      <button type="submit"
-        style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Return
-        to Admin</button>
-    </form>
-  </div>
-  @endif
+
+      {{-- Impersonation banner --}}
+      @if(session('impersonated_role') === 'patient' && session('impersonator_role') === 'super_admin')
+      <div
+        style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div>
+          <strong>You are viewing as Patient</strong><br>
+          <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
+        </div>
+        <form method="POST" action="{{ route('admin.stop_impersonation') }}">
+          @csrf
+          <button type="submit"
+            style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Return
+            to Admin</button>
+        </form>
+      </div>
+      @endif
 
       <!-- HERO CARD -->
       <div
@@ -1165,62 +1278,205 @@
           <h2 class="text-xs sm:text-base font-normal mt-2 sm:mt-4 mb-4 sm:mb-6 text-[#F4F4F4] fade-up">
             Healthy teeth start with one appointment.
           </h2>
-          <button
-            class="btn btn-soft shimmer-btn px-3 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl border-none text-xs sm:text-base font-semibold text-[#F4F4F4] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-            <a href="{{ route('patient.book.appointment') }}" class="flex items-center gap-2 whitespace-nowrap">
+          <a href="{{ route('patient.book.appointment') }}" class="flex items-center gap-2 whitespace-nowrap">
+            <button
+              class="btn btn-soft shimmer-btn px-3 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl border-none text-xs sm:text-base font-semibold text-[#F4F4F4] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_0_10px_rgba(255,255,255,0.4)]">
               <i class="fa-solid fa-calendar-plus"></i> Book Appointment
-            </a>
-          </button>
+            </button>
+          </a>
         </div>
         <div class="absolute right-4 sm:right-7 top-1/2 -translate-y-1/2 pointer-events-none">
-          <img src="{{ asset('images/home-tooth.png') }}" alt="Tooth Icon"
+          <img src="{{ asset('images/home-tooth.png') }}" alt="Tooth"
             class="hero-tooth float-slow w-[120px] sm:w-[250px] max-w-none drop-shadow-[0_14px_26px_rgba(255,255,255,0.25)] opacity-30 sm:opacity-100" />
         </div>
       </div>
 
-      <!-- ════ UPCOMING APPOINTMENT ════ -->
+      <!-- ════ UPCOMING APPOINTMENT — skeleton shown by default, replaced by JS ════ -->
       <div class="mb-6 fade-up">
-        <div id="upcomingAppointment"></div>
+        {{-- This wrapper is what JS targets. It starts as a skeleton. --}}
+        <div id="upcomingAppointmentWrapper">
+          {{-- Initial skeleton — visible immediately on page load --}}
+          <div class="rounded-2xl overflow-hidden border border-[#EDE8E4] shadow-sm animate-pulse">
+            <div class="flex items-center justify-between gap-3 px-5 py-3"
+              style="background:linear-gradient(135deg,#5A0000,#8B0000);">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-white/15 flex-shrink-0"></div>
+                <div class="h-4 w-40 bg-white/25 rounded-lg"></div>
+              </div>
+              <div class="h-6 w-20 bg-white/20 rounded-full"></div>
+            </div>
+            <div class="bg-white px-5 py-4">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div>
+                  <div class="h-2 w-16 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-full bg-gray-200 rounded"></div>
+                </div>
+                <div>
+                  <div class="h-2 w-24 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-full bg-gray-200 rounded"></div>
+                </div>
+                <div>
+                  <div class="h-2 w-16 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-full bg-gray-200 rounded"></div>
+                </div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-gray-100 flex justify-end">
+                <div class="h-3 w-20 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- CALENDAR SECTION -->
       <section class="max-w-7xl mx-auto mb-10">
         <div class="flex flex-col md:flex-row gap-6">
+
+          <!-- Profile + Request Docs column -->
           <div class="md:w-[600px] flex-shrink-0 flex flex-col gap-5">
-            <div id="profileSkeletonContainer" class="rounded-2xl overflow-hidden shadow-lg"></div>
+
+            {{-- Profile skeleton shown by default --}}
+            <div id="profileSkeletonContainer" class="rounded-2xl overflow-hidden shadow-lg">
+              <div class="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                <div class="bg-gray-200 h-24 w-full"></div>
+                <div class="p-4 space-y-3">
+                  <div class="flex gap-4">
+                    <div class="h-3 w-24 skeleton"></div>
+                    <div class="h-3 w-40 skeleton"></div>
+                  </div>
+                  <div class="flex gap-4">
+                    <div class="h-3 w-24 skeleton"></div>
+                    <div class="h-3 w-40 skeleton"></div>
+                  </div>
+                  <div class="flex gap-4">
+                    <div class="h-3 w-24 skeleton"></div>
+                    <div class="h-3 w-40 skeleton"></div>
+                  </div>
+                  <div class="flex gap-4">
+                    <div class="h-3 w-24 skeleton"></div>
+                    <div class="h-3 w-40 skeleton"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {{-- Request docs skeleton shown by default --}}
             <div class="bg-white rounded-2xl shadow-lg p-5">
-              <div id="requestDocsContainer" class="space-y-3"></div>
+              <div id="requestDocsContainer">
+                <div class="flex items-center gap-3 border rounded-xl p-3 animate-pulse mb-3">
+                  <div class="w-10 h-10 skeleton rounded-lg flex-shrink-0"></div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-3 w-36 skeleton"></div>
+                    <div class="h-2 w-48 skeleton"></div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 border rounded-xl p-3 animate-pulse">
+                  <div class="w-10 h-10 skeleton rounded-lg flex-shrink-0"></div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-3 w-36 skeleton"></div>
+                    <div class="h-2 w-48 skeleton"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Calendar column -->
           <div class="flex-1 flex flex-col gap-2">
+            {{-- Calendar skeleton shown by default --}}
             <div id="calendarSkeletonContainer" class="bg-white border shadow-sm rounded-2xl p-4 sm:p-6 w-full"
               style="min-height:500px;">
               <div class="animate-pulse space-y-4">
                 <div class="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
                 <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;">
-                  @for($i = 0; $i < 35; $i++) <div class="h-9 bg-gray-200 rounded-lg">
+                  @for ($i = 0; $i < 35; $i++) <div class="h-9 bg-gray-200 rounded-lg">
                 </div>
                 @endfor
               </div>
             </div>
           </div>
         </div>
+
     </div>
     </section>
 
-    <!-- RECORDS -->
-    <div class="bg-white rounded-2xl shadow-lg mb-8 fade-up overflow-hidden">
-      <div class="flex items-center justify-between px-4 sm:px-6 pt-6 pb-4 border-b">
-        <h2 class="text-lg sm:text-xl font-extrabold text-[#8B0000]">My Dental Records</h2>
-        <div id="viewAllContainer" class="hidden">
-          <a href="{{ route('patient.record') }}"
-            class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#8B0000] border border-[#8B0000] px-3 sm:px-4 py-1.5 rounded-lg hover:bg-[#8B0000] hover:text-white transition-colors duration-200">
-            View Full Record <i class="fa-solid fa-arrow-right text-xs"></i>
-          </a>
+    <!-- ════ RECORDS SECTION ════ -->
+    <div class="mb-8 fade-up">
+
+      {{-- Hero banner (always visible) --}}
+      <div class="relative overflow-hidden rounded-[20px] px-7 pt-7 pb-14 -mb-8"
+        style="background:linear-gradient(135deg,#5A0000 0%,#8B0000 60%,#b5282a 100%);">
+        <div class="absolute inset-0"
+          style="background:url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.04\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'20\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
+        </div>
+        <p class="relative z-10 text-[10px] font-bold tracking-[.15em] uppercase text-white/55 mb-1.5">
+          Patient Portal</p>
+        <h2 class="relative z-10 text-[28px] font-extrabold text-white leading-tight">Dental Records</h2>
+        <p class="relative z-10 text-[13px] text-white/65 mt-1.5">A complete history of your dental visits
+          and treatments.</p>
+        <div class="relative z-10 flex flex-wrap gap-3 mt-4">
+          <div id="recordsStatVisits"
+            class="flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-white/90"
+            style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);">
+            <i class="fa-solid fa-list text-[10px] opacity-70"></i>
+            <span id="recordsVisitCount">0 visits</span>
+          </div>
+          <div id="recordsStatLatest"
+            class="hidden items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-white/90"
+            style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);">
+            <i class="fa-regular fa-calendar text-[10px] opacity-70"></i>
+            <span id="recordsLatestDate"></span>
+          </div>
         </div>
       </div>
-      <div class="px-4 sm:px-6 py-4">
-        <div id="recordsInnerContainer" class="space-y-3"></div>
+
+      {{-- Records body card --}}
+      <div class="relative z-10 bg-white rounded-[20px] border border-[#EDE8E4] p-5"
+        style="box-shadow:0 4px 32px rgba(0,0,0,.06);">
+
+        {{-- Visit History header (hidden until records load) --}}
+        <div id="viewAllContainer" class="hidden mb-5 pt-2">
+          <div class="flex items-center gap-3">
+            <span class="text-[9px] font-extrabold tracking-[.12em] uppercase text-[#9E9690] whitespace-nowrap">Visit
+              History</span>
+            <div class="flex-1 h-px bg-[#EDE8E4]"></div>
+            <a href="{{ route('patient.record') }}"
+              class="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B0000] hover:text-[#5A0000] whitespace-nowrap transition-colors">
+              View Full Record <i class="fa-solid fa-arrow-right text-[9px]"></i>
+            </a>
+          </div>
+        </div>
+
+        {{-- Records skeleton shown by default --}}
+        <div id="recordsInnerContainer">
+          <div class="space-y-3 animate-pulse">
+            <div class="flex items-center gap-4 border rounded-xl p-4">
+              <div class="w-3 h-3 rounded-full bg-gray-200 flex-shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-40 skeleton"></div>
+                <div class="h-3 w-56 skeleton"></div>
+              </div>
+              <div class="h-8 w-20 skeleton rounded-lg"></div>
+            </div>
+            <div class="flex items-center gap-4 border rounded-xl p-4">
+              <div class="w-3 h-3 rounded-full bg-gray-200 flex-shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-36 skeleton"></div>
+                <div class="h-3 w-48 skeleton"></div>
+              </div>
+              <div class="h-8 w-20 skeleton rounded-lg"></div>
+            </div>
+            <div class="flex items-center gap-4 border rounded-xl p-4">
+              <div class="w-3 h-3 rounded-full bg-gray-200 flex-shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-44 skeleton"></div>
+                <div class="h-3 w-52 skeleton"></div>
+              </div>
+              <div class="h-8 w-20 skeleton rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1243,8 +1499,7 @@
                 <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800"><i
                     class="fa-solid fa-check text-white text-[8px]"></i></span> STATUS
               </div>
-              <div class="mt-3 ml-4">
-                <span id="m_status"
+              <div class="mt-3 ml-4"><span id="m_status"
                   class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
               </div>
             </div>
@@ -1253,14 +1508,13 @@
                 <span class="flex items-center justify-center w-3 h-3 rounded-full bg-gray-800"><i
                     class="fa-solid fa-check text-white text-[8px]"></i></span> DURATION
               </div>
-              <div class="mt-3 ml-4">
-                <span id="m_duration"
+              <div class="mt-3 ml-4"><span id="m_duration"
                   class="inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold bg-gray-200 text-gray-800">—</span>
               </div>
             </div>
           </div>
-          @foreach([['TREATMENT','m_remarks'],['ORAL
-          EXAMINATION','m_oral'],['DIAGNOSIS','m_diagnosis'],['PRESCRIPTION','m_prescription']] as [$label, $id])
+          @foreach ([['TREATMENT', 'm_remarks'], ['ORAL EXAMINATION', 'm_oral'], ['DIAGNOSIS', 'm_diagnosis'],
+          ['PRESCRIPTION', 'm_prescription']] as [$label, $mid])
           <div>
             <div class="flex items-center gap-4 mb-3">
               <span class="text-xs font-extrabold tracking-widest text-[#8B0000]">{{ $label }}</span>
@@ -1269,7 +1523,7 @@
             <div class="bg-white rounded-md overflow-hidden">
               <div class="grid grid-cols-[6px_1fr]">
                 <div class="bg-gray-300"></div>
-                <div class="p-4 sm:p-6 text-gray-700 text-sm leading-relaxed"><span id="{{ $id }}">—</span></div>
+                <div class="p-4 sm:p-6 text-gray-700 text-sm leading-relaxed"><span id="{{ $mid }}">—</span></div>
               </div>
             </div>
           </div>
@@ -1294,7 +1548,8 @@
           class="hidden absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4] text-xs font-semibold shadow-lg">
           Please complete all required fields</div>
         <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">Request Clearance</h3>
-        <p class="text-sm text-[#333333] mb-5">Please allow up to three (3) working days for processing.</p>
+        <p class="text-sm text-[#333333] mb-5">Please allow up to three (3) working days for processing.
+        </p>
         <div class="mb-5">
           <label class="block text-sm font-bold text-[#8B0000] mb-1">Type of Clearance</label>
           <select name="document_type" required
@@ -1331,7 +1586,8 @@
           class="hidden absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-red-600 text-[#F4F4F4] text-xs font-semibold shadow-lg">
           Please complete all required fields</div>
         <h3 class="font-extrabold text-2xl text-[#8B0000] mb-3">Request Dental Health Record</h3>
-        <p class="text-sm mb-5 text-[#333333]">Please allow up to three (3) working days for processing.</p>
+        <p class="text-sm mb-5 text-[#333333]">Please allow up to three (3) working days for processing.
+        </p>
         <div class="mb-5">
           <label class="block text-sm font-bold text-[#8B0000] mb-1">Type of Dental Health Record</label>
           <select name="document_type" required
@@ -1367,12 +1623,12 @@
           <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-2xl"></i>
         </div>
         <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">Active Appointment Detected</h3>
-        <p class="text-sm text-gray-600 mb-6">You already have an active appointment. Please complete or cancel it
-          before booking a new one.</p>
+        <p class="text-sm text-gray-600 mb-6">You already have an active appointment. Please complete or
+          cancel it before booking a new one.</p>
         <div class="modal-action justify-center gap-3">
           <a href="{{ route('patient.appointment.index') }}"
-            class="btn bg-[#8B0000] text-[#F4F4F4] hover:bg-[#7A0000] transition-colors duration-200">View My
-            Appointments</a>
+            class="btn bg-[#8B0000] text-[#F4F4F4] hover:bg-[#7A0000] transition-colors duration-200">View
+            My Appointments</a>
           <button id="closeActiveApptModalBtn" type="button" class="btn btn-ghost">Close</button>
         </div>
       </div>
@@ -1381,12 +1637,12 @@
     </div>
   </main>
 
-  <!-- Footer -->
+  <!-- ══════ FOOTER ══════ -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
     <div
       class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
-          Philippines</span></span>
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of
+          the Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
       <span class="hidden sm:inline">|</span>
@@ -1394,7 +1650,7 @@
     </div>
   </footer>
 
-  @if(session('activeAppointmentModal'))
+  @if (session('activeAppointmentModal'))
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       var modal = document.getElementById("activeAppointmentModal");
@@ -1415,8 +1671,94 @@
   </script>
   @endif
 
+  @if (session('login_as'))
   <script>
-    /* ── THEME TOGGLE ── */
+    document.addEventListener('DOMContentLoaded', () => {
+      showToast(
+        'Login Successful',
+        'Logged in successfully as <strong>{{ session('login_as') }}</strong>',
+        'success'
+      );
+    });
+  </script>
+  @endif
+
+  <script>
+    /* TOAST */
+    function showToast(title, message, type) {
+      type = type || 'error';
+      var container = document.getElementById('toastContainer');
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      var icon = type === 'error' ?
+        '<i class="fa-solid fa-circle-exclamation toast-icon"></i>' :
+        '<i class="fa-solid fa-circle-check toast-icon"></i>';
+      t.innerHTML = '<div class="toast-icon-wrap">' + icon + '</div>' +
+        '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+        '<div class="toast-msg">' + message + '</div></div>' +
+        '<button class="toast-close" onclick="this.closest(\'.toast\').classList.add(\'hide\')">' +
+        '<i class="fa-solid fa-xmark"></i></button>';
+      container.appendChild(t);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          t.classList.add('show');
+        });
+      });
+      setTimeout(function () {
+        t.classList.remove('show');
+        t.classList.add('hide');
+        setTimeout(function () {
+          t.remove();
+        }, 400);
+      }, 4500);
+    }
+
+    var HOME_RECORDS = @json($homeRecords);
+
+    @php
+    $upcomingJs = null;
+    if (isset($upcomingAppointment) && $upcomingAppointment) {
+      $uD = Carbon:: parse($upcomingAppointment -> appointment_date);
+      $uT = Carbon:: parse($upcomingAppointment -> appointment_time);
+      $upcomingJs = [
+        'exists' => true,
+        'service' => $upcomingAppointment -> service_type ?? '—',
+        'date' => $uD -> format('M d, Y'),
+        'time_raw' => $upcomingAppointment -> appointment_time,
+        'time_fmt' => $uT -> format('g:i A'),
+        'dentist' => $upcomingAppointment -> dentist_name ?? 'Dr. Nelson P. Angeles',
+        'status' => ucfirst($upcomingAppointment -> status),
+        'isRescheduled' => strtolower($upcomingAppointment -> status) === 'rescheduled',
+        'indexUrl' => route('patient.appointment.index'),
+        'bookUrl' => route('patient.book.appointment'),
+      ];
+    } else {
+      $upcomingJs = [
+        'exists' => false,
+        'bookUrl' => route('patient.book.appointment'),
+      ];
+    }
+    @endphp
+    var UPCOMING_DATA = @json($upcomingJs);
+
+    var PATIENT_NAME = "{{ urlencode($patient->name) }}";
+
+    @php
+    $profileRows = [['Date of Birth', $patient -> birthdate ? Carbon :: parse($patient -> birthdate) -> format('F d, Y') : '-'], ['Age', $patient -> age ?? '-'], ['Gender', $patient -> gender ?? '-'], ['Contact', $patient -> phone ?? '-'], ['Email', $patient -> email ?? '-']];
+    @endphp
+    var PROFILE_DATA = {
+      name: "{{ ucwords(strtolower($patient->name)) }}",
+      patientId: "{{ $patient->patient_id ?? 'N/A' }}",
+      rows: @json($profileRows),
+      avatar: "{{ $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name) . '&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+    };
+
+    var ROUTE_BOOK = "{{ route('patient.book.appointment') }}";
+    var ROUTE_RECORD = "{{ route('patient.record') }}";
+
+    /* ══════════════════════════════════════
+       THEME
+    ══════════════════════════════════════ */
     var html = document.documentElement;
     var themeToggleContainer = document.getElementById("themeToggle");
     var themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
@@ -1425,162 +1767,259 @@
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      themeOptions.forEach(function (opt) {
-        opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
+      themeOptions.forEach(function (o) {
+        o.classList.toggle("active", o.getAttribute("data-theme") === theme);
       });
       themeIndicator.classList.toggle("dark-mode", theme === "dark");
-      var fabIcon = document.getElementById("darkModeFabIcon");
-      if (fabIcon) fabIcon.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+      var fi = document.getElementById("darkModeFabIcon");
+      if (fi) fi.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
-
     applyTheme(localStorage.getItem("theme") || "light");
-    themeOptions.forEach(function (opt) {
-      opt.addEventListener("click", function () {
-        applyTheme(opt.getAttribute("data-theme"));
+    themeOptions.forEach(function (o) {
+      o.addEventListener("click", function () {
+        applyTheme(o.getAttribute("data-theme"));
       });
     });
 
-    /* ── DESKTOP SIDEBAR ── */
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
     var sidebarOpen = true;
 
-    function applyLayout(sidebarWidth) {
-      document.getElementById('sidebar').style.width = sidebarWidth;
-      document.getElementById('mainContent').style.marginLeft = sidebarWidth;
+    function applyLayout(w) {
+      document.getElementById('sidebar').style.width = w;
+      document.getElementById('mainContent').style.marginLeft = w;
     }
 
     function toggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      var texts = document.querySelectorAll('.sidebar-text');
-      var icon = document.getElementById('sidebarIcon');
-      var toggleWrapper = document.getElementById('sidebarToggleWrapper');
+      var s = document.getElementById('sidebar'),
+        tx = document.querySelectorAll('.sidebar-text');
+      var ic = document.getElementById('sidebarIcon'),
+        wr = document.getElementById('sidebarToggleWrapper');
       sidebarOpen = !sidebarOpen;
       if (sidebarOpen) {
         applyLayout('220px');
-        sidebar.classList.replace('collapsed', 'expanded');
-        texts.forEach(function (t) {
+        s.classList.replace('collapsed', 'expanded');
+        tx.forEach(function (t) {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-center', 'justify-end');
-        icon.classList.replace('fa-bars', 'fa-xmark');
+        wr.classList.replace('justify-center', 'justify-end');
+        ic.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
-        sidebar.classList.replace('expanded', 'collapsed');
-        texts.forEach(function (t) {
+        s.classList.replace('expanded', 'collapsed');
+        tx.forEach(function (t) {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-end', 'justify-center');
-        icon.classList.replace('fa-xmark', 'fa-bars');
+        wr.classList.replace('justify-end', 'justify-center');
+        ic.classList.replace('fa-xmark', 'fa-bars');
       }
       applyTheme(localStorage.getItem("theme") || "light");
     }
 
+    /* ══════════════════════════════════════
+       MOBILE PROFILE ACCORDION
+    ══════════════════════════════════════ */
+    function toggleMobileProfile() {
+      var p = document.getElementById('mobileProfileAccordion'),
+        c = document.getElementById('mobileProfileChevron');
+      var o = p.classList.contains('open');
+      p.classList.toggle('open', !o);
+      if (c) c.style.transform = o ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    /* ══════════════════════════════════════
+       HELPERS
+    ══════════════════════════════════════ */
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,
+        '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function formatTime(raw) {
+      if (!raw) return '—';
+      raw = String(raw).trim();
+      if (/[AaPp][Mm]$/.test(raw)) return raw;
+      var m = raw.match(/^(\d{1,2}):(\d{2})/);
+      if (!m) return raw;
+      var h = parseInt(m[1], 10),
+        mn = m[2],
+        ampm = h >= 12 ? 'PM' : 'AM',
+        hr = h % 12 || 12;
+      return hr + ':' + mn + ' ' + ampm;
+    }
+
+    function shortDate(raw) {
+      if (!raw) return '—';
+      return String(raw).replace(
+        /^(January|February|March|April|May|June|July|August|September|October|November|December)/,
+        function (s) {
+          return s.slice(0, 3);
+        });
+    }
+
+    /* ══════════════════════════════════════
+       DOM READY — all rendering happens here
+    ══════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
+
+      /* Layout */
       if (window.innerWidth >= 768) {
         sidebarOpen = true;
         applyLayout('220px');
+      } else {
+        document.getElementById('mainContent').style.marginLeft = '0';
       }
 
-      /* ── MOBILE FAB ── */
-      var mobFab = document.getElementById('mobFab');
-      var mobFabMenu = document.getElementById('mobFabMenu');
-      if (mobFab && mobFabMenu) {
-        mobFab.addEventListener('click', function (e) {
+      /* Mobile FAB */
+      var mf = document.getElementById('mobFab'),
+        mm = document.getElementById('mobFabMenu');
+      if (mf && mm) {
+        mf.addEventListener('click', function (e) {
           e.stopPropagation();
-          var isOpen = mobFabMenu.classList.contains('open');
-          if (isOpen) {
-            mobFabMenu.classList.remove('open');
-            mobFab.classList.remove('open');
-          } else {
-            mobFabMenu.classList.add('open');
-            mobFab.classList.add('open');
-          }
+          var o = mm.classList.contains('open');
+          mm.classList.toggle('open', !o);
+          mf.classList.toggle('open', !o);
         });
-        document.addEventListener('click', function () {
-          mobFabMenu.classList.remove('open');
-          mobFab.classList.remove('open');
-        });
-        mobFabMenu.addEventListener('click', function (e) {
+        mm.addEventListener('click', function (e) {
           e.stopPropagation();
         });
       }
 
-      /* ── NOTIFICATIONS ── */
-      var notifBtn = document.getElementById("notifBtn");
-      var notifMenu = document.getElementById("notifMenu");
-      var notifOpen = false;
-      if (notifBtn && notifMenu) {
-        notifBtn.addEventListener("click", function (e) {
+      /* Notifications */
+      var nb = document.getElementById("notifBtn"),
+        nm = document.getElementById("notifMenu");
+      if (nb && nm) {
+        nb.addEventListener("click", function (e) {
           e.stopPropagation();
-          notifOpen = !notifOpen;
-          notifMenu.classList.toggle("open", notifOpen);
+          nm.classList.toggle("open");
         });
-        document.addEventListener("click", function () {
-          notifOpen = false;
-          notifMenu.classList.remove("open");
-        });
-        notifMenu.addEventListener("click", function (e) {
+        nm.addEventListener("click", function (e) {
           e.stopPropagation();
         });
         document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape") {
-            notifOpen = false;
-            notifMenu.classList.remove("open");
-          }
+          if (e.key === "Escape") nm.classList.remove("open");
         });
       }
 
-      /* ── INIT ── */
-      showSkeletons();
+      /* Outside click */
+      document.addEventListener('click', function (e) {
+        if (mm) {
+          mm.classList.remove('open');
+          if (mf) mf.classList.remove('open');
+        }
+        if (nm) nm.classList.remove('open');
+        var panel = document.getElementById('mobileProfileAccordion');
+        var toggle = document.getElementById('mobileProfileToggle');
+        var chev = document.getElementById('mobileProfileChevron');
+        if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
+          panel.classList.remove('open');
+          if (chev) chev.style.transform = 'rotate(0deg)';
+        }
+      });
+
+      /* Greeting */
+      (function () {
+        var h = new Date().getHours(),
+          g, ic, an;
+        if (h >= 6 && h < 12) {
+          g = 'Good morning';
+          ic = 'fa-solid fa-sun text-yellow-400 text-sm';
+          an = 'greet-spin';
+        } else if (h >= 12 && h < 18) {
+          g = 'Good afternoon';
+          ic = 'fa-solid fa-cloud-sun text-yellow-300 text-sm';
+          an = 'greet-drift';
+        } else {
+          g = 'Good evening';
+          ic = 'fa-solid fa-moon text-blue-300 text-sm';
+          an = 'greet-float';
+        }
+        var el = document.getElementById('greetingText'),
+          ico = document.getElementById('greetingIcon');
+        if (el) el.textContent = g;
+        if (ico) ico.className = ic + ' ' + an;
+      })();
+
+      /* ── Fire all renders with simulated 1s skeleton delay ── */
       setTimeout(function () {
+        renderUpcomingAppointment();
         renderProfile();
-        loadCalendar();
         renderRequestDocs();
-        renderUpcomingSchedule();
         renderRecords();
+        loadCalendar();
       }, 1000);
+
     });
 
-    /* ── SKELETON LOADERS ── */
-    function showSkeletons() {
-      var viewAll = document.getElementById("viewAllContainer");
-      if (viewAll) viewAll.classList.add('hidden');
+    /* ══════════════════════════════════════
+       RENDER: UPCOMING APPOINTMENT
+    ══════════════════════════════════════ */
+    function renderUpcomingAppointment() {
+      var wrapper = document.getElementById('upcomingAppointmentWrapper');
+      if (!wrapper) return;
+      var d = UPCOMING_DATA;
 
-      document.getElementById("profileSkeletonContainer").innerHTML =
-        '<div class="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">' +
-        '<div class="bg-gray-200 h-24 w-full"></div>' +
-        '<div class="p-4 space-y-3">' + [1, 2, 3, 4].map(function () {
-          return '<div class="flex gap-4"><div class="h-3 w-24 skeleton"></div><div class="h-3 w-40 skeleton"></div></div>';
-        }).join('') + '</div></div>';
+      if (d.exists) {
+        var statusPillCls = d.isRescheduled ?
+          'bg-yellow-400/20 text-yellow-100' :
+          'bg-blue-500/20 text-blue-100';
+        var statusDotCls = d.isRescheduled ? 'bg-yellow-300' : 'bg-blue-400';
 
-      /* ── UPCOMING SKELETON (mobile-friendly) ── */
-      document.getElementById("upcomingAppointment").innerHTML =
-        '<div class="upcoming-card animate-pulse">' +
-        '<div class="upcoming-card-top"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-white/20 flex-shrink-0"></div><div class="h-4 w-36 bg-white/30 rounded-lg"></div></div><div class="h-6 w-20 bg-white/20 rounded-full"></div></div>' +
-        '<div class="upcoming-card-body"><div class="upcoming-info-row">' + ['w-24', 'w-32', 'w-20'].map(function (w) {
-          return '<div><div class="h-2 ' + w + ' bg-gray-200 rounded mb-2"></div><div class="h-4 w-full bg-gray-200 rounded"></div></div>';
-        }).join('') +
-        '</div></div></div>';
+        wrapper.innerHTML =
+          '<div class="rounded-2xl overflow-hidden border border-[#EDE8E4] shadow-sm fade-up">' +
 
-      document.getElementById("calendarSkeletonContainer").innerHTML =
-        '<div class="h-6 w-32 skeleton mx-auto mb-4"></div>' +
-        '<div class="grid grid-cols-7 gap-2">' +
-        Array(35).fill('<div class="h-9 skeleton rounded-lg"></div>').join('') + '</div>';
+          '<div class="flex items-center justify-between gap-3 px-5 py-3" style="background:linear-gradient(135deg,#5A0000,#8B0000);">' +
+          '<div class="flex items-center gap-2.5">' +
+          '<div class="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">' +
+          '<i class="fa-regular fa-calendar-check text-white text-sm"></i>' +
+          '</div>' +
+          '<span class="text-white font-bold text-sm">Upcoming Appointment</span>' +
+          '</div>' +
+          '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ' +
+          statusPillCls + '">' +
+          '<span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ' + statusDotCls + '"></span>' +
+          escapeHtml(d.status) +
+          '</span>' +
+          '</div>' +
 
-      document.getElementById("requestDocsContainer").innerHTML = [1, 2].map(function () {
-        return '<div class="flex items-center gap-3 border rounded-xl p-3 animate-pulse">' +
-          '<div class="w-10 h-10 skeleton rounded-lg flex-shrink-0"></div>' +
-          '<div class="flex-1 space-y-2"><div class="h-3 w-36 skeleton"></div><div class="h-2 w-48 skeleton"></div></div></div>';
-      }).join('');
+          '<div class="bg-white px-5 py-4">' +
+          '<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">' +
+          '<div><p class="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-1">Service</p><p class="text-sm font-bold text-[#8B0000]">' +
+          escapeHtml(d.service) + '</p></div>' +
+          '<div><p class="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-1">Date &amp; Time</p><p class="text-sm font-bold text-[#1C1410]">' +
+          escapeHtml(d.date) + '<span class="text-[#8B0000] mx-0.5">·</span>' + escapeHtml(d.time_fmt) +
+          '</p></div>' +
+          '<div><p class="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-1">Dentist</p><p class="text-sm font-bold text-[#1C1410]">' +
+          escapeHtml(d.dentist) + '</p></div>' +
+          '</div>' +
+          '<div class="mt-3 pt-3 border-t border-gray-100 flex justify-end">' +
+          '<a href="' + escapeHtml(d.indexUrl) +
+          '" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8B0000] hover:text-[#660000] transition-colors">' +
+          'View details <i class="fa-solid fa-arrow-right text-[10px]"></i>' +
+          '</a>' +
+          '</div>' +
+          '</div></div>';
 
-      document.getElementById("recordsInnerContainer").innerHTML =
-        '<div class="space-y-3 animate-pulse">' + [1, 2, 3].map(function () {
-          return '<div class="flex items-center gap-4 border rounded-xl p-4">' +
-            '<div class="w-3 h-3 rounded-full bg-gray-200 flex-shrink-0"></div>' +
-            '<div class="flex-1 space-y-2"><div class="h-4 w-40 skeleton"></div><div class="h-3 w-56 skeleton"></div></div>' +
-            '<div class="h-8 w-20 skeleton rounded-lg"></div></div>';
-        }).join('') + '</div>';
+      } else {
+        wrapper.innerHTML =
+          '<div class="rounded-2xl overflow-hidden border border-[#EDE8E4] shadow-sm fade-up">' +
+          '<div class="flex items-center gap-2.5 px-5 py-3" style="background:linear-gradient(135deg,#5A0000,#8B0000);">' +
+          '<div class="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">' +
+          '<i class="fa-regular fa-calendar text-white text-sm"></i>' +
+          '</div>' +
+          '<span class="text-white font-bold text-sm">No Upcoming Appointment</span>' +
+          '</div>' +
+          '<div class="bg-white px-5 py-4 flex items-center justify-between gap-3 flex-wrap">' +
+          '<p class="text-sm text-gray-500">Ready for your next visit? Book an appointment now.</p>' +
+          '<a href="' + escapeHtml(d.bookUrl) +
+          '" class="inline-flex items-center gap-1.5 bg-[#8B0000] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#660000] transition-colors flex-shrink-0">' +
+          '<i class="fa-solid fa-calendar-plus text-xs"></i> Book Now' +
+          '</a>' +
+          '</div></div>';
+      }
     }
 
     /* ── PROFILE ── */
@@ -1591,201 +2030,182 @@
         '<div class="avatar flex-shrink-0"><div class="w-14 h-14 rounded-full overflow-hidden ring-1 ring-white/30">' +
         '<img src="https://ui-avatars.com/api/?name={{ urlencode($patient->name) }}&background=660000&color=FFFFFF&rounded=true&size=128" alt="Profile">' +
         '</div></div>' +
-        '<div><p class="font-bold text-xl leading-tight">{{ isset($patient->name) ? ucwords(strtolower($patient->name)) : "Guest" }}</p>' +
-        '<p class="text-sm text-[#F4F4F4]/70 mb-2">Student</p>' +
-        '<span class="inline-block bg-[#FFD700]/40 text-[#FFD700] border border-[#FFD700] text-xs font-extrabold px-2.5 py-0.5 rounded-full">{{ $patient->patient_id ?? "N/A" }}</span>' +
-        '</div></div>' +
-        '<div class="mx-0 bg-white divide-y divide-gray-100 text-sm rounded-b-2xl overflow-hidden">' + [
-          ['Date of Birth', '{{ $patient->birthdate ? Carbon::parse($patient->birthdate)->format("F d, Y") : "-" }}'],
-          ['Age', '{{ $patient->age ?? "-" }}'],
-          ['Gender', '{{ $patient->gender ?? "-" }}'],
-          ['Contact', '{{ $patient->phone ?? "-" }}'],
-          ['Email', '{{ $patient->email ?? "-" }}'],
-        ].map(function (row) {
-          return '<div class="flex px-4 py-3 gap-4">' +
-            '<span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">' + row[0] + '</span>' +
-            '<span class="font-semibold text-[#333333]">' + row[1] + '</span></div>';
-        }).join('') + '</div></div>';
+        '<div><p class="font-bold text-xl leading-tight">{{ isset($patient->name) ? ucwords(strtolower($patient->name)) : 'Guest' }}</p>' +
+          '<p class="text-sm text-[#F4F4F4]/70 mb-2">Student</p>' +
+          '<span class="inline-block bg-[#FFD700]/40 text-[#FFD700] border border-[#FFD700] text-xs font-extrabold px-2.5 py-0.5 rounded-full">{{ $patient->patient_id ?? 'N / A' }}</span>' +
+            '</div></div>' +
+            '<div class="mx-0 bg-white divide-y divide-gray-100 text-sm rounded-b-2xl overflow-hidden">' + [
+              ['Date of Birth',
+                '{{ $patient->birthdate ? Carbon::parse($patient->birthdate)->format('F d, Y') : ' - ' }}'
+              ],
+              ['Age', '{{ $patient->age ?? ' - ' }}'],
+              ['Gender', '{{ $patient->gender ?? ' - ' }}'],
+              ['Contact', '{{ $patient->phone ?? ' - ' }}'],
+              ['Email', '{{ $patient->email ?? ' - ' }}'],
+            ].map(function (row) {
+              return '<div class="flex px-4 py-3 gap-4">' +
+                '<span class="text-[#757575] uppercase text-[10px] font-semibold w-28 flex-shrink-0 pt-0.5">' +
+                row[0] + '</span>' +
+                '<span class="font-semibold text-[#333333]">' + row[1] + '</span></div>';
+            }).join('') + '</div></div>';
     }
 
-    /* ── MOBILE PROFILE ACCORDION ── */
-    function toggleMobileProfile() {
-      var panel = document.getElementById('mobileProfileAccordion');
-      var chevron = document.getElementById('mobileProfileChevron');
-      var isOpen = panel.classList.contains('open');
-      if (isOpen) {
-        panel.classList.remove('open');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      } else {
-        panel.classList.add('open');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-      }
-    }
-    document.addEventListener('click', function (e) {
-      var panel = document.getElementById('mobileProfileAccordion');
-      var toggle = document.getElementById('mobileProfileToggle');
-      if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
-        panel.classList.remove('open');
-        var chevron = document.getElementById('mobileProfileChevron');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      }
-    });
-
-    /* ── REQUEST DOCS ── */
+    /* ══════════════════════════════════════
+       RENDER: REQUEST DOCS
+    ══════════════════════════════════════ */
     function renderRequestDocs() {
       document.getElementById("requestDocsContainer").innerHTML =
         '<div class="flex items-center gap-4 mb-4">' +
         '<div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">' +
         '<i class="fa-solid fa-folder text-[#8B0000] text-lg"></i></div>' +
         '<h3 class="font-extrabold text-lg text-[#333333]">Request Documents</h3></div>' +
+
         '<a onclick="document.getElementById(\'dentalHealthRecordModal\')?.showModal()" ' +
         'class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up">' +
         '<div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">' +
-        '<img src="{{ asset("images/dental-health-record.png") }}" class="w-7 h-6"/></div>' +
+        '<i class="fa-solid fa-file-medical text-white text-lg"></i></div>' +
         '<div><p class="font-bold text-sm text-[#333333]">Request Dental Health Record</p>' +
         '<p class="text-xs text-[#757575]">All Dental Records • Medical Record • Diagnosis &amp; Treatments</p></div></a>' +
+
         '<a onclick="document.getElementById(\'dentalClearanceModal\')?.showModal()" ' +
         'class="flex items-center gap-3 border border-gray-300 rounded-xl p-3 hover:border-red-800 hover:shadow-lg transition cursor-pointer fade-up mt-3">' +
         '<div class="bg-[#8B0000] w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">' +
-        '<img src="{{ asset("images/dental-clearance.png") }}" class="w-7 h-6"/></div>' +
+        '<i class="fa-solid fa-file-circle-check text-white text-lg"></i></div>' +
         '<div><p class="font-bold text-sm text-[#333333]">Request Dental Clearance</p>' +
         '<p class="text-xs text-[#757575]">Dental Clearance • Annual Dental Clearance</p></div></a>';
     }
 
-    function renderUpcomingSchedule() {
-      var container = document.getElementById("upcomingAppointment");
+    /* ══════════════════════════════════════
+       RENDER: RECORDS
+    ══════════════════════════════════════ */
+    function renderRecords() {
+      var container = document.getElementById("recordsInnerContainer");
+      var viewAll = document.getElementById("viewAllContainer");
+      var visitCount = document.getElementById("recordsVisitCount");
+      var statLatest = document.getElementById("recordsStatLatest");
+      var latestDate = document.getElementById("recordsLatestDate");
+      if (!container) return;
 
-      @if (isset($upcomingAppointment) && $upcomingAppointment)
-
-        /* Format time */
-        var rawTime = "{{ $upcomingAppointment->appointment_time }}";
-      var formattedTime = (function () {
-        try {
-          var parts = rawTime.split(':');
-          var h = parseInt(parts[0], 10);
-          var m = parseInt(parts[1], 10);
-          var ampm = h >= 12 ? 'PM' : 'AM';
-          var hour = h % 12 || 12;
-          return hour + ':' + String(m).padStart(2, '0') + ' ' + ampm;
-        } catch (e) {
-          return rawTime;
-        }
-      })();
-
-      var rawStatus = "{{ strtolower($upcomingAppointment->status ?? '') }}";
-      var isUpcoming = rawStatus === 'upcoming';
-      var isRescheduled = rawStatus === 'rescheduled';
-
-      var badgeBg, badgeDot, badgeText;
-      if (isUpcoming) {
-        badgeBg = 'bg-blue-500/20';
-        badgeDot = 'bg-blue-400';
-        badgeText = 'text-blue-100';
-      } else if (isRescheduled) {
-        badgeBg = 'bg-yellow-400/20';
-        badgeDot = 'bg-yellow-300';
-        badgeText = 'text-yellow-100';
+      if (!HOME_RECORDS || HOME_RECORDS.length === 0) {
+        if (visitCount) visitCount.textContent = "0 visits";
+        container.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;">' +
+          '<div style="width:72px;height:72px;border-radius:20px;background:#FDF1F1;border:1.5px solid rgba(139,0,0,.12);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">' +
+          '<i class="fa-solid fa-tooth" style="font-size:28px;color:#8B0000;opacity:.4;"></i></div>' +
+          '<p style="font-size:20px;font-weight:700;color:#1C1410;margin-bottom:6px;">No records yet</p>' +
+          '<p style="font-size:13px;color:#9E9690;max-width:260px;line-height:1.6;">Completed appointment records will appear here after your first dental visit.</p>' +
+          '<a href="' + ROUTE_BOOK +
+          '" style="margin-top:24px;display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:50px;background:#8B0000;color:white;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 2px 12px rgba(139,0,0,.3);">' +
+          '<i class="fa-solid fa-calendar-plus" style="font-size:11px;"></i> Book Appointment</a>' +
+          '</div>';
+        if (viewAll) viewAll.style.display = "none";
+        return;
       }
 
-      var statusLabel = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+      var count = HOME_RECORDS.length;
+      if (visitCount) visitCount.textContent = count + (count === 1 ? " visit" : " visits");
+      if (statLatest && latestDate && HOME_RECORDS[0].date) {
+        var pts = HOME_RECORDS[0].date.split(" ");
+        latestDate.textContent = "Latest: " + (pts[0] ? pts[0].slice(0, 3) : "") + " " + (pts[2] || "");
+        statLatest.style.display = "flex";
+      }
 
-      container.innerHTML =
-        /* Card wrapper */
-        '<div class="upcoming-card fade-up">' +
+      if (viewAll) {
+        viewAll.style.display = "block";
+        viewAll.classList.remove("hidden");
+      }
 
-        /* ── TOP BANNER (crimson) ── */
-        '<div class="upcoming-card-top">' +
-        /* Left: icon + label */
-        '<div class="flex items-center gap-2.5 min-w-0">' +
-        '<div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">' +
-        '<i class="fa-regular fa-calendar-check text-white text-base"></i>' +
-        '</div>' +
-        '<span class="text-white font-bold text-sm leading-tight truncate">Next Appointment</span>' +
-        '</div>' +
-        /* Right: status badge */
-        '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ' + badgeBg + ' ' + badgeText + '">' +
-        '<span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ' + badgeDot + '"></span>' +
-        statusLabel +
-        '</span>' +
-        '</div>' +
+      var html = '<div>';
+      HOME_RECORDS.forEach(function (r, idx) {
+        var encoded = encodeURIComponent(JSON.stringify(r));
+        var dispTime = formatTime(r.time);
+        var dispDate = shortDate(r.date);
+        var isLast = idx === HOME_RECORDS.length - 1;
 
-        /* ── BODY ── */
-        '<div class="upcoming-card-body">' +
-        '<div class="upcoming-info-row">' +
+        html +=
+          '<div class="flex items-stretch">' +
 
-        /* Service */
-        '<div>' +
-        '<p class="upcoming-info-label">Service</p>' +
-        '<p class="upcoming-info-value">{{ $upcomingAppointment->service_type ?? "Dental Visit" }}</p>' +
-        '</div>' +
+          /* Timeline */
+          '<div class="flex flex-col items-center w-8 flex-shrink-0 pt-4">' +
+          '<div class="w-[11px] h-[11px] rounded-full bg-[#8B0000] border-2 border-white flex-shrink-0 z-10" style="box-shadow:0 0 0 3px rgba(139,0,0,.18);"></div>' +
+          (isLast ? '<div class="flex-1"></div>' :
+            '<div class="flex-1 w-px mt-1.5" style="background:linear-gradient(to bottom,rgba(139,0,0,.2),rgba(139,0,0,.04));"></div>'
+          ) +
+          '</div>' +
 
-        /* Date & Time — stacks gracefully */
-        '<div>' +
-        '<p class="upcoming-info-label">Date &amp; Time</p>' +
-        '<p class="upcoming-info-value">' +
-        '{{ Carbon::parse($upcomingAppointment->appointment_date)->format("M d, Y") }}' +
-        '<span class="text-[#8B0000] mx-1">·</span>' +
-        '<span id="upcomingTimeText"></span>' +
-        '</p>' +
-        '</div>' +
+          /* Card */
+          '<div class="flex-1 min-w-0 pb-2.5">' +
+          '<div class="bg-white border border-[#EDE8E4] rounded-[14px] p-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 transition-all duration-200 hover:shadow-[0_6px_24px_rgba(139,0,0,.08)] hover:border-[rgba(139,0,0,.2)] hover:-translate-y-px">' +
 
-        /* Dentist */
-        '<div>' +
-        '<p class="upcoming-info-label">Dentist</p>' +
-        '<p class="upcoming-info-value">{{ $upcomingAppointment->dentist_name ?? "Dr. Nelson P. Angeles" }}</p>' +
-        '</div>' +
+          '<div class="min-w-0 flex-1">' +
+          '<p class="text-[13.5px] font-bold text-[#8B0000] leading-snug mb-1.5">' + escapeHtml(r
+            .service) + '</p>' +
+          '<div class="flex flex-wrap items-center gap-1.5">' +
+          '<span class="inline-flex items-center gap-1 bg-[#FDF1F1] text-[#8B0000] rounded-full px-2 py-0.5 text-[11px] font-semibold">' +
+          '<i class="fa-regular fa-calendar text-[9px] opacity-70"></i>' + escapeHtml(dispDate) +
+          '</span>' +
+          '<span class="inline-flex items-center gap-1 bg-[#FDF1F1] text-[#8B0000] rounded-full px-2 py-0.5 text-[11px] font-semibold">' +
+          '<i class="fa-regular fa-clock text-[9px] opacity-70"></i>' + escapeHtml(dispTime) + '</span>' +
+          '</div></div>' +
 
-        '</div>' +
+          '<button type="button" ' +
+          'class="w-full sm:w-auto flex-shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-[7px] rounded-full bg-[#8B0000] hover:bg-[#5A0000] text-white text-xs font-semibold border-none cursor-pointer whitespace-nowrap transition-all duration-150 hover:-translate-y-px" ' +
+          'style="box-shadow:0 2px 10px rgba(139,0,0,.28);" ' +
+          'onclick="openRecordModalFromData(\'' + encoded + '\')">' +
+          '<i class="fa-regular fa-eye text-[11px]"></i> Details</button>' +
 
-        /* View button (mobile: full width, desktop: right-aligned) */
-        '<div class="mt-3 pt-3 border-t border-gray-100 flex justify-end">' +
-        '<a href="{{ route("patient.appointment.index") }}" ' +
-        'class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8B0000] hover:text-[#660000] transition-colors">' +
-        'View details <i class="fa-solid fa-arrow-right text-[10px]"></i>' +
-        '</a>' +
-        '</div>' +
-        '</div>' +
-
-        '</div>';
-
-      /* Set time text safely via JS (avoids Blade/JS escaping issues) */
-      var timeEl = document.getElementById('upcomingTimeText');
-      if (timeEl) timeEl.textContent = formattedTime;
-
-      @else
-
-      container.innerHTML =
-        '<div class="upcoming-card fade-up">' +
-        '<div class="upcoming-card-top">' +
-        '<div class="flex items-center gap-2.5">' +
-        '<div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">' +
-        '<i class="fa-regular fa-calendar text-white text-base"></i>' +
-        '</div>' +
-        '<span class="text-white font-bold text-sm">No Upcoming Appointment</span>' +
-        '</div>' +
-        '</div>' +
-        '<div class="upcoming-card-body flex items-center justify-between gap-3 flex-wrap">' +
-        '<p class="text-sm text-gray-500">Ready for your next visit? Book an appointment now.</p>' +
-        '<a href="{{ route("patient.book.appointment") }}" ' +
-        'class="inline-flex items-center gap-1.5 bg-[#8B0000] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#660000] transition-colors flex-shrink-0">' +
-        '<i class="fa-solid fa-calendar-plus text-xs"></i> Book Now' +
-        '</a>' +
-        '</div>' +
-        '</div>';
-
-      @endif
+          '</div></div></div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
     }
 
-    /* ── CALENDAR ── */
+    /* ══════════════════════════════════════
+       RECORD MODAL
+    ══════════════════════════════════════ */
+    function openRecordModalFromData(encodedJson) {
+      openRecordModal(JSON.parse(decodeURIComponent(encodedJson)));
+    }
+
+    function openRecordModal(data) {
+      var modal = document.getElementById('record_modal');
+      if (!modal) return;
+      document.getElementById('m_service').textContent = data.service || '—';
+      document.getElementById('m_date').textContent = data.date || '—';
+      document.getElementById('m_time').textContent = formatTime(data.time);
+      var BADGE =
+        'inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold';
+      var status = (data.status || 'completed').trim();
+      var sEl = document.getElementById('m_status');
+      sEl.textContent = status;
+      sEl.className = BADGE;
+      var s = status.toLowerCase();
+      if (s === 'completed') sEl.classList.add('bg-emerald-200', 'text-emerald-900');
+      else if (s === 'rescheduled') sEl.classList.add('bg-yellow-200', 'text-yellow-900');
+      else if (s === 'cancelled') sEl.classList.add('bg-red-200', 'text-red-900');
+      else sEl.classList.add('bg-gray-200', 'text-gray-800');
+      var dEl = document.getElementById('m_duration');
+      dEl.textContent = (data.duration || '—').trim() || '—';
+      dEl.className = BADGE + ' bg-gray-200 text-gray-800';
+      document.getElementById('m_remarks').textContent = (data.remarks || '').trim() || '—';
+      document.getElementById('m_oral').textContent = (data.oral || '').trim() || '—';
+      document.getElementById('m_diagnosis').textContent = (data.diagnosis || '').trim() || '—';
+      document.getElementById('m_prescription').textContent = (data.prescription || '').trim() || '—';
+      modal.showModal();
+    }
+
+    /* ══════════════════════════════════════
+       CALENDAR
+    ══════════════════════════════════════ */
     function loadCalendar() {
       var MAX_PER_DAY = 5;
-      var myAppointments = calendarAppointments || {};
+      var myAppts = calendarAppointments || {};
       var apptCounts = calendarCounts || {};
-      var unavailableDates = calendarUnavailableDates || [];
-      var allHolidays = calendarHolidays || {};
+      var unavail = calendarUnavailableDates || [];
+      var holidays = calendarHolidays || {};
       var today = new Date();
-      var currentYear = today.getFullYear();
-      var currentMonth = today.getMonth();
+      var curYear = today.getFullYear(),
+        curMonth = today.getMonth();
 
       function pad(n) {
         return String(n).padStart(2, '0');
@@ -1798,38 +2218,38 @@
 
       function getHolidaysForMonth(y, m) {
         var f = {};
-        Object.keys(allHolidays).forEach(function (ds) {
+        Object.keys(holidays).forEach(function (ds) {
           var p = ds.split('-').map(Number);
-          if (p[0] === y && p[1] === m + 1) f[ds] = allHolidays[ds];
+          if (p[0] === y && p[1] === m + 1) f[ds] = holidays[ds];
         });
         return f;
       }
 
       function renderCalendar(year, month) {
-        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+          "October", "November", "December"
+        ];
         var dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         var firstDow = new Date(year, month, 1).getDay();
         var totalDays = new Date(year, month + 1, 0).getDate();
-        var holidays = getHolidaysForMonth(year, month);
+        var hl = getHolidaysForMonth(year, month);
         var cells = '';
 
         for (var i = 0; i < firstDow; i++) cells += '<div></div>';
-
         for (var d = 1; d <= totalDays; d++) {
-          var dateStr = year + '-' + pad(month + 1) + '-' + pad(d);
+          var ds = year + '-' + pad(month + 1) + '-' + pad(d);
           var isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
           var weekend = isWeekend(year, month, d);
-          var holiday = holidays[dateStr] || null;
-          var myAppt = myAppointments[dateStr] || null;
-          var count = apptCounts[dateStr] || 0;
+          var holiday = hl[ds] || null;
+          var myAppt = myAppts[ds] || null;
+          var count = apptCounts[ds] || 0;
           var isFull = count >= MAX_PER_DAY;
-          var isUnavail = unavailableDates.indexOf(dateStr) !== -1 || weekend;
+          var isUnavail = unavail.indexOf(ds) !== -1 || weekend;
           var bgClass = '',
             textClass = 'text-[#333333]',
             ringClass = '',
             dotHtml = '',
             tooltipTxt = '';
-
           if (isToday) {
             bgClass = 'bg-[#8B0000]';
             textClass = 'text-white font-extrabold';
@@ -1842,32 +2262,38 @@
           } else {
             bgClass = 'hover:bg-[#FFF0F0]';
           }
-
           if (myAppt) {
-            dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ' + (isToday ? 'bg-white' : 'bg-[#008440]') + '"></span>';
+            dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ' + (
+              isToday ? 'bg-white' : 'bg-[#008440]') + '"></span>';
             tooltipTxt = '<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>' + myAppt;
           }
           if (isFull && !myAppt && !isUnavail && !holiday) {
-            dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>';
+            dotHtml +=
+              '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>';
             tooltipTxt = '<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (' + count + ')';
           }
           if (holiday && !myAppt) {
-            dotHtml = '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>';
+            dotHtml =
+              '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>';
             tooltipTxt = '<i class="fa-solid fa-star mr-1 text-blue-300"></i>' + holiday;
           }
           if (isUnavail && !holiday && !myAppt) {
-            tooltipTxt = weekend ? '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed' : '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available';
+            tooltipTxt = weekend ? '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed' :
+              '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available';
           }
-
-          var tooltipHtml = tooltipTxt ?
-            '<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">' + tooltipTxt + '<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>' : '';
-
-          cells += '<div class="relative group flex items-center justify-center">' + tooltipHtml +
-            '<div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs sm:text-sm rounded-full transition-all duration-150 ' + bgClass + ' ' + textClass + ' ' + ringClass + ' cursor-default">' + d + dotHtml + '</div></div>';
+          var tooltip = tooltipTxt ?
+            '<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">' +
+            tooltipTxt +
+            '<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>' :
+            '';
+          cells += '<div class="relative group flex items-center justify-center">' + tooltip +
+            '<div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs sm:text-sm rounded-full transition-all duration-150 ' +
+            bgClass + ' ' + textClass + ' ' + ringClass + ' cursor-default">' + d + dotHtml + '</div></div>';
         }
 
         var headerHtml = dayLabels.map(function (l, i) {
-          return '<div class="text-center text-[9px] sm:text-[10px] font-bold ' + (i === 0 || i === 6 ? 'text-[#8B0000]/40' : 'text-[#333333]') + ' uppercase tracking-widest">' + l + '</div>';
+          return '<div class="text-center text-[9px] sm:text-[10px] font-bold ' + (i === 0 || i === 6 ?
+            'text-[#8B0000]/40' : 'text-[#333333]') + ' uppercase tracking-widest">' + l + '</div>';
         }).join('');
 
         document.getElementById("calendarSkeletonContainer").innerHTML =
@@ -1876,205 +2302,38 @@
           '<hr class="border-t border-gray-200 mb-3 sm:mb-4">' +
           '<div class="flex items-center justify-between mt-4 sm:mt-6 mb-4 sm:mb-5">' +
           '<button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150"><i class="fa-solid fa-chevron-left text-xs"></i></button>' +
-          '<div class="text-center"><p class="text-base sm:text-lg font-extrabold text-[#8B0000]">' + monthNames[month] + '</p><p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">' + year + '</p></div>' +
+          '<div class="text-center"><p class="text-base sm:text-lg font-extrabold text-[#8B0000]">' + monthNames[
+          month] + '</p><p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">' + year +
+          '</p></div>' +
           '<button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150"><i class="fa-solid fa-chevron-right text-xs"></i></button></div>' +
           '<div class="grid grid-cols-7 gap-1 sm:gap-2 mt-2 sm:mt-4 mb-2">' + headerHtml + '</div>' +
           '<div class="grid grid-cols-7 gap-1 sm:gap-2 flex-1 content-start">' + cells + '</div>' +
-          '<div class="flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0"></span>My Appt</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0"></span>Holiday</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0"></span>Full</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0"></span>Today</div>' +
+          '<div class="flex flex-wrap items-center justify-center gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-[#008440] inline-block flex-shrink-0"></span>My Appointment</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-blue-400 inline-block flex-shrink-0"></span>Holiday</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-red-500 inline-block flex-shrink-0"></span>Full Schedule</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-[#8B0000] inline-block flex-shrink-0"></span>Today</div>' +
           '</div></div>';
       }
 
       window.changeMonth = function (dir) {
-        currentMonth += dir;
-        if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear++;
+        curMonth += dir;
+        if (curMonth > 11) {
+          curMonth = 0;
+          curYear++;
         }
-        if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear--;
+        if (curMonth < 0) {
+          curMonth = 11;
+          curYear--;
         }
-        renderCalendar(currentYear, currentMonth);
+        renderCalendar(curYear, curMonth);
       };
-      renderCalendar(currentYear, currentMonth);
+      renderCalendar(curYear, curMonth);
     }
-
-    /* ── DENTAL RECORDS ── */
-    var HOME_RECORDS = @json($homeRecords);
-
-    function escapeHtml(str) {
-      return String(str ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-    }
-
-    /* Convert "10:00:00" or "10:00" or "10:00 AM" → "10:00 AM" */
-    function formatTime(raw) {
-      if (!raw) return '—';
-      raw = String(raw).trim();
-      /* Already formatted (contains AM/PM) */
-      if (/[AaPp][Mm]$/.test(raw)) return raw;
-      /* Parse HH:MM or HH:MM:SS */
-      var match = raw.match(/^(\d{1,2}):(\d{2})/);
-      if (!match) return raw;
-      var h = parseInt(match[1], 10);
-      var m = match[2];
-      var ampm = h >= 12 ? 'PM' : 'AM';
-      var hour = h % 12 || 12;
-      return hour + ':' + m + ' ' + ampm;
-    }
-
-    /* Shorten "March 26, 2026" → "Mar 26, 2026" */
-    function shortDate(raw) {
-      if (!raw) return '—';
-      return String(raw).replace(
-        /^(January|February|March|April|May|June|July|August|September|October|November|December)/,
-        function (m) {
-          return m.slice(0, 3);
-        }
-      );
-    }
-
-    function renderRecords() {
-      var container = document.getElementById("recordsInnerContainer");
-      var viewAll = document.getElementById("viewAllContainer");
-      if (!container) return;
-
-      if (!HOME_RECORDS || HOME_RECORDS.length === 0) {
-        container.innerHTML =
-          '<div class="flex flex-col items-center justify-center py-12 text-center space-y-4 fade-in">' +
-          '<div class="w-24 h-24 flex items-center justify-center pulse-icon">' +
-          '<img src="{{ asset("images/nodental-record.png") }}" class="w-24 h-24"></div>' +
-          '<p class="text-xl font-bold text-[#8B0000]">Nothing here yet\u2026</p>' +
-          '<p class="text-sm text-[#ADADAD]">Time to book that first visit.</p>' +
-          '<button class="btn btn-soft shimmer-btn px-6 py-3 rounded-2xl border-none text-base font-semibold text-[#F4F4F4] transition-transform duration-500 hover:-translate-y-2">' +
-          '<a href="{{ route("patient.book.appointment") }}" class="flex items-center gap-2">' +
-          '<i class="fa-solid fa-calendar-plus"></i> Book Appointment</a></button></div>';
-        if (viewAll) viewAll.classList.add('hidden');
-        return;
-      }
-
-      if (viewAll) viewAll.classList.remove('hidden');
-      var html =
-        '<div class="space-y-0">';
-
-      HOME_RECORDS.forEach(function (r, idx) {
-        var encoded = encodeURIComponent(JSON.stringify(r));
-        var dispTime = formatTime(r.time);
-        var dispDate = shortDate(r.date);
-        var isLast = idx === HOME_RECORDS.length - 1;
-
-        html +=
-          /* Row: dot column + card column */
-          '<div class="flex gap-0">' +
-
-          /* ── Timeline column ── */
-          '<div class="flex flex-col items-center flex-shrink-0" style="width:28px;">' +
-          /* Dot */
-          '<div class="w-3 h-3 rounded-full bg-[#8B0000] border-2 border-white ring-2 ring-[#8B0000]/20 mt-3.5 flex-shrink-0 z-10"></div>' +
-          /* Line below dot (hidden on last item) */
-          (isLast ?
-            '<div class="flex-1"></div>' :
-            '<div class="flex-1 w-px bg-[#8B0000]/20 my-1"></div>'
-          ) +
-          '</div>' +
-
-          /* ── Card ── */
-          '<div class="flex-1 pb-3">' +
-          '<div class="flex items-start justify-between gap-2 bg-white border border-gray-100 rounded-xl px-3 py-3 hover:shadow-sm hover:border-[#8B0000]/20 transition fade-up">' +
-
-          /* Left: service name + date/time row */
-          '<div class="min-w-0 flex-1">' +
-          '<p class="font-semibold text-[#8B0000] text-sm leading-snug">' +
-          escapeHtml(r.service) +
-          '</p>' +
-          '<div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5">' +
-          '<span class="inline-flex items-center gap-1 text-[11px] text-[#757575] font-medium">' +
-          '<i class="fa-regular fa-calendar text-[9px] text-[#8B0000]/50"></i>' +
-          escapeHtml(dispDate) +
-          '</span>' +
-          '<span class="text-gray-300 text-[10px] select-none">&bull;</span>' +
-          '<span class="inline-flex items-center gap-1 text-[11px] text-[#757575] font-medium">' +
-          '<i class="fa-regular fa-clock text-[9px] text-[#8B0000]/50"></i>' +
-          escapeHtml(dispTime) +
-          '</span>' +
-          '</div>' +
-          '</div>' +
-
-          /* Right: Details button — always shows text */
-          '<button type="button" ' +
-          'class="flex-shrink-0 self-center inline-flex items-center gap-1.5 ' +
-          'bg-[#8B0000] hover:bg-[#660000] active:scale-95 text-white ' +
-          'text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 whitespace-nowrap" ' +
-          'onclick="openRecordModalFromData(\'' + encoded + '\')">' +
-          '<i class="fa-regular fa-eye text-xs"></i> Details' +
-          '</button>' +
-
-          '</div>' +
-          '</div>' +
-
-          '</div>'; /* end row */
-      });
-
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
-    function openRecordModalFromData(encodedJson) {
-      var data = JSON.parse(decodeURIComponent(encodedJson));
-      openRecordModal(data);
-    }
-
-    function openRecordModal(data) {
-      var modal = document.getElementById('record_modal');
-      if (!modal) return;
-      document.getElementById('m_service').textContent = data.service || '—';
-      document.getElementById('m_date').textContent = data.date || '—';
-      document.getElementById('m_time').textContent = data.time || '—';
-      var BADGE = 'inline-flex items-center justify-center w-32 px-4 py-1 text-sm leading-none rounded-full font-semibold';
-      var status = (data.status || 'completed').trim();
-      var statusEl = document.getElementById('m_status');
-      statusEl.textContent = status;
-      statusEl.className = BADGE;
-      var s = status.toLowerCase();
-      if (s === 'completed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
-      else if (s === 'rescheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
-      else if (s === 'cancelled') statusEl.classList.add('bg-red-200', 'text-red-900');
-      else statusEl.classList.add('bg-gray-200', 'text-gray-800');
-      var durEl = document.getElementById('m_duration');
-      durEl.textContent = (data.duration || '—').trim() || '—';
-      durEl.className = BADGE + ' bg-gray-200 text-gray-800';
-      document.getElementById('m_remarks').textContent = (data.remarks || '').trim() || '—';
-      document.getElementById('m_oral').textContent = (data.oral || '').trim() || '—';
-      document.getElementById('m_diagnosis').textContent = (data.diagnosis || '').trim() || '—';
-      document.getElementById('m_prescription').textContent = (data.prescription || '').trim() || '—';
-      modal.showModal();
-    }
-
-    /* ── GREETING ── */
-    (function () {
-      var hour = new Date().getHours();
-      var greeting, iconClasses, animClass;
-      if (hour >= 6 && hour < 12) {
-        greeting = 'Good morning';
-        iconClasses = 'fa-solid fa-sun text-yellow-400 text-sm';
-        animClass = 'greet-spin';
-      } else if (hour >= 12 && hour < 18) {
-        greeting = 'Good afternoon';
-        iconClasses = 'fa-solid fa-cloud-sun text-yellow-300 text-sm';
-        animClass = 'greet-drift';
-      } else {
-        greeting = 'Good evening';
-        iconClasses = 'fa-solid fa-moon text-blue-300 text-sm';
-        animClass = 'greet-float';
-      }
-      var el = document.getElementById('greetingText');
-      var icon = document.getElementById('greetingIcon');
-      if (el) el.textContent = greeting;
-      if (icon) icon.className = iconClasses + ' ' + animClass;
-    })();
   </script>
 
 </body>

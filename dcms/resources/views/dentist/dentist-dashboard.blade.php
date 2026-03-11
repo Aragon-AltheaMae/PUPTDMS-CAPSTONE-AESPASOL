@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  
   <script>
     tailwind.config = {
       daisyui: {
@@ -420,8 +421,164 @@
       background: #2A2A2A;
       box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
     }
+
+    /* ── TOAST ── */
+    #toastContainer {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      bottom: unset !important;
+      left: unset !important;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      width: auto !important;
+      padding: 0 !important;
+    }
+
+    #toastContainer .toast {
+      min-width: 300px;
+      max-width: 360px;
+      background: white !important;
+      border-radius: 14px !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .18) !important;
+      padding: 14px 18px 14px 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px;
+      opacity: 0;
+      transform: translateX(340px);
+      transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
+      position: relative;
+      overflow: hidden;
+      pointer-events: all;
+      flex-direction: row !important;
+    }
+
+    #toastContainer .toast::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: none;
+    }
+
+    #toastContainer .toast.error::before {
+      background: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success::before {
+      background: #15803d !important;
+    }
+
+    #toastContainer .toast.show {
+      opacity: 1 !important;
+      transform: translateX(0) !important;
+    }
+
+    #toastContainer .toast.hide {
+      opacity: 0 !important;
+      transform: translateX(340px) !important;
+    }
+
+    #toastContainer .toast-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #toastContainer .toast.error .toast-icon-wrap {
+      background: rgba(139, 0, 0, .08);
+    }
+
+    #toastContainer .toast.success .toast-icon-wrap {
+      background: rgba(21, 128, 61, .08);
+    }
+
+    #toastContainer .toast-icon {
+      font-size: 17px;
+    }
+
+    #toastContainer .toast.error .toast-icon {
+      color: #8B0000 !important;
+    }
+
+    #toastContainer .toast.success .toast-icon {
+      color: #15803d !important;
+    }
+
+    #toastContainer .toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #toastContainer .toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A0A0A !important;
+    }
+
+    #toastContainer .toast-msg {
+      font-size: 12px;
+      color: #888 !important;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    #toastContainer .toast-close {
+      background: none !important;
+      border: none;
+      cursor: pointer;
+      color: #CCC;
+      font-size: 13px;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      transition: color .2s;
+    }
+
+    #toastContainer .toast-close:hover {
+      color: #888;
+    }
+
+    @media(max-width:640px) {
+      #toastContainer {
+        left: 12px !important;
+        right: 12px !important;
+        top: 72px !important;
+        bottom: unset !important;
+        width: auto !important;
+      }
+
+      #toastContainer .toast {
+        min-width: unset !important;
+        width: 100% !important;
+        transform: translateY(-120px) !important;
+        border-radius: 12px !important;
+      }
+
+      #toastContainer .toast.show {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+      }
+
+      #toastContainer .toast.hide {
+        transform: translateY(-120px) !important;
+        opacity: 0 !important;
+      }
+    }
+
+    /* --- */
   </style>
 </head>
+
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
@@ -458,8 +615,12 @@ $calendarAppointmentCounts = [
 
 <body class="bg-white text-[#333333] font-normal">
 
-  <!-- HEADER -->
+  <div id="toastContainer" role="region" aria-live="polite" style="position:fixed!important;top:20px!important;right:20px!important;
+         bottom:unset!important;left:unset!important;z-index:99999;
+         display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+  </div>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header-left">
       <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
@@ -473,10 +634,13 @@ $calendarAppointmentCounts = [
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div
+            style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">
+            Notifications</div>
           <div style="max-height:260px; overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+            <a href="{{ $n['url'] ?? '#' }}"
+              style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
@@ -521,10 +685,16 @@ $calendarAppointmentCounts = [
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
+          <span
+            class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i
+              class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span
+            class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{
+            $nav['label'] }}</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{
+            $nav['label'] }}</span>
         </a>
         @endforeach
       </nav>
@@ -533,17 +703,25 @@ $calendarAppointmentCounts = [
       <div class="section-label">Settings</div>
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i
+              class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i
+              class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
+        <button
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i
+              class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span
+            class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log
+            out</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log
+            out</span>
         </button>
       </form>
     </div>
@@ -553,23 +731,25 @@ $calendarAppointmentCounts = [
   <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
     <div class="max-w-7xl mt-4 mx-auto fade-in">
 
-    
-  <!--impersonating header-->
 
-@if(session('impersonated_role') && session('impersonator_role') === 'super_admin')
-  <div style="background:#DBEAFE;border:1px solid #93C5FD;color:#1E40AF;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-    <div>
-      <strong>You are viewing as {{ ucfirst(session('impersonated_role')) }}</strong><br>
-      <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
-    </div>
-    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
-      @csrf
-      <button type="submit" style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">
-        Return to Admin
-      </button>
-    </form>
-  </div>
-@endif
+      <!--impersonating header-->
+
+      @if(session('impersonated_role') && session('impersonator_role') === 'super_admin')
+      <div
+        style="background:#DBEAFE;border:1px solid #93C5FD;color:#1E40AF;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div>
+          <strong>You are viewing as {{ ucfirst(session('impersonated_role')) }}</strong><br>
+          <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
+        </div>
+        <form method="POST" action="{{ route('admin.stop_impersonation') }}">
+          @csrf
+          <button type="submit"
+            style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">
+            Return to Admin
+          </button>
+        </form>
+      </div>
+      @endif
 
 
       <!-- GREETING -->
@@ -585,7 +765,8 @@ $calendarAppointmentCounts = [
         </div>
         <div class="flex items-center gap-3">
           <span class="text-sm font-medium text-[#757575]">The Dentist is</span>
-          <button id="statusBtn" onclick="openStatusModal()" class="btn btn-success rounded-full px-6 font-bold shadow transition-all duration-300">
+          <button id="statusBtn" onclick="openStatusModal()"
+            class="btn btn-success rounded-full px-6 font-bold shadow transition-all duration-300">
             <span id="statusLabel" class="flex items-center gap-2">
               <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
             </span>
@@ -597,7 +778,8 @@ $calendarAppointmentCounts = [
       <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
 
         {{-- KPI 1: Dental Cases (real data) --}}
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#660000] text-white p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#660000] text-white p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest opacity-70 mb-1">Dental Cases</p>
@@ -608,7 +790,8 @@ $calendarAppointmentCounts = [
               <i class="fa-solid fa-tooth text-yellow-300 text-lg"></i>
             </div>
           </div>
-          <div class="flex items-center gap-1 mt-3 text-xs font-semibold
+          <div
+            class="flex items-center gap-1 mt-3 text-xs font-semibold
             {{ is_null($dentalCasesDelta) ? 'text-white/50' : ($dentalCasesDelta >= 0 ? 'text-green-300' : 'text-red-300') }}">
             @if(is_null($dentalCasesDelta))
             <i class="fa-solid fa-minus text-xs"></i> No data last month
@@ -622,18 +805,21 @@ $calendarAppointmentCounts = [
         </div>
 
         {{-- KPI 2: Total Appointments (real data) --}}
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Total Appts</p>
-              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">{{ $totalApptsThisMonth }}</p>
+              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">{{ $totalApptsThisMonth }}
+              </p>
               <p class="text-xs text-gray-400 mt-1">{{ now()->format('F Y') }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
               <i class="fa-regular fa-calendar-check text-[#8B0000] text-lg"></i>
             </div>
           </div>
-          <div class="flex items-center gap-1 mt-3 text-xs font-semibold
+          <div
+            class="flex items-center gap-1 mt-3 text-xs font-semibold
             {{ is_null($totalApptsDelta) ? 'text-gray-400' : ($totalApptsDelta >= 0 ? 'text-green-500' : 'text-red-500') }}">
             @if(is_null($totalApptsDelta))
             <i class="fa-solid fa-minus text-xs"></i> No data last month
@@ -647,18 +833,21 @@ $calendarAppointmentCounts = [
         </div>
 
         {{-- KPI 3: Today's Patients (real data — unchanged) --}}
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Today's Patients</p>
-              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">{{ $todayAppointments->count() }}</p>
+              <p class="text-4xl font-extrabold tracking-tight text-[#8B0000] leading-none">{{
+                $todayAppointments->count() }}</p>
               <p class="text-xs text-gray-400 mt-1">Scheduled today</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
               <i class="fa-solid fa-user-clock text-[#8B0000] text-lg"></i>
             </div>
           </div>
-          <div class="flex items-center gap-1 mt-3 text-xs font-semibold {{ $todayAppointments->where('status','confirmed')->count() > 0 ? 'text-green-500' : 'text-gray-400' }}">
+          <div
+            class="flex items-center gap-1 mt-3 text-xs font-semibold {{ $todayAppointments->where('status','confirmed')->count() > 0 ? 'text-green-500' : 'text-gray-400' }}">
             <i class="fa-solid fa-circle-check text-xs"></i>
             {{ $todayAppointments->where('status','confirmed')->count() }} confirmed
             &nbsp;·&nbsp;
@@ -668,16 +857,21 @@ $calendarAppointmentCounts = [
         </div>
 
         {{-- KPI 4: Live Clock --}}
-        <div class="relative overflow-hidden rounded-2xl p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+        <div
+          class="relative overflow-hidden rounded-2xl p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
           style="background: linear-gradient(135deg, #7b0c0c 0%, #4a0606 100%);">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-widest opacity-60 mb-2 text-white flex items-center gap-1.5">
+              <p
+                class="text-xs font-semibold uppercase tracking-widest opacity-60 mb-2 text-white flex items-center gap-1.5">
                 <span class="inline-block w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse flex-shrink-0"></span>
                 Live Time
               </p>
               <p class="leading-none text-white">
-                <span id="kpi-clock-hhmm" class="text-3xl font-extrabold tracking-tight" style="font-variant-numeric:tabular-nums;">12:00</span><span id="kpi-clock-ss" class="text-xl font-semibold opacity-50" style="font-variant-numeric:tabular-nums;">:00</span><span id="kpi-clock-ampm" class="text-xs font-bold opacity-60 ml-1 align-super">AM</span>
+                <span id="kpi-clock-hhmm" class="text-3xl font-extrabold tracking-tight"
+                  style="font-variant-numeric:tabular-nums;">12:00</span><span id="kpi-clock-ss"
+                  class="text-xl font-semibold opacity-50" style="font-variant-numeric:tabular-nums;">:00</span><span
+                  id="kpi-clock-ampm" class="text-xs font-bold opacity-60 ml-1 align-super">AM</span>
               </p>
               <p class="text-xs mt-2 text-white opacity-60 flex items-center gap-1.5">
                 <i id="kpi-clock-dayicon" class="fa-solid fa-sun text-yellow-300 text-xs flex-shrink-0"></i>
@@ -692,18 +886,21 @@ $calendarAppointmentCounts = [
         </div>
 
         {{-- KPI 5: Clinic Status (unchanged) --}}
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 text-[#333] p-5 shadow hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-[#8B0000]/60 mb-1">Clinic Status</p>
-              <p id="statusKpiLabel" class="text-2xl font-extrabold tracking-tight text-green-600 leading-none mt-1">Open</p>
+              <p id="statusKpiLabel" class="text-2xl font-extrabold tracking-tight text-green-600 leading-none mt-1">
+                Open</p>
               <p class="text-xs text-gray-400 mt-1">Dentist is currently IN</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
               <i id="statusKpiIcon" class="fa-solid fa-door-open text-green-600 text-lg"></i>
             </div>
           </div>
-          <button onclick="openStatusModal()" class="mt-3 text-xs font-semibold text-[#8B0000] hover:underline flex items-center gap-1">
+          <button onclick="openStatusModal()"
+            class="mt-3 text-xs font-semibold text-[#8B0000] hover:underline flex items-center gap-1">
             Change status <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </button>
           <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-green-50/50"></div>
@@ -718,8 +915,7 @@ $calendarAppointmentCounts = [
             <div class="animate-pulse space-y-4">
               <div class="h-6 w-40 bg-gray-200 rounded mx-auto"></div>
               <div class="grid grid-cols-7 gap-2">
-                @for($i = 0; $i < 35; $i++)
-                  <div class="h-9 bg-gray-200 rounded-lg">
+                @for($i = 0; $i < 35; $i++) <div class="h-9 bg-gray-200 rounded-lg">
               </div>
               @endfor
             </div>
@@ -734,7 +930,8 @@ $calendarAppointmentCounts = [
                 <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
               </h2>
               <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">
-                {{ $todayAppointments->count() }} {{ \Illuminate\Support\Str::plural('patient', $todayAppointments->count()) }}
+                {{ $todayAppointments->count() }} {{ \Illuminate\Support\Str::plural('patient',
+                $todayAppointments->count()) }}
               </span>
             </div>
             <div class="space-y-2 flex-1 overflow-y-auto pr-1">
@@ -749,7 +946,8 @@ $calendarAppointmentCounts = [
               @endphp
               <a href="{{ route('dentist.dentist.appointments') }}"
                 class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]">
-                <div class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div
+                  class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {{ strtoupper(substr($name, 0, 1)) }}
                 </div>
                 <div class="flex-1 min-w-0">
@@ -796,8 +994,10 @@ $calendarAppointmentCounts = [
               <p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex — {{ now()->format('F Y') }}</p>
             </div>
             <div class="flex items-center gap-4 text-xs font-semibold">
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#FFC0CB"></span>Female</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block" style="background:#89CFF0"></span>Male</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block"
+                  style="background:#FFC0CB"></span>Female</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full inline-block"
+                  style="background:#89CFF0"></span>Male</span>
             </div>
           </div>
           <div style="height:300px; width:100%;">
@@ -817,7 +1017,8 @@ $calendarAppointmentCounts = [
                 <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
                   <i class="fa-solid fa-boxes"></i> Medical Supplies
                 </h3>
-                <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                <a href="{{ route('dentist.dentist.inventory') }}"
+                  class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
                   View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
               </div>
@@ -836,12 +1037,8 @@ $calendarAppointmentCounts = [
                   @php
                   $balance = $item->qty - $item->used;
                   $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
-                  $isLow = $pct <= 30;
-                    $badgeCls=$isLow
-                    ? 'bg-red-100 text-red-700 animate-pulse'
-                    : 'bg-green-100 text-green-700' ;
-                    @endphp
-                    <tr>
+                  $isLow = $pct <= 30; $badgeCls=$isLow ? 'bg-red-100 text-red-700 animate-pulse'
+                    : 'bg-green-100 text-green-700' ; @endphp <tr>
                     <td class="max-w-[140px] truncate">{{ $item->name }}</td>
                     <td class="text-center">{{ $item->qty }}</td>
                     <td class="text-center">{{ $item->used }}</td>
@@ -872,7 +1069,8 @@ $calendarAppointmentCounts = [
                 <h3 class="font-bold text-[#8B0000] flex items-center gap-2 text-sm">
                   <i class="fa-solid fa-pills"></i> Medicine Supplies
                 </h3>
-                <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
+                <a href="{{ route('dentist.dentist.inventory') }}"
+                  class="text-xs text-[#8B0000] hover:underline font-semibold flex items-center gap-1">
                   View all <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
               </div>
@@ -891,12 +1089,8 @@ $calendarAppointmentCounts = [
                   @php
                   $balance = $item->qty - $item->used;
                   $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
-                  $isLow = $pct <= 30;
-                    $badgeCls=$isLow
-                    ? 'bg-red-100 text-red-700 animate-pulse'
-                    : 'bg-green-100 text-green-700' ;
-                    @endphp
-                    <tr>
+                  $isLow = $pct <= 30; $badgeCls=$isLow ? 'bg-red-100 text-red-700 animate-pulse'
+                    : 'bg-green-100 text-green-700' ; @endphp <tr>
                     <td class="max-w-[120px] truncate">{{ $item->name }}</td>
                     <td class="text-center">{{ $item->form ?? '—' }}</td>
                     <td class="text-center">{{ $item->qty }}</td>
@@ -928,9 +1122,11 @@ $calendarAppointmentCounts = [
   <!-- STATUS MODAL -->
   <div id="statusModal"
     class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-    <div id="statusModalBox" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
+    <div id="statusModalBox"
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
       <div id="modalBanner" class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-4 text-white text-center">
-        <div id="modalIcon" class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl bg-white/20">
+        <div id="modalIcon"
+          class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl bg-white/20">
           <i class="fa-solid fa-door-closed"></i>
         </div>
         <h2 id="modalTitle" class="text-xl font-extrabold">Close the Clinic?</h2>
@@ -938,11 +1134,14 @@ $calendarAppointmentCounts = [
       </div>
       <div class="px-6 py-5">
         <p id="modalBody" class="text-sm text-[#555] text-center leading-relaxed">
-          This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>. Patients will not be able to book new appointments while you are out.
+          This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>.
+          Patients will not be able to book new appointments while you are out.
         </p>
         <div class="flex gap-3 mt-5">
-          <button onclick="closeStatusModal()" class="flex-1 btn btn-ghost border border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-100">Cancel</button>
-          <button id="confirmStatusBtn" onclick="confirmStatus()" class="flex-1 btn rounded-xl font-bold text-white bg-[#8B0000] hover:bg-[#660000] border-none shadow">Confirm</button>
+          <button onclick="closeStatusModal()"
+            class="flex-1 btn btn-ghost border border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-100">Cancel</button>
+          <button id="confirmStatusBtn" onclick="confirmStatus()"
+            class="flex-1 btn rounded-xl font-bold text-white bg-[#8B0000] hover:bg-[#660000] border-none shadow">Confirm</button>
         </div>
       </div>
     </div>
@@ -950,8 +1149,10 @@ $calendarAppointmentCounts = [
 
   <!-- FOOTER -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+    <div
+      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+          Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
       <span class="hidden sm:inline">|</span>
@@ -959,7 +1160,65 @@ $calendarAppointmentCounts = [
     </div>
   </footer>
 
+  @if(session('activeAppointmentModal'))
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var modal = document.getElementById("activeAppointmentModal");
+      var closeBtn = document.getElementById("closeActiveApptModalBtn");
+      if (!modal) return;
+      modal.showModal();
+      modal.addEventListener('click', function (e) {
+        var box = modal.querySelector('.modal-box');
+        if (box && !box.contains(e.target)) e.preventDefault();
+      });
+      modal.addEventListener('cancel', function (e) { e.preventDefault(); });
+      if (closeBtn) closeBtn.addEventListener("click", function () { modal.close(); });
+    });
+  </script>
+  @endif
+
+  @if (session('login_as'))
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      showToast(
+        'Login Successful',
+        'Logged in successfully as <strong>{{ session("login_as") }}</strong>',
+        'success'
+      );
+    });
+  </script>
+  @endif
+
+  <script>
+    /* TOAST */
+    function showToast(title, message, type) {
+      type = type || 'error';
+      var container = document.getElementById('toastContainer');
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      var icon = type === 'error' ?
+        '<i class="fa-solid fa-circle-exclamation toast-icon"></i>' :
+        '<i class="fa-solid fa-circle-check toast-icon"></i>';
+      t.innerHTML = '<div class="toast-icon-wrap">' + icon + '</div>' +
+        '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+        '<div class="toast-msg">' + message + '</div></div>' +
+        '<button class="toast-close" onclick="this.closest(\'.toast\').classList.add(\'hide\')">' +
+        '<i class="fa-solid fa-xmark"></i></button>';
+      container.appendChild(t);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          t.classList.add('show');
+        });
+      });
+      setTimeout(function () {
+        t.classList.remove('show');
+        t.classList.add('hide');
+        setTimeout(function () {
+          t.remove();
+        }, 400);
+      }, 4500);
+    }
+
     const dashboardData = {
       gadLabels: @json($gadLabels),
       gadFemale: @json($gadFemale),
@@ -974,7 +1233,7 @@ $calendarAppointmentCounts = [
     const GAD_MALE = dashboardData.gadMale;
 
     // ── Live Clock ────────────────────────────────────────────────────────────
-    (function() {
+    (function () {
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -1073,7 +1332,7 @@ $calendarAppointmentCounts = [
     //   month: "long",
     //   day: "numeric"
     // });
-    (function() {
+    (function () {
       const h = new Date().getHours();
       const greeting = h < 12 ? 'Good Morning,' : h < 18 ? 'Good Afternoon,' : 'Good Evening,';
       const greetEl = document.querySelector('.bg-gradient-to-r.from-\\[\\#660000\\].to-\\[\\#FFD700\\].bg-clip-text');
@@ -1147,7 +1406,7 @@ $calendarAppointmentCounts = [
       }
       closeStatusModal();
     }
-    document.getElementById('statusModal').addEventListener('click', function(e) {
+    document.getElementById('statusModal').addEventListener('click', function (e) {
       if (e.target === this) closeStatusModal();
     });
 
@@ -1184,21 +1443,21 @@ $calendarAppointmentCounts = [
           data: {
             labels: GAD_LABELS,
             datasets: [{
-                label: 'Female',
-                data: GAD_FEMALE,
-                backgroundColor: 'rgba(255,192,203,0.85)',
-                borderColor: '#FFB6C1',
-                borderWidth: 1,
-                borderRadius: 6
-              },
-              {
-                label: 'Male',
-                data: GAD_MALE,
-                backgroundColor: 'rgba(137,207,240,0.85)',
-                borderColor: '#7EC8E3',
-                borderWidth: 1,
-                borderRadius: 6
-              },
+              label: 'Female',
+              data: GAD_FEMALE,
+              backgroundColor: 'rgba(255,192,203,0.85)',
+              borderColor: '#FFB6C1',
+              borderWidth: 1,
+              borderRadius: 6
+            },
+            {
+              label: 'Male',
+              data: GAD_MALE,
+              backgroundColor: 'rgba(137,207,240,0.85)',
+              borderColor: '#7EC8E3',
+              borderWidth: 1,
+              borderRadius: 6
+            },
             ]
           },
           options: {
@@ -1426,7 +1685,7 @@ $calendarAppointmentCounts = [
           </div>`;
       }
 
-      window.changeDentistMonth = function(dir) {
+      window.changeDentistMonth = function (dir) {
         currentMonth += dir;
         if (currentMonth > 11) {
           currentMonth = 0;
