@@ -58,7 +58,9 @@ class DocumentRequestController extends Controller
     ======================= */
     public function dentistIndex(Request $request)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -69,7 +71,9 @@ class DocumentRequestController extends Controller
 
     public function dentistData(Request $request)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -117,7 +121,9 @@ class DocumentRequestController extends Controller
     ======================= */
     public function approve(Request $request, $id)
     {
-        if (session('role') !== 'dentist') {
+       $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -132,7 +138,9 @@ class DocumentRequestController extends Controller
     ======================= */
     public function reject(Request $request, $id)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

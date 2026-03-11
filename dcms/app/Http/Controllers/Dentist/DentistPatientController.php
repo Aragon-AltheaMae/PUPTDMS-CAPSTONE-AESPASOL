@@ -13,7 +13,9 @@ class DentistPatientController extends Controller
 {
     public function index()
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 
@@ -60,7 +62,9 @@ class DentistPatientController extends Controller
 
     public function profile(Patient $patient)
     {
-        if (session('role') !== 'dentist') {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
 

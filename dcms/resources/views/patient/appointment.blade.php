@@ -6,40 +6,181 @@
   <title>PUP Taguig Dental Clinic | Appointment</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind + daisyUI CDN -->
   <script type="module" src="https://unpkg.com/cally"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-
   <script>
     tailwind.config = {
       daisyui: {
         themes: false
-      },
+      }
     }
   </script>
 
   <style>
     body {
-      font-family: 'Inter';
+      font-family: 'Inter', sans-serif;
     }
 
-    .tabs-bordered .tab {
-      transition: color 0.5s ease, font-weight 0.5s ease;
+    /* ── DESKTOP SIDEBAR LAYOUT ── */
+    #mainContent {
+      margin-left: 220px;
+      transition: margin-left .3s ease;
     }
 
-    .tabs-bordered .tab::after {
-      transition: width 0.5s ease, left 0.5s ease;
+    #sidebar {
+      width: 220px;
+      transition: width .3s ease;
     }
 
+    #sidebar.collapsed {
+      width: 72px !important;
+    }
+
+    /* ── MOBILE PROFILE ACCORDION ── */
+    #mobileProfileAccordion {
+      display: none;
+    }
+
+    /* ── MOBILE BOTTOM NAV ── */
+    #mobileBottomNav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: white;
+      border-top: 1px solid #f0e0e0;
+      z-index: 200;
+      align-items: center;
+      justify-content: space-around;
+      box-shadow: 0 -4px 20px rgba(139, 0, 0, .10);
+    }
+
+    .mob-nav-item {
+      flex: 1;
+      height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #9CA3AF;
+      text-decoration: none;
+      transition: color .2s;
+      position: relative;
+    }
+
+    .mob-nav-item.active {
+      color: #8B0000;
+    }
+
+    .mob-nav-item i {
+      font-size: 22px;
+    }
+
+    #mobFabWrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: static;
+    }
+
+    #mobFab {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8B0000, #660000);
+      color: white;
+      border: none;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(139, 0, 0, .45);
+      cursor: pointer;
+      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .2s;
+      z-index: 10;
+      position: relative;
+      top: -10px;
+    }
+
+    #mobFab:active {
+      transform: scale(.92) translateY(-2px);
+    }
+
+    #mobFab.open {
+      transform: rotate(45deg) translateY(-10px);
+    }
+
+    #mobFabMenu {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) scaleY(0);
+      transform-origin: bottom center;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(139, 0, 0, .18);
+      border: 1px solid #f5e8e8;
+      min-width: 200px;
+      overflow: hidden;
+      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), opacity .2s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 300;
+    }
+
+    #mobFabMenu.open {
+      transform: translateX(-50%) scaleY(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .fab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      text-decoration: none;
+      transition: background .15s;
+      border-bottom: 1px solid #fdf5f5;
+    }
+
+    .fab-menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .fab-menu-item:hover {
+      background: #FFF0F0;
+      color: #8B0000;
+    }
+
+    .fab-menu-item i {
+      width: 32px;
+      height: 32px;
+      background: #FFF0F0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #8B0000;
+      flex-shrink: 0;
+    }
+
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       0% {
         opacity: 0;
@@ -56,46 +197,31 @@
       animation: fadeUp 0.8s ease-out forwards;
     }
 
-    .service-card {
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.45s ease, box-shadow 0.45s ease;
+    @keyframes apptSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .service-card::before {
-      content: "";
-      position: absolute;
-      inset: -12px;
-      background: linear-gradient(135deg, #8B0000, #660000);
-      opacity: 0;
-      border-radius: 1.25rem;
-      transition: opacity 0.45s ease;
-      z-index: 0;
+    @keyframes apptPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.35;
+      }
     }
 
-    .service-card:hover::before {
-      opacity: 1;
-    }
-
-    .service-card:hover {
-      transform: scale(1.06);
-      z-index: 20;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
-    }
-
-    .service-card>* {
-      position: relative;
-      z-index: 1;
-    }
-
-    .service-card img {
-      transition: transform 0.45s ease;
-    }
-
-    .service-card:hover img {
-      transform: translateX(-6px) scale(1.08);
-    }
-
+    /* ── HEADER ── */
     .header {
       position: fixed;
       top: 0;
@@ -124,7 +250,7 @@
     }
 
     .header-title {
-      font-size: .95rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       letter-spacing: .01em;
@@ -227,6 +353,7 @@
       position: relative;
     }
 
+    /* ── DESKTOP SIDEBAR ── */
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -288,14 +415,6 @@
       margin-bottom: .25rem;
     }
 
-    body,
-    #sidebar,
-    main,
-    .card,
-    .modal-box {
-      transition: background-color .3s ease, color .3s ease;
-    }
-
     #sidebar.collapsed .sidebar-link {
       justify-content: center;
       padding-left: 0;
@@ -308,14 +427,11 @@
       text-align: center;
     }
 
-    #sidebar.expanded .sidebar-link span i {
-      margin-right: 0 !important;
-    }
-
     .sidebar-link.bg-\[\#8B0000\] {
       box-shadow: 0 0 12px rgba(139, 0, 0, .45);
     }
 
+    /* ── THEME TOGGLE ── */
     .theme-toggle-container {
       position: relative;
       display: flex;
@@ -409,6 +525,7 @@
       transform: translateY(calc(100% + 4px));
     }
 
+    /* ── DARK THEME ── */
     [data-theme="dark"] body {
       background-color: #000D1A;
       color: #E5E7EB;
@@ -444,7 +561,65 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
     }
 
-    /* ── MY APPOINTMENTS REDESIGN ── */
+    [data-theme="dark"] #mobileBottomNav {
+      background: #0a0a0a;
+      border-top-color: #1a1a1a;
+    }
+
+    [data-theme="dark"] #mobFabMenu {
+      background: #111;
+      border-color: #222;
+    }
+
+    [data-theme="dark"] .fab-menu-item {
+      color: #E5E7EB;
+      border-bottom-color: #1a1a1a;
+    }
+
+    [data-theme="dark"] .fab-menu-item:hover {
+      background: #1a1a1a;
+    }
+
+    [data-theme="dark"] .mob-nav-item {
+      color: #4B5563;
+    }
+
+    [data-theme="dark"] .mob-nav-item.active {
+      color: #ff6b6b;
+    }
+
+    [data-theme="dark"] .appt-card-new {
+      background: #0a1628;
+      border-color: #1a2a3a;
+    }
+
+    [data-theme="dark"] .appt-date-col {
+      background: #0d1f35;
+      border-right-color: #1a2a3a;
+    }
+
+    [data-theme="dark"] .appt-card-new.appt-past .appt-date-col {
+      background: #111827;
+    }
+
+    [data-theme="dark"] .appt-tabs {
+      background: #0a1628;
+      border-color: #1a2a3a;
+    }
+
+    [data-theme="dark"] .appt-service-name {
+      color: #E5E7EB;
+    }
+
+    [data-theme="dark"] .appt-meta-item {
+      color: #9CA3AF;
+    }
+
+    [data-theme="dark"] .appt-meta-item strong {
+      color: #E5E7EB;
+    }
+
+    /* ── APPOINTMENT STYLES ── */
     .appt-section-title {
       font-size: 1.875rem;
       font-weight: 700;
@@ -458,7 +633,6 @@
       margin-top: 3px;
     }
 
-    /* Book button */
     .appt-book-btn {
       display: inline-flex;
       align-items: center;
@@ -485,7 +659,6 @@
       color: white;
     }
 
-    /* Tab toggle */
     .appt-tabs {
       display: flex;
       background: #FFFFFF;
@@ -534,13 +707,13 @@
       color: white;
     }
 
-    /* Card */
+    /* ── APPOINTMENT CARD ── */
     .appt-card-new {
       background: #FFFFFF;
       border-radius: 18px;
       border: 1px solid #E8E0E0;
       display: grid;
-      grid-template-columns: 90px 1fr auto;
+      grid-template-columns: 80px 1fr auto;
       overflow: hidden;
       transition: box-shadow 0.2s ease, transform 0.2s ease;
       box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
@@ -561,19 +734,80 @@
       animation-delay: 0.14s;
     }
 
-    @keyframes apptSlideUp {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
+    /* Mobile card: stack vertically */
+    @media (max-width: 640px) {
+      .appt-card-new {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        border-radius: 16px;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      .appt-date-col {
+        flex-direction: row !important;
+        padding: 12px 16px !important;
+        gap: 8px;
+        border-right: none !important;
+        border-bottom: 1px solid #F0DADA;
+        justify-content: flex-start !important;
+        align-items: center !important;
+      }
+
+      .appt-card-new.appt-past .appt-date-col {
+        border-bottom-color: #E0E0E6;
+      }
+
+      .appt-date-day {
+        font-size: 22px !important;
+      }
+
+      .appt-date-month {
+        font-size: 13px !important;
+        margin-top: 0 !important;
+      }
+
+      .appt-date-year {
+        font-size: 12px !important;
+        margin-top: 0 !important;
+      }
+
+      .appt-body-new {
+        padding: 12px 14px !important;
+      }
+
+      .appt-actions-col {
+        flex-direction: row !important;
+        padding: 10px 14px !important;
+        justify-content: space-between !important;
+        border-top: 1px solid #F5F5F5;
+        width: 100%;
+      }
+
+      .appt-meta-row {
+        gap: 10px !important;
+        flex-wrap: wrap;
+      }
+
+      .appt-top-row {
+        flex-wrap: wrap;
+        gap: 6px !important;
+      }
+
+      .appt-service-name {
+        font-size: 14px !important;
+      }
+
+      .appt-tabs {
+        width: 100%;
+      }
+
+      .appt-tab {
+        flex: 1;
+        justify-content: center;
+        padding: 9px 12px;
+        font-size: 12.5px;
       }
     }
 
-    /* Date column */
     .appt-date-col {
       background: #FDF1F1;
       display: flex;
@@ -591,7 +825,7 @@
     }
 
     .appt-date-day {
-      font-size: 36px;
+      font-size: 34px;
       font-weight: 800;
       color: #8B0000;
       line-height: 1;
@@ -620,9 +854,8 @@
       margin-top: 1px;
     }
 
-    /* Body */
     .appt-body-new {
-      padding: 18px 22px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
       gap: 9px;
@@ -637,7 +870,7 @@
 
     .appt-service-name {
       font-family: 'DM Sans', sans-serif;
-      font-size: 15.5px;
+      font-size: 15px;
       font-weight: 600;
       color: #2D2D3A;
     }
@@ -646,7 +879,6 @@
       color: #5A5A6A;
     }
 
-    /* Status badges */
     .appt-badge {
       display: inline-flex;
       align-items: center;
@@ -693,19 +925,6 @@
       animation: apptPulse 2s infinite;
     }
 
-    @keyframes apptPulse {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.35;
-      }
-    }
-
-    /* Meta row */
     .appt-meta-row {
       display: flex;
       gap: 18px;
@@ -732,13 +951,12 @@
       font-weight: 500;
     }
 
-    /* Actions column */
     .appt-actions-col {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       justify-content: space-between;
-      padding: 18px 18px 18px 0;
+      padding: 16px 14px 16px 0;
       gap: 10px;
       flex-shrink: 0;
     }
@@ -796,7 +1014,6 @@
       border-color: #8B0000;
     }
 
-    /* Section divider label */
     .appt-divider-label {
       font-family: 'DM Sans', sans-serif;
       font-size: 11px;
@@ -817,24 +1034,23 @@
       background: #E8E0E0;
     }
 
-    /* Empty state */
     .appt-empty {
       text-align: center;
-      padding: 52px 20px;
+      padding: 40px 20px;
       background: #FFFFFF;
       border-radius: 18px;
       border: 1px dashed #E8E0E0;
     }
 
     .appt-empty img {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       margin: 0 auto 12px;
       opacity: 0.6;
     }
 
     .appt-empty-title {
-      font-size: 18px;
+      font-size: 16px;
       color: #8A8A9A;
       margin-bottom: 4px;
     }
@@ -845,9 +1061,171 @@
       color: #ADADAD;
     }
 
-    /* DETAILS MODAL (matches your screenshot) */
+    /* ── SERVICES SECTION ── */
+    .service-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      inset: -12px;
+      background: linear-gradient(135deg, #8B0000, #660000);
+      opacity: 0;
+      border-radius: 1.25rem;
+      transition: opacity 0.45s ease;
+      z-index: 0;
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-card:hover {
+      transform: scale(1.06);
+      z-index: 20;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .service-card>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .service-card img {
+      transition: transform 0.45s ease;
+    }
+
+    .service-card:hover img {
+      transform: translateX(-6px) scale(1.08);
+    }
+
+    /* Mobile services: single column, smaller images */
+    @media (max-width: 640px) {
+      .service-card {
+        padding: 20px 16px !important;
+      }
+
+      .service-card img {
+        width: 70px !important;
+        right: 10px !important;
+      }
+
+      .service-card h3 {
+        font-size: 1rem !important;
+      }
+
+      .service-card p {
+        font-size: 11px !important;
+        max-width: 55% !important;
+      }
+    }
+
+    /* ── MODAL ── */
     dialog#appt_detail_modal::backdrop {
       background: rgba(16, 16, 16, .45);
+    }
+
+    /* ── RESPONSIVE BREAKPOINTS ── */
+    @media (max-width: 767px) {
+      #sidebar {
+        display: none !important;
+      }
+
+      #mainContent {
+        margin-left: 0 !important;
+        padding-bottom: 90px;
+      }
+
+      #mobileBottomNav {
+        display: flex;
+      }
+
+      footer {
+        margin-bottom: 72px;
+      }
+
+      #desktopHeaderUser {
+        display: none !important;
+      }
+
+      #mobileProfileAccordion {
+        display: block;
+        position: fixed;
+        top: 62px;
+        left: 0;
+        right: 0;
+        z-index: 45;
+        background: white;
+        border-bottom: 1px solid #f0e0e0;
+        box-shadow: 0 4px 20px rgba(139, 0, 0, .08);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height .35s cubic-bezier(.4, 0, .2, 1), opacity .25s ease;
+        opacity: 0;
+      }
+
+      #mobileProfileAccordion.open {
+        max-height: 200px;
+        opacity: 1;
+      }
+
+      #mobileProfileToggle {
+        display: flex !important;
+      }
+
+      /* Mobile section header: stack vertically */
+      .appt-header-row {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+      }
+
+      .appt-book-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .appt-section-title {
+        font-size: 1.4rem;
+      }
+
+      /* Calendar: full width, compact */
+      #calendarSkeletonContainer {
+        padding: 16px !important;
+        min-height: 380px !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #mobileProfileToggle {
+        display: none !important;
+      }
+
+      #darkModeFab {
+        display: none !important;
+      }
+
+      #mobileBottomNav {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-title {
+        display: none;
+      }
+
+      .header-name,
+      .header-role {
+        display: none;
+      }
+
+      .header {
+        padding: 0 1rem;
+      }
     }
   </style>
 </head>
@@ -855,7 +1233,24 @@
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
+
+$calendarAppointments = [];
+foreach (($appointments ?? collect()) as $appt) {
+$calendarAppointments[\Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d')] =
+$appt->service_type . ' • ' . $appt->appointment_time;
+}
+
+$calendarCountsSafe = $appointmentCountsPerDay ?? [];
+$calendarUnavailableDatesSafe = $unavailableDates ?? [];
+$calendarHolidaysSafe = $philippineHolidays ?? [];
 @endphp
+
+<script>
+  const calendarAppointments = @json($calendarAppointments);
+  const calendarCounts = @json($appointmentCountsPerDay ?? []);
+  const calendarUnavailableDates = @json($unavailableDates ?? []);
+  const calendarHolidays = @json($philippineHolidays ?? []);
+</script>
 
 <body class="bg-white text-[#333333] font-normal">
 
@@ -873,24 +1268,30 @@ $notifCount = $notifications->count();
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">Notifications</div>
-          <div style="max-height:260px; overflow-y:auto;">
+          <div style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div style="max-height:260px;overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
+            <a href="{{ $n['url'] ?? '#' }}" style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-              @if(!empty($n['message']))<div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>@endif
+              @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
             @empty
-            <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all caught up.</div>
+            <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
       </div>
-      <div class="header-user">
-        <img src="{{ $patient->profile_image
-                ? asset('storage/'.$patient->profile_image)
-                : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
-          alt="Profile" />
+      <button id="mobileProfileToggle" onclick="toggleMobileProfile()"
+        style="display:none;align-items:center;gap:.6rem;background:none;border:none;cursor:pointer;padding:0;">
+        <img class="header-avatar"
+          src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          alt="Profile">
+        <i id="mobileProfileChevron" class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
+      </button>
+      <div class="header-user" id="desktopHeaderUser">
+        <img class="header-avatar"
+          src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
+          alt="Profile">
         <div>
           <div class="header-name">{{ ucwords(strtolower($patient->name)) }}</div>
           <div class="header-role">Student</div>
@@ -899,9 +1300,31 @@ $notifCount = $notifications->count();
     </div>
   </header>
 
-  <!-- SIDEBAR -->
+  <!-- MOBILE PROFILE ACCORDION  -->
+  <div id="mobileProfileAccordion">
+    <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100">
+      <img class="w-12 h-12 rounded-full border-2 border-[#8B0000]/20 object-cover flex-shrink-0"
+        src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=96' }}"
+        alt="Profile">
+      <div>
+        <p class="font-bold text-[#333333] text-base leading-tight">{{ ucwords(strtolower($patient->name)) }}</p>
+        <p class="text-xs text-[#757575] italic">Student</p>
+      </div>
+    </div>
+    <div class="px-5 py-3">
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit"
+          class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 font-semibold text-sm transition-colors duration-200">
+          <i class="fa-solid fa-right-from-bracket"></i> Log out
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DESKTOP SIDEBAR  -->
   <aside id="sidebar"
-    class="fixed left-0 top-[72px] h-[calc(100vh-72px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
+    class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
     <div class="pt-4">
       <div id="sidebarToggleWrapper" class="flex items-center justify-end px-4 py-2">
@@ -914,9 +1337,9 @@ $notifCount = $notifications->count();
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
         ['route'=>'homepage', 'icon'=>'fa-house', 'label'=>'Home'],
-        ['route'=>'patient.appointment.index', 'icon'=>'fa-calendar', 'label'=>'Appointment'],
+        ['route'=>'patient.appointment.index','icon'=>'fa-calendar', 'label'=>'Appointment'],
         ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Record'],
-        ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check', 'label'=>'About Us'],
+        ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check','label'=>'About Us'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
@@ -948,25 +1371,69 @@ $notifCount = $notifications->count();
     </div>
   </aside>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
-    <div class="max-w-7xl mt-4 mx-auto">
+  <!-- ══════ MOBILE BOTTOM NAV ══════ -->
+  <nav id="mobileBottomNav">
+    <a href="{{ route('homepage') }}" class="mob-nav-item {{ request()->routeIs('homepage') ? 'active' : '' }}">
+      <i class="fa-solid fa-house"></i><span>Home</span>
+    </a>
+    <a href="{{ route('patient.appointment.index') }}"
+      class="mob-nav-item {{ request()->routeIs('patient.appointment.index') ? 'active' : '' }}">
+      <i class="fa-solid fa-calendar"></i><span>Appointments</span>
+    </a>
+    <div id="mobFabWrapper">
+      <div id="mobFabMenu">
+        <a href="{{ route('patient.book.appointment') }}" class="fab-menu-item">
+          <i class="fa-solid fa-calendar-plus"></i> Book Appointment
+        </a>
+        <a onclick="document.getElementById('dentalHealthRecordModal')?.showModal()"
+          class="fab-menu-item cursor-pointer">
+          <i class="fa-solid fa-file-medical"></i> Request Health Record
+        </a>
+        <a onclick="document.getElementById('dentalClearanceModal')?.showModal()" class="fab-menu-item cursor-pointer">
+          <i class="fa-solid fa-file-circle-check"></i> Request Clearance
+        </a>
+      </div>
+      <button id="mobFab" aria-label="Quick actions"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <a href="{{ route('patient.record') }}"
+      class="mob-nav-item {{ request()->routeIs('patient.record') ? 'active' : '' }}">
+      <i class="fa-solid fa-folder-open"></i><span>Record</span>
+    </a>
+    <a href="{{ route('patient.about.us') }}"
+      class="mob-nav-item {{ request()->routeIs('patient.about.us') ? 'active' : '' }}">
+      <i class="fa-solid fa-circle-info"></i><span>About</span>
+    </a>
+  </nav>
 
-      <!-- BREADCRUMB -->
-      <div class="text-sm mb-4 font-medium fade-up">
-        <span class="text-gray-400">User</span>
-        <span class="mx-1 text-gray-400">&gt;</span>
+  <!-- DARK MODE FAB (mobile only) -->
+  <button id="darkModeFab"
+    onclick="applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')"
+    style="position:fixed;bottom:88px;right:16px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#660000);color:white;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(139,0,0,.45);cursor:pointer;z-index:199;transition:transform .2s cubic-bezier(.34,1.56,.64,1);"
+    aria-label="Toggle dark mode">
+    <i id="darkModeFabIcon" class="fa-solid fa-moon"></i>
+  </button>
+
+  <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+  <main id="mainContent" class="pt-[100px] px-4 sm:px-6 py-6 fade-up min-h-screen">
+    <div class="mx-auto">
+
+      <!-- Breadcrumb -->
+      <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400 pt-4">
+        <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[9px]"></i>
         <span class="text-[#8B0000] font-semibold">Appointment</span>
       </div>
 
-      <!-- ===== CLINIC SCHEDULE CALENDAR ===== -->
-      <section class="fade-up mb-14">
-        <div id="calendarSkeletonContainer" class="bg-white border shadow-sm rounded-2xl p-6 mx-auto" style="max-width:700px; min-height:480px;">
+      <!-- ═══ CALENDAR ═══ -->
+      <section class="fade-up mb-8 sm:mb-14">
+        <div id="calendarSkeletonContainer"
+          class="bg-white border shadow-sm rounded-2xl p-4 sm:p-6 mx-auto"
+          style="max-width:700px; min-height:420px;">
           <div class="animate-pulse space-y-4">
             <div class="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
             <div class="grid grid-cols-7 gap-2">
               @for($i = 0; $i < 35; $i++)
-                <div class="h-9 bg-gray-200 rounded-lg">
+                <div class="h-8 sm:h-9 bg-gray-200 rounded-lg">
             </div>
             @endfor
           </div>
@@ -974,11 +1441,11 @@ $notifCount = $notifications->count();
     </div>
     </section>
 
-    <!-- ===== MY APPOINTMENTS (REDESIGNED) ===== -->
-    <section class="max-w-6xl mx-auto fade-up mb-16">
+    <!-- ═══ MY APPOINTMENTS ═══ -->
+    <section class="fade-up mb-10 sm:mb-16">
 
-      {{-- Section Header --}}
-      <div class="flex justify-between items-end mb-6">
+      <!-- Section Header -->
+      <div class="appt-header-row flex justify-between items-end mb-5 sm:mb-6 gap-3">
         <div>
           <h2 class="appt-section-title">My Appointments</h2>
           <p class="appt-section-subtitle">
@@ -992,23 +1459,22 @@ $notifCount = $notifications->count();
         </a>
       </div>
 
-      {{-- Tab Toggle --}}
       @php
       $futureCount = $futureVisits->count();
       $pastCount = $pastVisits->count();
       @endphp
+
+      <!-- Tab Toggle -->
       <div class="appt-tabs">
         <button class="appt-tab appt-active" id="apptFutureTab" onclick="apptShowFuture()">
-          Future Visits
-          <span class="appt-count">{{ $futureCount }}</span>
+          Future Visits <span class="appt-count">{{ $futureCount }}</span>
         </button>
         <button class="appt-tab" id="apptPastTab" onclick="apptShowPast()">
-          Past Visits
-          <span class="appt-count">{{ $pastCount }}</span>
+          Past Visits <span class="appt-count">{{ $pastCount }}</span>
         </button>
       </div>
 
-      {{-- ── FUTURE VISITS PANEL ── --}}
+      <!-- FUTURE VISITS -->
       <div id="apptFuturePanel">
         @if($futureVisits->count())
         <div class="appt-divider-label">Upcoming</div>
@@ -1020,7 +1486,7 @@ $notifCount = $notifications->count();
         $diffDays = (int) $now->startOfDay()->diffInDays($apptDate->copy()->startOfDay(), false);
         if ($diffDays === 0) $countdown = 'Today';
         elseif ($diffDays === 1) $countdown = 'Tomorrow';
-        else $countdown = 'In ' . $diffDays . ' days';
+        else $countdown = 'In '.$diffDays.' days';
 
         $rawStatus = strtolower($appt->status ?? 'scheduled');
         $badgeClass = match($rawStatus) {
@@ -1028,17 +1494,14 @@ $notifCount = $notifications->count();
         'confirmed' => 'appt-badge-confirmed',
         default => 'appt-badge-scheduled',
         };
-        $showDot = in_array($rawStatus, ['upcoming', 'scheduled']);
+        $showDot = in_array($rawStatus, ['upcoming','scheduled']);
         @endphp
         <div class="appt-card-new">
-          {{-- Date --}}
           <div class="appt-date-col">
             <span class="appt-date-day">{{ $apptDate->format('d') }}</span>
             <span class="appt-date-month">{{ $apptDate->format('M') }}</span>
             <span class="appt-date-year">{{ $apptDate->format('Y') }}</span>
           </div>
-
-          {{-- Body --}}
           <div class="appt-body-new">
             <div class="appt-top-row">
               <span class="appt-service-name">
@@ -1055,13 +1518,10 @@ $notifCount = $notifications->count();
                 <strong>{{ $apptTime->format('g:i A') }} – {{ $apptTime->copy()->addHour()->format('g:i A') }}</strong>
               </div>
               <div class="appt-meta-item">
-                <i class="fa-regular fa-user"></i>
-                Dr. Nelson Angeles
+                <i class="fa-regular fa-user"></i> Dr. Nelson Angeles
               </div>
             </div>
           </div>
-
-          {{-- Actions --}}
           <div class="appt-actions-col">
             <button class="appt-more-btn" title="Options">
               <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
@@ -1079,7 +1539,7 @@ $notifCount = $notifications->count();
         @endif
       </div>
 
-      {{-- ── PAST VISITS PANEL ── --}}
+      <!-- PAST VISITS -->
       <div id="apptPastPanel" style="display:none;">
         @if($pastVisits->count())
         <div class="appt-divider-label">Recent History</div>
@@ -1088,16 +1548,11 @@ $notifCount = $notifications->count();
         $apptDate = \Carbon\Carbon::parse($appt->appointment_date);
         $apptTime = \Carbon\Carbon::parse($appt->appointment_time);
         $rawStatus = 'completed';
-
-        $badgeClass = 'appt-badge-completed';
-        $badgeIcon = '<i class="fa-solid fa-check" style="font-size:9px"></i>';
-
-        // IMPORTANT: data for modal
         $modalPayload = [
         'service' => $appt->service_type ?? '—',
         'date' => $appt->appointment_date ? \Carbon\Carbon::parse($appt->appointment_date)->format('F d, Y') : '—',
-        'time' => $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('H:i:s') : '—', // matches your screenshot "10:00:00"
-        'status' => $rawStatus ?: 'completed',
+        'time' => $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('H:i:s') : '—',
+        'status' => $rawStatus,
         'duration' => $appt->duration ?? '—',
         'remarks' => $appt->remarks ?? '—',
         'oral' => $appt->oral_examination ?? '—',
@@ -1106,22 +1561,19 @@ $notifCount = $notifications->count();
         ];
         @endphp
         <div class="appt-card-new appt-past">
-          {{-- Date --}}
           <div class="appt-date-col">
             <span class="appt-date-day">{{ $apptDate->format('d') }}</span>
             <span class="appt-date-month">{{ $apptDate->format('M') }}</span>
             <span class="appt-date-year">{{ $apptDate->format('Y') }}</span>
           </div>
-
-          {{-- Body --}}
           <div class="appt-body-new">
             <div class="appt-top-row">
               <span class="appt-service-name">
                 {{ $appt->service_type }}{{ $appt->other_services ? ' ('.$appt->other_services.')' : '' }}
               </span>
-              <span class="appt-badge {{ $badgeClass }}">
-                {!! $badgeIcon !!}
-                {{ ucfirst($rawStatus) }}
+              <span class="appt-badge appt-badge-completed">
+                <i class="fa-solid fa-check" style="font-size:9px"></i>
+                Completed
               </span>
             </div>
             <div class="appt-meta-row">
@@ -1130,19 +1582,14 @@ $notifCount = $notifications->count();
                 <strong>{{ $apptTime->format('g:i A') }} – {{ $apptTime->copy()->addHour()->format('g:i A') }}</strong>
               </div>
               <div class="appt-meta-item">
-                <i class="fa-regular fa-user"></i>
-                Dr. Nelson Angeles
+                <i class="fa-regular fa-user"></i> Dr. Nelson Angeles
               </div>
             </div>
           </div>
-
-          {{-- Actions --}}
           <div class="appt-actions-col">
             <button class="appt-more-btn" title="Options">
               <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
             </button>
-
-            {{-- ✅ FIX: Details now opens modal (no redirect) --}}
             <button type="button"
               class="appt-rebook-btn"
               data-appt='@json($modalPayload)'
@@ -1163,33 +1610,31 @@ $notifCount = $notifications->count();
 
     </section>
 
-    <!-- SERVICES OFFERED -->
-    <section class="max-w-6xl mx-auto mt-4 mb-4 fade-up">
-      <h2 class="text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700]
-                bg-clip-text text-transparent mb-6">
+    <!-- ═══ SERVICES OFFERED ═══ -->
+    <section class="mt-2 mb-6 fade-up">
+      <h2 class="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent mb-4 sm:mb-6">
         Services Offered
       </h2>
-
-      <div class="grid md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
-        <div class="service-card relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
-          <h3 class="text-2xl font-bold mb-2">Oral Check-Up</h3>
-          <p class="text-sm max-w-xs">Routine oral examination • Dental consultation</p>
-          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-6 inset-y-0 my-auto w-28" alt="Oral Checkup" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
+        <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
+          <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Oral Check-Up</h3>
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Routine oral examination • Dental consultation</p>
+          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Oral Checkup" />
         </div>
-        <div class="service-card relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
-          <h3 class="text-2xl font-bold mb-2">Dental Cleaning</h3>
-          <p class="text-sm max-w-xs">Oral hygiene treatment • Removing surface buildup</p>
-          <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-6 inset-y-0 my-auto w-28" alt="Dental Cleaning" />
+        <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
+          <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Cleaning</h3>
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Oral hygiene treatment • Removing surface buildup</p>
+          <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Cleaning" />
         </div>
-        <div class="service-card relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
-          <h3 class="text-2xl font-bold mb-2">Dental Restoration & Prosthesis</h3>
-          <p class="text-sm max-w-xs">Repairs/replaces damaged teeth • Fillings • Crowns • Inlay • etc.</p>
-          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-6 inset-y-0 my-auto w-28" alt="Restoration & Prosthesis" />
+        <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
+          <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Restoration & Prosthesis</h3>
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Repairs/replaces damaged teeth • Fillings • Crowns • Inlay • etc.</p>
+          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Restoration & Prosthesis" />
         </div>
-        <div class="service-card relative p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
-          <h3 class="text-2xl font-bold mb-2">Dental Surgery</h3>
-          <p class="text-sm max-w-xs">Treating dental issues surgically • Extraction • Supernumerary • etc.</p>
-          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-6 inset-y-0 my-auto w-28" alt="Dental Surgery" />
+        <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
+          <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Surgery</h3>
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Treating dental issues surgically • Extraction • Supernumerary • etc.</p>
+          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Surgery" />
         </div>
       </div>
     </section>
@@ -1197,9 +1642,9 @@ $notifCount = $notifications->count();
     </div>
   </main>
 
-  <!-- Footer -->
+  <!-- FOOTER  -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
       <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
@@ -1208,133 +1653,63 @@ $notifCount = $notifications->count();
     </div>
   </footer>
 
+  <!-- DETAIL MODAL -->
   <dialog id="appt_detail_modal" class="modal">
     <div class="modal-box p-0 w-full max-w-md rounded-2xl bg-[#F4F4F4] overflow-hidden">
-
-      <!-- Header -->
-      <div class="bg-[#7A0000] px-6 py-5 text-white">
-        <h3 id="d_service" class="text-2xl font-extrabold leading-tight">—</h3>
-        <div class="mt-2 flex items-center gap-3 text-white/90 text-sm">
+      <div class="bg-[#7A0000] px-5 sm:px-6 py-4 sm:py-5 text-white">
+        <h3 id="d_service" class="text-xl sm:text-2xl font-extrabold leading-tight">—</h3>
+        <div class="mt-2 flex items-center gap-3 text-white/90 text-sm flex-wrap">
           <div class="flex items-center gap-2">
-            <i class="fa-regular fa-calendar"></i>
-            <span id="d_date">—</span>
+            <i class="fa-regular fa-calendar"></i><span id="d_date">—</span>
           </div>
           <span class="opacity-60">·</span>
           <span id="d_time">—</span>
         </div>
       </div>
-
-      <!-- Body -->
-      <div class="px-6 py-5 space-y-5">
-
-        <!-- Status + Duration -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white border border-gray-200 rounded-xl px-4 py-3">
+      <div class="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4">
+          <div class="bg-white border border-gray-200 rounded-xl px-3 sm:px-4 py-3">
             <div class="flex items-center gap-2 text-[11px] font-extrabold tracking-widest text-gray-600">
-              <i class="fa-solid fa-circle-check text-gray-800"></i>
-              STATUS
+              <i class="fa-solid fa-circle-check text-gray-800"></i> STATUS
             </div>
             <div class="mt-3">
-              <span id="d_status"
-                class="inline-flex items-center justify-center w-28 px-4 py-1 text-xs rounded-full font-bold bg-emerald-200 text-emerald-900">
-                —
-              </span>
+              <span id="d_status" class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-emerald-200 text-emerald-900">—</span>
             </div>
           </div>
-
-          <div class="bg-white border border-gray-200 rounded-xl px-4 py-3">
+          <div class="bg-white border border-gray-200 rounded-xl px-3 sm:px-4 py-3">
             <div class="flex items-center gap-2 text-[11px] font-extrabold tracking-widest text-gray-600">
-              <i class="fa-solid fa-circle-check text-gray-800"></i>
-              DURATION
+              <i class="fa-solid fa-circle-check text-gray-800"></i> DURATION
             </div>
             <div class="mt-3">
-              <span id="d_duration"
-                class="inline-flex items-center justify-center w-28 px-4 py-1 text-xs rounded-full font-bold bg-gray-200 text-gray-800">
-                —
-              </span>
+              <span id="d_duration" class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-gray-200 text-gray-800">—</span>
             </div>
           </div>
         </div>
-
-        <!-- Section block -->
+        @foreach([['TREATMENT','d_remarks'],['ORAL EXAMINATION','d_oral'],['DIAGNOSIS','d_diagnosis'],['PRESCRIPTION','d_prescription']] as [$label,$id])
         <div>
           <div class="flex items-center gap-4 mb-2">
-            <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">TREATMENT</span>
+            <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">{{ $label }}</span>
             <div class="h-px flex-1 bg-gray-300"></div>
           </div>
           <div class="bg-white rounded-xl overflow-hidden">
             <div class="grid grid-cols-[6px_1fr]">
               <div class="bg-gray-300"></div>
-              <div class="p-4 text-gray-700 text-sm leading-relaxed">
-                <span id="d_remarks">—</span>
-              </div>
+              <div class="p-3 sm:p-4 text-gray-700 text-sm leading-relaxed"><span id="{{ $id }}">—</span></div>
             </div>
           </div>
         </div>
-
-        <div>
-          <div class="flex items-center gap-4 mb-2">
-            <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">ORAL EXAMINATION</span>
-            <div class="h-px flex-1 bg-gray-300"></div>
-          </div>
-          <div class="bg-white rounded-xl overflow-hidden">
-            <div class="grid grid-cols-[6px_1fr]">
-              <div class="bg-gray-300"></div>
-              <div class="p-4 text-gray-700 text-sm leading-relaxed">
-                <span id="d_oral">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center gap-4 mb-2">
-            <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">DIAGNOSIS</span>
-            <div class="h-px flex-1 bg-gray-300"></div>
-          </div>
-          <div class="bg-white rounded-xl overflow-hidden">
-            <div class="grid grid-cols-[6px_1fr]">
-              <div class="bg-gray-300"></div>
-              <div class="p-4 text-gray-700 text-sm leading-relaxed">
-                <span id="d_diagnosis">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center gap-4 mb-2">
-            <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">PRESCRIPTION</span>
-            <div class="h-px flex-1 bg-gray-300"></div>
-          </div>
-          <div class="bg-white rounded-xl overflow-hidden">
-            <div class="grid grid-cols-[6px_1fr]">
-              <div class="bg-gray-300"></div>
-              <div class="p-4 text-gray-700 text-sm leading-relaxed">
-                <span id="d_prescription">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Close -->
-        <div class="flex justify-end pt-2">
+        @endforeach
+        <div class="flex justify-end pt-1">
           <form method="dialog">
-            <button class="px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">
-              Close
-            </button>
+            <button class="px-6 sm:px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition text-sm">Close</button>
           </form>
         </div>
-
       </div>
     </div>
-
-    <form method="dialog" class="modal-backdrop">
-      <button>close</button>
-    </form>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
   </dialog>
 
-  <!-- MODAL: one appointment only -->
+  <!-- ACTIVE APPOINTMENT MODAL -->
   <dialog id="activeAppointmentModal" class="modal">
     <div class="modal-box swal-card rounded-2xl bg-white text-center shadow-2xl w-[min(92vw,420px)]">
       <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-[#FFF0F0] flex items-center justify-center">
@@ -1344,10 +1719,9 @@ $notifCount = $notifications->count();
       <p class="text-sm text-[#333] mb-6 leading-relaxed">
         {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed before booking another one." }}
       </p>
-      <div class="flex items-center justify-center gap-3">
+      <div class="flex items-center justify-center gap-3 flex-wrap">
         <a href="{{ route('patient.appointment.index') }}" class="btn border-none bg-[#8B0000] hover:bg-[#660000] text-white rounded-xl px-5">
-          <i class="fa-regular fa-calendar-check"></i>
-          View My Appointment
+          <i class="fa-regular fa-calendar-check"></i> View My Appointment
         </a>
         <button type="button" id="closeActiveApptModalBtn" class="btn btn-ghost rounded-xl px-6">Close</button>
       </div>
@@ -1356,194 +1730,255 @@ $notifCount = $notifications->count();
 
   @if(session('activeAppointmentModal'))
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const modal = document.getElementById("activeAppointmentModal");
-      const closeBtn = document.getElementById("closeActiveApptModalBtn");
+    document.addEventListener("DOMContentLoaded", function() {
+      var modal = document.getElementById("activeAppointmentModal");
+      var closeBtn = document.getElementById("closeActiveApptModalBtn");
       if (!modal) return;
       modal.showModal();
-      modal.addEventListener('click', (e) => {
-        const box = modal.querySelector('.modal-box');
-        if (!box) return;
-        if (!box.contains(e.target)) e.preventDefault();
+      modal.addEventListener('click', function(e) {
+        var box = modal.querySelector('.modal-box');
+        if (box && !box.contains(e.target)) e.preventDefault();
       });
-      modal.addEventListener('cancel', (e) => e.preventDefault());
-      if (closeBtn) closeBtn.addEventListener("click", () => modal.close());
+      modal.addEventListener('cancel', function(e) {
+        e.preventDefault();
+      });
+      if (closeBtn) closeBtn.addEventListener("click", function() {
+        modal.close();
+      });
     });
   </script>
   @endif
 
   <script>
-    // ✅ Appointment Details Modal
-    function openApptDetailModal(btn) {
-      const modal = document.getElementById('appt_detail_modal');
-      if (!modal) return;
+    /* ── TAB TOGGLE ── */
+    function apptShowFuture() {
+      document.getElementById('apptFuturePanel').style.display = '';
+      document.getElementById('apptPastPanel').style.display = 'none';
+      document.getElementById('apptFutureTab').classList.add('appt-active');
+      document.getElementById('apptPastTab').classList.remove('appt-active');
+    }
 
-      let data = {};
+    function apptShowPast() {
+      document.getElementById('apptFuturePanel').style.display = 'none';
+      document.getElementById('apptPastPanel').style.display = '';
+      document.getElementById('apptPastTab').classList.add('appt-active');
+      document.getElementById('apptFutureTab').classList.remove('appt-active');
+    }
+
+    /* ── DETAIL MODAL ── */
+    function openApptDetailModal(btn) {
+      var modal = document.getElementById('appt_detail_modal');
+      if (!modal) return;
+      var data = {};
       try {
         data = JSON.parse(btn.getAttribute('data-appt') || '{}');
-      } catch (e) {
-        data = {};
+      } catch (e) {}
+
+      function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = (val != null ? String(val) : '').trim() || '—';
       }
-
-      const setText = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = (val ?? '').toString().trim() || '—';
-      };
-
       setText('d_service', data.service);
       setText('d_date', data.date);
       setText('d_time', data.time);
-
-      // status pill color
-      const statusEl = document.getElementById('d_status');
-      if (statusEl) {
-        const s = (data.status || 'completed').toString().trim().toLowerCase();
-        statusEl.textContent = s || '—';
-        statusEl.className = 'inline-flex items-center justify-center w-28 px-4 py-1 text-xs rounded-full font-bold';
-
-        if (s === 'completed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
-        else if (s === 'confirmed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
-        else if (s === 'upcoming' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
-        else if (s === 'cancelled') statusEl.classList.add('bg-gray-200', 'text-gray-700');
-        else statusEl.classList.add('bg-gray-200', 'text-gray-800');
-      }
-
       setText('d_duration', data.duration);
       setText('d_remarks', data.remarks);
       setText('d_oral', data.oral);
       setText('d_diagnosis', data.diagnosis);
       setText('d_prescription', data.prescription);
 
+      var statusEl = document.getElementById('d_status');
+      if (statusEl) {
+        var s = (data.status || 'completed').toLowerCase().trim();
+        statusEl.textContent = s || '—';
+        statusEl.className = 'inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold';
+        if (s === 'completed' || s === 'confirmed') statusEl.classList.add('bg-emerald-200', 'text-emerald-900');
+        else if (s === 'upcoming' || s === 'scheduled') statusEl.classList.add('bg-yellow-200', 'text-yellow-900');
+        else if (s === 'cancelled') statusEl.classList.add('bg-gray-200', 'text-gray-700');
+        else statusEl.classList.add('bg-gray-200', 'text-gray-800');
+      }
       modal.showModal();
     }
 
-    // ── THEME TOGGLE ──
-    const html = document.documentElement;
-    const themeToggleContainer = document.getElementById("themeToggle");
-    const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-    const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
+    /* ── THEME TOGGLE ── */
+    var html = document.documentElement;
+    var themeToggleContainer = document.getElementById("themeToggle");
+    var themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
+    var themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
 
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      themeOptions.forEach(opt => opt.classList.toggle("active", opt.getAttribute("data-theme") === theme));
+      themeOptions.forEach(function(opt) {
+        opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
+      });
       themeIndicator.classList.toggle("dark-mode", theme === "dark");
+      var fabIcon = document.getElementById("darkModeFabIcon");
+      if (fabIcon) fabIcon.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
 
     applyTheme(localStorage.getItem("theme") || "light");
-    themeOptions.forEach(opt => opt.addEventListener("click", () => applyTheme(opt.getAttribute("data-theme"))));
+    themeOptions.forEach(function(opt) {
+      opt.addEventListener("click", function() {
+        applyTheme(opt.getAttribute("data-theme"));
+      });
+    });
 
-    // ── SIDEBAR ──
-    let sidebarOpen = true;
+    /* ── SIDEBAR ── */
+    var sidebarOpen = true;
 
-    function applyLayout(sidebarWidth) {
-      document.getElementById('sidebar').style.width = sidebarWidth;
-      document.getElementById('mainContent').style.marginLeft = sidebarWidth;
+    function applyLayout(w) {
+      document.getElementById('sidebar').style.width = w;
+      document.getElementById('mainContent').style.marginLeft = w;
     }
 
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const texts = document.querySelectorAll('.sidebar-text');
-      const icon = document.getElementById('sidebarIcon');
-      const toggleWrapper = document.getElementById('sidebarToggleWrapper');
+      var sidebar = document.getElementById('sidebar');
+      var texts = document.querySelectorAll('.sidebar-text');
+      var icon = document.getElementById('sidebarIcon');
+      var wrapper = document.getElementById('sidebarToggleWrapper');
       sidebarOpen = !sidebarOpen;
       if (sidebarOpen) {
         applyLayout('220px');
         sidebar.classList.replace('collapsed', 'expanded');
-        texts.forEach(t => {
+        texts.forEach(function(t) {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-center', 'justify-end');
+        wrapper.classList.replace('justify-center', 'justify-end');
         icon.classList.replace('fa-bars', 'fa-xmark');
       } else {
         applyLayout('72px');
         sidebar.classList.replace('expanded', 'collapsed');
-        texts.forEach(t => {
+        texts.forEach(function(t) {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
-        toggleWrapper.classList.replace('justify-end', 'justify-center');
+        wrapper.classList.replace('justify-end', 'justify-center');
         icon.classList.replace('fa-xmark', 'fa-bars');
       }
       applyTheme(localStorage.getItem("theme") || "light");
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      sidebarOpen = true;
-      applyLayout('220px');
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth >= 768) {
+        sidebarOpen = true;
+        applyLayout('220px');
+      }
 
-    // ── NOTIF ──
-    document.getElementById("notifBtn").addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("notifMenu").classList.toggle("open");
-    });
-    document.addEventListener("click", () => document.getElementById("notifMenu").classList.remove("open"));
-
-    // ── CALENDAR ──
-    function loadCalendar() {
-      const MAX_PER_DAY = 5;
-      const myAppointments = {
-        @if(isset($appointments) && $appointments->count() > 0)
-          @foreach($appointments as $appt)
-            "{{ \Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d') }}": "{{ addslashes($appt->service_type) }} • {{ \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') }}",
-          @endforeach
-        @endif
-      };
-      const apptCounts = {
-        @if(isset($appointmentCountsPerDay) && count($appointmentCountsPerDay) > 0)
-          @foreach($appointmentCountsPerDay as $date => $count)
-            "{{ $date }}": {{ (int)$count }},
-          @endforeach
-        @endif
-      };
-      const unavailableDates = [
-        @foreach(($unavailableDates ?? []) as $d) "{{ $d }}", @endforeach
-      ];
-      const allHolidays = {
-        @foreach(($philippineHolidays ?? []) as $date => $name)
-          "{{ $date }}": "{{ addslashes($name) }}",
-        @endforeach
-      };
-
-      const today = new Date();
-      let currentYear  = today.getFullYear();
-      let currentMonth = today.getMonth();
-
-      function pad(n) { return String(n).padStart(2, '0'); }
-      function isWeekend(y, m, d) { const dow = new Date(y, m, d).getDay(); return dow === 0 || dow === 6; }
-      function getHolidaysForMonth(y, m) {
-        const filtered = {};
-        Object.keys(allHolidays).forEach(ds => {
-          const [hy, hm] = ds.split('-').map(Number);
-          if (hy === y && hm === m + 1) filtered[ds] = allHolidays[ds];
+      /* FAB */
+      var mobFab = document.getElementById('mobFab');
+      var mobFabMenu = document.getElementById('mobFabMenu');
+      if (mobFab && mobFabMenu) {
+        mobFab.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var open = mobFabMenu.classList.contains('open');
+          mobFabMenu.classList.toggle('open', !open);
+          mobFab.classList.toggle('open', !open);
         });
-        return filtered;
+        document.addEventListener('click', function() {
+          mobFabMenu.classList.remove('open');
+          mobFab.classList.remove('open');
+        });
+        mobFabMenu.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+      }
+
+      /* NOTIFICATIONS */
+      var notifBtn = document.getElementById("notifBtn");
+      var notifMenu = document.getElementById("notifMenu");
+      var notifOpen = false;
+      if (notifBtn && notifMenu) {
+        notifBtn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          notifOpen = !notifOpen;
+          notifMenu.classList.toggle("open", notifOpen);
+        });
+        document.addEventListener("click", function() {
+          notifOpen = false;
+          notifMenu.classList.remove("open");
+        });
+        notifMenu.addEventListener("click", function(e) {
+          e.stopPropagation();
+        });
+        document.addEventListener("keydown", function(e) {
+          if (e.key === "Escape") {
+            notifOpen = false;
+            notifMenu.classList.remove("open");
+          }
+        });
+      }
+
+      loadCalendar();
+    });
+
+    /* ── MOBILE PROFILE ACCORDION ── */
+    function toggleMobileProfile() {
+      var panel = document.getElementById('mobileProfileAccordion');
+      var chevron = document.getElementById('mobileProfileChevron');
+      var isOpen = panel.classList.contains('open');
+      panel.classList.toggle('open', !isOpen);
+      if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    /* ── CALENDAR ── */
+    function loadCalendar() {
+      var MAX_PER_DAY = 5;
+
+      var myAppointments = calendarAppointments || {};
+      var apptCounts = calendarCounts || {};
+      var unavailableDates = calendarUnavailableDates || [];
+      var allHolidays = calendarHolidays || {};
+
+      var today = new Date();
+      var currentYear = today.getFullYear();
+      var currentMonth = today.getMonth();
+
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function isWeekend(y, m, d) {
+        var dow = new Date(y, m, d).getDay();
+        return dow === 0 || dow === 6;
+      }
+
+      function getHolidaysForMonth(y, m) {
+        var f = {};
+        Object.keys(allHolidays).forEach(function(ds) {
+          var p = ds.split('-').map(Number);
+          if (p[0] === y && p[1] === m + 1) f[ds] = allHolidays[ds];
+        });
+        return f;
       }
 
       function renderCalendar(year, month) {
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const firstDow = new Date(year, month, 1).getDay();
-        const totalDays = new Date(year, month + 1, 0).getDate();
-        const holidays = getHolidaysForMonth(year, month);
-        let cells = '';
-        for (let i = 0; i < firstDow; i++) cells += `<div></div>`;
-        for (let d = 1; d <= totalDays; d++) {
-          const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
-          const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-          const weekend = isWeekend(year, month, d);
-          const holiday = holidays[dateStr] || null;
-          const myAppt = myAppointments[dateStr] || null;
-          const count = apptCounts[dateStr] || 0;
-          const isFull = count >= MAX_PER_DAY;
-          const isUnavail = unavailableDates.includes(dateStr) || weekend;
-          let bgClass = '',
-            textClass = 'text-[#333333]',
-            ringClass = '',
-            dotHtml = '',
-            tooltipTxt = '';
+        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var firstDow = new Date(year, month, 1).getDay();
+        var totalDays = new Date(year, month + 1, 0).getDate();
+        var holidays = getHolidaysForMonth(year, month);
+        var cells = '';
+
+        for (var i = 0; i < firstDow; i++) cells += '<div></div>';
+
+        for (var d = 1; d <= totalDays; d++) {
+          var dateStr = year + '-' + pad(month + 1) + '-' + pad(d);
+          var isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+          var weekend = isWeekend(year, month, d);
+          var holiday = holidays[dateStr] || null;
+          var myAppt = myAppointments[dateStr] || null;
+          var count = apptCounts[dateStr] || 0;
+          var isFull = count >= MAX_PER_DAY;
+          var isUnavail = unavailableDates.indexOf(dateStr) !== -1 || weekend;
+
+          var bgClass = '';
+          var textClass = 'text-[#333333]';
+          var ringClass = '';
+          var dotHtml = '';
+          var tooltipTxt = '';
+
           if (isToday) {
             bgClass = 'bg-[#8B0000]';
             textClass = 'text-white font-extrabold';
@@ -1556,82 +1991,61 @@ $notifCount = $notifications->count();
           } else {
             bgClass = 'hover:bg-[#FFF0F0]';
           }
-          if (myAppt) {
-            dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-[#008440]'}"></span>`;
-            tooltipTxt = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${myAppt}`;
-          }
-          if (isFull && !myAppt && !isUnavail && !holiday) {
-            dotHtml += `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
-            tooltipTxt = `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (${count} appointments)`;
-          }
-          if (holiday && !myAppt) {
-            dotHtml = `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
-            tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
-          }
-          if (isUnavail && !holiday && !myAppt) {
-            tooltipTxt = weekend ? `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed` : `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
-          }
-          const tooltipHtml = tooltipTxt ? `
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50
-                        bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg
-                        whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none
-                        transition-opacity duration-200">
-              ${tooltipTxt}
-              <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div>
-            </div>` : '';
-          cells += `
-            <div class="relative group flex items-center justify-center">
-              ${tooltipHtml}
-              <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full
-                          transition-all duration-150 ${bgClass} ${textClass} ${ringClass} cursor-default">
-                ${d}${dotHtml}
-              </div>
-            </div>`;
-        }
-        const headerHtml = dayLabels.map((l, i) =>
-          `<div class="text-center text-[10px] font-bold ${(i===0||i===6)?'text-[#8B0000]/40':'text-[#333333]'} uppercase tracking-widest">${l}</div>`
-        ).join('');
-        document.getElementById("calendarSkeletonContainer").innerHTML = `
-          <div class="h-full flex flex-col select-none">
-            <div class="flex items-center justify-center gap-2 mb-3">
-              <i class="fa-regular fa-calendar-check text-[#333333] text-xl"></i>
-              <h2 class="text-xl font-extrabold text-[#333333]">Dental Clinic Schedule</h2>
-            </div>
-            <hr class="border-t border-gray-200 mb-4">
-            <div class="flex items-center justify-between mt-6 mb-5">
-              <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-              </button>
-              <div class="text-center">
-                <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
-                <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
-              </div>
-              <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
-            </div>
-            <div class="grid grid-cols-7 gap-2 mt-4 mb-2">${headerHtml}</div>
-            <div class="grid grid-cols-7 space-y-4 gap-2 flex-1 content-start">${cells}</div>
 
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-gray-100">
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0 ring-2 ring-[#008440]/30 ring-offset-1"></span>
-                  My Appointment
-                </div>
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0 ring-2 ring-blue-400/30 ring-offset-1"></span>
-                  Holiday
-                </div>
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0 ring-2 ring-red-500/30 ring-offset-1"></span>
-                  Fully Booked
-                </div>
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0 ring-2 ring-[#8B0000]/30 ring-offset-1"></span>
-                  Today
-                </div>
-              </div>
-          </div>`;
+          if (myAppt) {
+            dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ' + (isToday ? 'bg-white' : 'bg-[#008440]') + '"></span>';
+            tooltipTxt = '<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>' + myAppt;
+          }
+
+          if (isFull && !myAppt && !isUnavail && !holiday) {
+            dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>';
+            tooltipTxt = '<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (' + count + ')';
+          }
+
+          if (holiday && !myAppt) {
+            dotHtml = '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>';
+            tooltipTxt = '<i class="fa-solid fa-star mr-1 text-blue-300"></i>' + holiday;
+          }
+
+          if (isUnavail && !holiday && !myAppt) {
+            tooltipTxt = weekend ?
+              '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed' :
+              '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available';
+          }
+
+          var tooltipHtml = tooltipTxt ?
+            '<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">' + tooltipTxt + '<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>' :
+            '';
+
+          cells += '<div class="relative group flex items-center justify-center">' +
+            tooltipHtml +
+            '<div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs sm:text-sm rounded-full transition-all duration-150 ' + bgClass + ' ' + textClass + ' ' + ringClass + ' cursor-default">' +
+            d + dotHtml +
+            '</div></div>';
+        }
+
+        var headerHtml = dayLabels.map(function(l, i) {
+          return '<div class="text-center text-[9px] sm:text-[10px] font-bold ' + (i === 0 || i === 6 ? 'text-[#8B0000]/40' : 'text-[#333333]') + ' uppercase tracking-widest">' + l + '</div>';
+        }).join('');
+
+        document.getElementById("calendarSkeletonContainer").innerHTML =
+          '<div class="h-full flex flex-col select-none">' +
+          '<div class="flex items-center justify-center gap-2 mb-3">' +
+          '<i class="fa-regular fa-calendar-check text-[#333333] text-lg sm:text-xl"></i>' +
+          '<h2 class="text-lg sm:text-xl font-extrabold text-[#333333]">Dental Clinic Schedule</h2></div>' +
+          '<hr class="border-t border-gray-200 mb-3 sm:mb-4">' +
+          '<div class="flex items-center justify-between mt-4 sm:mt-6 mb-4 sm:mb-5">' +
+          '<button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150"><i class="fa-solid fa-chevron-left text-xs"></i></button>' +
+          '<div class="text-center"><p class="text-base sm:text-lg font-extrabold text-[#8B0000]">' + monthNames[month] + '</p><p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">' + year + '</p></div>' +
+          '<button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150"><i class="fa-solid fa-chevron-right text-xs"></i></button></div>' +
+          '<div class="grid grid-cols-7 gap-1 sm:gap-2 mt-2 sm:mt-4 mb-2">' + headerHtml + '</div>' +
+          '<div class="grid grid-cols-7 gap-1 sm:gap-2 flex-1 content-start">' + cells + '</div>' +
+          '<div class="flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0"></span>My Appt</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0"></span>Holiday</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0"></span>Full</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0"></span>Today</div>' +
+          '</div></div>';
       }
 
       window.changeMonth = function(dir) {
@@ -1649,10 +2063,7 @@ $notifCount = $notifications->count();
 
       renderCalendar(currentYear, currentMonth);
     }
-
-    document.addEventListener('DOMContentLoaded', () => loadCalendar());
   </script>
-
 </body>
 
 </html>

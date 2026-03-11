@@ -29,7 +29,7 @@ class AppointmentController extends Controller
 
     public function index()
     {
-        $patientId = session('patient_id');
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')->with('error', 'Please login first!');
@@ -90,7 +90,6 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        // ✅ REPLACE: Use PhilippineHolidays helper
         $philippineHolidays = PhilippineHolidays::range(1, 3);
 
         $notifications = [];
@@ -109,13 +108,26 @@ class AppointmentController extends Controller
 
     public function create()
     {
-        $patientId = session('patient_id');
+       $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')->with('error', 'Please login first!');
         }
 
         $patient = Patient::findOrFail($patientId);
+
+        // DO NOT REMOVE
+        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+        //     ->whereIn('status', ['upcoming', 'rescheduled'])
+        //     ->exists();
+
+        // if ($hasActiveAppointment) {
+        //     return redirect()->back()->with([
+        //         'activeAppointmentModal' => true,
+        //         'activeAppointmentMsg' =>
+        //         "You already have an active appointment. Please wait until it is completed before booking another one."
+        //     ]);
+        // }
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
@@ -135,7 +147,6 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        // ✅ REPLACE: Use PhilippineHolidays helper (current year + next year for booking)
         $philippineHolidays = PhilippineHolidays::range(0, 1);
 
         $diseases = Disease::orderBy('sort_order')->get();
