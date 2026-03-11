@@ -948,23 +948,6 @@
     const calendarHolidays = calendarData.holidays;
   </script>
 
-  {{-- Impersonation banner --}}
-  @if(session('impersonated_role') === 'patient' && session('impersonator_role') === 'super_admin')
-  <div
-    style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-    <div>
-      <strong>You are viewing as Patient</strong><br>
-      <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
-    </div>
-    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
-      @csrf
-      <button type="submit"
-        style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Return
-        to Admin</button>
-    </form>
-  </div>
-  @endif
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
@@ -1014,6 +997,8 @@
       </div>
     </div>
   </header>
+
+  
 
   <!-- MOBILE PROFILE ACCORDION -->
   <div id="mobileProfileAccordion">
@@ -1145,6 +1130,23 @@
   <!-- CONTENT -->
   <main id="mainContent" class="pt-[100px] px-4 sm:px-6 py-6 fade-up min-h-screen">
     <div class="mx-auto">
+      
+  {{-- Impersonation banner --}}
+  @if(session('impersonated_role') === 'patient' && session('impersonator_role') === 'super_admin')
+  <div
+    style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <div>
+      <strong>You are viewing as Patient</strong><br>
+      <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
+    </div>
+    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
+      @csrf
+      <button type="submit"
+        style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Return
+        to Admin</button>
+    </form>
+  </div>
+  @endif
 
       <!-- HERO CARD -->
       <div
