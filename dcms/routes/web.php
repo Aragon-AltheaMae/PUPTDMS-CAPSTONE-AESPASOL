@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\RolePermissionController;
 use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\AcademicPeriodController;
+
 use App\Http\Controllers\Admin\AdminPatientController;
 
 /*
@@ -216,6 +218,17 @@ Route::prefix('admin')->group(function () {
     // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
     Route::get('/patients/list', function () {
 
+// Academic Periods
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])->name('academic_periods');
+    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])->name('academic_periods.store');
+    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])->name('academic_periods.update');
+    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])->name('academic_periods.destroy');
+    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])->name('academic_periods.set_active');
+});
+
+// START IMPERSONATION
+    Route::post('/impersonate', function (Request $request) {
         if (!session('admin_logged_in') || session('role') !== 'super_admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
