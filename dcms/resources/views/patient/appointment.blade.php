@@ -12,7 +12,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet">
   <script>
     tailwind.config = {
       daisyui: {
@@ -1268,10 +1270,13 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
           @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
         </button>
         <div id="notifMenu">
-          <div style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">Notifications</div>
+          <div
+            style="padding:.85rem 1rem .65rem;font-weight:700;color:#8B0000;font-size:.82rem;border-bottom:1px solid #f5e8e8;">
+            Notifications</div>
           <div style="max-height:260px;overflow-y:auto;">
             @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
+            <a href="{{ $n['url'] ?? '#' }}"
+              style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
               <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
             </a>
@@ -1286,7 +1291,8 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
         <img class="header-avatar"
           src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=36' }}"
           alt="Profile">
-        <i id="mobileProfileChevron" class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
+        <i id="mobileProfileChevron"
+          class="fa-solid fa-chevron-down text-white text-xs transition-transform duration-300"></i>
       </button>
       <div class="header-user" id="desktopHeaderUser">
         <img class="header-avatar"
@@ -1322,7 +1328,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
     </div>
   </div>
 
-  <!-- DESKTOP SIDEBAR  -->
+  <!-- ══════════════ DESKTOP SIDEBAR ══════════════ -->
   <aside id="sidebar"
     class="fixed left-0 top-[62px] h-[calc(100vh-62px)] bg-white drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-40 expanded"
     style="width:220px;">
@@ -1337,16 +1343,22 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       <nav class="space-y-2 px-3 text-gray-600">
         @foreach([
         ['route'=>'homepage', 'icon'=>'fa-house', 'label'=>'Home'],
-        ['route'=>'patient.appointment.index','icon'=>'fa-calendar', 'label'=>'Appointment'],
-        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Record'],
+        ['route'=>'patient.appointment.index', 'icon'=>'fa-calendar', 'label'=>'Appointment'],
+        ['route'=>'patient.record', 'icon'=>'fa-folder-open', 'label'=>'Dental Record'],
         ['route'=>'patient.about.us', 'icon'=>'fa-file-circle-check','label'=>'About Us'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}"
           class="sidebar-link group relative flex items-center pl-1 pr-3 py-2 rounded-xl mt-8 transition-all duration-200 hover:bg-[#8B0000] hover:text-[#F4F4F4] {{ request()->routeIs($nav['route']) ? 'bg-[#8B0000] text-[#F4F4F4]' : '' }}">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
-          <span class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{ $nav['label'] }}</span>
-          <span class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{ $nav['label'] }}</span>
+          <span
+            class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-[#8B0000] {{ request()->routeIs($nav['route']) ? 'opacity-100' : 'opacity-0' }}"></span>
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ml-1"><i
+              class="fa-solid {{ $nav['icon'] }} text-lg"></i></span>
+          <span
+            class="sidebar-text ml-2 text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300">{{
+            $nav['label'] }}</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-4 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">{{
+            $nav['label'] }}</span>
         </a>
         @endforeach
       </nav>
@@ -1355,17 +1367,25 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       <div class="section-label">Settings</div>
       <div class="w-full px-3">
         <div id="themeToggle" class="theme-toggle-container">
-          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i class="fa-solid fa-sun"></i></button>
-          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i class="fa-regular fa-moon"></i></button>
+          <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode"><i
+              class="fa-solid fa-sun"></i></button>
+          <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode"><i
+              class="fa-regular fa-moon"></i></button>
           <div class="theme-indicator" aria-hidden="true"></div>
         </div>
       </div>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
-          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
-          <span class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log out</span>
-          <span class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log out</span>
+        <button
+          class="group sidebar-link w-full relative flex items-center rounded-xl text-sm text-red-600 hover:bg-red-100 transition-all duration-200">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ml-2"><i
+              class="fa-solid fa-right-from-bracket text-sm"></i></div>
+          <span
+            class="sidebar-text ml-2 opacity-0 w-0 font-semibold overflow-hidden transition-all duration-300 delay-150">Log
+            out</span>
+          <span
+            class="sidebar-tooltip absolute left-full ml-2 px-3 py-1 rounded-full bg-[#8B0000] text-[#F4F4F4] text-sm font-semibold whitespace-nowrap opacity-0 scale-95 pointer-events-none transition-all duration-200">Log
+            out</span>
         </button>
       </form>
     </div>
@@ -1418,7 +1438,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
     <div class="mx-auto">
 
       <!-- Breadcrumb -->
-      <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400 pt-4">
+      <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400">
         <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
         <i class="fa-solid fa-chevron-right text-[9px]"></i>
         <span class="text-[#8B0000] font-semibold">Appointment</span>
@@ -1426,14 +1446,12 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
       <!-- ═══ CALENDAR ═══ -->
       <section class="fade-up mb-8 sm:mb-14">
-        <div id="calendarSkeletonContainer"
-          class="bg-white border shadow-sm rounded-2xl p-4 sm:p-6 mx-auto"
+        <div id="calendarSkeletonContainer" class="bg-white border shadow-sm rounded-2xl p-4 sm:p-6 mx-auto"
           style="max-width:700px; min-height:420px;">
           <div class="animate-pulse space-y-4">
             <div class="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
             <div class="grid grid-cols-7 gap-2">
-              @for($i = 0; $i < 35; $i++)
-                <div class="h-8 sm:h-9 bg-gray-200 rounded-lg">
+              @for($i = 0; $i < 35; $i++) <div class="h-8 sm:h-9 bg-gray-200 rounded-lg">
             </div>
             @endfor
           </div>
@@ -1590,9 +1608,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
             <button class="appt-more-btn" title="Options">
               <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
             </button>
-            <button type="button"
-              class="appt-rebook-btn"
-              data-appt='@json($modalPayload)'
+            <button type="button" class="appt-rebook-btn" data-appt='@json($modalPayload)'
               onclick="openApptDetailModal(this)">
               Details
             </button>
@@ -1612,29 +1628,36 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
     <!-- ═══ SERVICES OFFERED ═══ -->
     <section class="mt-2 mb-6 fade-up">
-      <h2 class="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent mb-4 sm:mb-6">
+      <h2
+        class="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent mb-4 sm:mb-6">
         Services Offered
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
         <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Oral Check-Up</h3>
           <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Routine oral examination • Dental consultation</p>
-          <img src="{{ asset('images/oral-checkup.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Oral Checkup" />
+          <img src="{{ asset('images/oral-checkup.png') }}"
+            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Oral Checkup" />
         </div>
         <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
           <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Cleaning</h3>
           <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Oral hygiene treatment • Removing surface buildup</p>
-          <img src="{{ asset('images/dental-cleaning.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Cleaning" />
+          <img src="{{ asset('images/dental-cleaning.png') }}"
+            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Cleaning" />
         </div>
         <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-r border-[#F4F4F4]/60">
           <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Restoration & Prosthesis</h3>
-          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Repairs/replaces damaged teeth • Fillings • Crowns • Inlay • etc.</p>
-          <img src="{{ asset('images/restoration-prosthesis.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Restoration & Prosthesis" />
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Repairs/replaces damaged teeth • Fillings • Crowns •
+            Inlay • etc.</p>
+          <img src="{{ asset('images/restoration-prosthesis.png') }}"
+            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Restoration & Prosthesis" />
         </div>
         <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/60">
           <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Surgery</h3>
-          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Treating dental issues surgically • Extraction • Supernumerary • etc.</p>
-          <img src="{{ asset('images/dental-surgery.png') }}" class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Surgery" />
+          <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs">Treating dental issues surgically • Extraction •
+            Supernumerary • etc.</p>
+          <img src="{{ asset('images/dental-surgery.png') }}"
+            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Surgery" />
         </div>
       </div>
     </section>
@@ -1644,8 +1667,10 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
   <!-- FOOTER  -->
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+    <div
+      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
+      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+          Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
       <span class="hidden sm:inline">|</span>
@@ -1673,7 +1698,8 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
               <i class="fa-solid fa-circle-check text-gray-800"></i> STATUS
             </div>
             <div class="mt-3">
-              <span id="d_status" class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-emerald-200 text-emerald-900">—</span>
+              <span id="d_status"
+                class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-emerald-200 text-emerald-900">—</span>
             </div>
           </div>
           <div class="bg-white border border-gray-200 rounded-xl px-3 sm:px-4 py-3">
@@ -1681,11 +1707,13 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
               <i class="fa-solid fa-circle-check text-gray-800"></i> DURATION
             </div>
             <div class="mt-3">
-              <span id="d_duration" class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-gray-200 text-gray-800">—</span>
+              <span id="d_duration"
+                class="inline-flex items-center justify-center w-full px-3 py-1 text-xs rounded-full font-bold bg-gray-200 text-gray-800">—</span>
             </div>
           </div>
         </div>
-        @foreach([['TREATMENT','d_remarks'],['ORAL EXAMINATION','d_oral'],['DIAGNOSIS','d_diagnosis'],['PRESCRIPTION','d_prescription']] as [$label,$id])
+        @foreach([['TREATMENT','d_remarks'],['ORAL
+        EXAMINATION','d_oral'],['DIAGNOSIS','d_diagnosis'],['PRESCRIPTION','d_prescription']] as [$label,$id])
         <div>
           <div class="flex items-center gap-4 mb-2">
             <span class="text-[11px] font-extrabold tracking-widest text-[#8B0000]">{{ $label }}</span>
@@ -1701,7 +1729,8 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
         @endforeach
         <div class="flex justify-end pt-1">
           <form method="dialog">
-            <button class="px-6 sm:px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition text-sm">Close</button>
+            <button
+              class="px-6 sm:px-8 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition text-sm">Close</button>
           </form>
         </div>
       </div>
@@ -1717,10 +1746,12 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       </div>
       <h3 class="text-xl font-extrabold text-[#8B0000] mb-2">One Appointment at a Time</h3>
       <p class="text-sm text-[#333] mb-6 leading-relaxed">
-        {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed before booking another one." }}
+        {{ session('activeAppointmentMsg') ?? "You already have an active appointment. Please wait until it is completed
+        before booking another one." }}
       </p>
       <div class="flex items-center justify-center gap-3 flex-wrap">
-        <a href="{{ route('patient.appointment.index') }}" class="btn border-none bg-[#8B0000] hover:bg-[#660000] text-white rounded-xl px-5">
+        <a href="{{ route('patient.appointment.index') }}"
+          class="btn border-none bg-[#8B0000] hover:bg-[#660000] text-white rounded-xl px-5">
           <i class="fa-regular fa-calendar-check"></i> View My Appointment
         </a>
         <button type="button" id="closeActiveApptModalBtn" class="btn btn-ghost rounded-xl px-6">Close</button>
@@ -1730,19 +1761,19 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
   @if(session('activeAppointmentModal'))
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       var modal = document.getElementById("activeAppointmentModal");
       var closeBtn = document.getElementById("closeActiveApptModalBtn");
       if (!modal) return;
       modal.showModal();
-      modal.addEventListener('click', function(e) {
+      modal.addEventListener('click', function (e) {
         var box = modal.querySelector('.modal-box');
         if (box && !box.contains(e.target)) e.preventDefault();
       });
-      modal.addEventListener('cancel', function(e) {
+      modal.addEventListener('cancel', function (e) {
         e.preventDefault();
       });
-      if (closeBtn) closeBtn.addEventListener("click", function() {
+      if (closeBtn) closeBtn.addEventListener("click", function () {
         modal.close();
       });
     });
@@ -1772,7 +1803,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       var data = {};
       try {
         data = JSON.parse(btn.getAttribute('data-appt') || '{}');
-      } catch (e) {}
+      } catch (e) { }
 
       function setText(id, val) {
         var el = document.getElementById(id);
@@ -1809,7 +1840,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
     function applyTheme(theme) {
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      themeOptions.forEach(function(opt) {
+      themeOptions.forEach(function (opt) {
         opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
       });
       themeIndicator.classList.toggle("dark-mode", theme === "dark");
@@ -1818,8 +1849,8 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
     }
 
     applyTheme(localStorage.getItem("theme") || "light");
-    themeOptions.forEach(function(opt) {
-      opt.addEventListener("click", function() {
+    themeOptions.forEach(function (opt) {
+      opt.addEventListener("click", function () {
         applyTheme(opt.getAttribute("data-theme"));
       });
     });
@@ -1841,7 +1872,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       if (sidebarOpen) {
         applyLayout('220px');
         sidebar.classList.replace('collapsed', 'expanded');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
@@ -1850,7 +1881,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       } else {
         applyLayout('72px');
         sidebar.classList.replace('expanded', 'collapsed');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
@@ -1860,7 +1891,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       applyTheme(localStorage.getItem("theme") || "light");
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       if (window.innerWidth >= 768) {
         sidebarOpen = true;
         applyLayout('220px');
@@ -1870,17 +1901,17 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       var mobFab = document.getElementById('mobFab');
       var mobFabMenu = document.getElementById('mobFabMenu');
       if (mobFab && mobFabMenu) {
-        mobFab.addEventListener('click', function(e) {
+        mobFab.addEventListener('click', function (e) {
           e.stopPropagation();
           var open = mobFabMenu.classList.contains('open');
           mobFabMenu.classList.toggle('open', !open);
           mobFab.classList.toggle('open', !open);
         });
-        document.addEventListener('click', function() {
+        document.addEventListener('click', function () {
           mobFabMenu.classList.remove('open');
           mobFab.classList.remove('open');
         });
-        mobFabMenu.addEventListener('click', function(e) {
+        mobFabMenu.addEventListener('click', function (e) {
           e.stopPropagation();
         });
       }
@@ -1890,19 +1921,19 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
       var notifMenu = document.getElementById("notifMenu");
       var notifOpen = false;
       if (notifBtn && notifMenu) {
-        notifBtn.addEventListener("click", function(e) {
+        notifBtn.addEventListener("click", function (e) {
           e.stopPropagation();
           notifOpen = !notifOpen;
           notifMenu.classList.toggle("open", notifOpen);
         });
-        document.addEventListener("click", function() {
+        document.addEventListener("click", function () {
           notifOpen = false;
           notifMenu.classList.remove("open");
         });
-        notifMenu.addEventListener("click", function(e) {
+        notifMenu.addEventListener("click", function (e) {
           e.stopPropagation();
         });
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener("keydown", function (e) {
           if (e.key === "Escape") {
             notifOpen = false;
             notifMenu.classList.remove("open");
@@ -1946,11 +1977,21 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
       function getHolidaysForMonth(y, m) {
         var f = {};
-        Object.keys(allHolidays).forEach(function(ds) {
+        Object.keys(allHolidays).forEach(function (ds) {
           var p = ds.split('-').map(Number);
           if (p[0] === y && p[1] === m + 1) f[ds] = allHolidays[ds];
         });
         return f;
+      }
+
+      function formatTime(raw) {
+        if (!raw) return '—';
+        raw = String(raw).trim();
+        if (/[AaPp][Mm]$/.test(raw)) return raw;
+        var m = raw.match(/^(\d{1,2}):(\d{2})/);
+        if (!m) return raw;
+        var h = parseInt(m[1], 10), mn = m[2], ampm = h >= 12 ? 'PM' : 'AM', hr = h % 12 || 12;
+        return hr + ':' + mn + ' ' + ampm;
       }
 
       function renderCalendar(year, month) {
@@ -1994,7 +2035,10 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
 
           if (myAppt) {
             dotHtml += '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ' + (isToday ? 'bg-white' : 'bg-[#008440]') + '"></span>';
-            tooltipTxt = '<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>' + myAppt;
+            var apptParts = myAppt.split(' • ');
+            var apptService = apptParts[0] || '';
+            var apptTime = apptParts[1] ? formatTime(apptParts[1]) : '';
+            tooltipTxt = '<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>' + apptService + (apptTime ? ' • ' + apptTime : '');
           }
 
           if (isFull && !myAppt && !isUnavail && !holiday) {
@@ -2024,7 +2068,7 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
             '</div></div>';
         }
 
-        var headerHtml = dayLabels.map(function(l, i) {
+        var headerHtml = dayLabels.map(function (l, i) {
           return '<div class="text-center text-[9px] sm:text-[10px] font-bold ' + (i === 0 || i === 6 ? 'text-[#8B0000]/40' : 'text-[#333333]') + ' uppercase tracking-widest">' + l + '</div>';
         }).join('');
 
@@ -2040,15 +2084,19 @@ $calendarHolidaysSafe = $philippineHolidays ?? [];
           '<button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors duration-150"><i class="fa-solid fa-chevron-right text-xs"></i></button></div>' +
           '<div class="grid grid-cols-7 gap-1 sm:gap-2 mt-2 sm:mt-4 mb-2">' + headerHtml + '</div>' +
           '<div class="grid grid-cols-7 gap-1 sm:gap-2 flex-1 content-start">' + cells + '</div>' +
-          '<div class="flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#008440] inline-block flex-shrink-0"></span>My Appt</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-400 inline-block flex-shrink-0"></span>Holiday</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-red-500 inline-block flex-shrink-0"></span>Full</div>' +
-          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#8B0000] inline-block flex-shrink-0"></span>Today</div>' +
+          '<div class="flex flex-wrap items-center justify-center gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-[#008440] inline-block flex-shrink-0"></span>My Appointment</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-blue-400 inline-block flex-shrink-0"></span>Holiday</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-red-500 inline-block flex-shrink-0"></span>Full Schedule</div>' +
+          '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">' +
+          '<span class="w-2 h-2 rounded-full bg-[#8B0000] inline-block flex-shrink-0"></span>Today</div>' +
           '</div></div>';
       }
 
-      window.changeMonth = function(dir) {
+      window.changeMonth = function (dir) {
         currentMonth += dir;
         if (currentMonth > 11) {
           currentMonth = 0;

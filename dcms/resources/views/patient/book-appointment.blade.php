@@ -212,7 +212,7 @@
       bottom: 5rem;
     }
 
-        /* ── HEADER ── */
+    /* ── HEADER ── */
     .header {
       position: fixed;
       top: 0;
@@ -345,6 +345,11 @@
       position: relative;
     }
 
+    /* ── MOBILE PROFILE ACCORDION ── */
+    #mobileProfileAccordion {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .cal-time-layout {
         grid-template-columns: 1fr !important;
@@ -448,8 +453,8 @@
 </head>
 
 @php
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
+$notifications = collect($notifications ?? []);
+$notifCount = $notifications->count();
 @endphp
 
 <body class="bg-[#F4F4F4] text-[#8B0000] min-h-screen"
@@ -474,14 +479,14 @@
             Notifications</div>
           <div style="max-height:260px;overflow-y:auto;">
             @forelse($notifications as $n)
-              <a href="{{ $n['url'] ?? '#' }}"
-                style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
-                <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-                @if(!empty($n['message']))
-                <div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
-              </a>
+            <a href="{{ $n['url'] ?? '#' }}"
+              style="display:block;padding:.65rem 1rem;font-size:.78rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;">
+              <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
+              @if(!empty($n['message']))
+              <div style="color:#aaa;margin-top:2px;">{{ $n['message'] }}</div>@endif
+            </a>
             @empty
-              <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all caught up.</div>
+            <div style="padding:2rem 1rem;text-align:center;color:#bbb;font-size:.78rem;">You're all caught up.</div>
             @endforelse
           </div>
         </div>
@@ -506,36 +511,63 @@
     </div>
   </header>
 
-  <!-- ════ PAGE HERO ════ -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4 animation animate-fade-up text-center">
-    <p class="text-xs font-semibold uppercase tracking-widest mb-2 text-[#8B0000]">
-      <i class="fa-regular fa-calendar-check mr-1"></i> Dental Appointment System
-    </p>
-    <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000] mb-2">Book an Appointment</h1>
-    <p class="text-sm text-[#9e9690] max-w-md mx-auto">Complete all five steps to schedule your dental visit at PUP
-      Taguig Dental Clinic.</p>
-  </div>
-
-  <div class="flex items-center justify-center gap-3 mt-3">
-    <div class="hidden sm:flex items-center gap-2 flex-1 max-w-xs">
-      <span class="text-xs text-[#9e9690] font-semibold whitespace-nowrap">Step <span id="stepCounterText">1</span> of 5</span>
-      <div class="flex-1 h-[5px] rounded-full bg-[#e8e2dd] overflow-hidden">
-        <div id="headerProgressFill" class="h-full rounded-full bg-[#c9a84c] progress-fill" style="width:20%"></div>
+    <!-- ══════ MOBILE PROFILE ACCORDION ══════ -->
+  <div id="mobileProfileAccordion">
+    <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100">
+      <img class="w-12 h-12 rounded-full border-2 border-[#8B0000]/20 object-cover flex-shrink-0"
+        src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patient->name).'&background=660000&color=FFFFFF&rounded=true&size=96' }}"
+        alt="Profile">
+      <div>
+        <p class="font-bold text-[#333333] text-base leading-tight">{{ ucwords(strtolower($patient->name)) }}</p>
+        <p class="text-xs text-[#757575] italic">Student</p>
       </div>
     </div>
-    <a href="{{ route('homepage') }}"
-      class="flex items-center gap-1.5 bg-[#8B0000] hover:bg-[#660000] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-[#660000] transition">
-      <i class="fa-solid fa-arrow-left text-xs"></i>
-      <span class="hidden sm:inline">Back to Home</span>
-      <span class="sm:hidden">Home</span>
-    </a>
+    <div class="px-5 py-3">
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit"
+          class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 font-semibold text-sm transition-colors duration-200">
+          <i class="fa-solid fa-right-from-bracket"></i> Log out
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-2 animate-fade-up">
+    
+    <div class="flex items-center justify-between mt-8 mb-4">
+      <a href="{{ route('homepage') }}"
+        class="back-home-btn flex items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white px-4 py-2 rounded-xl text-xs font-bold border border-[#660000] transition shadow-sm">
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+        Back to Home
+      </a>
+      <span class="text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
+        Step <span id="stepCounterText">1</span> <span class="text-[#c4bfba]">of 5</span>
+      </span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-full h-2 rounded-full bg-[#e8e2dd] overflow-hidden mb-5">
+      <div id="headerProgressFill" class="h-full rounded-full progress-fill"
+        style="width:20%; background: linear-gradient(90deg, #8B0000, #c9a84c)"></div>
+    </div>
+
+    <!-- Title -->
+    <div class="text-center mb-1">
+      <p class="text-xs font-semibold uppercase tracking-widest mb-1 text-[#8B0000]">
+        <i class="fa-regular fa-calendar-check mr-1"></i> Dental Appointment System
+      </p>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000]">Book an Appointment</h1>
+      <p class="text-sm text-[#9e9690] mt-1">Complete all five steps to schedule your dental visit.</p>
+    </div>
+
   </div>
 
   <!-- ════ MAIN ════ -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pb-16">
 
     <!-- STEPPER -->
-    <div class="w-full mt-6 mb-0 animate-fade-up-1 py-3 px-2" style="overflow: hidden;">
+    <div class="w-full mt-4 mb-0 animate-fade-up-1 py-3 px-2" style="overflow: visible;">
       <div class="flex items-start justify-between w-full" style="padding: 6px 0;">
         <!-- Node 1 -->
         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
@@ -546,7 +578,8 @@
             class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-blue-600 text-center hidden sm:block mt-4">Date
             &amp; Time</span>
         </div>
-        <div id="conn1" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <div id="conn1" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
+          style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
         <!-- Node 2 -->
         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
           <div id="sc2"
@@ -555,7 +588,8 @@
           <span id="sl2"
             class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Service</span>
         </div>
-        <div id="conn2" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <div id="conn2" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
+          style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
         <!-- Node 3 -->
         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
           <div id="sc3"
@@ -565,7 +599,8 @@
             class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Dental
             History</span>
         </div>
-        <div id="conn3" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <div id="conn3" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
+          style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
         <!-- Node 4 -->
         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
           <div id="sc4"
@@ -575,14 +610,15 @@
             class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Medical
             History</span>
         </div>
-        <div id="conn4" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector" style="width:20px; margin-top:20px;"></div>
+        <div id="conn4" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
+          style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
         <!-- Node 5 -->
         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
           <div id="sc5"
             class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
             5</div>
           <span id="sl5"
-            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Confirmation</span>
+            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Confirm</span>
         </div>
       </div>
     </div>
@@ -667,31 +703,36 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
 
               @php
-                $services = [
-                  ['value' => 'Oral Check-up', 'img' => 'oral-checkup', 'title' => 'Oral Check-Up', 'desc' => 'Routine exam • Consultation'],
-                  ['value' => 'Dental Cleaning', 'img' => 'dental-cleaning', 'title' => 'Dental Cleaning', 'desc' => 'Oral hygiene • Surface buildup'],
-                  ['value' => 'Restoration & Prosthesis', 'img' => 'restoration-prosthesis', 'title' => 'Restoration & Prosthesis', 'desc' => 'Fillings • Crowns • Bridges'],
-                  ['value' => 'Dental Surgery', 'img' => 'dental-surgery', 'title' => 'Dental Surgery', 'desc' => 'Extraction • Implants'],
-                ];
+              $services = [
+              ['value' => 'Oral Check-up', 'img' => 'oral-checkup', 'title' => 'Oral Check-Up', 'desc' => 'Routine exam
+              • Consultation'],
+              ['value' => 'Dental Cleaning', 'img' => 'dental-cleaning', 'title' => 'Dental Cleaning', 'desc' => 'Oral
+              hygiene • Surface buildup'],
+              ['value' => 'Restoration & Prosthesis', 'img' => 'restoration-prosthesis', 'title' => 'Restoration &
+              Prosthesis', 'desc' => 'Fillings • Crowns • Bridges'],
+              ['value' => 'Dental Surgery', 'img' => 'dental-surgery', 'title' => 'Dental Surgery', 'desc' =>
+              'Extraction • Implants'],
+              ];
               @endphp
 
               @foreach($services as $svc)
-                <label class="service-card-label block cursor-pointer">
-                  <input type="radio" name="service_type" value="{{ $svc['value'] }}" class="hidden" {{ $loop->first ? 'required' : '' }}>
+              <label class="service-card-label block cursor-pointer">
+                <input type="radio" name="service_type" value="{{ $svc['value'] }}" class="hidden" {{ $loop->first ?
+                'required' : '' }}>
+                <div
+                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
                   <div
-                    class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                    <div
-                      class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                      <img src="images/{{ $svc['img'] }}.png" class="w-6 h-6"
-                        style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $svc['title'] }}</p>
-                      <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $svc['desc'] }}</p>
-                    </div>
-                    <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                    <img src="images/{{ $svc['img'] }}.png" class="w-6 h-6"
+                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
                   </div>
-                </label>
+                  <div class="flex-1 min-w-0">
+                    <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $svc['title'] }}</p>
+                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $svc['desc'] }}</p>
+                  </div>
+                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                </div>
+              </label>
               @endforeach
 
               <label class="service-card-label block cursor-pointer sm:col-span-2">
@@ -754,25 +795,25 @@
                 <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
               </div>
               @php
-                $dentalQ1 = [
-                  ['name' => 'bleeding_gums', 'q' => 'Do your gums bleed while brushing/flossing?'],
-                  ['name' => 'sensitive_temp', 'q' => 'Are your teeth sensitive to hot or cold?'],
-                  ['name' => 'sensitive_taste', 'q' => 'Are your teeth sensitive to sweets or sour?'],
-                  ['name' => 'tooth_pain', 'q' => 'Do you feel any pain in your teeth?'],
-                  ['name' => 'sores', 'q' => 'Do you have any sores/lumps in or near your mouth?'],
-                  ['name' => 'injuries', 'q' => 'Have you had any head, neck, or jaw injuries?'],
-                ];
+              $dentalQ1 = [
+              ['name' => 'bleeding_gums', 'q' => 'Do your gums bleed while brushing/flossing?'],
+              ['name' => 'sensitive_temp', 'q' => 'Are your teeth sensitive to hot or cold?'],
+              ['name' => 'sensitive_taste', 'q' => 'Are your teeth sensitive to sweets or sour?'],
+              ['name' => 'tooth_pain', 'q' => 'Do you feel any pain in your teeth?'],
+              ['name' => 'sores', 'q' => 'Do you have any sores/lumps in or near your mouth?'],
+              ['name' => 'injuries', 'q' => 'Have you had any head, neck, or jaw injuries?'],
+              ];
               @endphp
               @foreach($dentalQ1 as $q)
-                <div
-                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                  <span class="leading-snug">{{ $q['q'] }}</span>
-                  <input type="radio" name="{{ $q['name'] }}" value="YES"
-                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                    {{ $loop->first ? 'required' : '' }}>
-                  <input type="radio" name="{{ $q['name'] }}" value="NO"
-                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                </div>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
+                <span class="leading-snug">{{ $q['q'] }}</span>
+                <input type="radio" name="{{ $q['name'] }}" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  {{ $loop->first ? 'required' : '' }}>
+                <input type="radio" name="{{ $q['name'] }}" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
               @endforeach
             </div>
 
@@ -787,34 +828,34 @@
                 <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
               </div>
               @php
-                $dentalQ2 = [
-                  ['name' => 'clicking', 'q' => 'Clicking'],
-                  ['name' => 'joint_pain', 'q' => 'Pain (joint, side of the face)'],
-                  ['name' => 'difficulty_moving', 'q' => 'Difficulty in opening/closing'],
-                  ['name' => 'difficulty_chewing', 'q' => 'Difficulty in chewing'],
-                  ['name' => 'jaw_headaches', 'q' => 'Frequent headaches'],
-                  ['name' => 'clench_grind', 'q' => 'Do you clench or grind your teeth?'],
-                  ['name' => 'biting', 'q' => 'Frequent lips/cheek biting'],
-                  ['name' => 'teeth_loosening', 'q' => 'Have you noticed loosening of your teeth?'],
-                  ['name' => 'food_teeth', 'q' => 'Does food get caught between your teeth?'],
-                  ['name' => 'med_reaction', 'q' => 'Have you ever had a reaction to any medicine or dental anesthetic?'],
-                ];
+              $dentalQ2 = [
+              ['name' => 'clicking', 'q' => 'Clicking'],
+              ['name' => 'joint_pain', 'q' => 'Pain (joint, side of the face)'],
+              ['name' => 'difficulty_moving', 'q' => 'Difficulty in opening/closing'],
+              ['name' => 'difficulty_chewing', 'q' => 'Difficulty in chewing'],
+              ['name' => 'jaw_headaches', 'q' => 'Frequent headaches'],
+              ['name' => 'clench_grind', 'q' => 'Do you clench or grind your teeth?'],
+              ['name' => 'biting', 'q' => 'Frequent lips/cheek biting'],
+              ['name' => 'teeth_loosening', 'q' => 'Have you noticed loosening of your teeth?'],
+              ['name' => 'food_teeth', 'q' => 'Does food get caught between your teeth?'],
+              ['name' => 'med_reaction', 'q' => 'Have you ever had a reaction to any medicine or dental anesthetic?'],
+              ];
               @endphp
               @foreach($dentalQ2 as $q)
-                <div
-                  class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                  <span class="leading-snug">{{ $q['q'] }}</span>
-                  <input type="radio" name="{{ $q['name'] }}" value="YES"
-                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                    required>
-                  <input type="radio" name="{{ $q['name'] }}" value="NO"
-                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                </div>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
+                <span class="leading-snug">{{ $q['q'] }}</span>
+                <input type="radio" name="{{ $q['name'] }}" value="YES"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                  required>
+                <input type="radio" name="{{ $q['name'] }}" value="NO"
+                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              </div>
               @endforeach
               <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
-              <i class="fa-solid fa-circle-info mr-1"></i> If <b>YES</b>, please provide details during your
-              consultation.
-            </p>
+                <i class="fa-solid fa-circle-info mr-1"></i> If <b>YES</b>, please provide details during your
+                consultation.
+              </p>
             </div>
 
             <!-- Dental Procedures -->
@@ -912,161 +953,168 @@
               and proper care.</p>
 
             @php
-              function qSectionOpen(string $icon, string $label): string
-              {
-                return '<div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-                                          <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                            <i class="' . $icon . ' text-xs"></i> ' . $label . ' <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-                                          </p>
-                                          <div class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
-                                          </div>';
+            function qSectionOpen(string $icon, string $label): string
+            {
+            return '<div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                <i class="' . $icon . ' text-xs"></i> ' . $label . ' <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+              </p>
+              <div
+                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              </div>';
               }
-            @endphp
+              @endphp
 
-            <!-- General Health -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-heart-pulse text-xs"></i> General Health <span
-                  class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              <!-- General Health -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-heart-pulse text-xs"></i> General Health <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                </div>
+
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                  <span>Are you in good health?</span>
+                  <input type="radio" name="good_health" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="good_health" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
+                  <label class="text-xs text-[#8B0000] italic">If NO, please provide details:</label>
+                  <input type="text" name="good_health_details"
+                    class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Input here">
+                </div>
+
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                  <span>When was your last medical examination?</span>
+                  <input type="radio" name="had_medical_exam" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="had_medical_exam" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
+                  <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was your last medical
+                    examination?</label>
+                  <input type="text" id="medicalExamDate" name="medical_exam_date"
+                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
+                    placeholder="Select date" readonly>
+                </div>
+
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                  <span>Are you currently receiving treatment for any illness?</span>
+                  <input type="radio" name="under_treatment" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="under_treatment" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
+                  <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
+                  <input type="text" name="treatment_details"
+                    class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Input here">
+                </div>
+
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                  <span>Have you ever been hospitalized?</span>
+                  <input type="radio" name="hospitalized" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="hospitalized" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
+                  <label class="text-xs text-[#8B0000] italic">If YES, please provide details:</label>
+                  <input type="text" name="hospital_details"
+                    class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Input here">
+                </div>
               </div>
 
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                <span>Are you in good health?</span>
-                <input type="radio" name="good_health" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="good_health" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
-                <label class="text-xs text-[#8B0000] italic">If NO, please provide details:</label>
-                <input type="text" name="good_health_details"
-                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                  placeholder="Input here">
-              </div>
-
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                <span>When was your last medical examination?</span>
-                <input type="radio" name="had_medical_exam" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="had_medical_exam" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
-                <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was your last medical
-                  examination?</label>
-                <input type="text" id="medicalExamDate" name="medical_exam_date"
-                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[220px] w-full"
-                  placeholder="Select date" readonly>
-              </div>
-
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                <span>Are you currently receiving treatment for any illness?</span>
-                <input type="radio" name="under_treatment" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="under_treatment" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
-                <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
-                <input type="text" name="treatment_details"
-                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                  placeholder="Input here">
+              <!-- Allergies -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Are you allergic to any of the following?</span><span class="text-center">YES</span><span
+                    class="text-center">NO</span>
+                </div>
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
+                  <span>Medicines</span>
+                  <input type="radio" name="allergy_medicine" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="allergy_medicine" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                  <span>Food</span>
+                  <input type="radio" name="allergy_food" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="allergy_food" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="mt-3">
+                  <label class="text-xs text-[#8B0000] italic block mb-1">Others (please specify):</label>
+                  <input type="text" name="allergy_others"
+                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
+                    placeholder="Input here">
+                </div>
               </div>
 
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                <span>Have you ever been hospitalized?</span>
-                <input type="radio" name="hospitalized" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="hospitalized" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+              <!-- Medications -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-pills text-xs"></i> Medications <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                </div>
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                  <span>Are you taking any prescription or non-prescription medication?</span>
+                  <input type="radio" name="medication" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="medication" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
+                  <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
+                  <input type="text" name="medication_details"
+                    class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                    placeholder="Input here">
+                </div>
               </div>
-              <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
-                <label class="text-xs text-[#8B0000] italic">If YES, please provide details:</label>
-                <input type="text" name="hospital_details"
-                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                  placeholder="Input here">
-              </div>
-            </div>
 
-            <!-- Allergies -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies <span
-                  class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Are you allergic to any of the following?</span><span class="text-center">YES</span><span
-                  class="text-center">NO</span>
-              </div>
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                <span>Medicines</span>
-                <input type="radio" name="allergy_medicine" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="allergy_medicine" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                <span>Food</span>
-                <input type="radio" name="allergy_food" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="allergy_food" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="mt-3">
-                <label class="text-xs text-[#8B0000] italic block mb-1">Others (please specify):</label>
-                <input type="text" name="allergy_others"
-                  class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
-                  placeholder="Input here">
-              </div>
-            </div>
-
-            <!-- Medications -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-pills text-xs"></i> Medications <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
-              </div>
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                <span>Are you taking any prescription or non-prescription medication?</span>
-                <input type="radio" name="medication" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="medication" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
-                <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
-                <input type="text" name="medication_details"
-                  class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                  placeholder="Input here">
-              </div>
-            </div>
-
-            <!-- For Women -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-venus text-xs"></i> For Women Only <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
-              </div>
-              @foreach([['name' => 'pregnant', 'q' => 'Are you pregnant?'], ['name' => 'nursing', 'q' => 'Are you nursing?'], ['name' => 'birth_control', 'q' => 'Are you taking birth control pills?']] as $i => $q)
+              <!-- For Women -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-venus text-xs"></i> For Women Only <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                </div>
+                @foreach([['name' => 'pregnant', 'q' => 'Are you pregnant?'], ['name' => 'nursing', 'q' => 'Are you
+                nursing?'], ['name' => 'birth_control', 'q' => 'Are you taking birth control pills?']] as $i => $q)
                 <div
                   class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
                   <span>{{ $q['q'] }}</span>
@@ -1076,70 +1124,75 @@
                   <input type="radio" name="{{ $q['name'] }}" value="NO"
                     class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
                 </div>
-              @endforeach
-            </div>
+                @endforeach
+              </div>
 
-            <!-- Medical Conditions -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions <span
-                  class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you presently have or have ever had any of
-                the following:</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
-                @foreach($diseases as $d)
+              <!-- Medical Conditions -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you presently have or have ever had any
+                  of
+                  the following:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
+                  @foreach($diseases as $d)
                   <label class="flex items-center gap-2.5 cursor-pointer">
                     <input type="checkbox" name="diseases[]" value="{{ $d->code }}"
                       class="w-4 h-4 rounded border-2 border-[#e8e2dd] cursor-pointer accent-[#8B0000] flex-shrink-0">
                     <span class="text-[0.82rem] text-[#1a1410]">{{ $d->label }}</span>
                   </label>
-                @endforeach
-              </div>
-            </div>
-
-            <!-- Tobacco -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
-              </div>
-              <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                <span>Do you use tobacco products or any derivatives?</span>
-                <input type="radio" name="tobacco_use" value="YES"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                  required>
-                <input type="radio" name="tobacco_use" value="NO"
-                  class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-              </div>
-              <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="text-xs text-[#8B0000] italic w-28">How much per day:</span>
-                  <input type="text" name="tobacco_per_day" placeholder="Input here"
-                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
-                </div>
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
-                  <input type="text" name="tobacco_per_week" placeholder="Input here"
-                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
+                  @endforeach
                 </div>
               </div>
-            </div>
 
-            <!-- Suffers From -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From <span
-                  class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div
-                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                <span>Condition</span><span class="text-center">YES</span><span class="text-center">NO</span>
+              <!-- Tobacco -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use <span class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Question</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                </div>
+                <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
+                  <span>Do you use tobacco products or any derivatives?</span>
+                  <input type="radio" name="tobacco_use" value="YES"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                    required>
+                  <input type="radio" name="tobacco_use" value="NO"
+                    class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                </div>
+                <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <span class="text-xs text-[#8B0000] italic w-28">How much per day:</span>
+                    <input type="text" name="tobacco_per_day" placeholder="Input here"
+                      class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
+                  </div>
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
+                    <input type="text" name="tobacco_per_week" placeholder="Input here"
+                      class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[160px] w-full">
+                  </div>
+                </div>
               </div>
-              @foreach([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches', 'q' => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
+
+              <!-- Suffers From -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                  <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div
+                  class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                  <span>Condition</span><span class="text-center">YES</span><span class="text-center">NO</span>
+                </div>
+                @foreach([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches', 'q' => 'Earaches'],
+                ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
                 <div
                   class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
                   <span>{{ $q['q'] }}</span>
@@ -1149,142 +1202,146 @@
                   <input type="radio" name="{{ $q['name'] }}" value="NO"
                     class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
                 </div>
-              @endforeach
-            </div>
+                @endforeach
+              </div>
 
-            <!-- Emergency Contact -->
-            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-              <p class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-4">
-                <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact <span
-                  class="flex-1 h-px bg-[#f9e8e8]"></span>
-              </p>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Person to contact in case of
-                    emergency</label>
-                  <input type="text" name="emergency_person" maxlength="50"
-                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                    placeholder="Full name" required>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Contact Number</label>
-                  <input type="tel" id="emergency_number" name="emergency_number" maxlength="11"
-                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[240px] w-full"
-                    placeholder="09XXXXXXXXX" required>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Relation to Patient</label>
-                  <div class="relative max-w-[280px]">
-                    <select id="emergency_relation" name="emergency_relation"
-                      class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
-                      required>
-                      <option value="" disabled selected>Select relation</option>
-                      <option value="Mother">Mother</option>
-                      <option value="Father">Father</option>
-                      <option value="Guardian">Guardian</option>
-                      <option value="Spouse">Spouse</option>
-                      <option value="Others">Others</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-                      <i class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
+              <!-- Emergency Contact -->
+              <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
+                <p
+                  class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-4">
+                  <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact <span
+                    class="flex-1 h-px bg-[#f9e8e8]"></span>
+                </p>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Person to contact in case of
+                      emergency</label>
+                    <input type="text" name="emergency_person" maxlength="50"
+                      class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                      placeholder="Full name" required>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Contact Number</label>
+                    <input type="tel" id="emergency_number" name="emergency_number" maxlength="11"
+                      class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[240px] w-full"
+                      placeholder="09XXXXXXXXX" required>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Relation to Patient</label>
+                    <div class="relative max-w-[280px]">
+                      <select id="emergency_relation" name="emergency_relation"
+                        class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
+                        required>
+                        <option value="" disabled selected>Select relation</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Father">Father</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Others">Others</option>
+                      </select>
+                      <div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+                        <i class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
+                      </div>
+                    </div>
+                    <input type="text" id="relation_other" name="relation_other" maxlength="30"
+                      class="form-input mt-2 hidden border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
+                      placeholder="Please specify relation">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Patient's Signature</label>
+                    <div
+                      class="file-upload-zone max-w-[320px] border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 text-center cursor-pointer">
+                      <i class="fa-regular fa-image text-2xl text-[#9e9690] mb-2 block"></i>
+                      <p class="text-xs text-[#5c5550] mb-1">Select your file or drag and drop</p>
+                      <p class="text-xs text-[#9e9690] mb-3">JPG, PNG, up to 25 MB</p>
+                      <label
+                        class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
+                        <i class="fa-solid fa-upload"></i> Browse
+                        <input type="file" name="patient_signature" id="patient_signature" class="hidden"
+                          accept=".jpg,.jpeg,.png" required>
+                      </label>
+                      <p id="signature_filename" class="text-xs text-[#5c5550] mt-2 hidden truncate"></p>
                     </div>
                   </div>
-                  <input type="text" id="relation_other" name="relation_other" maxlength="30"
-                    class="form-input mt-2 hidden border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none max-w-[280px] w-full"
-                    placeholder="Please specify relation">
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#5c5550] mb-1.5">Patient's Signature</label>
-                  <div
-                    class="file-upload-zone max-w-[320px] border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 text-center cursor-pointer">
-                    <i class="fa-regular fa-image text-2xl text-[#9e9690] mb-2 block"></i>
-                    <p class="text-xs text-[#5c5550] mb-1">Select your file or drag and drop</p>
-                    <p class="text-xs text-[#9e9690] mb-3">JPG, PNG, up to 25 MB</p>
-                    <label
-                      class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
-                      <i class="fa-solid fa-upload"></i> Browse
-                      <input type="file" name="patient_signature" id="patient_signature" class="hidden"
-                        accept=".jpg,.jpeg,.png" required>
-                    </label>
-                    <p id="signature_filename" class="text-xs text-[#5c5550] mt-2 hidden truncate"></p>
+              </div>
+            </div>
+
+            <!-- ════ STEP 5: SUMMARY & CONFIRMATION ════ -->
+            <div class="step-content hidden" id="step5">
+
+              <!-- SUMMARY -->
+              <div id="summarySection">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Review Your Information</h2>
+                <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)">
+                </div>
+                <p class="text-sm text-[#5c5550] mb-6">Please review all the information you've provided before
+                  proceeding
+                  to confirmation.</p>
+                <div id="summaryBox" class="space-y-4"></div>
+                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                  <button type="button" id="summaryBackBtn"
+                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                    <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                  </button>
+                  <button type="button" id="goToConfirmationBtn"
+                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                    Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- CONFIRMATION -->
+              <div id="confirmationSection" class="hidden">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Final Confirmation</h2>
+                <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)">
+                </div>
+
+                <div class="bg-[#fff5f5] border border-[rgba(139,0,0,0.15)] rounded-2xl p-5 mb-2">
+                  <div class="flex items-start gap-2 mb-4">
+                    <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
+                    <p class="text-sm text-[#5c5550]">By submitting, you confirm that all the information provided is
+                      accurate and complete.</p>
                   </div>
+                  <label
+                    class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
+                    <input id="finalConfirm" type="checkbox"
+                      class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
+                      required>
+                    <span class="text-sm text-[#1a1410] leading-relaxed">
+                      I have reviewed my dental and medical information and I accept the
+                      <a href="/privacy-policy" class="text-[#8B0000] hover:underline font-semibold">Privacy Policy</a>
+                      and <a href="/terms-of-service" class="text-[#8B0000] hover:underline font-semibold">Terms of
+                        Service</a>.
+                    </span>
+                  </label>
+                </div>
+
+                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                  <button type="button" id="confirmBackBtn"
+                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                    <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                  </button>
+                  <button type="button" id="finalSubmitBtn"
+                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                    <i class="fa-solid fa-check"></i> Submit Appointment
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- ════ STEP 5: SUMMARY & CONFIRMATION ════ -->
-          <div class="step-content hidden" id="step5">
-
-            <!-- SUMMARY -->
-            <div id="summarySection">
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Review Your Information</h2>
-              <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
-              <p class="text-sm text-[#5c5550] mb-6">Please review all the information you've provided before proceeding
-                to confirmation.</p>
-              <div id="summaryBox" class="space-y-4"></div>
-              <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                <button type="button" id="summaryBackBtn"
-                  class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                  <i class="fa-solid fa-chevron-left text-xs"></i> Back
-                </button>
-                <button type="button" id="goToConfirmationBtn"
-                  class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                  Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-              </div>
             </div>
 
-            <!-- CONFIRMATION -->
-            <div id="confirmationSection" class="hidden">
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Final Confirmation</h2>
-              <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
-
-              <div class="bg-[#fff5f5] border border-[rgba(139,0,0,0.15)] rounded-2xl p-5 mb-2">
-                <div class="flex items-start gap-2 mb-4">
-                  <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
-                  <p class="text-sm text-[#5c5550]">By submitting, you confirm that all the information provided is
-                    accurate and complete.</p>
-                </div>
-                <label
-                  class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
-                  <input id="finalConfirm" type="checkbox"
-                    class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
-                    required>
-                  <span class="text-sm text-[#1a1410] leading-relaxed">
-                    I have reviewed my dental and medical information and I accept the
-                    <a href="/privacy-policy" class="text-[#8B0000] hover:underline font-semibold">Privacy Policy</a>
-                    and <a href="/terms-of-service" class="text-[#8B0000] hover:underline font-semibold">Terms of
-                      Service</a>.
-                  </span>
-                </label>
-              </div>
-
-              <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                <button type="button" id="confirmBackBtn"
-                  class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                  <i class="fa-solid fa-chevron-left text-xs"></i> Back
-                </button>
-                <button type="button" id="finalSubmitBtn"
-                  class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                  <i class="fa-solid fa-check"></i> Submit Appointment
-                </button>
-              </div>
+            <!-- ════ NAV BUTTONS ════ -->
+            <div id="navBtns" class="flex justify-center mt-8 gap-3 nav-btns-row">
+              <button type="button" id="prevBtn" style="display:none;"
+                class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                <i class="fa-solid fa-chevron-left text-xs"></i> Previous
+              </button>
+              <button type="button" id="nextBtn"
+                class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-8 py-2.5 text-sm font-bold">
+                Next <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
             </div>
-
-          </div>
-
-          <!-- ════ NAV BUTTONS ════ -->
-          <div id="navBtns" class="flex justify-center mt-8 gap-3 nav-btns-row">
-            <button type="button" id="prevBtn" style="display:none;"
-              class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-              <i class="fa-solid fa-chevron-left text-xs"></i> Previous
-            </button>
-            <button type="button" id="nextBtn"
-              class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-8 py-2.5 text-sm font-bold">
-              Next <i class="fa-solid fa-chevron-right text-xs"></i>
-            </button>
-          </div>
 
         </form>
       </div>
@@ -1359,7 +1416,7 @@
     const apptSlotCounts = @json($appointmentCountsPerSlot ?? []);
     const unavailableDates = @json($unavailableDates ?? []);
     const holidaysMap = @json($philippineHolidays ?? []);
-    const diseaseLabelByCode = @json($diseases->pluck('label', 'code'));
+    const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
 
     const allSlots = [{
       t: "9:00 AM",
@@ -1679,7 +1736,7 @@
         }
         if (conn) {
           conn.className = "h-0.5 flex-shrink-0 self-start step-connector ";
-          conn.style.width = "65px";
+          conn.style.width = window.innerWidth < 640 ? "8px" : "40px";
           conn.style.marginTop = "20px";
           conn.className += (idx < i && completedSteps.includes(idx)) ? "bg-green-700" : (idx === i ? "bg-blue-600" : "bg-[#e8e2dd]");
         }
@@ -1816,13 +1873,41 @@
         </div>
         ${card("Dental History", "fa-teeth", `
           <div class="grid grid-cols-2 gap-x-8 sm-grid-1col">
-            ${row("Last Dental Visit", get("last_dental_visit"))}${row("Bleeding Gums", get("bleeding_gums"))}${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}${row("Sensitive (Sweets)", get("sensitive_taste"))}${row("Tooth Pain", get("tooth_pain"))}${row("Sores/Lumps", get("sores"))}${row("Jaw Injuries", get("injuries"))}${row("Clicking Jaw", get("clicking"))}${row("Joint Pain", get("joint_pain"))}${row("Difficulty Moving", get("difficulty_moving"))}${row("Difficulty Chewing", get("difficulty_chewing"))}${row("Headaches", get("jaw_headaches"))}${row("Grinding/Clenching", get("clench_grind"))}${row("Lips/Cheek Biting", get("biting"))}${row("Teeth Loosening", get("teeth_loosening"))}${row("Food Caught Between Teeth", get("food_teeth"))}${row("Medicine Reaction", get("med_reaction"))}${row("Periodontal Treatment", get("periodontal"))}${row("Difficult Extraction", get("difficult_extraction"))}${row("Prolonged Bleeding", get("prolonged_bleeding"))}${row("Dentures", get("dentures"))}${row("Orthodontic Treatment", get("ortho_treatment"))}
+            ${row("Last Dental Visit", get("last_dental_visit"))}
+            ${row("Bleeding Gums", get("bleeding_gums"))}
+            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+            ${row("Sensitive (Sweets)", get("sensitive_taste"))}
+            ${row("Tooth Pain", get("tooth_pain"))}
+            ${row("Sores/Lumps", get("sores"))}
+            ${row("Jaw Injuries", get("injuries"))}
+            ${row("Clicking Jaw", get("clicking"))}
+            ${row("Joint Pain", get("joint_pain"))}
+            ${row("Difficulty Moving", get("difficulty_moving"))}
+            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+            ${row("Headaches", get("jaw_headaches"))}
+            ${row("Grinding/Clenching", get("clench_grind"))}
+            ${row("Lips/Cheek Biting", get("biting"))}
+            ${row("Teeth Loosening", get("teeth_loosening"))}
+            ${row("Food Caught Between Teeth", get("food_teeth"))}
+            ${row("Medicine Reaction", get("med_reaction"))}
+            ${row("Periodontal Treatment", get("periodontal"))}
+            ${row("Difficult Extraction", get("extraction_date"))}
+            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+            ${row("Dentures", get("dentures_date"))}
+            ${row("Orthodontic Treatment", get("ortho_date"))}
           </div>
           ${get("additional_concerns") !== "N/A" ? `<p class="mt-2"><b class="text-[#5c5550] font-semibold">Additional Concerns:</b><br>${get("additional_concerns")}</p>` : ""}
         `)}
         ${card("Medical History", "fa-heart-pulse", `
           <div class="grid grid-cols-2 gap-x-8 sm-grid-1col">
-            ${row("Good Health", get("good_health"))}${row("Last Medical Exam", get("medical_exam_date"))}${row("Under Treatment", get("under_treatment"))}${row("Hospitalized", get("hospitalized"))}${row("Allergy (Medicine)", get("allergy_medicine"))}${row("Allergy (Food)", get("allergy_food"))}${row("Medication", get("medication"))}${row("Tobacco Use", get("tobacco_use"))}
+            ${row("Good Health", get("good_health"))}
+            ${row("Last Medical Exam", get("medical_exam_date"))}
+            ${row("Under Treatment", get("under_treatment"))}
+            ${row("Hospitalized", get("hospitalized"))}
+            ${row("Allergy (Medicine)", get("allergy_medicine"))}
+            ${row("Allergy (Food)", get("allergy_food"))}
+            ${row("Medication", get("medication"))}
+            ${row("Tobacco Use", get("tobacco_use"))}
           </div>
           <p class="mt-2"><b class="text-[#5c5550] font-semibold">Medical Conditions:</b> ${diseases.length ? diseases.map(c => diseaseLabelByCode?.[c] ?? c).join(", ") : "None"}</p>
         `)}
@@ -1835,24 +1920,42 @@
       });
     }
 
-    /* SUBMIT */
+    // MODAL (FINAL SUBMIT)
     const confirmModal = document.getElementById("confirmModal");
     const confirmMessage = document.getElementById("confirmMessage");
-    document.getElementById("finalSubmitBtn")?.addEventListener("click", () => {
-      if (!document.getElementById("finalConfirm")?.checked) {
-        showMiniTab("Please confirm before submitting.");
-        return;
-      }
-      const date = document.getElementById("appointment_date")?.value || "N/A";
-      const time = document.getElementById("appointment_time")?.value || "N/A";
-      if (confirmMessage) confirmMessage.innerHTML = `Your dental appointment at PUP Taguig Dental Clinic has been scheduled for <b>${date}</b> at <b>${time}</b>.<br><br>Please arrive on time and bring your school or office ID.`;
-      confirmModal?.showModal();
-    });
-    document.getElementById("okBtn")?.addEventListener("click", () => {
-      clearDraft();
-      formSubmitting = true;
-      document.getElementById("appointmentForm").submit();
-    });
+    const okBtn = document.getElementById("okBtn");
+
+    if (finalSubmitBtn) {
+      finalSubmitBtn.addEventListener("click", () => {
+        if (!finalConfirm || !finalConfirm.checked) {
+          showMiniTab("Please confirm before submitting.");
+          return;
+        }
+
+        const date = document.getElementById("appointment_date")?.value || "N/A";
+        const time = document.getElementById("appointment_time")?.value || "N/A";
+
+        if (confirmMessage) {
+          confirmMessage.innerHTML = `
+        Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
+        <b>${date}</b> at <b>${time}</b>.<br>
+        Please arrive on time and bring your school or office ID.
+        <br>
+      `;
+        }
+
+        // show modal first
+        confirmModal?.showModal();
+      });
+    }
+
+    if (okBtn) {
+      okBtn.addEventListener("click", () => {
+        clearDraft();
+        formSubmitting = true;
+        document.getElementById("appointmentForm").submit();
+      });
+    }
 
     /* ══════════════════════════════════════════════
        THEME
@@ -1864,7 +1967,7 @@
       html.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
       if (themeToggleContainer) {
-        themeToggleContainer.querySelectorAll(".theme-option").forEach(function(opt) {
+        themeToggleContainer.querySelectorAll(".theme-option").forEach(function (opt) {
           opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
         });
         var indicator = themeToggleContainer.querySelector(".theme-indicator");
@@ -1875,8 +1978,8 @@
     }
     applyTheme(localStorage.getItem("theme") || "light");
     if (themeToggleContainer) {
-      themeToggleContainer.querySelectorAll(".theme-option").forEach(function(opt) {
-        opt.addEventListener("click", function() {
+      themeToggleContainer.querySelectorAll(".theme-option").forEach(function (opt) {
+        opt.addEventListener("click", function () {
           applyTheme(opt.getAttribute("data-theme"));
         });
       });
@@ -1903,7 +2006,7 @@
       if (sidebarOpen) {
         applyLayout('220px');
         sidebar.classList.replace('collapsed', 'expanded');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.remove('opacity-0', 'w-0');
           t.classList.add('opacity-100');
         });
@@ -1912,7 +2015,7 @@
       } else {
         applyLayout('72px');
         sidebar.classList.replace('expanded', 'collapsed');
-        texts.forEach(function(t) {
+        texts.forEach(function (t) {
           t.classList.add('opacity-0', 'w-0');
           t.classList.remove('opacity-100');
         });
@@ -1922,21 +2025,17 @@
       applyTheme(localStorage.getItem("theme") || "light");
     }
 
-    /* ══════════════════════════════════════════════
-       MOBILE PROFILE ACCORDION
-    ══════════════════════════════════════════════ */
+    /* ── MOBILE PROFILE ── */
     function toggleMobileProfile() {
-      var panel = document.getElementById('mobileProfileAccordion');
-      var chevron = document.getElementById('mobileProfileChevron');
-      var isOpen = panel.classList.contains('open');
-      panel.classList.toggle('open', !isOpen);
-      if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      var p = document.getElementById('mobileProfileAccordion'), c = document.getElementById('mobileProfileChevron');
+      var o = p.classList.contains('open'); p.classList.toggle('open', !o);
+      if (c) c.style.transform = o ? 'rotate(0deg)' : 'rotate(180deg)';
     }
 
     /* ══════════════════════════════════════════════
        DOM READY
     ══════════════════════════════════════════════ */
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       /* Desktop layout */
       if (window.innerWidth >= 768) {
         sidebarOpen = true;
@@ -1950,13 +2049,13 @@
       var mobFab = document.getElementById('mobFab');
       var mobFabMenu = document.getElementById('mobFabMenu');
       if (mobFab && mobFabMenu) {
-        mobFab.addEventListener('click', function(e) {
+        mobFab.addEventListener('click', function (e) {
           e.stopPropagation();
           var open = mobFabMenu.classList.contains('open');
           mobFabMenu.classList.toggle('open', !open);
           mobFab.classList.toggle('open', !open);
         });
-        mobFabMenu.addEventListener('click', function(e) {
+        mobFabMenu.addEventListener('click', function (e) {
           e.stopPropagation();
         });
       }
@@ -1965,20 +2064,20 @@
       var notifBtn = document.getElementById("notifBtn");
       var notifMenu = document.getElementById("notifMenu");
       if (notifBtn && notifMenu) {
-        notifBtn.addEventListener("click", function(e) {
+        notifBtn.addEventListener("click", function (e) {
           e.stopPropagation();
           notifMenu.classList.toggle("open");
         });
-        notifMenu.addEventListener("click", function(e) {
+        notifMenu.addEventListener("click", function (e) {
           e.stopPropagation();
         });
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener("keydown", function (e) {
           if (e.key === "Escape") notifMenu.classList.remove("open");
         });
       }
 
       /* Close all on outside click */
-      document.addEventListener('click', function() {
+      document.addEventListener('click', function () {
         if (mobFabMenu) {
           mobFabMenu.classList.remove('open');
           if (mobFab) mobFab.classList.remove('open');
@@ -1994,8 +2093,8 @@
       });
 
       /* Scroll reveal */
-      var revealObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
             revealObserver.unobserve(entry.target);
@@ -2004,11 +2103,11 @@
       }, {
         threshold: 0.1
       });
-      document.querySelectorAll('.reveal').forEach(function(el) {
+      document.querySelectorAll('.reveal').forEach(function (el) {
         revealObserver.observe(el);
       });
     });
-    
+
     /* OTHERS MODAL */
     const othersModal = document.getElementById("othersModal");
     const othersInput = document.getElementById("other_services");
@@ -2223,6 +2322,8 @@
       link.addEventListener("click", e => {
         const href = link.getAttribute("href") || "";
         if (href.startsWith("#") || href.startsWith("javascript:")) return;
+        // Skip the Back to Home button — let it navigate directly
+        if (link.closest('a') && (link.textContent.includes('Home') || link.classList.contains('back-home-btn'))) return;
         if (formIsDirty && !formSubmitting) {
           e.preventDefault();
           openLeaveModal(() => window.location.href = link.href);
