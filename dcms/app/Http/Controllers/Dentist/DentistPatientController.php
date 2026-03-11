@@ -8,6 +8,7 @@ use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\AuditLogger;
 
 class DentistPatientController extends Controller
 {
@@ -45,6 +46,12 @@ class DentistPatientController extends Controller
         $allCount        = $appointments->count();
 
         $notifications = [];
+
+        AuditLogger::log(
+            'view',
+            'dentist_patients',
+            "Dentist viewed patient list"
+        );
 
         return view('dentist.dentist-patient', compact(
             'appointments',
@@ -102,6 +109,12 @@ class DentistPatientController extends Controller
         $unavailableDates = [];
 
         $notifications = collect([]);
+
+        AuditLogger::log(
+            'view',
+            'dentist_patients',
+            "Dentist viewed patient details"
+        );
 
         return view('dentist.dentist-patientprofile', compact(
             'patient',

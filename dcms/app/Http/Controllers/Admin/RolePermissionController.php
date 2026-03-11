@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use App\Helpers\AuditLogger;
 
 class RolePermissionController extends Controller
 {
@@ -18,6 +19,12 @@ class RolePermissionController extends Controller
         $groupedPermissions = $permissions->groupBy('module');
 
         $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
+
+        AuditLogger::log(
+            'view',
+            'roles_permissions',
+            'Admin viewed roles and permissions'
+        );
 
         return view('admin.role-permissions', compact('roles', 'groupedPermissions', 'highlightRoleId'));
     }
@@ -114,6 +121,12 @@ class RolePermissionController extends Controller
             ->values()
             ->toArray();
 
+        AuditLogger::log(
+            'update',
+            'roles_permissions',
+            "Admin updated permissions for role ID {$role->id}"
+        );
+
         return redirect()
             ->route('admin.role_permissions')
             ->with('success', 'Role permissions updated successfully.')
@@ -189,8 +202,13 @@ class RolePermissionController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
-            'slug' => ['required', 'string', 'max:255', 'unique:roles,slug',
-                    'regex:/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/'],
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:roles,slug',
+                'regex:/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/'
+            ],
         ], [
             'name.unique' => 'A role with this name already exists.',
             'slug.unique' => 'A role with this slug already exists.',
@@ -209,25 +227,25 @@ class RolePermissionController extends Controller
     }
 
     public function destroyRole($id)
-{
-    $role = Role::findOrFail($id);
+    {
+        $role = Role::findOrFail($id);
 
-    // Prevent deleting super admin
-    if (in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) || 
-        str_contains(strtolower($role->name), 'super')) {
+        // Prevent deleting super admin
+        if (
+            in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+            str_contains(strtolower($role->name), 'super')
+        ) {
+            return redirect()->route('admin.role_permissions')
+                ->with('error', 'Cannot delete the Super Admin role.');
+        }
+
+        // Detach all permissions from this role first
+        $role->permissions()->detach();
+
+        // Delete the role from the database
+        $role->delete();
+
         return redirect()->route('admin.role_permissions')
-            ->with('error', 'Cannot delete the Super Admin role.');
+            ->with('success', "Role '{$role->name}' has been deleted.");
     }
-
-    // Detach all permissions from this role first
-    $role->permissions()->detach();
-
-    // Delete the role from the database
-    $role->delete();
-
-    return redirect()->route('admin.role_permissions')
-        ->with('success', "Role '{$role->name}' has been deleted.");
-}
-
-        
 }

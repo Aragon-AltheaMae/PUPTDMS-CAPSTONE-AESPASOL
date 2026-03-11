@@ -217,7 +217,7 @@ Route::prefix('admin')->group(function () {
 
         return view('admin.admin-dashboard');
     })->name('admin.admin.dashboard');
-    
+
     // ROLE PERMISSIONS
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
         ->name('admin.role_permissions');
@@ -239,6 +239,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/system-logs', [SystemLogController::class, 'index'])
         ->name('admin.system_logs');
 
+    Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
+        ->name('admin.system_logs.fetch');
+
     // PATIENT DIRECTORY
     Route::get('/patient-directory', [AdminPatientController::class, 'index'])
         ->name('admin.patient_directory');
@@ -250,44 +253,38 @@ Route::prefix('admin')->group(function () {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $patients = Patient::select('id','name','email','phone')
+        $patients = Patient::select('id', 'name', 'email', 'phone')
             ->orderBy('name')
             ->get();
 
         return response()->json($patients);
-
     })->name('admin.patients.list');
-
-
-    
-
 });
 
 // Academic Periods
 Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
-        ->name('admin.academic_periods');
-    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
-        ->name('admin.academic_periods.store');
-    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
-        ->name('admin.academic_periods.update');
-    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
-        ->name('admin.academic_periods.destroy');
-    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
-        ->name('admin.academic_periods.set_active');
+    ->name('admin.academic_periods');
+Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
+    ->name('admin.academic_periods.store');
+Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
+    ->name('admin.academic_periods.update');
+Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
+    ->name('admin.academic_periods.destroy');
+Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
+    ->name('admin.academic_periods.set_active');
 
 // START IMPERSONATION
-    Route::post('/impersonate', function (Request $request) {
-        if (!session('admin_logged_in') || session('role') !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+Route::post('/impersonate', function (Request $request) {
+    if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
 
-        $patients = Patient::select('id','name','email','phone')
-            ->orderBy('name')
-            ->get();
+    $patients = Patient::select('id', 'name', 'email', 'phone')
+        ->orderBy('name')
+        ->get();
 
-        return response()->json($patients);
-
-    })->name('admin.patients.list');
+    return response()->json($patients);
+})->name('admin.patients.list');
 
 /*
 |--------------------------------------------------------------------------
@@ -317,7 +314,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::put('/user-management/patient/{patient}/reset-password', [UserManagementController::class, 'resetPatientPassword'])
         ->name('user_management.patient.reset_password');
-
 });
 
 /*
@@ -399,7 +395,6 @@ Route::post('/impersonate', function (Request $request) {
     return response()->json([
         'message' => 'Unsupported role: ' . $targetRole
     ], 422);
-
 })->name('admin.impersonate');
 
 
@@ -428,9 +423,8 @@ Route::post('/stop-impersonation', function () {
     ]);
 
     return redirect()->route('admin.admin.dashboard');
-
 })->name('admin.stop_impersonation');
-    
+
 /*
 |--------------------------------------------------------------------------
 | PATIENT-PROTECTED ROUTES

@@ -10,7 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
         * {
@@ -1437,6 +1438,44 @@
                 transform: translateY(0);
             }
         }
+
+        .sl-row-new {
+            animation: slNewRowSlideIn 0.8s ease;
+        }
+
+        @keyframes slNewRowSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-8px);
+                background: rgba(16, 185, 129, 0.20);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                background: transparent;
+            }
+        }
+
+        [data-theme="dark"] .sl-row-new {
+            animation: slNewRowFlashDark 1.2s ease;
+        }
+
+        @keyframes slNewRowFlashDark {
+            0% {
+                background: rgba(16, 185, 129, 0.18);
+                transform: scale(1.01);
+            }
+
+            40% {
+                background: rgba(16, 185, 129, 0.10);
+            }
+
+            100% {
+                background: transparent;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -1668,8 +1707,7 @@
     $logs)->whereIn('action',['login','Login'])->count();
     @endphp
 
-    <main id="mainContent"
-    class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
 
             {{-- Top row --}}
@@ -1730,9 +1768,11 @@
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <div class="sl-search flex-1 sm:flex-none">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="slSearch" placeholder="Search logs…" oninput="slFilter()" class="w-full sm:w-auto">
+                            <input type="text" id="slSearch" placeholder="Search logs…" oninput="slFilter()"
+                                class="w-full sm:w-auto">
                         </div>
-                        <button class="sl-export-btn whitespace-nowrap"><i class="fa-solid fa-download"></i> Export</button>
+                        <button class="sl-export-btn whitespace-nowrap"><i class="fa-solid fa-download"></i>
+                            Export</button>
                     </div>
                 </div>
 
@@ -1814,8 +1854,7 @@
                                     </div>
                                 </td>
                                 <td><span class="sl-action {{ $actionClass }}"><i
-                                            class="fa-solid {{ $actionIcon }}"></i>{{ str_replace('_','
-                                        ',ucwords($log->action)) }}</span></td>
+                                            class="fa-solid {{ $actionIcon }}"></i>{{ str_replace('_','',ucwords($log->action)) }}</span></td>
                                 <td><span class="sl-module"><i class="fa-solid fa-cube"></i>{{ ucfirst($log->module)
                                         }}</span></td>
                                 <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span>
@@ -1935,6 +1974,179 @@
                 row.style.display = (tabOk && searchOk) ? '' : 'none';
             });
         }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getActionClass(action) {
+            action = (action || '').toLowerCase();
+
+            if (action.includes('login')) return 'login';
+            if (action.includes('logout')) return 'logout';
+            if (action.includes('create')) return 'create';
+            if (action.includes('update')) return 'update';
+            if (action.includes('delete')) return 'delete';
+
+            return 'default';
+        }
+
+        function getActionIcon(actionClass) {
+            switch (actionClass) {
+                case 'login': return 'fa-right-to-bracket';
+                case 'logout': return 'fa-right-from-bracket';
+                case 'create': return 'fa-plus';
+                case 'update': return 'fa-pen';
+                case 'delete': return 'fa-trash';
+                default: return 'fa-bolt';
+            }
+        }
+
+        function getRoleIcon(role) {
+            switch ((role || '').toLowerCase()) {
+                case 'admin': return 'fa-user-tie';
+                case 'dentist': return 'fa-tooth';
+                case 'patient': return 'fa-user';
+                default: return 'fa-circle-user';
+            }
+        }
+
+        function buildLogRow(log, isNew = false) {
+            const role = (log.actor_role || 'other').toLowerCase();
+            const action = (log.action || '').toLowerCase();
+            const actionClass = getActionClass(action);
+            const actionIcon = getActionIcon(actionClass);
+            const roleIcon = getRoleIcon(role);
+            const avatarLetter = ((log.actor_identifier || role || '—').charAt(0) || '—').toUpperCase();
+
+            return `
+                <tr class="${isNew ? 'sl-row-new' : ''}" data-log-id="${escapeHtml(log.id)}" data-role="${escapeHtml(role)}" data-action="${escapeHtml(actionClass)}">
+                    <td><span class="sl-id">#${String(log.id).padStart(3, '0')}</span></td>
+                    <td>
+                        <span class="sl-date-day">${escapeHtml(log.created_at_day || '')}</span>
+                        <span class="sl-date-time">${escapeHtml(log.created_at_time || '')}</span>
+                    </td>
+                    <td>
+                        <span class="sl-role ${escapeHtml(role)}">
+                            <i class="fa-solid ${escapeHtml(roleIcon)}"></i>${escapeHtml(role.charAt(0).toUpperCase() + role.slice(1))}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="sl-user">
+                            <div class="sl-avatar ${escapeHtml(role)}">${escapeHtml(avatarLetter)}</div>
+                            <span class="sl-username">${escapeHtml(log.actor_identifier || '—')}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="sl-action ${escapeHtml(actionClass)}">
+                            <i class="fa-solid ${escapeHtml(actionIcon)}"></i>${escapeHtml(action.replace(/_/g, ' '))}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="sl-module">
+                            <i class="fa-solid fa-cube"></i>${escapeHtml(log.module || '')}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="sl-desc">${escapeHtml(log.description || 'No description provided.')}</span>
+                    </td>
+                </tr>
+            `;
+        }
+
+        let seenLogIds = new Set();
+        let hasLoadedLogsOnce = false;
+        async function fetchAuditLogs() {
+            try {
+                const response = await fetch("{{ route('admin.system_logs.fetch') }}", {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch logs.');
+                }
+
+                const data = await response.json();
+                const tableBody = document.getElementById('slTableBody');
+
+                if (!tableBody) return;
+
+                if (!data.logs || data.logs.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="sl-empty">
+                                    <i class="fa-solid fa-clipboard-list"></i>
+                                    <div class="sl-empty-title">No system logs found</div>
+                                    <div class="sl-empty-sub">Activity will appear here once users interact with the system.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const incomingIds = new Set(data.logs.map(log => String(log.id)));
+
+                const html = data.logs.map(log => {
+                    const isNew = hasLoadedLogsOnce && !seenLogIds.has(String(log.id));
+                    return buildLogRow(log, isNew);
+                }).join('');
+
+                tableBody.innerHTML = html;
+
+                seenLogIds = incomingIds;
+                hasLoadedLogsOnce = true;
+
+                slFilter();
+                updateLogStats(data.logs);
+            } catch (error) {
+                console.error('Audit log fetch error:', error);
+            }
+        }
+
+        function updateLogStats(logs) {
+            const total = logs.length;
+            const admin = logs.filter(log => (log.actor_role || '').toLowerCase() === 'admin').length;
+            const dentist = logs.filter(log => (log.actor_role || '').toLowerCase() === 'dentist').length;
+            const patient = logs.filter(log => (log.actor_role || '').toLowerCase() === 'patient').length;
+            const logins = logs.filter(log => (log.action || '').toLowerCase().includes('login')).length;
+
+            const statNums = document.querySelectorAll('.sl-stat-num');
+            if (statNums.length >= 4) {
+                statNums[0].textContent = total;
+                statNums[1].textContent = admin;
+                statNums[2].textContent = dentist;
+                statNums[3].textContent = patient;
+            }
+
+            const tabCounts = document.querySelectorAll('.sl-tab-count');
+            if (tabCounts.length >= 5) {
+                tabCounts[0].textContent = total;
+                tabCounts[1].textContent = admin;
+                tabCounts[2].textContent = dentist;
+                tabCounts[3].textContent = patient;
+                tabCounts[4].textContent = logins;
+            }
+
+            const badge = document.querySelector('.sl-entry-badge');
+            if (badge) {
+                badge.textContent = `${total} ${total === 1 ? 'entry' : 'entries'}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAuditLogs();
+            setInterval(fetchAuditLogs, 1000);
+        });
     </script>
 </body>
 
