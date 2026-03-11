@@ -3115,12 +3115,12 @@
                 }
 
                 function renderPatientPicker(patients) {
-                    const list = document.getElementById('patientPickerList');
+    const list = document.getElementById('patientPickerList');
 
-                    if (!list) return;
+    if (!list) return;
 
-                    if (!patients.length) {
-                        list.innerHTML = `
+    if (!patients.length) {
+        list.innerHTML = `
             <div style="
                 text-align:center;
                 padding:32px 20px;
@@ -3130,34 +3130,44 @@
                 No patient accounts found.
             </div>
         `;
-                        return;
-                    }
+        return;
+    }
 
-                    list.innerHTML = patients.map(patient => `
-        <div class="va-role-row" data-patient-search="${((patient.name || '') + ' ' + (patient.email || '')).toLowerCase()}">
-            <div class="va-role-avatar" style="background:linear-gradient(135deg,#065F46,#047857);color:#fff;">
-                ${(patient.name || 'P').charAt(0).toUpperCase()}
+    list.innerHTML = patients.map(patient => {
+        const patientName = (patient.name || 'Patient').replace(/'/g, "\\'");
+        const patientEmail = patient.email || 'No email';
+        const patientPhone = patient.phone || '';
+        const patientInitial = (patient.name || 'P').charAt(0).toUpperCase();
+        const searchText = ((patient.name || '') + ' ' + (patient.email || '')).toLowerCase();
+
+        return `
+            <div class="va-role-row" data-patient-search="${searchText}">
+                <div class="va-role-avatar" style="background:linear-gradient(135deg,#065F46,#047857);color:#fff;">
+                    ${patientInitial}
+                </div>
+
+                <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:700;color:#2D2420;margin-bottom:3px;">
+                        ${escapeHtml(patient.name || 'Unnamed Patient')}
+                    </div>
+                    <div style="font-size:12px;color:#8A7A6F;">
+                        ${escapeHtml(patientEmail)}
+                    </div>
+                    <div style="font-size:12px;color:#B5A99A;margin-top:4px;">
+                        ID: ${patient.id}${patientPhone ? ' • ' + escapeHtml(patientPhone) : ''}
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="va-go-btn"
+                    onclick="event.stopPropagation(); startPatientImpersonation('patient', 'patient', '#065F46', ${patient.id}, '${patientName}')">
+                    <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Impersonate
+                </button>
             </div>
-
-            <div style="flex:1;">
-                <div style="font-size:14px;font-weight:700;color:#2D2420;margin-bottom:3px;">
-                    ${escapeHtml(patient.name || 'Unnamed Patient')}
-                </div>
-                <div style="font-size:12px;color:#8A7A6F;">
-                    ${escapeHtml(patient.email || 'No email')}
-                </div>
-                <div style="font-size:12px;color:#B5A99A;margin-top:4px;">
-                    ID: ${patient.id}${patient.phone ? ' • ' + escapeHtml(patient.phone) : ''}
-                </div>
-            </div>
-
-            <button class="va-go-btn"
-                onclick="startPatientImpersonation('patient', 'patient', '#065F46', ${patient.id}, ${JSON.stringify(patient.name || 'Patient')})">
-                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Impersonate
-            </button>
-        </div>
-    `).join('');
-                }
+        `;
+    }).join('');
+}
 
                 function filterPatientPicker(query) {
                     const q = query.toLowerCase().trim();
