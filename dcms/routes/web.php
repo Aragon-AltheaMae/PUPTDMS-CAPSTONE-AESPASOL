@@ -129,8 +129,13 @@ Route::post('/login', function (Request $request) {
 
     // ── DENTIST ──
     if ($request->email === 'dentist' && $request->password === 'dentist123') {
-        session(['role' => 'dentist', 'dentist_email' => 'dentist']);
+        session([
+            'role' => 'dentist',
+            'dentist_email' => 'dentist'
+        ]);
+
         AuditLogger::log('login', 'authentication', 'Dentist logged into the system');
+
         return redirect()->route('dentist.dentist.dashboard')
             ->with('login_as', 'Dentist')
             ->with('show_terms_modal', true);
@@ -138,8 +143,15 @@ Route::post('/login', function (Request $request) {
 
     // ── ADMIN ──
     if ($request->email === 'admin' && $request->password === 'admin123') {
-        session(['admin_logged_in' => true, 'role' => 'super_admin', 'admin_id' => 1, 'admin_email' => 'admin']);
+        session([
+            'admin_logged_in' => true,
+            'role' => 'super_admin',
+            'admin_id' => 1,
+            'admin_email' => 'admin'
+        ]);
+
         AuditLogger::log('login', 'authentication', 'Admin logged into the system');
+
         return redirect()->route('admin.admin.dashboard')
             ->with('login_as', 'Administrator')
             ->with('show_terms_modal', true);
@@ -147,21 +159,27 @@ Route::post('/login', function (Request $request) {
 
     // ── PATIENT ──
     $patient = Patient::where('email', $request->email)->first();
+
     if (!$patient) {
         return back()->with('error', 'No account associated with this email.');
     }
+
     if (!Hash::check($request->password, $patient->password)) {
         return back()->with('error', 'Incorrect password. Please try again.');
     }
 
-    session(['role' => 'patient', 'patient_id' => $patient->id, 'email' => $patient->email]);
+    session([
+        'role' => 'patient',
+        'patient_id' => $patient->id,
+        'email' => $patient->email
+    ]);
+
     AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
     return redirect()->route('homepage')
         ->with('login_as', $patient->name)
         ->with('show_terms_modal', true);
 });
-
 
 // Dentist Login POST (hard-coded for now)
 // Route::post('/dentist/login', function (Request $request) {

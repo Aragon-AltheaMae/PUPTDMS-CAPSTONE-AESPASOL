@@ -1935,10 +1935,6 @@ document.addEventListener('DOMContentLoaded', function () {
         fabMenu.addEventListener('click', e => e.stopPropagation());
       }
 
-      // Terms modal
-      if (!sessionStorage.getItem('terms_accepted')) {
-        document.getElementById('termsModal').showModal();
-      }
     });
   </script>
 
