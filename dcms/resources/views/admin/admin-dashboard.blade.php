@@ -1194,9 +1194,9 @@
         <span>I have read and agree to the Terms and Conditions and Privacy Policy</span>
       </label>
       <div class="terms-actions">
-        <form method="POST" action="{{ route('logout') }}" style="margin:0;" onsubmit="resetTermsSession()">
+        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
           @csrf
-          <button type="submit" class="terms-cancel-btn">Log out</button>
+          <button type="submit" class="terms-cancel-btn">Cancel</button>
         </form>
         <button id="termsContinueBtn" class="terms-continue-btn" disabled onclick="acceptTerms()">
           <i class="fa-solid fa-check" style="font-size:.75rem; margin-right:5px;"></i> Continue
@@ -1808,34 +1808,33 @@
   @endif
 
   <script>
-    /* ── TERMS MODAL ── */
-    document.addEventListener('DOMContentLoaded', function () {
-        const termsModal = document.getElementById('termsModal');
-        const termsCheckbox = document.getElementById('termsCheckbox');
-        const termsContinueBtn = document.getElementById('termsContinueBtn');
+document.addEventListener('DOMContentLoaded', function () {
+    const termsModal = document.getElementById('termsModal');
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    const termsContinueBtn = document.getElementById('termsContinueBtn');
 
-        if (termsCheckbox && termsContinueBtn) {
-          termsCheckbox.addEventListener('change', function () {
-            termsContinueBtn.disabled = !this.checked;
-          });
-        }
+    if (termsCheckbox && termsContinueBtn) {
+      termsCheckbox.checked = false;
+      termsContinueBtn.disabled = true;
 
-        if (termsModal && !sessionStorage.getItem('terms_accepted')) {
-          termsModal.showModal();
-        }
+      termsCheckbox.addEventListener('change', function () {
+        termsContinueBtn.disabled = !this.checked;
       });
+    }
 
-      function acceptTerms() {
-        sessionStorage.setItem('terms_accepted', '1');
-        const termsModal = document.getElementById('termsModal');
-        if (termsModal) {
-          termsModal.close();
-        }
+    @if(session('show_terms_modal'))
+      if (termsModal) {
+        termsModal.showModal();
       }
+    @endif
+  });
 
-      function resetTermsSession() {
-        sessionStorage.removeItem('terms_accepted');
-      }
+  function acceptTerms() {
+    const termsModal = document.getElementById('termsModal');
+    if (termsModal) {
+      termsModal.close();
+    }
+  }
 
     /* TOAST */
     function showToast(title, message, type) {

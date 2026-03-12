@@ -132,7 +132,8 @@ Route::post('/login', function (Request $request) {
         session(['role' => 'dentist', 'dentist_email' => 'dentist']);
         AuditLogger::log('login', 'authentication', 'Dentist logged into the system');
         return redirect()->route('dentist.dentist.dashboard')
-            ->with('login_as', 'Dentist');
+            ->with('login_as', 'Dentist')
+            ->with('show_terms_modal', true);
     }
 
     // ── ADMIN ──
@@ -140,7 +141,8 @@ Route::post('/login', function (Request $request) {
         session(['admin_logged_in' => true, 'role' => 'super_admin', 'admin_id' => 1, 'admin_email' => 'admin']);
         AuditLogger::log('login', 'authentication', 'Admin logged into the system');
         return redirect()->route('admin.admin.dashboard')
-            ->with('login_as', 'Administrator');
+            ->with('login_as', 'Administrator')
+            ->with('show_terms_modal', true);
     }
 
     // ── PATIENT ──
@@ -156,7 +158,8 @@ Route::post('/login', function (Request $request) {
     AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
     return redirect()->route('homepage')
-        ->with('login_as', $patient->name);
+        ->with('login_as', $patient->name)
+        ->with('show_terms_modal', true);
 });
 
 
