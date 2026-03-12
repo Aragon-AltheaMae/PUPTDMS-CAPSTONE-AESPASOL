@@ -79,6 +79,8 @@ class PatientAuthController extends Controller
             );
         }
 
+        session()->flash('show_terms_modal', true);
+
         return redirect()->route('dashboard');
     }
 
