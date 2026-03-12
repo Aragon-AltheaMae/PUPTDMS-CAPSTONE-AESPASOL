@@ -259,21 +259,6 @@ Route::prefix('admin')->group(function () {
 
         return response()->json($patients);
     })->name('admin.patients.list');
-<<<<<<< grace
-});
-
-// Academic Periods
-Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
-    ->name('admin.academic_periods');
-Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
-    ->name('admin.academic_periods.store');
-Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
-    ->name('admin.academic_periods.update');
-Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
-    ->name('admin.academic_periods.destroy');
-Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
-    ->name('admin.academic_periods.set_active');
-=======
 
     // ACADEMIC PERIODS
     Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
@@ -286,7 +271,6 @@ Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodCon
         ->name('admin.academic_periods.destroy');
     Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
         ->name('admin.academic_periods.set_active');
->>>>>>> main
 
     // // CLINIC SCHEDULE
     Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
