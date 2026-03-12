@@ -260,7 +260,7 @@ Route::prefix('admin')->group(function () {
         return response()->json($patients);
     })->name('admin.patients.list');
 
-    // ACADEMIC PERIODS
+    // ACADEMIC PERIOD
     Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
         ->name('admin.academic_periods');
     Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
