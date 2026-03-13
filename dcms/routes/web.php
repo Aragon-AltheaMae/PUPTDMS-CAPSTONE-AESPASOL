@@ -321,6 +321,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 });
 
+Route::prefix('admin')->group(function () {
+    Route::get('/service-types', [ServiceTypeController::class, 'index'])->name('admin.service-types');
+    Route::post('/service-types', [ServiceTypeController::class, 'store'])->name('admin.service-types.store');
+    Route::delete('/service-types/{id}', [ServiceTypeController::class, 'destroy'])->name('admin.service-types.destroy');
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN IMPERSONATION ROUTES
@@ -432,11 +439,7 @@ Route::post('/stop-impersonation', function () {
 
 })->name('admin.stop_impersonation');
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/service-types', [ServiceTypeController::class, 'index'])->name('service-types');
-    Route::post('/service-types', [ServiceTypeController::class, 'store'])->name('service-types.store');
-    Route::delete('/service-types/{id}', [ServiceTypeController::class, 'destroy'])->name('service-types.destroy');
-});
+
     
 /*
 |--------------------------------------------------------------------------

@@ -695,66 +695,51 @@ $notifCount = $notifications->count();
             </div>
           </div>
 
-          <!-- ════ STEP 2: SERVICE ════ -->
-          <div class="step-content hidden">
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Service Type</h2>
-            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+         <!-- ════ STEP 2: SERVICE ════ -->
+              <div class="step-content hidden">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Service Type</h2>
+                <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
 
-              @php
-              $services = [
-              ['value' => 'Oral Check-up', 'img' => 'oral-checkup', 'title' => 'Oral Check-Up', 'desc' => 'Routine exam
-              • Consultation'],
-              ['value' => 'Dental Cleaning', 'img' => 'dental-cleaning', 'title' => 'Dental Cleaning', 'desc' => 'Oral
-              hygiene • Surface buildup'],
-              ['value' => 'Restoration & Prosthesis', 'img' => 'restoration-prosthesis', 'title' => 'Restoration &
-              Prosthesis', 'desc' => 'Fillings • Crowns • Bridges'],
-              ['value' => 'Dental Surgery', 'img' => 'dental-surgery', 'title' => 'Dental Surgery', 'desc' =>
-              'Extraction • Implants'],
-              ];
-              @endphp
+                @foreach($serviceTypes as $service)
+                      <label class="service-card-label block cursor-pointer">
+                        <input type="radio" name="service_type" value="{{ $service['name'] }}" class="hidden" {{ $loop->first ? 'required' : '' }}>
+                        <div class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                          <div class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                            @if(!empty($service['img']))
+                              <img src="{{ asset('images/' . $service['img'] . '.png') }}" class="w-6 h-6"
+                                style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                            @else
+                              <i class="fa-solid fa-tooth text-[#8B0000] text-lg"></i>
+                            @endif
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $service['name'] }}</p>
+                            <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $service['desc'] }}</p>
+                          </div>
+                          <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                        </div>
+                      </label>
+                      @endforeach
 
-              @foreach($services as $svc)
-              <label class="service-card-label block cursor-pointer">
-                <input type="radio" name="service_type" value="{{ $svc['value'] }}" class="hidden" {{ $loop->first ?
-                'required' : '' }}>
-                <div
-                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                  <div
-                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                    <img src="images/{{ $svc['img'] }}.png" class="w-6 h-6"
-                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $svc['title'] }}</p>
-                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $svc['desc'] }}</p>
-                  </div>
-                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                  <label class="service-card-label block cursor-pointer sm:col-span-2">
+                    <input type="radio" name="service_type" value="Others" class="hidden">
+                    <div class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                      <div class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                        <img src="images/dental-others.png" class="w-6 h-6"
+                          style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
+                        <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let us know what you need.</p>
+                      </div>
+                      <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                    </div>
+                  </label>
+
                 </div>
-              </label>
-              @endforeach
-
-              <label class="service-card-label block cursor-pointer sm:col-span-2">
-                <input type="radio" name="service_type" value="Others" class="hidden">
-                <div
-                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                  <div
-                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                    <img src="images/dental-others.png" class="w-6 h-6"
-                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
-                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let us know what you
-                      need.</p>
-                  </div>
-                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
-                </div>
-              </label>
-
-            </div>
-          </div>
+              </div>
 
           <!-- ════ STEP 3: DENTAL HISTORY ════ -->
           <div class="step-content hidden">

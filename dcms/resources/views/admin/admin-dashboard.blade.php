@@ -1084,8 +1084,10 @@
               class="fa-solid fa-school"></i> Academic Periods</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
               class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-              class="fa-solid fa-list-check"></i> Service Types</a>
+         <a href="{{ route('admin.service-types') }}"
+                class="nav-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}">
+                <i class="fa-solid fa-list-check"></i> Service Types
+              </a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
               class="fa-solid fa-file-pen"></i> Document Templates</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i

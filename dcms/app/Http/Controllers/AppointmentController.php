@@ -20,8 +20,10 @@ use App\Models\Disease;
 use App\Models\MedicalHistoryDiseaseAnswer;
 
 use App\Models\Patient;
+use App\Models\ServiceType;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
+
 
 class AppointmentController extends Controller
 {
@@ -151,14 +153,25 @@ class AppointmentController extends Controller
 
         $diseases = Disease::orderBy('sort_order')->get();
 
+        $serviceTypes = ServiceType::orderBy('name')->get()->map(function ($service) {
+                return [
+                    'name' => $service->name,
+                    'img' => null,
+                    'desc' => $service->description ?: 'Dental service',
+                    'is_default' => false,
+                ];
+            })->values();
+
         return view('patient.book-appointment', compact(
             'patient',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',
             'unavailableDates',
             'philippineHolidays',
-            'diseases'
+            'diseases',
+            'serviceTypes'
         ));
+
     }
 
     /* =======================
@@ -169,7 +182,7 @@ class AppointmentController extends Controller
         $request->validate([
             'appointment_date'     => 'required|date',
             'appointment_time'     => 'required|string', // "1:00 PM"
-            'service_type'         => 'required|string|max:50',
+            'service_type' => 'required|string|max:255',
             'service_others_text'  => 'required_if:service_type,Others|nullable|string|max:100',
 
             'emergency_person'     => 'required|string|max:50',
@@ -181,6 +194,16 @@ class AppointmentController extends Controller
             'diseases'   => 'array',
             'diseases.*' => 'string|exists:diseases,code',
         ]);
+
+         if (
+            $request->service_type !== 'Others' &&
+            !ServiceType::where('name', $request->service_type)->exists()
+        ) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Invalid service type selected.');
+        }
+
 
         $patientId = session('patient_id');
         if (!$patientId) {
@@ -566,3 +589,4 @@ class AppointmentController extends Controller
         return response()->json(['success' => true]);
     }
 }
+       
