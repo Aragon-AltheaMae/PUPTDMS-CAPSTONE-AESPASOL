@@ -11,9 +11,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  
+
   <script>
     tailwind.config = {
       daisyui: {
@@ -548,6 +549,194 @@
       color: #888;
     }
 
+    /* ── TERMS MODAL ── */
+    #termsModal {
+      border: none;
+      padding: 0;
+      border-radius: 16px;
+      width: min(94vw, 500px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .22), 0 0 0 1px rgba(139, 0, 0, .08);
+      overflow: hidden;
+    }
+
+    #termsModal::backdrop {
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: blur(4px);
+    }
+
+    .terms-header {
+      background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+      padding: 20px 24px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .terms-header-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .terms-header-icon i {
+      font-size: 16px;
+      color: rgba(255, 255, 255, .9);
+    }
+
+    .terms-header h2 {
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -.01em;
+    }
+
+    .terms-header p {
+      color: rgba(255, 255, 255, .65);
+      font-size: .72rem;
+      margin: 2px 0 0;
+    }
+
+    .terms-body {
+      padding: 22px 24px 20px;
+    }
+
+    .terms-body p {
+      font-size: .85rem;
+      color: #4B5563;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+
+    .terms-body strong {
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .terms-divider {
+      height: 1px;
+      background: #f0e8e8;
+      margin: 4px 0 16px;
+    }
+
+    .terms-checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fdf5f5;
+      border: 1px solid #fce8e8;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .terms-checkbox-row input[type="checkbox"] {
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: #8B0000;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .terms-checkbox-row span {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .terms-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .terms-cancel-btn {
+      padding: 9px 20px;
+      border-radius: 9px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
+      font-weight: 600;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .terms-cancel-btn:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+      color: #374151;
+    }
+
+    .terms-continue-btn {
+      padding: 9px 22px;
+      border-radius: 9px;
+      border: none;
+      background: #9CA3AF;
+      color: white;
+      font-weight: 700;
+      font-size: .82rem;
+      cursor: not-allowed;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .terms-continue-btn:not(:disabled) {
+      background: #8B0000;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(139, 0, 0, .3);
+    }
+
+    .terms-continue-btn:not(:disabled):hover {
+      background: #700000;
+      box-shadow: 0 4px 14px rgba(139, 0, 0, .4);
+    }
+
+        [data-theme="dark"] #termsModal {
+      background: #161b22;
+    }
+
+    [data-theme="dark"] .terms-body p {
+      color: #9ca3af;
+    }
+
+    [data-theme="dark"] .terms-body strong {
+      color: #e5e7eb;
+    }
+
+    [data-theme="dark"] .terms-divider {
+      background: #21262d;
+    }
+
+    [data-theme="dark"] .terms-checkbox-row {
+      background: #1c1c1c;
+      border-color: #2d1a1a;
+    }
+
+    [data-theme="dark"] .terms-checkbox-row span {
+      color: #d1d5db;
+    }
+
+    [data-theme="dark"] .terms-cancel-btn {
+      background: #1f2937;
+      border-color: #374151;
+      color: #9ca3af;
+    }
+
+    [data-theme="dark"] .terms-cancel-btn:hover {
+      background: #374151;
+      color: #e5e7eb;
+    }
+
     @media(max-width:640px) {
       #toastContainer {
         left: 12px !important;
@@ -609,9 +798,6 @@ $calendarAppointmentCounts = [
 ];
 }
 @endphp
-
-
-
 
 <body class="bg-white text-[#333333] font-normal">
 
@@ -1151,7 +1337,7 @@ $calendarAppointmentCounts = [
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
     <div
       class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+      <span><span class="text-gray-300">© 1998-2026</span> <span class="font-semibold">Polytechnic University of the
           Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
@@ -1159,6 +1345,41 @@ $calendarAppointmentCounts = [
       <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
     </div>
   </footer>
+
+  <!-- ════════════ TERMS MODAL ════════════ -->
+  <dialog id="termsModal">
+    <div class="terms-header">
+      <div class="terms-header-icon"><i class="fa-solid fa-file-shield"></i></div>
+      <div>
+        <h2>Terms and Conditions</h2>
+        <p>Please read and accept before continuing</p>
+      </div>
+    </div>
+    <div class="terms-body">
+      <p>
+        By clicking <strong>"Continue"</strong>, you consent to the collection, use, and
+        processing of your personal data for legitimate purposes related to this service.
+      </p>
+      <p style="margin-bottom:0;">
+        Your information will be handled in accordance with our <strong>Privacy Policy</strong>
+        and in compliance with the <strong>Data Privacy Act of 2012</strong>.
+      </p>
+      <div class="terms-divider"></div>
+      <label class="terms-checkbox-row">
+        <input type="checkbox" id="termsCheckbox">
+        <span>I have read and agree to the Terms and Conditions and Privacy Policy</span>
+      </label>
+      <div class="terms-actions">
+        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+          @csrf
+          <button type="submit" class="terms-cancel-btn">Cancel</button>
+        </form>
+        <button id="termsContinueBtn" class="terms-continue-btn" disabled onclick="acceptTerms()">
+          <i class="fa-solid fa-check" style="font-size:.75rem; margin-right:5px;"></i> Continue
+        </button>
+      </div>
+    </div>
+  </dialog>
 
   @if(session('activeAppointmentModal'))
   <script>
@@ -1190,6 +1411,34 @@ $calendarAppointmentCounts = [
   @endif
 
   <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const termsModal = document.getElementById('termsModal');
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    const termsContinueBtn = document.getElementById('termsContinueBtn');
+
+    if (termsCheckbox && termsContinueBtn) {
+      termsCheckbox.checked = false;
+      termsContinueBtn.disabled = true;
+
+      termsCheckbox.addEventListener('change', function () {
+        termsContinueBtn.disabled = !this.checked;
+      });
+    }
+
+    @if(session('show_terms_modal'))
+      if (termsModal) {
+        termsModal.showModal();
+      }
+    @endif
+  });
+
+  function acceptTerms() {
+    const termsModal = document.getElementById('termsModal');
+    if (termsModal) {
+      termsModal.close();
+    }
+  }
+
     /* TOAST */
     function showToast(title, message, type) {
       type = type || 'error';

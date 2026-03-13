@@ -11,6 +11,12 @@ class InventoryController extends Controller
 {
     public function index()
     {
+        AuditLogger::log(
+            'view',
+            'inventory',
+            'Dentist viewed inventory page'
+        );
+
         return view('dentist.dentist-inventory');
     }
 
