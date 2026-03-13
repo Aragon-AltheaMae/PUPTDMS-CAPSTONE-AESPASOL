@@ -7,6 +7,7 @@ use App\Models\AcademicPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\AuditLogger;
 
 class AcademicPeriodController extends Controller
 {
@@ -24,8 +25,8 @@ class AcademicPeriodController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('academic_year', 'like', "%{$search}%")
-                  ->orWhere('semester', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('semester', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -42,18 +43,18 @@ class AcademicPeriodController extends Controller
 
                 case 'Upcoming':
                     $query->where('is_active', false)
-                          ->whereDate('start_date', '>', $today);
+                        ->whereDate('start_date', '>', $today);
                     break;
 
                 case 'Ended':
                     $query->where('is_active', false)
-                          ->whereDate('end_date', '<', $today);
+                        ->whereDate('end_date', '<', $today);
                     break;
 
                 case 'Inactive':
                     $query->where('is_active', false)
-                          ->whereDate('start_date', '<=', $today)
-                          ->whereDate('end_date', '>=', $today);
+                        ->whereDate('start_date', '<=', $today)
+                        ->whereDate('end_date', '>=', $today);
                     break;
             }
         }
@@ -63,12 +64,24 @@ class AcademicPeriodController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $calendarPeriods = AcademicPeriod::query()
+            ->orderBy('start_date')
+            ->get();
+
         $activePeriod = AcademicPeriod::where('is_active', true)
             ->orderByDesc('start_date')
             ->first();
 
+        $periods = AcademicPeriod::all();
+        AuditLogger::log(
+            'view',
+            'academic_periods',
+            'Admin viewed academic periods list'
+        );
+
         return view('admin.academic-period', compact(
             'academicPeriods',
+            'calendarPeriods',
             'activePeriod',
             'holidays'
         ));
@@ -102,6 +115,12 @@ class AcademicPeriodController extends Controller
             'description' => $validated['description'] ?? null,
             'is_active' => $isActive,
         ]);
+
+        AuditLogger::log(
+            'create',
+            'academic_periods',
+            "Admin created an academic period"
+        );
 
         return redirect()
             ->route('admin.academic_periods')
@@ -138,6 +157,12 @@ class AcademicPeriodController extends Controller
             'is_active' => $isActive,
         ]);
 
+        AuditLogger::log(
+            'update',
+            'academic_periods',
+            "Admin updated academic period ID {$academicPeriod->id}"
+        );
+
         return redirect()
             ->route('admin.academic_periods')
             ->with('success', 'Academic period updated successfully.');
@@ -147,6 +172,11 @@ class AcademicPeriodController extends Controller
     {
         $academicPeriod->delete();
 
+        AuditLogger::log(
+            'delete',
+            'academic_periods',
+            "Admin deleted academic period ID {$academicPeriod->id}"
+        );
         return redirect()
             ->route('admin.academic_periods')
             ->with('success', 'Academic period deleted successfully.');
