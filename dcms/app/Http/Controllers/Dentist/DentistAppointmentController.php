@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Helpers\AuditLogger;
 
 class DentistAppointmentController extends Controller
 {
@@ -46,6 +47,12 @@ class DentistAppointmentController extends Controller
 
         $notifications = collect($notifications ?? []);
 
+        AuditLogger::log(
+            'view',
+            'dentist_appointments',
+            "Dentist viewed appointments page"
+        );
+
         return view('dentist.dentist-appointments', compact(
             'appointments',
             'upcomingAppointments',
@@ -71,6 +78,12 @@ class DentistAppointmentController extends Controller
             return redirect()->route('dentist.appointments')
                 ->with('error', 'Patient not found for this appointment.');
         }
+
+        AuditLogger::log(
+            'view',
+            'dentist_patients',
+            "Dentist viewed patient profile"
+        );
 
         $today = Carbon::today()->toDateString();
 
@@ -117,6 +130,12 @@ class DentistAppointmentController extends Controller
         }
 
         $appointment->update(['status' => 'cancelled']);
+
+        AuditLogger::log(
+            'update',
+            'dentist_appointments',
+            "Dentist cancelled an appointment"
+        );
 
         return response()->json(['success' => true]);
     }

@@ -1851,7 +1851,7 @@ $notifCount = $notifications->count();
   <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
     <div
       class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of the
+      <span><span class="text-gray-300">© 1998-2026</span> <span class="font-semibold">Polytechnic University of the
           Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>

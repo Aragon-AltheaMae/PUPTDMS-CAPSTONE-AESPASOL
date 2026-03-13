@@ -1168,43 +1168,43 @@
 <body class="bg-[#f5f5f5] text-[#333333]">
 
   @php
-  $calendarPeriods = $academicPeriods->getCollection()
-  ->sortBy('start_date')
-  ->map(function ($period) {
-  return [
-  'id' => $period->id,
-  'academic_year' => $period->academic_year,
-  'semester' => $period->semester,
-  'start_date' => optional($period->start_date)->format('Y-m-d'),
-  'end_date' => optional($period->end_date)->format('Y-m-d'),
-  ];
-  })
-  ->values()
-  ->all();
+  $calendarPeriodsPayload = collect($calendarPeriods ?? [])
+      ->sortBy('start_date')
+      ->map(function ($period) {
+          return [
+              'id' => $period->id,
+              'academic_year' => $period->academic_year,
+              'semester' => $period->semester,
+              'start_date' => optional($period->start_date)->format('Y-m-d'),
+              'end_date' => optional($period->end_date)->format('Y-m-d'),
+          ];
+      })
+      ->values()
+      ->all();
 
   $holidayEvents = collect($holidays ?? [])
-  ->map(function ($name, $date) {
-  return [
-  'date' => $date,
-  'label' => $name,
-  'year' => date('Y', strtotime($date)),
-  'color' => '#6b7280',
-  'type' => 'holiday',
-  ];
-  })
-  ->values()
-  ->all();
+      ->map(function ($name, $date) {
+          return [
+              'date' => $date,
+              'label' => $name,
+              'year' => date('Y', strtotime($date)),
+              'color' => '#6b7280',
+              'type' => 'holiday',
+          ];
+      })
+      ->values()
+      ->all();
 
   $activePeriodPayload = $activePeriod ? [
-  'id' => $activePeriod->id,
-  'academic_year' => $activePeriod->academic_year,
-  'semester' => $activePeriod->semester,
-  'start_date' => optional($activePeriod->start_date)->format('Y-m-d'),
-  'end_date' => optional($activePeriod->end_date)->format('Y-m-d'),
-  'description' => $activePeriod->description,
-  'is_active' => (bool) $activePeriod->is_active,
+      'id' => $activePeriod->id,
+      'academic_year' => $activePeriod->academic_year,
+      'semester' => $activePeriod->semester,
+      'start_date' => optional($activePeriod->start_date)->format('Y-m-d'),
+      'end_date' => optional($activePeriod->end_date)->format('Y-m-d'),
+      'description' => $activePeriod->description,
+      'is_active' => (bool) $activePeriod->is_active,
   ] : null;
-  @endphp
+@endphp
 
   <!-- ════════════ HEADER ════════════ -->
   <header class="header">
@@ -1764,7 +1764,9 @@
               <span id="calYear"
                 class="text-[10px] font-bold text-[#8B0000] bg-red-50 px-2 py-0.5 rounded-full">Academic Periods</span>
             </div>
-            <div id="calendarList" class="p-4 space-y-1 overflow-y-auto scrollbar-thin" style="max-height:320px;">
+            <div id="calendarList"
+              class="p-4 space-y-1 overflow-y-auto scrollbar-thin"
+              style="max-height:485px;">
             </div>
             <div class="px-4 pb-4">
               <a href="https://www.pup.edu.ph/calendar/" target="_blank"
@@ -1820,7 +1822,7 @@
   <footer id="siteFooter" class="bg-[#8B0000] text-[#F4F4F4] p-6">
     <div
       class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-      <span><span class="text-gray-300">© 2025–2026</span> <span class="font-semibold">Polytechnic University of
+      <span><span class="text-gray-300">© 1998-2026</span> <span class="font-semibold">Polytechnic University of
           the Philippines</span></span>
       <span class="hidden sm:inline">|</span>
       <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
@@ -2134,7 +2136,8 @@
       );
     });
 
-    const calendarPeriods = @json($calendarPeriods);
+    //const calendarPeriods = @json($calendarPeriods);
+    const calendarPeriods = @json($calendarPeriodsPayload);
     const holidayEvents = @json($holidayEvents);
 
     function renderCalendar() {
@@ -2145,7 +2148,6 @@
       const periodEvents = [];
 
       calendarPeriods.forEach(period => {
-
         if (period.start_date) {
           periodEvents.push({
             date: period.start_date,
@@ -2165,15 +2167,11 @@
             type: 'end'
           });
         }
-
       });
 
       const events = [...periodEvents, ...holidayEvents].sort((a, b) => a.date.localeCompare(b.date));
-
       const today = todayStr();
-      const upcoming = events.filter(e => e.date >= today).slice(0, 8);
-      const past = events.filter(e => e.date < today).slice(-3);
-      const show = [...past, ...upcoming].sort((a, b) => a.date.localeCompare(b.date));
+      const show = events.sort((a, b) => a.date.localeCompare(b.date));
 
       if (show.length) {
         const years = [...new Set(show.map(e => e.year))];
@@ -2195,29 +2193,30 @@
         const day = d.getDate();
         const isHoliday = e.type === 'holiday';
         let color = e.color;
+
         if (e.type === 'holiday') color = '#16a34a';
         if (e.type === 'start') color = '#8B0000';
         if (e.type === 'end') color = '#2563eb';
 
         return `
-      <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0 ${isPast ? 'opacity-50' : ''}">
-        <div style="flex-shrink:0;width:38px;text-align:center;background:${isToday ? '#8B0000' : isHoliday ? '#f3f4f6' : '#fef2f2'};
-                    border-radius:8px;padding:4px 2px;border:1px solid ${isToday ? '#8B0000' : isHoliday ? '#e5e7eb' : '#fde8e8'}">
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${isToday ? 'rgba(255,255,255,.8)' : isHoliday ? '#6b7280' : '#8B0000'};">${mon}</div>
-          <div style="font-size:16px;font-weight:900;line-height:1;color:${isToday ? '#fff' : isHoliday ? '#374151' : '#8B0000'};">${day}</div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:${isToday ? '700' : '600'};color:${isToday ? '#8B0000' : '#374151'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${e.label}
+          <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0 ${isPast ? 'opacity-50' : ''}">
+            <div style="flex-shrink:0;width:38px;text-align:center;background:${isToday ? '#8B0000' : isHoliday ? '#f3f4f6' : '#fef2f2'};
+                        border-radius:8px;padding:4px 2px;border:1px solid ${isToday ? '#8B0000' : isHoliday ? '#e5e7eb' : '#fde8e8'}">
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${isToday ? 'rgba(255,255,255,.8)' : isHoliday ? '#6b7280' : '#8B0000'};">${mon}</div>
+              <div style="font-size:16px;font-weight:900;line-height:1;color:${isToday ? '#fff' : isHoliday ? '#374151' : '#8B0000'};">${day}</div>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:${isToday ? '700' : '600'};color:${isToday ? '#8B0000' : '#374151'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${e.label}
+              </div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:1px;">
+                ${e.year}${isHoliday ? ' • Holiday' : ''}${isToday ? ' • Today' : ''}
+              </div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px;"></div>
           </div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:1px;">
-            ${e.year}${isHoliday ? ' • Holiday' : ''}${isToday ? ' • Today' : ''}
-          </div>
-        </div>
-        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px;"></div>
-      </div>
-    `;
-      }).join('');
+        `;
+          }).join('');
     }
 
     function todayStr() {

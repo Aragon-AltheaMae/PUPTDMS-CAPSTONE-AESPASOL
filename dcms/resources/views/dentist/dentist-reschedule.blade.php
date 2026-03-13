@@ -898,6 +898,17 @@
         </div>
     </main>
 
+      <!-- FOOTER -->
+  <footer class="footer bg-[#8B0000] text-[#F4F4F4] p-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pl-24 text-sm text-center">
+      <span><span class="text-gray-300">© 1998-2026</span> <span class="font-semibold">Polytechnic University of the Philippines</span></span>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
+      <span class="hidden sm:inline">|</span>
+      <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    </div>
+  </footer>
+
     <!-- Success Modal -->
     <div class="modal-backdrop" id="successModal">
         <div class="modal-box">

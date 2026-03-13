@@ -6,16 +6,15 @@ use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\AuditLogger;
 
 class PatientAuthController extends Controller
 {
-    // SHOW REGISTER FORM
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    // REGISTER PATIENT
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -27,7 +26,7 @@ class PatientAuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        Patient::create([
+        $patient = Patient::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
@@ -36,16 +35,20 @@ class PatientAuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        AuditLogger::log(
+            'register',
+            'patient_auth',
+            "Patient registered an account"
+        );
+
         return redirect()->route('login')->with('success', 'Account created successfully!');
     }
 
-    // SHOW LOGIN FORM
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    // ✅ LOGIN USING AUTH:PATIENT
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -61,12 +64,38 @@ class PatientAuthController extends Controller
 
         $request->session()->regenerate();
 
+        $patient = Auth::guard('patient')->user();
+
+        if ($patient) {
+            session([
+                'patient_id' => $patient->id,
+                'role' => 'patient',
+            ]);
+
+            AuditLogger::log(
+                'login',
+                'patient_auth',
+                "Patient logged in"
+            );
+        }
+
+        session()->flash('show_terms_modal', true);
+
         return redirect()->route('dashboard');
     }
 
-    // ✅ LOGOUT USING AUTH:PATIENT
     public function logout(Request $request)
     {
+        $patient = Auth::guard('patient')->user();
+
+        if ($patient) {
+            AuditLogger::log(
+                'logout',
+                'patient_auth',
+                "Patient logged out"
+            );
+        }
+
         Auth::guard('patient')->logout();
 
         $request->session()->invalidate();
@@ -75,10 +104,17 @@ class PatientAuthController extends Controller
         return redirect()->route('login')->with('success', 'Logged out successfully!');
     }
 
-    // DASHBOARD
     public function dashboard()
     {
         $patient = Auth::guard('patient')->user();
+
+        if ($patient) {
+            AuditLogger::log(
+                'view',
+                'patient_dashboard',
+                "Patient viewed dashboard"
+            );
+        }
 
         return view('dashboard', compact('patient'));
     }
