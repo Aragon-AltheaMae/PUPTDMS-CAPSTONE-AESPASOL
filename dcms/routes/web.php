@@ -27,6 +27,8 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
 
 use App\Http\Controllers\Admin\AdminPatientController;
+use App\Http\Controllers\Admin\ServiceTypeController;
+
 
 
 /*
@@ -429,6 +431,12 @@ Route::post('/stop-impersonation', function () {
     return redirect()->route('admin.admin.dashboard');
 
 })->name('admin.stop_impersonation');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/service-types', [ServiceTypeController::class, 'index'])->name('service-types');
+    Route::post('/service-types', [ServiceTypeController::class, 'store'])->name('service-types.store');
+    Route::delete('/service-types/{id}', [ServiceTypeController::class, 'destroy'])->name('service-types.destroy');
+});
     
 /*
 |--------------------------------------------------------------------------
@@ -730,3 +738,4 @@ Route::prefix('report')->middleware(['role:dentist', 'permission:manage_reports'
         return view('dentist.dental-services');
     })->name('dentist.dentist.report.dental-services');
 });
+
