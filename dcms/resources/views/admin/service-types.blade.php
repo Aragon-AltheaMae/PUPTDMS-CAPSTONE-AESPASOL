@@ -569,46 +569,69 @@
 
             <!-- Add form -->
             <div class="st-add-bar">
-                <form method="POST" action="{{ route('admin.service-types.store') }}">
+              <form method="POST" action="{{ route('admin.service-types.store') }}">
                     @csrf
-                    <div class="flex gap-3 items-center">
-                        <div class="st-input-wrap">
-                            <i class="fa-solid fa-tag st-input-icon"></i>
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Enter new service type name…"
-                                required
-                                autocomplete="off"
-                                value="{{ old('name') }}"
-                                class="st-input"
-                            >
+
+                    <div class="flex flex-col gap-3">
+                        <div class="flex gap-3 items-center">
+                            <div class="st-input-wrap">
+                                <i class="fa-solid fa-tag st-input-icon"></i>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Enter new service type name…"
+                                    required
+                                    autocomplete="off"
+                                    value="{{ old('name') }}"
+                                    class="st-input"
+                                >
+                            </div>
+
+                            <button type="submit" class="btn-add-service">
+                                <i class="fa-solid fa-plus" style="font-size:12px;"></i>
+                                Add Service
+                            </button>
                         </div>
-                        <button type="submit" class="btn-add-service">
-                            <i class="fa-solid fa-plus" style="font-size:12px;"></i>
-                            Add Service
-                        </button>
+
+                        <div>
+                            <textarea
+                                name="description"
+                                placeholder="Enter service description…"
+                                class="st-input"
+                                style="height:90px; padding:12px 16px; resize:none;"
+                            >{{ old('description') }}</textarea>
+                        </div>
                     </div>
+
                     @error('name')
                         <div class="st-field-error">
                             <i class="fa-solid fa-circle-exclamation" style="font-size:11px;"></i>
                             {{ $message }}
                         </div>
                     @enderror
+
+                    @error('description')
+                        <div class="st-field-error">
+                            <i class="fa-solid fa-circle-exclamation" style="font-size:11px;"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </form>
+                
             </div>
 
             <!-- Column headers -->
-            <div class="st-table-head">
+            <div class="st-table-head" style="grid-template-columns: 68px 1fr 1.3fr auto;">
                 <span class="st-col-label">ID</span>
                 <span class="st-col-label">Service Name</span>
+                <span class="st-col-label">Description</span>
                 <span class="st-col-label">Action</span>
             </div>
 
             <!-- Service rows -->
             <div>
                 @forelse($services as $i => $service)
-                    <div class="st-row" style="animation-delay: {{ $i * 45 }}ms;">
+                    <div class="st-row" style="grid-template-columns: 68px 1fr 1.3fr auto; animation-delay: {{ $i * 45 }}ms;">
 
                         <div>
                             <span class="st-id-badge">#{{ $service->id }}</span>
@@ -618,9 +641,13 @@
                             <div class="st-service-icon">
                                 <i class="fa-solid fa-tooth"></i>
                             </div>
-                            <span style="font-weight:600; font-size:14px; color:#2D2420; truncate;">
+                            <span style="font-weight:600; font-size:14px; color:#2D2420;">
                                 {{ $service->name }}
                             </span>
+                        </div>
+
+                        <div style="font-size:13px; color:#8A7A6F; line-height:1.45;">
+                            {{ $service->description ?: 'No description provided.' }}
                         </div>
 
                         <div>

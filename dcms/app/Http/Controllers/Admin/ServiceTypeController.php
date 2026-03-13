@@ -20,14 +20,16 @@ class ServiceTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:service_types,name'
+            'name' => 'required|string|max:255|unique:service_types,name',
+            'description' => 'nullable|string|max:255',
         ]);
 
         ServiceType::create([
-            'name' => $request->name
+            'name' => $request->name,
+            'description' => $request->description,
         ]);
 
-        return back()->with('success','Service type added');
+        return back()->with('success', 'Service type added');
     }
 
 
