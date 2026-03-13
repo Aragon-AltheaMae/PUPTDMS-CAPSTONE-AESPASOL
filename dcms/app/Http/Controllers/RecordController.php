@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Helpers\AuditLogger;
 
 class RecordController extends Controller
 {
@@ -31,6 +32,12 @@ class RecordController extends Controller
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
             ->first();
+
+        AuditLogger::log(
+            'view',
+            'records',
+            "Patient viewed dental records"
+        );
 
         return view('patient.record', compact('patient', 'records', 'upcomingAppointment'));
     }

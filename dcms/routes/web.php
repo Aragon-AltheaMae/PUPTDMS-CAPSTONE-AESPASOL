@@ -25,10 +25,10 @@ use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
-
 use App\Http\Controllers\Admin\AdminPatientController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 
+use App\Http\Controllers\Admin\ClinicScheduleController;
 
 
 /*
@@ -117,7 +117,8 @@ Route::post('/register', function (Request $request) {
             ]);
         });
 
-        return redirect('/login')->with('success', 'Account created successfully! You can now log in.');
+        return redirect('/login')
+            ->with('success', 'Account created successfully! You can now log in.');
     } catch (\Exception $e) {
         return redirect()->back()
             ->withInput($request->except('password', 'password_confirmation'))
@@ -130,36 +131,57 @@ Route::post('/login', function (Request $request) {
 
     // ── DENTIST ──
     if ($request->email === 'dentist' && $request->password === 'dentist123') {
-        session(['role' => 'dentist', 'dentist_email' => 'dentist']);
+        session([
+            'role' => 'dentist',
+            'dentist_email' => 'dentist'
+        ]);
+
         AuditLogger::log('login', 'authentication', 'Dentist logged into the system');
+
         return redirect()->route('dentist.dentist.dashboard')
-            ->with('login_as', 'Dentist');
+            ->with('login_as', 'Dentist')
+            ->with('show_terms_modal', true);
     }
 
     // ── ADMIN ──
     if ($request->email === 'admin' && $request->password === 'admin123') {
-        session(['admin_logged_in' => true, 'role' => 'super_admin', 'admin_id' => 1, 'admin_email' => 'admin']);
+        session([
+            'admin_logged_in' => true,
+            'role' => 'super_admin',
+            'admin_id' => 1,
+            'admin_email' => 'admin'
+        ]);
+
         AuditLogger::log('login', 'authentication', 'Admin logged into the system');
+
         return redirect()->route('admin.admin.dashboard')
-            ->with('login_as', 'Administrator');
+            ->with('login_as', 'Administrator')
+            ->with('show_terms_modal', true);
     }
 
     // ── PATIENT ──
     $patient = Patient::where('email', $request->email)->first();
+
     if (!$patient) {
         return back()->with('error', 'No account associated with this email.');
     }
+
     if (!Hash::check($request->password, $patient->password)) {
         return back()->with('error', 'Incorrect password. Please try again.');
     }
 
-    session(['role' => 'patient', 'patient_id' => $patient->id, 'email' => $patient->email]);
+    session([
+        'role' => 'patient',
+        'patient_id' => $patient->id,
+        'email' => $patient->email
+    ]);
+
     AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
     return redirect()->route('homepage')
-        ->with('login_as', $patient->name);
+        ->with('login_as', $patient->name)
+        ->with('show_terms_modal', true);
 });
-
 
 // Dentist Login POST (hard-coded for now)
 // Route::post('/dentist/login', function (Request $request) {
@@ -218,7 +240,7 @@ Route::prefix('admin')->group(function () {
 
         return view('admin.admin-dashboard');
     })->name('admin.admin.dashboard');
-    
+
     // ROLE PERMISSIONS
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
         ->name('admin.role_permissions');
@@ -240,6 +262,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/system-logs', [SystemLogController::class, 'index'])
         ->name('admin.system_logs');
 
+    Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
+        ->name('admin.system_logs.fetch');
+
     // PATIENT DIRECTORY
     Route::get('/patient-directory', [AdminPatientController::class, 'index'])
         ->name('admin.patient_directory');
@@ -251,21 +276,15 @@ Route::prefix('admin')->group(function () {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $patients = Patient::select('id','name','email','phone')
+        $patients = Patient::select('id', 'name', 'email', 'phone')
             ->orderBy('name')
             ->get();
 
         return response()->json($patients);
-
     })->name('admin.patients.list');
 
-
-    
-
-});
-
-// Academic Periods
-Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
+    // ACADEMIC PERIOD
+    Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
         ->name('admin.academic_periods');
     Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
         ->name('admin.academic_periods.store');
@@ -276,21 +295,47 @@ Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
     Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
         ->name('admin.academic_periods.set_active');
 
+    // // CLINIC SCHEDULE
+    Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
+        ->name('admin.clinic_schedule');
+
+    Route::post('/clinic-schedule', [ClinicScheduleController::class, 'store'])
+        ->name('admin.clinic_schedule.store');
+
+    Route::put('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'update'])
+        ->name('admin.clinic_schedule.update');
+
+    Route::delete('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'destroy'])
+        ->name('admin.clinic_schedule.destroy');
+
+    Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
+        ->name('admin.clinic_schedule.block');
+
+    Route::delete('/clinic-schedule/block-date/{blockedDate}', [ClinicScheduleController::class, 'unblockDate'])
+        ->name('admin.clinic_schedule.unblock');
+
+    Route::get('/clinic-schedule/unavailable-dates', [ClinicScheduleController::class, 'unavailableDates'])
+        ->name('admin.clinic_schedule.unavailable_dates');
+
+    Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
+        ->name('admin.clinic_schedule.slots');
+});
+
 // START IMPERSONATION
-    Route::post('/impersonate', function (Request $request) {
-        if (!session('admin_logged_in') || session('role') !== 'super_admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+Route::post('/impersonate', function (Request $request) {
+    if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
 
-        $patients = Patient::select('id','name','email','phone')
-            ->orderBy('name')
-            ->get();
+    $patients = Patient::select('id', 'name', 'email', 'phone')
+        ->orderBy('name')
+        ->get();
 
-        return response()->json($patients);
+    return response()->json($patients);
+})->name('admin.patients.list');
 
-    })->name('admin.patients.list');
 
-/*
+/*  
 |--------------------------------------------------------------------------
 | ADMIN USER MANAGEMENT ROUTES
 |--------------------------------------------------------------------------
@@ -318,7 +363,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::put('/user-management/patient/{patient}/reset-password', [UserManagementController::class, 'resetPatientPassword'])
         ->name('user_management.patient.reset_password');
-
 });
 
 Route::prefix('admin')->group(function () {
@@ -407,7 +451,6 @@ Route::post('/impersonate', function (Request $request) {
     return response()->json([
         'message' => 'Unsupported role: ' . $targetRole
     ], 422);
-
 })->name('admin.impersonate');
 
 
@@ -436,7 +479,6 @@ Route::post('/stop-impersonation', function () {
     ]);
 
     return redirect()->route('admin.admin.dashboard');
-
 })->name('admin.stop_impersonation');
 
 
@@ -479,6 +521,10 @@ Route::middleware(['role:patient'])->group(function () {
 
     Route::get('/about-us', fn() => view('patient.about-us'))
         ->name('patient.about.us');
+    
+    // Clinic Schedule
+    Route::get('/book-appointment/slots', [AppointmentController::class, 'slotsForDate'])
+    ->name('book.appointment.slots');
 });
 
 /*
