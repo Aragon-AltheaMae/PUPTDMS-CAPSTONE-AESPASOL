@@ -170,21 +170,6 @@ class AppointmentController extends Controller
             "Patient opened book appointment page"
         );
 
-        AuditLogger::log(
-            'view',
-            'appointments',
-            "Patient opened book appointment page"
-        );
-
-        $serviceTypes = ServiceType::orderBy('name')->get()->map(function ($service) {
-                return [
-                    'name' => $service->name,
-                    'img' => null,
-                    'desc' => $service->description ?: 'Dental service',
-                    'is_default' => false,
-                ];
-            })->values();
-
         return view('patient.book-appointment', compact(
             'patient',
             'appointmentCountsPerDay',
