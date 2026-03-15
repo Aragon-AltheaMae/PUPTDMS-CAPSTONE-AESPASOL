@@ -9,15 +9,12 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <script>
-        tailwind.config = {
-            daisyui: {
-                themes: false
-            }
-        }
+        tailwind.config = { daisyui: { themes: false } }
     </script>
 
     <style>
@@ -27,6 +24,13 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --crimson: #8B0000;
+            --crimson-dark: #6b0000;
+            --crimson-light: #fef2f2;
+            --header-h: 64px;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: #F8F6F3;
@@ -34,7 +38,6 @@
             margin: 0;
         }
 
-        /* ── Scrollbar ── */
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -55,13 +58,13 @@
             left: 0;
             right: 0;
             z-index: 50;
-            background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
-            padding: 0 2rem;
-            height: 62px;
+            height: var(--header-h);
+            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 20px rgba(139, 0, 0, .25);
+            padding: 0 1.5rem;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .08), 0 4px 24px rgba(139, 0, 0, .3);
         }
 
         .header-left {
@@ -71,103 +74,133 @@
         }
 
         .header-logo {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(255, 255, 255, .2);
+            margin: 0 .25rem;
         }
 
         .header-title {
-            font-size: .95rem;
+            font-size: .85rem;
             font-weight: 700;
             color: #fff;
-            letter-spacing: .01em;
+            letter-spacing: .02em;
+            text-transform: uppercase;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: .75rem;
         }
 
-        .notif-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, .12);
-            border: none;
-            cursor: pointer;
+        .hdr-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .12);
             color: #fff;
-            font-size: .95rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background .15s;
+            font-size: .9rem;
+            transition: background .15s, transform .15s;
             position: relative;
+            text-decoration: none;
         }
 
-        .notif-btn:hover {
-            background: rgba(255, 255, 255, .22);
+        .hdr-icon-btn:hover {
+            background: rgba(255, 255, 255, .2);
+            transform: translateY(-1px);
         }
 
         .notif-badge {
             position: absolute;
-            top: -3px;
-            right: -3px;
-            background: #ff6b6b;
+            top: -4px;
+            right: -4px;
+            background: #ff4757;
             color: #fff;
-            font-size: .6rem;
-            font-weight: 700;
-            width: 16px;
-            height: 16px;
+            font-size: .58rem;
+            font-weight: 800;
+            width: 17px;
+            height: 17px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid #8B0000;
+            border: 2px solid var(--crimson);
+            box-shadow: 0 2px 6px rgba(255, 71, 87, .5);
         }
 
-        .header-user {
+        .header-user-btn {
             display: flex;
             align-items: center;
             gap: .6rem;
+            padding: .35rem .75rem .35rem .35rem;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 40px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .header-user-btn:hover {
+            background: rgba(255, 255, 255, .18);
         }
 
         .header-avatar {
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, .4);
             object-fit: cover;
         }
 
+        .header-user-text {
+            line-height: 1;
+        }
+
         .header-name {
-            font-size: .82rem;
-            font-weight: 600;
+            font-size: .78rem;
+            font-weight: 700;
             color: #fff;
-            line-height: 1.2;
         }
 
         .header-role {
-            font-size: .7rem;
-            color: rgba(255, 255, 255, .7);
-            font-style: italic;
+            font-size: .64rem;
+            color: rgba(255, 255, 255, .65);
+            margin-top: 2px;
+        }
+
+        /* Notification dropdown */
+        #notifDropdown {
+            position: relative;
         }
 
         #notifMenu {
             position: absolute;
             right: 0;
             top: calc(100% + 10px);
-            width: 300px;
+            width: 320px;
             background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
-            border: 1px solid #f0e6e6;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
             opacity: 0;
-            transform: scale(.95) translateY(-6px);
+            transform: scale(.95) translateY(-8px);
             pointer-events: none;
-            transition: all .2s;
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
             transform-origin: top right;
             z-index: 100;
+            overflow: hidden;
         }
 
         #notifMenu.open {
@@ -176,19 +209,164 @@
             pointer-events: auto;
         }
 
-        #notifDropdown {
+        .notif-header {
+            padding: .85rem 1.1rem .7rem;
+            font-weight: 800;
+            color: var(--crimson);
+            font-size: .8rem;
+            border-bottom: 1px solid #fce8e8;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        /* User dropdown */
+        #userDropdown {
             position: relative;
+        }
+
+        #userMenu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 210px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
+            opacity: 0;
+            transform: scale(.95) translateY(-8px);
+            pointer-events: none;
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
+            transform-origin: top right;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        #userMenu.open {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .user-menu-header {
+            padding: .85rem 1rem .7rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .user-menu-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .user-menu-name {
+            font-size: .78rem;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .user-menu-role {
+            font-size: .65rem;
+            color: #9ca3af;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .65rem 1rem;
+            font-size: .76rem;
+            font-weight: 600;
+            color: #374151;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .12s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .user-menu-item:hover {
+            background: #f9fafb;
+        }
+
+        .user-menu-item i {
+            width: 14px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .user-menu-item.danger {
+            color: #ef4444;
+        }
+
+        .user-menu-item.danger i {
+            color: #ef4444;
+        }
+
+        .user-menu-item.danger:hover {
+            background: #fef2f2;
+        }
+
+        .user-menu-sep {
+            height: 1px;
+            background: #f3f4f6;
+            margin: 3px 0;
+        }
+
+        /* Dark mode user menu */
+        [data-theme="dark"] #userMenu {
+            background: #161b22;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .06);
+        }
+
+        [data-theme="dark"] .user-menu-header {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .user-menu-name {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .user-menu-item {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .user-menu-item:hover {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .user-menu-item.danger {
+            color: #f87171;
+        }
+
+        [data-theme="dark"] .user-menu-item.danger:hover {
+            background: rgba(239, 68, 68, .1);
+        }
+
+        [data-theme="dark"] .user-menu-sep {
+            background: #21262d;
         }
 
         /* ── SIDEBAR ── */
         #sidebar {
             position: fixed;
             left: 0;
-            top: 62px;
-            width: 240px;
-            height: calc(100vh - 62px);
+            top: var(--header-h);
+            width: var(--sidebar-w);
+            height: calc(100vh - var(--header-h));
             background: #fff;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, .07);
+            border-right: 1px solid #eff0f2;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, .04);
             z-index: 40;
             display: flex;
             flex-direction: column;
@@ -199,123 +377,127 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 12px 0 6px;
+            padding: 16px 10px 8px;
         }
 
-        .sidebar-inner::-webkit-scrollbar {
-            width: 4px;
+        .nav-section-label {
+            font-size: .6rem;
+            font-weight: 800;
+            color: #b0b7c3;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            padding: 0 8px 6px;
+            margin-top: 4px;
         }
 
-        .sidebar-inner::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 4px;
-        }
-
-        /* Group header — static, not clickable for collapse */
         .nav-group {
-            margin: 0 8px 2px;
+            margin-bottom: 2px;
         }
 
-        .group-header {
+        .group-trigger {
             display: flex;
             align-items: center;
-            padding: 7px 8px 5px;
-            color: #6b7280;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: default;
         }
 
-        .group-icon {
-            width: 34px;
-            height: 34px;
+        .group-icon-wrap {
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
-            flex-shrink: 0;
+            background: var(--crimson-light);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 13px;
+            color: var(--crimson);
+            flex-shrink: 0;
+            transition: all .2s;
         }
 
-        .group-header.active-group .group-icon {
-            background: #8B0000;
+        .active-group .group-icon-wrap {
+            background: var(--crimson);
             color: #fff;
             box-shadow: 0 4px 12px rgba(139, 0, 0, .3);
         }
 
-        .group-label-wrap {
+        .group-text {
             flex: 1;
-            text-align: left;
             overflow: hidden;
-            margin-left: 10px;
         }
 
         .group-label {
-            font-size: .72rem;
-            font-weight: 700;
-            white-space: nowrap;
-            line-height: 1.2;
+            font-size: .7rem;
+            font-weight: 800;
+            color: var(--crimson);
             display: block;
             text-transform: uppercase;
             letter-spacing: .06em;
+            white-space: nowrap;
         }
 
         .group-sublabel {
             font-size: .62rem;
-            color: #b0b8c4;
-            white-space: nowrap;
+            color: #adb5bd;
             display: block;
             margin-top: 1px;
+            white-space: nowrap;
         }
 
-        /* Group body always visible */
         .group-body {
-            padding-bottom: 4px;
+            padding: 2px 0 6px;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 7px 10px 7px 44px;
-            border-radius: 8px;
-            margin: 1px 4px;
-            font-size: .77rem;
+            gap: 9px;
+            padding: 7px 10px 7px 42px;
+            border-radius: 9px;
+            margin: 1px 2px;
+            font-size: .76rem;
             font-weight: 500;
-            color: #6b7280;
+            color: #4a5568;
             text-decoration: none;
             transition: all .15s;
             white-space: nowrap;
         }
 
         .nav-link:hover {
-            background: #fef2f2;
-            color: #8B0000;
-            padding-left: 48px;
+            background: var(--crimson-light);
+            color: var(--crimson);
         }
 
         .nav-link.active {
-            background: #8B0000;
+            background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(139, 0, 0, .25);
+            box-shadow: 0 3px 10px rgba(139, 0, 0, .25);
+            font-weight: 600;
         }
 
         .nav-link.active:hover {
-            padding-left: 44px;
+            padding-left: 14px;
             background: #8B0000;
         }
 
         .nav-link i {
-            width: 16px;
+            width: 14px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
+            flex-shrink: 0;
         }
 
         .nav-sep {
             height: 1px;
             background: #f3f4f6;
-            margin: 8px 12px;
+            margin: 10px 6px;
         }
 
+        /* Sidebar bottom */
         .sidebar-bottom {
-            padding: 8px 8px 12px;
+            padding: 10px 10px 14px;
             border-top: 1px solid #f3f4f6;
             flex-shrink: 0;
         }
@@ -324,32 +506,29 @@
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             width: 100%;
-            height: 34px;
-            background: #F5F5F5;
-            border: 1px solid #E0E0E0;
-            border-radius: 24px;
+            height: 36px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 40px;
+            padding: 3px;
         }
 
         .theme-option {
             position: relative;
             z-index: 2;
             flex: 1;
-            height: 34px;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             background: transparent;
             border: none;
             cursor: pointer;
-            color: #9CA3AF;
-            transition: color .2s ease;
-            border-radius: 8px;
-        }
-
-        .theme-option i {
-            font-size: 16px;
+            color: #9ca3af;
+            transition: color .2s;
+            border-radius: 40px;
+            font-size: 13px;
         }
 
         .theme-option.active {
@@ -358,15 +537,15 @@
 
         .theme-indicator {
             position: absolute;
-            background: white;
-            border-radius: 20px;
+            background: #fff;
+            border-radius: 40px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
             transition: all .3s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
-            width: calc(50% - 4px);
-            height: calc(100% - 8px);
-            left: 4px;
-            top: 4px;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            left: 3px;
+            top: 3px;
         }
 
         .theme-indicator.dark-mode {
@@ -384,13 +563,61 @@
             background: none;
             cursor: pointer;
             color: #ef4444;
-            font-size: .77rem;
+            font-size: .76rem;
             font-weight: 600;
             transition: background .15s;
+            margin-top: 6px;
+            font-family: 'Inter', sans-serif;
         }
 
         .logout-btn:hover {
             background: #fef2f2;
+        }
+
+        .logout-icon {
+            width: 28px;
+            height: 28px;
+            background: #fef2f2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+
+        /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+        #siteFooter {
+            background: var(--crimson);
+            color: rgba(255, 255, 255, .8);
+            padding: 1.25rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: .74rem;
+        }
+
+        .footer-inner a {
+            color: rgba(255, 255, 255, .7);
+            text-decoration: none;
+            transition: color .15s;
+        }
+
+        .footer-inner a:hover {
+            color: #fff;
+        }
+
+        .footer-dot {
+            color: rgba(255, 255, 255, .3);
         }
 
         /* ── LAYOUT ── */
@@ -491,142 +718,276 @@
             border-color: #21262d;
         }
 
-        /* ── MOBILE BOTTOM NAV ── */
-        #adminMobileNav {
+        /* ── MOBILE DRAWER ── */
+        #mobileMenuBtn {
+            display: none;
+            background: rgba(255, 255, 255, .12);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+
+        #mobileMenuBtn:hover {
+            background: rgba(255, 255, 255, .22);
+        }
+
+        #mobileDrawerOverlay {
             display: none;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 68px;
-            background: #fff;
-            border-top: 1px solid #f0e0e0;
-            z-index: 200;
-            align-items: center;
-            justify-content: space-around;
-            box-shadow: 0 -4px 20px rgba(139, 0, 0, .10);
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 998;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity .25s;
         }
 
-        .adm-mob-item {
-            flex: 1;
-            height: 68px;
+        #mobileDrawerOverlay.open {
+            opacity: 1;
+        }
+
+        #mobileDrawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: #fff;
+            z-index: 999;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            font-size: 9.5px;
-            font-weight: 600;
-            color: #9ca3af;
-            text-decoration: none;
-            transition: color .2s;
-            position: relative;
-            cursor: pointer;
-            border: none;
-            background: none;
-            padding: 0;
-        }
-
-        .adm-mob-item.active {
-            color: #8B0000;
-        }
-
-        .adm-mob-item i {
-            font-size: 20px;
-        }
-
-        .adm-mob-item.active i {
-            filter: drop-shadow(0 0 6px rgba(139, 0, 0, .35));
-        }
-
-        /* FAB center button */
-        #admMobFabWrap {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #admMobFab {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B0000, #660000);
-            color: white;
-            border: none;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(139, 0, 0, .45);
-            cursor: pointer;
-            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
-            position: relative;
-            top: -10px;
-        }
-
-        #admMobFab.open {
-            transform: rotate(45deg) translateY(-10px);
-        }
-
-        /* FAB menu (quick nav) */
-        #admMobFabMenu {
-            position: fixed;
-            bottom: 86px;
-            left: 50%;
-            transform: translateX(-50%) scaleY(0);
-            transform-origin: bottom center;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(139, 0, 0, .18);
-            border: 1px solid #f5e8e8;
-            min-width: 220px;
+            transform: translateX(-100%);
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 4px 0 32px rgba(0, 0, 0, .15);
             overflow: hidden;
-            transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), opacity .2s;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 300;
         }
 
-        #admMobFabMenu.open {
-            transform: translateX(-50%) scaleY(1);
-            opacity: 1;
-            pointer-events: auto;
+        #mobileDrawer.open {
+            transform: translateX(0);
         }
 
-        .adm-fab-item {
+        .drawer-header {
+            background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
+            padding: 20px 18px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 13px 18px;
-            font-size: 13.5px;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .drawer-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drawer-logo {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .drawer-title {
+            font-size: .82rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: .01em;
+            line-height: 1.2;
+        }
+
+        .drawer-subtitle {
+            font-size: .75rem;
+            color: #F4F4F4;
             font-weight: 600;
-            color: #333;
-            text-decoration: none;
-            transition: background .15s;
-            border-bottom: 1px solid #fdf5f5;
         }
 
-        .adm-fab-item:last-child {
-            border-bottom: none;
-        }
-
-        .adm-fab-item:hover {
-            background: #fff0f0;
-            color: #8B0000;
-        }
-
-        .adm-fab-item .adm-fab-icon {
+        .drawer-close {
             width: 32px;
             height: 32px;
-            background: #fef2f2;
             border-radius: 8px;
+            background: rgba(255, 255, 255, .15);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background .15s;
+        }
+
+        .drawer-close:hover {
+            background: rgba(255, 255, 255, .28);
+        }
+
+        /* User info strip */
+        .drawer-user {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fdf9f9;
+            flex-shrink: 0;
+        }
+
+        .drawer-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .drawer-user-name {
+            font-size: .82rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .drawer-user-role {
+            font-size: .68rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .drawer-inner {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0 6px;
+        }
+
+        .drawer-inner::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .drawer-inner::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+
+        .drawer-group {
+            margin: 0 8px 2px;
+        }
+
+        .drawer-group-header {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px 4px;
+            color: #6b7280;
+        }
+
+        .drawer-group-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
             color: #8B0000;
             flex-shrink: 0;
+        }
+
+        .drawer-group-label {
+            font-size: .68rem;
+            font-weight: 700;
+            color: #8B0000;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-left: 8px;
+        }
+
+        .drawer-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px 8px 40px;
+            border-radius: 8px;
+            margin: 1px 4px;
+            font-size: .78rem;
+            font-weight: 500;
+            color: #374151;
+            text-decoration: none;
+            transition: all .15s;
+        }
+
+        .drawer-link:hover {
+            background: #fef2f2;
+            color: #8B0000;
+            padding-left: 44px;
+        }
+
+        .drawer-link.active {
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .2);
+        }
+
+        .drawer-link.active:hover {
+            padding-left: 40px;
+        }
+
+        .drawer-link i {
+            width: 15px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .drawer-sep {
+            height: 1px;
+            background: #f3f4f6;
+            margin: 6px 12px;
+        }
+
+        .drawer-bottom {
+            padding: 10px 12px 14px;
+            border-top: 1px solid #f3f4f6;
+            flex-shrink: 0;
+        }
+
+        /* dark mode drawer */
+        [data-theme="dark"] #mobileDrawer {
+            background: #0d1117;
+        }
+
+        [data-theme="dark"] .drawer-user {
+            background: #161b22;
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .drawer-user-name {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .drawer-link {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .drawer-link:hover {
+            background: rgba(139, 0, 0, .2);
+            color: #fff;
+        }
+
+        [data-theme="dark"] .drawer-sep {
+            background: #21262d;
+        }
+
+        [data-theme="dark"] .drawer-bottom {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .drawer-group-label {
+            color: #6b7280;
         }
 
         /* ── MOBILE RESPONSIVE ── */
@@ -642,11 +1003,14 @@
 
             #siteFooter {
                 margin-left: 0 !important;
-                margin-bottom: 68px;
             }
 
-            #adminMobileNav {
+            #mobileMenuBtn {
                 display: flex;
+            }
+
+            #mainContent {
+                padding-bottom: 2rem !important;
             }
 
             .header {
@@ -657,36 +1021,72 @@
                 display: none;
             }
 
-            .sl-stats {
-                grid-template-columns: repeat(2, 1fr);
+            /* ── Page title stacks vertically ── */
+            .flex.flex-col.sm\:flex-row.sm\:items-end.sm\:justify-between {
+                flex-direction: column !important;
+                align-items: stretch !important;
             }
 
-            .sl-table thead th:nth-child(6),
-            .sl-table tbody td:nth-child(6),
-            .sl-table thead th:nth-child(7),
-            .sl-table tbody td:nth-child(7) {
-                display: none;
-            }
-
-            #mainContent .grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            #mainContent .grid > div:first-child {
-                width: 100%;
-            }
-
-            .accent-card {
-                margin-top: 12px;
-                display: none;
-            }
-
-            .perm-row {
-                padding: 10px 14px 10px 14px;
-                flex-wrap: wrap;
+            .page-title-h1 {
+                flex-direction: column;
+                align-items: flex-start;
                 gap: 8px;
             }
 
+            .page-title-badge {
+                font-size: 18px;
+                padding: 6px 14px;
+            }
+
+            #newRoleBtn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* ── Two-column grid collapses to single column ── */
+            .grid.gap-6[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* ── Accent card hidden on mobile ── */
+            .accent-card {
+                display: none;
+            }
+
+            /* ── Role cards: 2-col grid ── */
+            #roleCardList {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .role-card {
+                padding: 10px 12px;
+            }
+
+            /* ── Toolbar ── */
+            .flex.flex-wrap.items-center.gap-3.mb-5 {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .flex.flex-wrap.items-center.gap-3.mb-5>div,
+            .flex.flex-wrap.items-center.gap-3.mb-5>.flex {
+                width: 100%;
+            }
+
+            .flex.gap-2.w-full.sm\:w-auto {
+                width: 100% !important;
+            }
+
+            #collapseBtn,
+            #resetDefaultsBtn {
+                flex: 1;
+                justify-content: center;
+                text-align: center;
+            }
+
+            /* ── Permission group header ── */
             .perm-group-header {
                 padding: 12px 14px;
                 gap: 10px;
@@ -703,15 +1103,31 @@
                 display: none;
             }
 
+            /* ── Permission rows ── */
+            .perm-row {
+                padding: 10px 14px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* Remove left indent on mobile since there's no dot-row space */
+            .perm-row {
+                padding-left: 14px;
+            }
+
+            /* ── Footer bar ── */
             .footer-bar {
                 flex-direction: column;
                 align-items: stretch;
                 padding: 14px 16px;
+                gap: 10px;
             }
 
-            .footer-bar > div:last-child {
+            .footer-bar>div:last-child {
+                display: flex;
                 flex-direction: column;
                 width: 100%;
+                gap: 8px;
             }
 
             .btn-save,
@@ -720,14 +1136,29 @@
                 justify-content: center;
             }
 
-            #roleCardList {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+            /* ── Modals full-width on mobile ── */
+            .delete-modal-box,
+            .reset-modal-box {
+                width: calc(100vw - 32px);
+                padding: 24px 20px 20px;
             }
 
-            .role-card {
-                padding: 10px 12px;
+            /* ── VA panel full-width ── */
+            .va-panel {
+                width: calc(100vw - 24px) !important;
+                max-height: calc(100vh - 80px);
+            }
+
+            .va-head {
+                padding: 16px 18px 14px;
+            }
+
+            .va-body {
+                padding: 14px 18px;
+            }
+
+            .va-foot {
+                padding: 12px 18px 16px;
             }
         }
 
@@ -737,7 +1168,6 @@
             }
         }
 
-        /* ── DARK MOBILE ── */
         [data-theme="dark"] #adminMobileNav {
             background: #0a0a0a;
             border-top-color: #1a1a1a;
@@ -765,51 +1195,9 @@
             color: #ff6b6b;
         }
 
-        /* ── DARK MODE ── */
-        body,
-        main,
-        footer {
-            transition: background-color .3s ease, color .3s ease;
-        }
-
-        [data-theme="dark"] body {
-            background-color: #000D1A;
-            color: #E5E7EB;
-        }
-
-        [data-theme="dark"] #sidebar {
-            background-color: #0d1117;
-        }
-
-        [data-theme="dark"] .bg-white {
-            background-color: #161b22 !important;
-        }
-
-        [data-theme="dark"] .text-\[\#333333\] {
-            color: #E5E7EB !important;
-        }
-
         [data-theme="dark"] .group-header:hover,
         [data-theme="dark"] .nav-link:hover {
             background: rgba(139, 0, 0, .2);
-        }
-
-        [data-theme="dark"] .theme-toggle-container {
-            background: #1F1F1F;
-            border-color: #2A2A2A;
-        }
-
-        [data-theme="dark"] .theme-option {
-            color: #6B7280;
-        }
-
-        [data-theme="dark"] .theme-option.active {
-            color: #F3F4F6;
-        }
-
-        [data-theme="dark"] .theme-indicator {
-            background: #2A2A2A;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
         }
 
         [data-theme="dark"] .flyout-panel {
@@ -821,48 +1209,7 @@
             color: #d1d5db;
         }
 
-        [data-theme="dark"] .nav-sep,
-        [data-theme="dark"] .sidebar-bottom {
-            border-color: #21262d;
-        }
-
         [data-theme="dark"] .sidebar-toggle-row {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .sl-card,
-        [data-theme="dark"] .sl-stat {
-            background: #161b22 !important;
-            border-color: #21262d !important;
-        }
-
-        [data-theme="dark"] .sl-page-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-toolbar-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-table thead tr {
-            background: #0d1117;
-        }
-
-        [data-theme="dark"] .sl-table tbody tr:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .sl-table tbody td {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .sl-username,
-        [data-theme="dark"] .sl-date-day {
-            color: #e5e7eb;
-        }
-
-        [data-theme="dark"] .sl-pagebar {
-            background: #0d1117;
             border-color: #21262d;
         }
 
@@ -1157,6 +1504,12 @@
             box-shadow: 0 8px 24px rgba(123, 13, 13, 0.35);
         }
 
+        .btn-save:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .search-input {
             width: 100%;
             padding: 10px 14px 10px 38px;
@@ -1245,11 +1598,9 @@
             box-shadow: 0 32px 80px rgba(0, 0, 0, 0.25);
         }
 
-        /* ════════════════════════════════════════════
-           NEW: View As button (footer — right side)
-        ════════════════════════════════════════════ */
+        /* ── View As button ── */
         .btn-view-as {
-            display: flex;
+            display: none;
             align-items: center;
             gap: 8px;
             background: linear-gradient(135deg, #1D4ED8, #3B82F6);
@@ -1307,7 +1658,6 @@
             box-shadow: 0 2px 6px rgba(239, 68, 68, .4);
         }
 
-        /* Pending-grant chips in footer */
         .grant-chips {
             display: flex;
             gap: 6px;
@@ -1354,7 +1704,7 @@
             display: flex;
         }
 
-        /* NEW: View As modal */
+        /* ── View As modal ── */
         .va-overlay {
             position: fixed;
             inset: 0;
@@ -1497,7 +1847,7 @@
             box-shadow: 0 6px 18px rgba(29, 78, 216, .35);
         }
 
-        /* NEW: Redirect overlay */
+        /* ── Redirect overlay ── */
         .redirect-overlay {
             position: fixed;
             inset: 0;
@@ -1532,7 +1882,7 @@
             }
         }
 
-        /* NEW: Toast */
+        /* ── Toast ── */
         .toast-pop {
             position: fixed;
             bottom: 28px;
@@ -1557,6 +1907,10 @@
             opacity: 1;
         }
 
+        .toast-pop.toast-error {
+            border-color: #FECACA;
+        }
+
         .toast-icon {
             width: 36px;
             height: 36px;
@@ -1570,7 +1924,11 @@
             flex-shrink: 0;
         }
 
-        /* NEW: Role card slide-in animation */
+        .toast-pop.toast-error .toast-icon {
+            background: #FEF2F2;
+            color: #EF4444;
+        }
+
         @keyframes cardSlide {
             from {
                 opacity: 0;
@@ -1587,130 +1945,271 @@
             animation: cardSlide 0.4s cubic-bezier(.34, 1.56, .64, 1) both;
         }
 
-            /* ── Delete Role Button ── */
-            .btn-delete-role {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                width: 26px;
-                height: 26px;
-                border-radius: 7px;
-                border: none;
-                background: transparent;
-                color: #C4B8AF;
-                font-size: 11px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                transition: all .15s;
-                z-index: 10;
-            }
-            .role-card:hover .btn-delete-role {
-                opacity: 1;
-            }
-            .btn-delete-role:hover {
-                background: #FEE2E2;
-                color: #DC2626;
-            }
+        /* ── Delete Role Button ── */
+        .btn-delete-role {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            border: none;
+            background: transparent;
+            color: #C4B8AF;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all .15s;
+            z-index: 10;
+        }
 
-            /* ── Delete confirm modal ── */
-            .delete-modal-overlay {
-                position: fixed;
-                inset: 0;
-                background: rgba(15,5,5,0.55);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 500;
-                backdrop-filter: blur(4px);
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity .2s;
-            }
-            .delete-modal-overlay.open {
-                opacity: 1;
-                pointer-events: auto;
-            }
-            .delete-modal-box {
-                background: #fff;
-                border-radius: 20px;
-                padding: 32px 32px 24px;
-                width: 400px;
-                box-shadow: 0 32px 80px rgba(0,0,0,0.25);
-                transform: scale(.94) translateY(12px);
-                transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-            }
-            .delete-modal-overlay.open .delete-modal-box {
-                transform: scale(1) translateY(0);
-            }
+        .role-card:hover .btn-delete-role {
+            opacity: 1;
+        }
 
+        .btn-delete-role:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
 
+        .delete-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 5, 5, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+
+        .delete-modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .delete-modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px 32px 24px;
+            width: 400px;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.25);
+            transform: scale(.94) translateY(12px);
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .delete-modal-overlay.open .delete-modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        #newRoleBtn {
+            transition: transform .18s, box-shadow .18s;
+        }
+
+        #newRoleBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(123, 13, 13, 0.45);
+        }
+
+        /* ════════════════════
+           TITLE REDESIGN
+        ════════════════════ */
+        .page-title-h1 {
+            margin: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .page-title-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #7B0D0D, #9B1515);
+            color: #fff;
+            border-radius: 10px;
+            padding: 4px 14px;
+            font-size: 22px;
+            font-weight: 900;
+            box-shadow: 0 4px 14px rgba(123, 13, 13, .25);
+        }
+
+        .page-title-badge i {
+            font-size: 16px;
+            opacity: .85;
+        }
+
+        .page-title-sub {
+            margin: 10px 0 0;
+            font-size: 13.5px;
+            color: #8A7A6F;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── Reset Confirm Modal ── */
+        .reset-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 5, 5, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+
+        .reset-modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .reset-modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px 32px 24px;
+            width: 420px;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.25);
+            transform: scale(.94) translateY(12px);
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .reset-modal-overlay.open .reset-modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        #newRoleModal {
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+
+        #newRoleModal.modal-visible {
+            opacity: 1;
+        }
+
+        #newRoleModal .modal-inner {
+            transform: scale(.95) translateY(10px);
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        #newRoleModal.modal-visible .modal-inner {
+            transform: scale(1) translateY(0);
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ════════════════ HEADER ════════════════ -->
+    <!-- ════════ HEADER ════════ -->
     <header class="header">
         <div class="header-left">
+            <button id="mobileMenuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
             <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
             <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
-            <span class="header-title">PUP TAGUIG DENTAL CLINIC</span>
+            <div class="header-divider"></div>
+            <span class="header-title">PUP Taguig Dental Clinic</span>
         </div>
         <div class="header-right">
-            @php
-            $notifications = collect($notifications ?? []);
-            $notifCount = $notifications->count();
-            @endphp
+            @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
             <div id="notifDropdown">
-                <button class="notif-btn" id="notifBtn">
+                <button class="hdr-icon-btn" id="notifBtn" aria-label="Notifications">
                     <i class="fa-regular fa-bell"></i>
-                    @if ($notifCount > 0)
-                    <span class="notif-badge">{{ $notifCount }}</span>
-                    @endif
+                    @if($notifCount > 0)<span class="notif-badge">{{ $notifCount }}</span>@endif
                 </button>
                 <div id="notifMenu">
-                    <div
-                        style="padding:.85rem 1rem .65rem; font-weight:700; color:#8B0000; font-size:.82rem; border-bottom:1px solid #f5e8e8;">
-                        Notifications</div>
-                    <div style="max-height:260px; overflow-y:auto;">
+                    <div class="notif-header"><i class="fa-solid fa-bell text-xs"></i> Notifications</div>
+                    <div style="max-height:260px;overflow-y:auto;">
                         @forelse($notifications as $n)
                         <a href="{{ $n['url'] ?? '#' }}"
-                            style="display:block; padding:.65rem 1rem; font-size:.78rem; color:#333; text-decoration:none; border-bottom:1px solid #fdf5f5;">
-                            <div style="font-weight:600;">{{ $n['title'] ?? 'Notification' }}</div>
-                            @if (!empty($n['message']))
-                            <div style="color:#aaa; margin-top:2px;">{{ $n['message'] }}</div>
-                            @endif
+                            style="display:block;padding:.65rem 1rem;font-size:.76rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;transition:background .1s;"
+                            onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">
+                            <div style="font-weight:700;">{{ $n['title'] ?? 'Notification' }}</div>
+                            @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;font-size:.7rem;">{{
+                                $n['message'] }}
+                            </div>@endif
                         </a>
                         @empty
-                        <div style="padding:2rem 1rem; text-align:center; color:#bbb; font-size:.78rem;">You're all
-                            caught up.</div>
+                        <div style="padding:2.5rem 1rem;text-align:center;color:#bbb;font-size:.76rem;">
+                            <i class="fa-regular fa-bell-slash"
+                                style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>
+                            You're all caught up.
+                        </div>
                         @endforelse
                     </div>
                 </div>
             </div>
-            <div class="header-user">
-                <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
-                <div>
-                    <div class="header-name">Admin</div>
-                    <div class="header-role">Admin</div>
+
+            {{-- Palitan ng system settings na route --}}
+            <a href="{{ route('admin.system_logs') }}" class="hdr-icon-btn" aria-label="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </a>
+
+            <div id="userDropdown">
+                <div class="header-user-btn" id="userBtn">
+                    <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
+                    <div class="header-user-text">
+                        <div class="header-name">Admin</div>
+                        <div class="header-role">Administrator</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"
+                        style="color:rgba(255,255,255,.5);font-size:.6rem;margin-left:.25rem;"></i>
+                </div>
+                <div id="userMenu">
+                    <div class="user-menu-header">
+                        <img src="https://i.pravatar.cc/40" class="user-menu-avatar" alt="Avatar">
+                        <div>
+                            <div class="user-menu-name">Admin</div>
+                            <div class="user-menu-role">Administrator</div>
+                        </div>
+                    </div>
+                    <!-- Dark mode toggle inside dropdown -->
+                    <div style="padding:.5rem .75rem; border-bottom:1px solid #f3f4f6;">
+                        <div
+                            style="font-size:.6rem;font-weight:800;letter-spacing:.08em;color:#b0b7c3;text-transform:uppercase;margin-bottom:6px;">
+                            Appearance</div>
+                        <div class="theme-toggle-container" id="userMenuThemeToggle">
+                            <button type="button" class="theme-option active" data-theme="light"><i
+                                    class="fa-solid fa-sun"></i></button>
+                            <button type="button" class="theme-option" data-theme="dark"><i
+                                    class="fa-regular fa-moon"></i></button>
+                            <div class="theme-indicator" aria-hidden="true"></div>
+                        </div>
+                    </div>
+                    <div class="user-menu-sep"></div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="user-menu-item danger">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Log out
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- ════════════ SIDEBAR ════════════ -->
+    <!-- ════════ SIDEBAR ════════ -->
     <aside id="sidebar">
         <div class="sidebar-inner">
 
-            <!-- GROUP 1 — CLINIC MANAGEMENT -->
-            <div class="nav-group" id="group-cms">
-                <div class="group-header {{ request()->routeIs('admin.admin.dashboard') ? 'active-group' : '' }}">
-                    <div class="group-icon"><i class="fa-solid fa-hospital"></i></div>
-                    <div class="group-label-wrap">
-                        <span class="group-label">Clinic Management</span>
+            <div class="nav-section-label">Clinic Management</div>
+            <div class="nav-group">
+                <div class="group-trigger {{ request()->routeIs('admin.admin.dashboard') ? 'active-group' : '' }}">
+                    <div class="group-icon-wrap"><i class="fa-solid fa-hospital"></i></div>
+                    <div class="group-text">
+                        <span class="group-label">Clinic</span>
                         <span class="group-sublabel">Core clinical modules</span>
                     </div>
                 </div>
@@ -1718,29 +2217,31 @@
                     <a href="{{ route('admin.admin.dashboard') }}"
                         class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-users"></i> Patients</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-calendar-check"></i> Appointments</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-tooth"></i> Dental Records</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-file-circle-check"></i> Document Request</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-file"></i> Reports</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-users"></i>
+                        Patients</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
+                            class="fa-solid fa-calendar-check"></i>
+                        Appointments</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-tooth"></i>
+                        Dental
+                        Records</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
+                            class="fa-solid fa-file-circle-check"></i>
+                        Document Request</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i>
+                        Reports</a>
                 </div>
             </div>
 
             <div class="nav-sep"></div>
-
-            <!-- GROUP 2 — MAINTENANCE -->
-            <div class="nav-group" id="group-mnt">
+            <div class="nav-section-label">Maintenance</div>
+            <div class="nav-group">
                 <div
-                    class="group-header {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*') ? 'active-group' : '' }}">
-                    <div class="group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                    <div class="group-label-wrap">
-                        <span class="group-label">Maintenance</span>
-                        <span class="group-sublabel">Configuration &amp; scheduling</span>
+                    class="group-trigger {{ request()->routeIs('admin.user_management*','admin.role_permissions','admin.academic_periods*','admin.clinic_schedule*') ? 'active-group' : '' }}">
+                    <div class="group-icon-wrap"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <div class="group-text">
+                        <span class="group-label">Configuration</span>
+                        <span class="group-sublabel">Settings & scheduling</span>
                     </div>
                 </div>
                 <div class="group-body">
@@ -1749,51 +2250,160 @@
                             class="fa-solid fa-user-gear"></i> User Management</a>
                     <a href="{{ route('admin.role_permissions') }}"
                         class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
-                            class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+                            class="fa-solid fa-user-shield"></i> Roles & Permissions</a>
                     <a href="{{ route('admin.academic_periods') }}"
                         class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
                             class="fa-solid fa-school"></i> Academic Periods</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
+                    <a href="{{ route('admin.clinic_schedule') }}"
+                        class="nav-link {{ request()->routeIs('admin.clinic_schedule*') ? 'active' : '' }}"><i
                             class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-                   <a href="{{ route('admin.service-types') }}"
-                            class="nav-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-list-check"></i> Service Types
-                            </a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-file-pen"></i> Document Templates</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+                    <a href="{{ route('admin.service-types') }}"
+                        class="nav-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}"><i
+                            class="fa-solid fa-list-check"></i> Service Types</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-pen"></i>
+                        Document
+                        Templates</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
+                            class="fa-solid fa-boxes-stacked"></i>
+                        Inventory</a>
                 </div>
             </div>
 
             <div class="nav-sep"></div>
-
-            <!-- GROUP 3 — SYSTEM -->
-            <div class="nav-group" id="group-sys">
-                <div class="group-header {{ request()->routeIs('admin.system_logs') ? 'active-group' : '' }}">
-                    <div class="group-icon"><i class="fa-solid fa-server"></i></div>
-                    <div class="group-label-wrap">
+            <div class="nav-section-label">System</div>
+            <div class="nav-group">
+                <div class="group-trigger {{ request()->routeIs('admin.system_logs') ? 'active-group' : '' }}">
+                    <div class="group-icon-wrap"><i class="fa-solid fa-server"></i></div>
+                    <div class="group-text">
                         <span class="group-label">System</span>
-                        <span class="group-sublabel">Admin &amp; configuration</span>
+                        <span class="group-sublabel">Admin & configuration</span>
                     </div>
                 </div>
                 <div class="group-body">
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-database"></i> Data Backup</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-database"></i>
+                        Data
+                        Backup</a>
                     <a href="{{ route('admin.system_logs') }}"
                         class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link {{ false ? 'active' : '' }}"><i
-                            class="fa-solid fa-sliders"></i> System Settings</a>
+                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-sliders"></i>
+                        System
+                        Settings</a>
                 </div>
             </div>
 
-        </div><!-- /sidebar-inner -->
+        </div>
+    </aside>
 
-        <div class="sidebar-bottom">
-            <div class="text-[.65rem] font-semibold tracking-widest text-gray-400 uppercase mb-2 px-1">Settings</div>
-            <div class="w-full px-1 mb-3">
-                <div id="themeToggle" class="theme-toggle-container">
+    <!-- ════════════ MOBILE DRAWER OVERLAY ════════════ -->
+    <div id="mobileDrawerOverlay" onclick="closeDrawer()"></div>
+
+    <!-- ════════════ MOBILE DRAWER ════════════ -->
+    <div id="mobileDrawer">
+
+        <!-- Header -->
+        <div class="drawer-header">
+            <div class="drawer-header-left">
+                <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="drawer-logo" alt="DMS">
+                <div>
+                    <div class="drawer-title">PUP TAGUIG</div>
+                    <div class="drawer-subtitle">Dental Clinic</div>
+                </div>
+            </div>
+            <button class="drawer-close" onclick="closeDrawer()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- User strip -->
+        <div class="drawer-user">
+            <img src="https://i.pravatar.cc/40" class="drawer-avatar" alt="Avatar">
+            <div>
+                <div class="drawer-user-name">Admin</div>
+                <div class="drawer-user-role">Administrator</div>
+            </div>
+        </div>
+
+        <!-- Nav -->
+        <div class="drawer-inner">
+
+            <div class="drawer-group">
+                <div class="drawer-group-header">
+                    <div class="drawer-group-icon"><i class="fa-solid fa-hospital"></i></div>
+                    <span class="drawer-group-label">Clinic Management</span>
+                </div>
+                <a href="{{ route('admin.admin.dashboard') }}"
+                    class="drawer-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
+                        class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-users"></i>
+                    Patients</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
+                        class="fa-solid fa-calendar-check"></i>
+                    Appointments</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-tooth"></i>
+                    Dental
+                    Records</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
+                        class="fa-solid fa-file-circle-check"></i>
+                    Document Request</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file"></i>
+                    Reports</a>
+            </div>
+
+            <div class="drawer-sep"></div>
+
+            <div class="drawer-group">
+                <div class="drawer-group-header">
+                    <div class="drawer-group-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <span class="drawer-group-label">Maintenance</span>
+                </div>
+                <a href="{{ route('admin.user_management') }}"
+                    class="drawer-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
+                        class="fa-solid fa-user-gear"></i> User Management</a>
+                <a href="{{ route('admin.role_permissions') }}"
+                    class="drawer-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
+                        class="fa-solid fa-user-shield"></i> Roles &amp; Permissions</a>
+                <a href="{{ route('admin.academic_periods') }}"
+                    class="drawer-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
+                        class="fa-solid fa-school"></i> Academic Periods</a>
+                <a href="{{ route('admin.clinic_schedule') }}"
+                    class="drawer-link {{ request()->routeIs('admin.clinic_schedule*') ? 'active' : '' }}"><i
+                        class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
+                <a href="{{ route('admin.service-types') }}"
+                    class="drawer-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}"><i
+                        class="fa-solid fa-list-check"></i> Service Types</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file-pen"></i>
+                    Document
+                    Templates</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
+                        class="fa-solid fa-boxes-stacked"></i>
+                    Inventory</a>
+            </div>
+
+            <div class="drawer-sep"></div>
+
+            <div class="drawer-group">
+                <div class="drawer-group-header">
+                    <div class="drawer-group-icon"><i class="fa-solid fa-server"></i></div>
+                    <span class="drawer-group-label">System</span>
+                </div>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-database"></i>
+                    Data
+                    Backup</a>
+                <a href="{{ route('admin.system_logs') }}"
+                    class="drawer-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
+                        class="fa-solid fa-clipboard-list"></i> System Logs</a>
+                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-sliders"></i>
+                    System
+                    Settings</a>
+            </div>
+
+        </div>
+
+        <!-- Bottom: theme + logout -->
+        <div class="drawer-bottom">
+            <div style="margin-bottom:10px;">
+                <div class="theme-toggle-container" id="drawerThemeToggle">
                     <button type="button" class="theme-option active" data-theme="light"><i
                             class="fa-solid fa-sun"></i></button>
                     <button type="button" class="theme-option" data-theme="dark"><i
@@ -1803,74 +2413,16 @@
             </div>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="logout-btn">
+                <button type="submit" class="logout-btn" style="font-size:.8rem;">
                     <span
-                        style="width:30px;height:30px;background:#fef2f2;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                        style="width:28px;height:28px;background:#fef2f2;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
                     </span>
                     <span class="font-semibold">Log out</span>
                 </button>
             </form>
         </div>
-    </aside>
-
-    <!-- ════════════ MOBILE BOTTOM NAV ════════════ -->
-    <nav id="adminMobileNav">
-        {{-- Dashboard --}}
-        <a href="{{ route('admin.admin.dashboard') }}"
-            class="adm-mob-item {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Dashboard</span>
-        </a>
-
-        {{-- Patients --}}
-        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-users"></i>
-            <span>Patients</span>
-        </a>
-
-        {{-- FAB — Quick Actions --}}
-        <div id="admMobFabWrap">
-            <div id="admMobFabMenu">
-                <a href="{{ route('admin.admin.dashboard') }}" class="adm-fab-item">
-                    <span class="adm-fab-icon"><i class="fa-solid fa-calendar-check"></i></span>
-                    Appointments
-                </a>
-                <a href="{{ route('admin.system_logs') }}" class="adm-fab-item">
-                    <span class="adm-fab-icon"><i class="fa-solid fa-clipboard-list"></i></span>
-                    System Logs
-                </a>
-                <a href="{{ route('admin.user_management') }}" class="adm-fab-item">
-                    <span class="adm-fab-icon"><i class="fa-solid fa-user-gear"></i></span>
-                    User Management
-                </a>
-                <a href="{{ route('admin.role_permissions') }}" class="adm-fab-item">
-                    <span class="adm-fab-icon"><i class="fa-solid fa-user-shield"></i></span>
-                    Roles &amp; Permissions
-                </a>
-                <a href="{{ route('admin.academic_periods') }}" class="adm-fab-item">
-                    <span class="adm-fab-icon"><i class="fa-solid fa-school"></i></span>
-                    Academic Periods
-                </a>
-            </div>
-            <button id="admMobFab" aria-label="Quick navigation">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </div>
-
-        {{-- Appointments --}}
-        <a href="{{ route('admin.admin.dashboard') }}" class="adm-mob-item {{ false ? 'active' : '' }}">
-            <i class="fa-solid fa-calendar-check"></i>
-            <span>Appts</span>
-        </a>
-
-        {{-- System Logs --}}
-        <a href="{{ route('admin.system_logs') }}"
-            class="adm-mob-item {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}">
-            <i class="fa-solid fa-clipboard-list"></i>
-            <span>Logs</span>
-        </a>
-    </nav>
+    </div>
 
     <!-- ════════════ MAIN CONTENT ════════════ -->
     @php
@@ -1889,33 +2441,23 @@
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
 
-            @if (session('success'))
-            <div
-                style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#166534;">
-                <i class="fa-solid fa-circle-check" style="color:#22C55E;"></i> {{ session('success') }}
-            </div>
-            @endif
-
-            <!-- Page title -->
+            <!-- ══ REDESIGNED PAGE TITLE ══ -->
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
-            <div>
-                <div
-                    style="font-size:11px; color:#B5A99A; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:600;">
-                    System Administration</div>
-                <h1 style="margin:0; font-size:26px; font-weight:800; color:#7B0D0D; line-height:1;">Role &amp;
-                    Permissions</h1>
-                <p style="margin:8px 0 0; font-size:14px; color:#8A7A6F;">Define what each role can see and do
-                    across the clinic system.</p>
+                <div>
+                    <h1 style="margin:0; font-size:28px; font-weight:900; color:#2D2420; line-height:1.1;">
+                        Roles &amp; <span style="color:#7B0D0D;">Permissions</span>
+                    </h1>
+                    <p style="margin:8px 0 0; font-size:13.5px; color:#8A7A6F;">
+                        Define what each role can see and do across the clinic system.
+                    </p>
+                </div>
+                <div class="flex-shrink-0">
+                    <button id="newRoleBtn" onclick="openNewRoleModal()"
+                        style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(123,13,13,0.25);">
+                        <i class="fa-solid fa-plus" style="font-size:13px;"></i> New Role
+                    </button>
+                </div>
             </div>
-            <div class="flex-shrink-0">
-                <button onclick="document.getElementById('newRoleModal').style.display='flex'"
-                    style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(123,13,13,0.25);transition:all 0.2s;"
-                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 24px rgba(123,13,13,0.35)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(123,13,13,0.25)'">
-                    <i class="fa-solid fa-plus" style="font-size:13px;"></i> New Role
-                </button>
-            </div>
-        </div>
 
             <!-- Two-column grid -->
             <div class="grid gap-6" style="grid-template-columns:280px 1fr; align-items:start;">
@@ -1923,28 +2465,17 @@
                 <!-- ══ LEFT: Role Cards ══ -->
                 <div>
                     @php
-                    function getRoleBadge($name, $slug)
-                    {
-                    $n = strtolower($name);
-                    $s = strtolower($slug);
-                    if (str_contains($n, 'super') || str_contains($s, 'super')) {
-                    return ['badgeColor' => '#7B0D0D', 'label' => 'Full Access'];
-                    }
-                    if (str_contains($n, 'dentist') || str_contains($s, 'dentist')) {
-                    return ['badgeColor' => '#B45309', 'label' => 'Clinical'];
-                    }
-                    if (str_contains($n, 'staff') || str_contains($s, 'staff') || str_contains($n, 'clinic')) {
-                    return ['badgeColor' => '#065F46', 'label' => 'Front Desk'];
-                    }
-                    if (
-                    str_contains($n, 'student') ||
-                    str_contains($s, 'student') ||
-                    str_contains($n, 'patient') ||
-                    str_contains($s, 'patient')
-                    ) {
-                    return ['badgeColor' => '#4B5563', 'label' => 'Limited'];
-                    }
-                    return ['badgeColor' => '#6B7280', 'label' => 'Custom'];
+                    function getRoleBadge($name, $slug) {
+                    $n = strtolower($name); $s = strtolower($slug);
+                    if (str_contains($n,'super') || str_contains($s,'super')) return
+                    ['badgeColor'=>'#7B0D0D','label'=>'Full Access'];
+                    if (str_contains($n,'dentist') || str_contains($s,'dentist')) return
+                    ['badgeColor'=>'#B45309','label'=>'Clinical'];
+                    if (str_contains($n,'staff') || str_contains($s,'staff') || str_contains($n,'clinic')) return
+                    ['badgeColor'=>'#065F46','label'=>'Front Desk'];
+                    if (str_contains($n,'student') || str_contains($s,'student') || str_contains($n,'patient') ||
+                    str_contains($s,'patient')) return ['badgeColor'=>'#4B5563','label'=>'Limited'];
+                    return ['badgeColor'=>'#6B7280','label'=>'Custom'];
                     }
                     $totalPerms = $groupedPermissions->flatten()->count();
                     @endphp
@@ -1955,95 +2486,87 @@
                     </div>
 
                     <div style="display:flex; flex-direction:column; gap:8px;" id="roleCardList">
-                  @foreach ($roles as $i => $role)
-    @php
-        $c = getRoleBadge($role->name, $role->slug);
-        $granted = $role->permissions->count();
-        $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
-        $words = array_slice(explode(' ', $role->name), 0, 2);
-        $initials = '';
-        foreach ($words as $_w) {
-            $initials .= strtoupper($_w[0]);
-        }
-        $isHighlighted = isset($highlightRoleId) && (int) $highlightRoleId === (int) $role->id;
-        $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
-        $isSuperRole =
-            in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-            str_contains(strtolower($role->name), 'super');
-        $isProtectedRole = $isSuperRole || in_array(strtolower($role->slug), ['admin', 'patient', 'dentist']);
-    @endphp
+                        @foreach ($roles as $i => $role)
+                        @php
+                        $c = getRoleBadge($role->name, $role->slug);
+                        $granted = $role->permissions->count();
+                        $pct = $totalPerms > 0 ? round(($granted / $totalPerms) * 100) : 0;
+                        $words = array_slice(explode(' ', $role->name), 0, 2);
+                        $initials = '';
+                        foreach ($words as $_w) { $initials .= strtoupper($_w[0]); }
+                        $isHighlighted = isset($highlightRoleId) && (int)$highlightRoleId === (int)$role->id;
+                        $isFirst = isset($highlightRoleId) ? $isHighlighted : $i === 0;
+                        $isSuperRole = in_array(strtolower($role->slug),['super_admin','super-admin','superadmin']) ||
+                        str_contains(strtolower($role->name),'super');
+                        $isProtectedRole = $isSuperRole ||
+                        in_array(strtolower($role->slug),['admin','patient','dentist']);
+                        @endphp
 
-    <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
-        data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
-        data-total="{{ $totalPerms }}" data-pct="{{ $pct }}"
-        data-slug="{{ $role->slug }}" data-is-super="{{ $isSuperRole ? '1' : '0' }}"
-        onclick="selectRole(this)" style="position:relative;">
+                        <div class="role-card {{ $isFirst ? 'active' : '' }}" data-role-id="{{ $role->id }}"
+                            data-role-name="{{ $role->name }}" data-granted="{{ $granted }}"
+                            data-total="{{ $totalPerms }}" data-pct="{{ $pct }}" data-slug="{{ $role->slug }}"
+                            data-is-super="{{ $isSuperRole ? '1' : '0' }}" onclick="selectRole(this)"
+                            style="position:relative;">
 
-        @if (!$isProtectedRole)
-            <button type="button" class="btn-delete-role"
-                onclick="event.stopPropagation(); openDeleteModal('{{ $role->id }}', '{{ addslashes($role->name) }}')"
-                title="Delete role">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        @endif
+                            @if (!$isProtectedRole)
+                            <button type="button" class="btn-delete-role"
+                                onclick="event.stopPropagation(); openDeleteModal('{{ $role->id }}', '{{ addslashes($role->name) }}')"
+                                title="Delete role">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            @endif
 
-        <div style="display:flex; align-items:center; gap:12px;">
-            <div class="role-avatar">{{ $initials }}</div>
-            <div style="flex:1;">
-                <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
-                    <span style="font-weight:600; font-size:14px; color:#2D2420;"
-                        class="role-name-label">{{ $role->name }}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                    <span class="badge-pill"
-                        style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{ $c['label'] }}</span>
-                    <span style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug }}</span>
-                </div>
-            </div>
-            <div class="active-dot"
-                style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
-            </div>
-        </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div class="role-avatar">{{ $initials }}</div>
+                                <div style="flex:1;">
+                                    <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                                        <span style="font-weight:600; font-size:14px; color:#2D2420;"
+                                            class="role-name-label">{{ $role->name }}</span>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                        <span class="badge-pill"
+                                            style="background:{{ $c['badgeColor'] }}18; color:{{ $c['badgeColor'] }}; border:1px solid {{ $c['badgeColor'] }}40; white-space:nowrap;">{{
+                                            $c['label'] }}</span>
+                                        <span style="font-size:11px; color:#B5A99A; white-space:nowrap;">{{ $role->slug
+                                            }}</span>
+                                    </div>
+                                </div>
+                                <div class="active-dot"
+                                    style="width:8px; height:8px; border-radius:50%; background:#7B0D0D; flex-shrink:0; display:{{ $isFirst ? 'block' : 'none' }};">
+                                </div>
+                            </div>
 
-        <div style="margin-top:12px;">
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
-                <span>Access level</span>
-                <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill"
-                    style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
-                </div>
-            </div>
-            <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
-                {{ $granted }} of {{ $totalPerms }} permissions
-            </div>
-        </div>
-
-    </div>{{-- closes role-card --}}
-
-@endforeach
+                            <div style="margin-top:12px;">
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:11px; color:#B5A99A; margin-bottom:5px;">
+                                    <span>Access level</span>
+                                    <span style="font-weight:600;" class="pct-label">{{ $pct }}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="width:{{ $pct }}%; background:{{ $isFirst ? 'linear-gradient(90deg,#7B0D0D,#C9973A)' : '#C4B8AF' }};">
+                                    </div>
+                                </div>
+                                <div style="font-size:11px; color:#C4B8AF; margin-top:4px;" class="count-label">
+                                    {{ $granted }} of {{ $totalPerms }} permissions
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
 
-                    <!-- Accent summary card -->
+                    <!-- Accent card -->
                     <div class="accent-card">
                         @php
-                        $fr = isset($highlightRoleId)
-                        ? $roles->firstWhere('id', (int) $highlightRoleId)
-                        : $roles->first();
-
-                        $fp = $fr
-                        ? ($totalPerms > 0
-                        ? round(($fr->permissions->count() / $totalPerms) * 100)
-                        : 0)
-                        : 0;
+                        $fr = isset($highlightRoleId) ? $roles->firstWhere('id',(int)$highlightRoleId) :
+                        $roles->first();
+                        $fp = $fr ? ($totalPerms > 0 ? round(($fr->permissions->count()/$totalPerms)*100) : 0) : 0;
                         @endphp
-                        <div style="font-size:16px; font-weight:700; margin-bottom:4px;" id="accentRoleName">
-                            {{ $fr->name ?? '' }}</div>
-                        <div style="font-size:28px; font-weight:700; margin-bottom:2px;" id="accentPct">
-                            {{ $fp }}%</div>
-                        <div style="font-size:12px; opacity:0.75; margin-bottom:14px;" id="accentCount">
-                            {{ $fr?->permissions->count() ?? 0 }} of {{ $totalPerms }} permissions active</div>
+                        <div style="font-size:16px; font-weight:700; margin-bottom:4px;" id="accentRoleName">{{
+                            $fr->name ?? '' }}</div>
+                        <div style="font-size:28px; font-weight:700; margin-bottom:2px;" id="accentPct">{{ $fp }}%</div>
+                        <div style="font-size:12px; opacity:0.75; margin-bottom:14px;" id="accentCount">{{
+                            $fr?->permissions->count() ?? 0 }} of {{ $totalPerms }} permissions active</div>
                         <div style="height:6px; background:rgba(255,255,255,0.2); border-radius:10px;">
                             <div id="accentBar"
                                 style="height:100%; width:{{ $fp }}%; background:#C9973A; border-radius:10px; transition:width 0.4s;">
@@ -2063,18 +2586,15 @@
                                 oninput="filterPerms(this.value)">
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button type="button" class="btn-collapse" id="collapseBtn" onclick="toggleAllGroups()">Collapse
-                                All</button>
-                                <form action="{{ route('admin.role_permissions.reset') }}" method="POST"
-                                    style="display:contents;">
-                                    @csrf
-                                    <button type="submit" class="btn-reset" style="border:1.5px solid #EDE8E2;">
-                                        <i class="fa-solid fa-rotate-left" style="font-size:12px; margin-right:4px;"></i>
-                                        Reset Defaults
-                                    </button>
-                                </form>
-                            </div>
+                            <button type="button" class="btn-collapse" id="collapseBtn"
+                                onclick="toggleAllGroups()">Collapse All</button>
+                            <button type="button" class="btn-reset" id="resetDefaultsBtn"
+                                style="border:1.5px solid #EDE8E2;" onclick="ajaxResetDefaults()">
+                                <i class="fa-solid fa-rotate-left" style="font-size:12px; margin-right:4px;"></i> Reset
+                                Defaults
+                            </button>
                         </div>
+                    </div>
 
                     <!-- Protected banner -->
                     <div class="protected-banner" id="protectedBanner" style="display:none;">
@@ -2089,32 +2609,26 @@
                     <!-- Permission forms — one per role, shown/hidden by JS -->
                     @foreach ($roles as $ri => $role)
                     @php
-                    $isSuperRole =
-                    in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-                    str_contains(strtolower($role->name), 'super');
-
-                    $isActiveRole = isset($highlightRoleId)
-                    ? (int) $highlightRoleId === (int) $role->id
-                    : $ri === 0;
-
+                    $isSuperRole = in_array(strtolower($role->slug),['super_admin','super-admin','superadmin']) ||
+                    str_contains(strtolower($role->name),'super');
+                    $isActiveRole = isset($highlightRoleId) ? (int)$highlightRoleId === (int)$role->id : $ri === 0;
                     $micons = [
-                    'Dental Records' => ['fa-notes-medical', '#7B0D0D'],
-                    'Patients' => ['fa-user-group', '#B45309'],
-                    'Appointments' => ['fa-calendar-days', '#065F46'],
-                    'Document Requests' => ['fa-envelope-open-text', '#1D4ED8'],
-                    'Document Templates' => ['fa-file-lines', '#6D28D9'],
-                    'Reports' => ['fa-chart-pie', '#6D28D9'],
-                    'General Access' => ['fa-user-shield', '#065F46'],
-                    'Inventory' => ['fa-boxes-stacked', '#EA580C'],
-                    'User Management' => ['fa-user-cog', '#DC2626'],
-                    'System Settings' => ['fa-screwdriver-wrench', '#374151'],
+                    'Dental Records' => ['fa-notes-medical','#7B0D0D'],
+                    'Patients' => ['fa-user-group','#B45309'],
+                    'Appointments' => ['fa-calendar-days','#065F46'],
+                    'Document Requests' => ['fa-envelope-open-text','#1D4ED8'],
+                    'Document Templates' => ['fa-file-lines','#6D28D9'],
+                    'Reports' => ['fa-chart-pie','#6D28D9'],
+                    'General Access' => ['fa-user-shield','#065F46'],
+                    'Inventory' => ['fa-boxes-stacked','#EA580C'],
+                    'User Management' => ['fa-user-cog','#DC2626'],
+                    'System Settings' => ['fa-screwdriver-wrench','#374151'],
                     ];
                     @endphp
 
+                    {{-- NOTE: no action/method needed — AJAX handles submission --}}
                     <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}"
-                        action="{{ route('admin.role_permissions.update') }}" method="POST"
-                        style="display:{{ $isActiveRole ? 'block' : 'none' }};"
-                        onsubmit="onFormSubmit('{{ $role->id }}')">
+                        style="display:{{ $isActiveRole ? 'block' : 'none' }};">
 
                         @csrf
                         <input type="hidden" name="role_id" value="{{ $role->id }}">
@@ -2122,42 +2636,37 @@
                         <div style="display:flex; flex-direction:column; gap:10px;" class="groups-container">
                             @forelse($groupedPermissions as $module => $permissions)
                             @php
-                            [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#374151'];
+                            [$ico,$icol] = $micons[$module] ?? ['fa-shield-halved','#374151'];
                             $mSlug = Str::slug($module);
                             $mTotal = $permissions->count();
                             $roleGranted = 0;
                             foreach ($permissions as $_p) {
-                            if ($role->permissions->contains('id', $_p->id)) {
-                            $roleGranted++;
-                            }
+                            if ($role->permissions->contains('id',$_p->id)) $roleGranted++;
                             }
                             $allOn = $roleGranted === $mTotal;
                             @endphp
 
                             <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
-
-                                <!-- Group header — uses perm-specific handler -->
                                 <div class="perm-group-header" onclick="togglePermGroup(this)">
                                     <div class="perm-group-icon"
                                         style="background:{{ $icol }}15; color:{{ $icol }}; border:1px solid {{ $icol }}25;">
                                         <i class="fa-solid {{ $ico }}"></i>
                                     </div>
                                     <div style="flex:1;">
-                                        <div style="font-weight:700; font-size:14px; color:#2D2420;">
-                                            {{ $module }}</div>
-                                        <div style="font-size:12px; color:#B5A99A;" class="group-count">
-                                            {{ $roleGranted }} of {{ $mTotal }} enabled</div>
+                                        <div style="font-weight:700; font-size:14px; color:#2D2420;">{{ $module }}</div>
+                                        <div style="font-size:12px; color:#B5A99A;" class="group-count">{{ $roleGranted
+                                            }} of {{ $mTotal }} enabled</div>
                                     </div>
                                     <div style="display:flex; align-items:center; gap:14px;">
                                         <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
                                             @for ($d = 0; $d < $mTotal; $d++) <div
                                                 class="dot {{ $d < $roleGranted ? 'on' : '' }}"
-                                                style="{{ $d < $roleGranted ? 'background:' . $icol . ';' : '' }}">
+                                                style="{{ $d < $roleGranted ? 'background:'.$icol.';' : '' }}">
                                         </div>
                                         @endfor
                                     </div>
                                     <div class="all-toggle-wrap"
-                                        onclick="event.stopPropagation(); toggleGroupPerms(this, '{{ $role->id }}', '{{ $mSlug }}', {{ $allOn ? 'true' : 'false' }})">
+                                        onclick="event.stopPropagation(); toggleGroupPerms(this,'{{ $role->id }}','{{ $mSlug }}',{{ $allOn ? 'true' : 'false' }})">
                                         <span style="font-size:11px; color:#6B5E56; font-weight:600;">All</span>
                                         <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
                                             onclick="event.preventDefault();">
@@ -2173,9 +2682,9 @@
 
                             <div class="perm-group-body">
                                 @foreach ($permissions as $permission)
-                                @php $isGranted = $role->permissions->contains('id', $permission->id); @endphp
-                                <div class="perm-row" style="{{ $isGranted ? 'background:' . $icol . '06;' : '' }}"
-                                    data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
+                                @php $isGranted = $role->permissions->contains('id',$permission->id); @endphp
+                                <div class="perm-row" style="{{ $isGranted ? 'background:'.$icol.'06;' : '' }}"
+                                    data-perm-search="{{ strtolower($permission->name.' '.$permission->slug) }}">
                                     <div style="flex:1;">
                                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
                                             <div class="perm-dot"
@@ -2185,12 +2694,12 @@
                                                 style="font-weight:600; font-size:13px; color:{{ $isGranted ? '#2D2420' : '#8A7A6F' }};"
                                                 class="perm-label">{{ $permission->name }}</span>
                                         </div>
-                                        <div style="font-size:12px; color:#B5A99A; padding-left:15px;">
-                                            {{ $permission->slug }}</div>
+                                        <div style="font-size:12px; color:#B5A99A; padding-left:15px;">{{
+                                            $permission->slug }}</div>
                                     </div>
                                     <div style="display:flex; align-items:center; gap:10px;">
                                         <span class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}"
-                                            style="{{ $isGranted ? 'background:' . $icol . '18; color:' . $icol . ';' : '' }}">
+                                            style="{{ $isGranted ? 'background:'.$icol.'18; color:'.$icol.';' : '' }}">
                                             {{ $isGranted ? 'Granted' : 'Denied' }}
                                         </span>
                                         <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
@@ -2211,41 +2720,36 @@
                         @empty
                         <div style="text-align:center; padding:60px 20px;">
                             <div style="font-size:40px; opacity:0.2; margin-bottom:12px;">🛡️</div>
-                            <p style="font-size:14px; font-weight:600; color:#8A7A6F;">No permissions
-                                found.</p>
+                            <p style="font-size:14px; font-weight:600; color:#8A7A6F;">No permissions found.</p>
                         </div>
                         @endforelse
                 </div>
 
                 @if (!$isSuperRole)
-                <!-- ── Footer bar with View As ── -->
                 <div class="footer-bar" id="footer-bar-{{ $role->id }}">
                     <div style="display:flex; flex-direction:column; gap:6px; flex:1; min-width:0;">
                         <div style="font-size:13px; color:#8A7A6F;" id="footer-msg-{{ $role->id }}">
-                            {{ $role->permissions->count() }} permissions enabled for
-                            {{ $role->name }}
+                            {{ $role->permissions->count() }} permissions enabled for {{ $role->name }}
                         </div>
-                        <!-- Pending chips appear here when toggles changed but not yet saved -->
                         <div class="grant-chips" id="chips-{{ $role->id }}"></div>
-                        <!-- Hint: visible only when there are pending (unsaved) grants -->
                         <div class="hint-save" id="hint-{{ $role->id }}">
-                            <i class="fa-solid fa-eye" style="font-size:11px;"></i> Save changes to
-                            unlock "View As"
+                            <i class="fa-solid fa-eye" style="font-size:11px;"></i> Save changes to unlock "View As"
                         </div>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center; flex-shrink:0;">
-                        <!-- View As button — only appears after at least one save with grants -->
                         <button type="button" class="btn-view-as" id="viewas-{{ $role->id }}" onclick="openViewAs()">
                             <i class="fa-solid fa-eye" style="font-size:13px;"></i> View As
                             <span class="va-count-badge" id="va-badge-{{ $role->id }}">0</span>
                         </button>
-                        <button type="submit" class="btn-save">
-                            <i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save
-                            Changes
+                        {{-- AJAX save button — no form submit --}}
+                        <button type="button" class="btn-save" id="save-btn-{{ $role->id }}"
+                            onclick="ajaxSaveRole('{{ $role->id }}')">
+                            <i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save Changes
                         </button>
                     </div>
                 </div>
                 @endif
+
                 </form>
                 @endforeach
 
@@ -2254,48 +2758,47 @@
         </div>
     </main>
 
-    <!-- ════════════ FOOTER ════════════ -->
-    <footer id="siteFooter" class="bg-[#8B0000] text-[#F4F4F4] p-6">
-        <div
-            class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-center">
-            <span><span class="text-gray-300">© 1998-2026</span> <span class="font-semibold">Polytechnic University of
-                    the Philippines</span></span>
-            <span class="hidden sm:inline">|</span>
-            <a href="https://www.pup.edu.ph/terms/" class="hover:underline">Terms of Use</a>
-            <span class="hidden sm:inline">|</span>
-            <a href="https://www.pup.edu.ph/privacy/" class="hover:underline">Privacy Statement</a>
+    <!-- FOOTER -->
+    <footer id="siteFooter">
+        <div class="footer-inner">
+            <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
+            <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
+            <span class="footer-dot">·</span>
+            <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
+            <span class="footer-dot">·</span>
+            <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
         </div>
     </footer>
 
     <!-- ════ DELETE ROLE MODAL ════ -->
-<div class="delete-modal-overlay" id="deleteRoleOverlay" onclick="if(event.target===this)closeDeleteModal()">
-    <div class="delete-modal-box">
-        <div style="width:48px;height:48px;border-radius:14px;background:#FEF2F2;border:1.5px solid #FECACA;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;">
-            <i class="fa-solid fa-trash" style="color:#DC2626;"></i>
-        </div>
-        <h2 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#1E293B;">Delete Role</h2>
-        <p style="margin:0 0 6px;font-size:14px;color:#8A7A6F;">You are about to permanently delete:</p>
-        <div id="deleteRoleName" style="font-size:16px;font-weight:700;color:#DC2626;margin-bottom:6px;"></div>
-        <p style="margin:0 0 22px;font-size:13px;color:#B5A99A;">This action cannot be undone. All permissions assigned to this role will be removed.</p>
-
-        <div id="deleteRoleError" style="display:none;color:#B91C1C;font-size:13px;margin-bottom:12px;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>
-
-        <div style="display:flex;gap:10px;justify-content:flex-end;">
-            <button onclick="closeDeleteModal()"
-                style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">
-                Cancel
-            </button>
-            <form id="deleteRoleForm" action="" method="POST" style="display:contents;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" id="deleteRoleConfirmBtn"
-                    style="background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(220,38,38,0.3);">
-                    <i class="fa-solid fa-trash" style="font-size:12px;"></i> Delete Role
-                </button>
-            </form>
+    <div class="delete-modal-overlay" id="deleteRoleOverlay" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="delete-modal-box">
+            <div
+                style="width:48px;height:48px;border-radius:14px;background:#FEF2F2;border:1.5px solid #FECACA;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;">
+                <i class="fa-solid fa-trash" style="color:#DC2626;"></i>
+            </div>
+            <h2 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#1E293B;">Delete Role</h2>
+            <p style="margin:0 0 6px;font-size:14px;color:#8A7A6F;">You are about to permanently delete:</p>
+            <div id="deleteRoleName" style="font-size:16px;font-weight:700;color:#DC2626;margin-bottom:6px;"></div>
+            <p style="margin:0 0 22px;font-size:13px;color:#B5A99A;">This action cannot be undone. All permissions
+                assigned to this role will be removed.</p>
+            <div id="deleteRoleError"
+                style="display:none;color:#B91C1C;font-size:13px;margin-bottom:12px;background:#FEF2F2;border-radius:8px;padding:8px 12px;">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button onclick="closeDeleteModal()"
+                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">Cancel</button>
+                <form id="deleteRoleForm" action="" method="POST" style="display:contents;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        style="background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(220,38,38,0.3);">
+                        <i class="fa-solid fa-trash" style="font-size:12px;"></i> Delete Role
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- ════ VIEW AS MODAL ════ -->
     <div class="va-overlay" id="vaOverlay" onclick="if(event.target===this)closeViewAs()">
@@ -2306,16 +2809,14 @@
                     <i class="fa-solid fa-eye"></i>
                 </div>
                 <div style="flex:1;">
-                    <div style="font-size:19px;font-weight:800;color:#1E293B;margin-bottom:3px;">View As —
-                        Select Role
+                    <div style="font-size:19px;font-weight:800;color:#1E293B;margin-bottom:3px;">View As — Select Role
                     </div>
-                    <div style="font-size:13px;color:#8A7A6F;" id="vaSubtitle">Select a role to preview their
-                        dashboard access</div>
+                    <div style="font-size:13px;color:#8A7A6F;" id="vaSubtitle">Select a role to preview their dashboard
+                        access</div>
                 </div>
                 <button onclick="closeViewAs()"
-                    style="margin-left:auto;width:34px;height:34px;border-radius:9px;background:#F5EFE9;border:none;cursor:pointer;color:#8A7A6F;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                    style="margin-left:auto;width:34px;height:34px;border-radius:9px;background:#F5EFE9;border:none;cursor:pointer;color:#8A7A6F;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="va-body">
                 <div class="va-summary">
@@ -2324,8 +2825,7 @@
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
-                        <div style="font-size:12px;opacity:.75;margin-bottom:2px;">Total newly granted &amp;
-                            saved
+                        <div style="font-size:12px;opacity:.75;margin-bottom:2px;">Total newly granted &amp; saved
                             permissions</div>
                         <div style="display:flex;align-items:baseline;gap:6px;">
                             <span style="font-size:22px;font-weight:800;" id="vaTotalPerms">0</span>
@@ -2342,9 +2842,7 @@
             </div>
             <div class="va-foot">
                 <button onclick="closeViewAs()"
-                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:10px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">
-                    Close
-                </button>
+                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:10px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">Close</button>
             </div>
         </div>
     </div>
@@ -2358,7 +2856,7 @@
 
     <!-- TOAST -->
     <div class="toast-pop" id="toastPop">
-        <div class="toast-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="toast-icon"><i class="fa-solid fa-circle-check" id="toastIconEl"></i></div>
         <div>
             <div id="toastTitle" style="font-weight:700;font-size:14px;color:#2D2420;"></div>
             <div id="toastSub" style="font-size:12px;color:#6B7280;margin-top:2px;"></div>
@@ -2368,17 +2866,15 @@
     <!-- ════ NEW ROLE MODAL ════ -->
     <div id="newRoleModal"
         style="display:none;position:fixed;inset:0;background:rgba(15,5,5,0.55);align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);">
-        <div
+        <div class="modal-inner"
             style="background:#fff;border-radius:20px;padding:36px 36px 28px;width:440px;box-shadow:0 32px 80px rgba(0,0,0,0.25);">
             <div
                 style="width:48px;height:48px;border-radius:14px;background:#FFF0F0;border:1.5px solid #7B0D0D30;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;">
                 <i class="fa-solid fa-user-shield" style="color:#7B0D0D;"></i>
             </div>
             <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#7B0D0D;">Create New Role</h2>
-            <p style="margin:0 0 22px;font-size:14px;color:#8A7A6F;">Define a new role and assign permissions
-                right
+            <p style="margin:0 0 22px;font-size:14px;color:#8A7A6F;">Define a new role and assign permissions right
                 after creating it.</p>
-
             <label
                 style="display:block;font-size:12px;font-weight:700;color:#6B5E56;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Role
                 Name</label>
@@ -2386,37 +2882,32 @@
                 style="width:100%;padding:12px 16px;border:1.5px solid #EDE8E2;border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;color:#2D2420;margin-bottom:10px;transition:border-color 0.18s;"
                 onfocus="this.style.borderColor='#7B0D0D'" onblur="this.style.borderColor='#EDE8E2'"
                 onkeydown="if(event.key==='Enter') createNewRole()">
-
             <label
                 style="display:block;font-size:12px;font-weight:700;color:#6B5E56;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Role
                 Slug</label>
             <input id="newRoleSlug" type="text" placeholder="e.g. dental-intern"
                 style="width:100%;padding:12px 16px;border:1.5px solid #EDE8E2;border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;color:#2D2420;margin-bottom:22px;transition:border-color 0.18s;"
                 onfocus="this.style.borderColor='#7B0D0D'" onblur="this.style.borderColor='#EDE8E2'">
-
             <div id="newRoleError"
                 style="display:none;color:#B91C1C;font-size:13px;margin-bottom:12px;background:#FEF2F2;border-radius:8px;padding:8px 12px;">
             </div>
-
             <div style="display:flex;gap:10px;justify-content:flex-end;">
                 <button onclick="closeNewRoleModal()"
-                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">
-                    Cancel
-                </button>
+                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">Cancel</button>
                 <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST"
                     style="display:contents;">
                     @csrf
                     <input type="hidden" name="name" id="createRoleName">
                     <input type="hidden" name="slug" id="createRoleSlug">
                     <button type="button" onclick="createNewRole()"
-                        style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">
-                        Create Role
-                    </button>
+                        style="background:linear-gradient(135deg,#7B0D0D,#9B1515);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;">Create
+                        Role</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Patient Picker -->
     <div class="va-overlay" id="patientPickerOverlay" onclick="if(event.target===this)closePatientPicker()">
         <div class="va-panel" style="width:760px;">
             <div class="va-head">
@@ -2430,645 +2921,595 @@
                     <div style="font-size:13px;color:#8A7A6F;">Choose which patient account to impersonate</div>
                 </div>
                 <button onclick="closePatientPicker()"
-                    style="margin-left:auto;width:34px;height:34px;border-radius:9px;background:#F5EFE9;border:none;cursor:pointer;color:#8A7A6F;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                    style="margin-left:auto;width:34px;height:34px;border-radius:9px;background:#F5EFE9;border:none;cursor:pointer;color:#8A7A6F;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="va-body">
                 <div style="margin-bottom:14px; position:relative;">
-
                     <i class="fa-solid fa-magnifying-glass"
-                        style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#B5A99A; font-size:13px;">
-                    </i>
-
+                        style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#B5A99A; font-size:13px;"></i>
                     <input type="text" id="patientPickerSearch" placeholder="Search patient name or email..."
                         class="search-input" style="padding-left:38px; padding-right:36px;"
                         oninput="filterPatientPicker(this.value)">
-
-                    <!-- CLEAR BUTTON -->
-                    <button onclick="clearPatientSearch()" style="
-        position:absolute;
-        right:10px;
-        top:50%;
-        transform:translateY(-50%);
-        border:none;
-        background:none;
-        color:#7B0D0D;
-        font-size:13px;
-        font-weight:600;
-        cursor:pointer;
-        font-family:'Inter',sans-serif;
-    ">
-                        Clear
-                    </button>
+                    <button onclick="clearPatientSearch()"
+                        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;color:#7B0D0D;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Clear</button>
                 </div>
-
                 <div id="patientPickerList"></div>
             </div>
+            <div class="va-foot"
+                style="display:flex;justify-content:flex-end;padding:18px 22px;border-top:1px solid #EDE8E2;background:#FAF8F6;">
+                <button onclick="closePatientPicker()"
+                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:10px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;"
+                    onmouseover="this.style.background='#EDE6DF'"
+                    onmouseout="this.style.background='#F5EFE9'">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-            <div class="va-foot" style="
-    display:flex;
-    justify-content:flex-end;
-    padding:18px 22px;
-    border-top:1px solid #EDE8E2;
-    background:#FAF8F6;
-">
+    <!-- ════ RESET DEFAULTS CONFIRM MODAL ════ -->
+    <div class="reset-modal-overlay" id="resetConfirmOverlay" onclick="if(event.target===this)closeResetConfirm()">
+        <div class="reset-modal-box">
 
-                <button onclick="closePatientPicker()" style="
-            background:#F5EFE9;
-            color:#6B5E56;
-            border:none;
-            border-radius:10px;
-            padding:10px 22px;
-            font-weight:600;
-            font-size:14px;
-            cursor:pointer;
-            font-family:'Inter',sans-serif;
-            transition:all .15s ease;
-        " onmouseover="this.style.background='#EDE6DF'" onmouseout="this.style.background='#F5EFE9'">
-                    Cancel
-                </button>
-
+            <!-- Icon -->
+            <div
+                style="width:52px;height:52px;border-radius:14px;background:#FEF3C7;border:1.5px solid #FCD34D;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">
+                <i class="fa-solid fa-rotate-left" style="color:#B45309;"></i>
             </div>
 
-            <script>
-                // Notifications
-                document.getElementById('notifBtn').addEventListener('click', e => {
+            <!-- Title -->
+            <h2 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#1E293B;">Reset to Defaults?</h2>
+            <p style="margin:0 0 16px;font-size:14px;color:#8A7A6F;line-height:1.6;">
+                This will restore the original permissions for <strong style="color:#2D2420;">Super Admin</strong>,
+                <strong style="color:#2D2420;">Dentist</strong>, and <strong style="color:#2D2420;">Patient</strong>.
+            </p>
+
+            <!-- Warning callout -->
+            <div
+                style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:22px;">
+                <i class="fa-solid fa-triangle-exclamation"
+                    style="color:#B45309;font-size:14px;margin-top:1px;flex-shrink:0;"></i>
+                <span style="font-size:12px;font-weight:600;color:#92400E;line-height:1.5;">
+                    Any custom permission changes you have made will be lost. This action cannot be undone.
+                </span>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button onclick="closeResetConfirm()"
+                    style="background:#F5EFE9;color:#6B5E56;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s;"
+                    onmouseover="this.style.background='#EDE5DA'" onmouseout="this.style.background='#F5EFE9'">
+                    Cancel
+                </button>
+                <button id="resetConfirmBtn" onclick="confirmResetDefaults()"
+                    style="background:linear-gradient(135deg,#B45309,#D97706);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(180,83,9,0.3);transition:all .2s;"
+                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 24px rgba(180,83,9,0.4)'"
+                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(180,83,9,0.3)'">
+                    <i class="fa-solid fa-rotate-left" style="font-size:12px;"></i> Yes, Reset
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* NOTIF */
+        document.getElementById('notifBtn').addEventListener('click', e => {
+            e.stopPropagation();
+            document.getElementById('notifMenu').classList.toggle('open');
+        });
+        document.addEventListener('click', () => document.getElementById('notifMenu').classList.remove('open'));
+
+        /* USER DROPDOWN */
+        document.getElementById('userBtn').addEventListener('click', e => {
+            e.stopPropagation();
+            document.getElementById('notifMenu').classList.remove('open'); // close notif if open
+            document.getElementById('userMenu').classList.toggle('open');
+        });
+        document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+        /* Sync user menu theme toggle */
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#userMenuThemeToggle .theme-option').forEach(o =>
+                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
+            );
+        });
+
+        /* ── MOBILE DRAWER ── */
+        function openDrawer() {
+            const drawer = document.getElementById('mobileDrawer');
+            const overlay = document.getElementById('mobileDrawerOverlay');
+            overlay.style.display = 'block';
+            requestAnimationFrame(() => {
+                overlay.classList.add('open');
+                drawer.classList.add('open');
+            });
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            const drawer = document.getElementById('mobileDrawer');
+            const overlay = document.getElementById('mobileDrawerOverlay');
+            drawer.classList.remove('open');
+            overlay.classList.remove('open');
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', e => {
+            e.stopPropagation();
+            openDrawer();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeDrawer();
+        });
+
+        /* Sync drawer theme toggles with main theme */
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#drawerThemeToggle .theme-option').forEach(o =>
+                o.addEventListener('click', e => {
                     e.stopPropagation();
-                    document.getElementById('notifMenu').classList.toggle('open');
-                });
-                document.addEventListener('click', () => {
-                    document.getElementById('notifMenu').classList.remove('open');
-                    const fabMenu = document.getElementById('admMobFabMenu');
-                    const fab = document.getElementById('admMobFab');
-                    if (fabMenu) fabMenu.classList.remove('open');
-                    if (fab) fab.classList.remove('open');
-                });
+                    applyTheme(o.getAttribute('data-theme'));
+                    // sync indicator in drawer
+                    const ind = document.querySelector('#drawerThemeToggle .theme-indicator');
+                    if (ind) ind.classList.toggle('dark-mode', o.getAttribute('data-theme') === 'dark');
+                })
+            );
+        });
 
-                // Mobile FAB
-                document.addEventListener('DOMContentLoaded', () => {
-                    const fab = document.getElementById('admMobFab');
-                    const fabMenu = document.getElementById('admMobFabMenu');
-                    if (fab && fabMenu) {
-                        fab.addEventListener('click', e => {
-                            e.stopPropagation();
-                            const isOpen = fabMenu.classList.contains('open');
-                            fabMenu.classList.toggle('open', !isOpen);
-                            fab.classList.toggle('open', !isOpen);
-                        });
-                        fabMenu.addEventListener('click', e => e.stopPropagation());
+        // THEME
+        const html = document.documentElement;
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.querySelectorAll('.theme-option').forEach(o =>
+                o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active')
+            );
+            const ind = document.querySelector('.theme-indicator');
+            if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(localStorage.getItem('theme') || 'light');
+            document.querySelectorAll('.theme-option').forEach(o =>
+                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
+            );
+        });
+
+        // PERM MODULE META
+        const PERM_MODULES = [
+            { module: 'Dashboard', icon: 'fa-chart-line', color: '#7B0D0D' },
+            { module: 'Patients', icon: 'fa-users', color: '#B45309' },
+            { module: 'Appointments', icon: 'fa-calendar-check', color: '#065F46' },
+            { module: 'Document Requests', icon: 'fa-file-circle-check', color: '#1D4ED8' },
+            { module: 'Document Template', icon: 'fa-file-pen', color: '#6D28D9' },
+            { module: 'Reports', icon: 'fa-chart-column', color: '#6D28D9' },
+            { module: 'Academic Periods', icon: 'fa-school', color: '#065F46' },
+            { module: 'Data Backup', icon: 'fa-database', color: '#EA580C' },
+            { module: 'System Logs', icon: 'fa-clipboard-list', color: '#6D28D9' },
+            { module: 'System Settings', icon: 'fa-gear', color: '#374151' },
+        ];
+        function getModuleColor(module) {
+            const found = PERM_MODULES.find(m => m.module === module);
+            return found ? found.color : '#374151';
+        }
+
+        // VIEW-AS STATE
+        const savedGrants = {};
+        const pendingGrants = {};
+
+        const flashedViewAs = @json(session('saved_view_as') ?? null);
+        if (flashedViewAs && flashedViewAs.role_id) {
+            savedGrants[String(flashedViewAs.role_id)] = (flashedViewAs.permissions || []).map(p => ({
+                name: p.name, slug: p.slug, color: getModuleColor(p.module)
+            }));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(localStorage.getItem('theme') || 'light');
+            document.querySelectorAll('.theme-option').forEach(o =>
+                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
+            );
+
+            const firstCard = document.querySelector('.role-card');
+            const protectedBanner = document.getElementById('protectedBanner');
+            if (firstCard && protectedBanner && firstCard.dataset.isSuper === '1') {
+                protectedBanner.style.display = 'flex';
+            }
+
+            document.querySelectorAll('.role-form').forEach(form => {
+                const roleId = form.dataset.roleId;
+                if (!roleId) return;
+                if (!savedGrants[roleId]) savedGrants[roleId] = [];
+                if (!pendingGrants[roleId]) pendingGrants[roleId] = [];
+
+                form.querySelectorAll('.perm-toggle:checked').forEach(input => {
+                    if (!savedGrants[roleId].find(p => p.slug === input.dataset.permSlug)) {
+                        savedGrants[roleId].push({ name: input.dataset.permName || '', slug: input.dataset.permSlug || '', color: input.dataset.color || '#374151' });
                     }
                 });
 
-                // Theme
-                const html = document.documentElement;
-                function applyTheme(theme) {
-                    html.setAttribute('data-theme', theme);
-                    localStorage.setItem('theme', theme);
-                    document.querySelectorAll('.theme-option').forEach(o =>
-                        o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active')
-                    );
-                    const ind = document.querySelector('.theme-indicator');
-                    if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
-                }
-                document.addEventListener('DOMContentLoaded', () => {
-                    applyTheme(localStorage.getItem('theme') || 'light');
-                    document.querySelectorAll('.theme-option').forEach(o =>
-                        o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
-                    );
+                updateFooterMsg(roleId);
+                updateFooterExtras(roleId);
+
+                const modules = [...new Set(Array.from(form.querySelectorAll('.perm-toggle')).map(t => t.dataset.module).filter(Boolean))];
+                modules.forEach(module => {
+                    const sample = form.querySelector(`.perm-toggle[data-module="${module}"]`);
+                    if (!sample) return;
+                    syncGroupMaster(roleId, module);
+                    updateGroupCount(roleId, module);
+                    updateDots(roleId, module, sample.dataset.color || '#374151');
                 });
+            });
+        });
 
-                const PERM_MODULES = [{
-                    module: 'Dashboard',
-                    icon: 'fa-chart-line',
-                    color: '#7B0D0D'
-                },
-                {
-                    module: 'Patients',
-                    icon: 'fa-users',
-                    color: '#B45309'
-                },
-                {
-                    module: 'Appointments',
-                    icon: 'fa-calendar-check',
-                    color: '#065F46'
-                },
-                {
-                    module: 'Document Requests',
-                    icon: 'fa-file-circle-check',
-                    color: '#1D4ED8'
-                },
-                {
-                    module: 'Document Template',
-                    icon: 'fa-file-pen',
-                    color: '#6D28D9'
-                },
-                {
-                    module: 'Reports',
-                    icon: 'fa-chart-column',
-                    color: '#6D28D9'
-                },
-                {
-                    module: 'Academic Periods',
-                    icon: 'fa-school',
-                    color: '#065F46'
-                },
-                {
-                    module: 'Data Backup',
-                    icon: 'fa-database',
-                    color: '#EA580C'
-                },
-                {
-                    module: 'System Logs',
-                    icon: 'fa-clipboard-list',
-                    color: '#6D28D9'
-                },
-                {
-                    module: 'System Settings',
-                    icon: 'fa-gear',
-                    color: '#374151'
-                },
-                ];
+        // ROLE CARD SELECT
+        function selectRole(card) {
+            document.querySelectorAll('.role-card').forEach(c => {
+                c.classList.remove('active');
+                const dot = c.querySelector('.active-dot');
+                if (dot) dot.style.display = 'none';
+                const fill = c.querySelector('.progress-fill');
+                if (fill) fill.style.background = '#C4B8AF';
+            });
 
-                function getModuleColor(module) {
-                    const found = PERM_MODULES.find(m => m.module === module);
-                    return found ? found.color : '#374151';
+            card.classList.add('active');
+            const dot = card.querySelector('.active-dot');
+            if (dot) dot.style.display = 'block';
+            const fill = card.querySelector('.progress-fill');
+            if (fill) fill.style.background = 'linear-gradient(90deg,#7B0D0D,#C9973A)';
+
+            const roleId = card.dataset.roleId;
+            const roleName = card.dataset.roleName || '';
+            const granted = parseInt(card.dataset.granted || '0', 10);
+            const total = parseInt(card.dataset.total || '0', 10);
+            const pct = parseInt(card.dataset.pct || '0', 10);
+
+            document.getElementById('accentRoleName').textContent = roleName;
+            document.getElementById('accentPct').textContent = pct + '%';
+            document.getElementById('accentCount').textContent = granted + ' of ' + total + ' permissions active';
+            document.getElementById('accentBar').style.width = pct + '%';
+
+            const slug = (card.dataset.slug || '').toLowerCase();
+            const isSuper = ['super_admin', 'super-admin', 'superadmin'].includes(slug) || roleName.toLowerCase().includes('super');
+            const banner = document.getElementById('protectedBanner');
+            if (banner) banner.style.display = isSuper ? 'flex' : 'none';
+
+            document.querySelectorAll('.role-form').forEach(f => f.style.display = 'none');
+            const form = document.getElementById('form-role-' + roleId);
+            if (form) form.style.display = 'block';
+
+            const permSearch = document.getElementById('permSearch');
+            if (permSearch) permSearch.value = '';
+            filterPerms('');
+        }
+
+        // PERMISSION GROUP COLLAPSE
+        let allExpanded = true;
+        function togglePermGroup(header) {
+            const body = header.nextElementSibling;
+            const chev = header.querySelector('.chevron');
+            const isCollapsed = body.classList.contains('collapsed');
+            body.classList.toggle('collapsed');
+            chev.classList.toggle('collapsed', !isCollapsed);
+        }
+        function toggleAllGroups() {
+            const btn = document.getElementById('collapseBtn');
+            const form = [...document.querySelectorAll('.role-form')].find(f => f.style.display === 'block');
+            if (!form) return;
+            allExpanded = !allExpanded;
+            form.querySelectorAll('.perm-group-body').forEach(b => b.classList.toggle('collapsed', !allExpanded));
+            form.querySelectorAll('.chevron').forEach(c => c.classList.toggle('collapsed', !allExpanded));
+            btn.textContent = allExpanded ? 'Collapse All' : 'Expand All';
+        }
+
+        // PER-PERMISSION TOGGLE
+        function onPermChange(input) {
+            const row = input.closest('.perm-row');
+            const badge = row.querySelector('.perm-status');
+            const dot = row.querySelector('.perm-dot');
+            const label = row.querySelector('.perm-label');
+            const color = input.dataset.color;
+            const roleId = input.dataset.role;
+            const mSlug = input.dataset.module;
+            const pName = input.dataset.permName;
+            const pSlug = input.dataset.permSlug;
+
+            if (input.checked) {
+                badge.textContent = 'Granted'; badge.className = 'perm-status status-granted';
+                badge.style.background = color + '18'; badge.style.color = color;
+                dot.style.background = color; label.style.color = '#2D2420';
+                row.style.background = color + '06';
+                if (!pendingGrants[roleId]) pendingGrants[roleId] = [];
+                if (!pendingGrants[roleId].find(p => p.slug === pSlug)) {
+                    pendingGrants[roleId].push({ name: pName, slug: pSlug, color });
                 }
+            } else {
+                badge.textContent = 'Denied'; badge.className = 'perm-status status-denied';
+                badge.style.background = ''; badge.style.color = '';
+                dot.style.background = '#D5CEC8'; label.style.color = '#8A7A6F';
+                row.style.background = 'transparent';
+                if (pendingGrants[roleId]) pendingGrants[roleId] = pendingGrants[roleId].filter(p => p.slug !== pSlug);
+                if (savedGrants[roleId]) savedGrants[roleId] = savedGrants[roleId].filter(p => p.slug !== pSlug);
+            }
 
-                /* ══════════════════════════════════════
-                   View-As state
-                ══════════════════════════════════════ */
-                const savedGrants = {};
-                const pendingGrants = {};
+            updateDots(roleId, mSlug, color);
+            updateGroupCount(roleId, mSlug);
+            syncGroupMaster(roleId, mSlug);
+            updateAccentCard(roleId);
+            updateFooterMsg(roleId);
+            updateFooterExtras(roleId);
+        }
 
-                const flashedViewAs = JSON.parse('@json(session('saved_view_as') ?? 'null')');
+        // ALL TOGGLE
+        function toggleGroupPerms(wrapper, roleId, mSlug, currentlyAllOn) {
+            const newState = !currentlyAllOn;
+            wrapper.setAttribute('onclick', `event.stopPropagation(); toggleGroupPerms(this,'${roleId}','${mSlug}',${newState})`);
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`).forEach(t => {
+                if (t.disabled) return;
+                t.checked = newState;
+                onPermChange(t);
+            });
+            const master = form.querySelector(`.group-master[data-module="${mSlug}"]`);
+            if (master) master.checked = newState;
+        }
 
-                if (flashedViewAs && flashedViewAs.role_id) {
-                    savedGrants[String(flashedViewAs.role_id)] = (flashedViewAs.permissions || []).map(p => ({
-                        name: p.name,
-                        slug: p.slug,
-                        color: getModuleColor(p.module)
-                    }));
+        function syncGroupMaster(roleId, mSlug) {
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            const all = [...form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`)];
+            const checked = all.filter(t => t.checked).length;
+            const master = form.querySelector(`.group-master[data-module="${mSlug}"]`);
+            if (!master) return;
+            master.checked = checked === all.length;
+            master.indeterminate = checked > 0 && checked < all.length;
+        }
+
+        function updateDots(roleId, mSlug, color) {
+            const cont = document.getElementById(`dots-${roleId}-${mSlug}`);
+            if (!cont) return;
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            const toggles = [...form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`)];
+            const dots = cont.querySelectorAll('.dot');
+            toggles.forEach((t, i) => { if (dots[i]) dots[i].style.background = t.checked ? color : '#E5DDD5'; });
+        }
+
+        function updateGroupCount(roleId, mSlug) {
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            const dotsEl = form.querySelector(`[id="dots-${roleId}-${mSlug}"]`);
+            if (!dotsEl) return;
+            const gc = dotsEl.closest('.group-card');
+            if (!gc) return;
+            const all = [...gc.querySelectorAll('.perm-toggle')];
+            const countEl = gc.querySelector('.group-count');
+            if (countEl) countEl.textContent = `${all.filter(t => t.checked).length} of ${all.length} enabled`;
+        }
+
+        function updateAccentCard(roleId) {
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            const all = [...form.querySelectorAll('.perm-toggle')];
+            const total = all.length;
+            const checked = all.filter(t => t.checked).length;
+            const pct = total > 0 ? Math.round(checked / total * 100) : 0;
+
+            document.getElementById('accentPct').textContent = pct + '%';
+            document.getElementById('accentCount').textContent = `${checked} of ${total} permissions active`;
+            document.getElementById('accentBar').style.width = pct + '%';
+
+            const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
+            if (card) {
+                card.querySelector('.pct-label').textContent = pct + '%';
+                card.querySelector('.count-label').textContent = `${checked} of ${total} permissions`;
+                card.querySelector('.progress-fill').style.width = pct + '%';
+                card.dataset.granted = checked;
+                card.dataset.pct = pct;
+            }
+        }
+
+        function updateFooterMsg(roleId) {
+            const el = document.getElementById('footer-msg-' + roleId);
+            if (!el) return;
+            const form = document.getElementById('form-role-' + roleId);
+            if (!form) return;
+            const checked = [...form.querySelectorAll('.perm-toggle')].filter(t => t.checked).length;
+            const roleName = document.querySelector(`.role-card[data-role-id="${roleId}"]`)?.dataset.roleName || '';
+            el.textContent = `${checked} permissions enabled for ${roleName}`;
+        }
+
+        function updateFooterExtras(roleId) {
+            const pending = pendingGrants[roleId] || [];
+            const chipsEl = document.getElementById('chips-' + roleId);
+            const hintEl = document.getElementById('hint-' + roleId);
+            const vaBtn = document.getElementById('viewas-' + roleId);
+            const roleName = document.querySelector(`.role-card[data-role-id="${roleId}"]`)?.dataset.roleName || '';
+
+            if (chipsEl) {
+                chipsEl.innerHTML = '';
+                if (pending.length) {
+                    const col = pending[0]?.color || '#374151';
+                    chipsEl.innerHTML = `<span class="grant-chip" style="background:${col}18;color:${col};border:1px solid ${col}40;">
+                    <i class="fa-solid fa-circle-plus" style="font-size:9px;"></i>
+                    ${pending.length} new grant${pending.length > 1 ? 's' : ''} pending for ${roleName}
+                </span>`;
                 }
+            }
+            if (hintEl) hintEl.classList.toggle('show', pending.length > 0);
 
-                document.addEventListener('DOMContentLoaded', () => {
-                    applyLayout('240px');
-                    applyTheme(localStorage.getItem('theme') || 'light');
-
-                    document.querySelectorAll('.theme-option').forEach(o => {
-                        o.addEventListener('click', e => {
-                            e.stopPropagation();
-                            applyTheme(o.getAttribute('data-theme'));
-                        });
-                    });
-
-                    const firstCard = document.querySelector('.role-card');
-                    const protectedBanner = document.getElementById('protectedBanner');
-
-                    if (firstCard && protectedBanner && firstCard.dataset.isSuper === '1') {
-                        protectedBanner.style.display = 'flex';
-                    }
-
-                    document.querySelectorAll('.role-form').forEach(form => {
-                        const roleId = form.dataset.roleId;
-                        if (!roleId) return;
-
-                        if (!savedGrants[roleId]) savedGrants[roleId] = [];
-                        if (!pendingGrants[roleId]) pendingGrants[roleId] = [];
-
-                        const checkedPerms = form.querySelectorAll('.perm-toggle:checked');
-                        checkedPerms.forEach(input => {
-                            if (!savedGrants[roleId].find(p => p.slug === input.dataset.permSlug)) {
-                                savedGrants[roleId].push({
-                                    name: input.dataset.permName || '',
-                                    slug: input.dataset.permSlug || '',
-                                    color: input.dataset.color || '#374151'
-                                });
-                            }
-                        });
-
-                        updateFooterMsg(roleId);
-                        updateFooterExtras(roleId);
-
-                        const toggles = form.querySelectorAll('.perm-toggle');
-                        const modules = [...new Set(Array.from(toggles).map(t => t.dataset.module).filter(
-                            Boolean))];
-
-                        modules.forEach(module => {
-                            const sample = form.querySelector(`.perm-toggle[data-module="${module}"]`);
-                            if (!sample) return;
-
-                            syncGroupMaster(roleId, module);
-                            updateGroupCount(roleId, module);
-                            updateDots(roleId, module, sample.dataset.color || '#374151');
-                        });
-                    });
-                });
-
-                /* ══════════════════════════════════════
-                   ROLE CARD SELECT
-                ══════════════════════════════════════ */
-                function selectRole(card) {
-                    document.querySelectorAll('.role-card').forEach(c => {
-                        c.classList.remove('active');
-
-                        const activeDot = c.querySelector('.active-dot');
-                        if (activeDot) activeDot.style.display = 'none';
-
-                        const progressFill = c.querySelector('.progress-fill');
-                        if (progressFill) progressFill.style.background = '#C4B8AF';
-
-                        const roleNameLabel = c.querySelector('.role-name-label');
-                        if (roleNameLabel) roleNameLabel.style.color = '#2D2420';
-                    });
-
-                    card.classList.add('active');
-
-                    const activeDot = card.querySelector('.active-dot');
-                    if (activeDot) activeDot.style.display = 'block';
-
-                    const progressFill = card.querySelector('.progress-fill');
-                    if (progressFill) progressFill.style.background = 'linear-gradient(90deg,#7B0D0D,#C9973A)';
-
-                    const roleId = card.dataset.roleId;
-                    const roleName = card.dataset.roleName || '';
-                    const granted = parseInt(card.dataset.granted || '0', 10);
-                    const total = parseInt(card.dataset.total || '0', 10);
-                    const pct = parseInt(card.dataset.pct || '0', 10);
-
-                    document.getElementById('accentRoleName').textContent = roleName;
-                    document.getElementById('accentPct').textContent = pct + '%';
-                    document.getElementById('accentCount').textContent = granted + ' of ' + total + ' permissions active';
-                    document.getElementById('accentBar').style.width = pct + '%';
-
-                    const slug = (card.dataset.slug || '').toLowerCase();
-                    const isSuper = ['super_admin', 'super-admin', 'superadmin'].includes(slug) || roleName.toLowerCase().includes(
-                        'super');
-
-                    const protectedBanner = document.getElementById('protectedBanner');
-                    if (protectedBanner) {
-                        protectedBanner.style.display = isSuper ? 'flex' : 'none';
-                    }
-
-                    document.querySelectorAll('.role-form').forEach(f => {
-                        f.style.display = 'none';
-                    });
-
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (form) form.style.display = 'block';
-
-                    const permSearch = document.getElementById('permSearch');
-                    if (permSearch) permSearch.value = '';
-
-                    filterPerms('');
+            if (vaBtn) {
+                const totalSavedRoles = Object.values(savedGrants).filter(a => a.length > 0).length;
+                const badge = document.getElementById('va-badge-' + roleId);
+                if (totalSavedRoles > 0) {
+                    vaBtn.classList.add('show');
+                    if (badge) badge.textContent = totalSavedRoles;
+                } else {
+                    vaBtn.classList.remove('show');
+                    if (badge) badge.textContent = '0';
                 }
+            }
+        }
 
-                /* ══════════════════════════════════════
-                   PERMISSION GROUP COLLAPSE
-                ══════════════════════════════════════ */
-                let allExpanded = true;
+        // AJAX SAVE
+        function ajaxSaveRole(roleId) {
+            const form = document.getElementById('form-role-' + roleId);
+            const btn = document.getElementById('save-btn-' + roleId);
+            if (!form || !btn) return;
 
-                function togglePermGroup(header) {
-                    const body = header.nextElementSibling;
-                    const chev = header.querySelector('.chevron');
-                    const isCollapsed = body.classList.contains('collapsed');
+            const checkedIds = [...form.querySelectorAll('.perm-toggle:checked')].map(t => t.value);
 
-                    body.classList.toggle('collapsed');
-                    chev.classList.toggle('collapsed', !isCollapsed);
-                }
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+                || form.querySelector('input[name="_token"]')?.value
+                || '{{ csrf_token() }}';
 
-                function toggleAllGroups() {
-                    const btn = document.getElementById('collapseBtn');
-                    const visibleForm = [...document.querySelectorAll('.role-form')].find(f => f.style.display === 'block');
-                    if (!visibleForm) return;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:13px;"></i> Saving…';
 
-                    const bodies = visibleForm.querySelectorAll('.perm-group-body');
-                    const chevs = visibleForm.querySelectorAll('.chevron');
-
-                    allExpanded = !allExpanded;
-                    bodies.forEach(b => b.classList.toggle('collapsed', !allExpanded));
-                    chevs.forEach(c => c.classList.toggle('collapsed', !allExpanded));
-                    btn.textContent = allExpanded ? 'Collapse All' : 'Expand All';
-                }
-
-                /* ══════════════════════════════════════
-                   PER-PERMISSION TOGGLE
-                ══════════════════════════════════════ */
-                function onPermChange(input) {
-                    const row = input.closest('.perm-row');
-                    const badge = row.querySelector('.perm-status');
-                    const dot = row.querySelector('.perm-dot');
-                    const label = row.querySelector('.perm-label');
-                    const color = input.dataset.color;
-                    const roleId = input.dataset.role;
-                    const mSlug = input.dataset.module;
-                    const pName = input.dataset.permName;
-                    const pSlug = input.dataset.permSlug;
-
-                    if (input.checked) {
-                        badge.textContent = 'Granted';
-                        badge.className = 'perm-status status-granted';
-                        badge.style.background = color + '18';
-                        badge.style.color = color;
-                        dot.style.background = color;
-                        label.style.color = '#2D2420';
-                        row.style.background = color + '06';
-
-                        if (!pendingGrants[roleId]) pendingGrants[roleId] = [];
-                        if (!pendingGrants[roleId].find(p => p.slug === pSlug)) {
-                            pendingGrants[roleId].push({
-                                name: pName,
-                                slug: pSlug,
-                                color
-                            });
-                        }
-                    } else {
-                        badge.textContent = 'Denied';
-                        badge.className = 'perm-status status-denied';
-                        badge.style.background = '';
-                        badge.style.color = '';
-                        dot.style.background = '#D5CEC8';
-                        label.style.color = '#8A7A6F';
-                        row.style.background = 'transparent';
-
-                        if (pendingGrants[roleId]) {
-                            pendingGrants[roleId] = pendingGrants[roleId].filter(p => p.slug !== pSlug);
-                        }
-                        if (savedGrants[roleId]) {
-                            savedGrants[roleId] = savedGrants[roleId].filter(p => p.slug !== pSlug);
-                        }
-                    }
-
-                    updateDots(roleId, mSlug, color);
-                    updateGroupCount(roleId, mSlug);
-                    syncGroupMaster(roleId, mSlug);
-                    updateAccentCard(roleId);
-                    updateFooterMsg(roleId);
-                    updateFooterExtras(roleId);
-                }
-
-                /* ══════════════════════════════════════
-                   GROUP "ALL" TOGGLE
-                ══════════════════════════════════════ */
-                function toggleGroupPerms(wrapper, roleId, mSlug, currentlyAllOn) {
-                    const newState = !currentlyAllOn;
-                    wrapper.setAttribute('onclick',
-                        `event.stopPropagation(); toggleGroupPerms(this, '${roleId}', '${mSlug}', ${newState})`);
-
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`).forEach(t => {
-                        if (t.disabled) return;
-                        t.checked = newState;
-                        onPermChange(t);
-                    });
-
-                    const master = form.querySelector(`.group-master[data-module="${mSlug}"]`);
-                    if (master) master.checked = newState;
-                }
-
-                function syncGroupMaster(roleId, mSlug) {
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    const all = [...form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`)];
-                    const checked = all.filter(t => t.checked).length;
-                    const master = form.querySelector(`.group-master[data-module="${mSlug}"]`);
-                    if (!master) return;
-
-                    master.checked = checked === all.length;
-                    master.indeterminate = checked > 0 && checked < all.length;
-                }
-
-                function updateDots(roleId, mSlug, color) {
-                    const cont = document.getElementById(`dots-${roleId}-${mSlug}`);
-                    if (!cont) return;
-
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    const toggles = [...form.querySelectorAll(`.perm-toggle[data-module="${mSlug}"]`)];
-                    const dots = cont.querySelectorAll('.dot');
-
-                    toggles.forEach((t, i) => {
-                        if (dots[i]) dots[i].style.background = t.checked ? color : '#E5DDD5';
-                    });
-                }
-
-                function updateGroupCount(roleId, mSlug) {
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    const dotsEl = form.querySelector(`[id="dots-${roleId}-${mSlug}"]`);
-                    if (!dotsEl) return;
-
-                    const groupCard = dotsEl.closest('.group-card');
-                    if (!groupCard) return;
-
-                    const all = [...groupCard.querySelectorAll('.perm-toggle')];
-                    const checked = all.filter(t => t.checked).length;
-                    const countEl = groupCard.querySelector('.group-count');
-
-                    if (countEl) countEl.textContent = `${checked} of ${all.length} enabled`;
-                }
-
-                function updateAccentCard(roleId) {
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    const all = [...form.querySelectorAll('.perm-toggle')];
-                    const total = all.length;
-                    const checked = all.filter(t => t.checked).length;
-                    const pct = total > 0 ? Math.round(checked / total * 100) : 0;
-
-                    document.getElementById('accentPct').textContent = pct + '%';
-                    document.getElementById('accentCount').textContent = `${checked} of ${total} permissions active`;
-                    document.getElementById('accentBar').style.width = pct + '%';
-
-                    const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
-                    if (card) {
-                        card.querySelector('.pct-label').textContent = pct + '%';
-                        card.querySelector('.count-label').textContent = `${checked} of ${total} permissions`;
-                        card.querySelector('.progress-fill').style.width = pct + '%';
-                        card.dataset.granted = checked;
-                        card.dataset.pct = pct;
-                    }
-                }
-
-                function updateFooterMsg(roleId) {
-                    const el = document.getElementById('footer-msg-' + roleId);
-                    if (!el) return;
-
-                    const form = document.getElementById('form-role-' + roleId);
-                    if (!form) return;
-
-                    const checked = [...form.querySelectorAll('.perm-toggle')].filter(t => t.checked).length;
-                    const roleName = document.querySelector(`.role-card[data-role-id="${roleId}"]`)?.dataset.roleName || '';
-
-                    el.textContent = `${checked} permissions enabled for ${roleName}`;
-                }
-
-                /* ══════════════════════════════════════
-                   FOOTER EXTRAS — chips + hint + View As
-                ══════════════════════════════════════ */
-                function updateFooterExtras(roleId) {
-                    const pending = pendingGrants[roleId] || [];
-                    const chipsEl = document.getElementById('chips-' + roleId);
-                    const hintEl = document.getElementById('hint-' + roleId);
-                    const vaBtn = document.getElementById('viewas-' + roleId);
-                    const roleName = document.querySelector(`.role-card[data-role-id="${roleId}"]`)?.dataset.roleName || '';
-
-                    if (chipsEl) {
-                        chipsEl.innerHTML = '';
-                        if (pending.length) {
-                            const col = pending[0]?.color || '#374151';
-                            chipsEl.innerHTML = `<span class="grant-chip" style="background:${col}18;color:${col};border:1px solid ${col}40;">
-                <i class="fa-solid fa-circle-plus" style="font-size:9px;"></i>
-                ${pending.length} new grant${pending.length > 1 ? 's' : ''} pending for ${roleName}
-            </span>`;
-                        }
-                    }
-
-                    if (hintEl) {
-                        hintEl.classList.toggle('show', pending.length > 0);
-                    }
-
-                    if (vaBtn) {
-                        const totalSavedRoles = Object.values(savedGrants).filter(a => a.length > 0).length;
-                        const badge = document.getElementById('va-badge-' + roleId);
-
-                        if (totalSavedRoles > 0) {
-                            vaBtn.classList.add('show');
-                            if (badge) badge.textContent = totalSavedRoles;
-                        } else {
-                            vaBtn.classList.remove('show');
-                            if (badge) badge.textContent = '0';
-                        }
-                    }
-                }
-
-                /* ══════════════════════════════════════
-                   FORM SUBMIT — move pending → saved
-                ══════════════════════════════════════ */
-                function onFormSubmit(roleId) {
+            fetch('{{ route("admin.role_permissions.update") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                body: JSON.stringify({ role_id: roleId, permissions: checkedIds })
+            })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || 'Server error ' + res.status);
+                    return data;
+                })
+                .then(data => {
+                    // Move pending → saved
                     const pending = pendingGrants[roleId] || [];
                     if (!savedGrants[roleId]) savedGrants[roleId] = [];
-
                     pending.forEach(p => {
-                        if (!savedGrants[roleId].find(s => s.slug === p.slug)) {
-                            savedGrants[roleId].push(p);
-                        }
+                        if (!savedGrants[roleId].find(s => s.slug === p.slug)) savedGrants[roleId].push(p);
                     });
-
                     pendingGrants[roleId] = [];
 
-                    document.querySelectorAll('[id^="viewas-"]').forEach(btn => {
-                        const rid = btn.id.replace('viewas-', '');
+                    // Update View As badges
+                    document.querySelectorAll('[id^="viewas-"]').forEach(vbtn => {
+                        const rid = vbtn.id.replace('viewas-', '');
                         const total = Object.values(savedGrants).filter(a => a.length > 0).length;
                         const badge = document.getElementById('va-badge-' + rid);
-
-                        if (total > 0) {
-                            btn.classList.add('show');
-                            if (badge) badge.textContent = total;
-                        } else {
-                            btn.classList.remove('show');
-                            if (badge) badge.textContent = '0';
-                        }
-                    });
-                }
-
-                /* ══════════════════════════════════════
-                   SEARCH
-                ══════════════════════════════════════ */
-                function filterPerms(q) {
-                    q = q.toLowerCase().trim();
-                    const visibleForm = [...document.querySelectorAll('.role-form')].find(f => f.style.display === 'block');
-                    if (!visibleForm) return;
-
-                    visibleForm.querySelectorAll('.perm-row').forEach(row => {
-                        const match = !q || (row.dataset.permSearch || '').includes(q);
-                        row.style.display = match ? '' : 'none';
+                        if (total > 0) { vbtn.classList.add('show'); if (badge) badge.textContent = total; }
+                        else { vbtn.classList.remove('show'); if (badge) badge.textContent = '0'; }
                     });
 
-                    visibleForm.querySelectorAll('.perm-group').forEach(group => {
-                        const visible = [...group.querySelectorAll('.perm-row')].some(r => r.style.display !== 'none');
-                        group.style.display = visible ? '' : 'none';
+                    updateFooterMsg(roleId);
+                    updateFooterExtras(roleId);
 
-                        if (q && visible) {
-                            const b = group.querySelector('.perm-group-body');
-                            if (b) b.classList.remove('collapsed');
-                        }
-                    });
-                }
+                    showToast('Saved!', `Permissions updated successfully.`, 'success');
+                })
+                .catch(err => {
+                    showToast('Error', err.message || 'Could not save permissions.', 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save Changes';
+                });
+        }
 
-                /* ══════════════════════════════════════
-                   VIEW AS MODAL
-                ══════════════════════════════════════ */
-function openViewAs() {
-    const overlay = document.getElementById('vaOverlay');
-    const list = document.getElementById('vaRoleList');
+        // RESET DEFAULTS
+        function ajaxResetDefaults() {
+            document.getElementById('resetConfirmOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
 
-    if (!overlay || !list) return;
+        function closeResetConfirm() {
+            document.getElementById('resetConfirmOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
 
-    list.innerHTML = '';
-    let totalPerms = 0;
-    let totalRoles = 0;
+        function confirmResetDefaults() {
+            const btn = document.getElementById('resetDefaultsBtn');
+            const confirmBtn = document.getElementById('resetConfirmBtn');
+            if (!confirmBtn) return;
 
-    document.querySelectorAll('.role-card').forEach(card => {
-        const roleId = card.dataset.roleId;
-        const roleName = card.dataset.roleName || 'Role';
-        const roleSlug = (card.dataset.slug || '').toLowerCase();
-        const granted = parseInt(card.dataset.granted || '0', 10);
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+                || '{{ csrf_token() }}';
 
-        if (granted <= 0) return;
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:12px;"></i> Resetting…';
 
-        const form = document.getElementById(`form-role-${roleId}`);
-        if (!form) return;
+            fetch('{{ route("admin.role_permissions.reset") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                body: JSON.stringify({})
+            })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || 'Server error ' + res.status);
+                    return data;
+                })
+                .then(() => {
+                    closeResetConfirm();
+                    showToast('Defaults Restored', 'All permissions have been reset to their defaults.', 'success');
+                    setTimeout(() => window.location.reload(), 2000);
+                })
+                .catch(err => {
+                    closeResetConfirm();
+                    showToast('Error', err.message || 'Could not reset permissions.', 'error');
+                })
+                .finally(() => {
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<i class="fa-solid fa-rotate-left" style="font-size:12px;"></i> Yes, Reset';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-rotate-left" style="font-size:12px; margin-right:4px;"></i> Reset Defaults';
+                    }
+                });
+        }
 
-        const checkedPerms = [...form.querySelectorAll('.perm-toggle:checked')].map(input => ({
-            name: input.dataset.permName || input.closest('.perm-row')?.querySelector('.perm-label')?.textContent?.trim() || 'Permission',
-            slug: input.dataset.permSlug || '',
-            color: input.dataset.color || '#374151'
-        }));
+        function filterPerms(q) {
+            q = q.toLowerCase().trim();
+            const form = [...document.querySelectorAll('.role-form')].find(f => f.style.display === 'block');
+            if (!form) return;
+            form.querySelectorAll('.perm-row').forEach(row => {
+                row.style.display = (!q || (row.dataset.permSearch || '').includes(q)) ? '' : 'none';
+            });
+            form.querySelectorAll('.perm-group').forEach(group => {
+                const visible = [...group.querySelectorAll('.perm-row')].some(r => r.style.display !== 'none');
+                group.style.display = visible ? '' : 'none';
+                if (q && visible) { const b = group.querySelector('.perm-group-body'); if (b) b.classList.remove('collapsed'); }
+            });
+        }
 
-        if (!checkedPerms.length) return;
+        function openViewAs() {
+            const overlay = document.getElementById('vaOverlay');
+            const list = document.getElementById('vaRoleList');
+            if (!overlay || !list) return;
+            list.innerHTML = '';
+            let totalPerms = 0, totalRoles = 0;
 
-        totalRoles++;
-        totalPerms += checkedPerms.length;
+            document.querySelectorAll('.role-card').forEach(card => {
+                const roleId = card.dataset.roleId;
+                const roleName = card.dataset.roleName || 'Role';
+                const roleSlug = (card.dataset.slug || '').toLowerCase();
+                const granted = parseInt(card.dataset.granted || '0', 10);
+                if (granted <= 0) return;
 
-        const words = roleName.split(' ').slice(0, 2);
-        const initials = words.map(w => w[0].toUpperCase()).join('');
-        const color = checkedPerms[0]?.color || '#374151';
-        const grad = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+                const form = document.getElementById(`form-role-${roleId}`);
+                if (!form) return;
 
-        const isSuperAdmin =
-            ['super_admin', 'super-admin', 'superadmin'].includes(roleSlug) ||
-            roleName.toLowerCase().includes('super');
+                const checkedPerms = [...form.querySelectorAll('.perm-toggle:checked')].map(input => ({
+                    name: input.dataset.permName || input.closest('.perm-row')?.querySelector('.perm-label')?.textContent?.trim() || 'Permission',
+                    slug: input.dataset.permSlug || '',
+                    color: input.dataset.color || '#374151'
+                }));
+                if (!checkedPerms.length) return;
 
-        const tags = checkedPerms.map(p => `
-            <span class="va-perm-tag" style="background:${color}18;color:${color};border:1px solid ${color}40;">
-                <i class="fa-solid fa-circle-check" style="font-size:8px;"></i> ${p.name}
-            </span>
-        `).join('');
+                totalRoles++; totalPerms += checkedPerms.length;
+                const words = roleName.split(' ').slice(0, 2);
+                const initials = words.map(w => w[0].toUpperCase()).join('');
+                const color = checkedPerms[0]?.color || '#374151';
+                const grad = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+                const isSuperAdmin = ['super_admin', 'super-admin', 'superadmin'].includes(roleSlug) || roleName.toLowerCase().includes('super');
 
-        const goBtn = !isSuperAdmin ? `
-            <button class="va-go-btn va-redirect-btn"
-                data-role-id="${roleId}"
-                data-role-name="${roleName}"
-                data-role-slug="${roleSlug}"
-                data-color="${color}">
-                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Go to Dashboard
-            </button>` : '';
+                const tags = checkedPerms.map(p => `<span class="va-perm-tag" style="background:${color}18;color:${color};border:1px solid ${color}40;"><i class="fa-solid fa-circle-check" style="font-size:8px;"></i> ${p.name}</span>`).join('');
+                const goBtn = !isSuperAdmin ? `<button class="va-go-btn va-redirect-btn" data-role-id="${roleId}" data-role-name="${roleName}" data-role-slug="${roleSlug}" data-color="${color}"><i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Go to Dashboard</button>` : '';
 
-        list.innerHTML += `
-            <div class="va-role-row ${!isSuperAdmin ? 'va-redirect-btn' : ''}"
-                data-role-id="${roleId}"
-                data-role-name="${roleName}"
-                data-role-slug="${roleSlug}"
-                data-color="${color}"
-                style="${isSuperAdmin ? 'cursor:default;' : ''}">
+                list.innerHTML += `
+            <div class="va-role-row ${!isSuperAdmin ? 'va-redirect-btn' : ''}" data-role-id="${roleId}" data-role-name="${roleName}" data-role-slug="${roleSlug}" data-color="${color}" style="${isSuperAdmin ? 'cursor:default;' : ''}">
                 <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:${grad};border-radius:14px 0 0 14px;"></div>
                 <div class="va-role-avatar" style="background:${grad};color:#fff;">${initials}</div>
                 <div style="flex:1;">
@@ -3077,591 +3518,198 @@ function openViewAs() {
                     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;">${tags}</div>
                 </div>
                 ${goBtn}
-            </div>
-        `;
-    });
+            </div>`;
+            });
 
-    list.querySelectorAll('.va-redirect-btn').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const target = this.closest('[data-role-id]') || this;
-            redirectToRole(
-                target.dataset.roleId,
-                target.dataset.roleName,
-                target.dataset.roleSlug,
-                target.dataset.color
-            );
+            list.querySelectorAll('.va-redirect-btn').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const t = this.closest('[data-role-id]') || this;
+                    redirectToRole(t.dataset.roleId, t.dataset.roleName, t.dataset.roleSlug, t.dataset.color);
+                });
+            });
+
+            document.getElementById('vaTotalPerms').textContent = totalPerms;
+            document.getElementById('vaTotalRoles').textContent = totalRoles;
+            document.getElementById('vaSubtitle').textContent = `${totalRoles} role${totalRoles > 1 ? 's' : ''} with granted access — select one to redirect`;
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeViewAs() {
+            const overlay = document.getElementById('vaOverlay');
+            if (overlay) overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function redirectToRole(roleId, roleName, roleSlug, color) {
+            if (roleSlug === 'patient') { closeViewAs(); openPatientPicker(roleName, roleSlug, color); return; }
+            closeViewAs();
+            const ol = document.getElementById('redirectOverlay');
+            ol.style.background = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+            document.getElementById('redirectText').textContent = `Redirecting to ${roleName} Dashboard…`;
+            document.getElementById('redirectSub').textContent = `Loading ${roleName} view for Super Admin`;
+            ol.classList.add('show');
+
+            fetch("{{ route('admin.impersonate') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                body: JSON.stringify({ role: roleSlug })
+            })
+                .then(async res => { const d = await res.json(); if (!res.ok) throw new Error(d.message || 'Error'); if (d.redirect) { window.location.href = d.redirect; return; } throw new Error('No redirect'); })
+                .catch(err => { ol.classList.remove('show'); showToast('Error', err.message || 'Something went wrong', 'error'); });
+        }
+
+        document.getElementById('newRoleName')?.addEventListener('input', function () {
+            document.getElementById('newRoleSlug').value = this.value.toLowerCase().trim()
+                .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
         });
-    });
+        function openNewRoleModal() {
+            const modal = document.getElementById('newRoleModal');
+            modal.style.display = 'flex';
+            // Trigger fade in on next frame
+            requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('modal-visible')));
+        }
 
-    document.getElementById('vaTotalPerms').textContent = totalPerms;
-    document.getElementById('vaTotalRoles').textContent = totalRoles;
-    document.getElementById('vaSubtitle').textContent =
-        `${totalRoles} role${totalRoles > 1 ? 's' : ''} with granted access — select one to redirect`;
+        function closeNewRoleModal() {
+            const modal = document.getElementById('newRoleModal');
+            modal.classList.remove('modal-visible');
+            // Wait for fade out to finish before hiding
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('newRoleName').value = '';
+                document.getElementById('newRoleSlug').value = '';
+                document.getElementById('newRoleError').style.display = 'none';
+            }, 250);
+        }
+        function createNewRole() {
+            const name = document.getElementById('newRoleName').value.trim();
+            const slug = document.getElementById('newRoleSlug').value.trim();
+            const errEl = document.getElementById('newRoleError');
+            if (!name) { errEl.textContent = 'Please enter a role name.'; errEl.style.display = 'block'; return; }
+            if (!slug) { errEl.textContent = 'Please enter a slug.'; errEl.style.display = 'block'; return; }
+            if (document.querySelector(`.role-card[data-slug="${slug}"]`)) { errEl.textContent = 'A role with this slug already exists.'; errEl.style.display = 'block'; return; }
+            errEl.style.display = 'none';
+            document.getElementById('createRoleName').value = name;
+            document.getElementById('createRoleSlug').value = slug;
+            document.getElementById('createRoleForm').submit();
+        }
 
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
+        function hexDarken(hex) {
+            const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            return '#' + Math.max(0, r - 45).toString(16).padStart(2, '0') + Math.max(0, g - 45).toString(16).padStart(2, '0') + Math.max(0, b - 45).toString(16).padStart(2, '0');
+        }
 
-                function closeViewAs() {
-                    const overlay = document.getElementById('vaOverlay');
-                    if (overlay) overlay.classList.remove('open');
-                    document.body.style.overflow = '';
-                }
+        function showToast(title, sub, type = 'success') {
+            const t = document.getElementById('toastPop');
+            const icon = document.getElementById('toastIconEl');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastSub').textContent = sub;
+            t.classList.remove('toast-error');
+            if (type === 'error') {
+                t.classList.add('toast-error');
+                icon.className = 'fa-solid fa-circle-exclamation';
+            } else {
+                icon.className = 'fa-solid fa-circle-check';
+            }
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4500);
+        }
 
-                function redirectToRole(roleId, roleName, roleSlug, color) {
-                    if (roleSlug === 'patient') {
-                        closeViewAs();
-                        openPatientPicker(roleName, roleSlug, color);
-                        return;
-                    }
+        // DELETE ROLE MODAL
+        const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
+        let deleteTargetRoleId = null;
 
-                    closeViewAs();
+        function openDeleteModal(roleId, roleName) {
+            const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
+            const slug = (card?.dataset.slug || '').toLowerCase().trim();
+            if (PROTECTED_ROLE_SLUGS.includes(slug)) { showToast('Protected Role', `"${roleName}" is a built-in role and cannot be deleted.`, 'error'); return; }
+            deleteTargetRoleId = roleId;
+            document.getElementById('deleteRoleName').textContent = roleName;
+            document.getElementById('deleteRoleError').style.display = 'none';
+            document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
+            document.getElementById('deleteRoleOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteRoleOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+            deleteTargetRoleId = null;
+        }
 
-                    const ol = document.getElementById('redirectOverlay');
+        // PATIENT PICKER
+        let patientAccountsCache = [];
 
-                    ol.style.background = `linear-gradient(135deg,${color},${hexDarken(color)})`;
-                    document.getElementById('redirectText').textContent = `Redirecting to ${roleName} Dashboard…`;
-                    document.getElementById('redirectSub').textContent = `Loading ${roleName} view for Super Admin`;
-
-                    ol.classList.add('show');
-
-                    fetch("{{ route('admin.impersonate') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({
-                            role: roleSlug
-                        })
-                    })
-                        .then(async response => {
-                            const data = await response.json();
-
-                            if (!response.ok) {
-                                throw new Error(data.message || "Unable to start impersonation.");
-                            }
-
-                            if (data.redirect) {
-                                window.location.href = data.redirect;
-                                return;
-                            }
-
-                            throw new Error("No redirect URL returned.");
-                        })
-                        .catch(error => {
-                            ol.classList.remove('show');
-                            showToast('Error', error.message || 'Something went wrong');
-                        });
-                }
-
-
-                /* ══════════════════════════════════════
-                   NEW ROLE MODAL
-                ══════════════════════════════════════ */
-                document.getElementById('newRoleName')?.addEventListener('input', function () {
-                    document.getElementById('newRoleSlug').value = this.value.toLowerCase().trim()
-                        .replace(/[^a-z0-9\s-]/g, '')
-                        .replace(/\s+/g, '-')
-                        .replace(/-+/g, '-');
-                });
-
-                function closeNewRoleModal() {
-                    document.getElementById('newRoleModal').style.display = 'none';
-                    document.getElementById('newRoleName').value = '';
-                    document.getElementById('newRoleSlug').value = '';
-                    document.getElementById('newRoleError').style.display = 'none';
-                }
-
-                function createNewRole() {
-                    const name = document.getElementById('newRoleName').value.trim();
-                    const slug = document.getElementById('newRoleSlug').value.trim();
-                    const errEl = document.getElementById('newRoleError');
-
-                    if (!name) {
-                        errEl.textContent = 'Please enter a role name.';
-                        errEl.style.display = 'block';
-                        return;
-                    }
-
-                    if (!slug) {
-                        errEl.textContent = 'Please enter a slug.';
-                        errEl.style.display = 'block';
-                        return;
-                    }
-
-                    if (document.querySelector(`.role-card[data-slug="${slug}"]`)) {
-                        errEl.textContent = 'A role with this slug already exists.';
-                        errEl.style.display = 'block';
-                        return;
-                    }
-
-                    errEl.style.display = 'none';
-
-                    document.getElementById('createRoleName').value = name;
-                    document.getElementById('createRoleSlug').value = slug;
-                    document.getElementById('createRoleForm').submit();
-
-
-                    const words = name.split(' ').slice(0, 2);
-                    const initials = words.map(w => w[0].toUpperCase()).join('');
-                    const badgeInfo = getRoleBadgeJS(name, slug);
-                    const tempId = 'new-' + Date.now();
-
-                    const card = document.createElement('div');
-                    card.className = 'role-card card-new';
-                    card.dataset.roleId = tempId;
-                    card.dataset.roleName = name;
-                    card.dataset.granted = '0';
-                    card.dataset.total = '0';
-                    card.dataset.pct = '0';
-                    card.dataset.slug = slug;
-                    card.dataset.isSuper = '0';
-                    card.onclick = function () {
-                        selectRole(this);
-                    };
-
-                    card.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div class="role-avatar">${initials}</div>
-            <div style="flex:1;">
-                <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px;">
-                    <span style="font-weight:600;font-size:14px;color:#2D2420;" class="role-name-label">${name}</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                    <span class="badge-pill" style="background:${badgeInfo.color}18;color:${badgeInfo.color};border:1px solid ${badgeInfo.color}40;white-space:nowrap;">${badgeInfo.label}</span>
-                    <span style="font-size:11px;color:#B5A99A;white-space:nowrap;">${slug}</span>
-                </div>
-            </div>
-            <div class="active-dot" style="width:8px;height:8px;border-radius:50%;background:#7B0D0D;flex-shrink:0;display:none;"></div>
-        </div>
-        <div style="margin-top:12px;">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:#B5A99A;margin-bottom:5px;">
-                <span>Access level</span>
-                <span style="font-weight:600;" class="pct-label">0%</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#C4B8AF;"></div></div>
-            <div style="font-size:11px;color:#C4B8AF;margin-top:4px;" class="count-label">0 of 0 permissions</div>
-        </div>`;
-
-                    document.getElementById('roleCardList').appendChild(card);
-                    document.getElementById('roleCountLabel').textContent =
-                        `Roles (${document.querySelectorAll('.role-card').length})`;
-
-                    buildRoleForm(tempId, name, slug, badgeInfo.color);
-
-                    savedGrants[tempId] = [];
-                    pendingGrants[tempId] = [];
-
-                    closeNewRoleModal();
-                    showToast('Role created!', `"${name}" added. Grant permissions then save.`);
-
-                    setTimeout(() => selectRole(card), 150);
-                    document.getElementById('createRoleForm').submit();
-                }
-
-                function getRoleBadgeJS(name, slug) {
-                    const n = name.toLowerCase();
-                    const s = slug.toLowerCase();
-
-                    if (n.includes('super') || s.includes('super')) return {
-                        color: '#7B0D0D',
-                        label: 'Full Access'
-                    };
-                    if (n.includes('dentist') || s.includes('dentist')) return {
-                        color: '#B45309',
-                        label: 'Clinical'
-                    };
-                    if (n.includes('staff') || s.includes('staff') || n.includes('clinic')) return {
-                        color: '#065F46',
-                        label: 'Front Desk'
-                    };
-                    if (n.includes('student') || s.includes('student') || n.includes('patient')) return {
-                        color: '#4B5563',
-                        label: 'Limited'
-                    };
-
-                    return {
-                        color: '#6B7280',
-                        label: 'Custom'
-                    };
-                }
-
-                function buildRoleForm(roleId, roleName, slug, accentColor) {
-                    let groupsHtml = '';
-
-                    PERM_MODULES.forEach(grp => {
-                        const mSlug = grp.module.toLowerCase().replace(/\s+/g, '-');
-                        groupsHtml += `
-        <div class="group-card perm-group" data-group="${grp.module.toLowerCase()}">
-            <div class="perm-group-header" onclick="togglePermGroup(this)">
-                <div class="perm-group-icon" style="background:${grp.color}15;color:${grp.color};border:1px solid ${grp.color}25;">
-                    <i class="fa-solid ${grp.icon}"></i>
-                </div>
+        function escapeHtml(v) {
+            return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+        function closePatientPicker() {
+            const o = document.getElementById('patientPickerOverlay');
+            if (o) o.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function openPatientPicker(roleName, roleSlug, color) {
+            fetch("{{ route('admin.patients.list') }}", { method: 'GET', headers: { 'Accept': 'application/json' } })
+                .then(async res => { const d = await res.json(); if (!res.ok) throw new Error(d.message || 'Error'); patientAccountsCache = Array.isArray(d) ? d : []; renderPatientPicker(patientAccountsCache); document.getElementById('patientPickerSearch').value = ''; document.getElementById('patientPickerOverlay').classList.add('open'); document.body.style.overflow = 'hidden'; })
+                .catch(err => showToast('Error', err.message || 'Unable to load patients', 'error'));
+        }
+        function renderPatientPicker(patients) {
+            const list = document.getElementById('patientPickerList');
+            if (!list) return;
+            if (!patients.length) { list.innerHTML = '<div style="text-align:center;padding:32px 20px;color:#8A7A6F;font-size:14px;">No patient accounts found.</div>'; return; }
+            list.innerHTML = patients.map(p => {
+                const n = (p.name || 'Patient').replace(/'/g, "\\'");
+                const i = (p.name || 'P').charAt(0).toUpperCase();
+                return `<div class="va-role-row" data-patient-search="${((p.name || '') + ' ' + (p.email || '')).toLowerCase()}">
+                <div class="va-role-avatar" style="background:linear-gradient(135deg,#065F46,#047857);color:#fff;">${i}</div>
                 <div style="flex:1;">
-                    <div style="font-weight:700;font-size:14px;color:#2D2420;">${grp.module}</div>
-                    <div style="font-size:12px;color:#B5A99A;" class="group-count">0 of 0 enabled</div>
+                    <div style="font-size:14px;font-weight:700;color:#2D2420;margin-bottom:3px;">${escapeHtml(p.name || 'Unnamed Patient')}</div>
+                    <div style="font-size:12px;color:#8A7A6F;">${escapeHtml(p.email || '')}</div>
+                    <div style="font-size:12px;color:#B5A99A;margin-top:4px;">ID: ${p.id}${p.phone ? ' • ' + escapeHtml(p.phone) : ''}</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:14px;">
-                    <div class="dot-row" id="dots-${roleId}-${mSlug}"></div>
-                    <div class="all-toggle-wrap" onclick="event.stopPropagation();toggleGroupPerms(this,'${roleId}','${mSlug}',false)">
-                        <span style="font-size:11px;color:#6B5E56;font-weight:600;">All</span>
-                        <label class="toggle-switch" onclick="event.preventDefault();">
-                            <input type="checkbox" class="group-master" data-role="${roleId}" data-module="${mSlug}">
-                            <span class="toggle-track"></span>
-                        </label>
-                    </div>
-                    <i class="fa-solid fa-chevron-up chevron"></i>
-                </div>
-            </div>
-            <div class="perm-group-body">
-                <div style="text-align:center;padding:16px;font-size:12px;color:#B5A99A;font-style:italic;">
-                    <i class="fa-solid fa-circle-info" style="margin-right:5px;opacity:.6;"></i>
-                    Permissions load after the role is saved to the database.
-                </div>
-            </div>
-        </div>`;
-                    });
-
-                    const footerHtml = `
-    <div class="footer-bar" id="footer-bar-${roleId}">
-        <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">
-            <div style="font-size:13px;color:#8A7A6F;" id="footer-msg-${roleId}">0 permissions enabled for ${roleName}</div>
-            <div class="grant-chips" id="chips-${roleId}"></div>
-            <div class="hint-save" id="hint-${roleId}">
-                <i class="fa-solid fa-eye" style="font-size:11px;"></i> Save changes to unlock "View As"
-            </div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
-            <button type="button" class="btn-view-as" id="viewas-${roleId}" onclick="openViewAs()">
-                <i class="fa-solid fa-eye" style="font-size:13px;"></i> View As
-                <span class="va-count-badge" id="va-badge-${roleId}">0</span>
-            </button>
-            <button type="button" class="btn-save"
-                onclick="showToast('Save in progress…','Role will be fully available after page reloads.')">
-                <i class="fa-solid fa-floppy-disk" style="font-size:13px;"></i> Save Changes
-            </button>
-        </div>
-    </div>`;
-
-                    const form = document.createElement('form');
-                    form.id = 'form-role-' + roleId;
-                    form.className = 'role-form';
-                    form.dataset.roleId = roleId;
-                    form.style.display = 'none';
-                    form.innerHTML =
-                        `<div style="display:flex;flex-direction:column;gap:10px;" class="groups-container">${groupsHtml}</div>${footerHtml}`;
-
-                    const allForms = document.querySelectorAll('.role-form');
-                    const last = allForms[allForms.length - 1];
-                    last.parentNode.insertBefore(form, last.nextSibling);
-                }
-
-                /* ══════════════════════════════════════
-                   HELPERS
-                ══════════════════════════════════════ */
-                function hexDarken(hex) {
-                    const r = parseInt(hex.slice(1, 3), 16);
-                    const g = parseInt(hex.slice(3, 5), 16);
-                    const b = parseInt(hex.slice(5, 7), 16);
-
-                    return '#' +
-                        Math.max(0, r - 45).toString(16).padStart(2, '0') +
-                        Math.max(0, g - 45).toString(16).padStart(2, '0') +
-                        Math.max(0, b - 45).toString(16).padStart(2, '0');
-                }
-
-                function showToast(title, sub) {
-                    document.getElementById('toastTitle').textContent = title;
-                    document.getElementById('toastSub').textContent = sub;
-
-                    const t = document.getElementById('toastPop');
-                    t.classList.add('show');
-
-                    setTimeout(() => t.classList.remove('show'), 4500);
-                }
-
-                /* Keyboard shortcuts */
-                document.addEventListener('keydown', e => {
-                    if (e.key === 'Escape') {
-                        closeViewAs();
-                        if (document.getElementById('newRoleModal').style.display !== 'none') {
-                            closeNewRoleModal();
-                        }
-                    }
-                });
-
-                document.getElementById('newRoleModal')?.addEventListener('click', function (e) {
-                    if (e.target === this) closeNewRoleModal();
-                });
-
-
-                let patientAccountsCache = [];
-
-                function escapeHtml(value) {
-                    return String(value)
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#039;');
-                }
-
-                function closePatientPicker() {
-                    const overlay = document.getElementById('patientPickerOverlay');
-                    if (overlay) overlay.classList.remove('open');
-                    document.body.style.overflow = '';
-                }
-
-                function openPatientPicker(roleName, roleSlug, color) {
-                    fetch("{{ route('admin.patients.list') }}", {
-                        method: "GET",
-                        headers: {
-                            "Accept": "application/json"
-                        }
-                    })
-                        .then(async response => {
-                            const data = await response.json();
-
-                            if (!response.ok) {
-                                throw new Error(data.message || 'Unable to load patients.');
-                            }
-
-                            patientAccountsCache = Array.isArray(data) ? data : [];
-                            renderPatientPicker(patientAccountsCache);
-
-                            const searchInput = document.getElementById('patientPickerSearch');
-                            if (searchInput) {
-                                searchInput.value = '';
-                            }
-
-                            document.getElementById('patientPickerOverlay').classList.add('open');
-                            document.body.style.overflow = 'hidden';
-                        })
-                        .catch(error => {
-                            showToast('Error', error.message || 'Unable to load patients');
-                        });
-                }
-
-                function renderPatientPicker(patients) {
-                    const list = document.getElementById('patientPickerList');
-
-                    if (!list) return;
-
-                    if (!patients.length) {
-                        list.innerHTML = `
-            <div style="
-                text-align:center;
-                padding:32px 20px;
-                color:#8A7A6F;
-                font-size:14px;
-            ">
-                No patient accounts found.
-            </div>
-        `;
-                        return;
-                    }
-
-                    list.innerHTML = patients.map(patient => {
-                        const patientName = (patient.name || 'Patient').replace(/'/g, "\\'");
-                        const patientEmail = patient.email || 'No email';
-                        const patientPhone = patient.phone || '';
-                        const patientInitial = (patient.name || 'P').charAt(0).toUpperCase();
-                        const searchText = ((patient.name || '') + ' ' + (patient.email || '')).toLowerCase();
-
-                        return `
-            <div class="va-role-row" data-patient-search="${searchText}">
-                <div class="va-role-avatar" style="background:linear-gradient(135deg,#065F46,#047857);color:#fff;">
-                    ${patientInitial}
-                </div>
-
-                <div style="flex:1;">
-                    <div style="font-size:14px;font-weight:700;color:#2D2420;margin-bottom:3px;">
-                        ${escapeHtml(patient.name || 'Unnamed Patient')}
-                    </div>
-                    <div style="font-size:12px;color:#8A7A6F;">
-                        ${escapeHtml(patientEmail)}
-                    </div>
-                    <div style="font-size:12px;color:#B5A99A;margin-top:4px;">
-                        ID: ${patient.id}${patientPhone ? ' • ' + escapeHtml(patientPhone) : ''}
-                    </div>
-                </div>
-
-                <button
-                    type="button"
-                    class="va-go-btn"
-                    onclick="event.stopPropagation(); startPatientImpersonation('patient', 'patient', '#065F46', ${patient.id}, '${patientName}')">
+                <button type="button" class="va-go-btn" onclick="event.stopPropagation(); startPatientImpersonation('patient','patient','#065F46',${p.id},'${n}')">
                     <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i> Impersonate
                 </button>
-            </div>
-        `;
-                    }).join('');
-                }
+            </div>`;
+            }).join('');
+        }
+        function filterPatientPicker(q) {
+            q = q.toLowerCase().trim();
+            if (!q) { renderPatientPicker(patientAccountsCache); return; }
+            const filtered = patientAccountsCache.filter(p => ((p.name || '') + (p.email || '')).toLowerCase().includes(q));
+            if (!filtered.length) {
+                document.getElementById('patientPickerList').innerHTML = `<div style="text-align:center;padding:32px 20px;color:#8A7A6F;"><div style="font-size:16px;font-weight:700;color:#7B0D0D;margin-bottom:8px;">No results for "${escapeHtml(q)}"</div><div style="font-size:14px;">Try a different patient name.</div></div>`;
+                return;
+            }
+            renderPatientPicker(filtered);
+        }
+        function clearPatientSearch() {
+            const inp = document.getElementById('patientPickerSearch');
+            if (inp) { inp.value = ''; filterPatientPicker(''); }
+        }
+        function startPatientImpersonation(roleName, roleSlug, color, patientId, patientName) {
+            closePatientPicker();
+            const ol = document.getElementById('redirectOverlay');
+            ol.style.background = `linear-gradient(135deg,${color},${hexDarken(color)})`;
+            document.getElementById('redirectText').textContent = `Redirecting as ${patientName}…`;
+            document.getElementById('redirectSub').textContent = 'Loading patient dashboard for Super Admin';
+            ol.classList.add('show');
+            fetch("{{ route('admin.impersonate') }}", {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                body: JSON.stringify({ role: roleSlug, patient_id: patientId })
+            })
+                .then(async res => { const d = await res.json(); if (!res.ok) throw new Error(d.message || 'Error'); if (d.redirect) { window.location.href = d.redirect; return; } throw new Error('No redirect'); })
+                .catch(err => { ol.classList.remove('show'); showToast('Error', err.message || 'Something went wrong', 'error'); });
+        }
 
-                function filterPatientPicker(query) {
-                    const q = query.toLowerCase().trim();
-                    const list = document.getElementById('patientPickerList');
-
-                    if (!list) return;
-
-                    if (q === '') {
-                        renderPatientPicker(patientAccountsCache);
-                        return;
-                    }
-
-                    const filteredPatients = patientAccountsCache.filter(patient => {
-                        const name = (patient.name || '').toLowerCase();
-                        const email = (patient.email || '').toLowerCase();
-                        return name.includes(q) || email.includes(q);
-                    });
-
-                    if (!filteredPatients.length) {
-                        list.innerHTML = `
-            <div style="
-                text-align:center;
-                padding:32px 20px;
-                color:#8A7A6F;
-            ">
-                <div style="
-                    font-size:16px;
-                    font-weight:700;
-                    color:#7B0D0D;
-                    margin-bottom:8px;
-                ">
-                    No results for "${escapeHtml(query)}"
-                </div>
-                <div style="
-                    font-size:14px;
-                    color:#8A7A6F;
-                ">
-                    Try a different patient name.
-                </div>
-            </div>
-        `;
-                        return;
-                    }
-
-                    renderPatientPicker(filteredPatients);
-                }
-
-                function startPatientImpersonation(roleName, roleSlug, color, patientId, patientName) {
-                    closePatientPicker();
-
-                    const ol = document.getElementById('redirectOverlay');
-                    ol.style.background = `linear-gradient(135deg,${color},${hexDarken(color)})`;
-                    document.getElementById('redirectText').textContent = `Redirecting as ${patientName}…`;
-                    document.getElementById('redirectSub').textContent = `Loading patient dashboard for Super Admin`;
-                    ol.classList.add('show');
-
-                    fetch("{{ route('admin.impersonate') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({
-                            role: roleSlug,
-                            patient_id: patientId
-                        })
-                    })
-                        .then(async response => {
-                            const data = await response.json();
-
-                            if (!response.ok) {
-                                throw new Error(data.message || "Unable to start impersonation.");
-                            }
-
-                            if (data.redirect) {
-                                window.location.href = data.redirect;
-                                return;
-                            }
-
-                            throw new Error("No redirect URL returned.");
-                        })
-                        .catch(error => {
-                            ol.classList.remove('show');
-                            showToast('Error', error.message || 'Something went wrong');
-                        });
-                }
-
-                function toggleClearBtn(value) {
-                    const btn = document.getElementById('patientSearchClear');
-                    if (!btn) return;
-
-                    btn.style.display = value.trim() !== '' ? 'flex' : 'none';
-                }
-
-                function clearPatientSearch() {
-                    const input = document.getElementById('patientPickerSearch');
-                    const btn = document.getElementById('patientSearchClear');
-
-                    if (!input) return;
-
-                    input.value = '';
-                    if (btn) btn.style.display = 'none';
-
-                    filterPatientPicker('');
-                }
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape') {
-                        closePatientPicker();
-                    }
-                });
-
-                function clearPatientSearch() {
-                    const input = document.getElementById('patientPickerSearch');
-
-                    if (!input) return;
-
-                    input.value = '';
-                    filterPatientPicker('');
-                }
-
-                /* ══════════════════════════════════════
-                    DELETE ROLE MODAL
-                    ══════════════════════════════════════ */
-                    let deleteTargetRoleId = null;
-
-                   // Roles that cannot be deleted
-                        const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
-
-                        function openDeleteModal(roleId, roleName) {
-                            // Get the slug from the role card
-                            const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
-                            const slug = (card?.dataset.slug || '').toLowerCase().trim();
-
-                            if (PROTECTED_ROLE_SLUGS.includes(slug)) {
-                                showToast('Protected Role', `"${roleName}" is a built-in role and cannot be deleted.`);
-                                return;
-                            }
-
-                            deleteTargetRoleId = roleId;
-                            document.getElementById('deleteRoleName').textContent = roleName;
-                            document.getElementById('deleteRoleError').style.display = 'none';
-
-                            const form = document.getElementById('deleteRoleForm');
-                            form.action = `/admin/role-permissions/${roleId}/destroy`;
-
-                            document.getElementById('deleteRoleOverlay').classList.add('open');
-                            document.body.style.overflow = 'hidden';
-                        }
-
-                    function closeDeleteModal() {
-                        document.getElementById('deleteRoleOverlay').classList.remove('open');
-                        document.body.style.overflow = '';
-                        deleteTargetRoleId = null;
-                    }
-
-                    // Add ESC key support for delete modal
-                    document.addEventListener('keydown', function(e) {
-                        if (e.key === 'Escape') {
-                            closeDeleteModal();
-                        }
-                    });
-            </script>
+        // KEYBOARD SHORTCUTS
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeViewAs(); closeDeleteModal(); closePatientPicker(); closeResetConfirm();
+                if (document.getElementById('newRoleModal').style.display !== 'none') closeNewRoleModal();
+            }
+        });
+    </script>
 
 </body>
 
