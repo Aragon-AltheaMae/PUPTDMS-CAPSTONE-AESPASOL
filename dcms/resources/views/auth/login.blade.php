@@ -6,25 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PUPT-DMS | Login</title>
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
     <style>
-        :root {
-            --crimson: #8B0000;
-            --crimson-mid: #6B0000;
-            --crimson-dark: #3D0000;
-            --gold: #C9A84C;
-            --gold-bright: #FFD700;
-            --ivory: #FEFCF8;
-            --text-dark: #1A0A0A;
-            --text-mid: #6B5B5B;
-            --text-light: #A89898;
-        }
-
         *,
         *::before,
         *::after {
@@ -36,7 +23,7 @@
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: var(--crimson-dark);
+            background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #C9A84C 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -102,19 +89,92 @@
             }
         }
 
+        /* ── BG GRID LAYER ── */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-layer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(201, 168, 76, .06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201, 168, 76, .06) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ── FLOATING TEETH ── */
+        .tooth-float {
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.095;
+        }
+
+        .tooth-1 {
+            top: 8%;
+            left: 5%;
+            animation: floatA 14s ease-in-out infinite alternate;
+        }
+
+        .tooth-2 {
+            top: 60%;
+            right: 4%;
+            animation: floatB 18s ease-in-out infinite alternate;
+        }
+
+        .tooth-3 {
+            bottom: 12%;
+            left: 12%;
+            animation: floatA 20s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatA {
+            from {
+                transform: translateY(0) rotate(-8deg);
+            }
+
+            to {
+                transform: translateY(20px) rotate(4deg);
+            }
+        }
+
+        @keyframes floatB {
+            from {
+                transform: translateY(0) rotate(6deg);
+            }
+
+            to {
+                transform: translateY(-18px) rotate(-3deg);
+            }
+        }
+
+        /* ── MAIN CENTERING ── */
+        main {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            min-height: calc(100vh - 120px);
+        }
+
         /* ── CARD ── */
         .login-card {
             position: relative;
-            z-index: 10;
-            width: min(96vw, 980px);
+            width: min(980px);
             display: grid;
             grid-template-columns: 1fr 1.1fr;
             border-radius: 24px;
             overflow: hidden;
             box-shadow:
                 0 0 0 1px rgba(201, 168, 76, .15),
-                0 24px 80px rgba(0, 0, 0, .7),
-                0 8px 24px rgba(0, 0, 0, .4);
+                0 24px 80px rgba(0, 0, 0, 0.178),
+                0 8px 24px rgba(0, 0, 0, 0.157);
             animation: cardUp .9s cubic-bezier(.22, 1, .36, 1) .1s both;
         }
 
@@ -137,7 +197,9 @@
             min-height: 500px;
         }
 
-        .photo-side img {
+        .photo-side .campus-bg {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -147,7 +209,7 @@
             transition: transform 12s ease;
         }
 
-        .photo-side:hover img {
+        .photo-side:hover .campus-bg {
             transform: scale(1.08);
         }
 
@@ -161,26 +223,56 @@
                     rgba(0, 0, 0, .15) 100%);
         }
 
+        /* Medical cross accents */
+        .medical-cross {
+            position: absolute;
+            z-index: 2;
+            opacity: 0.07;
+        }
+
+        .medical-cross-1 {
+            top: 10%;
+            right: 8%;
+            width: 80px;
+        }
+
+        .medical-cross-2 {
+            bottom: 18%;
+            left: 6%;
+            width: 50px;
+        }
+
         .photo-content {
             position: absolute;
             inset: 0;
-            z-index: 2;
+            z-index: 4;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 32px;
+            padding: 40px 32px 64px;
             text-align: center;
+        }
+
+        /* Eyebrow label */
+        .panel-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: rgba(201, 168, 76, .75);
+            margin-bottom: 10px;
+            display: block;
         }
 
         /* Shine text */
         .shine-text {
             background: linear-gradient(90deg,
-                    var(--crimson-mid) 0%,
-                    var(--gold-bright) 35%,
+                    #6B0000 0%,
+                    #FFD700 35%,
                     #fff 50%,
-                    var(--gold-bright) 65%,
-                    var(--crimson-mid) 100%);
+                    #FFD700 65%,
+                    #6B0000 100%);
             background-size: 250% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -232,12 +324,9 @@
             background: linear-gradient(90deg, rgba(201, 168, 76, .45), transparent);
         }
 
-        .photo-divider-dot {
-            width: 5px;
-            height: 5px;
-            background: var(--gold);
-            transform: rotate(45deg);
-            opacity: .7;
+        .photo-divider-cross {
+            color: rgba(201, 168, 76, .55);
+            font-size: 10px;
         }
 
         /* Logos */
@@ -279,11 +368,54 @@
             background: linear-gradient(to bottom, transparent, rgba(201, 168, 76, .4), transparent);
         }
 
-        .photo-tagline {
-            font-size: 12px;
-            color: rgb(239, 239, 239);
-            line-height: 1.8;
-            max-width: 300px;
+        /* Feature pills */
+        .feature-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 260px;
+        }
+
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(201, 168, 76, .15);
+            border-radius: 10px;
+            padding: 9px 14px;
+            backdrop-filter: blur(4px);
+            text-align: left;
+            transition: background .2s, border-color .2s;
+        }
+
+        .feature-pill:hover {
+            background: rgba(255, 255, 255, .09);
+            border-color: rgba(201, 168, 76, .3);
+        }
+
+        .feature-pill-icon {
+            width: 26px;
+            height: 26px;
+            background: rgba(201, 168, 76, .12);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-pill-icon i {
+            font-size: 11px;
+            color: #C9A84C;
+        }
+
+        .feature-pill-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.3;
         }
 
         .photo-badge {
@@ -291,7 +423,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 3;
+            z-index: 5;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -309,7 +441,7 @@
 
         /* ── RIGHT: FORM ── */
         .form-side {
-            background: var(--ivory);
+            background: #F4F4F4;
             padding: 52px 48px;
             display: flex;
             flex-direction: column;
@@ -328,43 +460,21 @@
             pointer-events: none;
         }
 
-        .form-portal-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .form-portal-pip {
-            width: 28px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--crimson), var(--gold));
-            border-radius: 2px;
-        }
-
-        .form-portal-text {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .18em;
-            text-transform: uppercase;
-            color: var(--gold);
-        }
-
         .form-heading {
             font-size: 30px;
             font-weight: 800;
-            color: var(--text-dark);
+            color: #333;
             line-height: 1.15;
             margin-bottom: 4px;
         }
 
         .form-heading span {
-            color: var(--crimson);
+            color: #8B0000;
         }
 
         .form-sub {
             font-size: 13px;
-            color: var(--text-light);
+            color: #757575;
             margin-bottom: 28px;
             line-height: 1.5;
         }
@@ -379,7 +489,7 @@
             gap: 6px;
             font-size: 11px;
             font-weight: 600;
-            color: var(--text-mid);
+            color: #6B5B5B;
             margin-bottom: 7px;
             letter-spacing: .05em;
             text-transform: uppercase;
@@ -387,7 +497,7 @@
 
         .field-label i {
             font-size: 10px;
-            color: var(--crimson);
+            color: #8B0000;
             opacity: .7;
         }
 
@@ -399,7 +509,7 @@
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-            color: var(--text-dark);
+            color: #1A0A0A;
             outline: none;
             transition: border-color .2s, box-shadow .2s, background .2s;
         }
@@ -410,7 +520,7 @@
         }
 
         .field-input:focus {
-            border-color: var(--crimson);
+            border-color: #8B0000;
             box-shadow: 0 0 0 4px rgba(139, 0, 0, .07);
             background: #FFFDF9;
         }
@@ -435,20 +545,20 @@
         }
 
         .pw-toggle:hover {
-            color: var(--crimson);
+            color: #8B0000;
         }
 
         input:-webkit-autofill,
         input:-webkit-autofill:focus {
             -webkit-box-shadow: 0 0 0 40px #fff inset !important;
-            -webkit-text-fill-color: var(--text-dark) !important;
+            -webkit-text-fill-color: #1A0A0A !important;
         }
 
         .btn-submit {
             width: 100%;
             margin-top: 8px;
             padding: 14px;
-            background: linear-gradient(135deg, var(--crimson) 0%, #B22222 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -505,11 +615,11 @@
             padding-top: 18px;
             border-top: 1px solid #F0EAE2;
             font-size: 13px;
-            color: var(--text-light);
+            color: #757575;
         }
 
         .register-row a {
-            color: var(--crimson);
+            color: #8B0000;
             font-weight: 700;
             text-decoration: none;
             transition: opacity .2s;
@@ -559,7 +669,7 @@
         }
 
         .toast.error::before {
-            background: var(--crimson);
+            background: #8B0000;
         }
 
         .toast.success::before {
@@ -599,7 +709,7 @@
         }
 
         .toast.error .toast-icon {
-            color: var(--crimson);
+            color: #8B0000;
         }
 
         .toast.success .toast-icon {
@@ -640,9 +750,8 @@
         }
 
         /* ════════════════════════════
-        LOGIN FOOTER
+           LOGIN FOOTER
         ════════════════════════════ */
-
         .login-footer {
             width: 100%;
             margin-top: 30px;
@@ -654,12 +763,11 @@
 
         .login-footer-inner {
             text-align: center;
-            color: rgba(255,255,255,.75);
+            color: rgba(255, 255, 255, .75);
             font-size: 12px;
             letter-spacing: .04em;
         }
 
-        /* Divider */
         .footer-divider {
             display: flex;
             align-items: center;
@@ -671,29 +779,22 @@
         .footer-divider span {
             width: 40px;
             height: 1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(201,168,76,.6),
-                transparent
-            );
+            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .6), transparent);
         }
 
         .footer-divider i {
             font-size: 11px;
-            color: rgba(255,215,0,.65);
+            color: rgba(255, 215, 0, .65);
         }
 
-        /* Text */
         .footer-text {
             font-weight: 500;
         }
 
         .footer-year {
-            color: rgba(255,255,255,.45);
+            color: rgba(255, 255, 255, .45);
         }
 
-        /* Links */
         .footer-links {
             margin-top: 6px;
             display: flex;
@@ -704,7 +805,7 @@
         }
 
         .footer-links a {
-            color: rgba(255,215,0,.75);
+            color: rgba(255, 215, 0, .75);
             text-decoration: none;
             transition: opacity .2s;
         }
@@ -716,7 +817,7 @@
         .footer-links .dot {
             width: 4px;
             height: 4px;
-            background: rgba(255,215,0,.45);
+            background: rgba(255, 215, 0, .45);
             border-radius: 50%;
         }
 
@@ -751,6 +852,10 @@
                 padding-top: 32px;
             }
 
+            main {
+                min-height: unset;
+            }
+
             .login-card {
                 grid-template-columns: 1fr;
                 width: 100%;
@@ -759,34 +864,30 @@
                 margin: 0 auto;
             }
 
-            /* Mobile: photo becomes a banner */
             .photo-side {
                 min-height: unset;
                 height: auto;
             }
 
-            .photo-side img {
-                height: 220px;
-                transform: scale(1.0);
-            }
-
-            .photo-content {
-                position: relative;
-                /* stack in flow */
-                padding: 28px 24px 24px;
-                background: linear-gradient(135deg,
-                        rgba(61, 0, 0, .92) 0%,
-                        rgba(90, 0, 0, .85) 50%,
-                        rgba(30, 0, 0, .9) 100%);
-            }
-
-            /* Hide the campus photo entirely on mobile — use CSS bg only */
-            .photo-side img {
+            .photo-side .campus-bg {
                 display: none;
             }
 
             .photo-side::after {
                 display: none;
+            }
+
+            .medical-cross {
+                display: none;
+            }
+
+            .photo-content {
+                position: relative;
+                padding: 28px 24px 24px;
+                background: linear-gradient(135deg,
+                        rgba(61, 0, 0, .92) 0%,
+                        rgba(90, 0, 0, .85) 50%,
+                        rgba(30, 0, 0, .9) 100%);
             }
 
             .photo-title-main {
@@ -808,7 +909,7 @@
                 height: 36px;
             }
 
-            .photo-tagline {
+            .feature-pills {
                 display: none;
             }
 
@@ -821,7 +922,6 @@
                 display: inline-flex;
             }
 
-            /* Form */
             .form-side {
                 padding: 28px 24px 36px;
             }
@@ -886,6 +986,33 @@
 </head>
 
 <body>
+
+    <!-- Grid background -->
+    <div class="bg-layer"></div>
+
+    <!-- Floating teeth -->
+    <div class="tooth-float tooth-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="140" viewBox="0 0 100 110">
+            <path
+                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+                fill="#C9A84C" />
+        </svg>
+    </div>
+    <div class="tooth-float tooth-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="190" viewBox="0 0 100 110">
+            <path
+                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+                fill="#8B0000" />
+        </svg>
+    </div>
+    <div class="tooth-float tooth-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="90" height="110" viewBox="0 0 100 110">
+            <path
+                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+                fill="#C9A84C" />
+        </svg>
+    </div>
+
     <canvas id="stars"></canvas>
     <div class="glow-orb glow-orb-1"></div>
     <div class="glow-orb glow-orb-2"></div>
@@ -896,23 +1023,34 @@
 
             <!-- LEFT / TOP: Photo Panel -->
             <div class="photo-side">
-                <img src="/images/PUP TAGUIG CAMPUS.jpg" alt="PUP Taguig Campus">
+                <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" alt="PUP Taguig Campus" class="campus-bg">
+
+                <!-- Medical cross accents -->
+                <svg class="medical-cross medical-cross-1" viewBox="0 0 60 60" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
+                    <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
+                </svg>
+                <svg class="medical-cross medical-cross-2" viewBox="0 0 60 60" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
+                    <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
+                </svg>
 
                 <div class="photo-content">
-                    <!-- Title first -->
                     <h2>
                         <span class="shine-text photo-title-main">PUP TAGUIG</span>
-                        <span class="shine-text photo-title-sub">DENTAL MANAGEMENT SYSTEM</span>
+                        <span class="shine-text photo-title-sub">DENTAL CLINIC</span>
                     </h2>
 
                     <!-- Divider -->
                     <div class="photo-divider">
                         <div class="photo-divider-line"></div>
-                        <div class="photo-divider-dot"></div>
+                        <i class="fa-solid fa-plus photo-divider-cross"></i>
                         <div class="photo-divider-line r"></div>
                     </div>
 
-                    <!-- Logos below title -->
+                    <!-- Logos -->
                     <div class="logo-row">
                         <div class="logo-circle">
                             <img src="{{ asset('images/PUP.png') }}" alt="PUP">
@@ -923,13 +1061,30 @@
                         </div>
                     </div>
 
-                    <p class="photo-tagline">
-                        Your campus dental clinic, now fully digital.<br>
-                        Book appointments, view records, and more.
-                    </p>
+                    <!-- Feature pills -->
+                    <div class="feature-pills">
+                        <div class="feature-pill">
+                            <div class="feature-pill-icon">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <span class="feature-pill-text">Book appointments online, anytime</span>
+                        </div>
+                        <div class="feature-pill">
+                            <div class="feature-pill-icon">
+                                <i class="fa-solid fa-file-medical"></i>
+                            </div>
+                            <span class="feature-pill-text">View your dental records & history</span>
+                        </div>
+                        <div class="feature-pill">
+                            <div class="feature-pill-icon">
+                                <i class="fa-solid fa-shield-heart"></i>
+                            </div>
+                            <span class="feature-pill-text">Secure & private patient portal</span>
+                        </div>
+                    </div>
 
                     <div class="photo-badge">
-                        <i class="fa-solid fa-tooth" style="font-size:8px;"></i>
+                        <i class="fa-solid fa-tooth" style="font-size:12px;"></i>
                         Patient Portal
                     </div>
                 </div>
@@ -938,12 +1093,7 @@
             <!-- RIGHT / BOTTOM: Form -->
             <div class="form-side">
 
-                <div class="form-portal-label">
-                    <div class="form-portal-pip"></div>
-                    <span class="form-portal-text">Secure Login</span>
-                </div>
-
-                <h1 class="form-heading">Welcome <span>back.</span></h1>
+                <h1 class="form-heading">Welcome!</h1>
                 <p class="form-sub">Sign in to access your dental appointments and records.</p>
 
                 <form method="POST" action="{{ route('login') }}">
@@ -994,26 +1144,26 @@
 
     <!-- ══════ LOGIN FOOTER ══════ -->
     <footer class="login-footer">
-    <div class="login-footer-inner">
+        <div class="login-footer-inner">
 
-        <div class="footer-divider">
-        <span></span>
-        <i class="fa-solid fa-shield-halved"></i>
-        <span></span>
+            <div class="footer-divider">
+                <span></span>
+                <i class="fa-solid fa-shield-halved"></i>
+                <span></span>
+            </div>
+
+            <p class="footer-text">
+                <span class="footer-year">© 1998–2026</span>
+                <strong>Polytechnic University of the Philippines</strong>
+            </p>
+
+            <div class="footer-links">
+                <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms of Use</a>
+                <span class="dot"></span>
+                <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>
+            </div>
+
         </div>
-
-        <p class="footer-text">
-        <span class="footer-year">© 1998–2026</span>
-        <strong>Polytechnic University of the Philippines</strong>
-        </p>
-
-        <div class="footer-links">
-        <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms of Use</a>
-        <span class="dot"></span>
-        <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>
-        </div>
-
-    </div>
     </footer>
 
     <script>
@@ -1026,9 +1176,7 @@
             function resize() {
                 w = canvas.width = window.innerWidth;
                 h = canvas.height = window.innerHeight;
-                stars = Array.from({
-                    length: 200
-                }, () => ({
+                stars = Array.from({ length: 200 }, () => ({
                     x: Math.random() * w,
                     y: Math.random() * h,
                     r: Math.random() * 1.6 + 0.3,
@@ -1046,10 +1194,7 @@
                     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
                     ctx.fill();
                     s.y -= s.v;
-                    if (s.y < 0) {
-                        s.y = h;
-                        s.x = Math.random() * w;
-                    }
+                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
                 }
                 ctx.globalAlpha = 1;
                 requestAnimationFrame(draw);
@@ -1068,9 +1213,9 @@
             inp.type = isText ? 'password' : 'text';
             icon.innerHTML = isText ?
                 `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>` :
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>` :
                 `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.042-3.368M6.223 6.223A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.132 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/>`;
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/>`;
         }
 
         /* TOAST */
@@ -1109,7 +1254,7 @@
     </script>
     @endif
 
-    {{-- SUCCESS login toast: pass role name from controller via session('login_as') --}}
+    {{-- SUCCESS login toast --}}
     @if (session('success'))
     <script>
         document.addEventListener('DOMContentLoaded', () =>
@@ -1118,7 +1263,7 @@
     </script>
     @endif
 
-    {{-- Login success with role name e.g. "Logged in successfully as Admin" --}}
+    {{-- Login success with role name --}}
     @if (session('login_as'))
     <script>
         document.addEventListener('DOMContentLoaded', () =>
