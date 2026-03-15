@@ -1450,7 +1450,7 @@
       </div>
       @endif
 
-  <!-- ════════════ TERMS MODAL ════════════ -->
+  <!-- TERMS MODAL -->
   <dialog id="termsModal">
     <div class="terms-header">
       <div class="terms-header-icon"><i class="fa-solid fa-file-shield"></i></div>
@@ -1461,7 +1461,7 @@
     </div>
     <div class="terms-body">
       <p>
-        By clicking <strong>"Continue"</strong>, you consent to the collection, use, and
+        By clicking <strong>"I Agree"</strong>, you consent to the collection, use, and
         processing of your personal data for legitimate purposes related to this service.
       </p>
       <p style="margin-bottom:0;">
@@ -1471,7 +1471,7 @@
       <div class="terms-divider"></div>
       <label class="terms-checkbox-row">
         <input type="checkbox" id="termsCheckbox">
-        <span>I have read and agree to the Terms and Conditions and Privacy Policy</span>
+        <span>I have read and agree to the Terms and Conditions</span>
       </label>
       <div class="terms-actions">
         <form method="POST" action="{{ route('logout') }}" style="margin:0;">
