@@ -6,24 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Patient Registration</title>
   <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
 
   <style>
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
       min-height: 100vh;
       background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #C9A84C 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      position: relative;
       overflow-x: hidden;
     }
 
@@ -31,179 +38,441 @@
     #stars {
       position: fixed;
       inset: 0;
-      z-index: 1;
+      z-index: 0;
       pointer-events: none;
     }
 
-    /* ── SHINE TEXT ── */
-    .shine-text {
-      background: linear-gradient(90deg, #6B0000, #FFD700, #fff, #FFD700, #6B0000);
-      background-size: 250% auto;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shine 4s linear infinite;
+    /* ── AMBIENT GLOW ── */
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    @keyframes shine {
-      0% {
-        background-position: 250% center;
+    .glow-orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #C9A84C, transparent 70%);
+      top: -100px;
+      left: -100px;
+      animation: orbFloat1 12s ease-in-out infinite alternate;
+    }
+
+    .glow-orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #8B0000, transparent 70%);
+      bottom: -80px;
+      right: -80px;
+      animation: orbFloat2 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbFloat1 {
+      from {
+        transform: translate(0, 0);
       }
 
-      100% {
-        background-position: -250% center;
+      to {
+        transform: translate(60px, 40px);
       }
     }
 
-    /* ── FADE UP ── */
-    @keyframes fadeUp {
-      0% {
+    @keyframes orbFloat2 {
+      from {
+        transform: translate(0, 0);
+      }
+
+      to {
+        transform: translate(-40px, -60px);
+      }
+    }
+
+    /* ── BG GRID LAYER ── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-layer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201, 168, 76, .06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201, 168, 76, .06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ── FLOATING TEETH ── */
+    .tooth-float {
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.095;
+    }
+
+    .tooth-1 {
+      top: 8%;
+      left: 5%;
+      animation: floatA 14s ease-in-out infinite alternate;
+    }
+
+    .tooth-2 {
+      top: 60%;
+      right: 4%;
+      animation: floatB 18s ease-in-out infinite alternate;
+    }
+
+    .tooth-3 {
+      bottom: 12%;
+      left: 12%;
+      animation: floatA 20s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatA {
+      from {
+        transform: translateY(0) rotate(-8deg);
+      }
+
+      to {
+        transform: translateY(20px) rotate(4deg);
+      }
+    }
+
+    @keyframes floatB {
+      from {
+        transform: translateY(0) rotate(6deg);
+      }
+
+      to {
+        transform: translateY(-18px) rotate(-3deg);
+      }
+    }
+
+    /* ── MAIN CENTERING ── */
+    main {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      min-height: calc(100vh - 120px);
+    }
+
+    /* ── CARD ── */
+    .register-card {
+      position: relative;
+      width: min(1060px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(201, 168, 76, .15),
+        0 24px 80px rgba(0, 0, 0, 0.178),
+        0 8px 24px rgba(0, 0, 0, 0.157);
+      animation: cardUp .9s cubic-bezier(.22, 1, .36, 1) .1s both;
+    }
+
+    @keyframes cardUp {
+      from {
         opacity: 0;
-        transform: translateY(16px);
+        transform: translateY(32px);
       }
 
-      100% {
+      to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .fade-up {
-      animation: fadeUp 0.6s ease-out forwards;
-    }
-
-    /* ── OUTER WRAPPER ── */
-    .page-wrapper {
-      position: relative;
-      z-index: 10;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    /* ── CARD ── */
-    .card {
-      width: 100%;
-      max-width: 1100px;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Desktop: side by side */
-    @media (min-width: 1024px) {
-      .card {
-        flex-direction: row;
-        min-height: 680px;
-        max-height: 92vh;
-      }
-    }
-
-    /* ── LEFT PHOTO PANEL ── */
-    .photo-panel {
+    /* ── LEFT: PHOTO ── */
+    .photo-side {
       position: relative;
       overflow: hidden;
-      flex-shrink: 0;
+      min-height: 540px;
     }
 
-    /* Mobile: banner */
-    .photo-panel {
-      height: 140px;
-    }
-
-    @media (min-width: 640px) {
-      .photo-panel {
-        height: 180px;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .photo-panel {
-        height: auto;
-        width: 42%;
-        min-height: 680px;
-      }
-    }
-
-    .photo-panel img {
+    .photo-side .campus-bg {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center;
+      display: block;
+      filter: brightness(.35) saturate(.5);
+      transform: scale(1.02);
+      transition: transform 12s ease;
     }
 
-    .photo-overlay {
+    .photo-side:hover .campus-bg {
+      transform: scale(1.08);
+    }
+
+    .photo-side::after {
+      content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, rgba(139, 0, 0, 0.3), rgba(60, 0, 0, 0.6));
+      background: linear-gradient(135deg,
+          rgba(61, 0, 0, .8) 0%,
+          rgba(90, 0, 0, .4) 40%,
+          rgba(0, 0, 0, .15) 100%);
     }
 
-    /* Mobile: show title in photo panel */
-    .photo-mobile-title {
+    /* Medical cross accents */
+    .medical-cross {
       position: absolute;
-      bottom: 16px;
-      left: 20px;
-      right: 20px;
+      z-index: 2;
+      opacity: 0.07;
+    }
+
+    .medical-cross-1 {
+      top: 10%;
+      right: 8%;
+      width: 80px;
+    }
+
+    .medical-cross-2 {
+      bottom: 18%;
+      left: 6%;
+      width: 50px;
+    }
+
+    .photo-content {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px 64px;
+      text-align: center;
+    }
+
+    /* Shine text */
+    .shine-text {
+      background: linear-gradient(90deg,
+          #6B0000 0%,
+          #FFD700 35%,
+          #fff 50%,
+          #FFD700 65%,
+          #6B0000 100%);
+      background-size: 250% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shine 16s linear infinite;
       display: block;
     }
 
-    @media (min-width: 1024px) {
-      .photo-mobile-title {
-        display: none;
+    @keyframes shine {
+      from {
+        background-position: 250% center;
+      }
+
+      to {
+        background-position: -250% center;
       }
     }
 
-    /* ── RIGHT FORM PANEL ── */
-    .form-panel {
-      flex: 1;
-      padding: 24px 20px 28px;
-      overflow-y: auto;
+    .photo-title-main {
+      font-size: clamp(24px, 3.2vw, 38px);
+      font-weight: 900;
+      letter-spacing: .05em;
+      line-height: 1;
+    }
+
+    .photo-title-sub {
+      font-size: clamp(9px, 1.1vw, 13px);
+      font-weight: 700;
+      letter-spacing: .16em;
+      margin-top: 6px;
+    }
+
+    /* Divider */
+    .photo-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .photo-divider-line {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .45));
+    }
+
+    .photo-divider-line.r {
+      background: linear-gradient(90deg, rgba(201, 168, 76, .45), transparent);
+    }
+
+    .photo-divider-cross {
+      color: rgba(201, 168, 76, .55);
+      font-size: 10px;
+    }
+
+    /* Logos */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .logo-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .08);
+      border: 1.5px solid rgba(201, 168, 76, .25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: border-color .3s;
+    }
+
+    .logo-circle:hover {
+      border-color: rgba(201, 168, 76, .55);
+    }
+
+    .logo-circle img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .logo-v-divider {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(to bottom, transparent, rgba(201, 168, 76, .4), transparent);
+    }
+
+    /* Feature pills */
+    .feature-pills {
       display: flex;
       flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 260px;
     }
 
-    @media (min-width: 640px) {
-      .form-panel {
-        padding: 28px 32px 36px;
-      }
+    .feature-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(201, 168, 76, .15);
+      border-radius: 10px;
+      padding: 9px 14px;
+      backdrop-filter: blur(4px);
+      text-align: left;
+      transition: background .2s, border-color .2s;
     }
 
-    @media (min-width: 1024px) {
-      .form-panel {
-        padding: 36px 44px 44px;
-        justify-content: center;
-      }
+    .feature-pill:hover {
+      background: rgba(255, 255, 255, .09);
+      border-color: rgba(201, 168, 76, .3);
     }
 
-    /* Desktop title (hidden on mobile) */
-    .desktop-title {
-      display: none;
+    .feature-pill-icon {
+      width: 26px;
+      height: 26px;
+      background: rgba(201, 168, 76, .12);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    @media (min-width: 1024px) {
-      .desktop-title {
-        display: block;
-        margin-bottom: 6px;
-      }
+    .feature-pill-icon i {
+      font-size: 11px;
+      color: #C9A84C;
+    }
+
+    .feature-pill-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .65);
+      line-height: 1.3;
+    }
+
+    .photo-badge {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201, 168, 76, .1);
+      border: 1px solid rgba(201, 168, 76, .25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255, 215, 0, .65);
+      white-space: nowrap;
+    }
+
+    /* ── RIGHT: FORM ── */
+    .form-side {
+      background: #F4F4F4;
+      padding: 40px 48px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .form-side::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at top right, rgba(201, 168, 76, .08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .form-heading {
+      font-size: 28px;
+      font-weight: 800;
+      color: #333;
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+
+    .form-heading span {
+      color: #8B0000;
+    }
+
+    .form-sub {
+      font-size: 13px;
+      color: #757575;
+      margin-bottom: 22px;
+      line-height: 1.5;
     }
 
     /* ── FORM GRID ── */
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    @media (min-width: 480px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 14px 16px;
-      }
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 16px;
     }
 
     .col-span-2 {
@@ -214,43 +483,54 @@
       grid-column: span 1;
     }
 
-    @media (max-width: 479px) {
-
-      .col-span-2,
-      .col-span-1 {
-        grid-column: span 1;
-      }
+    /* ── FIELD ── */
+    .field {
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ── INPUT STYLES ── */
     .field-label {
-      display: block;
-      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
       font-weight: 600;
-      color: #4B4B4B;
-      margin-bottom: 5px;
-      letter-spacing: 0.01em;
+      color: #6B5B5B;
+      margin-bottom: 7px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .field-label i {
+      font-size: 10px;
+      color: #8B0000;
+      opacity: .7;
     }
 
     .field-input {
       width: 100%;
-      padding: 9px 14px;
-      border-radius: 10px;
-      background: #F7F5F5;
-      border: 1.5px solid #E5E0E0;
-      font-size: 13px;
-      color: #333;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1.5px solid #E8E0D8;
+      border-radius: 12px;
       font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      font-size: 13.5px;
+      color: #1A0A0A;
       outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
       appearance: none;
       -webkit-appearance: none;
     }
 
+    .field-input::placeholder {
+      color: #CEC6BE;
+      font-size: 13px;
+    }
+
     .field-input:focus {
       border-color: #8B0000;
-      box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
-      background: #fff;
+      box-shadow: 0 0 0 4px rgba(139, 0, 0, .07);
+      background: #FFFDF9;
     }
 
     .field-input.border-red-500 {
@@ -261,42 +541,32 @@
       border-color: #22C55E;
     }
 
-    .field-input::placeholder {
-      color: #BCBCBC;
-    }
-
-    /* date + select fix on mobile */
-    input[type="date"].field-input,
-    select.field-input {
-      padding: 9px 10px;
-      line-height: 1.4;
-    }
-
-    /* ── PASSWORD WRAPPER ── */
-    .pass-wrap {
+    /* Password wrap */
+    .pw-wrap {
       position: relative;
     }
 
-    .pass-toggle {
+    .pw-toggle {
       position: absolute;
-      right: 12px;
+      right: 14px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       cursor: pointer;
-      color: #9CA3AF;
-      padding: 0;
+      color: #CEC6BE;
+      transition: color .2s;
       display: flex;
       align-items: center;
+      padding: 4px;
     }
 
-    .pass-toggle:hover {
-      color: #555;
+    .pw-toggle:hover {
+      color: #8B0000;
     }
 
-    .pass-wrap .field-input {
-      padding-right: 40px;
+    .pw-wrap .field-input {
+      padding-right: 46px;
     }
 
     /* ── PASSWORD RULES ── */
@@ -306,6 +576,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 4px 12px;
       font-size: 11px;
+      list-style: none;
     }
 
     #passwordRules li {
@@ -313,9 +584,6 @@
       align-items: center;
       gap: 5px;
       color: #9CA3AF;
-      list-style: none;
-      padding: 0;
-      margin: 0;
     }
 
     #passwordRules li.text-green-600 {
@@ -327,51 +595,107 @@
       transition: opacity 0.4s ease;
     }
 
-    /* ── REGISTER BUTTON ── */
-    .register-btn {
+    /* ── AUTOFILL FIX ── */
+    input:-webkit-autofill,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 40px #fff inset !important;
+      -webkit-text-fill-color: #1A0A0A !important;
+    }
+
+    /* ── FIELD ERROR ── */
+    .field-error {
+      font-size: 11px;
+      color: #DC2626;
+      margin-top: 3px;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
       width: 100%;
-      padding: 11px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #8B0000, #A52A2A);
+      padding: 14px;
+      background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
       color: white;
-      font-weight: 700;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
       border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .04em;
       cursor: pointer;
-      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 16px rgba(139, 0, 0, 0.3);
+      gap: 10px;
       position: relative;
       overflow: hidden;
+      transition: transform .18s, box-shadow .18s;
+      box-shadow: 0 6px 20px rgba(139, 0, 0, .35);
     }
 
-    .register-btn:hover {
-      background: linear-gradient(135deg, #A52A2A, #8B0000);
-      box-shadow: 0 6px 22px rgba(139, 0, 0, 0.42);
-      transform: translateY(-1px);
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .12) 0%, transparent 60%);
     }
 
-    .register-btn:active {
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(139, 0, 0, .45);
+    }
+
+    .btn-submit:active {
       transform: translateY(0);
     }
 
-    /* ── AUTOFILL FIX ── */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0 30px #F7F5F5 inset !important;
-      -webkit-text-fill-color: #333333 !important;
+    .btn-arrow {
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, .15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .2s, background .2s;
+    }
+
+    .btn-submit:hover .btn-arrow {
+      transform: translateX(3px);
+      background: rgba(255, 255, 255, .25);
+    }
+
+    /* ── LOGIN LINK ROW ── */
+    .login-row {
+      text-align: center;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #F0EAE2;
+      font-size: 13px;
+      color: #757575;
+    }
+
+    .login-row a {
+      color: #8B0000;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+
+    .login-row a:hover {
+      opacity: .75;
+      text-decoration: underline;
     }
 
     /* ── TOAST ── */
     #toastContainer {
       position: fixed;
-      top: 16px;
-      right: 16px;
+      top: 20px;
+      right: 20px;
       z-index: 99999;
       display: flex;
       flex-direction: column;
@@ -379,42 +703,24 @@
       pointer-events: none;
     }
 
-    @media (max-width: 640px) {
-      #toastContainer {
-        top: 12px;
-        left: 12px;
-        right: 12px;
-      }
-    }
-
-    .toast-item {
+    .toast {
+      min-width: 300px;
       background: white;
       border-radius: 14px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
-      padding: 13px 16px 13px 14px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .18);
+      padding: 14px 18px 14px 16px;
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 12px;
       opacity: 0;
       transform: translateX(340px);
-      transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
       position: relative;
       overflow: hidden;
       pointer-events: all;
-      min-width: 280px;
-      max-width: 380px;
     }
 
-    @media (max-width: 640px) {
-      .toast-item {
-        min-width: unset;
-        max-width: unset;
-        width: 100%;
-        transform: translateY(-80px);
-      }
-    }
-
-    .toast-item::before {
+    .toast::before {
       content: '';
       position: absolute;
       left: 0;
@@ -423,23 +729,90 @@
       width: 4px;
     }
 
-    .toast-item.toast-error::before {
+    .toast.error::before {
       background: #8B0000;
     }
 
-    .toast-item.toast-success::before {
+    .toast.success::before {
       background: #15803d;
     }
 
-    .toast-item.show {
+    .toast.show {
       opacity: 1;
       transform: translateX(0);
     }
 
-    /* ════════════════════════════
-        LOGIN FOOTER
-        ════════════════════════════ */
+    .toast.hide {
+      opacity: 0;
+      transform: translateX(340px);
+    }
 
+    .toast-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .toast.error .toast-icon-wrap {
+      background: rgba(139, 0, 0, .08);
+    }
+
+    .toast.success .toast-icon-wrap {
+      background: rgba(21, 128, 61, .08);
+    }
+
+    .toast-icon {
+      font-size: 17px;
+    }
+
+    .toast.error .toast-icon {
+      color: #8B0000;
+    }
+
+    .toast.success .toast-icon {
+      color: #15803d;
+    }
+
+    .toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A0A0A;
+    }
+
+    .toast-msg {
+      font-size: 12px;
+      color: #888;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #CCC;
+      font-size: 13px;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      transition: color .2s;
+    }
+
+    .toast-close:hover {
+      color: #888;
+    }
+
+    /* ════════════════════════════
+           LOGIN FOOTER
+        ════════════════════════════ */
     .login-footer {
       width: 100%;
       margin-top: 30px;
@@ -456,7 +829,6 @@
       letter-spacing: .04em;
     }
 
-    /* Divider */
     .footer-divider {
       display: flex;
       align-items: center;
@@ -468,10 +840,7 @@
     .footer-divider span {
       width: 40px;
       height: 1px;
-      background: linear-gradient(90deg,
-          transparent,
-          rgba(201, 168, 76, .6),
-          transparent);
+      background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .6), transparent);
     }
 
     .footer-divider i {
@@ -479,7 +848,6 @@
       color: rgba(255, 215, 0, .65);
     }
 
-    /* Text */
     .footer-text {
       font-weight: 500;
     }
@@ -488,7 +856,6 @@
       color: rgba(255, 255, 255, .45);
     }
 
-    /* Links */
     .footer-links {
       margin-top: 6px;
       display: flex;
@@ -515,265 +882,411 @@
       border-radius: 50%;
     }
 
-    @media (max-width: 640px) {
-      .toast-item.show {
+    /* ════════════════════════════
+           MOBILE RESPONSIVE
+        ════════════════════════════ */
+    @media (max-width: 767px) {
+      body {
+        padding: 16px;
+        justify-content: flex-start;
+        padding-top: 32px;
+      }
+
+      main {
+        min-height: unset;
+      }
+
+      .register-card {
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 440px;
+        border-radius: 20px;
+        margin: 0 auto;
+      }
+
+      .photo-side {
+        min-height: unset;
+        height: auto;
+      }
+
+      .photo-side .campus-bg {
+        display: none;
+      }
+
+      .photo-side::after {
+        display: none;
+      }
+
+      .medical-cross {
+        display: none;
+      }
+
+      .photo-content {
+        position: relative;
+        padding: 28px 24px 24px;
+        background: linear-gradient(135deg,
+            rgba(61, 0, 0, .92) 0%,
+            rgba(90, 0, 0, .85) 50%,
+            rgba(30, 0, 0, .9) 100%);
+      }
+
+      .photo-title-main {
+        font-size: 28px;
+      }
+
+      .photo-title-sub {
+        font-size: 10px;
+        letter-spacing: .14em;
+      }
+
+      .logo-circle {
+        width: 52px;
+        height: 52px;
+      }
+
+      .logo-circle img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .feature-pills {
+        display: none;
+      }
+
+      .photo-badge {
+        position: relative;
+        bottom: unset;
+        left: unset;
+        transform: none;
+        margin: 12px auto 0;
+        display: inline-flex;
+      }
+
+      .form-side {
+        padding: 28px 24px 36px;
+      }
+
+      .form-heading {
+        font-size: 22px;
+      }
+
+      .form-sub {
+        margin-bottom: 18px;
+        font-size: 12.5px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .col-span-2,
+      .col-span-1 {
+        grid-column: span 1;
+      }
+
+      .field-input {
+        padding: 12px 14px;
+        font-size: 15px;
+      }
+
+      .btn-submit {
+        padding: 13px;
+      }
+
+      .login-row {
+        font-size: 12.5px;
+      }
+
+      #toastContainer {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+      }
+
+      .toast {
+        min-width: unset;
+        transform: translateY(-80px);
+      }
+
+      .toast.show {
         transform: translateY(0);
       }
-    }
 
-    .toast-item.hide {
-      opacity: 0;
-      transform: translateX(340px);
-    }
-
-    @media (max-width: 640px) {
-      .toast-item.hide {
+      .toast.hide {
         transform: translateY(-80px);
       }
     }
 
-    .toast-icon-wrap {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 16px;
-    }
+    @media (max-width: 380px) {
+      body {
+        padding: 12px;
+        padding-top: 20px;
+      }
 
-    .toast-error .toast-icon-wrap {
-      background: rgba(139, 0, 0, .08);
-      color: #8B0000;
-    }
+      .form-side {
+        padding: 24px 18px 28px;
+      }
 
-    .toast-success .toast-icon-wrap {
-      background: rgba(21, 128, 61, .08);
-      color: #15803d;
-    }
+      .photo-content {
+        padding: 22px 20px 20px;
+      }
 
-    .toast-body {
-      flex: 1;
-      min-width: 0;
-    }
+      .photo-title-main {
+        font-size: 24px;
+      }
 
-    .toast-title {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #1A0A0A;
-    }
+      .logo-circle {
+        width: 46px;
+        height: 46px;
+      }
 
-    .toast-msg {
-      font-size: 11.5px;
-      color: #888;
-      margin-top: 2px;
-      line-height: 1.4;
-    }
-
-    .toast-close {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #CCC;
-      font-size: 12px;
-      flex-shrink: 0;
-      padding: 2px 4px;
-      transition: color .2s;
-    }
-
-    .toast-close:hover {
-      color: #888;
-    }
-
-    /* ── ERROR TEXT ── */
-    .field-error {
-      font-size: 11px;
-      color: #DC2626;
-      margin-top: 3px;
-      display: none;
-    }
-
-    .field-error.visible {
-      display: block;
+      .logo-circle img {
+        width: 32px;
+        height: 32px;
+      }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Grid background -->
+  <div class="bg-layer"></div>
+
+  <!-- Floating teeth -->
+  <div class="tooth-float tooth-1">
+    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="140" viewBox="0 0 100 110">
+      <path
+        d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+        fill="#C9A84C" />
+    </svg>
+  </div>
+  <div class="tooth-float tooth-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="190" viewBox="0 0 100 110">
+      <path
+        d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+        fill="#8B0000" />
+    </svg>
+  </div>
+  <div class="tooth-float tooth-3">
+    <svg xmlns="http://www.w3.org/2000/svg" width="90" height="110" viewBox="0 0 100 110">
+      <path
+        d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
+        fill="#C9A84C" />
+    </svg>
+  </div>
+
   <canvas id="stars"></canvas>
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
   <div id="toastContainer"></div>
 
   <main>
-    <div class="page-wrapper fade-up">
-      <div class="card">
+    <div class="register-card">
 
-        <!-- LEFT: Photo Panel -->
-        <div class="photo-panel">
-          <img src="/images/PUP TAGUIG CAMPUS.jpg" alt="PUP Taguig Campus">
-          <div class="photo-overlay"></div>
-          <!-- Title shown on mobile inside photo -->
-          <div class="photo-mobile-title">
-            <p class="text-white/70 text-[10px] font-bold tracking-[.15em] uppercase mb-0.5">Patient Portal</p>
-            <h1 class="text-white text-2xl font-extrabold leading-tight shine-text">Create Account</h1>
+      <!-- LEFT: Photo Panel -->
+      <div class="photo-side">
+        <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" alt="PUP Taguig Campus" class="campus-bg">
+
+        <!-- Medical cross accents -->
+        <svg class="medical-cross medical-cross-1" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
+          <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
+        </svg>
+        <svg class="medical-cross medical-cross-2" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
+          <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
+        </svg>
+
+        <div class="photo-content">
+          <h2>
+            <span class="shine-text photo-title-main">PUP TAGUIG</span>
+            <span class="shine-text photo-title-sub">DENTAL CLINIC</span>
+          </h2>
+
+          <div class="photo-divider">
+            <div class="photo-divider-line"></div>
+            <i class="fa-solid fa-plus photo-divider-cross"></i>
+            <div class="photo-divider-line r"></div>
+          </div>
+
+          <!-- Logos -->
+          <div class="logo-row">
+            <div class="logo-circle">
+              <img src="{{ asset('images/PUP.png') }}" alt="PUP">
+            </div>
+            <div class="logo-v-divider"></div>
+            <div class="logo-circle">
+              <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="DMS">
+            </div>
+          </div>
+
+          <!-- Feature pills -->
+          <div class="feature-pills">
+            <div class="feature-pill">
+              <div class="feature-pill-icon"><i class="fa-solid fa-user-plus"></i></div>
+              <span class="feature-pill-text">Create your free patient account</span>
+            </div>
+            <div class="feature-pill">
+              <div class="feature-pill-icon"><i class="fa-solid fa-calendar-check"></i></div>
+              <span class="feature-pill-text">Book appointments online, anytime</span>
+            </div>
+            <div class="feature-pill">
+              <div class="feature-pill-icon"><i class="fa-solid fa-shield-heart"></i></div>
+              <span class="feature-pill-text">Secure & private patient portal</span>
+            </div>
+          </div>
+
+          <div class="photo-badge">
+            <i class="fa-solid fa-tooth" style="font-size:12px;"></i>
+            Patient Portal
           </div>
         </div>
+      </div>
 
-        <!-- RIGHT: Form Panel -->
-        <div class="form-panel">
+      <!-- RIGHT: Form Panel -->
+      <div class="form-side">
 
-          <!-- Desktop-only title -->
-          <div class="desktop-title">
-            <p class="text-[10px] font-bold tracking-[.15em] uppercase text-[#8B0000]/60 mb-1">Patient Portal</p>
-            <h1 class="text-3xl font-extrabold shine-text leading-tight mb-1">Create Account</h1>
-            <p class="text-xs text-gray-400 mb-5">Register a new patient account to get started</p>
-          </div>
+        <h1 class="form-heading">Create <span>Account</span></h1>
+        <p class="form-sub">Register a new patient account to get started.</p>
 
-          <!-- Mobile subtitle (below photo, above form) -->
-          <div class="lg:hidden mb-4 mt-1">
-            <p class="text-xs text-gray-400">Fill in the details below to create your account</p>
-          </div>
+        <form method="POST" action="/register" id="registerForm">
+          @csrf
 
-          <form method="POST" action="/register" id="registerForm">
-            @csrf
+          <div class="form-grid">
 
-            <div class="form-grid">
+            <!-- Full Name -->
+            <div class="field col-span-2">
+              <label class="field-label"><i class="fa-solid fa-user"></i> Full Name</label>
+              <input id="name" name="name" value="{{ old('name') }}" placeholder="Enter your full name" required
+                class="field-input">
+              <p id="name-error" class="field-error"></p>
+            </div>
 
-              <!-- Full Name -->
-              <div class="col-span-2">
-                <label class="field-label">Full Name</label>
-                <input id="name" name="name" value="{{ old('name') }}" placeholder="Enter your full name" required
+            <!-- Email -->
+            <div class="field col-span-1">
+              <label class="field-label"><i class="fa-solid fa-envelope"></i> Email</label>
+              <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email"
+                required class="field-input">
+              <p id="email-error" class="field-error"></p>
+            </div>
+
+            <!-- Phone -->
+            <div class="field col-span-1">
+              <label class="field-label"><i class="fa-solid fa-phone"></i> Phone</label>
+              <input id="phone" name="phone" value="{{ old('phone') }}" placeholder="Enter phone number"
+                class="field-input">
+              <p id="phone-error" class="field-error"></p>
+            </div>
+
+            <!-- Birthdate -->
+            <div class="field col-span-1">
+              <label class="field-label"><i class="fa-solid fa-calendar"></i> Birthdate</label>
+              <input id="birthdate" type="date" name="birthdate" value="{{ old('birthdate') }}" required
+                class="field-input">
+              <p id="birthdate-error" class="field-error"></p>
+            </div>
+
+            <!-- Gender -->
+            <div class="field col-span-1">
+              <label class="field-label"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+              <select id="gender" name="gender" required class="field-input">
+                <option value="">Select Gender</option>
+                <option value="Male" {{ old('gender')=='Male' ? 'selected' : '' }}>Male</option>
+                <option value="Female" {{ old('gender')=='Female' ? 'selected' : '' }}>Female</option>
+              </select>
+              <p id="gender-error" class="field-error"></p>
+            </div>
+
+            <!-- Password -->
+            <div class="field col-span-2">
+              <label class="field-label"><i class="fa-solid fa-lock"></i> Password</label>
+              <div class="pw-wrap">
+                <input id="password" type="password" name="password" placeholder="Enter your password" required
                   class="field-input">
-                <p id="name-error" class="field-error"></p>
-              </div>
-
-              <!-- Email -->
-              <div class="col-span-1">
-                <label class="field-label">Email</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email"
-                  required class="field-input">
-                <p id="email-error" class="field-error"></p>
-              </div>
-
-              <!-- Phone -->
-              <div class="col-span-1">
-                <label class="field-label">Phone</label>
-                <input id="phone" name="phone" value="{{ old('phone') }}" placeholder="Enter phone number"
-                  class="field-input">
-                <p id="phone-error" class="field-error"></p>
-              </div>
-
-              <!-- Birthdate -->
-              <div class="col-span-1">
-                <label class="field-label">Birthdate</label>
-                <input id="birthdate" type="date" name="birthdate" value="{{ old('birthdate') }}" required
-                  class="field-input">
-                <p id="birthdate-error" class="field-error"></p>
-              </div>
-
-              <!-- Gender -->
-              <div class="col-span-1">
-                <label class="field-label">Gender</label>
-                <select id="gender" name="gender" required class="field-input">
-                  <option value="">Select Gender</option>
-                  <option value="Male" {{ old('gender')=='Male' ? 'selected' : '' }}>Male</option>
-                  <option value="Female" {{ old('gender')=='Female' ? 'selected' : '' }}>Female</option>
-                </select>
-                <p id="gender-error" class="field-error"></p>
-              </div>
-
-              <!-- Password -->
-              <div class="col-span-2">
-                <label class="field-label">Password</label>
-                <div class="pass-wrap">
-                  <input id="password" type="password" name="password" placeholder="Enter your password" required
-                    class="field-input">
-                  <button type="button" class="pass-toggle" onclick="togglePassword('password','eyePassword')">
-                    <svg id="eyePassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
-                      viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-                <ul id="passwordRules">
-                  <li id="rule-length"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least 8 characters</li>
-                  <li id="rule-letter"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least one letter</li>
-                  <li id="rule-number"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least one number</li>
-                  <li id="rule-special"><i class="fa-solid fa-circle-xmark text-[10px]"></i> One special symbol</li>
-                </ul>
-              </div>
-
-              <!-- Confirm Password -->
-              <div class="col-span-2">
-                <label class="field-label">Confirm Password</label>
-                <div class="pass-wrap">
-                  <input id="confirmPassword" type="password" name="password_confirmation"
-                    placeholder="Re-enter your password" required class="field-input">
-                  <button type="button" class="pass-toggle"
-                    onclick="togglePassword('confirmPassword','eyeConfirmPassword')">
-                    <svg id="eyeConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
-                      viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-                <p id="passwordMismatch" class="field-error"><i class="fa-solid fa-circle-xmark"></i> Passwords do not
-                  match</p>
-                <p id="passwordMatch" class="field-error" style="color:#16A34A;display:none;"><i
-                    class="fa-solid fa-circle-check"></i> Passwords match</p>
-              </div>
-
-              <!-- Submit -->
-              <div class="col-span-2" style="margin-top:4px;">
-                <button type="submit" class="register-btn">
-                  <span>Register</span>
-                  <i class="fa-solid fa-user-plus text-sm"></i>
+                <button type="button" class="pw-toggle" onclick="togglePassword('password','eyePassword')">
+                  <svg id="eyePassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
                 </button>
               </div>
-
-              <!-- Login Link -->
-              <p class="col-span-2 text-center text-xs text-gray-400" style="margin-top:2px;">
-                Already have an account?
-                <a href="/login" class="text-[#8B0000] font-bold hover:underline">Login here</a>
-              </p>
-
+              <ul id="passwordRules">
+                <li id="rule-length"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least 8 characters</li>
+                <li id="rule-letter"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least one letter</li>
+                <li id="rule-number"><i class="fa-solid fa-circle-xmark text-[10px]"></i> At least one number</li>
+                <li id="rule-special"><i class="fa-solid fa-circle-xmark text-[10px]"></i> One special symbol</li>
+              </ul>
             </div>
-          </form>
 
-        </div>
+            <!-- Confirm Password -->
+            <div class="field col-span-2">
+              <label class="field-label"><i class="fa-solid fa-lock"></i> Confirm Password</label>
+              <div class="pw-wrap">
+                <input id="confirmPassword" type="password" name="password_confirmation"
+                  placeholder="Re-enter your password" required class="field-input">
+                <button type="button" class="pw-toggle"
+                  onclick="togglePassword('confirmPassword','eyeConfirmPassword')">
+                  <svg id="eyeConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+              </div>
+              <p id="passwordMismatch" class="field-error"><i class="fa-solid fa-circle-xmark"></i> Passwords do not
+                match</p>
+              <p id="passwordMatch" class="field-error" style="color:#16A34A;display:none;"><i
+                  class="fa-solid fa-circle-check"></i> Passwords match</p>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-span-2" style="margin-top:4px;">
+              <button type="submit" class="btn-submit">
+                Register
+                <div class="btn-arrow">
+                  <i class="fa-solid fa-user-plus" style="font-size:11px;"></i>
+                </div>
+              </button>
+            </div>
+
+            <!-- Login link -->
+            <div class="login-row col-span-2">
+              Already have an account? <a href="/login">Login here</a>
+            </div>
+
+          </div>
+        </form>
+
       </div>
     </div>
   </main>
 
-    <!-- ══════ LOGIN FOOTER ══════ -->
-    <footer class="login-footer">
+  <!-- ══════ FOOTER ══════ -->
+  <footer class="login-footer">
     <div class="login-footer-inner">
-
-        <div class="footer-divider">
+      <div class="footer-divider">
         <span></span>
         <i class="fa-solid fa-shield-halved"></i>
         <span></span>
-        </div>
-
-        <p class="footer-text">
+      </div>
+      <p class="footer-text">
         <span class="footer-year">© 1998–2026</span>
         <strong>Polytechnic University of the Philippines</strong>
-        </p>
-
-        <div class="footer-links">
+      </p>
+      <div class="footer-links">
         <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms of Use</a>
         <span class="dot"></span>
         <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>
-        </div>
-
+      </div>
     </div>
-    </footer>
+  </footer>
 
   @if($errors->any())
   <script>
@@ -794,48 +1307,74 @@
   @endif
 
   <script>
-    /* ══════════════════════════
-       TOAST
-    ══════════════════════════ */
-    function showToast(title, message, type) {
-      type = type || 'error';
-      var container = document.getElementById('toastContainer');
-      var t = document.createElement('div');
-      t.className = 'toast-item toast-' + type;
+    /* ══════ STARS ══════ */
+    (function () {
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d');
+      let w, h, stars = [];
 
-      var icon = type === 'success'
-        ? '<i class="fa-solid fa-circle-check"></i>'
-        : '<i class="fa-solid fa-circle-exclamation"></i>';
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        stars = Array.from({ length: 200 }, () => ({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.6 + 0.3,
+          v: Math.random() * 0.25 + 0.06,
+          a: Math.random() * 0.7 + 0.3,
+        }));
+      }
 
-      t.innerHTML =
-        '<div class="toast-icon-wrap">' + icon + '</div>' +
-        '<div class="toast-body">' +
-        '<div class="toast-title">' + title + '</div>' +
-        '<div class="toast-msg">' + message + '</div>' +
-        '</div>' +
-        '<button class="toast-close" onclick="dismissToast(this.parentElement)">' +
-        '<i class="fa-solid fa-xmark"></i>' +
-        '</button>';
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          ctx.globalAlpha = s.a * 0.75;
+          ctx.fillStyle = '#FFF8DC';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+          s.y -= s.v;
+          if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
 
+      window.addEventListener('resize', resize);
+      resize(); draw();
+    })();
+
+    /* ══════ TOAST ══════ */
+    function showToast(title, message, type = 'error') {
+      const container = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      const icon = type === 'error'
+        ? '<i class="fa-solid fa-circle-exclamation toast-icon"></i>'
+        : '<i class="fa-solid fa-circle-check toast-icon"></i>';
+      t.innerHTML = `
+                <div class="toast-icon-wrap">${icon}</div>
+                <div class="toast-body">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-msg">${message}</div>
+                </div>
+                <button class="toast-close" onclick="dismissToast(this.parentElement)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>`;
       container.appendChild(t);
-      requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
-
-      setTimeout(function () {
-        dismissToast(t);
-      }, type === 'success' ? 4000 : 5000);
+      requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+      setTimeout(() => dismissToast(t), type === 'success' ? 4000 : 5000);
     }
 
     function dismissToast(t) {
       t.classList.remove('show');
       t.classList.add('hide');
-      setTimeout(function () { if (t.parentElement) t.remove(); }, 400);
+      setTimeout(() => { if (t.parentElement) t.remove(); }, 400);
     }
 
-    /* ══════════════════════════
-       VALIDATION HELPERS
-    ══════════════════════════ */
+    /* ══════ VALIDATION HELPERS ══════ */
     function setError(inputEl, errorId, msg) {
-      var e = document.getElementById(errorId);
+      const e = document.getElementById(errorId);
       e.textContent = msg;
       e.classList.add('visible');
       inputEl.classList.add('border-red-500');
@@ -843,45 +1382,45 @@
     }
 
     function clearError(inputEl, errorId) {
-      var e = document.getElementById(errorId);
+      const e = document.getElementById(errorId);
       e.classList.remove('visible');
       inputEl.classList.remove('border-red-500');
       inputEl.classList.add('border-green-500');
     }
 
-    var nameInput = document.getElementById('name');
-    var emailInput = document.getElementById('email');
-    var phoneInput = document.getElementById('phone');
-    var birthdateInput = document.getElementById('birthdate');
-    var genderInput = document.getElementById('gender');
-    var password = document.getElementById('password');
-    var confirmPassword = document.getElementById('confirmPassword');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const birthdateInput = document.getElementById('birthdate');
+    const genderInput = document.getElementById('gender');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
 
     function validateName() {
-      var v = nameInput.value.trim();
+      const v = nameInput.value.trim();
       if (v.length < 2) { setError(nameInput, 'name-error', 'Name must be at least 2 characters'); return false; }
       if (v.length > 255) { setError(nameInput, 'name-error', 'Name must not exceed 255 characters'); return false; }
       clearError(nameInput, 'name-error'); return true;
     }
 
     function validateEmail() {
-      var pat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const pat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailInput.value) { setError(emailInput, 'email-error', 'Email is required'); return false; }
       if (!pat.test(emailInput.value)) { setError(emailInput, 'email-error', 'Please enter a valid email'); return false; }
       clearError(emailInput, 'email-error'); return true;
     }
 
     function validatePhone() {
-      var pat = /^[\d\s\-\+\(\)]+$/;
+      const pat = /^[\d\s\-\+\(\)]+$/;
       if (phoneInput.value && !pat.test(phoneInput.value)) { setError(phoneInput, 'phone-error', 'Invalid phone number'); return false; }
       if (phoneInput.value && phoneInput.value.length > 20) { setError(phoneInput, 'phone-error', 'Phone too long'); return false; }
       clearError(phoneInput, 'phone-error'); return true;
     }
 
     function validateBirthdate() {
-      var sel = new Date(birthdateInput.value);
-      var today = new Date();
-      var min = new Date(); min.setFullYear(today.getFullYear() - 120);
+      const sel = new Date(birthdateInput.value);
+      const today = new Date();
+      const min = new Date(); min.setFullYear(today.getFullYear() - 120);
       if (!birthdateInput.value) { setError(birthdateInput, 'birthdate-error', 'Birthdate is required'); return false; }
       if (sel > today) { setError(birthdateInput, 'birthdate-error', 'Cannot be in the future'); return false; }
       if (sel < min) { setError(birthdateInput, 'birthdate-error', 'Please enter a valid date'); return false; }
@@ -894,7 +1433,7 @@
     }
 
     function validatePasswordRules() {
-      var v = password.value;
+      const v = password.value;
       return v.length >= 8 && /[A-Za-z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v);
     }
 
@@ -913,13 +1452,13 @@
     genderInput.addEventListener('change', validateGender);
 
     document.getElementById('registerForm').addEventListener('submit', function (e) {
-      var nameOk = validateName();
-      var emailOk = validateEmail();
-      var phoneOk = validatePhone();
-      var birthOk = validateBirthdate();
-      var genderOk = validateGender();
-      var rulesOk = validatePasswordRules();
-      var matchOk = validatePasswordMatch();
+      const nameOk = validateName();
+      const emailOk = validateEmail();
+      const phoneOk = validatePhone();
+      const birthOk = validateBirthdate();
+      const genderOk = validateGender();
+      const rulesOk = validatePasswordRules();
+      const matchOk = validatePasswordMatch();
 
       if (!rulesOk) showToast('Password Error', 'Password does not meet the requirements.', 'error');
       if (!matchOk) showToast('Password Mismatch', 'Passwords do not match.', 'error');
@@ -929,15 +1468,13 @@
       }
     });
 
-    /* ══════════════════════════
-       PASSWORD RULES
-    ══════════════════════════ */
-    var rulesBox = document.getElementById('passwordRules');
-    var mismatchTxt = document.getElementById('passwordMismatch');
-    var matchTxt = document.getElementById('passwordMatch');
-    var hideTimer, mismatchTimer;
+    /* ══════ PASSWORD RULES ══════ */
+    const rulesBox = document.getElementById('passwordRules');
+    const mismatchTxt = document.getElementById('passwordMismatch');
+    const matchTxt = document.getElementById('passwordMatch');
+    let hideTimer, mismatchTimer;
 
-    var rules = {
+    const rules = {
       length: document.getElementById('rule-length'),
       letter: document.getElementById('rule-letter'),
       number: document.getElementById('rule-number'),
@@ -945,19 +1482,19 @@
     };
 
     function updateRule(el, ok) {
-      var icon = el.querySelector('i');
+      const icon = el.querySelector('i');
       if (ok) {
-        el.classList.remove('text-gray-400'); el.style.color = '#16A34A';
-        icon.className = 'fa-solid fa-circle-check text-[10px]';
+        el.style.color = '#16A34A';
+        icon.className = 'fa-solid fa-circle-check';
       } else {
-        el.style.color = ''; el.classList.add('text-gray-400');
-        icon.className = 'fa-solid fa-circle-xmark text-[10px]';
+        el.style.color = '';
+        icon.className = 'fa-solid fa-circle-xmark';
       }
     }
 
     password.addEventListener('input', function () {
-      var v = password.value;
-      var checks = {
+      const v = password.value;
+      const checks = {
         length: v.length >= 8,
         letter: /[A-Za-z]/.test(v),
         number: /[0-9]/.test(v),
@@ -973,16 +1510,16 @@
       clearTimeout(hideTimer);
 
       if (Object.values(checks).every(Boolean)) {
-        hideTimer = setTimeout(function () {
+        hideTimer = setTimeout(() => {
           rulesBox.classList.add('fade-out');
-          setTimeout(function () { rulesBox.style.display = 'none'; }, 400);
+          setTimeout(() => { rulesBox.style.display = 'none'; }, 400);
         }, 600);
       }
     });
 
     confirmPassword.addEventListener('input', function () {
       clearTimeout(mismatchTimer);
-      mismatchTimer = setTimeout(function () {
+      mismatchTimer = setTimeout(() => {
         if (!confirmPassword.value) {
           mismatchTxt.style.display = 'none';
           matchTxt.style.display = 'none';
@@ -1002,43 +1539,10 @@
       }, 200);
     });
 
-    /* ══════════════════════════
-       STARS CANVAS
-    ══════════════════════════ */
-    var canvas = document.getElementById('stars');
-    var ctx = canvas.getContext('2d');
-    var w, h, stars = [];
-
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      stars = Array.from({ length: 160 }, function () {
-        return { x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.4 + 0.4, v: Math.random() * 0.3 + 0.1 };
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = 'rgba(255,255,200,0.85)';
-      stars.forEach(function (s) {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-        s.y -= s.v;
-        if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
-      });
-      requestAnimationFrame(draw);
-    }
-
-    window.addEventListener('resize', resize);
-    resize(); draw();
-
-    /* ══════════════════════════
-       PASSWORD TOGGLE
-    ══════════════════════════ */
+    /* ══════ PASSWORD TOGGLE ══════ */
     function togglePassword(inputId, eyeId) {
-      var input = document.getElementById(inputId);
-      var icon = document.getElementById(eyeId);
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(eyeId);
       if (input.type === 'password') {
         input.type = 'text';
         icon.innerHTML =
@@ -1056,32 +1560,21 @@
   {{-- SESSION TOASTS --}}
   @if(session('error'))
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      showToast('Error', "{{ session('error') }}", 'error');
-    });
+    document.addEventListener('DOMContentLoaded', () => showToast('Error', "{{ session('error') }}", 'error'));
   </script>
   @endif
 
   @if(session('success'))
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      showToast('Account Created!', "{{ session('success') }}", 'success');
-    });
+    document.addEventListener('DOMContentLoaded', () => showToast('Account Created!', "{{ session('success') }}", 'success'));
   </script>
   @endif
 
-  {{-- REGISTRATION SUCCESS: show toast then redirect --}}
   @if(session('registered'))
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      showToast(
-        'Account Created Successfully!',
-        'Redirecting you to login&hellip;',
-        'success'
-      );
-      setTimeout(function () {
-        window.location.href = '/login';
-      }, 3000);
+      showToast('Account Created Successfully!', 'Redirecting you to login&hellip;', 'success');
+      setTimeout(() => { window.location.href = '/login'; }, 3000);
     });
   </script>
   @endif

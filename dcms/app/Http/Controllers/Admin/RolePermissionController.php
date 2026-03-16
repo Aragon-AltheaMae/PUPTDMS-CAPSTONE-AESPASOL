@@ -103,36 +103,53 @@ class RolePermissionController extends Controller
 
         $role = Role::findOrFail($request->role_id);
 
-        $permissionIds = $request->input("permissions.{$role->id}", []);
-        $permissionIds = array_map('intval', $permissionIds);
+        if ($request->expectsJson()) {
+            $permissionIds = array_map('intval', $request->input('permissions', []));
+        } else {
+            $permissionIds = array_map('intval', $request->input("permissions.{$role->id}", []));
+        }
 
         $role->permissions()->sync($permissionIds);
-
-        $savedPermissions = Permission::whereIn('id', $permissionIds)
-            ->get(['id', 'name', 'slug', 'module'])
-            ->map(function ($permission) {
-                return [
-                    'id' => $permission->id,
-                    'name' => $permission->name,
-                    'slug' => $permission->slug,
-                    'module' => $permission->module,
-                ];
-            })
-            ->values()
-            ->toArray();
 
         AuditLogger::log(
             'update',
             'roles_permissions',
-            "Admin updated permissions for role ID {$role->id}"
+            "Admin updated permissions for role ID {$role->id} ({$role->name})"
         );
+
+        if ($request->expectsJson()) {
+            $savedPermissions = Permission::whereIn('id', $permissionIds)
+                ->get(['id', 'name', 'slug', 'module'])
+                ->map(fn($p) => [
+                    'id'     => $p->id,
+                    'name'   => $p->name,
+                    'slug'   => $p->slug,
+                    'module' => $p->module,
+                ])
+                ->values()
+                ->toArray();
+
+            return response()->json([
+                'success'     => true,
+                'message'     => "Permissions for \"{$role->name}\" updated successfully.",
+                'role_id'     => $role->id,
+                'role_name'   => $role->name,
+                'permissions' => $savedPermissions,
+            ]);
+        }
+
+        $savedPermissions = Permission::whereIn('id', $permissionIds)
+            ->get(['id', 'name', 'slug', 'module'])
+            ->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'slug' => $p->slug, 'module' => $p->module])
+            ->values()
+            ->toArray();
 
         return redirect()
             ->route('admin.role_permissions')
             ->with('success', 'Role permissions updated successfully.')
             ->with('saved_view_as', [
-                'role_id' => $role->id,
-                'role_name' => $role->name,
+                'role_id'     => $role->id,
+                'role_name'   => $role->name,
                 'permissions' => $savedPermissions,
             ]);
     }
@@ -140,8 +157,8 @@ class RolePermissionController extends Controller
     public function reset()
     {
         $superAdmin = Role::where('slug', 'super_admin')->firstOrFail();
-        $dentist = Role::where('slug', 'dentist')->firstOrFail();
-        $patient = Role::where('slug', 'patient')->firstOrFail();
+        $dentist    = Role::where('slug', 'dentist')->firstOrFail();
+        $patient    = Role::where('slug', 'patient')->firstOrFail();
 
         $superAdminPermissions = Permission::whereIn('slug', [
             'access_super_admin_dashboard',
@@ -175,7 +192,6 @@ class RolePermissionController extends Controller
             'manage_dental_records',
             'manage_appointments',
             'manage_patient_profiles',
-            'manage_appointments',
             'manage_inventory',
             'manage_reports',
             'manage_document_requests',
@@ -194,6 +210,18 @@ class RolePermissionController extends Controller
         $superAdmin->permissions()->sync($superAdminPermissions);
         $dentist->permissions()->sync($dentistPermissions);
         $patient->permissions()->sync($patientPermissions);
+
+        AuditLogger::log
+            ('update', 
+            'roles_permissions', 
+            'Admin reset all permissions to defaults');
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Default permissions restored.',
+            ]);
+        }
 
         return back()->with('success', 'Default permissions restored.');
     }
@@ -230,7 +258,6 @@ class RolePermissionController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        // Prevent deleting super admin
         if (
             in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
             str_contains(strtolower($role->name), 'super')
@@ -239,10 +266,7 @@ class RolePermissionController extends Controller
                 ->with('error', 'Cannot delete the Super Admin role.');
         }
 
-        // Detach all permissions from this role first
         $role->permissions()->detach();
-
-        // Delete the role from the database
         $role->delete();
 
         return redirect()->route('admin.role_permissions')
