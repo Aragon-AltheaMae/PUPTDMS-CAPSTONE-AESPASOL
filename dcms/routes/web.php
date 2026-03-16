@@ -27,9 +27,8 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
 use App\Http\Controllers\Admin\AdminPatientController;
 use App\Http\Controllers\Admin\ServiceTypeController;
-
 use App\Http\Controllers\Admin\ClinicScheduleController;
-
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -233,13 +232,8 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 Route::prefix('admin')->group(function () {
 
     // ADMIN DASHBOARD
-    Route::get('/dashboard', function () {
-        if (!session('admin_logged_in') && session('role') !== 'super_admin') {
-            return redirect('/admin/login');
-        }
-
-        return view('admin.admin-dashboard');
-    })->name('admin.admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+    ->name('admin.admin.dashboard');
 
     // ROLE PERMISSIONS
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
