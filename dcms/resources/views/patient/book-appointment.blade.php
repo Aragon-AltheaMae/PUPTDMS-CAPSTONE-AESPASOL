@@ -555,7 +555,7 @@ $notifCount = $notifications->count();
     <!-- Title -->
     <div class="text-center mb-1">
       <p class="text-xs font-semibold uppercase tracking-widest mb-1 text-[#8B0000]">
-        <i class="fa-regular fa-calendar-check mr-1"></i> Dental Appointment System
+        <i class="fa-regular fa-calendar-check mr-1"></i> PUP TAGUIG DENTAL CLINIC
       </p>
       <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000]">Book an Appointment</h1>
       <p class="text-sm text-[#9e9690] mt-1">Complete all five steps to schedule your dental visit.</p>
@@ -647,14 +647,15 @@ $notifCount = $notifications->count();
               <div class="border border-[#e8e2dd] rounded-2xl p-5 bg-white">
                 <div id="calendarSkeletonContainer"></div>
                 <div class="mt-4 pt-3 border-t border-[#f0ebe6] flex flex-wrap gap-x-4 gap-y-2 justify-center">
-                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
-                      class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span> Full Slot</div>
-                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
-                      class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span> Holiday</div>
-                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
-                      class="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0"></span> Unavailable</div>
-                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium"><span
-                      class="w-2 h-2 rounded-full bg-[#8B0000] flex-shrink-0"></span> Today</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
+                    <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span> Full Slot</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span> Holiday</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
+                    <span class="w-2 h-2 rounded-full bg-gray-200 flex-shrink-0"></span> Unavailable</div>
+                  <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
+                    <span class="w-2 h-2 rounded-full bg-gray-500 flex-shrink-0"></span> Today not available
+                  </div>
                 </div>
               </div>
 
@@ -727,7 +728,7 @@ $notifCount = $notifications->count();
                     <input type="radio" name="service_type" value="Others" class="hidden">
                     <div class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
                       <div class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                        <img src="images/dental-others.png" class="w-6 h-6"
+                        <img src="{{ asset('images/dental-others.png') }}" class="w-6 h-6"
                           style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
                       </div>
                       <div class="flex-1 min-w-0">
@@ -1394,15 +1395,32 @@ $notifCount = $notifications->count();
     </div>
   </dialog>
 
+@include('components.appointment-calendar-script', [
+    'mode' => 'booking',
+    'renderStyle' => 'patient',
+    'calendarContainerId' => 'calendarSkeletonContainer',
+    'dateInputId' => 'appointment_date',
+    'timeInputId' => 'appointment_time',
+    'dateBannerId' => 'dateBanner',
+    'slotPlaceholderId' => 'slotPlaceholder',
+    'slotContainerId' => 'slotContainer',
+    'slotGridId' => 'slotGrid',
+    'selectedSlotDisplayId' => 'selectedSlotDisplay',
+    'selectedSlotTextId' => 'selectedSlotText',
+    'slotEndpoint' => route('book.appointment.slots'),
+    'scheduleRules' => $schedules ?? [],
+    'blockedDates' => $blockedDates ?? [],
+    'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+    'philippineHolidays' => $philippineHolidays ?? [],
+    'useDynamicScheduleRules' => true,
+    'disallowToday' => true,
+    'allowToggleOffDate' => true,
+])
+
   <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
   <script>
-    const scheduleRules = @json($schedules ?? []);
-    const blockedDates = @json($blockedDates ?? []);
-    const apptCounts = @json($appointmentCountsPerDay ?? []);
-    const apptSlotCounts = @json($appointmentCountsPerSlot ?? []);
-    const holidaysMap = @json($philippineHolidays ?? []);
     const diseaseLabelByCode = @json($diseases->pluck('label', 'code'));
-
+    
 
     /* DRAFT */
     const DRAFT_KEY = "appointmentDraft:v1";
@@ -1504,240 +1522,9 @@ $notifCount = $notifications->count();
       setTimeout(() => input.style.animation = "", 400);
     }
 
-    /* CALENDAR */
-    let selectedDate = null,
-      selectedTime = null;
-    const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0);
-
-    function pad(n) {
-      return String(n).padStart(2, "0");
-    }
-
-    function getDayAbbrFromDate(dateObj) {
-      return dateObj.toLocaleDateString('en-US', { weekday: 'short' }).replace('.', '');
-    }
-
-    function getRuleForDate(dateObj) {
-      const dayAbbr = getDayAbbrFromDate(dateObj);
-      return scheduleRules.find(rule =>
-        rule.is_active &&
-        Array.isArray(rule.days) &&
-        rule.days.includes(dayAbbr)
-      ) || null;
-    }
-
-    function getMaxPerDay(dateObj) {
-      const rule = getRuleForDate(dateObj);
-      return rule?.max_slots ?? 0;
-    }
-
-    function isDateSchedulable(dateObj, iso) {
-      const rule = getRuleForDate(dateObj);
-
-      if (!rule || rule.status === 'closed') return false;
-      if (blockedDates.includes(iso)) return false;
-      if (holidaysMap?.[iso]) return false;
-
-      return true;
-    }
-
-    async function fetchSlotsForDate(iso) {
-      const response = await fetch(`{{ route('book.appointment.slots') }}?date=${encodeURIComponent(iso)}`, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to load slots.');
-      }
-
-      return response.json();
-    }
-
-    function loadCalendar() {
-      const today = new Date();
-      let curYear = today.getFullYear(),
-        curMonth = today.getMonth();
-
-      function renderCalendar(year, month) {
-        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const firstDow = new Date(year, month, 1).getDay();
-        const totalDays = new Date(year, month + 1, 0).getDate();
-        let header = DAYS.map((d, i) => `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${i === 0 || i === 6 ? 'text-[rgba(139,0,0,0.4)]' : 'text-[#9e9690]'}">${d}</div>`).join("");
-        let cells = "";
-        for (let i = 0; i < firstDow; i++) cells += `<div></div>`;
-        for (let d = 1; d <= totalDays; d++) {
-          const iso = `${year}-${pad(month + 1)}-${pad(d)}`;
-          const cellDate = new Date(year, month, d);
-          cellDate.setHours(0, 0, 0, 0);
-          const isToday = cellDate.getTime() === todayDate.getTime();
-          const isPast = cellDate < todayDate;
-          const isHoliday = !!holidaysMap?.[iso];
-          const isUnavail = !isDateSchedulable(cellDate, iso);
-          const maxPerDay = getMaxPerDay(cellDate);
-          const count = apptCounts?.[iso] ?? 0;
-          const isFull = !isUnavail && maxPerDay > 0 ? count >= maxPerDay : false;
-          const isDisabled = isPast || isHoliday || isUnavail || isFull;
-          const isSelected = iso === selectedDate;
-
-          let cls = "cal-day w-full h-full flex items-center justify-center text-sm font-medium rounded-full cursor-pointer relative";
-
-          if (isSelected) cls += " bg-[#8B0000] text-white font-bold shadow-[0_2px_12px_rgba(139,0,0,0.3)]";
-          else if (isToday) cls += " bg-[#8B0000] text-white font-extrabold";
-          else if (isPast) cls += " text-[#d1ccc8] cursor-not-allowed disabled";
-          else if (isHoliday) cls += " bg-blue-50 text-blue-700 font-bold disabled";
-          else if (isUnavail) cls += " text-[#d1ccc8] cursor-not-allowed unavailable disabled";
-          else if (isFull) cls += " bg-red-50 text-red-700 font-bold disabled";
-          let dotHtml = "";
-          if (!isPast && !isToday && !isSelected) {
-            if (isHoliday) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400"></span>`;
-            else if (isFull) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-500"></span>`;
-            else if (isUnavail) dotHtml = `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gray-400"></span>`;
-          }
-          let tip = "";
-          if (isPast) tip = "Past date — booking not allowed";
-          else if (isHoliday) tip = holidaysMap[iso];
-          else if (isUnavail) tip = "Clinic closed on this date";
-          else if (isFull) tip = "Full Slot";
-          const tipHtml = tip ? `<div class="cal-tooltip absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 bg-[#1a1410] text-white text-[0.65rem] font-medium px-2.5 py-1.5 rounded-lg whitespace-nowrap z-50 after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-[#1a1410]">${tip}</div>` : "";
-          cells += `<div class="cal-cell-wrap relative flex items-center justify-center aspect-square">${tipHtml}<div class="${cls}" data-date="${iso}" data-disabled="${isDisabled ? 1 : 0}">${d}${dotHtml}</div></div>`;
-        }
-        document.getElementById("calendarSkeletonContainer").innerHTML = `
-          <div class="flex items-center justify-between mb-5">
-            <button type="button" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="text-center">
-              <p class="text-base font-extrabold text-[#660000]">${MONTHS[month]}</p>
-              <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
-            </div>
-            <button type="button" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-          <hr class="border-[#f0ebe6] mb-3">
-          <div class="grid grid-cols-7 gap-0.5">${header}${cells}</div>`;
-        document.querySelectorAll("#calendarSkeletonContainer [data-date]").forEach(el => {
-          el.addEventListener("click", () => {
-            if (el.dataset.disabled === "1") return;
-            selectDate(el.dataset.date);
-          });
-        });
-      }
-      window.changeMonth = function (dir) {
-        curMonth += dir;
-        if (curMonth > 11) {
-          curMonth = 0;
-          curYear++;
-        }
-        if (curMonth < 0) {
-          curMonth = 11;
-          curYear--;
-        }
-        renderCalendar(curYear, curMonth);
-      };
-      renderCalendar(curYear, curMonth);
-    }
-
-    async function selectDate(iso) {
-      selectedDate = iso;
-      selectedTime = null;
-
-      document.getElementById("appointment_date").value = iso;
-      document.getElementById("appointment_time").value = "";
-
-      document.querySelectorAll("#calendarSkeletonContainer [data-date]").forEach(el => {
-        el.classList.remove("bg-[#8B0000]", "text-white", "font-bold", "shadow-[0_2px_12px_rgba(139,0,0,0.3)]");
-        if (el.dataset.date === iso && el.dataset.disabled !== "1") {
-          el.classList.add("bg-[#8B0000]", "text-white", "font-bold", "shadow-[0_2px_12px_rgba(139,0,0,0.3)]");
-        }
-      });
-
-      const banner = document.getElementById("dateBanner");
-      const [y, m, d] = iso.split("-");
-      const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-      try {
-        const payload = await fetchSlotsForDate(iso);
-
-        const remaining = payload.remaining ?? 0;
-        const maxPerDay = payload.max_slots ?? 0;
-        const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
-
-        banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${maxPerDay} slots left)</span>`;
-        banner.classList.remove("hidden");
-        banner.style.display = "block";
-
-        renderSlots(payload.slots || [], payload.message || "");
-      } catch (error) {
-        banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
-        banner.classList.remove("hidden");
-        banner.style.display = "block";
-
-        renderSlots([], "Unable to load available slots.");
-      }
-    }
-
-    function renderSlots(slots = [], message = "") {
-      const slotPlaceholder = document.getElementById("slotPlaceholder");
-      const slotContainer = document.getElementById("slotContainer");
-      const slotGrid = document.getElementById("slotGrid");
-      const display = document.getElementById("selectedSlotDisplay");
-      const displayTxt = document.getElementById("selectedSlotText");
-
-      if (!slotGrid) return;
-
-      slotPlaceholder?.classList.add("hidden");
-      slotContainer?.classList.remove("hidden");
-      display?.classList.add("hidden");
-      if (displayTxt) displayTxt.textContent = "";
-      slotGrid.innerHTML = "";
-
-      if (!slots.length) {
-        slotGrid.innerHTML = `<div class="text-sm text-[#9e9690] italic py-4 text-center">${message || 'No available slots for this date.'}</div>`;
-        return;
-      }
-
-      slots.forEach(slot => {
-        const disabled = !slot.available;
-
-        const chip = document.createElement("div");
-        chip.className =
-          "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer " +
-          (disabled
-            ? "border-[#e8e2dd] text-[#c4bfba] line-through opacity-60 cursor-not-allowed"
-            : "border-[#e8e2dd] bg-[#fafaf8] text-[#1a1410] hover:border-[#8B0000] hover:bg-[#fff5f5] hover:text-[#8B0000]");
-
-        chip.dataset.time = slot.time;
-        chip.innerHTML = disabled
-          ? `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${slot.time} — Taken</span>`
-          : `<i class="text-xs opacity-70 fa-regular fa-clock"></i><span>${slot.time}</span>`;
-
-        if (!disabled) {
-          chip.addEventListener("click", () => {
-            slotGrid.querySelectorAll(".slot-chip").forEach(c => {
-              c.classList.remove("bg-[#8B0000]", "text-white", "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
-              c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
-            });
-
-            chip.classList.add("bg-[#8B0000]", "text-white", "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
-            chip.classList.remove("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
-
-            selectedTime = slot.time;
-            document.getElementById("appointment_time").value = slot.time;
-
-            if (displayTxt) displayTxt.textContent = slot.time;
-            display?.classList.remove("hidden");
-          });
-        }
-
-        slotGrid.appendChild(chip);
-      });
-    }
-
     /* STEPPER */
     let step = 0,
-      completedSteps = [];
+    completedSteps = [];
     const steps = document.querySelectorAll(".step-content");
     const navBtns = document.getElementById("navBtns");
     const prevBtn = document.getElementById("prevBtn");
@@ -2382,7 +2169,6 @@ $notifCount = $notifications->count();
 
     /* INIT */
     showStep(0);
-    loadCalendar();
     restoreDraft();
 
     window.addEventListener("resize", () => {

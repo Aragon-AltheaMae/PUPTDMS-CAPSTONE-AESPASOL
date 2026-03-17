@@ -233,7 +233,7 @@ Route::prefix('admin')->group(function () {
 
     // ADMIN DASHBOARD
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-    ->name('admin.admin.dashboard');
+        ->name('admin.admin.dashboard');
 
     // ROLE PERMISSIONS
     Route::get('/role-permissions', [RolePermissionController::class, 'index'])
@@ -476,7 +476,7 @@ Route::post('/stop-impersonation', function () {
 })->name('admin.stop_impersonation');
 
 
-    
+
 /*
 |--------------------------------------------------------------------------
 | PATIENT-PROTECTED ROUTES
@@ -515,10 +515,10 @@ Route::middleware(['role:patient'])->group(function () {
 
     Route::get('/about-us', fn() => view('patient.about-us'))
         ->name('patient.about.us');
-    
+
     // Clinic Schedule
     Route::get('/book-appointment/slots', [AppointmentController::class, 'slotsForDate'])
-    ->name('book.appointment.slots');
+        ->name('book.appointment.slots');
 });
 
 /*
@@ -673,13 +673,17 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.dentist.appointments.patientProfile');
 
-    Route::get('/appointments/{id}/reschedule', [AppointmentController::class, 'reschedule'])
+    Route::get('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'reschedule'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.dentist.appointments.reschedule');
 
-    Route::put('/appointments/{id}/reschedule', [AppointmentController::class, 'updateReschedule'])
+    Route::put('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'updateReschedule'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.dentist.appointments.reschedule.update');
+
+    Route::get('/dentist/appointment-slots', [AppointmentController::class, 'slotsForDate'])
+        ->middleware(['role:dentist'])
+        ->name('dentist.appointment.slots');
 
     Route::post('/appointments/{id}/cancel', [DentistAppointmentController::class, 'cancel'])
         ->middleware('permission:manage_appointments')
@@ -781,4 +785,3 @@ Route::prefix('report')->middleware(['role:dentist', 'permission:manage_reports'
         return view('dentist.dental-services');
     })->name('dentist.dentist.report.dental-services');
 });
-
