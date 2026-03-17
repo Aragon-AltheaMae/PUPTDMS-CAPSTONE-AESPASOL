@@ -164,6 +164,16 @@ class AppointmentController extends Controller
 
         $diseases = Disease::orderBy('sort_order')->get();
 
+        $serviceTypes = ServiceType::orderBy('name')
+        ->get()
+        ->map(function ($service) {
+            return [
+                'name' => $service->name,
+                'desc' => $service->description ?: 'No description available.',
+                'img'  => null,
+            ];
+        });
+
         AuditLogger::log(
             'view',
             'appointments',
@@ -189,7 +199,7 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'appointment_date'     => 'required|date',
+            'appointment_date'     => 'required|date|after:today',
             'appointment_time'     => 'required|string', // "1:00 PM"
             'service_type' => 'required|string|max:255',
             'service_others_text'  => 'required_if:service_type,Others|nullable|string|max:100',
@@ -230,6 +240,12 @@ class AppointmentController extends Controller
 
     $date = Carbon::parse($request->appointment_date);
         $dayAbbr = $date->format('D');
+
+        if ($date->isToday()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Same-day booking is not allowed. Please select a future date.');
+        }
 
         if (BlockedDate::whereDate('date', $request->appointment_date)->exists()) {
             return redirect()->back()
@@ -305,10 +321,10 @@ class AppointmentController extends Controller
         $signaturePath = $request->file('patient_signature')->store('signatures', 'public');
         $appointment = null;
 
-        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId) {
+        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, &$appointment) {
 
             // 1) APPOINTMENT
-            Appointment::create([
+            $appointment = Appointment::create([
                 'patient_id'       => $patientId,
                 'service_type'     => $request->service_type,
                 'other_services'   => $request->service_type === 'Others'
@@ -546,13 +562,13 @@ class AppointmentController extends Controller
             }
         });
 
-        $patient = Patient::find($patientId);
-
-        AuditLogger::log(
-            'create',
-            'appointments',
-            "Patient booked appointment"
-        );
+        if ($appointment) {
+            AuditLogger::log(
+                'create',
+                'appointments',
+                "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
+            );
+        }
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
     }
@@ -560,12 +576,19 @@ class AppointmentController extends Controller
     public function slotsForDate(Request $request)
     {
         $request->validate([
-            'date' => 'required|date|after_or_equal:today',
+            'date' => 'required|date|after:today',
         ]);
 
         $iso = $request->date;
         $date = Carbon::parse($iso);
         $dayAbbr = $date->format('D');
+
+        if ($date->isToday()) {
+            return response()->json([
+                'slots' => [],
+                'message' => 'Same-day booking is not allowed. Please choose a future date.',
+            ]);
+        }
 
         if (BlockedDate::whereDate('date', $iso)->exists()) {
             return response()->json([
@@ -669,7 +692,7 @@ class AppointmentController extends Controller
 
         $philippineHolidays = PhilippineHolidays::current();
 
-        return view('dentist-reschedule', compact(
+        return view('dentist.dentist-reschedule', compact(
             'appointment',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',
