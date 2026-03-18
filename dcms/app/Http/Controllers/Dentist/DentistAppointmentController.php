@@ -7,6 +7,9 @@ use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\AuditLogger;
+use App\Models\BlockedDate;
+use App\Models\ClinicSchedule;
+use App\Helpers\PhilippineHolidays;
 
 class DentistAppointmentController extends Controller
 {
@@ -135,6 +138,111 @@ class DentistAppointmentController extends Controller
             'update',
             'dentist_appointments',
             "Dentist cancelled an appointment"
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    public function reschedule($id)
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if ($activeRole !== 'dentist') {
+            return redirect('/login');
+        }
+
+        $appointment = Appointment::with('patient')->findOrFail($id);
+
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
+            ->groupBy('appointment_date', 'appointment_time')
+            ->get()
+            ->groupBy('appointment_date')
+            ->map(function ($rows) {
+                return $rows->pluck('count', 'appointment_time')->toArray();
+            })
+            ->toArray();
+
+        $schedules = ClinicSchedule::active()->orderBy('id')->get()
+        ->map(function ($s) {
+            $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
+            return $s;
+        });
+
+        $blockedDates = BlockedDate::pluck('date')
+            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->toArray();
+
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+
+        $notifications = collect([]);
+
+        AuditLogger::log(
+            'view',
+            'dentist_appointments',
+            "Dentist opened reschedule appointment page"
+        );
+
+        return view('dentist.dentist-reschedule', compact(
+            'appointment',
+            'appointmentCountsPerDay',
+            'appointmentCountsPerSlot',
+            'schedules',
+            'blockedDates',
+            'philippineHolidays',
+            'notifications'
+        ));
+    }
+
+    public function updateReschedule(Request $request, $id)
+    {
+        $request->validate([
+            'new_appointment_date' => 'required|date|after:today',
+            'new_appointment_time' => 'required',
+            'service_type' => 'required|string',
+        ]);
+
+        if (Carbon::parse($request->new_appointment_date)->isToday()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Same-day rescheduling is not allowed. Please choose a future date.',
+            ], 422);
+        }
+
+        $appointment = Appointment::findOrFail($id);
+
+        $mysqlTime = Carbon::createFromFormat('g:i A', trim($request->new_appointment_time))->format('H:i:s');
+
+        $slotTaken = Appointment::where('appointment_date', $request->new_appointment_date)
+            ->where('appointment_time', $mysqlTime)
+            ->where('id', '!=', $id)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->exists();
+
+        if ($slotTaken) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sorry, that time slot is already taken. Please choose another time.',
+            ], 422);
+        }
+
+        $appointment->update([
+            'appointment_date' => $request->new_appointment_date,
+            'appointment_time' => $mysqlTime,
+            'service_type' => $request->service_type,
+            'status' => 'rescheduled',
+        ]);
+
+        AuditLogger::log(
+            'update',
+            'dentist_appointments',
+            "Dentist rescheduled an appointment"
         );
 
         return response()->json(['success' => true]);
