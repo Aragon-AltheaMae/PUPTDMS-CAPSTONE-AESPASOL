@@ -10,8 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
     <style>
         * {
@@ -2125,9 +2124,9 @@
                 </div>
                 <div class="flex items-center gap-3 flex-shrink-0 sm:pt-1">
                     <span class="sl-live"><span class="sl-live-dot"></span> Live Monitoring</span>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="sl-back-btn">
+                    {{-- <a href="{{ route('admin.admin.dashboard') }}" class="sl-back-btn">
                         <i class="fa-solid fa-arrow-left" style="font-size:0.72rem;"></i> Back to Dashboard
-                    </a>
+                    </a> --}}
                 </div>
             </div>
 

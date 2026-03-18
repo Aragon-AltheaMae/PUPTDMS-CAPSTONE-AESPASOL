@@ -185,13 +185,17 @@
     .header-user-btn {
       display: flex;
       align-items: center;
-      gap: .6rem;
-      padding: .35rem .75rem .35rem .35rem;
-      background: rgba(255, 255, 255, .1);
-      border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 40px;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 999px;
       cursor: pointer;
-      transition: background .15s;
+    }
+
+    .header-user-btn img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
     }
 
     .header-user-btn:hover {
@@ -1201,6 +1205,15 @@
         margin-left: 0 !important;
       }
 
+      #siteFooter {
+        padding: 1rem;
+      }
+
+      .footer-inner {
+        gap: .75rem;
+        font-size: .7rem;
+      }
+
       #mobileMenuBtn {
         display: flex;
       }
@@ -1425,7 +1438,7 @@ $calendarAppointmentCounts = [
 
   <!-- ════════ HEADER ════════ -->
   <header class="header">
-    <div class="header-left">
+    <div class="flex items-center gap-3">
       <button id="mobileMenuBtn" onclick="openDrawer()" aria-label="Open menu">
         <i class="fa-solid fa-bars"></i>
       </button>
@@ -1434,8 +1447,7 @@ $calendarAppointmentCounts = [
       <div class="header-divider"></div>
       <span class="header-title">PUP Taguig Dental Clinic</span>
     </div>
-    <div class="header-right">
-      @php $notifications = collect($notifications ?? []); $notifCount = $notifications->count(); @endphp
+    <div class="flex items-center gap-2 sm:gap-3">
       <div id="notifDropdown">
         <button class="hdr-icon-btn" id="notifBtn" aria-label="Notifications">
           <i class="fa-regular fa-bell"></i>
@@ -1446,7 +1458,7 @@ $calendarAppointmentCounts = [
           <div style="max-height:260px;overflow-y:auto;">
             @forelse($notifications as $n)
             <a href="{{ $n['url'] ?? '#' }}"
-              style="display:block;padding:.65rem 1rem;font-size:.76rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;transition:background .1s;"
+              style="display:block;padding:.65rem 1rem;font-size:.76rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;"
               onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">
               <div style="font-weight:700;">{{ $n['title'] ?? 'Notification' }}</div>
               @if(!empty($n['message']))<div style="color:#aaa;margin-top:2px;font-size:.7rem;">{{ $n['message'] }}
@@ -1454,19 +1466,18 @@ $calendarAppointmentCounts = [
             </a>
             @empty
             <div style="padding:2.5rem 1rem;text-align:center;color:#bbb;font-size:.76rem;">
-              <i class="fa-regular fa-bell-slash" style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>
-              You're all caught up.
+              <i class="fa-regular fa-bell-slash" style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>You're
+              all caught up.
             </div>
             @endforelse
           </div>
         </div>
       </div>
-
       <div id="userDropdown">
         <div class="header-user-btn" id="userBtn">
           <img src="{{ asset('images/Nelson-Angeles.jpg') }}" alt="Dr. Nelson P. Angeles" class="header-avatar"
             onerror="this.src='https://ui-avatars.com/api/?name=Nelson+Angeles&background=660000&color=FFFFFF&size=88'">
-          <div class="header-user-text">
+          <div class="hidden sm:block" style="line-height:1;">
             <div class="header-name">Dr. Nelson P. Angeles</div>
             <div class="header-role">Dentist</div>
           </div>
@@ -1496,34 +1507,33 @@ $calendarAppointmentCounts = [
           <div class="user-menu-sep"></div>
           <form method="POST" action="{{ route('logout') }}" style="margin:0;">
             @csrf
-            <button type="submit" class="user-menu-item danger">
-              <i class="fa-solid fa-right-from-bracket"></i> Log out
-            </button>
+            <button type="submit" class="user-menu-item danger"><i class="fa-solid fa-right-from-bracket"></i>Log
+              out</button>
           </form>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (desktop) -->
   <aside id="sidebar" style="width:220px;">
     <div class="sidebar-inner">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <div class="toggle-row flex justify-end mb-3">
         <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-          style="width:30px;height:30px;border-radius:8px;border:none;background:#fef2f2;color:#8B0000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .15s;"
+          style="width:30px;height:30px;border-radius:8px;border:none;background:#fef2f2;color:#8B0000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;"
           onmouseover="this.style.background='#fce8e8'" onmouseout="this.style.background='#fef2f2'">
           <i id="sidebarIcon" class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <div class="nav-section-label" id="sidebarNavLabel">Navigation</div>
+      <div class="nav-section-label">Navigation</div>
       <nav style="display:flex;flex-direction:column;gap:2px;">
         @foreach([
-        ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-        ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-        ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-        ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
-        ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-        ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+        ['route'=>'dentist.dentist.dashboard','icon'=>'fa-chart-line','label'=>'Dashboard'],
+        ['route'=>'dentist.dentist.patients','icon'=>'fa-users','label'=>'Patients'],
+        ['route'=>'dentist.dentist.appointments','icon'=>'fa-calendar-check','label'=>'Appointments'],
+        ['route'=>'dentist.dentist.documentrequests','icon'=>'fa-file-circle-check','label'=>'Document Requests'],
+        ['route'=>'dentist.dentist.inventory','icon'=>'fa-box','label'=>'Inventory'],
+        ['route'=>'dentist.dentist.report','icon'=>'fa-file','label'=>'Reports'],
         ] as $nav)
         <a href="{{ route($nav['route']) }}" title="{{ $nav['label'] }}"
           class="sidebar-nav-item {{ request()->routeIs($nav['route']) ? 'active' : '' }}">
@@ -1535,15 +1545,12 @@ $calendarAppointmentCounts = [
     </div>
   </aside>
 
-  <!-- MOBILE DRAWER OVERLAY -->
-  <div id="mobileDrawerOverlay" onclick="closeDrawer()"></div>
-
   <!-- MOBILE DRAWER -->
+  <div id="mobileDrawerOverlay" onclick="closeDrawer()"></div>
   <div id="mobileDrawer">
     <div class="drawer-header">
       <div class="drawer-brand">
-        <img src="{{ asset('images/PUP.png') }}"
-          style="width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3));" alt="PUP">
+        <img src="{{ asset('images/PUP.png') }}" style="width:26px;height:26px;object-fit:contain;" alt="PUP">
         <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" style="width:24px;height:24px;object-fit:contain;" alt="DMS">
         <span class="drawer-brand-text">PUP Taguig<br>Dental Clinic</span>
       </div>
@@ -1552,12 +1559,12 @@ $calendarAppointmentCounts = [
     <nav class="drawer-nav">
       <div class="drawer-section-label">Navigation</div>
       @foreach([
-      ['route'=>'dentist.dentist.dashboard', 'icon'=>'fa-chart-line', 'label'=>'Dashboard'],
-      ['route'=>'dentist.dentist.patients', 'icon'=>'fa-users', 'label'=>'Patients'],
-      ['route'=>'dentist.dentist.appointments', 'icon'=>'fa-calendar-check', 'label'=>'Appointments'],
-      ['route'=>'dentist.dentist.documentrequests', 'icon'=>'fa-file-circle-check', 'label'=>'Document Requests'],
-      ['route'=>'dentist.dentist.inventory', 'icon'=>'fa-box', 'label'=>'Inventory'],
-      ['route'=>'dentist.dentist.report', 'icon'=>'fa-file', 'label'=>'Reports'],
+      ['route'=>'dentist.dentist.dashboard','icon'=>'fa-chart-line','label'=>'Dashboard'],
+      ['route'=>'dentist.dentist.patients','icon'=>'fa-users','label'=>'Patients'],
+      ['route'=>'dentist.dentist.appointments','icon'=>'fa-calendar-check','label'=>'Appointments'],
+      ['route'=>'dentist.dentist.documentrequests','icon'=>'fa-file-circle-check','label'=>'Document Requests'],
+      ['route'=>'dentist.dentist.inventory','icon'=>'fa-box','label'=>'Inventory'],
+      ['route'=>'dentist.dentist.report','icon'=>'fa-file','label'=>'Reports'],
       ] as $nav)
       <a href="{{ route($nav['route']) }}"
         class="drawer-nav-link {{ request()->routeIs($nav['route']) ? 'active' : '' }}">
@@ -1570,7 +1577,7 @@ $calendarAppointmentCounts = [
       <form method="POST" action="{{ route('logout') }}" style="margin:0;">
         @csrf
         <button type="submit"
-          style="width:100%;display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:10px;border:1px solid #fce8e8;background:#fdf5f5;color:#8B0000;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s;">
+          style="width:100%;display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:10px;border:1px solid #fce8e8;background:#fdf5f5;color:#8B0000;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
           <i class="fa-solid fa-right-from-bracket"></i> Log out
         </button>
       </form>
@@ -1578,7 +1585,7 @@ $calendarAppointmentCounts = [
   </div>
 
   <!-- CONTENT -->
-  <main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
+  <main id="mainContent" class="pt-[100px] px-6 py-6 fade-in min-h-screen">
     <div class="max-w-7xl mx-auto fade-in">
 
       @if(session('impersonated_role') && session('impersonator_role') === 'super_admin')
@@ -2059,17 +2066,16 @@ $calendarAppointmentCounts = [
   @endif
 
   <script>
-    // ── Mobile Drawer ─────────────────────────────────────────────
-    function openDrawer() {
-      document.getElementById('mobileDrawer').classList.add('open');
-      document.getElementById('mobileDrawerOverlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeDrawer() {
-      document.getElementById('mobileDrawer').classList.remove('open');
-      document.getElementById('mobileDrawerOverlay').classList.remove('open');
-      document.body.style.overflow = '';
-    }
+    // ── Drawer ──
+    function openDrawer() { document.getElementById('mobileDrawer').classList.add('open'); document.getElementById('mobileDrawerOverlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeDrawer() { document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('mobileDrawerOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+
+    /* NOTIF */
+    document.getElementById('notifBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('notifMenu').classList.toggle('open');
+      document.getElementById('userMenu').classList.remove('open');
+    });
 
     /* USER DROPDOWN */
     document.getElementById('userBtn').addEventListener('click', e => {
@@ -2077,45 +2083,40 @@ $calendarAppointmentCounts = [
       document.getElementById('notifMenu').classList.remove('open');
       document.getElementById('userMenu').classList.toggle('open');
     });
-    document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
+    /* CLOSE MENUS WHEN CLICKING OUTSIDE */
+    document.addEventListener('click', () => {
+      document.getElementById('notifMenu').classList.remove('open');
+      document.getElementById('userMenu').classList.remove('open');
+    });
+
+    // ── Theme toggle sync ──
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#userMenuThemeToggle .theme-option').forEach(o =>
         o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
       );
+      applyTheme(localStorage.getItem('theme') || 'light');
     });
 
-    /* ── THEME ── */
     function applyTheme(theme) {
       document.documentElement.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      document.querySelectorAll(".theme-option").forEach(o =>
-        o.getAttribute("data-theme") === theme ? o.classList.add("active") : o.classList.remove("active")
-      );
+      document.querySelectorAll(".theme-option").forEach(o => o.getAttribute("data-theme") === theme ? o.classList.add("active") : o.classList.remove("active"));
       const ind = document.querySelector(".theme-indicator");
       if (ind) ind.classList.toggle("dark-mode", theme === "dark");
     }
 
-    /* ── SIDEBAR ── */
-    function applyLayout(w) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('mainContent');
-      if (sidebar) sidebar.style.width = w;
-      if (main) main.style.marginLeft = w;
-    }
-
+    // ── Sidebar ──
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const icon = document.getElementById('sidebarIcon');
       const isCollapsed = sidebar.classList.contains('collapsed');
       if (isCollapsed) {
-        sidebar.classList.remove('collapsed');
-        sidebar.style.width = '220px';
+        sidebar.classList.remove('collapsed'); sidebar.style.width = '220px';
         document.getElementById('mainContent').style.marginLeft = '220px';
         icon.className = 'fa-solid fa-xmark';
       } else {
-        sidebar.classList.add('collapsed');
-        sidebar.style.width = '64px';
+        sidebar.classList.add('collapsed'); sidebar.style.width = '64px';
         document.getElementById('mainContent').style.marginLeft = '64px';
         icon.className = 'fa-solid fa-bars';
       }
@@ -2291,6 +2292,18 @@ $calendarAppointmentCounts = [
     document.getElementById('statusModal').addEventListener('click', function (e) {
       if (e.target === this) closeStatusModal();
     });
+
+    function applyLayout(w) {
+      if (window.innerWidth < 768) return;
+
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('mainContent');
+      const footer = document.getElementById('siteFooter');
+
+      if (sidebar) sidebar.style.width = w;
+      if (main) main.style.marginLeft = w;
+      if (footer) footer.style.marginLeft = w;
+    }
 
     /* ── DOM READY ── */
     document.addEventListener("DOMContentLoaded", () => {
