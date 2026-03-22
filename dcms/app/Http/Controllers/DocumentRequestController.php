@@ -11,38 +11,44 @@ use App\Helpers\AuditLogger;
 
 class DocumentRequestController extends Controller
 {
-    /* =======================
-       STORE DOCUMENT REQUEST
-    ======================= */
     public function store(Request $request)
     {
         $request->validate([
             'document_type' => 'required|string|max:100',
-            'purpose'       => 'required|string|max:150',
+            'purpose' => 'required|string|max:150',
         ]);
 
         try {
             DB::transaction(function () use ($request) {
+                $nextId = (DocumentRequest::max('id') ?? 0) + 1;
+
                 DocumentRequest::create([
-                    'patient_id'   => session('patient_id'),
+                    'patient_id' => session('patient_id'),
+                    'reference_number' => 'DOC-' . now()->format('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
                     'document_type' => $request->document_type,
-                    'purpose'      => $request->purpose,
+                    'purpose' => $request->purpose,
+                    'priority' => 'normal',
                     'request_date' => Carbon::now()->toDateString(),
                     'request_time' => Carbon::now()->toTimeString(),
-                    'status'       => 'pending',
+                    'status' => 'pending',
                 ]);
             });
         } catch (\Throwable $e) {
-            return back()->with('error', 'Failed to submit request.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit request.'
+            ], 500);
         }
 
         $patient = Patient::find(session('patient_id'));
 
-        AuditLogger::log(
-            'create',
-            'document_request',
-            "Patient submitted document request"
-        );
+        if ($patient) {
+            AuditLogger::log(
+                'create',
+                'document_request',
+                'Patient submitted document request'
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -50,13 +56,10 @@ class DocumentRequestController extends Controller
         ]);
     }
 
-    /* =======================
-       PATIENT REQUEST HISTORY
-    ======================= */
     public function index()
     {
         $requests = DocumentRequest::where('patient_id', session('patient_id'))
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->get();
 
         $patient = Patient::find(session('patient_id'));
@@ -65,16 +68,13 @@ class DocumentRequestController extends Controller
             AuditLogger::log(
                 'view',
                 'document_request',
-                "Patient viewed document request history"
+                'Patient viewed document request history'
             );
         }
 
         return view('document-requests.index', compact('requests'));
     }
 
-    /* =======================
-       DENTIST: LIST PAGE
-    ======================= */
     public function dentistIndex(Request $request)
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -100,20 +100,24 @@ class DocumentRequestController extends Controller
             ->latest('request_date')
             ->get()
             ->map(function ($req) {
-                $parts       = explode(' ', trim($req->patient->name ?? ''));
-                $last        = count($parts) > 1 ? array_pop($parts) : ($parts[0] ?? '—');
-                $first       = implode(' ', $parts);
-                $displayName = $first ? "$last, $first" : $last;
+                $fullName = $req->patient->full_name ?? $req->patient->name ?? 'Unknown Patient';
+
+                $parts = explode(' ', trim($fullName));
+                $last = count($parts) > 1 ? array_pop($parts) : ($parts[0] ?? '—');
+                $first = implode(' ', $parts);
+                $displayName = $first ? "{$last}, {$first}" : $last;
 
                 return [
-                    'id'            => $req->id,
-                    'status'        => $req->status,
+                    'id' => $req->id,
+                    'reference_number' => $req->reference_number,
+                    'status' => $req->status,
                     'document_type' => $req->document_type,
-                    'purpose'       => $req->purpose ?? '—',
-                    'request_date'  => Carbon::parse($req->request_date)->format('M d, Y'),
-                    'request_time'  => Carbon::parse($req->request_time)->format('h:i A'),
-                    'patient_name'  => $displayName,
-                    'sub_label'     => $req->patient->course_section
+                    'purpose' => $req->purpose ?? '—',
+                    'priority' => $req->priority ?? 'normal',
+                    'request_date' => Carbon::parse($req->request_date)->format('M d, Y'),
+                    'request_time' => Carbon::parse($req->request_time)->format('h:i A'),
+                    'patient_name' => $displayName,
+                    'sub_label' => $req->patient->course_section
                         ?? $req->patient->department
                         ?? $req->patient->role
                         ?? null,
@@ -126,18 +130,17 @@ class DocumentRequestController extends Controller
 
         return response()->json([
             'requests' => $requests,
-            'stats'    => [
-                'all'      => DocumentRequest::count(),
-                'pending'  => $counts['pending']  ?? 0,
+            'stats' => [
+                'all' => DocumentRequest::count(),
+                'pending' => $counts['pending'] ?? 0,
                 'approved' => $counts['approved'] ?? 0,
+                'ready' => $counts['ready'] ?? 0,
+                'released' => $counts['released'] ?? 0,
                 'rejected' => $counts['rejected'] ?? 0,
             ],
         ]);
     }
 
-    /* =======================
-       DENTIST: APPROVE (AJAX)
-    ======================= */
     public function approve(Request $request, $id)
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -149,12 +152,12 @@ class DocumentRequestController extends Controller
         $docRequest = DocumentRequest::findOrFail($id);
         $docRequest->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => 'Document request approved.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Document request approved.'
+        ]);
     }
 
-    /* =======================
-       DENTIST: REJECT (AJAX)
-    ======================= */
     public function reject(Request $request, $id)
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -166,36 +169,22 @@ class DocumentRequestController extends Controller
         $docRequest = DocumentRequest::findOrFail($id);
         $docRequest->update(['status' => 'rejected']);
 
-        return response()->json(['success' => true, 'message' => 'Document request rejected.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Document request rejected.'
+        ]);
     }
 
-    /* =======================
-       LEGACY: UPDATE STATUS
-    ======================= */
     public function updateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:approved,rejected']);
+        $request->validate([
+            'status' => 'required|in:approved,rejected,ready,released',
+        ]);
 
-        DocumentRequest::findOrFail($id)->update(['status' => $request->status]);
+        DocumentRequest::findOrFail($id)->update([
+            'status' => $request->status
+        ]);
 
         return back()->with('success', 'Request updated.');
     }
-
-    /* =======================
-       ADMIN: UPDATE STATUS
-    ======================= */
-    // public function updateStatus(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'status' => 'required|in:approved,rejected',
-    //     ]);
-
-    //     $docRequest = DocumentRequest::findOrFail($id);
-
-    //     $docRequest->update([
-    //         'status' => $request->status,
-    //     ]);
-
-    //     return back()->with('success', 'Request updated.');
-    // }
 }

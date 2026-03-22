@@ -2063,8 +2063,9 @@
       </div>
 
       {{-- Palitan ng system settings na route --}}
-      <a href="{{ route('admin.system_logs') }}" class="hdr-icon-btn" aria-label="Settings">
-        <i class="fa-solid fa-gear"></i>
+      <a href="{{ route('admin.system_settings') }}"
+        class="drawer-link {{ request()->routeIs('admin.system_settings*') ? 'active' : '' }}">
+          <i class="fa-solid fa-sliders"></i> System Settings
       </a>
 
       <div id="userDropdown">
@@ -2132,8 +2133,10 @@
             Appointments</a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-tooth"></i> Dental
             Records</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-circle-check"></i>
-            Document Request</a>
+          <a href="{{ route('admin.document-requests.index') }}"
+            class="nav-link {{ request()->routeIs('admin.document-requests*') ? 'active' : '' }}">
+            <i class="fa-solid fa-file-circle-check"></i> Document Request
+          </a>
           <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i> Reports</a>
         </div>
       </div>
@@ -2188,8 +2191,9 @@
           <a href="{{ route('admin.system_logs') }}"
             class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
               class="fa-solid fa-clipboard-list"></i> System Logs</a>
-          <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-sliders"></i> System
-            Settings</a>
+          <a href="{{ route('admin.system_settings') }}"
+            class="nav-link {{ request()->routeIs('admin.system_settings*') ? 'active' : '' }}"><i
+              class="fa-solid fa-sliders"></i> System Settings</a>
         </div>
       </div>
 
@@ -2231,8 +2235,10 @@
           Appointments</a>
         <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-tooth"></i> Dental
           Records</a>
-        <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file-circle-check"></i>
-          Document Request</a>
+        <a href="{{ route('admin.document-requests.index') }}"
+          class="drawer-link {{ request()->routeIs('admin.document-requests*') ? 'active' : '' }}">
+          <i class="fa-solid fa-file-circle-check"></i> Document Request
+        </a>
         <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file"></i> Reports</a>
       </div>
       <div class="drawer-sep"></div>

@@ -11,8 +11,10 @@ class DocumentRequest extends Model
 
     protected $fillable = [
         'patient_id',
+        'reference_number',
         'document_type',
         'purpose',
+        'priority',
         'request_date',
         'request_time',
         'status',
