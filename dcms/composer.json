@@ -30,7 +30,8 @@
         },
         "files": [
             "app/Helpers/PhilippineHolidays.php",
-            "app/Helpers/AuditLogger.php"
+            "app/Helpers/AuditLogger.php",
+            "app/Helpers/SettingHelper.php"
         ]
     },
     "autoload-dev": {
