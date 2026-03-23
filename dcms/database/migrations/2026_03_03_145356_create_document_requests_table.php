@@ -14,13 +14,17 @@ return new class extends Migration {
                 ->constrained('patients')
                 ->onDelete('cascade');
 
+            $table->string('reference_number')->unique();
+
             $table->string('document_type', 100);
             $table->string('purpose', 150);
+
+            $table->enum('priority', ['high', 'normal', 'low'])->default('normal');
 
             $table->date('request_date');
             $table->time('request_time');
 
-            $table->enum('status', ['pending', 'approved', 'rejected'])
+            $table->enum('status', ['pending', 'approved', 'ready', 'released', 'rejected'])
                 ->default('pending');
 
             $table->timestamps();

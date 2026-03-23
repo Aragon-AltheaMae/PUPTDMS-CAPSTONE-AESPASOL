@@ -29,6 +29,8 @@ use App\Http\Controllers\Admin\AdminPatientController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\ClinicScheduleController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -289,7 +291,7 @@ Route::prefix('admin')->group(function () {
     Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
         ->name('admin.academic_periods.set_active');
 
-    // // CLINIC SCHEDULE
+    // CLINIC SCHEDULE
     Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
         ->name('admin.clinic_schedule');
 
@@ -315,6 +317,30 @@ Route::prefix('admin')->group(function () {
         ->name('admin.clinic_schedule.slots');
 });
 
+    // DOCUMENT REQUEST 
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/document-requests', [AdminDocumentRequestController::class, 'index'])
+        ->name('document-requests.index');
+
+    Route::get('/document-requests/export', [AdminDocumentRequestController::class, 'export'])
+        ->name('document-requests.export');
+
+    Route::get('/document-requests/print-queue', [AdminDocumentRequestController::class, 'printQueue'])
+        ->name('document-requests.print-queue');
+
+    Route::get('/document-requests/{documentRequest}', [AdminDocumentRequestController::class, 'show'])
+        ->name('document-requests.show');
+
+    Route::patch('/document-requests/{documentRequest}/approve', [AdminDocumentRequestController::class, 'approve'])
+        ->name('document-requests.approve');
+
+    Route::patch('/document-requests/{documentRequest}/release', [AdminDocumentRequestController::class, 'release'])
+        ->name('document-requests.release');
+
+    Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
+        ->name('document-requests.reject');
+});
+
 // START IMPERSONATION
 Route::post('/impersonate', function (Request $request) {
     if (!session('admin_logged_in') || session('role') !== 'super_admin') {
@@ -328,7 +354,12 @@ Route::post('/impersonate', function (Request $request) {
     return response()->json($patients);
 })->name('admin.patients.list');
 
+// SYSTEM SETTINGS
+Route::get('/admin/system-settings', [SystemSettingsController::class, 'index'])
+    ->name('admin.system_settings');
 
+Route::post('/admin/system-settings', [SystemSettingsController::class, 'update'])
+    ->name('admin.system_settings.update');
 /*  
 |--------------------------------------------------------------------------
 | ADMIN USER MANAGEMENT ROUTES
