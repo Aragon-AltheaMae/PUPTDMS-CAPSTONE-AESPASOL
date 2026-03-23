@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
-
-
 use App\Models\Patient;
 use App\Helpers\AuditLogger;
 use App\Http\Controllers\AppointmentController;
@@ -261,6 +259,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
         ->name('admin.system_logs.fetch');
 
+    Route::get('/admin/system-logs/check', [SystemLogController::class, 'checkLatest'])
+        ->name('admin.system_logs.check');
+
     // PATIENT DIRECTORY
     Route::get('/patient-directory', [AdminPatientController::class, 'index'])
         ->name('admin.patient_directory');
@@ -317,7 +318,7 @@ Route::prefix('admin')->group(function () {
         ->name('admin.clinic_schedule.slots');
 });
 
-    // DOCUMENT REQUEST 
+// DOCUMENT REQUEST 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/document-requests', [AdminDocumentRequestController::class, 'index'])
         ->name('document-requests.index');

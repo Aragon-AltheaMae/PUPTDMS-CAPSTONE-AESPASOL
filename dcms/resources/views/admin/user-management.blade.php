@@ -993,6 +993,123 @@
             color: #6b7280;
         }
 
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 0 14px;
+            height: 38px;
+            transition: border-color .2s, box-shadow .2s;
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        .search-wrap:focus-within {
+            border-color: var(--crimson);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+        }
+
+        .search-wrap i {
+            color: var(--crimson);
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .search-wrap input {
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 13px;
+            color: #333;
+            width: 100%;
+        }
+
+        .search-wrap input::placeholder {
+            color: #B0ABA6;
+        }
+
+        .search-clear-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            background: #E0DDD8;
+            color: #7A7370;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            padding: 0;
+        }
+
+        .search-clear-btn:hover {
+            background: #8b000076;
+            color: #fff;
+        }
+
+        .search-clear-btn.visible {
+            display: flex;
+        }
+
+        .tab-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9A9490;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--crimson);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        #toastContainer {
+            padding-top: 10px;
+            padding-right: 10px;
+        }
+
+        @media (max-width: 640px) {
+            #toastContainer {
+                top: 10px !important;
+                right: 10px !important;
+                left: 10px !important;
+                align-items: stretch;
+            }
+
+            #toastContainer > div {
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+        }
+
         /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 767px) {
             #sidebar {
@@ -1485,7 +1602,7 @@
             </div>
 
             {{-- Palitan ng system settings na route --}}
-            <a href="{{ route('admin.system_logs') }}" class="hdr-icon-btn" aria-label="Settings">
+            <a href="{{ route('admin.system_settings') }}" class="hdr-icon-btn" aria-label="Settings">
                 <i class="fa-solid fa-gear"></i>
             </a>
 
@@ -1758,6 +1875,9 @@
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
 
+            <!-- Global Toast Container -->
+            <div class="toast toast-top toast-end z-[9999]" id="toastContainer"></div>
+
             <div class="mb-6">
                 <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
                     <i class="fa-solid fa-user-gear text-[#8B0000] text-xs"></i>
@@ -1776,27 +1896,23 @@
             </div>
 
             @if (session('success'))
-                <div class="flash-alert bg-green-50 border border-green-200 text-green-800">
-                    <i class="fa-solid fa-circle-check text-green-500"></i>
-                    {{ session('success') }}
-                    <button onclick="this.parentElement.remove()"
-                        class="ml-auto text-green-400 hover:text-green-600"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSuccessToast("{{ session('success') }}");
+                    });
+                </script>
             @endif
 
             @if (session('error'))
-                <div class="flash-alert bg-red-50 border border-red-200 text-red-800">
-                    <i class="fa-solid fa-circle-xmark text-red-500"></i>
-                    {{ session('error') }}
-                    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i
-                            class="fa-solid fa-xmark"></i></button>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showErrorToast("{{ session('error') }}");
+                    });
+                </script>
             @endif
 
             @php
-                $totalUsers = $users->total();
-                $activeCount = \App\Models\User::where('status', 'active')->count();
-                $inactiveCount = \App\Models\User::where('status', 'inactive')->count();
+                $totalUsers = $allUsersCount;
             @endphp
 
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -1810,7 +1926,7 @@
                             <i class="fa-solid fa-users text-white text-sm"></i>
                         </div>
                         <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Users</p>
-                        <p class="text-3xl font-extrabold text-gray-800">{{ $totalUsers }}</p>
+                        <p class="text-3xl font-extrabold text-gray-800" id="countTotalUsers">{{ $totalUsers }}</p>
                     </div>
                 </div>
 
@@ -1824,7 +1940,7 @@
                             <i class="fa-solid fa-circle-check text-white text-sm"></i>
                         </div>
                         <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Active</p>
-                        <p class="text-3xl font-extrabold text-gray-800">{{ $activeCount }}</p>
+                        <p class="text-3xl font-extrabold text-gray-800" id="countActiveUsers">{{ $activeCount }}</p>
                     </div>
                 </div>
 
@@ -1838,7 +1954,7 @@
                             <i class="fa-solid fa-user-slash text-white text-sm"></i>
                         </div>
                         <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Inactive</p>
-                        <p class="text-3xl font-extrabold text-gray-800">{{ $inactiveCount }}</p>
+                        <p class="text-3xl font-extrabold text-gray-800" id="countInactiveUsers">{{ $inactiveCount }}</p>
                     </div>
                 </div>
             </div>
@@ -1852,54 +1968,53 @@
                             class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers }}</span>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.user_management') }}"
-                        class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto"
-                        id="filterForm">
-                        <div class="relative w-full sm:w-auto">
-                            <i
-                                class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}"
+                    {{-- Filter bar --}}
+                    <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm" class="flex items-center gap-2.5 flex-wrap">
+                        {{-- Search --}}
+                        <div class="search-wrap" style="width:260px;">
+                            <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
+                            <input
+                                id="umSearch"
+                                name="search"
                                 placeholder="Search name or email…"
-                                class="field-input pl-8 pr-8 py-2 text-xs border border-gray-200 rounded-lg bg-white w-full sm:w-52"
-                                oninput="liveFilter(this.value)" autocomplete="off">
-                            <button type="button" id="clearSearchBtn" onclick="clearLiveSearch()"
-                                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors"
-                                style="display:{{ request('search') ? 'flex' : 'none' }}; align-items:center;">
-                                <i class="fa-solid fa-xmark text-xs"></i>
+                                value="{{ $search ?? '' }}"
+                                autocomplete="off"
+                                oninput="toggleSearchClear(this)"
+                                onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+                            />
+                            <button
+                                type="button"
+                                id="searchClearBtn"
+                                class="search-clear-btn {{ ($search ?? '') ? 'visible' : '' }}"
+                                onclick="clearSearch()"
+                                title="Clear">
+                                <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
 
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <select name="role"
-                                class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer flex-1 sm:flex-none"
-                                onchange="this.form.submit()">
-                                <option value="">All Roles</option>
-                                <option value="super_admin" {{ request('role') === 'super_admin' ? 'selected' : '' }}>
-                                    Admin</option>
-                                <option value="dentist" {{ request('role') === 'dentist' ? 'selected' : '' }}>Dentist
-                                </option>
-                                <option value="patient" {{ request('role') === 'patient' ? 'selected' : '' }}>Patient
-                                </option>
-                            </select>
-
-                            <select name="status"
-                                class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer flex-1 sm:flex-none"
-                                onchange="this.form.submit()">
-                                <option value="">All Status</option>
-                                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active
-                                </option>
-                                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>
-                                    Inactive
-                                </option>
-                            </select>
-
-                            @if (request()->hasAny(['search', 'role', 'status']))
-                                <a href="{{ route('admin.user_management') }}"
-                                    class="text-xs text-gray-400 hover:text-[#8B0000] font-semibold flex items-center gap-1 transition-colors whitespace-nowrap self-center">
-                                    <i class="fa-solid fa-xmark"></i> Clear
-                                </a>
-                            @endif
+                        {{-- Role filter --}}
+                        <div style="display:flex;background:#F5F2EE;border:1px solid #E8E4DE;border-radius:10px;padding:3px;gap:2px;">
+                            <button type="button" onclick="setRoleFilter(this,'all')"
+                                class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
+                                data-role="">All</button>
+                            <button type="button" onclick="setRoleFilter(this,'super_admin')"
+                                class="tab-btn {{ ($roleFilter ?? '') === 'super_admin' ? 'active' : '' }}"
+                                data-role="super_admin">Admin</button>
+                            <button type="button" onclick="setRoleFilter(this,'dentist')"
+                                class="tab-btn {{ ($roleFilter ?? '') === 'dentist' ? 'active' : '' }}"
+                                data-role="dentist">Dentist</button>
+                            <button type="button" onclick="setRoleFilter(this,'patient')"
+                                class="tab-btn {{ ($roleFilter ?? '') === 'patient' ? 'active' : '' }}"
+                                data-role="patient">Patient</button>
                         </div>
+
+                        {{-- Status filter --}}
+                        <select id="statusFilter" name="status"
+                            class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer">
+                            <option value="">All Status</option>
+                            <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
                     </form>
                 </div>
 
@@ -1915,7 +2030,7 @@
                                 <th class="py-3 px-5 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="umTableBody">
                             @forelse($users as $user)
                                 <tr class="user-table-row border-b border-gray-50 last:border-0"
                                     data-name="{{ strtolower($user->name) }}"
@@ -2017,82 +2132,26 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr id="dbEmptyRow">
-                                    <td colspan="6" class="text-center py-14">
-                                        <i class="fa-solid fa-users-slash text-5xl text-gray-300 mb-3 block"></i>
-                                        <p class="text-gray-400 text-sm">No users found</p>
-                                        @if (request()->hasAny(['search', 'role', 'status']))
-                                            <a href="{{ route('admin.user_management') }}"
-                                                class="text-xs text-[#8B0000] font-semibold hover:underline mt-2 inline-block">Clear
-                                                filters</a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforelse
-                            <tr id="noResultsRow" style="display:none;">
-                                <td colspan="6" class="text-center py-14">
-                                    <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 mb-3 block"></i>
-                                    <p class="text-gray-400 text-sm">No users found for "<span id="noResultsQuery"
-                                            class="font-semibold text-gray-500"></span>"</p>
-                                    <button type="button" onclick="clearLiveSearch()"
-                                        class="text-xs text-[#8B0000] font-semibold hover:underline mt-2 inline-flex items-center gap-1">
-                                        <i class="fa-solid fa-xmark"></i> Clear search
-                                    </button>
+                            <tr id="dbEmptyRow">
+                                <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
+                                    <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
+                                        <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:#d1d5db;"></i>
+                                    </div>
+                                    <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users found</p>
+                                    <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
                                 </td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                <div
-                    class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p class="text-xs text-gray-500">
-                        Showing <span class="font-semibold">{{ $users->firstItem() ?? 0 }}</span>–<span
-                            class="font-semibold">{{ $users->lastItem() ?? 0 }}</span>
-                        of <span class="font-semibold">{{ $users->total() }}</span> users
+                <div class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p class="text-xs text-gray-500 um-pagebar-info">
+                        Showing <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0 }}</strong>
+                        of <strong>{{ $users->total() }}</strong> users
                     </p>
-                    <div class="flex items-center gap-1.5">
-                        @if ($users->onFirstPage())
-                            <button class="page-btn" disabled><i
-                                    class="fa-solid fa-chevron-left text-[10px]"></i></button>
-                        @else
-                            <a href="{{ $users->previousPageUrl() }}" class="page-btn"><i
-                                    class="fa-solid fa-chevron-left text-[10px]"></i></a>
-                        @endif
-
-                        @php
-                            $start = max(1, $users->currentPage() - 2);
-                            $end = min($users->lastPage(), $users->currentPage() + 2);
-                        @endphp
-
-                        @if ($start > 1)
-                            <a href="{{ $users->url(1) }}" class="page-btn">1</a>
-                            @if ($start > 2)
-                                <span class="text-gray-400 text-xs px-1">…</span>
-                            @endif
-                        @endif
-
-                        @for ($p = $start; $p <= $end; $p++)
-                            <a href="{{ $users->url($p) }}"
-                                class="page-btn {{ $p === $users->currentPage() ? 'active' : '' }}">{{ $p }}</a>
-                        @endfor
-
-                        @if ($end < $users->lastPage())
-                            @if ($end < $users->lastPage() - 1)
-                                <span class="text-gray-400 text-xs px-1">…</span>
-                            @endif
-                            <a href="{{ $users->url($users->lastPage()) }}"
-                                class="page-btn">{{ $users->lastPage() }}</a>
-                        @endif
-
-                        @if ($users->hasMorePages())
-                            <a href="{{ $users->nextPageUrl() }}" class="page-btn"><i
-                                    class="fa-solid fa-chevron-right text-[10px]"></i></a>
-                        @else
-                            <button class="page-btn" disabled><i
-                                    class="fa-solid fa-chevron-right text-[10px]"></i></button>
-                        @endif
-                    </div>
+                    <div class="um-pagination-wrap flex items-center gap-1.5"></div>
                 </div>
             </div>
         </div>
@@ -2101,12 +2160,12 @@
     <!-- FOOTER -->
     <footer id="siteFooter">
         <div class="footer-inner">
-            <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
-            <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
-            <span class="footer-dot">·</span>
-            <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
-            <span class="footer-dot">·</span>
-            <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
+        <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
+        <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
         </div>
     </footer>
 
@@ -2470,6 +2529,17 @@
             day: 'numeric'
         });
 
+        var umState = {
+            search: '{{ $search ?? "" }}',
+            role: '{{ $roleFilter ?? "" }}',
+            status: '{{ $statusFilter ?? "" }}',
+            perPage: {{ $perPage ?? 10 }},
+            page: {{ request('page', 1) }},
+        };
+
+        var umSearchTimer = null;
+        var umController = null;
+
         /* NOTIF */
         document.getElementById('notifBtn').addEventListener('click', e => {
             e.stopPropagation();
@@ -2660,56 +2730,405 @@
             });
         });
 
-        // ── LIVE SEARCH ──
-        function liveFilter(query) {
-            const q = query.toLowerCase().trim();
-            const rows = document.querySelectorAll('.user-table-row');
-            const clearBtn = document.getElementById('clearSearchBtn');
-            const noResultsRow = document.getElementById('noResultsRow');
-            const noResultsQuery = document.getElementById('noResultsQuery');
-            const dbEmptyRow = document.getElementById('dbEmptyRow');
-
-            clearBtn.style.display = q ? 'flex' : 'none';
-
-            if (rows.length === 0) {
-                if (dbEmptyRow) dbEmptyRow.style.display = q ? 'none' : '';
-                if (noResultsRow) {
-                    noResultsRow.style.display = q ? '' : 'none';
-                    if (noResultsQuery) noResultsQuery.textContent = query;
-                }
-                return;
-            }
-
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                const name = row.dataset.name || '';
-                const email = row.dataset.email || '';
-                const role = row.dataset.role || '';
-                const matches = !q || name.includes(q) || email.includes(q) || role.includes(q);
-                row.style.display = matches ? '' : 'none';
-                if (matches) visibleCount++;
-            });
-
-            if (noResultsRow) {
-                noResultsRow.style.display = (visibleCount === 0 && q) ? '' : 'none';
-                if (noResultsQuery) noResultsQuery.textContent = query;
-            }
+        function toggleSearchClear(input) {
+            document.getElementById('searchClearBtn')?.classList.toggle('visible', input.value.length > 0);
         }
 
-        function clearLiveSearch() {
-            const input = document.getElementById('liveSearch');
+        function clearSearch() {
+            var input = document.getElementById('umSearch');
             if (!input) return;
+
             input.value = '';
-            liveFilter('');
+            document.getElementById('searchClearBtn')?.classList.remove('visible');
+            umState.search = '';
+            umState.page = 1;
+            umFetch();
             input.focus();
         }
 
-        // Run on page load in case search value was pre-filled from URL
-        document.addEventListener('DOMContentLoaded', () => {
-            const input = document.getElementById('liveSearch');
-            if (input && input.value.trim()) {
-                liveFilter(input.value);
+        function umFetch(silent) {
+            if (umController) umController.abort();
+            umController = new AbortController();
+
+            var params = new URLSearchParams({
+                search: umState.search,
+                role: umState.role,
+                status: umState.status,
+                per_page: umState.perPage,
+                page: umState.page,
+            });
+
+            history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+
+            fetch('{{ route("admin.user_management") }}?' + params.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                signal: umController.signal
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                umRenderRows(data.users);
+                umRenderPagebar(data.pagination);
+            })
+            .catch(function (e) {
+                if (e.name !== 'AbortError') console.error(e);
+            });
+        }
+
+        function umRenderRows(users) {
+            var tbody = document.getElementById('umTableBody');
+            if (!tbody) return;
+
+            if (!users || users.length === 0) {
+                var searchVal = umState.search || '';
+                var emptyTitle = searchVal
+                    ? 'No results for &ldquo;' + searchVal + '&rdquo;'
+                    : 'No users found';
+                var emptySub = searchVal
+                    ? 'Try a different name or email.'
+                    : 'Try adjusting your filters.';
+                var clearBtn = searchVal
+                    ? '<button onclick="clearSearch()" style="margin-top:.75rem;display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:99px;border:1.5px dashed #d1d5db;background:none;font-size:.78rem;color:#9ca3af;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class=\"fa-solid fa-xmark\" style=\"font-size:.7rem;\"></i> Clear search</button>'
+                    : '';
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
+                            <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
+                                <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:#d1d5db;"></i>
+                            </div>
+                            <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">${emptyTitle}</p>
+                            <p style="font-size:.78rem;color:#9ca3af;margin:0;">${emptySub}</p>
+                            ${clearBtn}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            var startNumber = ((umState.page - 1) * umState.perPage) + 1;
+            var html = '';
+
+            users.forEach(function (user, index) {
+                var rowNumber = startNumber + index;
+                var roleSlug = (user.role_slug || '').toLowerCase();
+                var roleLabel = user.role_name || 'No Role';
+                var registeredDay = user.created_at_day || '—';
+
+                var roleBg = '#fee2e2';
+                var roleColor = '#8B0000';
+
+                if (roleSlug === 'patient') {
+                    roleBg = '#dbeafe';
+                    roleColor = '#1d4ed8';
+                } else if (roleSlug === 'dentist') {
+                    roleBg = '#d1fae5';
+                    roleColor = '#065f46';
+                }
+
+                var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
+                var initial = (user.name || 'U').charAt(0).toUpperCase();
+
+                html += `
+                    <tr class="user-table-row border-b border-gray-50 last:border-0">
+                        <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
+                            <span class="text-xs text-gray-400 font-medium">${rowNumber}</span>
+                        </td>
+
+                        <td class="py-3.5 px-3 sm:px-4">
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                    ${initial}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                        ${user.name}
+                                    </div>
+                                    <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
+                                        ${user.email}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="py-3.5 px-4">
+                            <span class="badge-role" style="background:${roleBg};color:${roleColor};">
+                                ${roleLabel}
+                            </span>
+                        </td>
+
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
+                                ${(user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1)}
+                            </span>
+                        </td>
+
+                        <td class="py-3.5 px-4 hidden lg:table-cell">
+                            <span class="text-xs text-gray-400">${registeredDay}</span>
+                        </td>
+
+                        <td class="py-3.5 px-2 sm:px-5">
+                            <div class="flex items-center justify-center gap-1">
+                                <button type="button"
+                                    onclick="openEditModal(
+                                        'users',
+                                        ${user.id},
+                                        ${JSON.stringify(user.name)},
+                                        ${JSON.stringify(user.email)},
+                                        ${JSON.stringify(user.role_id ?? '')},
+                                        ${JSON.stringify(user.status)}
+                                    )"
+                                    class="action-btn btn-edit" title="Edit account">
+                                    <i class="fa-solid fa-pen text-[11px]"></i>
+                                </button>
+
+                                <form method="POST" action="/admin/user-management/${user.id}/toggle-status" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="PATCH">
+                                    <button type="submit"
+                                        class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
+                                        title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
+                                        <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
+                                    </button>
+                                </form>
+
+                                <button type="button"
+                                    onclick="openResetModal('users', ${user.id}, ${JSON.stringify(user.name)})"
+                                    class="action-btn btn-reset" title="Reset password">
+                                    <i class="fa-solid fa-key text-[11px]"></i>
+                                </button>
+
+                                <button type="button"
+                                    onclick="openViewModal(
+                                        ${JSON.stringify(user.name)},
+                                        ${JSON.stringify(user.email)},
+                                        ${JSON.stringify(roleLabel)},
+                                        ${JSON.stringify((user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1))},
+                                        'Users',
+                                        ${JSON.stringify((user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : ''))}
+                                    )"
+                                    class="action-btn" style="background:#f3f4f6;color:#374151;"
+                                    title="View details">
+                                    <i class="fa-solid fa-eye text-[11px]"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function umGoPage(page) {
+            umState.page = page;
+            umFetch();
+        }
+
+        function umRenderPagebar(p) {
+            if (!p) return;
+
+            document.querySelectorAll('.um-pagebar-info').forEach(function (el) {
+                el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total + '</strong> users';
+            });
+
+            var html = umBuildPagination(p);
+            document.querySelectorAll('.um-pagination-wrap').forEach(function (el) {
+                el.innerHTML = html;
+            });
+        }
+
+        function umRenderCounts(counts) {
+            if (!counts) return;
+
+            const totalEl = document.getElementById('countTotalUsers');
+            const activeEl = document.getElementById('countActiveUsers');
+            const inactiveEl = document.getElementById('countInactiveUsers');
+
+            if (totalEl) totalEl.textContent = counts.all ?? 0;
+            if (activeEl) activeEl.textContent = counts.active ?? 0;
+            if (inactiveEl) inactiveEl.textContent = counts.inactive ?? 0;
+        }
+
+        function umBuildPagination(p) {
+            if (p.last_page <= 1) return '';
+
+            var current = p.current_page;
+            var last = p.last_page;
+            var windowSize = 5;
+            var half = Math.floor(windowSize / 2);
+            var start = Math.max(1, current - half);
+            var end = Math.min(last, start + windowSize - 1);
+
+            if (end - start + 1 < windowSize) {
+                start = Math.max(1, end - windowSize + 1);
+            }
+
+            var btn = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"';
+            var btnActive = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #8B0000;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;"';
+            var btnDis = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#d1d5db;font-size:.75rem;font-weight:600;cursor:not-allowed;display:inline-flex;align-items:center;justify-content:center;"';
+
+            var html = '<nav style="display:flex;align-items:center;gap:.35rem;flex-wrap:nowrap;">';
+
+            if (current <= 1) {
+                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
+            } else {
+                html += '<button onclick="umGoPage(' + (current - 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
+            }
+
+            for (var i = start; i <= end; i++) {
+                if (i === current) {
+                    html += '<span ' + btnActive + '>' + i + '</span>';
+                } else {
+                    html += '<button onclick="umGoPage(' + i + ')" ' + btn + '>' + i + '</button>';
+                }
+            }
+
+            if (current >= last) {
+                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+            } else {
+                html += '<button onclick="umGoPage(' + (current + 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+            }
+
+            html += '</nav>';
+            return html;
+        }
+
+        // Toast helper function
+        function showSuccessToast(message) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'relative overflow-hidden flex items-start gap-2.5 bg-white border border-emerald-100 shadow-lg rounded-xl px-3 py-2.5 w-[calc(100vw-1.5rem)] max-w-[320px] sm:max-w-[340px] animate-slide-in';
+
+            toast.innerHTML = `
+                <div class="absolute inset-y-0 left-0 w-1 bg-emerald-500"></div>
+
+                <div class="flex-shrink-0 ml-1">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-0 pr-1">
+                    <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Success</h3>
+                    <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${message}</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+                    onclick="this.parentElement.remove()"
+                >
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function showErrorToast(message) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'relative overflow-hidden flex items-start gap-2.5 bg-white border border-red-100 shadow-lg rounded-xl px-3 py-2.5 w-[calc(100vw-1.5rem)] max-w-[320px] sm:max-w-[340px] animate-slide-in';
+
+            toast.innerHTML = `
+                <div class="absolute inset-y-0 left-0 w-1 bg-red-500"></div>
+
+                <div class="flex-shrink-0 ml-1">
+                    <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-0 pr-1">
+                    <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Error</h3>
+                    <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${message}</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+                    onclick="this.parentElement.remove()"
+                >
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function setRoleFilter(el, role) {
+            // Update active tab button
+            document.querySelectorAll('[data-role]').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            el.classList.add('active');
+
+            umState.role = role === 'all' ? '' : role;
+            umState.page = 1;
+            umFetch();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            applyTheme(localStorage.getItem('theme') || 'light');
+            document.querySelectorAll('.theme-option').forEach(function(o) {
+                o.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    applyTheme(o.getAttribute('data-theme'));
+                });
+            });
+
+            umRenderPagebar({
+                total: {{ $users->total() }},
+                from: {{ $users->firstItem() ?? 0 }},
+                to: {{ $users->lastItem() ?? 0 }},
+                current_page: {{ $users->currentPage() }},
+                last_page: {{ $users->lastPage() }},
+                per_page: {{ $users->perPage() }},
+            });
+
+            var searchInput = document.getElementById('umSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    toggleSearchClear(this);
+                    clearTimeout(umSearchTimer);
+                    var val = this.value;
+                    umSearchTimer = setTimeout(function () {
+                        umState.search = val;
+                        umState.page = 1;
+                        umFetch(true);
+                    }, 350);
+                });
+            }
+
+            var statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function () {
+                    umState.status = this.value;
+                    umState.page = 1;
+                    umFetch();
+                });
             }
         });
     </script>

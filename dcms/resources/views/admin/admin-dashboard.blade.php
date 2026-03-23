@@ -11,8 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
   <script>tailwind.config = { daisyui: { themes: false } }</script>
 
@@ -2063,9 +2062,8 @@
       </div>
 
       {{-- Palitan ng system settings na route --}}
-      <a href="{{ route('admin.system_settings') }}"
-        class="drawer-link {{ request()->routeIs('admin.system_settings*') ? 'active' : '' }}">
-          <i class="fa-solid fa-sliders"></i> System Settings
+      <a href="{{ route('admin.system_settings') }}" class="hdr-icon-btn" aria-label="Settings">
+        <i class="fa-solid fa-gear"></i>
       </a>
 
       <div id="userDropdown">
@@ -2304,7 +2302,7 @@
       <div class="page-banner-inner">
         <div>
           <div class="page-greeting">
-            <i class="fa-solid fa-sun" style="color:#fcd34d;"></i>
+            <i id="currentDateIcon" class="fa-solid fa-calendar-day" style="color:#fcd34d;"></i>
             <span id="currentDate"></span>
           </div>
           <h1 class="page-title">Admin Dashboard</h1>
@@ -2415,23 +2413,23 @@
             <!-- Mini stats -->
             <div class="log-stats-row">
               <div class="log-stat" style="background:#f5f3ff;">
-                <div class="log-stat-value" style="color:#7c3aed;">0</div>
+                <div class="log-stat-value" style="color:#7c3aed;">{{ $logThisMonth ?? 0 }}</div>
                 <div class="log-stat-label" style="color:#7c3aed;">This Month</div>
               </div>
               <div class="log-stat" style="background:#eff6ff;">
-                <div class="log-stat-value" style="color:#2563eb;">0</div>
-                <div class="log-stat-label" style="color:#3b82f6;">Info</div>
+                <div class="log-stat-value" style="color:#2563eb;">{{ $logInfo ?? 0 }}</div>
+                <div class="log-stat-label" style="color:#3b82f6;">Views</div>
               </div>
               <div class="log-stat" style="background:#fffbeb;">
-                <div class="log-stat-value" style="color:#d97706;">0</div>
-                <div class="log-stat-label" style="color:#f59e0b;">Warnings</div>
+                <div class="log-stat-value" style="color:#d97706;">{{ $logWarnings ?? 0 }}</div>
+                <div class="log-stat-label" style="color:#f59e0b;">Logins</div>
               </div>
               <div class="log-stat" style="background:#f0fdf4;">
-                <div class="log-stat-value" style="color:#16a34a;">0</div>
+                <div class="log-stat-value" style="color:#16a34a;">{{ $logBackups ?? 0 }}</div>
                 <div class="log-stat-label" style="color:#22c55e;">Backups</div>
               </div>
               <div class="log-stat" style="background:#fef2f2;">
-                <div class="log-stat-value" style="color:var(--crimson);">0</div>
+                <div class="log-stat-value" style="color:var(--crimson);">{{ $logErrors ?? 0 }}</div>
                 <div class="log-stat-label" style="color:#ef4444;">Errors</div>
               </div>
             </div>
@@ -2448,6 +2446,31 @@
                   </tr>
                 </thead>
                 <tbody>
+                  @forelse($recentLogs ?? [] as $log)
+                  @php
+                    $logId         = data_get($log, 'id', '—');
+                    $logDate       = data_get($log, 'created_at');
+                    $logDesc       = data_get($log, 'description', 'No description provided.');
+                    $logActor      = data_get($log, 'actor_identifier', '—');
+                    $logRole       = data_get($log, 'actor_role', '');
+                  @endphp
+                  <tr>
+                    <td style="color:#9ca3af;font-size:.72rem;">#{{ $logId }}</td>
+                    <td>
+                      <div style="font-size:.74rem;font-weight:600;color:#374151;">
+                        {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('M j, Y') : '—' }}
+                      </div>
+                      <div style="font-size:.68rem;color:#9ca3af;">
+                        {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('h:i:s A') : '—' }}
+                      </div>
+                    </td>
+                    <td style="font-size:.76rem;">{{ $logDesc }}</td>
+                    <td>
+                      <span style="font-size:.72rem;font-weight:600;color:#4a5568;">{{ $logActor }}</span>
+                      <div style="font-size:.65rem;color:#9ca3af;text-transform:capitalize;">{{ $logRole }}</div>
+                    </td>
+                  </tr>
+                  @empty
                   <tr>
                     <td colspan="4">
                       <div class="empty-state">
@@ -2457,6 +2480,7 @@
                       </div>
                     </td>
                   </tr>
+                  @endforelse
                 </tbody>
               </table>
             </div>
@@ -2592,17 +2616,17 @@
     </div><!-- /content-lift -->
   </main>
 
-  <!-- FOOTER -->
-  <footer id="siteFooter">
-    <div class="footer-inner">
-      <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
-      <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
-      <span class="footer-dot">·</span>
-      <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
-      <span class="footer-dot">·</span>
-      <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
-    </div>
-  </footer>
+    <!-- FOOTER -->
+    <footer id="siteFooter">
+        <div class="footer-inner">
+        <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
+        <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
+        </div>
+    </footer>
 
   @if(session('activeAppointmentModal'))
   <script>
@@ -2669,12 +2693,55 @@
     }
 
     /* DATE */
+    document.addEventListener('DOMContentLoaded', function () {
     const dateEl = document.getElementById('currentDate');
-    if (dateEl) {
-      dateEl.textContent = new Date().toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    const dateIconEl = document.getElementById('currentDateIcon');
+
+    if (!dateEl) return;
+
+    function updateDateTime() {
+      const now = new Date();
+
+      const dateText = now.toLocaleDateString('en-US', {
+        timeZone: 'Asia/Manila',
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
+
+      const timeText = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Manila',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      dateEl.textContent = dateText + ' | ' + timeText;
+
+      if (dateIconEl) {
+        const hourInManila = Number(new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Manila',
+          hour: 'numeric',
+          hour12: false
+        }).format(now));
+
+        if (hourInManila >= 5 && hourInManila < 12) {
+          dateIconEl.className = 'fa-solid fa-sun';
+          dateIconEl.style.color = '#fcd34d';
+        } else if (hourInManila >= 12 && hourInManila < 18) {
+          dateIconEl.className = 'fa-solid fa-sun';
+          dateIconEl.style.color = '#fb923c';
+        } else {
+          dateIconEl.className = 'fa-solid fa-moon';
+          dateIconEl.style.color = '#c4b5fd';
+        }
+      }
     }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+  });
 
     /* NOTIF */
     document.getElementById('notifBtn').addEventListener('click', e => {
