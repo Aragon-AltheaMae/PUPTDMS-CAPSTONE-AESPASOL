@@ -18,9 +18,11 @@ class UserManagementController extends Controller
     {
         $roles = Role::orderBy('name')->get();
 
-        $search = trim((string) $request->get('search'));
-        $roleFilter = trim((string) $request->get('role'));
-        $statusFilter = trim((string) $request->get('status', 'active'));
+        $search = trim((string) $request->get('search', ''));
+        $roleFilter = trim((string) $request->get('role', ''));
+        $statusFilter = trim((string) $request->get('status', ''));
+        $perPage = (int) $request->get('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
 
         $query = User::with(['role', 'patient']);
 
@@ -42,17 +44,81 @@ class UserManagementController extends Controller
             $query->where('status', $statusFilter);
         }
 
-        $users = $query->latest()->paginate(10)->withQueryString();
+        $users = $query->latest()->paginate($perPage)->withQueryString();
 
         $notifications = collect([]);
 
-        AuditLogger::log(
-            'view',
-            'user_management',
-            'Admin viewed user management'
-        );
+        $allUsersCount = User::count();
+        $adminCount = User::whereHas('role', function ($q) {
+            $q->where('slug', 'super_admin')->orWhere('name', 'super_admin');
+        })->count();
 
-        return view('admin.user-management', compact('users', 'roles', 'notifications'));
+        $dentistCount = User::whereHas('role', function ($q) {
+            $q->where('slug', 'dentist')->orWhere('name', 'dentist');
+        })->count();
+
+        $patientCount = User::whereHas('role', function ($q) {
+            $q->where('slug', 'patient')->orWhere('name', 'patient');
+        })->count();
+
+        $activeCount = User::where('status', 'active')->count();
+        $inactiveCount = User::where('status', 'inactive')->count();
+
+        // AuditLogger::log(
+        //     'view',
+        //     'user_management',
+        //     'Admin viewed user management'
+        // );
+
+        if ($request->ajax()) {
+            return response()->json([
+                'users' => $users->getCollection()->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'status' => $user->status,
+                        'role_id' => $user->role_id,
+                        'role_name' => optional($user->role)->name ?? '—',
+                        'role_slug' => optional($user->role)->slug ?? '',
+                        'created_at_day' => optional($user->created_at)?->format('M d, Y'),
+                        'created_at_time' => optional($user->created_at)?->format('h:i A'),
+                    ];
+                })->values(),
+                'pagination' => [
+                    'total' => $users->total(),
+                    'from' => $users->firstItem() ?? 0,
+                    'to' => $users->lastItem() ?? 0,
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                ],
+                'counts' => [
+                    'all' => $allUsersCount,
+                    'admin' => $adminCount,
+                    'dentist' => $dentistCount,
+                    'patient' => $patientCount,
+                    'active' => $activeCount,
+                    'inactive' => $inactiveCount,
+                ],
+            ]);
+        }
+
+        return view('admin.user-management', compact(
+            'users',
+            'roles',
+            'notifications',
+            'allUsersCount',
+            'adminCount',
+            'dentistCount',
+            'patientCount',
+            'activeCount',
+            'inactiveCount',
+            'perPage',
+            'search',
+            'roleFilter',
+            'statusFilter'
+        ));
     }
 
     public function store(Request $request)
@@ -68,7 +134,7 @@ class UserManagementController extends Controller
             'gender' => 'nullable|in:Male,Female',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $user = DB::transaction(function () use ($request) {
             $role = $request->role_id ? Role::find($request->role_id) : null;
 
             $user = User::create([
@@ -90,13 +156,16 @@ class UserManagementController extends Controller
                     'password' => $user->password,
                 ]);
             }
+
+            return $user;
         });
 
         AuditLogger::log(
             'create',
-            'user_management',
-            "Admin created a user"
+            'user',
+            "Created user #{$user->id} ({$user->email})"
         );
+
         return redirect()->route('admin.user_management')
             ->with('success', 'User created successfully.');
     }
@@ -108,6 +177,9 @@ class UserManagementController extends Controller
                 'required',
                 'email',
                 Rule::unique('users')->ignore($user->id),
+                Rule::unique('patients', 'email')->ignore(
+                    optional(Patient::where('user_id', $user->id)->first())->id
+                ),
             ],
             'role_id' => 'nullable|exists:roles,id',
             'status' => 'required|in:active,inactive',
@@ -129,12 +201,6 @@ class UserManagementController extends Controller
             if ($role && $role->slug === 'patient') {
                 $patient = Patient::firstOrNew(['user_id' => $user->id]);
 
-                if ($patient->exists && $patient->id) {
-                    $request->validate([
-                        'email' => 'required|email|unique:patients,email,' . $patient->id,
-                    ]);
-                }
-
                 $patient->fill([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -150,17 +216,17 @@ class UserManagementController extends Controller
                 Patient::where('user_id', $user->id)->delete();
 
                 AuditLogger::log(
-                    'delete',
-                    'user_management',
-                    "Admin deleted a user"
+                    'update',
+                    'user',
+                    "Removed linked patient record for user #{$user->id}"
                 );
             }
         });
 
         AuditLogger::log(
             'update',
-            'user_management',
-            "Admin updated a user"
+            'user',
+            "Updated user #{$user->id} ({$user->email})",
         );
 
         return redirect()->route('admin.user_management')
@@ -194,10 +260,18 @@ class UserManagementController extends Controller
 
     public function toggleStatus(User $user)
     {
+        $oldStatus = $user->status;
+
         $user->status = $user->status === 'active' ? 'inactive' : 'active';
         $user->save();
 
-        return redirect()->route('admin.user_management')
+        AuditLogger::log(
+            'update_status',
+            'user',
+            "Changed status of user #{$user->id} from {$oldStatus} → {$user->status}",
+        );
+
+        return redirect()->back()
             ->with('success', 'User status updated.');
     }
 
@@ -223,11 +297,54 @@ class UserManagementController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
+        $hashedPassword = Hash::make($request->password);
+
         $patient->update([
-            'password' => Hash::make($request->password),
+            'password' => $hashedPassword,
         ]);
+
+        // If the patient is linked to a user, also update the user's password (consistency)
+        if ($patient->user) {
+            $patient->user->update([
+                'password' => $hashedPassword,
+            ]);
+
+            $user = $patient->user;
+
+            AuditLogger::log(
+                'reset_password',
+                'user',
+                "Reset password for user #{$user->id} via patient record"
+            );
+        } else {
+            // Log anyway — even if no linked user (rare case)
+            AuditLogger::log(
+                'reset_password',
+                'patient',
+                "Reset password for standalone patient #{$patient->id}",
+            );
+        }
 
         return redirect()->route('admin.user_management')
             ->with('success', 'Patient password reset successfully.');
+    }
+
+    public function destroy(User $user)
+    {
+        $email = $user->email;
+
+        DB::transaction(function () use ($user) {
+            Patient::where('user_id', $user->id)->delete();
+            $user->delete(); // or ->forceDelete() if you don't use soft deletes
+        });
+
+        AuditLogger::log(
+            'delete',
+            'user',
+            "Deleted user #{$user->id} ({$email})",
+        );
+
+        return redirect()->route('admin.user_management')
+            ->with('success', 'User deleted successfully.');
     }
 }

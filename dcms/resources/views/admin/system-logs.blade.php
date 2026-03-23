@@ -6,7 +6,7 @@
     <title>System Logs | PUP Taguig Dental Clinic</title>
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
@@ -602,9 +602,13 @@
         }
 
         /* ── LAYOUT ── */
+        :root {
+            --sidebar-w: 256px;
+        }
+
         #mainContent,
         #siteFooter {
-            margin-left: 256px;
+            margin-left: var(--sidebar-w);
         }
 
         /* ── DARK MODE ── */
@@ -661,42 +665,6 @@
 
         [data-theme="dark"] .group-label {
             color: #333333;
-        }
-
-        [data-theme="dark"] .sl-card,
-        [data-theme="dark"] .sl-stat {
-            background: #161b22 !important;
-            border-color: #21262d !important;
-        }
-
-        [data-theme="dark"] .sl-page-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-toolbar-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-table thead tr {
-            background: #0d1117;
-        }
-
-        [data-theme="dark"] .sl-table tbody tr:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .sl-table tbody td {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .sl-username,
-        [data-theme="dark"] .sl-date-day {
-            color: #e5e7eb;
-        }
-
-        [data-theme="dark"] .sl-pagebar {
-            background: #0d1117;
-            border-color: #21262d;
         }
 
         /* ── MOBILE DRAWER ── */
@@ -979,7 +947,7 @@
 
             #mainContent {
                 margin-left: 0 !important;
-                padding-bottom: 86px !important;
+                padding-bottom: 2rem !important;
             }
 
             #siteFooter {
@@ -990,10 +958,6 @@
                 display: flex;
             }
 
-            #mainContent {
-                padding-bottom: 2rem !important;
-            }
-
             .header {
                 padding: 0 1rem;
             }
@@ -1002,205 +966,250 @@
                 display: none;
             }
 
-            .sl-stats {
-                grid-template-columns: repeat(2, 1fr);
+            /* Banner */
+            .page-banner {
+                border-radius: 14px !important;
+                padding: 1.25rem 1.25rem 1.5rem !important;
             }
 
-            .sl-table thead th:nth-child(6),
-            .sl-table tbody td:nth-child(6),
-            .sl-table thead th:nth-child(7),
-            .sl-table tbody td:nth-child(7) {
+            .page-title {
+                font-size: 1.5rem !important;
+            }
+
+            .page-banner-inner {
+                flex-direction: column;
+                gap: .75rem;
+            }
+
+            .page-banner-inner>div:last-child {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: .5rem;
+            }
+
+            /* Stat cards */
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: .75rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem !important;
+            }
+
+            .stat-footer {
                 display: none;
             }
 
-
-            .sl-toolbar {
+            /* Card header stacks */
+            .card-header {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: .6rem;
+                padding: .75rem 1rem;
             }
 
-            .sl-search {
-                flex: 1;
-                min-width: 0;
-            }
-
-            .sl-search input {
+            .card-header>div:first-child {
                 width: 100%;
+            }
+
+            .card-header>div:last-child {
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .search-wrap {
+                width: 100% !important;
+                flex: 1;
+            }
+
+            .flex.gap-1.px-5.py-2\.5 {
+                padding: .5rem .75rem;
+                gap: .25rem;
+            }
+
+            .tab-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+                flex-shrink: 0;
+            }
+
+            #slTable thead th {
+                display: none;
+            }
+
+            #slTable tbody tr {
+                display: block;
+                margin: 0 1rem .75rem;
+                border-radius: 12px;
+                border: 1px solid #f0f0f0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+                background: #fff;
+                padding: .75rem 1rem;
+                border-bottom: none !important;
+            }
+
+            #slTable tbody tr:hover {
+                background: #fafbff;
+            }
+
+            /* Hide all cells by default */
+            #slTable tbody td {
+                display: none;
+                border: none !important;
+                padding: 0 !important;
+            }
+
+            /* Show only the cells we want */
+            /* Col 1: ID */
+            #slTable tbody td:nth-child(1) {
+                display: inline-block;
+            }
+
+            /* Col 2: Timestamp */
+            #slTable tbody td:nth-child(2) {
+                display: inline-block;
+                float: right;
+            }
+
+            /* Col 3: Role */
+            #slTable tbody td:nth-child(3) {
+                display: block;
+                margin-top: .5rem;
+            }
+
+            /* Col 4: User */
+            #slTable tbody td:nth-child(4) {
+                display: inline-block;
+                margin-top: .35rem;
+            }
+
+            /* Col 5: Action */
+            #slTable tbody td:nth-child(5) {
+                display: inline-block;
+                margin-top: .35rem;
+                margin-left: .35rem;
+            }
+
+            /* Col 7: Description */
+            #slTable tbody td:nth-child(7) {
+                display: block;
+                margin-top: .5rem;
+                padding-top: .5rem !important;
+                border-top: 1px solid #f3f4f6 !important;
             }
 
             .sl-desc {
-                max-width: 160px;
-                font-size: 0.7rem;
+                max-width: 100%;
+                font-size: .72rem;
+                color: #6b7280;
             }
 
-            .sl-table tbody td {
-                padding: 0.65rem 0.6rem;
+            #slTable tbody td:nth-child(1),
+            #slTable tbody td:nth-child(2) {
+                vertical-align: middle;
             }
 
-            .sl-table thead th {
-                padding: 0.55rem 0.6rem;
-                font-size: 0.6rem;
+            /* Fix overflow for the table wrapper */
+            #slTable {
+                border-collapse: separate;
+                border-spacing: 0;
             }
 
-            .sl-table tbody td:first-child,
-            .sl-table thead th:first-child {
-                padding-left: 0.85rem;
+            /* Dark mode cards */
+            [data-theme="dark"] #slTable tbody tr {
+                background: #161b22;
+                border-color: #21262d;
             }
 
+            [data-theme="dark"] #slTable tbody td:nth-child(7) {
+                border-color: #21262d !important;
+            }
+
+            .sl-module {
+                max-width: 100px;
+            }
+
+            /* Pagebar */
             .sl-pagebar {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 0.75rem;
+                gap: .6rem;
+                padding: .75rem 1rem;
             }
 
-            .sl-pagebar nav {
+            .sl-pagebar>div:first-child {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: .5rem;
+            }
+
+            .sl-pagebar>div:last-child {
                 width: 100%;
                 overflow-x: auto;
             }
+
+            .sl-pagebar nav {
+                width: max-content;
+            }
+
+            .data-table thead th {
+                padding: .5rem .5rem;
+                font-size: .6rem;
+            }
+
+            .data-table tbody td {
+                padding: .6rem .5rem;
+                font-size: .72rem;
+            }
+
+            #entryBadge {
+                white-space: nowrap;
+            }
         }
 
-        /* ── DARK MODE ── */
-        body,
-        main,
-        footer {
-            transition: background-color .3s ease, color .3s ease;
-        }
+        @media (max-width: 480px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: .5rem;
+            }
 
-        [data-theme="dark"] body {
-            background-color: #000D1A;
-            color: #E5E7EB;
-        }
+            .stat-card {
+                padding: 1rem;
+            }
 
-        [data-theme="dark"] #sidebar {
-            background-color: #0d1117;
-        }
+            .stat-value {
+                font-size: 1.6rem !important;
+            }
 
-        [data-theme="dark"] .bg-white {
-            background-color: #161b22 !important;
-        }
+            .stat-badge {
+                display: none;
+            }
 
-        [data-theme="dark"] .text-\[\#333333\] {
-            color: #E5E7EB !important;
-        }
+            .page-title {
+                font-size: 1.3rem !important;
+            }
 
-        [data-theme="dark"] .group-header:hover,
-        [data-theme="dark"] .nav-link:hover {
-            background: rgba(139, 0, 0, .2);
-        }
+            .sl-export-btn span {
+                display: none;
+            }
 
-        [data-theme="dark"] .theme-toggle-container {
-            background: #1F1F1F;
-            border-color: #2A2A2A;
-        }
+            .sl-export-btn {
+                padding: .42rem .6rem;
+            }
 
-        [data-theme="dark"] .theme-option {
-            color: #333333;
-        }
+            .card-header {
+                padding: .65rem .75rem;
+            }
 
-        [data-theme="dark"] .theme-option.active {
-            color: #F3F4F6;
-        }
+            .tab-btn span {
+                display: none;
+            }
 
-        [data-theme="dark"] .theme-indicator {
-            background: #2A2A2A;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-        }
-
-        [data-theme="dark"] .flyout-panel {
-            background: #161b22;
-            border-color: #2d1a1a;
-        }
-
-        [data-theme="dark"] .flyout-link {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .nav-sep,
-        [data-theme="dark"] .sidebar-bottom {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .sidebar-toggle-row {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .sl-card,
-        [data-theme="dark"] .sl-stat {
-            background: #161b22 !important;
-            border-color: #21262d !important;
-        }
-
-        [data-theme="dark"] .sl-page-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-toolbar-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .sl-table thead tr {
-            background: #0d1117;
-        }
-
-        [data-theme="dark"] .sl-table tbody tr:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .sl-table tbody td {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .sl-username,
-        [data-theme="dark"] .sl-date-day {
-            color: #e5e7eb;
-        }
-
-        [data-theme="dark"] .sl-pagebar {
-            background: #0d1117;
-            border-color: #21262d;
-        }
-
-        /* ══════════════════════════════════════════
-           MAIN CONTENT STYLES
-        ══════════════════════════════════════════ */
-        .sl-page-title {
-            font-size: 1.85rem;
-            font-weight: 800;
-            color: #1a1a2e;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-        }
-
-        .sl-page-title span {
-            color: #8B0000;
-        }
-
-        .sl-page-sub {
-            font-size: 0.8rem;
-            color: #9ca3af;
-            margin-top: 0.3rem;
-            font-weight: 400;
-        }
-
-        .sl-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.1rem;
-            border-radius: 10px;
-            background: #8B0000;
-            color: #fff !important;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            box-shadow: 0 2px 10px rgba(139, 0, 0, 0.25);
-        }
-
-        .sl-back-btn:hover {
-            background: #700000;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(139, 0, 0, 0.3);
+            #slTable thead th:nth-child(5),
+            #slTable tbody td:nth-child(5) {
+                display: none;
+            }
         }
 
         .sl-live {
@@ -1236,197 +1245,14 @@
             }
         }
 
-        .sl-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
+        @keyframes sl-shimmer {
+            0% {
+                background-position: 200% 0;
+            }
 
-        .sl-stat {
-            background: #fff;
-            border-radius: 16px;
-            padding: 1.1rem 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.9rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f0f0f0;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-            animation: sl-fadeUp 0.4s ease both;
-        }
-
-        .sl-stat:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .sl-stat:nth-child(1) {
-            animation-delay: .05s;
-        }
-
-        .sl-stat:nth-child(2) {
-            animation-delay: .1s;
-        }
-
-        .sl-stat:nth-child(3) {
-            animation-delay: .15s;
-        }
-
-        .sl-stat:nth-child(4) {
-            animation-delay: .2s;
-        }
-
-        .sl-stat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            border-radius: 3px 3px 0 0;
-        }
-
-        .sl-stat.c-all::before {
-            background: linear-gradient(90deg, #8B0000, #c0392b);
-        }
-
-        .sl-stat.c-admin::before {
-            background: linear-gradient(90deg, #ef4444, #fca5a5);
-        }
-
-        .sl-stat.c-dent::before {
-            background: linear-gradient(90deg, #3b82f6, #93c5fd);
-        }
-
-        .sl-stat.c-pat::before {
-            background: linear-gradient(90deg, #10b981, #6ee7b7);
-        }
-
-        .sl-stat-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .sl-stat.c-all .sl-stat-icon {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .sl-stat.c-admin .sl-stat-icon {
-            background: #fef2f2;
-            color: #ef4444;
-        }
-
-        .sl-stat.c-dent .sl-stat-icon {
-            background: #eff6ff;
-            color: #3b82f6;
-        }
-
-        .sl-stat.c-pat .sl-stat-icon {
-            background: #ecfdf5;
-            color: #10b981;
-        }
-
-        .sl-stat-num {
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: #1a1a2e;
-            line-height: 1;
-        }
-
-        .sl-stat-label {
-            font-size: 0.68rem;
-            font-weight: 700;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            margin-top: 3px;
-        }
-
-        .sl-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f0f0f0;
-            overflow: hidden;
-            animation: sl-fadeUp 0.4s ease 0.25s both;
-        }
-
-        .sl-toolbar {
-            padding: 1rem 1.4rem;
-            border-bottom: 1px solid #f3f4f6;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .sl-toolbar-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #1a1a2e;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sl-toolbar-title i {
-            color: #8B0000;
-        }
-
-        .sl-entry-badge {
-            background: #fef2f2;
-            color: #8B0000;
-            font-size: 0.68rem;
-            font-weight: 700;
-            padding: 0.18rem 0.55rem;
-            border-radius: 99px;
-            border: 1px solid #fecaca;
-        }
-
-        .sl-search {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 0.42rem 0.7rem;
-            transition: all 0.2s;
-        }
-
-        .sl-search:focus-within {
-            border-color: #8B0000;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.07);
-        }
-
-        .sl-search i {
-            font-size: 0.68rem;
-            color: #9ca3af;
-        }
-
-        .sl-search input {
-            background: transparent;
-            border: none;
-            outline: none;
-            font-size: 0.78rem;
-            color: #374151;
-            width: 155px;
-        }
-
-        .sl-search input::placeholder {
-            color: #9ca3af;
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         .sl-export-btn {
@@ -1447,111 +1273,6 @@
         .sl-export-btn:hover {
             background: #f3f4f6;
             border-color: #d1d5db;
-        }
-
-        .sl-tabs {
-            display: flex;
-            gap: 0.2rem;
-            padding: 0.65rem 1.4rem;
-            border-bottom: 1px solid #f3f4f6;
-            overflow-x: auto;
-        }
-
-        .sl-tab {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.38rem 0.8rem;
-            border-radius: 8px;
-            border: none;
-            font-size: 0.74rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: transparent;
-            color: #333333;
-            white-space: nowrap;
-        }
-
-        .sl-tab:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .sl-tab.active {
-            background: #fef2f2;
-            color: #8B0000;
-        }
-
-        .sl-tab-count {
-            background: #e5e7eb;
-            color: #333333;
-            font-size: 0.62rem;
-            font-weight: 700;
-            padding: 0.08rem 0.42rem;
-            border-radius: 99px;
-        }
-
-        .sl-tab.active .sl-tab-count {
-            background: #fecaca;
-            color: #8B0000;
-        }
-
-        .sl-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .sl-table thead tr {
-            background: #f8f9fb;
-        }
-
-        .sl-table thead th {
-            padding: 0.7rem 1rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.09em;
-            color: #161616;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-            white-space: nowrap;
-        }
-
-        .sl-table thead th:first-child {
-            padding-left: 1.4rem;
-        }
-
-        .sl-table thead th:last-child {
-            padding-right: 1.4rem;
-        }
-
-        .sl-table tbody tr {
-            transition: background 0.1s;
-            border-bottom: 1px solid #f7f8fa;
-        }
-
-        .sl-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .sl-table tbody tr:hover {
-            background: #fafbff;
-        }
-
-        .sl-table tbody td {
-            padding: 0.85rem 1rem;
-            font-size: 0.8rem;
-            vertical-align: middle;
-        }
-
-        .sl-table tbody td:first-child {
-            padding-left: 1.4rem;
-        }
-
-        .sl-table tbody td:last-child {
-            padding-right: 1.4rem;
         }
 
         .sl-id {
@@ -1701,46 +1422,30 @@
             display: flex;
             align-items: center;
             gap: 0.3rem;
+            white-space: normal;
+            word-break: break-word;
+            max-width: 130px;
+            line-height: 1.35;
         }
 
         .sl-module i {
             color: #8B0000;
             font-size: 0.65rem;
+            flex-shrink: 0;
         }
 
         .sl-desc {
             color: #333333;
             font-size: 0.76rem;
-            max-width: 260px;
+            max-width: 240px;
             line-height: 1.45;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .sl-desc strong {
             color: #374151;
             font-weight: 600;
-        }
-
-        .sl-empty {
-            padding: 4rem;
-            text-align: center;
-        }
-
-        .sl-empty i {
-            font-size: 2.5rem;
-            color: #d1d5db;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
-
-        .sl-empty-title {
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .sl-empty-sub {
-            font-size: 0.78rem;
-            color: #9ca3af;
-            margin-top: 0.25rem;
         }
 
         .sl-pagebar {
@@ -1811,10 +1516,428 @@
                 transform: scale(1);
             }
         }
+
+        .page-banner {
+            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
+            padding: 1.75rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+        }
+
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-banner-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff !important;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+        }
+
+        .page-subtitle {
+            font-size: .78rem;
+            color: rgba(255, 255, 255, .65) !important;
+            margin-top: .4rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.25rem 1.4rem;
+            border: 1px solid rgba(0, 0, 0, .05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .06);
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+            animation: fadeSlideUp .4s ease both;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, .1);
+        }
+
+        .stat-card-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-badge {
+            font-size: .68rem;
+            font-weight: 700;
+            padding: .3rem .75rem;
+            border-radius: 20px;
+        }
+
+        .stat-label {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #9ca3af;
+            margin-bottom: .3rem;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #1a202c;
+            letter-spacing: -.03em;
+            margin-bottom: .5rem;
+        }
+
+        .stat-footer {
+            font-size: .7rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .05);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+            overflow: hidden;
+            animation: fadeSlideUp .4s ease .2s both;
+        }
+
+        .card-header {
+            padding: .9rem 1.25rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .card-header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--crimson-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--crimson);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .76rem;
+            table-layout: fixed;
+        }
+
+        .data-table thead th {
+            padding: .7rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #9ca3af;
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: #fafafa;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .data-table tbody td {
+            padding: .8rem 1rem;
+            color: #4a5568;
+            border-bottom: 1px solid #f9fafb;
+        }
+
+        .data-table tbody tr:hover td {
+            background: #fafafa;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* search-wrap + tab-btn (same as inventory) */
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 0 14px;
+            height: 38px;
+            transition: border-color .2s, box-shadow .2s;
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        .search-wrap:focus-within {
+            border-color: var(--crimson);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+        }
+
+        .search-wrap i {
+            color: var(--crimson);
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .search-wrap input {
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 13px;
+            color: #333;
+            width: 100%;
+        }
+
+        .search-wrap input::placeholder {
+            color: #B0ABA6;
+        }
+
+        .search-clear-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            background: #E0DDD8;
+            color: #7A7370;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            padding: 0;
+        }
+
+        .search-clear-btn:hover {
+            background: #8b000076;
+            color: #fff;
+        }
+
+        .search-clear-btn.visible {
+            display: flex;
+        }
+
+        .tab-group {
+            display: flex;
+            background: #F5F2EE;
+            border: 1px solid #E8E4DE;
+            border-radius: 10px;
+            padding: 3px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9A9490;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--crimson);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .3);
+        }
+
+        .sl-export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .42rem .85rem;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            color: #374151;
+            font-size: .76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .sl-export-btn:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .sl-live {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .72rem;
+            font-weight: 600;
+            color: #059669;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: .3rem .7rem;
+            border-radius: 99px;
+        }
+
+        .sl-live-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: sl-pulse 2s infinite;
+        }
+
+        @keyframes sl-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, .5);
+            }
+
+            50% {
+                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: .05s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: .1s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: .15s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: .2s;
+        }
+
+        @media(max-width:1024px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:640px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* dark mode cards */
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .card {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .card-header {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .card-title,
+        [data-theme="dark"] .stat-value {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .data-table thead th {
+            background: #0d1117;
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .data-table tbody td {
+            color: #d1d5db;
+            border-color: #1c2128;
+        }
+
+        [data-theme="dark"] .data-table tbody tr:hover td {
+            background: #1c2128;
+        }
     </style>
 </head>
 
-<body class="bg-[#f5f5f5] text-[#333333] min-h-screen">
+<body class="bg-[#F4F4F4] text-[#333333] min-h-screen">
 
     <!-- ════════ HEADER ════════ -->
     <header class="header">
@@ -1856,7 +1979,7 @@
             </div>
 
             {{-- Palitan ng system settings na route --}}
-            <a href="{{ route('admin.system_logs') }}" class="hdr-icon-btn" aria-label="Settings">
+            <a href="{{ route('admin.system_settings') }}" class="hdr-icon-btn" aria-label="Settings">
                 <i class="fa-solid fa-gear"></i>
             </a>
 
@@ -2099,120 +2222,177 @@
         </div>
     </div>
 
-    <!-- ════════════ MAIN CONTENT ════════════ -->
     @php
     $logs = $logs ?? collect([]);
-    $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
-    $adminCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
-    $logs)->where('actor_role','admin')->count();
-    $dentistCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
-    $logs)->where('actor_role','dentist')->count();
-    $patientCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
-    $logs)->where('actor_role','patient')->count();
-    $loginCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() :
-    $logs)->whereIn('action',['login','Login'])->count();
+    $perPage = $perPage ?? 20;
     @endphp
 
-    <main id="mainContent" class="px-4 sm:px-6 pb-8 min-h-screen" style="padding-top: var(--header-h)">
-        <div style="max-width:1280px; margin:0 auto;">
+    <main id="mainContent" class="pb-8 min-h-screen"
+        style="padding-top: calc(var(--header-h) + 1.5rem); padding-left: 1.5rem; padding-right: 1.5rem;">
+        <div class="max-w-[1280px] mx-auto">
 
-            {{-- Top row --}}
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-7 mt-6">
-                <div>
-                    <h1 class="sl-page-title">System <span>Logs</span></h1>
-                    <p class="sl-page-sub">View recorded activities of admin, dentist, and patient users.</p>
-                </div>
-                <div class="flex items-center gap-3 flex-shrink-0 sm:pt-1">
-                    <span class="sl-live"><span class="sl-live-dot"></span> Live Monitoring</span>
-                    {{-- <a href="{{ route('admin.admin.dashboard') }}" class="sl-back-btn">
-                        <i class="fa-solid fa-arrow-left" style="font-size:0.72rem;"></i> Back to Dashboard
-                    </a> --}}
-                </div>
-            </div>
-
-            {{-- Stats Row --}}
-            <div class="sl-stats" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="sl-stat c-all">
-                    <div class="sl-stat-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+            <!-- Page Banner -->
+            <div class="page-banner rounded-2xl mb-6">
+                <div class="page-banner-inner">
                     <div>
-                        <div class="sl-stat-num">{{ $totalCount }}</div>
-                        <div class="sl-stat-label">Total Logs</div>
+                        <h1 class="page-title">System Logs</h1>
+                        <p class="page-subtitle">View recorded activities of admin, dentist, and patient users.</p>
                     </div>
-                </div>
-                <div class="sl-stat c-admin">
-                    <div class="sl-stat-icon"><i class="fa-solid fa-user-tie"></i></div>
-                    <div>
-                        <div class="sl-stat-num">{{ $adminCount }}</div>
-                        <div class="sl-stat-label">Admin Actions</div>
-                    </div>
-                </div>
-                <div class="sl-stat c-dent">
-                    <div class="sl-stat-icon"><i class="fa-solid fa-tooth"></i></div>
-                    <div>
-                        <div class="sl-stat-num">{{ $dentistCount }}</div>
-                        <div class="sl-stat-label">Dentist Actions</div>
-                    </div>
-                </div>
-                <div class="sl-stat c-pat">
-                    <div class="sl-stat-icon"><i class="fa-solid fa-user"></i></div>
-                    <div>
-                        <div class="sl-stat-num">{{ $patientCount }}</div>
-                        <div class="sl-stat-label">Patient Actions</div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <span class="sl-live"><span class="sl-live-dot"></span> Live Monitoring</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Main Logs Card --}}
-            <div class="sl-card">
-
-                {{-- Toolbar --}}
-                <div class="sl-toolbar flex-col sm:flex-row gap-3">
-                    <div class="flex items-center gap-2">
-                        <span class="sl-toolbar-title"><i class="fa-solid fa-list-check"></i> Audit Trail</span>
-                        <span class="sl-entry-badge">{{ $totalCount }} {{ Str::plural('entry', $totalCount) }}</span>
+            {{-- STAT CARDS (dashboard style) --}}
+            <div class="stat-grid" style="margin-bottom:1.5rem;">
+                <div class="stat-card">
+                    <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--crimson),#c0392b);">
                     </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <div class="sl-search flex-1 sm:flex-none">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="slSearch" placeholder="Search logs…" oninput="slFilter()"
-                                class="w-full sm:w-auto">
+                    <div class="stat-top">
+                        <div class="stat-icon" style="background:#fef2f2;">
+                            <i class="fa-solid fa-clipboard-list" style="color:var(--crimson);"></i>
                         </div>
-                        <button class="sl-export-btn whitespace-nowrap"><i class="fa-solid fa-download"></i>
-                            Export</button>
+                        <span class="stat-badge" style="background:#fef2f2;color:var(--crimson);">Total</span>
+                    </div>
+                    <div class="stat-label">Total Logs</div>
+                    <div class="stat-value" id="statTotal">{{ $totalCount }}</div>
+                    <div class="stat-footer"><i class="fa-solid fa-list"
+                            style="font-size:.65rem;color:var(--crimson);"></i> All recorded activity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-accent" style="background:linear-gradient(90deg,#ef4444,#fca5a5);"></div>
+                    <div class="stat-top">
+                        <div class="stat-icon" style="background:#fef2f2;">
+                            <i class="fa-solid fa-user-tie" style="color:#ef4444;"></i>
+                        </div>
+                        <span class="stat-badge" style="background:#fef2f2;color:#ef4444;">Admin</span>
+                    </div>
+                    <div class="stat-label">Admin Actions</div>
+                    <div class="stat-value" id="statAdmin" style="color:#ef4444;">{{ $adminCount }}</div>
+                    <div class="stat-footer"><i class="fa-solid fa-shield" style="font-size:.65rem;color:#ef4444;"></i>
+                        Administrator activity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-accent" style="background:linear-gradient(90deg,#3b82f6,#93c5fd);"></div>
+                    <div class="stat-top">
+                        <div class="stat-icon" style="background:#eff6ff;">
+                            <i class="fa-solid fa-tooth" style="color:#3b82f6;"></i>
+                        </div>
+                        <span class="stat-badge" style="background:#eff6ff;color:#3b82f6;">Dentist</span>
+                    </div>
+                    <div class="stat-label">Dentist Actions</div>
+                    <div class="stat-value" id="statDentist" style="color:#3b82f6;">{{ $dentistCount }}</div>
+                    <div class="stat-footer"><i class="fa-solid fa-stethoscope"
+                            style="font-size:.65rem;color:#3b82f6;"></i> Dentist activity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-accent" style="background:linear-gradient(90deg,#10b981,#6ee7b7);"></div>
+                    <div class="stat-top">
+                        <div class="stat-icon" style="background:#ecfdf5;">
+                            <i class="fa-solid fa-user" style="color:#10b981;"></i>
+                        </div>
+                        <span class="stat-badge" style="background:#ecfdf5;color:#059669;">Patient</span>
+                    </div>
+                    <div class="stat-label">Patient Actions</div>
+                    <div class="stat-value" id="statPatient" style="color:#10b981;">{{ $patientCount }}</div>
+                    <div class="stat-footer"><i class="fa-solid fa-heart-pulse"
+                            style="font-size:.65rem;color:#10b981;"></i> Patient activity</div>
+                </div>
+            </div>
+
+            <div class="card">
+                {{-- Card Header --}}
+                <div class="card-header">
+                    <div class="flex items-center gap-2.5">
+                        <div class="card-header-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                        <span class="card-title">Audit Trail</span>
+                        <span id="entryBadge"
+                            class="bg-red-50 text-[#8B0000] text-[0.68rem] font-bold px-2 py-0.5 rounded-full border border-red-200 ml-1.5">
+                            {{ $totalCount }} {{ Str::plural('entry', $totalCount) }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <form method="GET" action="{{ route('admin.system_logs') }}" id="searchForm"
+                            class="flex items-center">
+                            <input type="hidden" name="role" value="{{ $role ?? 'all' }}">
+                            <input type="hidden" name="per_page" value="{{ $perPage }}">
+                            <div class="search-wrap" style="width:200px;">
+                                <i class="fa fa-search"></i>
+                                <input id="slSearch" name="search" placeholder="Search logs…"
+                                    value="{{ $search ?? '' }}"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();slState.search=this.value;slState.page=1;slFetch();}">
+                                <button type="button" id="searchClearBtn"
+                                    class="search-clear-btn {{ ($search ?? '') ? 'visible' : '' }}"
+                                    onclick="clearSearch()" title="Clear">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <button class="sl-export-btn">
+                            <i class="fa-solid fa-download"></i>
+                            <span class="hidden sm:inline">Export</span>
+                        </button>
                     </div>
                 </div>
 
                 {{-- Filter Tabs --}}
-                <div class="sl-tabs">
-                    <button class="sl-tab active" onclick="slSetTab(this,'all')">
-                        <i class="fa-solid fa-layer-group"></i> All <span class="sl-tab-count">{{ $totalCount }}</span>
+                @php $activeRole = $role ?? 'all'; @endphp
+                <div class="flex gap-1 px-5 py-2.5 border-b border-gray-100 overflow-x-auto">
+                    @foreach([
+                    ['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
+                    ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount],
+                    ['key' => 'dentist', 'label' => 'Dentist', 'icon' => 'fa-tooth', 'count' => $dentistCount],
+                    ['key' => 'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount],
+                    ['key' => 'login', 'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount],
+                    ] as $tab)
+                    <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
+                        onclick="slSetTab(this, '{{ $tab['key'] }}')">
+                        <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i> {{ $tab['label'] }}
+                        <span
+                            class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                            {{ $tab['count'] }}
+                        </span>
                     </button>
-                    <button class="sl-tab" onclick="slSetTab(this,'admin')">
-                        <i class="fa-solid fa-user-tie"></i> Admin <span class="sl-tab-count">{{ $adminCount }}</span>
-                    </button>
-                    <button class="sl-tab" onclick="slSetTab(this,'dentist')">
-                        <i class="fa-solid fa-tooth"></i> Dentist <span class="sl-tab-count">{{ $dentistCount }}</span>
-                    </button>
-                    <button class="sl-tab" onclick="slSetTab(this,'patient')">
-                        <i class="fa-solid fa-user"></i> Patient <span class="sl-tab-count">{{ $patientCount }}</span>
-                    </button>
-                    <button class="sl-tab" onclick="slSetTab(this,'login')">
-                        <i class="fa-solid fa-right-to-bracket"></i> Logins <span class="sl-tab-count">{{ $loginCount
-                            }}</span>
-                    </button>
+                    @endforeach
+                </div>
+
+                {{-- Top pagebar --}}
+                <div class="sl-pagebar" style="border-top:none; border-bottom:1px solid #f3f4f6;">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="sl-pagebar-info">
+                            @if(method_exists($logs,'total'))
+                            Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
+                            of <strong>{{ $logs->total() }}</strong> entries
+                            @else
+                            Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
+                            @endif
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[0.7rem] text-gray-400 font-semibold">Show</label>
+                            <select id="perPageSelect"
+                                class="h-[30px] px-2 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 bg-white outline-none cursor-pointer transition-colors focus:border-[#8B0000]">
+                                @foreach([10, 20, 50, 100] as $size)
+                                <option value="{{ $size }}" {{ $perPage == $size ? 'selected' : '' }}>{{ $size }}</option>
+                                @endforeach
+                            </select>
+                            <span class="text-[0.7rem] text-gray-400 font-semibold">per page</span>
+                        </div>
+                    </div>
+                    <div class="sl-pagination-wrap"></div>
                 </div>
 
                 {{-- Table --}}
                 <div style="overflow-x:auto;">
-                    <table class="sl-table">
+                    <table class="data-table" id="slTable">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Timestamp</th>
-                                <th>Role</th>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Module</th>
+                                <th style="width:100px;">ID</th>
+                                <th style="width:150px;">Timestamp</th>
+                                <th style="width:150px;">Role</th>
+                                <th style="width:130px;">User</th>
+                                <th style="width:170px;">Action</th>
+                                <th style="width:210px;">Module</th>
                                 <th>Description</th>
                             </tr>
                         </thead>
@@ -2260,42 +2440,34 @@
                                     </div>
                                 </td>
                                 <td><span class="sl-action {{ $actionClass }}"><i
-                                            class="fa-solid {{ $actionIcon }}"></i>{{
-                                        str_replace('_','',ucwords($log->action)) }}</span></td>
-                                <td><span class="sl-module"><i class="fa-solid fa-cube"></i>{{ ucfirst($log->module)
-                                        }}</span></td>
+                                            class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_','
+                                        ',$log->action)) }}</span></td>
+                                <td><span class="sl-module"><i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_','
+                                        ',$log->module)) }}</span></td>
                                 <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span>
                                 </td>
                             </tr>
                             @empty
-                            <tr>
-                                <td colspan="7">
-                                    <div class="sl-empty">
-                                        <i class="fa-solid fa-clipboard-list"></i>
-                                        <div class="sl-empty-title">No system logs found</div>
-                                        <div class="sl-empty-sub">Activity will appear here once users interact with the
-                                            system.</div>
-                                    </div>
-                                </td>
-                            </tr>
+                            {{-- handled by JS empty state below --}}
                             @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                {{-- Pagination --}}
+                {{-- Empty State (JS-controlled) --}}
+                <div id="emptyState" style="display:none;"></div>
+
+                {{-- Bottom pagebar --}}
                 <div class="sl-pagebar">
-                    @if(method_exists($logs, 'total'))
                     <span class="sl-pagebar-info">
-                        Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong> of <strong>{{
-                            $logs->total() }}</strong> entries
+                        @if(method_exists($logs,'total'))
+                        Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
+                        of <strong>{{ $logs->total() }}</strong> entries
+                        @else
+                        Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
+                        @endif
                     </span>
-                    <div>{{ $logs->links() }}</div>
-                    @else
-                    <span class="sl-pagebar-info">Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry',
-                        $logs->count()) }}</span>
-                    <span></span>
-                    @endif
+                    <div class="sl-pagination-wrap"></div>
                 </div>
             </div>
 
@@ -2305,292 +2477,394 @@
     <!-- FOOTER -->
     <footer id="siteFooter">
         <div class="footer-inner">
-            <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
-            <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
-            <span class="footer-dot">·</span>
-            <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
-            <span class="footer-dot">·</span>
-            <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
+        <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
+        <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
+        <span class="footer-dot">|</span>
+        <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
         </div>
     </footer>
 
     <script>
-        /* NOTIF */
-        document.getElementById('notifBtn').addEventListener('click', e => {
-            e.stopPropagation();
-            document.getElementById('notifMenu').classList.toggle('open');
-        });
-        document.addEventListener('click', () => document.getElementById('notifMenu').classList.remove('open'));
-
-        /* USER DROPDOWN */
-        document.getElementById('userBtn').addEventListener('click', e => {
-            e.stopPropagation();
-            document.getElementById('notifMenu').classList.remove('open'); // close notif if open
-            document.getElementById('userMenu').classList.toggle('open');
-        });
-        document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
-
-        /* Sync user menu theme toggle */
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('#userMenuThemeToggle .theme-option').forEach(o =>
-                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
-            );
-        });
+        /* ── NOTIF ── */
+        document.getElementById('notifBtn').addEventListener('click', function (e) { e.stopPropagation(); document.getElementById('notifMenu').classList.toggle('open'); document.getElementById('userMenu').classList.remove('open'); });
+        document.getElementById('userBtn').addEventListener('click', function (e) { e.stopPropagation(); document.getElementById('notifMenu').classList.remove('open'); document.getElementById('userMenu').classList.toggle('open'); });
+        document.addEventListener('click', function () { document.getElementById('notifMenu').classList.remove('open'); document.getElementById('userMenu').classList.remove('open'); });
 
         /* ── MOBILE DRAWER ── */
-        function openDrawer() {
-            const drawer = document.getElementById('mobileDrawer');
-            const overlay = document.getElementById('mobileDrawerOverlay');
-            overlay.style.display = 'block';
-            requestAnimationFrame(() => {
-                overlay.classList.add('open');
-                drawer.classList.add('open');
-            });
-            document.body.style.overflow = 'hidden';
-        }
+        function openDrawer() { var d = document.getElementById('mobileDrawer'), o = document.getElementById('mobileDrawerOverlay'); o.style.display = 'block'; requestAnimationFrame(function () { o.classList.add('open'); d.classList.add('open'); }); document.body.style.overflow = 'hidden'; }
+        function closeDrawer() { var d = document.getElementById('mobileDrawer'), o = document.getElementById('mobileDrawerOverlay'); d.classList.remove('open'); o.classList.remove('open'); setTimeout(function () { o.style.display = 'none'; }, 250); document.body.style.overflow = ''; }
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function (e) { e.stopPropagation(); openDrawer(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
 
-        function closeDrawer() {
-            const drawer = document.getElementById('mobileDrawer');
-            const overlay = document.getElementById('mobileDrawerOverlay');
-            drawer.classList.remove('open');
-            overlay.classList.remove('open');
-            setTimeout(() => { overlay.style.display = 'none'; }, 250);
-            document.body.style.overflow = '';
-        }
-
-        document.getElementById('mobileMenuBtn')?.addEventListener('click', e => {
-            e.stopPropagation();
-            openDrawer();
-        });
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeDrawer();
-        });
-
-        /* Sync drawer theme toggles with main theme */
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('#drawerThemeToggle .theme-option').forEach(o =>
-                o.addEventListener('click', e => {
-                    e.stopPropagation();
-                    applyTheme(o.getAttribute('data-theme'));
-                    // sync indicator in drawer
-                    const ind = document.querySelector('#drawerThemeToggle .theme-indicator');
-                    if (ind) ind.classList.toggle('dark-mode', o.getAttribute('data-theme') === 'dark');
-                })
-            );
-        });
-
-        // Theme
-        const html = document.documentElement;
+        /* ── THEME ── */
         function applyTheme(theme) {
-            html.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            document.querySelectorAll('.theme-option').forEach(o =>
-                o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active')
-            );
-            document.querySelectorAll('.theme-indicator').forEach(ind =>
-                theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode')
-            );
+            document.querySelectorAll('.theme-option').forEach(function (o) { o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active'); });
+            document.querySelectorAll('.theme-indicator').forEach(function (ind) { theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode'); });
         }
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function () {
             applyTheme(localStorage.getItem('theme') || 'light');
-            document.querySelectorAll('.theme-option').forEach(o =>
-                o.addEventListener('click', e => { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); })
-            );
+            document.querySelectorAll('.theme-option').forEach(function (o) {
+                o.addEventListener('click', function (e) { e.stopPropagation(); applyTheme(o.getAttribute('data-theme')); });
+            });
+
+            @if(method_exists($logs, 'total') && $logs->total() > 0)
+            slRenderPagebar({
+                total:        {{ $logs->total() }},
+                from:         {{ $logs->firstItem() ?? 0 }},
+                to:           {{ $logs->lastItem() ?? 0 }},
+                current_page: {{ $logs->currentPage() }},
+                last_page:    {{ $logs->lastPage() }},
+                per_page:     {{ $logs->perPage() }},
+            });
+            @endif
+
+            var searchInput = document.getElementById('slSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    toggleSearchClear(this);
+                    clearTimeout(slSearchTimer);
+                    slSearchTimer = setTimeout(function () {
+                        slState.search = searchInput.value;
+                        slState.page = 1;
+                        slFetch(true);
+                    });
+                });
+            }
+
+            /* ── Per-page select ── */
+            var perPageSelect = document.getElementById('perPageSelect');
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function () {
+                    slState.perPage = parseInt(this.value);
+                    slState.page = 1;
+                    slFetch();
+                });
+            }
+
+            @php $latestLogId = optional(($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() : $logs)->first())->id ?? 0; @endphp
+
+            var lastKnownId = {{ $latestLogId }};
+            var notifBanner = null;
+
+            function checkForNewLogs() {
+                fetch("{{ route('admin.system_logs.check') }}", { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data.latest_id > lastKnownId) { lastKnownId = data.latest_id; showNewLogBanner(); }
+                    }).catch(function () { });
+            }
+
+            function showNewLogBanner() {
+                if (notifBanner) notifBanner.remove();
+
+                notifBanner = document.createElement('div');
+                notifBanner.style.cssText = `
+                    position:fixed;
+                    top:80px;
+                    left:50%;
+                    transform:translateX(-50%);
+                    z-index:9999;
+                    display:flex;
+                    align-items:center;
+                    gap:.6rem;
+                    background:#fff;
+                    border:1.5px solid #a7f3d0;
+                    border-radius:12px;
+                    padding:.65rem 1.1rem;
+                    box-shadow:0 8px 24px rgba(0,0,0,.12);
+                    font-size:.78rem;
+                    font-weight:600;
+                    color:#059669;
+                    white-space:nowrap;
+                `;
+
+                notifBanner.innerHTML = `
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
+                    New log entries detected.
+                    <span style="color:#8B0000;text-decoration:underline;margin-left:.25rem;cursor:pointer;"
+                        onclick="slState.page=1;slFetch(); this.closest('div').remove();">
+                        Refresh to see
+                    </span>
+                    <button onclick="this.parentElement.remove()"
+                        style="margin-left:.5rem;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:.7rem;padding:0;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+
+                document.body.appendChild(notifBanner);
+            }
+
+            setInterval(checkForNewLogs, 5000);
         });
 
-        // Logs filtering
-        let slActiveTab = 'all';
-        function slSetTab(el, tab) {
-            slActiveTab = tab;
-            document.querySelectorAll('.sl-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            slFilter();
+        /* ════════════════════════════════════════
+           AJAX FILTER STATE
+        ════════════════════════════════════════ */
+        var slState = {
+            role: '{{ $role ?? "all" }}',
+            search: '{{ $search ?? "" }}',
+            perPage: {{ $perPage ?? 20 }},
+            page: {{ request('page', 1) }},
+        };
+
+        var slOverallTotal = {{ $totalCount }};
+        var slSearchTimer = null;
+        var slController = null;
+
+        /* ── Search input ── */
+        function toggleSearchClear(input) {
+            document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0);
         }
-        function slFilter() {
-            const q = document.getElementById('slSearch').value.toLowerCase();
-            document.querySelectorAll('#slTableBody tr').forEach(row => {
-                const role = (row.dataset.role || '').toLowerCase();
-                const action = (row.dataset.action || '').toLowerCase();
-                const text = row.textContent.toLowerCase();
-                const tabOk = slActiveTab === 'all' || slActiveTab === role || (slActiveTab === 'login' && action === 'login');
-                const searchOk = !q || text.includes(q);
-                row.style.display = (tabOk && searchOk) ? '' : 'none';
+
+        function clearSearch() {
+            var input = document.getElementById('slSearch');
+            input.value = '';
+            document.getElementById('searchClearBtn').classList.remove('visible');
+            slState.search = '';
+            slState.page = 1;
+            slFetch();
+            input.focus();
+        }
+
+        /* ── Tab click ── */
+        function slSetTab(el, role) {
+            slState.role = role;
+            slState.page = 1;
+            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+            el.classList.add('active');
+
+            // Update tab badge colors
+            document.querySelectorAll('.tab-btn .tab-count').forEach(function (span) {
+                span.className = 'tab-count bg-gray-200 text-gray-500 text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1';
+            });
+            var activeSpan = el.querySelector('.tab-count');
+            if (activeSpan) activeSpan.className = 'tab-count bg-red-200 text-[#8B0000] text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1';
+
+            slFetch();
+        }
+
+        /* ── Pagination click ── */
+        function slGoPage(page) {
+            slState.page = page;
+            slFetch();
+            // Smooth scroll to table top
+            document.getElementById('slTable')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /* ── Core fetch ── */
+        function slFetch(silent) {
+            if (slController) slController.abort();
+            slController = new AbortController();
+
+            var params = new URLSearchParams({
+                role: slState.role,
+                search: slState.search,
+                per_page: slState.perPage,
+                page: slState.page,
+            });
+
+            history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+
+            if (!silent) {
+             document.getElementById('slTableBody').innerHTML = slSkeletonRows(slState.perPage);
+            }
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('slTable').style.display = '';
+
+            fetch('{{ route("admin.system_logs") }}?' + params.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
+                },
+                signal: slController.signal
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                slRenderRows(data.logs);
+                slRenderPagebar(data.pagination);
+                slRenderCounts(data.counts);
+            })
+            .catch(function (e) {
+                if (e.name !== 'AbortError') console.error('Fetch error:', e);
             });
         }
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+        /* ── Skeleton loader rows ── */
+        function slSkeletonRows(count) {
+            var pulse = 'style="background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:sl-shimmer 1.2s infinite;border-radius:6px;display:inline-block;"';
+            var row = '<tr>';
+            row += '<td><span class="sl-id" ' + pulse + ' style="width:36px;height:14px;background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:sl-shimmer 1.2s infinite;border-radius:6px;display:inline-block;">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:80px;height:14px;">&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:60px;height:22px;">&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:70px;height:14px;">&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:55px;height:22px;">&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:80px;height:14px;">&nbsp;</span></td>';
+            row += '<td><span ' + pulse + ' style="width:140px;height:14px;">&nbsp;</span></td>';
+            row += '</tr>';
+            var html = '';
+            for (var i = 0; i < Math.min(count, 5); i++) html += row;
+            return html;
         }
 
-        function getActionClass(action) {
-            action = (action || '').toLowerCase();
-
-            if (action.includes('login')) return 'login';
-            if (action.includes('logout')) return 'logout';
-            if (action.includes('create')) return 'create';
-            if (action.includes('update')) return 'update';
-            if (action.includes('delete')) return 'delete';
-
-            return 'default';
-        }
-
-        function getActionIcon(actionClass) {
-            switch (actionClass) {
-                case 'login': return 'fa-right-to-bracket';
-                case 'logout': return 'fa-right-from-bracket';
-                case 'create': return 'fa-plus';
-                case 'update': return 'fa-pen';
-                case 'delete': return 'fa-trash';
-                default: return 'fa-bolt';
+        /* ── Render table rows ── */
+        function slRenderRows(logs) {
+            if (!logs || logs.length === 0) {
+                document.getElementById('slTableBody').innerHTML = '';
+                showEmptyState(0, slState.search);
+                return;
             }
+
+            var actionIcons = { login: 'fa-right-to-bracket', logout: 'fa-right-from-bracket', create: 'fa-plus', update: 'fa-pen', delete: 'fa-trash', default: 'fa-bolt' };
+            var roleIcons = { admin: 'fa-user-tie', dentist: 'fa-tooth', patient: 'fa-user' };
+
+            var html = '';
+            logs.forEach(function (log) {
+                var role = (log.actor_role || 'other').toLowerCase();
+                var action = (log.action || '').toLowerCase();
+                var actionClass = action.includes('login') ? 'login' : action.includes('logout') ? 'logout' : action.includes('create') ? 'create' : action.includes('update') ? 'update' : action.includes('delete') ? 'delete' : 'default';
+                var actionIcon = actionIcons[actionClass] || 'fa-bolt';
+                var roleIcon = roleIcons[role] || 'fa-circle-user';
+                var letter = (log.actor_identifier || role).charAt(0).toUpperCase();
+                var idPadded = '#' + String(log.id).padStart(3, '0');
+                var actionLabel = (log.action || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+                var moduleLabel = (log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+
+                html += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
+                html += '<td><span class="sl-id">' + idPadded + '</span></td>';
+                html += '<td><span class="sl-date-day">' + log.created_at_day + '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
+                html += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
+                html += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter + '</div><span class="sl-username">' + (log.actor_identifier || '—') + '</span></div></td>';
+                html += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon + '"></i>' + actionLabel + '</span></td>';
+                html += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel + '</span></td>';
+                html += '<td><span class="sl-desc" title="' + (log.description || '') + '">' + (log.description || 'No description provided.') + '</span></td>';
+                html += '</tr>';
+            });
+
+            document.getElementById('slTableBody').innerHTML = html;
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('slTable').style.display = '';
         }
 
-        function getRoleIcon(role) {
-            switch ((role || '').toLowerCase()) {
-                case 'admin': return 'fa-user-tie';
-                case 'dentist': return 'fa-tooth';
-                case 'patient': return 'fa-user';
-                default: return 'fa-circle-user';
+        /* ── Render both pagebars ── */
+        function slRenderPagebar(p) {
+            if (!p) return;
+
+            var infoHtml = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total + '</strong> entries';
+            document.querySelectorAll('.sl-pagebar-info').forEach(function (el) { el.innerHTML = infoHtml; });
+
+            var navHtml = slBuildPagination(p);
+            document.querySelectorAll('.sl-pagination-wrap').forEach(function (el) {
+                el.innerHTML = navHtml;
+            });
+
+            // Update entry badge
+            var badge = document.getElementById('entryBadge');
+            if (badge) badge.textContent = slOverallTotal + ' ' + (slOverallTotal === 1 ? 'entry' : 'entries');
+        }
+
+        /* ── Build pagination HTML ── */
+        function slBuildPagination(p) {
+            if (p.last_page <= 1) return '';
+
+            var current = p.current_page;
+            var last = p.last_page;
+            var window = 5;
+            var half = Math.floor(window / 2);
+            var start = Math.max(1, current - half);
+            var end = Math.min(last, start + window - 1);
+            if (end - start + 1 < window) start = Math.max(1, end - window + 1);
+
+            var btn = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;text-decoration:none;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';this.style.background=\'#fef2f2\';" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.color=\'#374151\';this.style.background=\'#fff\';"';
+            var btnActive = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #8B0000;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(139,0,0,.25);"';
+            var btnDis = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#d1d5db;font-size:.75rem;font-weight:600;cursor:not-allowed;display:inline-flex;align-items:center;justify-content:center;"';
+            var dots = '<span style="height:32px;min-width:32px;display:inline-flex;align-items:center;justify-content:center;color:#9ca3af;font-size:.75rem;font-weight:600;">…</span>';
+
+            var html = '<nav style="display:flex;align-items:center;gap:.35rem;flex-wrap:nowrap;">';
+
+            // Prev
+            if (current <= 1) {
+                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
+            } else {
+                html += '<button onclick="slGoPage(' + (current - 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
             }
-        }
 
-        function buildLogRow(log, isNew = false) {
-            const role = (log.actor_role || 'other').toLowerCase();
-            const action = (log.action || '').toLowerCase();
-            const actionClass = getActionClass(action);
-            const actionIcon = getActionIcon(actionClass);
-            const roleIcon = getRoleIcon(role);
-            const avatarLetter = ((log.actor_identifier || role || '—').charAt(0) || '—').toUpperCase();
+            // First + ellipsis
+            if (start > 1) {
+                html += '<button onclick="slGoPage(1)" ' + btn + '>1</button>';
+                if (start > 2) html += dots;
+            }
 
-            return `
-                <tr class="${isNew ? 'sl-row-new' : ''}" data-log-id="${escapeHtml(log.id)}" data-role="${escapeHtml(role)}" data-action="${escapeHtml(actionClass)}">
-                    <td><span class="sl-id">#${String(log.id).padStart(3, '0')}</span></td>
-                    <td>
-                        <span class="sl-date-day">${escapeHtml(log.created_at_day || '')}</span>
-                        <span class="sl-date-time">${escapeHtml(log.created_at_time || '')}</span>
-                    </td>
-                    <td>
-                        <span class="sl-role ${escapeHtml(role)}">
-                            <i class="fa-solid ${escapeHtml(roleIcon)}"></i>${escapeHtml(role.charAt(0).toUpperCase() + role.slice(1))}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="sl-user">
-                            <div class="sl-avatar ${escapeHtml(role)}">${escapeHtml(avatarLetter)}</div>
-                            <span class="sl-username">${escapeHtml(log.actor_identifier || '—')}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="sl-action ${escapeHtml(actionClass)}">
-                            <i class="fa-solid ${escapeHtml(actionIcon)}"></i>${escapeHtml(action.replace(/_/g, ' '))}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sl-module">
-                            <i class="fa-solid fa-cube"></i>${escapeHtml(log.module || '')}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sl-desc">${escapeHtml(log.description || 'No description provided.')}</span>
-                    </td>
-                </tr>
-            `;
-        }
-
-        let seenLogIds = new Set();
-        let hasLoadedLogsOnce = false;
-        async function fetchAuditLogs() {
-            try {
-                const response = await fetch("{{ route('admin.system_logs.fetch') }}", {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch logs.');
+            // Window pages
+            for (var i = start; i <= end; i++) {
+                if (i === current) {
+                    html += '<span ' + btnActive + '>' + i + '</span>';
+                } else {
+                    html += '<button onclick="slGoPage(' + i + ')" ' + btn + '>' + i + '</button>';
                 }
-
-                const data = await response.json();
-                const tableBody = document.getElementById('slTableBody');
-
-                if (!tableBody) return;
-
-                if (!data.logs || data.logs.length === 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="7">
-                                <div class="sl-empty">
-                                    <i class="fa-solid fa-clipboard-list"></i>
-                                    <div class="sl-empty-title">No system logs found</div>
-                                    <div class="sl-empty-sub">Activity will appear here once users interact with the system.</div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                const incomingIds = new Set(data.logs.map(log => String(log.id)));
-
-                const html = data.logs.map(log => {
-                    const isNew = hasLoadedLogsOnce && !seenLogIds.has(String(log.id));
-                    return buildLogRow(log, isNew);
-                }).join('');
-
-                tableBody.innerHTML = html;
-
-                seenLogIds = incomingIds;
-                hasLoadedLogsOnce = true;
-
-                slFilter();
-                updateLogStats(data.logs);
-            } catch (error) {
-                console.error('Audit log fetch error:', error);
             }
+
+            // Last + ellipsis
+            if (end < last) {
+                if (end < last - 1) html += dots;
+                html += '<button onclick="slGoPage(' + last + ')" ' + btn + '>' + last + '</button>';
+            }
+
+            // Next
+            if (current >= last) {
+                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+            } else {
+                html += '<button onclick="slGoPage(' + (current + 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+            }
+
+            html += '</nav>';
+            return html;
         }
 
-        function updateLogStats(logs) {
-            const total = logs.length;
-            const admin = logs.filter(log => (log.actor_role || '').toLowerCase() === 'admin').length;
-            const dentist = logs.filter(log => (log.actor_role || '').toLowerCase() === 'dentist').length;
-            const patient = logs.filter(log => (log.actor_role || '').toLowerCase() === 'patient').length;
-            const logins = logs.filter(log => (log.action || '').toLowerCase().includes('login')).length;
+        /* ── Update stat counts ── */
+        function slRenderCounts(counts) {
+            if (!counts) return;
 
-            const statNums = document.querySelectorAll('.sl-stat-num');
-            if (statNums.length >= 4) {
-                statNums[0].textContent = total;
-                statNums[1].textContent = admin;
-                statNums[2].textContent = dentist;
-                statNums[3].textContent = patient;
-            }
+            slOverallTotal = counts.total;
 
-            const tabCounts = document.querySelectorAll('.sl-tab-count');
-            if (tabCounts.length >= 5) {
-                tabCounts[0].textContent = total;
-                tabCounts[1].textContent = admin;
-                tabCounts[2].textContent = dentist;
-                tabCounts[3].textContent = patient;
-                tabCounts[4].textContent = logins;
-            }
+            document.getElementById('statTotal').textContent = counts.total;
+            document.getElementById('statAdmin').textContent = counts.admin;
+            document.getElementById('statDentist').textContent = counts.dentist;
+            document.getElementById('statPatient').textContent = counts.patient;
 
-            const badge = document.querySelector('.sl-entry-badge');
+            var badge = document.getElementById('entryBadge');
             if (badge) {
-                badge.textContent = `${total} ${total === 1 ? 'entry' : 'entries'}`;
+                badge.textContent = slOverallTotal + ' ' + (slOverallTotal === 1 ? 'entry' : 'entries');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchAuditLogs();
-            setInterval(fetchAuditLogs, 1000);
-        });
+        /* ── Empty state ── */
+        function showEmptyState(count, query) {
+            var emptyState = document.getElementById('emptyState');
+            var table = document.getElementById('slTable');
+            if (!emptyState) return;
+            if (count > 0) { emptyState.style.display = 'none'; if (table) table.style.display = ''; return; }
+            if (table) table.style.display = 'none';
+            emptyState.style.display = 'block';
+
+            var icon, title, sub, extra = '';
+            if (query) {
+                icon = 'fa-magnifying-glass'; title = 'No results for \u201c' + query + '\u201d'; sub = 'Try a different name, action, or user.';
+                extra = '<button onclick="clearSearch()" style="margin-top:.75rem;padding:.5rem 1.1rem;border-radius:10px;border:1.5px dashed #d1d5db;background:none;font-size:.8rem;color:#9ca3af;cursor:pointer;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class="fa-solid fa-xmark" style="margin-right:.4rem;font-size:.7rem;"></i>Clear search</button>';
+            } else if (slState.role !== 'all') {
+                var labels = { admin: 'Admin', dentist: 'Dentist', patient: 'Patient', login: 'Login' };
+                icon = 'fa-filter'; title = 'No ' + (labels[slState.role] || slState.role) + ' logs found'; sub = 'There are no logs matching this filter yet.';
+                extra = '<button onclick="slSetTab(document.querySelector(\'.tab-btn\'),\'all\')" style="margin-top:.75rem;padding:.5rem 1.1rem;border-radius:10px;border:1.5px dashed #d1d5db;background:none;font-size:.8rem;color:#9ca3af;cursor:pointer;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class="fa-solid fa-xmark" style="margin-right:.4rem;font-size:.7rem;"></i>Show all logs</button>';
+            } else {
+                icon = 'fa-clipboard-list'; title = 'No system logs yet'; sub = 'Activity will appear here once users interact with the system.';
+            }
+
+            emptyState.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;text-align:center;gap:.5rem;"><div style="width:60px;height:60px;border-radius:16px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fa-solid ' + icon + '" style="font-size:1.6rem;color:#d1d5db;"></i></div><p style="font-size:.9rem;font-weight:700;color:#6b7280;margin:0;">' + title + '</p><p style="font-size:.78rem;color:#b0b7c3;margin:0;max-width:280px;">' + sub + '</p>' + extra + '</div>';
+        }
     </script>
 </body>
 
