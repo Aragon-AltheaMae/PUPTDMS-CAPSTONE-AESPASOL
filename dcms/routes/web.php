@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\ClinicScheduleController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
+use App\Http\Controllers\Admin\DataBackupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -340,6 +341,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
         ->name('document-requests.reject');
+});
+
+// DATA BACKUP
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/data-backup', [DataBackupController::class, 'index'])->name('data_backup');
+    Route::post('/data-backup/store', [DataBackupController::class, 'store'])->name('data_backup.store');
+    Route::get('/data-backup/download/{id}', [DataBackupController::class, 'download'])->name('data_backup.download');
+    Route::post('/data-backup/toggle-auto', [DataBackupController::class, 'toggleAuto'])->name('data_backup.toggle_auto');
+    Route::post('/data-backup/restore/{id}', [DataBackupController::class, 'restore'])->name('data_backup.restore');
+    Route::delete('/data-backup/delete/{id}', [DataBackupController::class, 'destroy'])->name('data_backup.delete');
+    Route::post('/data-backup/update-schedule', [DataBackupController::class, 'updateSchedule'])->name('data_backup.update_schedule');
 });
 
 // START IMPERSONATION
