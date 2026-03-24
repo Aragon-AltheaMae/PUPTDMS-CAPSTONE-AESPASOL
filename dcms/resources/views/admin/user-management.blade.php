@@ -1,35 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.admin')
 
-<head>
-    <meta charset="UTF-8" />
-    <title>User Management | PUP Taguig Dental Clinic</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+@section('title', 'User Management | PUP Taguig Dental Clinic')
 
-    <script>
-        tailwind.config = {
-            daisyui: {
-                themes: false
-            }
-        }
-    </script>
+@section('body-class', 'bg-[#f4f5f7]')
+
+@section('styles')
 
     <style>
-        :root {
-            --crimson: #8B0000;
-            --crimson-dark: #6b0000;
-            --crimson-light: #fef2f2;
-            --header-h: 64px;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
@@ -52,583 +29,6 @@
             background: #9ca3af;
         }
 
-        /* ── HEADER ── */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            height: var(--header-h);
-            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, .08), 0 4px 24px rgba(139, 0, 0, .3);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-        }
-
-        .header-logo {
-            width: 34px;
-            height: 34px;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 28px;
-            background: rgba(255, 255, 255, .2);
-            margin: 0 .25rem;
-        }
-
-        .header-title {
-            font-size: .85rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: .02em;
-            text-transform: uppercase;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-        }
-
-        .hdr-icon-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, .1);
-            border: 1px solid rgba(255, 255, 255, .12);
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .9rem;
-            transition: background .15s, transform .15s;
-            position: relative;
-            text-decoration: none;
-        }
-
-        .hdr-icon-btn:hover {
-            background: rgba(255, 255, 255, .2);
-            transform: translateY(-1px);
-        }
-
-        .notif-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ff4757;
-            color: #fff;
-            font-size: .58rem;
-            font-weight: 800;
-            width: 17px;
-            height: 17px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--crimson);
-            box-shadow: 0 2px 6px rgba(255, 71, 87, .5);
-        }
-
-        .header-user-btn {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            padding: .35rem .75rem .35rem .35rem;
-            background: rgba(255, 255, 255, .1);
-            border: 1px solid rgba(255, 255, 255, .12);
-            border-radius: 40px;
-            cursor: pointer;
-            transition: background .15s;
-        }
-
-        .header-user-btn:hover {
-            background: rgba(255, 255, 255, .18);
-        }
-
-        .header-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, .4);
-            object-fit: cover;
-        }
-
-        .header-user-text {
-            line-height: 1;
-        }
-
-        .header-name {
-            font-size: .78rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .header-role {
-            font-size: .64rem;
-            color: rgba(255, 255, 255, .65);
-            margin-top: 2px;
-        }
-
-        /* Notification dropdown */
-        #notifDropdown {
-            position: relative;
-        }
-
-        #notifMenu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 10px);
-            width: 320px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-            opacity: 0;
-            transform: scale(.95) translateY(-8px);
-            pointer-events: none;
-            transition: all .2s cubic-bezier(.4, 0, .2, 1);
-            transform-origin: top right;
-            z-index: 100;
-            overflow: hidden;
-        }
-
-        #notifMenu.open {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-        }
-
-        .notif-header {
-            padding: .85rem 1.1rem .7rem;
-            font-weight: 800;
-            color: var(--crimson);
-            font-size: .8rem;
-            border-bottom: 1px solid #fce8e8;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-        }
-
-        /* User dropdown */
-        #userDropdown {
-            position: relative;
-        }
-
-        #userMenu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 10px);
-            width: 210px;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-            opacity: 0;
-            transform: scale(.95) translateY(-8px);
-            pointer-events: none;
-            transition: all .2s cubic-bezier(.4, 0, .2, 1);
-            transform-origin: top right;
-            z-index: 100;
-            overflow: hidden;
-        }
-
-        #userMenu.open {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-        }
-
-        .user-menu-header {
-            padding: .85rem 1rem .7rem;
-            border-bottom: 1px solid #f3f4f6;
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-        }
-
-        .user-menu-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #e5e7eb;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .user-menu-name {
-            font-size: .78rem;
-            font-weight: 800;
-            color: #1a202c;
-        }
-
-        .user-menu-role {
-            font-size: .65rem;
-            color: #9ca3af;
-        }
-
-        .user-menu-item {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .65rem 1rem;
-            font-size: .76rem;
-            font-weight: 600;
-            color: #374151;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background .12s;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .user-menu-item:hover {
-            background: #f9fafb;
-        }
-
-        .user-menu-item i {
-            width: 14px;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 12px;
-        }
-
-        .user-menu-item.danger {
-            color: #ef4444;
-        }
-
-        .user-menu-item.danger i {
-            color: #ef4444;
-        }
-
-        .user-menu-item.danger:hover {
-            background: #fef2f2;
-        }
-
-        .user-menu-sep {
-            height: 1px;
-            background: #f3f4f6;
-            margin: 3px 0;
-        }
-
-        /* Dark mode user menu */
-        [data-theme="dark"] #userMenu {
-            background: #161b22;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .06);
-        }
-
-        [data-theme="dark"] .user-menu-header {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .user-menu-name {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .user-menu-item {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .user-menu-item:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .user-menu-item.danger {
-            color: #f87171;
-        }
-
-        [data-theme="dark"] .user-menu-item.danger:hover {
-            background: rgba(239, 68, 68, .1);
-        }
-
-        [data-theme="dark"] .user-menu-sep {
-            background: #21262d;
-        }
-
-        /* ════════════════════════════════
-       SIDEBAR
-    ════════════════════════════════ */
-        #sidebar {
-            position: fixed;
-            left: 0;
-            top: var(--header-h);
-            width: var(--sidebar-w);
-            height: calc(100vh - var(--header-h));
-            background: #fff;
-            border-right: 1px solid #eff0f2;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, .04);
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .sidebar-inner {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 16px 10px 8px;
-        }
-
-        .nav-section-label {
-            font-size: .6rem;
-            font-weight: 800;
-            color: #b0b7c3;
-            text-transform: uppercase;
-            letter-spacing: .1em;
-            padding: 0 8px 6px;
-            margin-top: 4px;
-        }
-
-        .nav-group {
-            margin-bottom: 2px;
-        }
-
-        .group-trigger {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 10px;
-            cursor: default;
-        }
-
-        .group-icon-wrap {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--crimson-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            color: var(--crimson);
-            flex-shrink: 0;
-            transition: all .2s;
-        }
-
-        .active-group .group-icon-wrap {
-            background: var(--crimson);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(139, 0, 0, .3);
-        }
-
-        .group-text {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .group-label {
-            font-size: .7rem;
-            font-weight: 800;
-            color: var(--crimson);
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            white-space: nowrap;
-        }
-
-        .group-sublabel {
-            font-size: .62rem;
-            color: #adb5bd;
-            display: block;
-            margin-top: 1px;
-            white-space: nowrap;
-        }
-
-        .group-body {
-            padding: 2px 0 6px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 7px 10px 7px 42px;
-            border-radius: 9px;
-            margin: 1px 2px;
-            font-size: .76rem;
-            font-weight: 500;
-            color: #4a5568;
-            text-decoration: none;
-            transition: all .15s;
-            white-space: nowrap;
-        }
-
-        .nav-link:hover {
-            background: var(--crimson-light);
-            color: var(--crimson);
-        }
-
-        .nav-link.active {
-            background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(139, 0, 0, .25);
-            font-weight: 600;
-        }
-
-        .nav-link.active:hover {
-            padding-left: 14px;
-            background: #8B0000;
-        }
-
-        .nav-link i {
-            width: 14px;
-            text-align: center;
-            font-size: 11px;
-            flex-shrink: 0;
-        }
-
-        .nav-sep {
-            height: 1px;
-            background: #f3f4f6;
-            margin: 10px 6px;
-        }
-
-        /* Sidebar bottom */
-        .sidebar-bottom {
-            padding: 10px 10px 14px;
-            border-top: 1px solid #f3f4f6;
-            flex-shrink: 0;
-        }
-
-        .theme-toggle-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            height: 36px;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 40px;
-            padding: 3px;
-        }
-
-        .theme-option {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: #9ca3af;
-            transition: color .2s;
-            border-radius: 40px;
-            font-size: 13px;
-        }
-
-        .theme-option.active {
-            color: #374151;
-        }
-
-        .theme-indicator {
-            position: absolute;
-            background: #fff;
-            border-radius: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-            transition: all .3s cubic-bezier(.4, 0, .2, 1);
-            pointer-events: none;
-            width: calc(50% - 3px);
-            height: calc(100% - 6px);
-            left: 3px;
-            top: 3px;
-        }
-
-        .theme-indicator.dark-mode {
-            transform: translateX(calc(100% + 0px));
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 10px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            color: #ef4444;
-            font-size: .76rem;
-            font-weight: 600;
-            transition: background .15s;
-            margin-top: 6px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .logout-btn:hover {
-            background: #fef2f2;
-        }
-
-        .logout-icon {
-            width: 28px;
-            height: 28px;
-            background: #fef2f2;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 11px;
-        }
-
-        /* ════════════════════════════════
-       FOOTER
-    ════════════════════════════════ */
-        #siteFooter {
-            background: var(--crimson);
-            color: rgba(255, 255, 255, .8);
-            padding: 1.25rem 2rem;
-        }
-
-        .footer-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            font-size: .74rem;
-        }
-
-        .footer-inner a {
-            color: rgba(255, 255, 255, .7);
-            text-decoration: none;
-            transition: color .15s;
-        }
-
-        .footer-inner a:hover {
-            color: #fff;
-        }
-
-        .footer-dot {
-            color: rgba(255, 255, 255, .3);
-        }
-
-        /* ── LAYOUT ── */
-        #mainContent,
-        #siteFooter {
-            margin-left: 256px;
-        }
-
         /* ── DARK MODE ── */
         body,
         main,
@@ -641,48 +41,12 @@
             color: #E5E7EB;
         }
 
-        [data-theme="dark"] #sidebar {
-            background-color: #0d1117;
-            border-right: 1px solid #21262d;
-        }
-
         [data-theme="dark"] .bg-white {
             background-color: #161b22 !important;
         }
 
         [data-theme="dark"] .text-\[\#333333\] {
             color: #E5E7EB !important;
-        }
-
-        [data-theme="dark"] .nav-link:hover {
-            background: rgba(139, 0, 0, .2);
-        }
-
-        [data-theme="dark"] .theme-toggle-container {
-            background: #1F1F1F;
-            border-color: #2A2A2A;
-        }
-
-        [data-theme="dark"] .theme-option {
-            color: #6B7280;
-        }
-
-        [data-theme="dark"] .theme-option.active {
-            color: #F3F4F6;
-        }
-
-        [data-theme="dark"] .theme-indicator {
-            background: #2A2A2A;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-        }
-
-        [data-theme="dark"] .nav-sep,
-        [data-theme="dark"] .sidebar-bottom {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .group-label {
-            color: #6b7280;
         }
 
         [data-theme="dark"] .sl-card,
@@ -719,278 +83,6 @@
         [data-theme="dark"] .sl-pagebar {
             background: #0d1117;
             border-color: #21262d;
-        }
-
-        /* ── MOBILE DRAWER ── */
-        #mobileMenuBtn {
-            display: none;
-            background: rgba(255, 255, 255, .12);
-            border: none;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 9px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            transition: background .15s;
-            flex-shrink: 0;
-        }
-
-        #mobileMenuBtn:hover {
-            background: rgba(255, 255, 255, .22);
-        }
-
-        #mobileDrawerOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .45);
-            z-index: 998;
-            backdrop-filter: blur(2px);
-            opacity: 0;
-            transition: opacity .25s;
-        }
-
-        #mobileDrawerOverlay.open {
-            opacity: 1;
-        }
-
-        #mobileDrawer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 280px;
-            height: 100vh;
-            background: #fff;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            transform: translateX(-100%);
-            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
-            box-shadow: 4px 0 32px rgba(0, 0, 0, .15);
-            overflow: hidden;
-        }
-
-        #mobileDrawer.open {
-            transform: translateX(0);
-        }
-
-        .drawer-header {
-            background: linear-gradient(135deg, #6b0000 0%, #8B0000 100%);
-            padding: 20px 18px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .drawer-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .drawer-logo {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        .drawer-title {
-            font-size: .82rem;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: .01em;
-            line-height: 1.2;
-        }
-
-        .drawer-subtitle {
-            font-size: .65rem;
-            color: rgba(255, 255, 255, .6);
-            font-style: italic;
-        }
-
-        .drawer-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, .15);
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: background .15s;
-        }
-
-        .drawer-close:hover {
-            background: rgba(255, 255, 255, .28);
-        }
-
-        /* User info strip */
-        .drawer-user {
-            padding: 14px 18px;
-            border-bottom: 1px solid #f3f4f6;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fdf9f9;
-            flex-shrink: 0;
-        }
-
-        .drawer-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 2px solid #e5e7eb;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .drawer-user-name {
-            font-size: .82rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        .drawer-user-role {
-            font-size: .68rem;
-            color: #9ca3af;
-            font-style: italic;
-        }
-
-        .drawer-inner {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0 6px;
-        }
-
-        .drawer-inner::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .drawer-inner::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 4px;
-        }
-
-        .drawer-group {
-            margin: 0 8px 2px;
-        }
-
-        .drawer-group-header {
-            display: flex;
-            align-items: center;
-            padding: 6px 8px 4px;
-            color: #6b7280;
-        }
-
-        .drawer-group-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            color: #8B0000;
-            flex-shrink: 0;
-        }
-
-        .drawer-group-label {
-            font-size: .68rem;
-            font-weight: 700;
-            color: #8B0000;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            margin-left: 8px;
-        }
-
-        .drawer-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px 8px 40px;
-            border-radius: 8px;
-            margin: 1px 4px;
-            font-size: .78rem;
-            font-weight: 500;
-            color: #374151;
-            text-decoration: none;
-            transition: all .15s;
-        }
-
-        .drawer-link:hover {
-            background: #fef2f2;
-            color: #8B0000;
-            padding-left: 44px;
-        }
-
-        .drawer-link.active {
-            background: #8B0000;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(139, 0, 0, .2);
-        }
-
-        .drawer-link.active:hover {
-            padding-left: 40px;
-        }
-
-        .drawer-link i {
-            width: 15px;
-            text-align: center;
-            font-size: 11px;
-        }
-
-        .drawer-sep {
-            height: 1px;
-            background: #f3f4f6;
-            margin: 6px 12px;
-        }
-
-        .drawer-bottom {
-            padding: 10px 12px 14px;
-            border-top: 1px solid #f3f4f6;
-            flex-shrink: 0;
-        }
-
-        /* dark mode drawer */
-        [data-theme="dark"] #mobileDrawer {
-            background: #0d1117;
-        }
-
-        [data-theme="dark"] .drawer-user {
-            background: #161b22;
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .drawer-user-name {
-            color: #e5e7eb;
-        }
-
-        [data-theme="dark"] .drawer-link {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .drawer-link:hover {
-            background: rgba(139, 0, 0, .2);
-            color: #fff;
-        }
-
-        [data-theme="dark"] .drawer-sep {
-            background: #21262d;
-        }
-
-        [data-theme="dark"] .drawer-bottom {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .drawer-group-label {
-            color: #6b7280;
         }
 
         .search-wrap {
@@ -1081,6 +173,7 @@
                 opacity: 0;
                 transform: translateY(-30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1092,19 +185,28 @@
         }
 
         #toastContainer {
-            padding-top: 10px;
-            padding-right: 10px;
+            position: fixed !important;
+            top: 80px !important;
+            right: 16px !important;
+            z-index: 99999 !important;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            pointer-events: none;
+            width: 340px;
         }
 
         @media (max-width: 640px) {
             #toastContainer {
-                top: 10px !important;
+                top: 80px !important;
                 right: 10px !important;
                 left: 10px !important;
+                width: auto !important;
                 align-items: stretch;
             }
 
-            #toastContainer > div {
+            #toastContainer>div {
                 max-width: 100% !important;
                 width: 100% !important;
             }
@@ -1112,33 +214,8 @@
 
         /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 767px) {
-            #sidebar {
-                display: none !important;
-            }
-
-            #mainContent {
-                margin-left: 0 !important;
-                padding-bottom: 86px !important;
-            }
-
-            #siteFooter {
-                margin-left: 0 !important;
-            }
-
-            #mobileMenuBtn {
-                display: flex;
-            }
-
             #mainContent {
                 padding-bottom: 2rem !important;
-            }
-
-            .header {
-                padding: 0 1rem;
-            }
-
-            .header-title {
-                display: none;
             }
 
             .sl-stats {
@@ -1162,36 +239,6 @@
             }
         }
 
-
-        /* ── DARK MODE ── */
-        body,
-        main,
-        footer {
-            transition: background-color .3s ease, color .3s ease;
-        }
-
-        [data-theme="dark"] body {
-            background-color: #000D1A;
-            color: #E5E7EB;
-        }
-
-        [data-theme="dark"] #sidebar {
-            background-color: #0d1117;
-        }
-
-        [data-theme="dark"] .bg-white {
-            background-color: #161b22 !important;
-        }
-
-        [data-theme="dark"] .text-\[\#333333\] {
-            color: #E5E7EB !important;
-        }
-
-        [data-theme="dark"] .group-header:hover,
-        [data-theme="dark"] .nav-link:hover {
-            background: rgba(139, 0, 0, .2);
-        }
-
         [data-theme="dark"] .theme-toggle-container {
             background: #1F1F1F;
             border-color: #2A2A2A;
@@ -1210,21 +257,8 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
         }
 
-        [data-theme="dark"] .flyout-panel {
-            background: #161b22;
-            border-color: #2d1a1a;
-        }
-
-        [data-theme="dark"] .flyout-link {
-            color: #d1d5db;
-        }
-
         [data-theme="dark"] .nav-sep,
         [data-theme="dark"] .sidebar-bottom {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .sidebar-toggle-row {
             border-color: #21262d;
         }
 
@@ -1355,7 +389,7 @@
             inset: 0;
             background: rgba(0, 0, 0, .45);
             z-index: 200;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -1365,6 +399,7 @@
         }
 
         .modal-overlay.open {
+            display: flex;
             opacity: 1;
             pointer-events: auto;
         }
@@ -1445,19 +480,6 @@
             margin-bottom: 1.25rem;
         }
 
-        [data-theme="dark"] body {
-            background-color: #000D1A;
-            color: #E5E7EB;
-        }
-
-        [data-theme="dark"] #sidebar {
-            background-color: #0d1117;
-        }
-
-        [data-theme="dark"] .bg-white {
-            background-color: #161b22 !important;
-        }
-
         [data-theme="dark"] .text-gray-800 {
             color: #e5e7eb !important;
         }
@@ -1476,41 +498,6 @@
 
         [data-theme="dark"] .bg-\[\#f5f5f5\] {
             background-color: #000D1A !important;
-        }
-
-        [data-theme="dark"] .theme-toggle-container {
-            background: #1F1F1F;
-            border-color: #2A2A2A;
-        }
-
-        [data-theme="dark"] .theme-option {
-            color: #6B7280;
-        }
-
-        [data-theme="dark"] .theme-option.active {
-            color: #F3F4F6;
-        }
-
-        [data-theme="dark"] .theme-indicator {
-            background: #2A2A2A;
-        }
-
-        [data-theme="dark"] .flyout-panel {
-            background: #161b22;
-            border-color: #2d1a1a;
-        }
-
-        [data-theme="dark"] .flyout-link {
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .nav-sep,
-        [data-theme="dark"] .sidebar-bottom {
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .sidebar-toggle-row {
-            border-color: #21262d;
         }
 
         [data-theme="dark"] .user-table-row:hover {
@@ -1552,307 +539,9 @@
             background-color: #21262d !important;
         }
     </style>
-</head>
+@endsection
 
-<body class="bg-[#f5f5f5] text-[#333333]">
-
-    <!-- ════════ HEADER ════════ -->
-    <header class="header">
-        <div class="header-left">
-            <button id="mobileMenuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
-            <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
-            <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
-            <div class="header-divider"></div>
-            <span class="header-title">PUP Taguig Dental Clinic</span>
-        </div>
-        <div class="header-right">
-            @php
-                $notifications = collect($notifications ?? []);
-                $notifCount = $notifications->count();
-            @endphp
-            <div id="notifDropdown">
-                <button class="hdr-icon-btn" id="notifBtn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    @if ($notifCount > 0)
-                        <span class="notif-badge">{{ $notifCount }}</span>
-                    @endif
-                </button>
-                <div id="notifMenu">
-                    <div class="notif-header"><i class="fa-solid fa-bell text-xs"></i> Notifications</div>
-                    <div style="max-height:260px;overflow-y:auto;">
-                        @forelse($notifications as $n)
-                            <a href="{{ $n['url'] ?? '#' }}"
-                                style="display:block;padding:.65rem 1rem;font-size:.76rem;color:#333;text-decoration:none;border-bottom:1px solid #fdf5f5;transition:background .1s;"
-                                onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">
-                                <div style="font-weight:700;">{{ $n['title'] ?? 'Notification' }}</div>
-                                @if (!empty($n['message']))
-                                    <div style="color:#aaa;margin-top:2px;font-size:.7rem;">{{ $n['message'] }}
-                                    </div>
-                                @endif
-                            </a>
-                        @empty
-                            <div style="padding:2.5rem 1rem;text-align:center;color:#bbb;font-size:.76rem;">
-                                <i class="fa-regular fa-bell-slash"
-                                    style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>
-                                You're all caught up.
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-
-            {{-- Palitan ng system settings na route --}}
-            <a href="{{ route('admin.system_settings') }}" class="hdr-icon-btn" aria-label="Settings">
-                <i class="fa-solid fa-gear"></i>
-            </a>
-
-            <div id="userDropdown">
-                <div class="header-user-btn" id="userBtn">
-                    <img src="https://i.pravatar.cc/40" class="header-avatar" alt="Avatar">
-                    <div class="header-user-text">
-                        <div class="header-name">Admin</div>
-                        <div class="header-role">Administrator</div>
-                    </div>
-                    <i class="fa-solid fa-chevron-down"
-                        style="color:rgba(255,255,255,.5);font-size:.6rem;margin-left:.25rem;"></i>
-                </div>
-                <div id="userMenu">
-                    <div class="user-menu-header">
-                        <img src="https://i.pravatar.cc/40" class="user-menu-avatar" alt="Avatar">
-                        <div>
-                            <div class="user-menu-name">Admin</div>
-                            <div class="user-menu-role">Administrator</div>
-                        </div>
-                    </div>
-                    <!-- Dark mode toggle inside dropdown -->
-                    <div style="padding:.5rem .75rem; border-bottom:1px solid #f3f4f6;">
-                        <div
-                            style="font-size:.6rem;font-weight:800;letter-spacing:.08em;color:#b0b7c3;text-transform:uppercase;margin-bottom:6px;">
-                            Appearance</div>
-                        <div class="theme-toggle-container" id="userMenuThemeToggle">
-                            <button type="button" class="theme-option active" data-theme="light"><i
-                                    class="fa-solid fa-sun"></i></button>
-                            <button type="button" class="theme-option" data-theme="dark"><i
-                                    class="fa-regular fa-moon"></i></button>
-                            <div class="theme-indicator" aria-hidden="true"></div>
-                        </div>
-                    </div>
-                    <div class="user-menu-sep"></div>
-                    <form method="POST" action="{{ route('logout') }}" style="margin:0;">
-                        @csrf
-                        <button type="submit" class="user-menu-item danger">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            Log out
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ════════ SIDEBAR ════════ -->
-    <aside id="sidebar">
-        <div class="sidebar-inner">
-
-            <div class="nav-section-label">Clinic Management</div>
-            <div class="nav-group">
-                <div class="group-trigger {{ request()->routeIs('admin.admin.dashboard') ? 'active-group' : '' }}">
-                    <div class="group-icon-wrap"><i class="fa-solid fa-hospital"></i></div>
-                    <div class="group-text">
-                        <span class="group-label">Clinic</span>
-                        <span class="group-sublabel">Core clinical modules</span>
-                    </div>
-                </div>
-                <div class="group-body">
-                    <a href="{{ route('admin.admin.dashboard') }}"
-                        class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
-                            class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-users"></i>
-                        Patients</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-calendar-check"></i>
-                        Appointments</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-tooth"></i>
-                        Dental
-                        Records</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-file-circle-check"></i>
-                        Document Request</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i>
-                        Reports</a>
-                </div>
-            </div>
-
-            <div class="nav-sep"></div>
-            <div class="nav-section-label">Maintenance</div>
-            <div class="nav-group">
-                <div
-                    class="group-trigger {{ request()->routeIs('admin.user_management*', 'admin.role_permissions', 'admin.academic_periods*', 'admin.clinic_schedule*') ? 'active-group' : '' }}">
-                    <div class="group-icon-wrap"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                    <div class="group-text">
-                        <span class="group-label">Configuration</span>
-                        <span class="group-sublabel">Settings & scheduling</span>
-                    </div>
-                </div>
-                <div class="group-body">
-                    <a href="{{ route('admin.user_management') }}"
-                        class="nav-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
-                            class="fa-solid fa-user-gear"></i> User Management</a>
-                    <a href="{{ route('admin.role_permissions') }}"
-                        class="nav-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
-                            class="fa-solid fa-user-shield"></i> Roles & Permissions</a>
-                    <a href="{{ route('admin.academic_periods') }}"
-                        class="nav-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
-                            class="fa-solid fa-school"></i> Academic Periods</a>
-                    <a href="{{ route('admin.clinic_schedule') }}"
-                        class="nav-link {{ request()->routeIs('admin.clinic_schedule*') ? 'active' : '' }}"><i
-                            class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-                    <a href="{{ route('admin.service-types') }}"
-                        class="nav-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}"><i
-                            class="fa-solid fa-list-check"></i> Service Types</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-file-pen"></i>
-                        Document
-                        Templates</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-boxes-stacked"></i>
-                        Inventory</a>
-                </div>
-            </div>
-
-            <div class="nav-sep"></div>
-            <div class="nav-section-label">System</div>
-            <div class="nav-group">
-                <div class="group-trigger {{ request()->routeIs('admin.system_logs') ? 'active-group' : '' }}">
-                    <div class="group-icon-wrap"><i class="fa-solid fa-server"></i></div>
-                    <div class="group-text">
-                        <span class="group-label">System</span>
-                        <span class="group-sublabel">Admin & configuration</span>
-                    </div>
-                </div>
-                <div class="group-body">
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-database"></i>
-                        Data
-                        Backup</a>
-                    <a href="{{ route('admin.system_logs') }}"
-                        class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
-                            class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                    <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                            class="fa-solid fa-sliders"></i>
-                        System
-                        Settings</a>
-                </div>
-            </div>
-
-        </div>
-    </aside>
-
-    <!-- Mobile drawer overlay -->
-    <div id="mobileDrawerOverlay" onclick="closeDrawer()"></div>
-
-    <!-- Mobile drawer -->
-    <div id="mobileDrawer">
-        <div class="drawer-header">
-            <div class="drawer-header-left">
-                <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="drawer-logo" alt="DMS">
-                <div>
-                    <div class="drawer-title">PUP TAGUIG</div>
-                    <div class="drawer-subtitle">Dental Clinic</div>
-                </div>
-            </div>
-            <button class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="drawer-user">
-            <img src="https://i.pravatar.cc/40" class="drawer-avatar" alt="Avatar">
-            <div>
-                <div class="drawer-user-name">Admin</div>
-                <div class="drawer-user-role">Administrator</div>
-            </div>
-        </div>
-        <div class="drawer-inner">
-            <div class="drawer-group">
-                <div class="drawer-group-header"><i class="drawer-group-icon fa-solid fa-hospital"></i><span
-                        class="drawer-group-label">Clinic Management</span></div>
-                <a href="{{ route('admin.admin.dashboard') }}"
-                    class="drawer-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
-                        class="fa-solid fa-chart-line"></i> Dashboard</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-users"></i>
-                    Patients</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-calendar-check"></i>
-                    Appointments</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-tooth"></i>
-                    Dental
-                    Records</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-file-circle-check"></i>
-                    Document Request</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file"></i>
-                    Reports</a>
-            </div>
-            <div class="drawer-sep"></div>
-            <div class="drawer-group">
-                <div class="drawer-group-header"><i class="drawer-group-icon fa-solid fa-screwdriver-wrench"></i><span
-                        class="drawer-group-label">Maintenance</span></div>
-                <a href="{{ route('admin.user_management') }}"
-                    class="drawer-link {{ request()->routeIs('admin.user_management*') ? 'active' : '' }}"><i
-                        class="fa-solid fa-user-gear"></i> User Management</a>
-                <a href="{{ route('admin.role_permissions') }}"
-                    class="drawer-link {{ request()->routeIs('admin.role_permissions') ? 'active' : '' }}"><i
-                        class="fa-solid fa-user-shield"></i> Roles & Permissions</a>
-                <a href="{{ route('admin.academic_periods') }}"
-                    class="drawer-link {{ request()->routeIs('admin.academic_periods*') ? 'active' : '' }}"><i
-                        class="fa-solid fa-school"></i> Academic Periods</a>
-                <a href="{{ route('admin.clinic_schedule') }}"
-                    class="drawer-link {{ request()->routeIs('admin.clinic_schedule*') ? 'active' : '' }}"><i
-                        class="fa-solid fa-calendar-days"></i> Clinic Schedule</a>
-                <a href="{{ route('admin.service-types') }}"
-                    class="drawer-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}"><i
-                        class="fa-solid fa-list-check"></i> Service Types</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-file-pen"></i>
-                    Document
-                    Templates</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-boxes-stacked"></i>
-                    Inventory</a>
-            </div>
-            <div class="drawer-sep"></div>
-            <div class="drawer-group">
-                <div class="drawer-group-header"><i class="drawer-group-icon fa-solid fa-server"></i><span
-                        class="drawer-group-label">System</span></div>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-database"></i>
-                    Data
-                    Backup</a>
-                <a href="{{ route('admin.system_logs') }}"
-                    class="drawer-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
-                        class="fa-solid fa-clipboard-list"></i> System Logs</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i
-                        class="fa-solid fa-sliders"></i>
-                    System
-                    Settings</a>
-            </div>
-        </div>
-        <div class="drawer-bottom">
-            <div class="theme-toggle-container" id="drawerThemeToggle" style="margin-bottom:10px;">
-                <button type="button" class="theme-option active" data-theme="light"><i
-                        class="fa-solid fa-sun"></i></button>
-                <button type="button" class="theme-option" data-theme="dark"><i
-                        class="fa-regular fa-moon"></i></button>
-                <div class="theme-indicator" aria-hidden="true"></div>
-            </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="logout-btn"><span class="logout-icon"><i
-                            class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i></span><span>Log
-                        out</span></button>
-            </form>
-        </div>
-    </div>
+@section('content')
 
     <!-- ════════════ MAIN CONTENT ════════════ -->
     @php
@@ -1874,9 +563,6 @@
 
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
-
-            <!-- Global Toast Container -->
-            <div class="toast toast-top toast-end z-[9999]" id="toastContainer"></div>
 
             <div class="mb-6">
                 <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
@@ -1964,36 +650,29 @@
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-users-gear text-[#8B0000]"></i>
                         <h2 class="font-bold text-gray-800 text-sm">All System Users</h2>
-                        <span
+                        <span id="countBadgeUsers"
                             class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers }}</span>
                     </div>
 
                     {{-- Filter bar --}}
-                    <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm" class="flex items-center gap-2.5 flex-wrap">
+                    <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
+                        class="flex items-center gap-2.5 flex-wrap">
                         {{-- Search --}}
                         <div class="search-wrap" style="width:260px;">
                             <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
-                            <input
-                                id="umSearch"
-                                name="search"
-                                placeholder="Search name or email…"
-                                value="{{ $search ?? '' }}"
-                                autocomplete="off"
-                                oninput="toggleSearchClear(this)"
-                                onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-                            />
-                            <button
-                                type="button"
-                                id="searchClearBtn"
-                                class="search-clear-btn {{ ($search ?? '') ? 'visible' : '' }}"
-                                onclick="clearSearch()"
+                            <input id="umSearch" name="search" placeholder="Search name or email…"
+                                value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
+                                onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                            <button type="button" id="searchClearBtn"
+                                class="search-clear-btn {{ $search ?? '' ? 'visible' : '' }}" onclick="clearSearch()"
                                 title="Clear">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
 
                         {{-- Role filter --}}
-                        <div style="display:flex;background:#F5F2EE;border:1px solid #E8E4DE;border-radius:10px;padding:3px;gap:2px;">
+                        <div
+                            style="display:flex;background:#F5F2EE;border:1px solid #E8E4DE;border-radius:10px;padding:3px;gap:2px;">
                             <button type="button" onclick="setRoleFilter(this,'all')"
                                 class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
                                 data-role="">All</button>
@@ -2012,8 +691,10 @@
                         <select id="statusFilter" name="status"
                             class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer">
                             <option value="">All Status</option>
-                            <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active
+                            </option>
+                            <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>Inactive
+                            </option>
                         </select>
                     </form>
                 </div>
@@ -2096,18 +777,13 @@
                                                 <i class="fa-solid fa-pen text-[11px]"></i>
                                             </button>
 
-                                            <form method="POST"
-                                                action="{{ route('admin.user_management.toggle_status', $user->id) }}"
-                                                style="display:inline;">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                    class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                                    title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                                    <i
-                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
+                                                class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
+                                                title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                                <i
+                                                    class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                            </button>
 
                                             <button type="button"
                                                 onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
@@ -2132,23 +808,28 @@
                                     </td>
                                 </tr>
                             @empty
-                            <tr id="dbEmptyRow">
-                                <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
-                                    <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
-                                        <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:#d1d5db;"></i>
-                                    </div>
-                                    <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users found</p>
-                                    <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
-                                </td>
-                            </tr>
+                                <tr id="dbEmptyRow">
+                                    <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
+                                        <div
+                                            style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
+                                            <i class="fa-solid fa-magnifying-glass"
+                                                style="font-size:1.6rem;color:#d1d5db;"></i>
+                                        </div>
+                                        <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users
+                                            found</p>
+                                        <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                <div class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div
+                    class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p class="text-xs text-gray-500 um-pagebar-info">
-                        Showing <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0 }}</strong>
+                        Showing
+                        <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0 }}</strong>
                         of <strong>{{ $users->total() }}</strong> users
                     </p>
                     <div class="um-pagination-wrap flex items-center gap-1.5"></div>
@@ -2157,17 +838,10 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer id="siteFooter">
-        <div class="footer-inner">
-        <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
-        <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
-        <span class="footer-dot">|</span>
-        <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
-        <span class="footer-dot">|</span>
-        <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
-        </div>
-    </footer>
+    <!-- Global Toast Container -->
+    <div id="toastContainer"
+        style="position:fixed;top:16px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;width:340px;">
+    </div>
 
     <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event,'addModal')">
         <div class="modal-box">
@@ -2204,8 +878,7 @@
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Full Name
                         <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}"
-                        placeholder="e.g. Juan dela Cruz"
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Juan dela Cruz"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm" required>
                 </div>
 
@@ -2213,18 +886,14 @@
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Email
                         Address <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <i
-                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="email" name="email" value="{{ old('email') }}"
-                            placeholder="user@pup.edu.ph"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
-                            required>
+                        <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="user@pup.edu.ph"
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm" required>
                     </div>
                 </div>
 
                 <div>
-                    <label
-                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
                     <select name="role_id"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
                         <option value="">— No Role —</option>
@@ -2335,17 +1004,14 @@
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Email
                         Address <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <i
-                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                         <input type="email" name="email" id="editEmail" placeholder="user@pup.edu.ph"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
-                            required>
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm" required>
                     </div>
                 </div>
 
                 <div>
-                    <label
-                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
                     <select name="role_id" id="editRole"
                         class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
                         <option value="">— No Role —</option>
@@ -2407,8 +1073,6 @@
                 </button>
             </div>
 
-
-
             <form method="POST" id="resetForm" class="p-6 space-y-4">
                 @csrf
                 @method('PUT')
@@ -2457,7 +1121,6 @@
             </form>
         </div>
     </div>
-
 
     <!-- View Details Modal -->
     <div class="modal-overlay" id="viewModal" onclick="closeModalOutside(event,'viewModal')">
@@ -2521,6 +1184,47 @@
         </div>
     </div>
 
+    <!-- Toggle Status Confirmation Modal -->
+    <div class="modal-overlay" id="toggleConfirmModal" onclick="closeModalOutside(event,'toggleConfirmModal')">
+        <div class="modal-box modal-sm">
+            <div
+                class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+                <div class="flex items-center gap-3">
+                    <div id="toggleModalIcon" class="w-10 h-10 rounded-xl flex items-center justify-center shadow">
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-800 text-base" id="toggleModalTitle">Confirm Action</h3>
+                        <p class="text-[10px] text-gray-500" id="toggleModalSubtitle">Please confirm this change</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('toggleConfirmModal')"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div id="toggleModalBody" class="rounded-xl p-4 mb-5 flex items-start gap-3 text-sm"></div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeModal('toggleConfirmModal')"
+                        class="px-5 py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
+                        Cancel
+                    </button>
+                    <form id="toggleConfirmForm" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" id="toggleConfirmBtn"
+                            class="px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2">
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
     <script>
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
             weekday: 'long',
@@ -2530,9 +1234,9 @@
         });
 
         var umState = {
-            search: '{{ $search ?? "" }}',
-            role: '{{ $roleFilter ?? "" }}',
-            status: '{{ $statusFilter ?? "" }}',
+            search: '{{ $search ?? '' }}',
+            role: '{{ $roleFilter ?? '' }}',
+            status: '{{ $statusFilter ?? '' }}',
             perPage: {{ $perPage ?? 10 }},
             page: {{ request('page', 1) }},
         };
@@ -2540,113 +1244,113 @@
         var umSearchTimer = null;
         var umController = null;
 
-        /* NOTIF */
-        document.getElementById('notifBtn').addEventListener('click', e => {
-            e.stopPropagation();
-            document.getElementById('notifMenu').classList.toggle('open');
-        });
-        document.addEventListener('click', () => document.getElementById('notifMenu').classList.remove('open'));
-
-        /* USER DROPDOWN */
-        document.getElementById('userBtn').addEventListener('click', e => {
-            e.stopPropagation();
-            document.getElementById('notifMenu').classList.remove('open'); // close notif if open
-            document.getElementById('userMenu').classList.toggle('open');
-        });
-        document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
-
-        /* Sync user menu theme toggle */
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('#userMenuThemeToggle .theme-option').forEach(o =>
-                o.addEventListener('click', e => {
-                    e.stopPropagation();
-                    applyTheme(o.getAttribute('data-theme'));
-                })
-            );
-        });
-
-        /* ── MOBILE DRAWER ── */
-        function openDrawer() {
-            const drawer = document.getElementById('mobileDrawer');
-            const overlay = document.getElementById('mobileDrawerOverlay');
-            overlay.style.display = 'block';
-            requestAnimationFrame(() => {
-                overlay.classList.add('open');
-                drawer.classList.add('open');
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+                modal.classList.remove('open');
+                modal.style.display = 'none';
             });
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeDrawer() {
-            const drawer = document.getElementById('mobileDrawer');
-            const overlay = document.getElementById('mobileDrawerOverlay');
-            drawer.classList.remove('open');
-            overlay.classList.remove('open');
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 250);
             document.body.style.overflow = '';
         }
 
-        document.getElementById('mobileMenuBtn')?.addEventListener('click', e => {
-            e.stopPropagation();
-            openDrawer();
-        });
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeDrawer();
-        });
-
-        /* Sync drawer theme toggles with main theme */
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('#drawerThemeToggle .theme-option').forEach(o =>
-                o.addEventListener('click', e => {
-                    e.stopPropagation();
-                    applyTheme(o.getAttribute('data-theme'));
-                    // sync indicator in drawer
-                    const ind = document.querySelector('#drawerThemeToggle .theme-indicator');
-                    if (ind) ind.classList.toggle('dark-mode', o.getAttribute('data-theme') === 'dark');
-                })
-            );
-        });
-
-        // Theme
-        const html = document.documentElement;
-
-        function applyTheme(theme) {
-            html.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            document.querySelectorAll('.theme-option').forEach(o =>
-                o.getAttribute('data-theme') === theme ? o.classList.add('active') : o.classList.remove('active')
-            );
-            const ind = document.querySelector('.theme-indicator');
-            if (ind) theme === 'dark' ? ind.classList.add('dark-mode') : ind.classList.remove('dark-mode');
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            applyTheme(localStorage.getItem('theme') || 'light');
-            document.querySelectorAll('.theme-option').forEach(o =>
-                o.addEventListener('click', e => {
-                    e.stopPropagation();
-                    applyTheme(o.getAttribute('data-theme'));
-                })
-            );
-        });
-
         function openModal(id) {
-            document.getElementById(id).classList.add('open');
+            closeAllModals();
+
+            var modal = document.getElementById(id);
+            if (!modal) return;
+
+            modal.style.display = 'flex';
+
+            requestAnimationFrame(function() {
+                modal.classList.add('open');
+            });
+
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
+            var modal = document.getElementById(id);
+            if (!modal) return;
+
+            modal.classList.remove('open');
+
+            setTimeout(function() {
+                modal.style.display = 'none';
+            }, 200);
+
+            document.body.style.overflow = '';
         }
 
         function closeModalOutside(e, id) {
-            if (e.target.id === id) closeModal(id);
+            if (e.target.id === id) {
+                closeModal(id);
+            }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            closeAllModals();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        });
 
         @if ($errors->any() && old('_method') !== 'PUT')
             document.addEventListener('DOMContentLoaded', () => openModal('addModal'));
         @endif
+
+        function openToggleConfirm(userId, currentStatus, userName) {
+            var isActive = currentStatus === 'active';
+            var icon = document.getElementById('toggleModalIcon');
+            var title = document.getElementById('toggleModalTitle');
+            var subtitle = document.getElementById('toggleModalSubtitle');
+            var body = document.getElementById('toggleModalBody');
+            var btn = document.getElementById('toggleConfirmBtn');
+            var form = document.getElementById('toggleConfirmForm');
+
+            form.dataset.userId = userId;
+            form.dataset.currentStatus = currentStatus;
+            form.dataset.userName = userName;
+            form.action = '/admin/user-management/' + userId + '/toggle-status';
+
+            btn.disabled = false;
+
+            if (isActive) {
+                icon.className =
+                    'w-10 h-10 rounded-xl flex items-center justify-center shadow bg-gradient-to-br from-amber-400 to-orange-500';
+                icon.innerHTML = '<i class="fa-solid fa-user-slash text-white text-sm"></i>';
+                title.textContent = 'Deactivate User';
+                subtitle.textContent = 'This will restrict their access';
+                body.className = 'rounded-xl p-4 mb-5 flex items-start gap-3 text-sm bg-amber-50 border border-amber-100';
+                body.innerHTML =
+                    '<i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-amber-800">' +
+                    userName +
+                    '</strong><span class="text-amber-700"> will be <strong>deactivated</strong>. They will no longer be able to log in until reactivated.</span></div>';
+                btn.className =
+                    'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-amber-500 hover:bg-amber-600';
+                btn.innerHTML = '<i class="fa-solid fa-user-slash"></i> Yes, Deactivate';
+            } else {
+                icon.className =
+                    'w-10 h-10 rounded-xl flex items-center justify-center shadow bg-gradient-to-br from-emerald-500 to-green-600';
+                icon.innerHTML = '<i class="fa-solid fa-user-check text-white text-sm"></i>';
+                title.textContent = 'Activate User';
+                subtitle.textContent = 'This will restore their access';
+                body.className =
+                    'rounded-xl p-4 mb-5 flex items-start gap-3 text-sm bg-emerald-50 border border-emerald-100';
+                body.innerHTML =
+                    '<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-emerald-800">' +
+                    userName +
+                    '</strong><span class="text-emerald-700"> will be <strong>activated</strong>. They will regain full access to the system.</span></div>';
+                btn.className =
+                    'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700';
+                btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Yes, Activate';
+            }
+
+            btn.dataset.originalHtml = btn.innerHTML;
+
+            openModal('toggleConfirmModal');
+        }
 
         function openEditModal(source, id, name, email, roleId, status) {
             const form = document.getElementById('editForm');
@@ -2662,6 +1366,9 @@
                 document.getElementById('editStatusActive').disabled = false;
                 document.getElementById('editStatusInactive').disabled = false;
             }
+
+            // Store source for AJAX handler
+            form.dataset.source = source;
 
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
@@ -2760,38 +1467,47 @@
 
             history.replaceState(null, '', window.location.pathname + '?' + params.toString());
 
-            fetch('{{ route("admin.user_management") }}?' + params.toString(), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                signal: umController.signal
-            })
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
-                umRenderRows(data.users);
-                umRenderPagebar(data.pagination);
-            })
-            .catch(function (e) {
-                if (e.name !== 'AbortError') console.error(e);
-            });
+            fetch('{{ route('admin.user_management') }}?' + params.toString(), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    signal: umController.signal
+                })
+                .then(function(res) {
+                    return res.json();
+                })
+                .then(function(data) {
+                    umRenderRows(data.users);
+                    umRenderPagebar(data.pagination);
+                    if (data.counts) {
+                        umRenderCounts(data.counts);
+                    }
+                })
+                .catch(function(e) {
+                    if (e.name !== 'AbortError') console.error(e);
+                });
         }
 
         function umRenderRows(users) {
+            function jsAttr(value) {
+                return JSON.stringify(value ?? '').replace(/"/g, '&quot;');
+            }
+
             var tbody = document.getElementById('umTableBody');
             if (!tbody) return;
 
             if (!users || users.length === 0) {
                 var searchVal = umState.search || '';
-                var emptyTitle = searchVal
-                    ? 'No results for &ldquo;' + searchVal + '&rdquo;'
-                    : 'No users found';
-                var emptySub = searchVal
-                    ? 'Try a different name or email.'
-                    : 'Try adjusting your filters.';
-                var clearBtn = searchVal
-                    ? '<button onclick="clearSearch()" style="margin-top:.75rem;display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:99px;border:1.5px dashed #d1d5db;background:none;font-size:.78rem;color:#9ca3af;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class=\"fa-solid fa-xmark\" style=\"font-size:.7rem;\"></i> Clear search</button>'
-                    : '';
+                var emptyTitle = searchVal ?
+                    'No results for &ldquo;' + searchVal + '&rdquo;' :
+                    'No users found';
+                var emptySub = searchVal ?
+                    'Try a different name or email.' :
+                    'Try adjusting your filters.';
+                var clearBtn = searchVal ?
+                    '<button onclick="clearSearch()" style="margin-top:.75rem;display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:99px;border:1.5px dashed #d1d5db;background:none;font-size:.78rem;color:#9ca3af;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class=\"fa-solid fa-xmark\" style=\"font-size:.7rem;\"></i> Clear search</button>' :
+                    '';
 
                 tbody.innerHTML = `
                     <tr>
@@ -2811,7 +1527,7 @@
             var startNumber = ((umState.page - 1) * umState.perPage) + 1;
             var html = '';
 
-            users.forEach(function (user, index) {
+            users.forEach(function(user, index) {
                 var rowNumber = startNumber + index;
                 var roleSlug = (user.role_slug || '').toLowerCase();
                 var roleLabel = user.role_name || 'No Role';
@@ -2832,92 +1548,89 @@
                 var initial = (user.name || 'U').charAt(0).toUpperCase();
 
                 html += `
-                    <tr class="user-table-row border-b border-gray-50 last:border-0">
-                        <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
-                            <span class="text-xs text-gray-400 font-medium">${rowNumber}</span>
-                        </td>
+                <tr class="user-table-row border-b border-gray-50 last:border-0">
+                    <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
+                        <span class="text-xs text-gray-400 font-medium">${rowNumber}</span>
+                    </td>
 
-                        <td class="py-3.5 px-3 sm:px-4">
-                            <div class="flex items-center gap-2 sm:gap-3">
-                                <div
-                                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                                    ${initial}
+                    <td class="py-3.5 px-3 sm:px-4">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                ${initial}
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                    ${user.name}
                                 </div>
-                                <div>
-                                    <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                        ${user.name}
-                                    </div>
-                                    <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
-                                        ${user.email}
-                                    </div>
+                                <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
+                                    ${user.email}
                                 </div>
                             </div>
-                        </td>
+                        </div>
+                    </td>
 
-                        <td class="py-3.5 px-4">
-                            <span class="badge-role" style="background:${roleBg};color:${roleColor};">
-                                ${roleLabel}
-                            </span>
-                        </td>
+                    <td class="py-3.5 px-4">
+                        <span class="badge-role" style="background:${roleBg};color:${roleColor};">
+                            ${roleLabel}
+                        </span>
+                    </td>
 
-                        <td class="py-3.5 px-4 text-center">
-                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
-                                ${(user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1)}
-                            </span>
-                        </td>
+                    <td class="py-3.5 px-4 text-center">
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
+                            ${(user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1)}
+                        </span>
+                    </td>
 
-                        <td class="py-3.5 px-4 hidden lg:table-cell">
-                            <span class="text-xs text-gray-400">${registeredDay}</span>
-                        </td>
+                    <td class="py-3.5 px-4 hidden lg:table-cell">
+                        <span class="text-xs text-gray-400">${registeredDay}</span>
+                    </td>
 
-                        <td class="py-3.5 px-2 sm:px-5">
-                            <div class="flex items-center justify-center gap-1">
-                                <button type="button"
-                                    onclick="openEditModal(
-                                        'users',
-                                        ${user.id},
-                                        ${JSON.stringify(user.name)},
-                                        ${JSON.stringify(user.email)},
-                                        ${JSON.stringify(user.role_id ?? '')},
-                                        ${JSON.stringify(user.status)}
-                                    )"
-                                    class="action-btn btn-edit" title="Edit account">
-                                    <i class="fa-solid fa-pen text-[11px]"></i>
-                                </button>
+                    <td class="py-3.5 px-2 sm:px-5">
+                        <div class="flex items-center justify-center gap-1">
+                            <button type="button"
+                                onclick="openEditModal(
+                                    'users',
+                                    ${user.id},
+                                    ${jsAttr(user.name)},
+                                    ${jsAttr(user.email)},
+                                    ${jsAttr(user.role_id)},
+                                    ${jsAttr(user.status)}
+                                )"
+                                class="action-btn btn-edit" title="Edit account">
+                                <i class="fa-solid fa-pen text-[11px]"></i>
+                            </button>
 
-                                <form method="POST" action="/admin/user-management/${user.id}/toggle-status" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="_method" value="PATCH">
-                                    <button type="submit"
-                                        class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
-                                        title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
-                                        <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
-                                    </button>
-                                </form>
+                            <button type="button"
+                                onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
+                                class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
+                                title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
+                                <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
+                            </button>
 
-                                <button type="button"
-                                    onclick="openResetModal('users', ${user.id}, ${JSON.stringify(user.name)})"
-                                    class="action-btn btn-reset" title="Reset password">
-                                    <i class="fa-solid fa-key text-[11px]"></i>
-                                </button>
+                            <button type="button"
+                                onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
+                                class="action-btn btn-reset" title="Reset password">
+                                <i class="fa-solid fa-key text-[11px]"></i>
+                            </button>
 
-                                <button type="button"
-                                    onclick="openViewModal(
-                                        ${JSON.stringify(user.name)},
-                                        ${JSON.stringify(user.email)},
-                                        ${JSON.stringify(roleLabel)},
-                                        ${JSON.stringify((user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1))},
-                                        'Users',
-                                        ${JSON.stringify((user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : ''))}
-                                    )"
-                                    class="action-btn" style="background:#f3f4f6;color:#374151;"
-                                    title="View details">
-                                    <i class="fa-solid fa-eye text-[11px]"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                            <button type="button"
+                                onclick="openViewModal(
+                                    ${jsAttr(user.name)},
+                                    ${jsAttr(user.email)},
+                                    ${jsAttr(roleLabel)},
+                                    ${jsAttr((user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1))},
+                                    'Users',
+                                    ${jsAttr((user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : ''))}
+                                )"
+                                class="action-btn" style="background:#f3f4f6;color:#374151;"
+                                title="View details">
+                                <i class="fa-solid fa-eye text-[11px]"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
             });
 
             tbody.innerHTML = html;
@@ -2931,12 +1644,13 @@
         function umRenderPagebar(p) {
             if (!p) return;
 
-            document.querySelectorAll('.um-pagebar-info').forEach(function (el) {
-                el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total + '</strong> users';
+            document.querySelectorAll('.um-pagebar-info').forEach(function(el) {
+                el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total +
+                    '</strong> users';
             });
 
             var html = umBuildPagination(p);
-            document.querySelectorAll('.um-pagination-wrap').forEach(function (el) {
+            document.querySelectorAll('.um-pagination-wrap').forEach(function(el) {
                 el.innerHTML = html;
             });
         }
@@ -2944,13 +1658,15 @@
         function umRenderCounts(counts) {
             if (!counts) return;
 
-            const totalEl = document.getElementById('countTotalUsers');
-            const activeEl = document.getElementById('countActiveUsers');
-            const inactiveEl = document.getElementById('countInactiveUsers');
+            var totalEl = document.getElementById('countTotalUsers');
+            var activeEl = document.getElementById('countActiveUsers');
+            var inactiveEl = document.getElementById('countInactiveUsers');
+            var badgeEl = document.getElementById('countBadgeUsers');
 
             if (totalEl) totalEl.textContent = counts.all ?? 0;
             if (activeEl) activeEl.textContent = counts.active ?? 0;
             if (inactiveEl) inactiveEl.textContent = counts.inactive ?? 0;
+            if (badgeEl) badgeEl.textContent = counts.all ?? 0;
         }
 
         function umBuildPagination(p) {
@@ -2967,16 +1683,21 @@
                 start = Math.max(1, end - windowSize + 1);
             }
 
-            var btn = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"';
-            var btnActive = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #8B0000;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;"';
-            var btnDis = 'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#d1d5db;font-size:.75rem;font-weight:600;cursor:not-allowed;display:inline-flex;align-items:center;justify-content:center;"';
+            var btn =
+                'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"';
+            var btnActive =
+                'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #8B0000;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;"';
+            var btnDis =
+                'style="height:32px;min-width:32px;padding:0 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#d1d5db;font-size:.75rem;font-weight:600;cursor:not-allowed;display:inline-flex;align-items:center;justify-content:center;"';
 
             var html = '<nav style="display:flex;align-items:center;gap:.35rem;flex-wrap:nowrap;">';
 
             if (current <= 1) {
-                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
+                html += '<button disabled ' + btnDis +
+                    '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
             } else {
-                html += '<button onclick="umGoPage(' + (current - 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
+                html += '<button onclick="umGoPage(' + (current - 1) + ')" ' + btn +
+                    '><i class="fa-solid fa-chevron-left" style="font-size:.65rem;"></i></button>';
             }
 
             for (var i = start; i <= end; i++) {
@@ -2988,9 +1709,11 @@
             }
 
             if (current >= last) {
-                html += '<button disabled ' + btnDis + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+                html += '<button disabled ' + btnDis +
+                    '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
             } else {
-                html += '<button onclick="umGoPage(' + (current + 1) + ')" ' + btn + '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
+                html += '<button onclick="umGoPage(' + (current + 1) + ')" ' + btn +
+                    '><i class="fa-solid fa-chevron-right" style="font-size:.65rem;"></i></button>';
             }
 
             html += '</nav>';
@@ -3003,7 +1726,8 @@
             if (!container) return;
 
             const toast = document.createElement('div');
-            toast.className = 'relative overflow-hidden flex items-start gap-2.5 bg-white border border-emerald-100 shadow-lg rounded-xl px-3 py-2.5 w-[calc(100vw-1.5rem)] max-w-[320px] sm:max-w-[340px] animate-slide-in';
+            toast.style.cssText =
+                'pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #d1fae5;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:14px;padding:10px 12px;width:320px;animation:slideIn .35s ease forwards;';
 
             toast.innerHTML = `
                 <div class="absolute inset-y-0 left-0 w-1 bg-emerald-500"></div>
@@ -3043,7 +1767,8 @@
             if (!container) return;
 
             const toast = document.createElement('div');
-            toast.className = 'relative overflow-hidden flex items-start gap-2.5 bg-white border border-red-100 shadow-lg rounded-xl px-3 py-2.5 w-[calc(100vw-1.5rem)] max-w-[320px] sm:max-w-[340px] animate-slide-in';
+            toast.style.cssText =
+                'pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #fee2e2;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:14px;padding:10px 12px;width:320px;animation:slideIn .35s ease forwards;';
 
             toast.innerHTML = `
                 <div class="absolute inset-y-0 left-0 w-1 bg-red-500"></div>
@@ -3079,18 +1804,17 @@
         }
 
         function setRoleFilter(el, role) {
-            // Update active tab button
             document.querySelectorAll('[data-role]').forEach(function(b) {
                 b.classList.remove('active');
             });
             el.classList.add('active');
 
-            umState.role = role === 'all' ? '' : role;
+            umState.role = (role === 'all' || role === '') ? '' : role;
             umState.page = 1;
             umFetch();
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             applyTheme(localStorage.getItem('theme') || 'light');
             document.querySelectorAll('.theme-option').forEach(function(o) {
                 o.addEventListener('click', function(e) {
@@ -3110,11 +1834,11 @@
 
             var searchInput = document.getElementById('umSearch');
             if (searchInput) {
-                searchInput.addEventListener('input', function () {
+                searchInput.addEventListener('input', function() {
                     toggleSearchClear(this);
                     clearTimeout(umSearchTimer);
                     var val = this.value;
-                    umSearchTimer = setTimeout(function () {
+                    umSearchTimer = setTimeout(function() {
                         umState.search = val;
                         umState.page = 1;
                         umFetch(true);
@@ -3124,15 +1848,177 @@
 
             var statusFilter = document.getElementById('statusFilter');
             if (statusFilter) {
-                statusFilter.addEventListener('change', function () {
+                statusFilter.addEventListener('change', function() {
                     umState.status = this.value;
                     umState.page = 1;
                     umFetch();
                 });
             }
+
+            var toggleForm = document.getElementById('toggleConfirmForm');
+            if (toggleForm) {
+                toggleForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    var form = this;
+                    var url = form.action;
+                    var btn = document.getElementById('toggleConfirmBtn');
+                    var originalHtml = btn.dataset.originalHtml || btn.innerHTML;
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing…';
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: '_method=PATCH&_token={{ csrf_token() }}'
+                        })
+                        .then(function(res) {
+                            return res.json().then(function(data) {
+                                return {
+                                    ok: res.ok,
+                                    data: data
+                                };
+                            });
+                        })
+                        .then(function(result) {
+                            if (result.ok && result.data.success) {
+                                closeAllModals();
+                                showSuccessToast(result.data.message);
+                                umFetch(true);
+                            } else {
+                                showErrorToast(result.data.message || 'Something went wrong.');
+                            }
+                        })
+                        .catch(function() {
+                            showErrorToast('Something went wrong. Please try again.');
+                        })
+                        .finally(function() {
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        });
+                });
+            }
+
+            // ── AJAX: Edit User ──────────────────────────────────
+            var editForm = document.getElementById('editForm');
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    var form = this;
+                    var url = form.action;
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    var originalHtml = submitBtn.innerHTML;
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+
+                    var formData = new FormData(form);
+                    // FormData already includes _method=PUT from the hidden input
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        })
+                        .then(function(res) {
+                            return res.json().then(function(data) {
+                                return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    data: data
+                                };
+                            });
+                        })
+                        .then(function(result) {
+                            if (result.status === 422 && result.data.errors) {
+                                var msgs = Object.values(result.data.errors).flat().join(' ');
+                                showErrorToast(msgs);
+                            } else if (result.ok && result.data.success) {
+                                closeAllModals();
+                                showSuccessToast(result.data.message || 'User updated successfully.');
+                                umFetch(true);
+                            } else {
+                                showErrorToast(result.data.message || 'Something went wrong.');
+                            }
+                        })
+                        .catch(function() {
+                            showErrorToast('Something went wrong. Please try again.');
+                        })
+                        .finally(function() {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalHtml;
+                        });
+                });
+            }
+
+            // ── AJAX: Reset Password ─────────────────────────────
+            var resetForm = document.getElementById('resetForm');
+            if (resetForm) {
+                resetForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    var form = this;
+                    var url = form.action;
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    var originalHtml = submitBtn.innerHTML;
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resetting…';
+
+                    var formData = new FormData(form);
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        })
+                        .then(function(res) {
+                            return res.json().then(function(data) {
+                                return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    data: data
+                                };
+                            });
+                        })
+                        .then(function(result) {
+                            if (result.status === 422 && result.data.errors) {
+                                var msgs = Object.values(result.data.errors).flat().join(' ');
+                                showErrorToast(msgs);
+                            } else if (result.ok && result.data.success) {
+                                closeAllModals();
+                                showSuccessToast(result.data.message || 'Password reset successfully.');
+                                // Clear fields for next use
+                                document.getElementById('resetPassword').value = '';
+                                document.getElementById('resetPasswordConf').value = '';
+                            } else {
+                                showErrorToast(result.data.message || 'Something went wrong.');
+                            }
+                        })
+                        .catch(function() {
+                            showErrorToast('Something went wrong. Please try again.');
+                        })
+                        .finally(function() {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalHtml;
+                        });
+                });
+            }
         });
     </script>
-
-</body>
-
-</html>
+@endsection
