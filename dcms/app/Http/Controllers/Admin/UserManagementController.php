@@ -229,8 +229,14 @@ class UserManagementController extends Controller
             "Updated user #{$user->id} ({$user->email})",
         );
 
-        return redirect()->route('admin.user_management')
-            ->with('success', 'User updated successfully.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully.',
+            ]);
+        }
+
+        return back()->with('success', 'User updated successfully.');
     }
 
     public function resetPassword(Request $request, User $user)
@@ -241,18 +247,22 @@ class UserManagementController extends Controller
 
         DB::transaction(function () use ($request, $user) {
             $hashedPassword = Hash::make($request->password);
-
-            $user->update([
-                'password' => $hashedPassword,
-            ]);
+            $user->update(['password' => $hashedPassword]);
 
             $role = $user->role;
             if ($role && $role->slug === 'patient') {
-                Patient::where('user_id', $user->id)->update([
-                    'password' => $hashedPassword,
-                ]);
+                Patient::where('user_id', $user->id)->update(['password' => $hashedPassword]);
             }
         });
+
+        AuditLogger::log('reset_password', 'user', "Reset password for user #{$user->id}");
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully.',
+            ]);
+        }
 
         return redirect()->route('admin.user_management')
             ->with('success', 'Password reset successfully.');
@@ -260,19 +270,22 @@ class UserManagementController extends Controller
 
     public function toggleStatus(User $user)
     {
-        $oldStatus = $user->status;
-
         $user->status = $user->status === 'active' ? 'inactive' : 'active';
         $user->save();
 
-        AuditLogger::log(
-            'update_status',
-            'user',
-            "Changed status of user #{$user->id} from {$oldStatus} → {$user->status}",
-        );
+        $label = $user->status === 'active' ? 'activated' : 'deactivated';
 
-        return redirect()->back()
-            ->with('success', 'User status updated.');
+        AuditLogger::log('update', 'user', "Status changed: user #{$user->id} is now {$user->status}");
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "{$user->name} has been {$label} successfully.",
+                'status'  => $user->status,
+            ]);
+        }
+
+        return back()->with('success', "{$user->name} has been {$label} successfully.");
     }
 
     public function updatePatient(Request $request, Patient $patient)
