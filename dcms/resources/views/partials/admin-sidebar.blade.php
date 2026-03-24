@@ -361,9 +361,9 @@
                 </div>
             </div>
             <div class="group-body">
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-database"></i>
-                    Data
-                    Backup</a>
+                <a href="{{ route('admin.data_backup') }}"
+                    class="nav-link {{ request()->routeIs('admin.data_backup') ? 'active' : '' }}"><i
+                        class="fa-solid fa-sliders"></i> Data Backup</a>
                 <a href="{{ route('admin.system_logs') }}"
                     class="nav-link {{ request()->routeIs('admin.system_logs') ? 'active' : '' }}"><i
                         class="fa-solid fa-clipboard-list"></i> System Logs</a>
