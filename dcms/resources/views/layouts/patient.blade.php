@@ -16,6 +16,7 @@
 
     <script>
         tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
             daisyui: {
                 themes: false
             }
@@ -32,23 +33,23 @@
         }
     </style>
     
-    @include('partials.admin.styles')
+    @include('partials.patient.styles')
     @yield('styles')
     
 </head>
 
 <body class="@yield('body-class', 'bg-[#F4F4F4]')">
 
-    @include('partials.admin.header')
-    @include('partials.admin.sidebar')
-    @include('partials.admin.drawer')
+    @include('partials.patient.header')
+    @include('partials.patient.sidebar')
+    @include('partials.patient.mobile-nav')
 
     @yield('content')
 
     @include('partials.footer')
 
     {{-- Sitewide scripts --}}
-    @include('partials.admin.scripts')
+    @include('partials.patient.script')
 
     {{-- Sienna Accessibility Widget --}}
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js" defer></script>

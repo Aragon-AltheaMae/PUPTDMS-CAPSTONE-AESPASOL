@@ -115,6 +115,7 @@
     .form-input:focus {
       border-color: #8B0000;
       box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+      padding-right: 2.5rem !important;
     }
 
     .q-radio:checked {
@@ -449,6 +450,55 @@
         padding: 0 1rem;
       }
     }
+
+    /* Ensure inputs have room for the mic icon */
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      padding-right: 2.5rem !important;
+    }
+
+    /* Tooltip/status styling */
+    .voice-status {
+      position: absolute;
+      right: 0;
+      top: -25px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+#leaveModal::backdrop, #othersModal::backdrop, #confirmModal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+#leaveModal.flex {
+    display: flex;
+}
+
+.pika-single {
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    font-family: 'Inter', sans-serif;
+}
+.pika-button:hover {
+    background: #8B0000 !important;
+    color: white !important;
+}
+.is-selected .pika-button {
+    background: #8B0000 !important;
+    box-shadow: none !important;
+}
+.is-today .pika-button {
+    color: #8B0000 !important;
+    font-weight: bold;
+}
+
   </style>
 </head>
 
@@ -511,7 +561,7 @@ $notifCount = $notifications->count();
     </div>
   </header>
 
-    <!-- ══════ MOBILE PROFILE ACCORDION ══════ -->
+  <!-- ══════ MOBILE PROFILE ACCORDION ══════ -->
   <div id="mobileProfileAccordion">
     <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100">
       <img class="w-12 h-12 rounded-full border-2 border-[#8B0000]/20 object-cover flex-shrink-0"
@@ -534,14 +584,15 @@ $notifCount = $notifications->count();
   </div>
 
   <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-2 animate-fade-up">
-    
+
     <div class="flex items-center justify-between mt-8 mb-4">
       <a href="{{ route('homepage') }}"
         class="back-home-btn flex items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white px-4 py-2 rounded-xl text-xs font-bold border border-[#660000] transition shadow-sm">
         <i class="fa-solid fa-arrow-left text-xs"></i>
         Back to Home
       </a>
-      <span class="text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
+      <span
+        class="text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
         Step <span id="stepCounterText">1</span> <span class="text-[#c4bfba]">of 5</span>
       </span>
     </div>
@@ -638,7 +689,7 @@ $notifCount = $notifications->count();
             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Date &amp; Time</h2>
             <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
 
-            <input type="hidden" id="appointment_date" name="appointment_date" required>
+            <input type="text" id="appointment_date" name="appointment_date" readonly required>
             <input type="hidden" id="appointment_time" name="appointment_time" required>
 
             <div class="cal-time-layout grid gap-5 items-start" style="grid-template-columns: 1fr 280px;">
@@ -648,11 +699,14 @@ $notifCount = $notifications->count();
                 <div id="calendarSkeletonContainer"></div>
                 <div class="mt-4 pt-3 border-t border-[#f0ebe6] flex flex-wrap gap-x-4 gap-y-2 justify-center">
                   <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
-                    <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span> Full Slot</div>
+                    <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span> Full Slot
+                  </div>
                   <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
-                    <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span> Holiday</div>
+                    <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span> Holiday
+                  </div>
                   <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
-                    <span class="w-2 h-2 rounded-full bg-gray-200 flex-shrink-0"></span> Unavailable</div>
+                    <span class="w-2 h-2 rounded-full bg-gray-200 flex-shrink-0"></span> Unavailable
+                  </div>
                   <div class="flex items-center gap-1.5 text-xs text-[#5c5550] font-medium">
                     <span class="w-2 h-2 rounded-full bg-gray-500 flex-shrink-0"></span> Today not available
                   </div>
@@ -696,51 +750,57 @@ $notifCount = $notifications->count();
             </div>
           </div>
 
-         <!-- ════ STEP 2: SERVICE ════ -->
-              <div class="step-content hidden">
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Service Type</h2>
-                <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
+          <!-- ════ STEP 2: SERVICE ════ -->
+          <div class="step-content hidden">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#660000] mb-0.5">Select Service Type</h2>
+            <div class="h-0.5 mb-7 rounded-sm" style="background: linear-gradient(90deg, #8B0000, transparent)"></div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
 
-                @foreach($serviceTypes as $service)
-                      <label class="service-card-label block cursor-pointer">
-                        <input type="radio" name="service_type" value="{{ $service['name'] }}" class="hidden" {{ $loop->first ? 'required' : '' }}>
-                        <div class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                          <div class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                            @if(!empty($service['img']))
-                              <img src="{{ asset('images/' . $service['img'] . '.png') }}" class="w-6 h-6"
-                                style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                            @else
-                              <i class="fa-solid fa-tooth text-[#8B0000] text-lg"></i>
-                            @endif
-                          </div>
-                          <div class="flex-1 min-w-0">
-                            <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $service['name'] }}</p>
-                            <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $service['desc'] }}</p>
-                          </div>
-                          <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
-                        </div>
-                      </label>
-                      @endforeach
-
-                  <label class="service-card-label block cursor-pointer sm:col-span-2">
-                    <input type="radio" name="service_type" value="Others" class="hidden">
-                    <div class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                      <div class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                        <img src="{{ asset('images/dental-others.png') }}" class="w-6 h-6"
-                          style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
-                        <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let us know what you need.</p>
-                      </div>
-                      <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
-                    </div>
-                  </label>
-
+              @foreach($serviceTypes as $service)
+              <label class="service-card-label block cursor-pointer">
+                <input type="radio" name="service_type" value="{{ $service['name'] }}" class="hidden" {{ $loop->first ?
+                'required' : '' }}>
+                <div
+                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                  <div
+                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                    @if(!empty($service['img']))
+                    <img src="{{ asset('images/' . $service['img'] . '.png') }}" class="w-6 h-6"
+                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                    @else
+                    <i class="fa-solid fa-tooth text-[#8B0000] text-lg"></i>
+                    @endif
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="svc-title font-bold text-sm text-[#1a1410]">{{ $service['name'] }}</p>
+                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">{{ $service['desc'] }}</p>
+                  </div>
+                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
                 </div>
-              </div>
+              </label>
+              @endforeach
+
+              <label class="service-card-label block cursor-pointer sm:col-span-2">
+                <input type="radio" name="service_type" value="Others" class="hidden">
+                <div
+                  class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
+                  <div
+                    class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
+                    <img src="{{ asset('images/dental-others.png') }}" class="w-6 h-6"
+                      style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
+                    <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let us know what you
+                      need.</p>
+                  </div>
+                  <i class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
+                </div>
+              </label>
+
+            </div>
+          </div>
 
           <!-- ════ STEP 3: DENTAL HISTORY ════ -->
           <div class="step-content hidden">
@@ -1343,17 +1403,22 @@ $notifCount = $notifications->count();
   </div>
 
   <!-- ════ OTHERS MODAL ════ -->
-  <dialog id="othersModal"
-    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]"
-    style="">
+  <dialog id="othersModal" class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
     <div class="bg-[#8B0000] px-8 py-6">
       <h3 class="text-xl font-bold text-white mb-1">Other Service</h3>
       <p class="text-sm text-white/75">Please describe the service you need.</p>
     </div>
     <div class="bg-white px-8 py-6">
-      <input type="text" id="other_services" name="service_others_text"
-        class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2.5 text-sm bg-white outline-none mb-5"
-        placeholder="e.g. Teeth whitening, fluoride treatment..." maxlength="100">
+      <div class="relative w-full mb-5">
+        <input type="text" id="other_services" name="service_others_text"
+          class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2.5 text-sm bg-white outline-none"
+          placeholder="e.g. Teeth whitening, fluoride treatment..." maxlength="100">
+        <button type="button" id="othersMicBtn"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <span id="othersVoiceStatus" class="voice-status hidden"></span>
+      </div>
       <div class="flex justify-end gap-3">
         <button type="button" id="othersCancelBtn"
           class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-5 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">Cancel</button>
@@ -1379,48 +1444,50 @@ $notifCount = $notifications->count();
   </dialog>
 
   <!-- ════ LEAVE MODAL ════ -->
-  <dialog id="leaveModal"
-    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
+  <dialog id="leaveModal" class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
     <div class="bg-[#8B0000] px-6 py-5">
       <h3 class="text-lg font-bold text-white mb-0.5">Unsaved Changes</h3>
-      <p class="text-sm text-white/80">Save your progress or discard changes.</p>
+      <p class="text-sm text-white/80">Save your progress, discard changes, or stay on the page.</p>
     </div>
-    <div class="bg-white px-6 py-5 flex justify-end gap-3">
-      <button type="button" id="discardDraftBtn"
-        class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-5 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">Discard
-        Changes</button>
-      <button type="button" id="saveDraftBtn"
-        class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">Save
-        Draft</button>
+    <div class="bg-white px-6 py-5 flex justify-end gap-3 flex-wrap">
+      <button type="button" id="cancelLeaveBtn" class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-4 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">
+        Cancel
+      </button>
+      <button type="button" id="discardDraftBtn" class="btn-secondary-custom inline-flex items-center gap-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl px-4 py-2 text-sm font-semibold transition-colors">
+        Discard
+      </button>
+      <button type="button" id="saveDraftBtn" class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">
+        Save Draft
+      </button>
     </div>
   </dialog>
 
-@include('components.appointment-calendar-script', [
-    'mode' => 'booking',
-    'renderStyle' => 'patient',
-    'calendarContainerId' => 'calendarSkeletonContainer',
-    'dateInputId' => 'appointment_date',
-    'timeInputId' => 'appointment_time',
-    'dateBannerId' => 'dateBanner',
-    'slotPlaceholderId' => 'slotPlaceholder',
-    'slotContainerId' => 'slotContainer',
-    'slotGridId' => 'slotGrid',
-    'selectedSlotDisplayId' => 'selectedSlotDisplay',
-    'selectedSlotTextId' => 'selectedSlotText',
-    'slotEndpoint' => route('book.appointment.slots'),
-    'scheduleRules' => $schedules ?? [],
-    'blockedDates' => $blockedDates ?? [],
-    'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
-    'philippineHolidays' => $philippineHolidays ?? [],
-    'useDynamicScheduleRules' => true,
-    'disallowToday' => true,
-    'allowToggleOffDate' => true,
-])
+  @include('components.appointment-calendar-script', [
+  'mode' => 'booking',
+  'renderStyle' => 'patient',
+  'calendarContainerId' => 'calendarSkeletonContainer',
+  'dateInputId' => 'appointment_date',
+  'timeInputId' => 'appointment_time',
+  'dateBannerId' => 'dateBanner',
+  'slotPlaceholderId' => 'slotPlaceholder',
+  'slotContainerId' => 'slotContainer',
+  'slotGridId' => 'slotGrid',
+  'selectedSlotDisplayId' => 'selectedSlotDisplay',
+  'selectedSlotTextId' => 'selectedSlotText',
+  'slotEndpoint' => route('book.appointment.slots'),
+  'scheduleRules' => $schedules ?? [],
+  'blockedDates' => $blockedDates ?? [],
+  'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+  'philippineHolidays' => $philippineHolidays ?? [],
+  'useDynamicScheduleRules' => true,
+  'disallowToday' => true,
+  'allowToggleOffDate' => true,
+  ])
 
   <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
   <script>
-    const diseaseLabelByCode = @json($diseases->pluck('label', 'code'));
-    
+    const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
+
 
     /* DRAFT */
     const DRAFT_KEY = "appointmentDraft:v1";
@@ -1446,6 +1513,69 @@ $notifCount = $notifications->count();
     function clearDraft() {
       localStorage.removeItem(DRAFT_KEY);
     }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) return;
+
+    // Exclude inputs inside dialogs/modals to avoid breaking them
+    const inputs = document.querySelectorAll('input[type="text"]:not([readonly]), input[type="email"], textarea');
+
+    inputs.forEach(input => {
+        // Skip any input that is inside a <dialog> element
+        if (input.closest('dialog')) return;
+
+        const isTextarea = input.tagName.toLowerCase() === 'textarea';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative w-full';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        const statusLabel = document.createElement('span');
+        statusLabel.className = 'voice-status hidden';
+        wrapper.appendChild(statusLabel);
+
+        const micBtn = document.createElement('button');
+        micBtn.type = 'button';
+        // For textarea: pin to top-right; for single-line inputs: vertically center
+        micBtn.className = isTextarea
+            ? 'absolute right-3 top-3 text-gray-400 hover:text-crimson transition-colors'
+            : 'absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-crimson transition-colors';
+        micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        wrapper.appendChild(micBtn);
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+
+        micBtn.onclick = () => {
+            recognition.start();
+            statusLabel.innerText = "Speaking...";
+            statusLabel.className = 'voice-status block text-blue-600 animate-pulse';
+            micBtn.classList.add('text-crimson');
+        };
+
+        recognition.onresult = (event) => {
+            const result = event.results[0][0].transcript;
+            input.value = result;
+            formIsDirty = true; // Mark form as changed for your modal logic
+            input.dispatchEvent(new Event('input')); 
+            statusLabel.classList.add('hidden');
+        };
+
+        recognition.onerror = () => {
+            statusLabel.innerText = "sorry didn't hear that, please try again.";
+            statusLabel.className = 'voice-status block text-red-600';
+            setTimeout(() => statusLabel.classList.add('hidden'), 3000);
+        };
+
+        recognition.onend = () => {
+            micBtn.classList.remove('text-crimson');
+            if (statusLabel.innerText === "Speaking...") statusLabel.classList.add('hidden');
+        };
+    });
+});
 
     function restoreDraft() {
       const raw = localStorage.getItem(DRAFT_KEY);
@@ -1524,7 +1654,7 @@ $notifCount = $notifications->count();
 
     /* STEPPER */
     let step = 0,
-    completedSteps = [];
+      completedSteps = [];
     const steps = document.querySelectorAll(".step-content");
     const navBtns = document.getElementById("navBtns");
     const prevBtn = document.getElementById("prevBtn");
@@ -1744,6 +1874,9 @@ $notifCount = $notifications->count();
     const confirmMessage = document.getElementById("confirmMessage");
     const okBtn = document.getElementById("okBtn");
 
+    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+    const finalConfirm = document.getElementById('finalConfirm');
+
     if (finalSubmitBtn) {
       finalSubmitBtn.addEventListener("click", () => {
         if (!finalConfirm || !finalConfirm.checked) {
@@ -1855,6 +1988,26 @@ $notifCount = $notifications->count();
        DOM READY
     ══════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
+
+      // Initialize Pikaday on the input with id="datepicker"
+      var picker = new Pikaday({
+          field: document.getElementById('datepicker'),
+          format: 'YYYY-MM-DD',
+          minDate: new Date(), // Prevents selecting past dates
+          toString(date, format) {
+              // Ensure the date is formatted correctly for your database
+              const day = date.getDate();
+              const month = date.getMonth() + 1;
+              const year = date.getFullYear();
+              return `${year}-${month}-${day}`;
+          },
+          onSelect: function() {
+              // Trigger the 'input' event so your "formIsDirty" logic 
+              // and draft saving features detect the change
+              document.getElementById('datepicker').dispatchEvent(new Event('input'));
+          }
+      });
+
       /* Desktop layout */
       if (window.innerWidth >= 768) {
         sidebarOpen = true;
@@ -1931,11 +2084,24 @@ $notifCount = $notifications->count();
     const othersModal = document.getElementById("othersModal");
     const othersInput = document.getElementById("other_services");
     const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
-    othersRadio?.addEventListener("change", () => {
+    const othersLabel = othersRadio?.closest('label');
+
+    function openOthersModal() {
+      if (!othersModal || othersModal.open) return;
       othersInput.required = true;
-      othersModal?.showModal();
+      othersModal.showModal();
       setTimeout(() => othersInput?.focus(), 100);
+    }
+
+    // Use click on the label so it fires even when already selected
+    othersLabel?.addEventListener("click", () => {
+      // Let the radio check first, then open
+      setTimeout(openOthersModal, 0);
     });
+
+    // Also handle change as a fallback for first-time selection
+    othersRadio?.addEventListener("change", openOthersModal);
+
     document.getElementById("othersConfirmBtn")?.addEventListener("click", () => {
       if (!othersInput?.value.trim()) {
         showInputError(othersInput);
@@ -1952,6 +2118,44 @@ $notifCount = $notifications->count();
       if (othersRadio) othersRadio.checked = false;
     });
 
+    /* OTHERS MODAL MIC BUTTON */
+    (function() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+      const micBtn = document.getElementById("othersMicBtn");
+      const input = document.getElementById("other_services");
+      const statusLabel = document.getElementById("othersVoiceStatus");
+      if (!micBtn || !input || !statusLabel) return;
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+
+      micBtn.addEventListener("click", () => {
+        recognition.start();
+        statusLabel.innerText = "Speaking...";
+        statusLabel.className = 'voice-status block text-blue-600 animate-pulse';
+        micBtn.classList.add('text-[#8B0000]');
+      });
+
+      recognition.onresult = (event) => {
+        input.value = event.results[0][0].transcript;
+        formIsDirty = true;
+        input.dispatchEvent(new Event('input'));
+        statusLabel.classList.add('hidden');
+      };
+
+      recognition.onerror = () => {
+        statusLabel.innerText = "Sorry, didn't hear that. Try again.";
+        statusLabel.className = 'voice-status block text-red-600';
+        setTimeout(() => statusLabel.classList.add('hidden'), 3000);
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove('text-[#8B0000]');
+        if (statusLabel.innerText === "Speaking...") statusLabel.classList.add('hidden');
+      };
+    })();
+
     /* DATE PICKERS */
     ["lastDentalVisit", "extractionDate", "denturesDate", "orthoDate", "medicalExamDate"].forEach(id => {
       const el = document.getElementById(id);
@@ -1962,7 +2166,13 @@ $notifCount = $notifications->count();
         yearRange: [1950, new Date().getFullYear()],
         firstDay: 1,
         onSelect(date) {
-          el.value = date.toISOString().split("T")[0];
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          
+          el.value = `${year}-${month}-${day}`;
+          
+          formIsDirty = true;
         }
       });
     });
@@ -2104,68 +2314,98 @@ $notifCount = $notifications->count();
       if (!emergencyNumber.value) emergencyNumber.classList.remove("border-red-500", "border-green-600");
     });
 
-    /* LEAVE / DRAFT */
-    let formIsDirty = false,
-      formSubmitting = false;
-    const formEl = document.getElementById("appointmentForm");
-    const leaveModal = document.getElementById("leaveModal");
-    let pendingNavigation = null;
-    formEl?.addEventListener("change", () => {
-      if (!formSubmitting) formIsDirty = true;
-    });
-    formEl?.addEventListener("input", () => {
-      if (!formSubmitting) formIsDirty = true;
-    });
+    /* --- NAVIGATION & DIRTY CHECK --- */
+let formIsDirty = false;
+let formSubmitting = false;
+let pendingNavigation = null;
 
-    function openLeaveModal(cb) {
-      pendingNavigation = cb;
-      leaveModal?.showModal();
-    }
-    document.getElementById("saveDraftBtn")?.addEventListener("click", () => {
-      saveDraftData();
-      leaveModal?.close();
-      formSubmitting = true;
-      formIsDirty = false;
-      if (typeof pendingNavigation === "function") pendingNavigation();
-      pendingNavigation = null;
+const leaveModal = document.getElementById('leaveModal');
+
+// Track if form is touched (typing, clicking radios, voice input, picking dates)
+document.querySelectorAll('input, textarea, select').forEach(input => {
+    input.addEventListener('input', () => {
+        formIsDirty = true;
     });
-    document.getElementById("discardDraftBtn")?.addEventListener("click", () => {
-      clearDraft();
-      leaveModal?.close();
-      formSubmitting = true;
-      formIsDirty = false;
-      if (typeof pendingNavigation === "function") pendingNavigation();
-      pendingNavigation = null;
+});
+document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+    input.addEventListener('change', () => {
+        formIsDirty = true;
     });
-    document.querySelectorAll('a[href]').forEach(link => {
-      link.addEventListener("click", e => {
+});
+
+// Function to open modal
+function openLeaveModal(onConfirm) {
+    pendingNavigation = onConfirm;
+    leaveModal.showModal(); // Native way to open a <dialog>
+}
+
+// Function to close modal
+function closeLeaveModal() {
+    leaveModal.close();
+    pendingNavigation = null;
+}
+
+// BUTTON ACTIONS
+// 1. Cancel: Just close the modal, do nothing else.
+document.getElementById('cancelLeaveBtn')?.addEventListener('click', closeLeaveModal);
+
+// 2. Save Draft: Call the save function, turn off dirty warning, and navigate.
+document.getElementById('saveDraftBtn')?.addEventListener('click', () => {
+    saveDraftData();
+    formIsDirty = false; 
+    if (typeof pendingNavigation === "function") pendingNavigation();
+});
+
+// 3. Discard: Call the clear function, turn off dirty warning, and navigate.
+document.getElementById('discardDraftBtn')?.addEventListener('click', () => {
+    clearDraft();
+    formIsDirty = false;
+    if (typeof pendingNavigation === "function") pendingNavigation();
+});
+
+// Handle Clicks on internal links (like "Back to Home")
+document.querySelectorAll('a[href]').forEach(link => {
+    link.addEventListener("click", e => {
         const href = link.getAttribute("href") || "";
-        if (href.startsWith("#") || href.startsWith("javascript:")) return;
-        // Skip the Back to Home button — let it navigate directly
-        if (link.closest('a') && (link.textContent.includes('Home') || link.classList.contains('back-home-btn'))) return;
+        
+        // Ignore internal anchors and javascript links
+        if (href.startsWith("#") || href.startsWith("javascript:") || link.type === 'submit') return;
+
         if (formIsDirty && !formSubmitting) {
-          e.preventDefault();
-          openLeaveModal(() => window.location.href = link.href);
+            e.preventDefault(); 
+            openLeaveModal(() => {
+                window.location.href = link.href;
+            });
         }
-      });
     });
-    history.pushState({
-      page: "book-appointment"
-    }, "", window.location.href);
-    window.addEventListener("popstate", () => {
-      if (formIsDirty && !formSubmitting) {
-        openLeaveModal(() => history.back());
-        history.pushState({
-          page: "book-appointment"
-        }, "", window.location.href);
-      }
-    });
-    window.addEventListener("beforeunload", e => {
-      if (formIsDirty && !formSubmitting) {
+});
+
+// System Tab-Close Validation (Cannot be customized visually)
+window.addEventListener("beforeunload", e => {
+    if (formIsDirty && !formSubmitting) {
         e.preventDefault();
-        e.returnValue = "";
-      }
-    });
+        e.returnValue = ""; 
+    }
+});
+
+    /* CALENDAR INITIALIZATION */
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('datepicker');
+    
+    if (dateInput) {
+        const picker = new Pikaday({
+            field: dateInput,
+            format: 'YYYY-MM-DD',
+            minDate: new Date(), // Prevents picking dates in the past
+            theme: 'crimson-theme', // Optional: for custom styling
+            onSelect: function() {
+                // Ensure the form is marked as "dirty" when a date is picked
+                formIsDirty = true;
+                dateInput.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+});
 
     /* INIT */
     showStep(0);
