@@ -29,7 +29,20 @@ use App\Http\Controllers\Admin\ClinicScheduleController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
+use App\Http\Controllers\Auth\OIDCController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DataBackupController;
+
+
+// routes/web.php
+
+Route::middleware(['web'])->group(function () {
+    Route::get('/auth/oidc/redirect', [OIDCController::class, 'redirect'])
+        ->name('oidc.redirect');
+    Route::get('/auth/oidc/callback', [OIDCController::class, 'callback'])
+        ->name('oidc.callback');
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +51,7 @@ use App\Http\Controllers\Admin\DataBackupController;
 */
 
 Route::get('/', fn() => redirect('/login'));
-Route::get('/', fn() => redirect('/login'));
+
 
 // Patient Login
 Route::get('/login', function () {
@@ -178,9 +191,22 @@ Route::post('/login', function (Request $request) {
 
     AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
-    return redirect()->route('homepage')
-        ->with('login_as', $patient->name)
-        ->with('show_terms_modal', true);
+    session([
+        'role' => 'patient',
+        'patient_id' => $patient->id,
+        'email' => $patient->email
+    ]);
+
+    session()->save();
+
+    dd([
+        'message' => 'patient login success',
+        'session' => session()->all(),
+        'redirecting_to' => route('patient.dashboard'),
+    ]);
+   return redirect()->route('patient.dashboard')
+    ->with('login_as', $patient->name)
+    ->with('show_terms_modal', true);
 });
 
 // Dentist Login POST (hard-coded for now)
@@ -207,18 +233,7 @@ Route::post('/login', function (Request $request) {
 // Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 
 // Logout (all roles)
-Route::post('/logout', function () {
-    AuditLogger::log(
-        'logout',
-        'authentication',
-        'User logged out of the system'
-    );
-
-    session()->flush();
-    Auth::logout();
-
-    return redirect('/login');
-})->name('logout');
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 // Admin Logout
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
