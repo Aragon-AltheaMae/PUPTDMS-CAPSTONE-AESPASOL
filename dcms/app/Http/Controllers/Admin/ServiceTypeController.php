@@ -35,9 +35,21 @@ class ServiceTypeController extends Controller
 
     public function destroy($id)
     {
-        ServiceType::findOrFail($id)->delete();
+        $service = ServiceType::findOrFail($id);
 
-        return back()->with('success','Service type deleted');
+        $defaultServices = [
+            'Oral Check-Up',
+            'Dental Cleaning',
+            'Restoration & Prosthesis',
+            'Dental Surgery',
+        ];
+
+        if (in_array($service->name, $defaultServices)) {
+            return back()->with('error', 'Default services cannot be deleted.');
+        }
+
+        $service->delete();
+
+        return back()->with('success', 'Service type deleted');
     }
-
 }
