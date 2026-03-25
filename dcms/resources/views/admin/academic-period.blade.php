@@ -2,8 +2,6 @@
 
 @section('title', 'Academic Period | PUP Taguig Dental Clinic')
 
-@section('body-class', 'bg-[#f4f5f7]')
-
 @section('styles')
 
 <style>
@@ -22,127 +20,6 @@
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
-  }
-
-  [data-theme="dark"] body {
-    background-color: #000D1A;
-    color: #E5E7EB;
-  }
-
-  [data-theme="dark"] #sidebar {
-    background-color: #0d1117;
-    border-right: 1px solid #21262d;
-  }
-
-  [data-theme="dark"] .bg-white {
-    background-color: #161b22 !important;
-  }
-
-  [data-theme="dark"] .text-\[\#333333\] {
-    color: #E5E7EB !important;
-  }
-
-  [data-theme="dark"] .sl-card,
-  [data-theme="dark"] .sl-stat {
-    background: #161b22 !important;
-    border-color: #21262d !important;
-  }
-
-  [data-theme="dark"] .sl-page-title {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .sl-toolbar-title {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .sl-table thead tr {
-    background: #0d1117;
-  }
-
-  [data-theme="dark"] .sl-table tbody tr:hover {
-    background: #1c2128;
-  }
-
-  [data-theme="dark"] .sl-table tbody td {
-    color: #d1d5db;
-  }
-
-  [data-theme="dark"] .sl-username,
-  [data-theme="dark"] .sl-date-day {
-    color: #e5e7eb;
-  }
-
-  [data-theme="dark"] .sl-pagebar {
-    background: #0d1117;
-    border-color: #21262d;
-  }
-
-  /* ── MOBILE RESPONSIVE ── */
-  @media (max-width: 767px) {
-
-    #mainContent {
-      padding-bottom: 2rem !important;
-    }
-
-    .sl-stats {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .sl-table thead th:nth-child(6),
-    .sl-table tbody td:nth-child(6),
-    .sl-table thead th:nth-child(7),
-    .sl-table tbody td:nth-child(7) {
-      display: none;
-    }
-  }
-
-  [data-theme="dark"] .bg-white {
-    background-color: #161b22 !important;
-  }
-
-  [data-theme="dark"] .text-\[\#333333\] {
-    color: #E5E7EB !important;
-  }
-
-  [data-theme="dark"] .nav-link:hover {
-    background: rgba(139, 0, 0, .2);
-  }
-
-  [data-theme="dark"] .sl-card,
-  [data-theme="dark"] .sl-stat {
-    background: #161b22 !important;
-    border-color: #21262d !important;
-  }
-
-  [data-theme="dark"] .sl-page-title {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .sl-toolbar-title {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .sl-table thead tr {
-    background: #0d1117;
-  }
-
-  [data-theme="dark"] .sl-table tbody tr:hover {
-    background: #1c2128;
-  }
-
-  [data-theme="dark"] .sl-table tbody td {
-    color: #d1d5db;
-  }
-
-  [data-theme="dark"] .sl-username,
-  [data-theme="dark"] .sl-date-day {
-    color: #e5e7eb;
-  }
-
-  [data-theme="dark"] .sl-pagebar {
-    background: #0d1117;
-    border-color: #21262d;
   }
 
   .active-banner {
@@ -468,23 +345,6 @@
 
   .reset-btn:hover {
     background: #f9fafb;
-  }
-
-  [data-theme="dark"] body {
-    background-color: #000D1A;
-    color: #E5E7EB;
-  }
-
-  [data-theme="dark"] .bg-white {
-    background-color: #161b22 !important;
-  }
-
-  [data-theme="dark"] .bg-gray-50 {
-    background-color: #0d1117 !important;
-  }
-
-  [data-theme="dark"] .bg-\[\#f5f5f5\] {
-    background-color: #000D1A !important;
   }
 
   [data-theme="dark"] .border-gray-100 {
