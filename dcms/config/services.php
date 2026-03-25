@@ -2,18 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
-
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
@@ -34,5 +22,20 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    // ✅ MOVE THIS OUTSIDE
+    'oidc' => [
+            'authorize_url' => env('OIDC_AUTHORIZE_URL'),
+            'token_url' => env('OIDC_TOKEN_URL'),
+            'me_url' => env('OIDC_ME_URL'),
+            'logout_url' => env('OIDC_LOGOUT_URL'),
+            'client_id' => env('OIDC_CLIENT_ID'),
+            'client_secret' => env('OIDC_CLIENT_SECRET'),
+            'redirect' => env('OIDC_REDIRECT_URI'),
+            ],
+
+    'idp' => [
+    'login_url' => env('IDP_LOGIN_URL'),
+],
 
 ];
