@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class SystemSetting extends Model
 {
-    public $timestamps = false;
-
     protected $fillable = [
         'key',
         'value',
@@ -16,7 +15,7 @@ class SystemSetting extends Model
 
     public static function getSetting(string $key, mixed $default = null): mixed
     {
-        $setting = static::where('key', $key)->first();
+        $setting = static::query()->where('key', $key)->first();
 
         return $setting && $setting->value !== null
             ? $setting->value
@@ -29,9 +28,20 @@ class SystemSetting extends Model
             $value = implode(',', $value);
         }
 
-        $setting = static::firstOrNew(['key' => $key]);
-        $setting->value = $value;
-        $setting->group = $group;
-        $setting->save();
+        static::query()->updateOrCreate(
+            ['key' => $key],
+            [
+                'value' => $value,
+                'group' => $group,
+            ]
+        );
+    }
+
+    public static function getMany(array $keys): Collection
+    {
+        return static::query()
+            ->whereIn('key', $keys)
+            ->get()
+            ->keyBy('key');
     }
 }
