@@ -796,7 +796,16 @@
                                 {{ $services->count() }} {{ Str::plural('Item', $services->count()) }}
                             </span>
                         </div>
-
+                        
+                        @php
+                            $defaultServices = [
+                                'Oral Check-Up',
+                                'Dental Cleaning',
+                                'Restoration & Prosthesis',
+                                'Dental Surgery',
+                            ];
+                        @endphp
+                        
                         <div style="overflow-x:auto;">
                             <table class="data-table">
                                 <thead>
@@ -817,18 +826,23 @@
                                                         style="width:26px; height:26px; background:#fef2f2; color:var(--crimson); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px;">
                                                         <i class="fa-solid fa-tooth"></i>
                                                     </div>
-                                                    <span
-                                                        style="font-size:.78rem;font-weight:700;color:#1a202c;">{{ $service->name }}</span>
+                                                    <span style="font-size:.78rem;font-weight:700;color:#1a202c;">{{ $service->name }}</span>
                                                 </div>
                                             </td>
                                             <td style="font-size:.72rem; line-height:1.5;">
                                                 {{ $service->description ?: '—' }}
                                             </td>
                                             <td style="text-align:center;">
-                                                <button type="button" class="btn-delete-sm" title="Delete"
-                                                    onclick="openDeleteModal('{{ route('admin.service-types.destroy', $service->id) }}', '{{ addslashes($service->name) }}')">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
+                                                @if (!in_array($service->name, $defaultServices))
+                                                    <button type="button" class="btn-delete-sm" title="Delete"
+                                                        onclick="openDeleteModal('{{ route('admin.service-types.destroy', $service->id) }}', '{{ addslashes($service->name) }}')">
+                                                        <i class="fa-solid fa-trash-can"></i>
+                                                    </button>
+                                                @else
+                                                    <span class="service-badge" style="background:#ecfdf5;color:#166534;border:1px solid #bbf7d0;">
+                                                        Default
+                                                    </span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
