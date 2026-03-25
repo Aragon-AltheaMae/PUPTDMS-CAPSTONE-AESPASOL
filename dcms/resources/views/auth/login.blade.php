@@ -1,1281 +1,666 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PUPT-DMS | Login</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
-
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #C9A84C 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 16px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* ── STARS ── */
-        #stars {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* ── AMBIENT GLOW ── */
-        .glow-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.18;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .glow-orb-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #C9A84C, transparent 70%);
-            top: -100px;
-            left: -100px;
-            animation: orbFloat1 12s ease-in-out infinite alternate;
-        }
-
-        .glow-orb-2 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, #8B0000, transparent 70%);
-            bottom: -80px;
-            right: -80px;
-            animation: orbFloat2 15s ease-in-out infinite alternate;
-        }
-
-        @keyframes orbFloat1 {
-            from {
-                transform: translate(0, 0);
-            }
-
-            to {
-                transform: translate(60px, 40px);
-            }
-        }
-
-        @keyframes orbFloat2 {
-            from {
-                transform: translate(0, 0);
-            }
-
-            to {
-                transform: translate(-40px, -60px);
-            }
-        }
-
-        /* ── BG GRID LAYER ── */
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .bg-layer::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(201, 168, 76, .06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(201, 168, 76, .06) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        /* ── FLOATING TEETH ── */
-        .tooth-float {
-            position: fixed;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.095;
-        }
-
-        .tooth-1 {
-            top: 8%;
-            left: 5%;
-            animation: floatA 14s ease-in-out infinite alternate;
-        }
-
-        .tooth-2 {
-            top: 60%;
-            right: 4%;
-            animation: floatB 18s ease-in-out infinite alternate;
-        }
-
-        .tooth-3 {
-            bottom: 12%;
-            left: 12%;
-            animation: floatA 20s ease-in-out infinite alternate-reverse;
-        }
-
-        @keyframes floatA {
-            from {
-                transform: translateY(0) rotate(-8deg);
-            }
-
-            to {
-                transform: translateY(20px) rotate(4deg);
-            }
-        }
-
-        @keyframes floatB {
-            from {
-                transform: translateY(0) rotate(6deg);
-            }
-
-            to {
-                transform: translateY(-18px) rotate(-3deg);
-            }
-        }
-
-        /* ── MAIN CENTERING ── */
-        main {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            min-height: calc(100vh - 120px);
-        }
-
-        /* ── CARD ── */
-        .login-card {
-            position: relative;
-            width: min(980px);
-            display: grid;
-            grid-template-columns: 1fr 1.1fr;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow:
-                0 0 0 1px rgba(201, 168, 76, .15),
-                0 24px 80px rgba(0, 0, 0, 0.178),
-                0 8px 24px rgba(0, 0, 0, 0.157);
-            animation: cardUp .9s cubic-bezier(.22, 1, .36, 1) .1s both;
-        }
-
-        @keyframes cardUp {
-            from {
-                opacity: 0;
-                transform: translateY(32px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ── LEFT: PHOTO ── */
-        .photo-side {
-            position: relative;
-            overflow: hidden;
-            min-height: 500px;
-        }
-
-        .photo-side .campus-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            filter: brightness(.35) saturate(.5);
-            transform: scale(1.02);
-            transition: transform 12s ease;
-        }
-
-        .photo-side:hover .campus-bg {
-            transform: scale(1.08);
-        }
-
-        .photo-side::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg,
-                    rgba(61, 0, 0, .8) 0%,
-                    rgba(90, 0, 0, .4) 40%,
-                    rgba(0, 0, 0, .15) 100%);
-        }
-
-        /* Medical cross accents */
-        .medical-cross {
-            position: absolute;
-            z-index: 2;
-            opacity: 0.07;
-        }
-
-        .medical-cross-1 {
-            top: 10%;
-            right: 8%;
-            width: 80px;
-        }
-
-        .medical-cross-2 {
-            bottom: 18%;
-            left: 6%;
-            width: 50px;
-        }
-
-        .photo-content {
-            position: absolute;
-            inset: 0;
-            z-index: 4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 32px 64px;
-            text-align: center;
-        }
-
-        /* Eyebrow label */
-        .panel-eyebrow {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .22em;
-            text-transform: uppercase;
-            color: rgba(201, 168, 76, .75);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        /* Shine text */
-        .shine-text {
-            background: linear-gradient(90deg,
-                    #6B0000 0%,
-                    #FFD700 35%,
-                    #fff 50%,
-                    #FFD700 65%,
-                    #6B0000 100%);
-            background-size: 250% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shine 16s linear infinite;
-            display: block;
-        }
-
-        @keyframes shine {
-            from {
-                background-position: 250% center;
-            }
-
-            to {
-                background-position: -250% center;
-            }
-        }
-
-        .photo-title-main {
-            font-size: clamp(24px, 3.2vw, 38px);
-            font-weight: 900;
-            letter-spacing: .05em;
-            line-height: 1;
-        }
-
-        .photo-title-sub {
-            font-size: clamp(9px, 1.1vw, 13px);
-            font-weight: 700;
-            letter-spacing: .16em;
-            margin-top: 6px;
-        }
-
-        /* Divider */
-        .photo-divider {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 18px 0;
-        }
-
-        .photo-divider-line {
-            width: 40px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .45));
-        }
-
-        .photo-divider-line.r {
-            background: linear-gradient(90deg, rgba(201, 168, 76, .45), transparent);
-        }
-
-        .photo-divider-cross {
-            color: rgba(201, 168, 76, .55);
-            font-size: 10px;
-        }
-
-        /* Logos */
-        .logo-row {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .logo-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, .08);
-            border: 1.5px solid rgba(201, 168, 76, .25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            transition: border-color .3s;
-        }
-
-        .logo-circle:hover {
-            border-color: rgba(201, 168, 76, .55);
-        }
-
-        .logo-circle img {
-            width: 42px;
-            height: 42px;
-            object-fit: contain;
-            filter: none;
-            transform: none;
-        }
-
-        .logo-v-divider {
-            width: 1px;
-            height: 32px;
-            background: linear-gradient(to bottom, transparent, rgba(201, 168, 76, .4), transparent);
-        }
-
-        /* Feature pills */
-        .feature-pills {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-            max-width: 260px;
-        }
-
-        .feature-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, .05);
-            border: 1px solid rgba(201, 168, 76, .15);
-            border-radius: 10px;
-            padding: 9px 14px;
-            backdrop-filter: blur(4px);
-            text-align: left;
-            transition: background .2s, border-color .2s;
-        }
-
-        .feature-pill:hover {
-            background: rgba(255, 255, 255, .09);
-            border-color: rgba(201, 168, 76, .3);
-        }
-
-        .feature-pill-icon {
-            width: 26px;
-            height: 26px;
-            background: rgba(201, 168, 76, .12);
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .feature-pill-icon i {
-            font-size: 11px;
-            color: #C9A84C;
-        }
-
-        .feature-pill-text {
-            font-size: 11px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, .65);
-            line-height: 1.3;
-        }
-
-        .photo-badge {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(201, 168, 76, .1);
-            border: 1px solid rgba(201, 168, 76, .25);
-            border-radius: 20px;
-            padding: 5px 14px;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: .16em;
-            text-transform: uppercase;
-            color: rgba(255, 215, 0, .65);
-            white-space: nowrap;
-        }
-
-        /* ── RIGHT: FORM ── */
-        .form-side {
-            background: #F4F4F4;
-            padding: 52px 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-        }
-
-        .form-side::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle at top right, rgba(201, 168, 76, .08), transparent 70%);
-            pointer-events: none;
-        }
-
-        .form-heading {
-            font-size: 30px;
-            font-weight: 800;
-            color: #333;
-            line-height: 1.15;
-            margin-bottom: 4px;
-        }
-
-        .form-heading span {
-            color: #8B0000;
-        }
-
-        .form-sub {
-            font-size: 13px;
-            color: #757575;
-            margin-bottom: 28px;
-            line-height: 1.5;
-        }
-
-        .field {
-            margin-bottom: 18px;
-        }
-
-        .field-label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #6B5B5B;
-            margin-bottom: 7px;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-        }
-
-        .field-label i {
-            font-size: 10px;
-            color: #8B0000;
-            opacity: .7;
-        }
-
-        .field-input {
-            width: 100%;
-            padding: 13px 16px;
-            background: #fff;
-            border: 1.5px solid #E8E0D8;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            color: #1A0A0A;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-        }
-
-        .field-input::placeholder {
-            color: #CEC6BE;
-            font-size: 13px;
-        }
-
-        .field-input:focus {
-            border-color: #8B0000;
-            box-shadow: 0 0 0 4px rgba(139, 0, 0, .07);
-            background: #FFFDF9;
-        }
-
-        .pw-wrap {
-            position: relative;
-        }
-
-        .pw-toggle {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #CEC6BE;
-            transition: color .2s;
-            display: flex;
-            align-items: center;
-            padding: 4px;
-        }
-
-        .pw-toggle:hover {
-            color: #8B0000;
-        }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 40px #fff inset !important;
-            -webkit-text-fill-color: #1A0A0A !important;
-        }
-
-        .btn-submit {
-            width: 100%;
-            margin-top: 8px;
-            padding: 14px;
-            background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: .04em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            transition: transform .18s, box-shadow .18s;
-            box-shadow: 0 6px 20px rgba(139, 0, 0, .35);
-        }
-
-        .btn-submit::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, .12) 0%, transparent 60%);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(139, 0, 0, .45);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit .btn-arrow {
-            width: 28px;
-            height: 28px;
-            background: rgba(255, 255, 255, .15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform .2s, background .2s;
-        }
-
-        .btn-submit:hover .btn-arrow {
-            transform: translateX(3px);
-            background: rgba(255, 255, 255, .25);
-        }
-
-        .register-row {
-            text-align: center;
-            margin-top: 22px;
-            padding-top: 18px;
-            border-top: 1px solid #F0EAE2;
-            font-size: 13px;
-            color: #757575;
-        }
-
-        .register-row a {
-            color: #8B0000;
-            font-weight: 700;
-            text-decoration: none;
-            transition: opacity .2s;
-        }
-
-        .register-row a:hover {
-            opacity: .75;
-            text-decoration: underline;
-        }
-
-        /* ── TOAST ── */
-        #toastContainer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            min-width: 300px;
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, .18);
-            padding: 14px 18px 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0;
-            transform: translateX(340px);
-            transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
-            position: relative;
-            overflow: hidden;
-            pointer-events: all;
-        }
-
-        .toast::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-        }
-
-        .toast.error::before {
-            background: #8B0000;
-        }
-
-        .toast.success::before {
-            background: #15803d;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .toast.hide {
-            opacity: 0;
-            transform: translateX(340px);
-        }
-
-        .toast-icon-wrap {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .toast.error .toast-icon-wrap {
-            background: rgba(139, 0, 0, .08);
-        }
-
-        .toast.success .toast-icon-wrap {
-            background: rgba(21, 128, 61, .08);
-        }
-
-        .toast-icon {
-            font-size: 17px;
-        }
-
-        .toast.error .toast-icon {
-            color: #8B0000;
-        }
-
-        .toast.success .toast-icon {
-            color: #15803d;
-        }
-
-        .toast-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .toast-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1A0A0A;
-        }
-
-        .toast-msg {
-            font-size: 12px;
-            color: #888;
-            margin-top: 2px;
-            line-height: 1.4;
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #CCC;
-            font-size: 13px;
-            flex-shrink: 0;
-            padding: 2px 4px;
-            transition: color .2s;
-        }
-
-        .toast-close:hover {
-            color: #888;
-        }
-
-        /* ════════════════════════════
-           LOGIN FOOTER
-        ════════════════════════════ */
-        .login-footer {
-            width: 100%;
-            margin-top: 30px;
-            padding: 18px 16px 24px;
-            display: flex;
-            justify-content: center;
-            z-index: 5;
-        }
-
-        .login-footer-inner {
-            text-align: center;
-            color: rgba(255, 255, 255, .75);
-            font-size: 12px;
-            letter-spacing: .04em;
-        }
-
-        .footer-divider {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .footer-divider span {
-            width: 40px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .6), transparent);
-        }
-
-        .footer-divider i {
-            font-size: 11px;
-            color: rgba(255, 215, 0, .65);
-        }
-
-        .footer-text {
-            font-weight: 500;
-        }
-
-        .footer-year {
-            color: rgba(255, 255, 255, .45);
-        }
-
-        .footer-links {
-            margin-top: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
-        }
-
-        .footer-links a {
-            color: rgba(255, 215, 0, .75);
-            text-decoration: none;
-            transition: opacity .2s;
-        }
-
-        .footer-links a:hover {
-            opacity: .7;
-        }
-
-        .footer-links .dot {
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 215, 0, .45);
-            border-radius: 50%;
-        }
-
-        @media (max-width: 640px) {
-            #toastContainer {
-                left: 12px;
-                right: 12px;
-                top: 12px;
-            }
-
-            .toast {
-                min-width: unset;
-                transform: translateY(-80px);
-            }
-
-            .toast.show {
-                transform: translateY(0);
-            }
-
-            .toast.hide {
-                transform: translateY(-80px);
-            }
-        }
-
-        /* ════════════════════════════
-           MOBILE RESPONSIVE
-        ════════════════════════════ */
-        @media (max-width: 767px) {
-            body {
-                padding: 16px;
-                justify-content: flex-start;
-                padding-top: 32px;
-            }
-
-            main {
-                min-height: unset;
-            }
-
-            .login-card {
-                grid-template-columns: 1fr;
-                width: 100%;
-                max-width: 440px;
-                border-radius: 20px;
-                margin: 0 auto;
-            }
-
-            .photo-side {
-                min-height: unset;
-                height: auto;
-            }
-
-            .photo-side .campus-bg {
-                display: none;
-            }
-
-            .photo-side::after {
-                display: none;
-            }
-
-            .medical-cross {
-                display: none;
-            }
-
-            .photo-content {
-                position: relative;
-                padding: 28px 24px 24px;
-                background: linear-gradient(135deg,
-                        rgba(61, 0, 0, .92) 0%,
-                        rgba(90, 0, 0, .85) 50%,
-                        rgba(30, 0, 0, .9) 100%);
-            }
-
-            .photo-title-main {
-                font-size: 28px;
-            }
-
-            .photo-title-sub {
-                font-size: 10px;
-                letter-spacing: .14em;
-            }
-
-            .logo-circle {
-                width: 52px;
-                height: 52px;
-            }
-
-            .logo-circle img {
-                width: 36px;
-                height: 36px;
-            }
-
-            .feature-pills {
-                display: none;
-            }
-
-            .photo-badge {
-                position: relative;
-                bottom: unset;
-                left: unset;
-                transform: none;
-                margin: 12px auto 0;
-                display: inline-flex;
-            }
-
-            .form-side {
-                padding: 28px 24px 36px;
-            }
-
-            .form-heading {
-                font-size: 24px;
-            }
-
-            .form-sub {
-                margin-bottom: 22px;
-                font-size: 12.5px;
-            }
-
-            .field {
-                margin-bottom: 16px;
-            }
-
-            .field-input {
-                padding: 12px 14px;
-                font-size: 15px;
-            }
-
-            .btn-submit {
-                padding: 13px;
-                font-size: 14px;
-            }
-
-            .register-row {
-                font-size: 12.5px;
-            }
-        }
-
-        @media (max-width: 380px) {
-            body {
-                padding: 12px;
-                padding-top: 20px;
-            }
-
-            .form-side {
-                padding: 24px 18px 28px;
-            }
-
-            .photo-content {
-                padding: 22px 20px 20px;
-            }
-
-            .photo-title-main {
-                font-size: 24px;
-            }
-
-            .logo-circle {
-                width: 46px;
-                height: 46px;
-            }
-
-            .logo-circle img {
-                width: 32px;
-                height: 32px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUP Taguig — Dental Clinic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red-deep:   #8B0000;
+      --red-mid:    #B01020;
+      --red-bright: #CC1A2A;
+      --gold:       #D4A017;
+      --gold-light: #F0C040;
+      --white:      #FFFFFF;
+      --off-white:  #F5F0E8;
+      --dark:       #1A0505;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED BACKGROUND ── */
+    .bg-wrap {
+      position: fixed; inset: 0;
+      z-index: 0;
+      background: radial-gradient(ellipse 80% 70% at 70% 50%, #7a1a00 0%, #3d0000 40%, #1A0505 100%);
+    }
+
+    /* Grid lines like the reference */
+    .bg-wrap::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(212,160,23,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,160,23,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Animated floating particles */
+    .particles { position: absolute; inset: 0; overflow: hidden; }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(212,160,23,0.5);
+      animation: drift linear infinite;
+    }
+
+    /* Decorative tooth shapes in BG (like reference) */
+    .bg-tooth {
+      position: absolute;
+      opacity: 0.06;
+      fill: var(--gold);
+    }
+    .bg-tooth-1 { top: 8%; left: 5%; width: 90px; animation: floatY 7s ease-in-out infinite; }
+    .bg-tooth-2 { bottom: 10%; left: 3%; width: 120px; animation: floatY 9s ease-in-out 2s infinite; }
+    .bg-tooth-3 { bottom: 20%; right: 4%; width: 80px; animation: floatY 6s ease-in-out 1s infinite; }
+
+    @keyframes drift {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-18px) rotate(5deg); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5rem;
+      background: rgba(26, 5, 5, 0.7);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(212,160,23,0.2);
+      z-index: 100;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .nav-brand-text {
+      display: flex; flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .nav-brand-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .nav-brand-sub {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.85);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex; gap: 2.5rem; list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--gold-light); }
+
+    .nav-cta {
+      background: var(--gold);
+      color: var(--dark) !important;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 700 !important;
+      transition: background 0.3s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--gold-light) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 5rem 5rem;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    /* LEFT */
+    .hero-left { animation: fadeUp 1s ease 0.2s both; }
+
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(212,160,23,0.15);
+      border: 1px solid rgba(212,160,23,0.35);
+      border-radius: 40px;
+      padding: 0.4rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 1.8rem;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(2.6rem, 4.5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.08;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .line-gold {
+      background: linear-gradient(90deg,
+        #6B0000 0%,
+        #FFD700 35%,
+        #fff 50%,
+        #FFD700 65%,
+        #6B0000 100%);
+      background-size: 250% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shine 16s linear infinite;
+      display: block;
+    }
+
+    h1 .line-white {
+      display: block;
+      color: var(--white);
+    }
+
+    @keyframes shine {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    .subtitle-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .subtitle-line { flex: 1; height: 1px; background: rgba(212,160,23,0.3); }
+
+    .subtitle-text {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+    }
+
+    .hero-desc {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.9);
+      font-weight: 400;
+      margin-bottom: 2.5rem;
+      max-width: 440px;
+    }
+
+    /* Feature list */
+    .features {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .features li {
+      display: flex; align-items: center; gap: 0.8rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.95);
+      font-weight: 500;
+    }
+
+    .feat-icon {
+      width: 30px; height: 30px;
+      background: rgba(212,160,23,0.15);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    /* CTA */
+    .cta-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      background: linear-gradient(135deg, var(--red-bright), var(--red-deep));
+      color: var(--white);
+      border: none;
+      padding: 1rem 2rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 30px rgba(176, 16, 32, 0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--gold), var(--red-bright));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(176,16,32,0.6); }
+    .btn-primary:hover::before { opacity: 1; }
+
+    .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
+
+    .btn-arrow {
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s;
+    }
+
+    .btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+    .btn-secondary {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      display: flex; align-items: center; gap: 0.4rem;
+      transition: color 0.3s;
+    }
+
+    .btn-secondary:hover { color: var(--gold-light); }
+
+    /* RIGHT */
+    .hero-right {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeUp 1s ease 0.45s both;
+    }
+
+    /* Glow circle */
+    .glow-ring {
+      position: absolute;
+      width: 380px; height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(176,16,32,0.4) 0%, transparent 70%);
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50%       { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Center card */
+    .clinic-card {
+      position: relative; z-index: 2;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 2rem;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 360px;
+      backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .card-logos {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-circle {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .logo-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.12), rgba(0,0,0,0.2));
+    }
+
+    .logo-sep { color: rgba(212,160,23,0.4); font-size: 1.2rem; }
+
+    .card-title {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.05em;
+      padding-bottom: 1.2rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .card-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+      padding: 1.2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-top: 0.2rem;
+    }
+
+    .card-motto {
+      margin-top: 1.2rem;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: 0.03em;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 1rem;
+    }
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.6;
+    }
+
+    /* Floating small badges */
+    .float-badge {
+      position: absolute;
+      background: rgba(26,5,5,0.85);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 12px;
+      padding: 0.6rem 0.9rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      backdrop-filter: blur(10px);
+      z-index: 3;
+      animation: floatY 5s ease-in-out infinite;
+    }
+
+    .float-badge-icon { font-size: 1rem; }
+    .float-badge-text { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,1); white-space: nowrap; }
+
+    .fb1 { top: -5%; right: -10%; animation-delay: 0s; }
+    .fb2 { bottom: 5%; left: -12%; animation-delay: 2s; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(212,160,23,0.1);
+    }
+
+    .footer-inner {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-sep { color: rgba(212,160,23,0.4); }
+
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; }
+    .footer-links a {
+      font-size: 0.68rem;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    .footer-links a:hover { opacity: 1; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 880px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+
+      .hero { padding: 7rem 1.5rem 4rem; }
+      .hero-inner { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
+      .hero-desc { margin: 0 auto 2.5rem; }
+      .features li { justify-content: center; }
+      .cta-row { justify-content: center; }
+      .hero-right { display: none; }
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- Grid background -->
-    <div class="bg-layer"></div>
+  <!-- BG -->
+  <div class="bg-wrap">
+    <div class="particles" id="particles"></div>
 
-    <!-- Floating teeth -->
-    <div class="tooth-float tooth-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="140" viewBox="0 0 100 110">
-            <path
-                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
-                fill="#C9A84C" />
-        </svg>
-    </div>
-    <div class="tooth-float tooth-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="190" viewBox="0 0 100 110">
-            <path
-                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
-                fill="#8B0000" />
-        </svg>
-    </div>
-    <div class="tooth-float tooth-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="90" height="110" viewBox="0 0 100 110">
-            <path
-                d="M50 4 C34 4 18 15 16 32 C14 46 19 57 21 68 C23 79 25 96 32 98 C39 100 41 84 45 75 C47 69 49 66 50 66 C51 66 53 69 55 75 C59 84 61 100 68 98 C75 96 77 79 79 68 C81 57 86 46 84 32 C82 15 66 4 50 4Z"
-                fill="#C9A84C" />
-        </svg>
+    <!-- Tooth decorations -->
+    <svg class="bg-tooth bg-tooth-1" viewBox="0 0 100 120">
+      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
+    </svg>
+    <svg class="bg-tooth bg-tooth-2" viewBox="0 0 100 120">
+      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
+    </svg>
+    <svg class="bg-tooth bg-tooth-3" viewBox="0 0 100 120">
+      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
+    </svg>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand">
+      <span class="nav-brand-title">PUP Taguig Dental Clinic</span>
     </div>
 
-    <canvas id="stars"></canvas>
-    <div class="glow-orb glow-orb-1"></div>
-    <div class="glow-orb glow-orb-2"></div>
-    <div id="toastContainer"></div>
+  </nav>
 
-    <main>
-        <div class="login-card">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
 
-            <!-- LEFT / TOP: Photo Panel -->
-            <div class="photo-side">
-                <img src="{{ asset('images/PUP TAGUIG CAMPUS.jpg') }}" alt="PUP Taguig Campus" class="campus-bg">
+      <!-- LEFT -->
+      <div class="hero-left">
+        <h1>
+          <span class="line-gold">PUP Taguig</span>
+          <span class="line-white">Dental Clinic</span>
+        </h1>
 
-                <!-- Medical cross accents -->
-                <svg class="medical-cross medical-cross-1" viewBox="0 0 60 60" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
-                    <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
-                </svg>
-                <svg class="medical-cross medical-cross-2" viewBox="0 0 60 60" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <rect x="22" y="0" width="16" height="60" rx="4" fill="white" />
-                    <rect x="0" y="22" width="60" height="16" rx="4" fill="white" />
-                </svg>
 
-                <div class="photo-content">
-                    <h2>
-                        <span class="shine-text photo-title-main">PUP TAGUIG</span>
-                        <span class="shine-text photo-title-sub">DENTAL CLINIC</span>
-                    </h2>
+        <p class="hero-desc">
+          Quality dental care for PUP Taguig students, faculty, and staff. Book appointments online, access your records, and take charge of your oral health — anytime, anywhere.
+        </p>
 
-                    <!-- Divider -->
-                    <div class="photo-divider">
-                        <div class="photo-divider-line"></div>
-                        <i class="fa-solid fa-plus photo-divider-cross"></i>
-                        <div class="photo-divider-line r"></div>
-                    </div>
+        <ul class="features">
+          <li>
+            <span class="feat-icon">🗓</span>
+            Book appointments online, anytime
+          </li>
+          <li>
+            <span class="feat-icon">📋</span>
+            View your dental records &amp; history
+          </li>
+          <li>
+            <span class="feat-icon">🔒</span>
+            Secure &amp; private patient portal
+          </li>
+        </ul>
 
-                    <!-- Logos -->
-                    <div class="logo-row">
-                        <div class="logo-circle">
-                            <img src="{{ asset('images/PUP.png') }}" alt="PUP">
-                        </div>
-                        <div class="logo-v-divider"></div>
-                        <div class="logo-circle">
-                            <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="DMS">
-                        </div>
-                    </div>
-
-                    <!-- Feature pills -->
-                    <div class="feature-pills">
-                        <div class="feature-pill">
-                            <div class="feature-pill-icon">
-                                <i class="fa-solid fa-calendar-check"></i>
-                            </div>
-                            <span class="feature-pill-text">Book appointments online, anytime</span>
-                        </div>
-                        <div class="feature-pill">
-                            <div class="feature-pill-icon">
-                                <i class="fa-solid fa-file-medical"></i>
-                            </div>
-                            <span class="feature-pill-text">View your dental records & history</span>
-                        </div>
-                        <div class="feature-pill">
-                            <div class="feature-pill-icon">
-                                <i class="fa-solid fa-shield-heart"></i>
-                            </div>
-                            <span class="feature-pill-text">Secure & private patient portal</span>
-                        </div>
-                    </div>
-
-                    <div class="photo-badge">
-                        <i class="fa-solid fa-tooth" style="font-size:12px;"></i>
-                        Patient Portal
-                    </div>
-                </div>
-            </div>
-
-            <!-- RIGHT / BOTTOM: Form -->
-            <div class="form-side">
-
-                <h1 class="form-heading">Welcome!</h1>
-                <p class="form-sub">Sign in to access your dental appointments and records.</p>
-
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
-                    <div class="field">
-                        <label class="field-label">
-                            <i class="fa-solid fa-user"></i> Email or Username
-                        </label>
-                        <input type="text" name="email" required placeholder="Enter your email or username"
-                            class="field-input" autocomplete="username">
-                    </div>
-
-                    <div class="field">
-                        <label class="field-label">
-                            <i class="fa-solid fa-lock"></i> Password
-                        </label>
-                        <div class="pw-wrap">
-                            <input type="password" id="loginPw" name="password" required placeholder="••••••••"
-                                class="field-input" style="padding-right:46px;" autocomplete="current-password">
-                            <button type="button" class="pw-toggle" onclick="togglePw()">
-                                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-submit">
-                        Sign In
-                        <div class="btn-arrow">
-                            <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
-                        </div>
-                    </button>
-                </form>
-
-                <div class="register-row">
-                    New patient? <a href="/register">Create an account</a>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <!-- ══════ LOGIN FOOTER ══════ -->
-    <footer class="login-footer">
-        <div class="login-footer-inner">
-
-            <div class="footer-divider">
-                <span></span>
-                <i class="fa-solid fa-shield-halved"></i>
-                <span></span>
-            </div>
-
-            <p class="footer-text">
-                <span class="footer-year">© 1998–2026</span>
-                <strong>Polytechnic University of the Philippines</strong>
-            </p>
-
-            <div class="footer-links">
-                <a href="https://www.pup.edu.ph/terms/" target="_blank">Terms of Use</a>
-                <span class="dot"></span>
-                <a href="https://www.pup.edu.ph/privacy/" target="_blank">Privacy Statement</a>
-            </div>
+        <div class="cta-row">
+          <a href="/auth/oidc/redirect" class="btn-primary">
+    <span>Login with SSO</span>
+    <span class="btn-arrow">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+</a>
 
         </div>
-    </footer>
+      </div>
 
-    <script>
-        /* STARS */
-        (function () {
-            const canvas = document.getElementById('stars');
-            const ctx = canvas.getContext('2d');
-            let w, h, stars = [];
+      <!-- RIGHT -->
+      <div class="hero-right">
+        <div class="glow-ring"></div>
 
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-                stars = Array.from({ length: 200 }, () => ({
-                    x: Math.random() * w,
-                    y: Math.random() * h,
-                    r: Math.random() * 1.6 + 0.3,
-                    v: Math.random() * 0.25 + 0.06,
-                    a: Math.random() * 0.7 + 0.3,
-                }));
-            }
+<div class="clinic-card">
+          <div class="card-logos">
+            <div class="logo-circle">
+              <div class="logo-img-placeholder">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  <path d="M16 8l1.5 4.5H22l-3.7 2.7 1.4 4.4L16 17l-3.7 2.6 1.4-4.4L10 12.5h4.5z" fill="rgba(255,255,255,0.25)"/>
+                  <text x="16" y="28" text-anchor="middle" font-size="6" fill="rgba(255,255,255,0.4)" font-family="Montserrat,sans-serif" font-weight="600">PUP LOGO</text>
+                </svg>
+              </div>
+            </div>
+            <span class="logo-sep">+</span>
+            <div class="logo-circle">
+              <div class="logo-img-placeholder">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  <path d="M16 7c-3 0-6 2-6.4 5.4-.3 2.6.8 4.8 1.2 7 .4 2.4-.1 6 2 6.8 1.6.6 2-1.6 2.8-3.4.3-.8.4-1.4.4-1.4s.1.6.4 1.4c.8 1.8 1.2 4 2.8 3.4 2.1-.8 1.6-4.4 2-6.8.4-2.2 1.5-4.4 1.2-7C22 9 19 7 16 7z" fill="rgba(255,255,255,0.25)"/>
+                  <text x="16" y="29" text-anchor="middle" font-size="5.5" fill="rgba(255,255,255,0.4)" font-family="Montserrat,sans-serif" font-weight="600">CLINIC</text>
+                </svg>
+              </div>
+            </div>
+          </div>
 
-            function draw() {
-                ctx.clearRect(0, 0, w, h);
-                for (const s of stars) {
-                    ctx.globalAlpha = s.a * 0.75;
-                    ctx.fillStyle = '#FFF8DC';
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    s.y -= s.v;
-                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
-                }
-                ctx.globalAlpha = 1;
-                requestAnimationFrame(draw);
-            }
+          <div class="card-title">Serving the PUP Community</div>
 
-            window.addEventListener('resize', resize);
-            resize();
-            draw();
-        })();
+          <p class="card-tagline">
+            Your smile is our priority.<br>
+            Accessible, compassionate dental care<br>right on campus.
+          </p>
+          <div class="card-motto">"Mula Sayo, Para Sa Bayan."</div>
+        </div>
+      </div>
 
-        /* PASSWORD TOGGLE */
-        function togglePw() {
-            const inp = document.getElementById('loginPw');
-            const icon = document.getElementById('eyeIcon');
-            const isText = inp.type === 'text';
-            inp.type = isText ? 'password' : 'text';
-            icon.innerHTML = isText ?
-                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>` :
-                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.042-3.368M6.223 6.223A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.132 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/>`;
-        }
+    </div>
+  </section>
 
-        /* TOAST */
-        function showToast(title, message, type = 'error') {
-            const container = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = `toast ${type}`;
-            const icon = type === 'error' ?
-                '<i class="fa-solid fa-circle-exclamation toast-icon"></i>' :
-                '<i class="fa-solid fa-circle-check toast-icon"></i>';
-            t.innerHTML = `
-                <div class="toast-icon-wrap">${icon}</div>
-                <div class="toast-body">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-msg">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.closest('.toast').classList.add('hide')">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>`;
-            container.appendChild(t);
-            requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
-            setTimeout(() => {
-                t.classList.remove('show');
-                t.classList.add('hide');
-                setTimeout(() => t.remove(), 400);
-            }, 4500);
-        }
-    </script>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span>© 1998–2026</span>
+      <span class="footer-sep">•</span>
+      <strong style="color:rgba(255,255,255,0.55)">Polytechnic University of the Philippines</strong>
+      <span class="footer-sep">🦷</span>
+      <span>Taguig Campus</span>
+    </div>
+    <div class="footer-links">
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy Statement</a>
+    </div>
+  </footer>
 
-    {{-- ERROR from server --}}
-    @if (session('error'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () =>
-            showToast('Login Failed', "{{ session('error') }}", 'error')
-        );
-    </script>
-    @endif
-
-    {{-- SUCCESS login toast --}}
-    @if (session('success'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () =>
-            showToast('Logged in successfully', "{{ session('success') }}", 'success')
-        );
-    </script>
-    @endif
-
-    {{-- Login success with role name --}}
-    @if (session('login_as'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () =>
-            showToast(
-                'Login Successful',
-                'Logged in successfully as <strong>{{ session('login_as') }}</strong>',
-                'success'
-            )
-        );
-    </script>
-    @endif
-
+  <script>
+    // Generate floating particles
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${Math.random()*100}%;
+        animation-duration:${8 + Math.random()*12}s;
+        animation-delay:${Math.random()*10}s;
+      `;
+      container.appendChild(p);
+    }
+  </script>
 </body>
-
 </html>
