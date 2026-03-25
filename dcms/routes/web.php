@@ -263,6 +263,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin/system-logs/check', [SystemLogController::class, 'checkLatest'])
         ->name('admin.system_logs.check');
 
+    Route::get('/admin/system-logs/export', [SystemLogController::class, 'export'])
+        ->name('admin.system_logs.export');
+
     // PATIENT DIRECTORY
     Route::get('/patient-directory', [AdminPatientController::class, 'index'])
         ->name('admin.patient_directory');
