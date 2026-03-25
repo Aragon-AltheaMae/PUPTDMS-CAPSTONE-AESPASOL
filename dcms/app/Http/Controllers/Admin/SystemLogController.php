@@ -20,12 +20,27 @@ class SystemLogController extends Controller
         $role    = $request->input('role', 'all');
         $search  = $request->input('search');
 
-        // Only log view on normal page loads, not every AJAX poll
-        if (!$request->ajax()) {
+        $sort       = $request->input('sort', 'desc');
+        $dateFrom   = $request->input('date_from');
+        $dateTo     = $request->input('date_to');
+        $actionType = $request->input('action_type');
+        $module     = $request->input('module');
+
+        $hasLogFilters = $request->filled('search')
+            || $request->filled('role')
+            || $request->filled('sort')
+            || $request->filled('date_from')
+            || $request->filled('date_to')
+            || $request->filled('action_type')
+            || $request->filled('module')
+            || $request->filled('page')
+            || $request->filled('per_page');
+
+        if (!$request->ajax() && !$hasLogFilters) {
             AuditLogger::log('view', 'system_logs', 'Admin viewed system logs');
         }
 
-        $query = AuditLog::latest();
+        $query = AuditLog::query();
 
         if ($role === 'login') {
             $query->where('action', 'like', '%login%');
@@ -36,12 +51,30 @@ class SystemLogController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('actor_identifier', 'like', "%{$search}%")
-                    ->orWhere('action',          'like', "%{$search}%")
-                    ->orWhere('module',           'like', "%{$search}%")
-                    ->orWhere('description',      'like', "%{$search}%")
-                    ->orWhere('actor_role',       'like', "%{$search}%");
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('module', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('actor_role', 'like', "%{$search}%");
             });
         }
+
+        if ($actionType) {
+            $query->where('action', 'like', "%{$actionType}%");
+        }
+
+        if ($module) {
+            $query->where('module', 'like', "%{$module}%");
+        }
+
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $query->orderBy('created_at', $sort === 'asc' ? 'asc' : 'desc');
 
         $logs = $query->paginate($perPage)->withQueryString();
 
@@ -81,6 +114,15 @@ class SystemLogController extends Controller
                     'patient' => $patientCount,
                     'login'   => $loginCount,
                 ],
+                'filters' => [
+                    'role'        => $role,
+                    'search'      => $search,
+                    'sort'        => $sort,
+                    'date_from'   => $dateFrom,
+                    'date_to'     => $dateTo,
+                    'action_type' => $actionType,
+                    'module'      => $module,
+                ],
             ]);
         }
 
@@ -89,6 +131,11 @@ class SystemLogController extends Controller
             'perPage',
             'role',
             'search',
+            'sort',
+            'dateFrom',
+            'dateTo',
+            'actionType',
+            'module',
             'totalCount',
             'adminCount',
             'dentistCount',
