@@ -1,4 +1,4 @@
-<aside id="sidebar" class="hidden md:flex">
+<aside id="sidebar" class="hidden md:flex flex-col">
     <div class="sidebar-inner">
         <div class="nav-section-label mt-2">Navigation</div>
 
