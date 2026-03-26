@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequest
 use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DataBackupController;
+use App\Http\Controllers\Admin\AdminAppointmentController;
 
 
 // routes/web.php
@@ -204,9 +205,9 @@ Route::post('/login', function (Request $request) {
         'session' => session()->all(),
         'redirecting_to' => route('patient.dashboard'),
     ]);
-   return redirect()->route('patient.dashboard')
-    ->with('login_as', $patient->name)
-    ->with('show_terms_modal', true);
+    return redirect()->route('patient.dashboard')
+        ->with('login_as', $patient->name)
+        ->with('show_terms_modal', true);
 });
 
 // Dentist Login POST (hard-coded for now)
@@ -284,6 +285,28 @@ Route::prefix('admin')->group(function () {
     // PATIENT DIRECTORY
     Route::get('/patient-directory', [AdminPatientController::class, 'index'])
         ->name('admin.patient_directory');
+
+    Route::get('/patients', [AdminPatientController::class, 'index'])
+        ->name('admin.admin.patients');
+
+    Route::get('/patient/{patient}', [AdminPatientController::class, 'show'])
+        ->name('admin.admin.patient.profile');
+
+    // APPOINTMENTS
+    Route::get('/appointments', [AdminAppointmentController::class, 'index'])
+        ->name('admin.admin.appointments');
+
+    Route::get('/appointments/{id}', [AdminAppointmentController::class, 'show'])
+        ->name('admin.admin.appointments.show');
+
+    Route::get('/appointments/{id}/reschedule', [AdminAppointmentController::class, 'reschedule'])
+        ->name('admin.admin.appointments.reschedule');
+
+    Route::get('/appointments/{id}/start', [AdminAppointmentController::class, 'start'])
+        ->name('admin.admin.appointments.start');
+
+    Route::post('/appointments/{id}/cancel', [AdminAppointmentController::class, 'cancel'])
+        ->name('admin.admin.appointments.cancel');
 
     // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
     Route::get('/patients/list', function () {

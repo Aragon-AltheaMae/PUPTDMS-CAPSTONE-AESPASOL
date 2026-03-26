@@ -15,11 +15,14 @@
                 <a href="{{ route('admin.admin.dashboard') }}"
                     class="nav-link {{ request()->routeIs('admin.admin.dashboard') ? 'active' : '' }}"><i
                         class="fa-solid fa-chart-line"></i> Dashboard</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-users"></i>
-                    Patients</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                        class="fa-solid fa-calendar-check"></i>
-                    Appointments</a>
+                <a href="{{ route('admin.patient_directory') }}"
+                    class="nav-link {{ request()->routeIs('admin.patient_directory') ? 'active' : '' }}">
+                    <i class="fa-solid fa-users"></i> Patients
+                </a>
+                <a href="{{ route('admin.admin.appointments') }}"
+                    class="nav-link {{ request()->routeIs('admin.admin.appointments') ? 'active' : '' }}">
+                    <i class="fa-solid fa-calendar-check"></i> Appointments
+                </a>
                 <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-tooth"></i> Dental
                     Records</a>
                 <a href="{{ route('admin.document-requests.index') }}"
