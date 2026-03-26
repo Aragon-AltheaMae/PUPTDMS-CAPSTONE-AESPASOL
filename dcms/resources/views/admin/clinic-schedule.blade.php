@@ -762,7 +762,7 @@
             background: #fff;
             border: 1px solid #f1e7e4;
             border-radius: 18px;
-            padding: 1rem;
+            padding: .8rem;
             box-shadow: 0 4px 14px rgba(0, 0, 0, .03);
         }
 
@@ -1061,8 +1061,7 @@
             max-height: calc(100dvh - 2rem);
             border-radius: 24px;
             border: none;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             padding: 0 !important;
             background: #fff;
         }
@@ -1075,7 +1074,7 @@
             background:
                 radial-gradient(circle at top right, rgba(255, 255, 255, .16), transparent 32%),
                 linear-gradient(135deg, #6b0000, #8B0000 65%, #b91c1c);
-            padding: 1.35rem 1.5rem 1.15rem;
+            padding: 1.1rem 1.35rem .95rem;
             border-radius: 24px 24px 0 0;
             margin: 0;
         }
@@ -1083,6 +1082,9 @@
         .modal-body.modal-form-body {
             padding: 1.15rem;
             background: linear-gradient(to bottom, #fff, #fffdfc);
+            max-height: calc(100dvh - 170px);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         @media (max-width: 767px) {
@@ -1309,14 +1311,6 @@
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div class="max-w-[1280px] mx-auto">
 
-            @if (session('success'))
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showToast('Success', @json(session('success')), 'success');
-                    });
-                </script>
-            @endif
-
             @if ($errors->any())
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -1373,11 +1367,7 @@
             @endif
 
             {{-- ── Title row ── --}}
-            <div class="mb-6">
-                <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <i class="fa-solid fa-sun text-yellow-400 text-xs"></i>
-                    <p id="currentDate"></p>
-                </div>
+            <div class="mb-6 mt-3">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">Clinic Schedule</h1>
