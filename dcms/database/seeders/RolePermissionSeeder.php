@@ -10,11 +10,11 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $superAdmin = Role::where('slug', 'super_admin')->firstOrFail();
+        $superAdmin = Role::where('slug', 'admin')->firstOrFail();
         $dentist = Role::where('slug', 'dentist')->firstOrFail();
         $patient = Role::where('slug', 'patient')->firstOrFail();
 
-        $superAdminPermissions = [
+        $adminPermissions = [
             'access_super_admin_dashboard',
             'access_dentist_dashboard',
             'receive_notifications',
@@ -58,8 +58,8 @@ class RolePermissionSeeder extends Seeder
             'request_documents',
         ];
 
-        $superAdmin->permissions()->sync(
-            Permission::whereIn('slug', $superAdminPermissions)->pluck('id')
+        $admin->permissions()->sync(
+            Permission::whereIn('slug', $adminPermissions)->pluck('id')
         );
 
         $dentist->permissions()->sync(
