@@ -109,6 +109,7 @@ class OIDCController extends Controller
                 ->with('error', 'Authorization code missing.');
         }
 
+        /** @var Response $tokenResponse */
         $tokenResponse = Http::acceptJson()
             ->contentType('application/json')
             ->post(config('services.oidc.token_url'), [
