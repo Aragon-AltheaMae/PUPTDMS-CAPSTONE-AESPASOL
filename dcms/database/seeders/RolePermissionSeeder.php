@@ -10,7 +10,7 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $superAdmin = Role::where('slug', 'admin')->firstOrFail();
+        $admin = Role::where('slug', 'admin')->firstOrFail();
         $dentist = Role::where('slug', 'dentist')->firstOrFail();
         $patient = Role::where('slug', 'patient')->firstOrFail();
 
