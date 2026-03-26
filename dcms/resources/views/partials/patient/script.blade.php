@@ -1,18 +1,15 @@
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        
-        /* ══════════════════════════════════════
-           DROPDOWN MENUS (Notifications & User)
-        ══════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+
         const notifBtn = document.getElementById('notifBtn');
         const notifMenu = document.getElementById('notifMenu');
-        
+
         const userBtn = document.getElementById('userBtn');
         const userMenu = document.getElementById('userMenu');
 
         // Toggle Notifications Menu
         if (notifBtn && notifMenu) {
-            notifBtn.addEventListener('click', function (e) {
+            notifBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 notifMenu.classList.toggle('open');
                 // Close user menu if it's open
@@ -22,7 +19,7 @@
 
         // Toggle User Profile Menu
         if (userBtn && userMenu) {
-            userBtn.addEventListener('click', function (e) {
+            userBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 userMenu.classList.toggle('open');
                 // Close notif menu if it's open
@@ -31,11 +28,11 @@
         }
 
         // Close dropdowns when clicking outside of them
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (notifMenu && !notifMenu.contains(e.target) && !notifBtn.contains(e.target)) {
                 notifMenu.classList.remove('open');
             }
-            
+
             if (userMenu && !userMenu.contains(e.target) && !userBtn.contains(e.target)) {
                 userMenu.classList.remove('open');
             }
@@ -46,20 +43,20 @@
         ══════════════════════════════════════ */
         const html = document.documentElement;
         const themeToggleContainer = document.getElementById("themeToggle");
-        
+
         function applyTheme(theme) {
             html.setAttribute("data-theme", theme);
             localStorage.setItem("theme", theme);
-            
+
             if (themeToggleContainer) {
                 const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
                 const themeIndicator = themeToggleContainer.querySelector(".theme-indicator");
-                
+
                 // Update active button text color
-                themeOptions.forEach(function (o) {
+                themeOptions.forEach(function(o) {
                     o.classList.toggle("active", o.getAttribute("data-theme") === theme);
                 });
-                
+
                 // Move the white indicator pill
                 if (themeIndicator) {
                     themeIndicator.classList.toggle("dark-mode", theme === "dark");
@@ -73,10 +70,10 @@
         // Add click listeners to the theme toggle buttons
         if (themeToggleContainer) {
             const themeOptions = themeToggleContainer.querySelectorAll(".theme-option");
-            themeOptions.forEach(function (o) {
-                o.addEventListener("click", function (e) {
+            themeOptions.forEach(function(o) {
+                o.addEventListener("click", function(e) {
                     // Prevent the dropdown from closing when clicking the theme toggle
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                     applyTheme(o.getAttribute("data-theme"));
                 });
             });
