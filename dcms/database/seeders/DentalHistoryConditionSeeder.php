@@ -34,10 +34,10 @@ class DentalHistoryConditionSeeder extends Seeder
         ];
 
         foreach ($conditions as $i => $code) {
-            DentalHistoryCondition::create([
-                'code' => $code,
-                'sort_order' => $i + 1
-            ]);
+            DentalHistoryCondition::updateOrCreate(
+                ['code' => $code],
+                ['sort_order' => $i + 1]
+            );
         }
     }
 }
