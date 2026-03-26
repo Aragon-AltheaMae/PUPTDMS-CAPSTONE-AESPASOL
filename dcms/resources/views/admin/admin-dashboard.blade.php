@@ -762,29 +762,37 @@
                     <h1 class="page-title">Admin Dashboard</h1>
                     <p class="page-subtitle">Welcome back, Administrator. Here's what's happening today.</p>
                 </div>
+
                 <div class="period-pill">
                     <div class="period-item">
                         <span class="period-label"><i class="fa-solid fa-calendar" style="margin-right:3px;"></i>
                             Semester</span>
-                        <span class="period-value">2nd Semester</span>
+                        <span class="period-value">
+                            {{ $activePeriod?->semester ?? 'No Active Period' }}
+                        </span>
                     </div>
                     <div class="period-divider"></div>
                     <div class="period-item">
                         <span class="period-label"><i class="fa-solid fa-graduation-cap" style="margin-right:3px;"></i>
                             Academic
                             Year</span>
-                        <span class="period-value">2025–2026</span>
+                        <span class="period-value">
+                            {{ $activePeriod?->academic_year ?? 'Not Set' }}
+                        </span>
                     </div>
                     <div class="period-divider"></div>
                     <div class="period-item">
                         <span class="period-label"><i class="fa-solid fa-clock" style="margin-right:3px;"></i> Period
                             Ends</span>
-                        <span class="period-value">June 10, 2026</span>
+                        <span class="period-value">
+                            {{ $activePeriod?->end_date ? $activePeriod->end_date->format('F d, Y') : 'Not Set' }}
+                        </span>
                     </div>
                     <a href="{{ route('admin.academic_periods') }}" class="manage-btn">
                         <i class="fa-solid fa-gear"></i> Manage
                     </a>
                 </div>
+
             </div>
         </div>
 

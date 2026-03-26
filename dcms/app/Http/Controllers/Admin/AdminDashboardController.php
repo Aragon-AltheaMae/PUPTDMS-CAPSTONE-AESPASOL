@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Patient;
 use App\Models\Appointment;
+use App\Models\AcademicPeriod;
 use Carbon\Carbon;
 use App\Models\AuditLog;
 use App\Helpers\AuditLogger;
+use App\Helpers\PhilippineHolidays;
 
 class AdminDashboardController extends Controller
 {
@@ -54,6 +56,12 @@ class AdminDashboardController extends Controller
 
         $logErrors = AuditLog::where('action', 'error')->count();
 
+        $activePeriod = AcademicPeriod::where('is_active', true)
+            ->orderByDesc('start_date')
+            ->first();
+
+        $holidays = PhilippineHolidays::range(1, 1);
+
         return view('admin.admin-dashboard', compact(
             'totalPatients',
             'appointmentsThisMonth',
@@ -64,7 +72,9 @@ class AdminDashboardController extends Controller
             'logInfo',
             'logWarnings',
             'logBackups',
-            'logErrors'
+            'logErrors',
+            'activePeriod',
+            'holidays'
         ));
     }
 }
