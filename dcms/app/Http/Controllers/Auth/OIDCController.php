@@ -204,7 +204,7 @@ class OIDCController extends Controller
             $roleName = strtolower($profile['roles'][0] ?? '');
 
             if (str_contains($roleName, 'admin')) {
-                $roleId = Role::where('slug', 'super_admin')->value('id');
+                $roleId = Role::where('slug', 'admin')->value('id');
             } elseif (str_contains($roleName, 'dentist')) {
                 $roleId = Role::where('slug', 'dentist')->value('id');
             } else {
