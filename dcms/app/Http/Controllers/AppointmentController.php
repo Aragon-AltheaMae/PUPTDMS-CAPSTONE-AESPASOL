@@ -165,14 +165,14 @@ class AppointmentController extends Controller
         $diseases = Disease::orderBy('sort_order')->get();
 
         $serviceTypes = ServiceType::orderBy('name')
-        ->get()
-        ->map(function ($service) {
-            return [
-                'name' => $service->name,
-                'desc' => $service->description ?: 'No description available.',
-                'img'  => null,
-            ];
-        });
+            ->get()
+            ->map(function ($service) {
+                return [
+                    'name' => $service->name,
+                    'desc' => $service->description ?: 'No description available.',
+                    'img'  => null,
+                ];
+            });
 
         AuditLogger::log(
             'view',
@@ -190,7 +190,6 @@ class AppointmentController extends Controller
             'diseases',
             'serviceTypes'
         ));
-
     }
 
     /* =======================
@@ -202,7 +201,6 @@ class AppointmentController extends Controller
             'appointment_date'     => 'required|date|after:today',
             'appointment_time'     => 'required|string', // "1:00 PM"
             'service_type' => 'required|string|max:255',
-            'service_others_text'  => 'required_if:service_type,Others|nullable|string|max:100',
 
             'emergency_person'     => 'required|string|max:50',
             'emergency_number'     => 'required|string|max:15',
@@ -214,15 +212,12 @@ class AppointmentController extends Controller
             'diseases.*' => 'string|exists:diseases,code',
         ]);
 
-         if (
-            $request->service_type !== 'Others' &&
-            !ServiceType::where('name', $request->service_type)->exists()
-        ) {
+
+        if (!ServiceType::where('name', $request->service_type)->exists()) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Invalid service type selected.');
         }
-
 
         $patientId = session('patient_id');
         if (!$patientId) {
@@ -238,7 +233,7 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid time format. Please pick a valid time slot.');
         }
 
-    $date = Carbon::parse($request->appointment_date);
+        $date = Carbon::parse($request->appointment_date);
         $dayAbbr = $date->format('D');
 
         if ($date->isToday()) {
@@ -296,7 +291,7 @@ class AppointmentController extends Controller
                     ->with('error', 'Selected time falls within the clinic lunch break.');
             }
         }
-   
+
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
@@ -327,9 +322,6 @@ class AppointmentController extends Controller
             $appointment = Appointment::create([
                 'patient_id'       => $patientId,
                 'service_type'     => $request->service_type,
-                'other_services'   => $request->service_type === 'Others'
-                    ? trim($request->service_others_text ?? '')
-                    : null,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $mysqlTime,
                 'status'           => 'upcoming',
@@ -744,4 +736,3 @@ class AppointmentController extends Controller
         return response()->json(['success' => true]);
     }
 }
-       

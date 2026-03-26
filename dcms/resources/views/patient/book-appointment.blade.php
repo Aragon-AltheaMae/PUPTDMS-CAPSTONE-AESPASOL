@@ -787,27 +787,6 @@
                                     </div>
                                 </label>
                             @endforeach
-
-                            <label class="service-card-label block cursor-pointer sm:col-span-2">
-                                <input type="radio" name="service_type" value="Others" class="hidden">
-                                <div
-                                    class="service-card-inner flex items-center gap-4 px-5 py-4 rounded-2xl border-2 border-[#e8e2dd] bg-[#fafaf8]">
-                                    <div
-                                        class="svc-icon-wrap w-12 h-12 rounded-xl bg-[#f9e8e8] flex items-center justify-center flex-shrink-0">
-                                        <img src="{{ asset('images/dental-others.png') }}" class="w-6 h-6"
-                                            style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="svc-title font-bold text-sm text-[#1a1410]">Others</p>
-                                        <p class="svc-desc text-xs text-[#9e9690] mt-0.5">Can't find your service? Let
-                                            us know what you
-                                            need.</p>
-                                    </div>
-                                    <i
-                                        class="svc-arrow fa-solid fa-chevron-right text-xs text-[#e8e2dd] flex-shrink-0"></i>
-                                </div>
-                            </label>
-
                         </div>
                     </div>
 
@@ -1473,27 +1452,6 @@
         <span id="miniTabText">Please complete all required fields.</span>
     </div>
 
-    <!-- ════ OTHERS MODAL ════ -->
-    <dialog id="othersModal"
-        class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
-        <div class="bg-[#8B0000] px-8 py-6">
-            <h3 class="text-xl font-bold text-white mb-1">Other Service</h3>
-            <p class="text-sm text-white/75">Please describe the service you need.</p>
-        </div>
-        <div class="bg-white px-8 py-6">
-            <div class="w-full mb-5">
-                <x-voice-input id="other_services" name="service_others_text"
-                    placeholder="e.g. Teeth whitening, fluoride treatment..." maxlength="100"
-                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2.5 text-sm bg-white outline-none" />
-            </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" id="othersCancelBtn"
-                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-5 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">Cancel</button>
-                <button type="button" id="othersConfirmBtn"
-                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">Confirm</button>
-            </div>
-        </div>
-    </dialog>
 
     <!-- ════ CONFIRM MODAL ════ -->
     <dialog id="confirmModal"
@@ -1836,7 +1794,7 @@
             document.getElementById("summaryBox").innerHTML = `
         <div class="grid grid-cols-2 gap-4 sm-grid-1col">
           ${card("Appointment Details", "fa-calendar-check", row("Date", get("appointment_date")) + row("Time", get("appointment_time")))}
-          ${card("Service", "fa-tooth", row("Type", get("service_type") === "Others" ? "Others – " + (get("service_others_text") || "N/A") : get("service_type")))}
+          ${card("Service", "fa-tooth", row("Type", get("service_type")))}
         </div>
         ${card("Dental History", "fa-teeth", `
                   <div class="grid grid-cols-2 gap-x-8 sm-grid-1col">
@@ -2098,44 +2056,6 @@
             document.querySelectorAll('.reveal').forEach(function(el) {
                 revealObserver.observe(el);
             });
-        });
-
-        /* OTHERS MODAL */
-        const othersModal = document.getElementById("othersModal");
-        const othersInput = document.getElementById("other_services");
-        const othersRadio = document.querySelector('input[name="service_type"][value="Others"]');
-        const othersLabel = othersRadio?.closest('label');
-
-        function openOthersModal() {
-            if (!othersModal || othersModal.open) return;
-            othersInput.required = true;
-            othersModal.showModal();
-            setTimeout(() => othersInput?.focus(), 100);
-        }
-
-        // Use click on the label so it fires even when already selected
-        othersLabel?.addEventListener("click", () => {
-            // Let the radio check first, then open
-            setTimeout(openOthersModal, 0);
-        });
-
-        // Also handle change as a fallback for first-time selection
-        othersRadio?.addEventListener("change", openOthersModal);
-
-        document.getElementById("othersConfirmBtn")?.addEventListener("click", () => {
-            if (!othersInput?.value.trim()) {
-                showInputError(othersInput);
-                return;
-            }
-            othersModal?.close();
-        });
-        document.getElementById("othersCancelBtn")?.addEventListener("click", () => {
-            if (othersInput) {
-                othersInput.value = "";
-                othersInput.required = false;
-            }
-            othersModal?.close();
-            if (othersRadio) othersRadio.checked = false;
         });
 
         /* DATE PICKERS */
