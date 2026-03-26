@@ -1,37 +1,5 @@
-<style>
-    @media (max-width: 767px) {
-        body {
-            padding-bottom: 110px !important; 
-        }
-    }
-
-    #mobFabMenu {
-        visibility: hidden;
-        opacity: 0;
-        left: 50%;
-        transform: translateX(-50%) translateY(15px) scale(0.95);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        pointer-events: none;
-    }
-
-    #mobFabMenu.open {
-        visibility: visible;
-        opacity: 1;
-        transform: translateX(-50%) translateY(0) scale(1);
-        pointer-events: auto;
-    }
-
-    #mobFab i {
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #mobFab.open i {
-        transform: rotate(135deg);
-    }
-</style>
-
 <nav id="mobileBottomNav"
-    class="md:hidden fixed bottom-6 left-5 right-5 bg-white/95 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.15)] z-[9999] rounded-full border border-gray-100 transition-colors duration-300 dark:bg-[#0d1117]/95 dark:border-[#21262d] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+    class="md:hidden fixed bottom-6 left-5 right-5 bg-white/95 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.15)] z-40 rounded-full border border-gray-100 transition-colors duration-300 dark:bg-[#0d1117]/95 dark:border-[#21262d] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
     
     <div class="grid grid-cols-5 items-center w-full h-[66px] relative z-10 px-1">
 
@@ -47,7 +15,7 @@
         <a href="{{ route('patient.appointment.index') }}"
             class="flex flex-col items-center justify-center w-full h-full relative pb-1 transition-all duration-300 {{ $isAppt ? 'text-[#8B0000] dark:text-[#ff6b6b]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500' }}">
             <i class="fa-solid fa-calendar-check text-[18px] mb-1 transition-transform duration-300 {{ $isAppt ? 'scale-110' : '' }}"></i>
-            <span class="text-[10px] font-bold">Appointments</span>
+            <span class="text-[10px] font-bold">Appts</span>
             <span class="absolute bottom-1 w-1 h-1 rounded-full bg-[#8B0000] dark:bg-[#ff6b6b] transition-opacity duration-300 {{ $isAppt ? 'opacity-100' : 'opacity-0' }}"></span>
         </a>
 
@@ -68,7 +36,7 @@
                     <div class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-[#8B0000] dark:text-red-400 flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-file-medical"></i>
                     </div>
-                    Request Health Record
+                    Request Record
                 </button>
 
                 <div class="h-px bg-gray-100 dark:bg-[#21262d] mx-4"></div>

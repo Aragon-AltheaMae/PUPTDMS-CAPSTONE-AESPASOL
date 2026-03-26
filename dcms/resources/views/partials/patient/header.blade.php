@@ -1,46 +1,9 @@
-<dialog id="termsModal">
-    <div class="terms-header">
-        <div class="terms-header-icon"><i class="fa-solid fa-file-shield"></i></div>
-        <div>
-            <h2>Terms and Conditions</h2>
-            <p>Please read and accept before continuing</p>
-        </div>
-    </div>
-    <div class="terms-body">
-        <p>
-            By clicking <strong>"I Agree"</strong>, you consent to the collection, use, and
-            processing of your personal data for legitimate purposes related to this service.
-        </p>
-        <p style="margin-bottom:0;">
-            Your information will be handled in accordance with our <strong>Privacy Policy</strong>
-            and in compliance with the <strong>Data Privacy Act of 2012</strong>.
-        </p>
-        <div class="terms-divider"></div>
-        <label class="terms-checkbox-row">
-            <input type="checkbox" id="termsCheckbox">
-            <span>I have read and agree to the Terms and Conditions</span>
-        </label>
-        <div class="terms-actions">
-            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
-                @csrf
-                <button type="submit" class="terms-cancel-btn">Cancel</button>
-            </form>
-            <button id="termsContinueBtn" class="terms-continue-btn" disabled onclick="acceptTerms()">
-                <i class="fa-solid fa-check" style="font-size:.75rem; margin-right:5px;"></i> Continue
-            </button>
-        </div>
-    </div>
-</dialog>
-
-<!-- TOAST -->
-<div id="toastContainer" role="region" aria-live="polite"></div>
-
 <header class="header">
     <div class="header-left">
         <img src="{{ asset('images/PUP.png') }}" class="header-logo" alt="PUP">
         <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="header-logo" alt="DMS">
         <div class="header-divider hidden sm:block"></div>
-        <span class="header-title hidden sm:block">PUP Taguig Dental Clinic</span>
+        <span class="header-title mobile-title">PUP Taguig Dental Clinic</span>
     </div>
 
     <div class="header-right">
@@ -80,23 +43,23 @@
         </div>
 
         <div id="userDropdown">
-            <div class="header-user-btn" id="userBtn">
-                <img src="{{ isset($patient->profile_image) && $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name ?? 'Patient') . '&background=ffffff&color=8B0000' }}"
+            <div class="header-user-btn mobile-pill" id="userBtn">
+                <img src="{{ !empty($patient->profile_image) ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode(optional($patient)->name ?? 'Patient') . '&background=ffffff&color=8B0000' }}"
                     class="header-avatar" alt="Avatar">
                 <div class="header-user-text hidden sm:block text-left">
-                    <div class="header-name">{{ ucwords(strtolower($patient->name ?? 'Patient User')) }}</div>
+                    <div class="header-name">{{ ucwords(strtolower(optional($patient)->name ?? 'Patient User')) }}</div>
                     <div class="header-role">Student</div>
                 </div>
-                <i class="fa-solid fa-chevron-down hidden sm:block"
-                    style="color:rgba(255,255,255,.5);font-size:.6rem;margin-left:.25rem;"></i>
+                <i class="fa-solid fa-chevron-down"></i>
             </div>
 
             <div id="userMenu">
                 <div class="user-menu-header">
-                    <img src="{{ isset($patient->profile_image) && $patient->profile_image ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patient->name ?? 'Patient') . '&background=ffffff&color=8B0000' }}"
+                    <img src="{{ !empty($patient->profile_image) ? asset('storage/' . $patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode(optional($patient)->name ?? 'Patient') . '&background=ffffff&color=8B0000' }}"
                         class="user-menu-avatar" alt="Avatar">
                     <div>
-                        <div class="user-menu-name">{{ ucwords(strtolower($patient->name ?? 'Patient User')) }}</div>
+                        <div class="user-menu-name">
+                            {{ ucwords(strtolower(optional($patient)->name ?? 'Patient User')) }}</div>
                         <div class="user-menu-role">Student</div>
                     </div>
                 </div>
@@ -125,6 +88,5 @@
                 </form>
             </div>
         </div>
-
     </div>
 </header>
