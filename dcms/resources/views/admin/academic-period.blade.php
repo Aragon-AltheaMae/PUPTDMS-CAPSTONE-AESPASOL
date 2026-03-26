@@ -215,9 +215,7 @@
   }
 
   @keyframes pulse {
-
-    0%,
-    100% {
+    0%, 100% {
       opacity: 1
     }
 
@@ -341,6 +339,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
   }
 
   .reset-btn:hover {
@@ -449,188 +448,187 @@
   }
 
   .ap-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.ap-toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.ap-toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.ap-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.ap-table {
-  width: 100%;
-  min-width: 760px;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.ap-table th,
-.ap-table td {
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.ap-table td.col-year,
-.ap-table td.col-semester {
-  white-space: normal;
-}
-
-.ap-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.ap-empty {
-  padding: 3rem 1rem;
-}
-
-@media (max-width: 1023px) {
-  .ap-toolbar {
-    align-items: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
-  .ap-toolbar-right {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 767px) {
-  #mainContent {
-    padding-left: 0.9rem !important;
-    padding-right: 0.9rem !important;
-    padding-top: 74px !important;
-  }
-
-  .active-banner-inner {
-    padding: 1rem;
-  }
-
-  .ap-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .ap-toolbar-left,
-  .ap-toolbar-right {
-    width: 100%;
-  }
-
-  .ap-toolbar-right {
-    flex-direction: column;
-    align-items: stretch;
+  .ap-toolbar-left {
+    display: flex;
+    align-items: center;
     gap: 8px;
+    min-width: 0;
   }
 
-  .search-wrap,
-  .filter-select,
-  .filter-btn,
-  .reset-btn {
-    width: 100% !important;
+  .ap-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
-  .filter-select,
-  .filter-btn,
-  .reset-btn {
-    justify-content: center;
+  .ap-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .ap-table {
-    min-width: 640px;
+    width: 100%;
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
   }
 
   .ap-table th,
   .ap-table td {
-    padding: 10px 12px !important;
-    font-size: 12px;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 
-  .ap-table thead th:nth-child(4),
-  .ap-table tbody td:nth-child(4),
-  .ap-table thead th:nth-child(5),
-  .ap-table tbody td:nth-child(5) {
-    display: none;
+  .ap-table td.col-year,
+  .ap-table td.col-semester {
+    white-space: normal;
   }
 
   .ap-actions {
-    gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
-  .act {
-    width: 28px;
-    height: 28px;
+  .ap-empty {
+    padding: 3rem 1rem;
   }
 
-  .sem-pill,
-  .status-badge {
-    font-size: 10px !important;
-  }
-}
+  @media (max-width: 1023px) {
+    .ap-toolbar {
+      align-items: stretch;
+    }
 
+    .ap-toolbar-right {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 767px) {
+    #mainContent {
+      padding-left: 0.9rem !important;
+      padding-right: 0.9rem !important;
+      padding-top: 74px !important;
+    }
+
+    .active-banner-inner {
+      padding: 1rem;
+    }
+
+    .ap-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ap-toolbar-left,
+    .ap-toolbar-right {
+      width: 100%;
+    }
+
+    .ap-toolbar-right {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .search-wrap,
+    .filter-select,
+    .filter-btn,
+    .reset-btn {
+      width: 100% !important;
+    }
+
+    .filter-select,
+    .filter-btn,
+    .reset-btn {
+      justify-content: center;
+    }
+
+    .ap-table {
+      min-width: 640px;
+    }
+
+    .ap-table th,
+    .ap-table td {
+      padding: 10px 12px !important;
+      font-size: 12px;
+    }
+
+    .ap-table thead th:nth-child(4),
+    .ap-table tbody td:nth-child(4),
+    .ap-table thead th:nth-child(5),
+    .ap-table tbody td:nth-child(5) {
+      display: none;
+    }
+
+    .ap-actions {
+      gap: 6px;
+    }
+
+    .act {
+      width: 28px;
+      height: 28px;
+    }
+
+    .sem-pill,
+    .status-badge {
+      font-size: 10px !important;
+    }
+  }
 </style>
 @endsection
 
 @php
 $calendarPeriodsPayload = collect($calendarPeriods ?? [])
-->sortBy('start_date')
-->map(function ($period) {
-return [
-'id' => $period->id,
-'academic_year' => $period->academic_year,
-'semester' => $period->semester,
-'start_date' => optional($period->start_date)->format('Y-m-d'),
-'end_date' => optional($period->end_date)->format('Y-m-d'),
-];
-})
-->values()
-->all();
+    ->sortBy('start_date')
+    ->map(function ($period) {
+        return [
+            'id' => $period->id,
+            'academic_year' => $period->academic_year,
+            'semester' => $period->semester,
+            'start_date' => optional($period->start_date)->format('Y-m-d'),
+            'end_date' => optional($period->end_date)->format('Y-m-d'),
+        ];
+    })
+    ->values()
+    ->all();
 
 $holidayEvents = collect($holidays ?? [])
-->map(function ($name, $date) {
-return [
-'date' => $date,
-'label' => $name,
-'year' => date('Y', strtotime($date)),
-'color' => '#6b7280',
-'type' => 'holiday',
-];
-})
-->values()
-->all();
+    ->map(function ($name, $date) {
+        return [
+            'date' => $date,
+            'label' => $name,
+            'year' => date('Y', strtotime($date)),
+            'color' => '#6b7280',
+            'type' => 'holiday',
+        ];
+    })
+    ->values()
+    ->all();
 
 $activePeriodPayload = $activePeriod
-? [
-'id' => $activePeriod->id,
-'academic_year' => $activePeriod->academic_year,
-'semester' => $activePeriod->semester,
-'start_date' => optional($activePeriod->start_date)->format('Y-m-d'),
-'end_date' => optional($activePeriod->end_date)->format('Y-m-d'),
-'description' => $activePeriod->description,
-'is_active' => (bool) $activePeriod->is_active,
-]
-: null;
+    ? [
+        'id' => $activePeriod->id,
+        'academic_year' => $activePeriod->academic_year,
+        'semester' => $activePeriod->semester,
+        'start_date' => optional($activePeriod->start_date)->format('Y-m-d'),
+        'end_date' => optional($activePeriod->end_date)->format('Y-m-d'),
+        'description' => $activePeriod->description,
+        'is_active' => (bool) $activePeriod->is_active,
+    ]
+    : null;
 @endphp
 
 @section('content')
@@ -655,11 +653,7 @@ $activePeriodPayload = $activePeriod
     </div>
     @endif
 
-    <div class="mb-6">
-      <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-        <i class="fa-solid fa-sun text-yellow-400 text-xs" id="timeIcon"></i>
-        <p id="currentDateTime"></p>
-      </div>
+    <div class="mb-6 mt-3">
       <div class="flex items-end justify-between flex-wrap gap-3">
         <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">Academic Periods</h1>
         <button onclick="openModal('addModal')" type="button"
@@ -675,23 +669,20 @@ $activePeriodPayload = $activePeriod
           <div>
             <div class="flex items-center gap-2 mb-1">
               <i class="fa-solid fa-calendar text-[#8B0000] text-sm"></i>
-              <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current
-                Semester</p>
+              <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current Semester</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerSem">
-              {{ $activePeriod?->semester ??
-              'No Active
-              Period' }}
+              {{ $activePeriod?->semester ?? 'No Active Period' }}
             </p>
           </div>
           <div>
             <div class="flex items-center gap-2 mb-1">
               <i class="fa-solid fa-graduation-cap text-[#8B0000] text-sm"></i>
-              <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Academic Year
-              </p>
+              <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Academic Year</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerYear">
-              {{ $activePeriod?->academic_year ?? '—' }}</p>
+              {{ $activePeriod?->academic_year ?? '—' }}
+            </p>
           </div>
           <div>
             <div class="flex items-center gap-2 mb-1">
@@ -699,26 +690,26 @@ $activePeriodPayload = $activePeriod
               <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Period Ends</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerEnd">
-              {{ $activePeriod ? $activePeriod->end_date->format('F d, Y') : '—' }}</p>
+              {{ $activePeriod ? $activePeriod->end_date->format('F d, Y') : '—' }}
+            </p>
           </div>
         </div>
 
         <div class="flex flex-col gap-3 lg:flex-shrink-0 lg:w-64">
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Semester
-                Progress</span>
-              <span class="text-[11px] font-bold text-[#8B0000]" id="bannerPct">{{ $activePeriod?->progress_percent ?? 0
-                }}%</span>
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Semester Progress</span>
+              <span class="text-[11px] font-bold text-[#8B0000]" id="bannerPct">
+                {{ $activePeriod?->progress_percent ?? 0 }}%
+              </span>
             </div>
             <div class="progress-track">
-              <div class="progress-fill" id="bannerFill" style="width:{{ $activePeriod?->progress_percent ?? 0 }}%;">
-              </div>
+              <div class="progress-fill" id="bannerFill" style="width:{{ $activePeriod?->progress_percent ?? 0 }}%;"></div>
             </div>
             <p class="text-[10px] text-gray-400 mt-1" id="bannerDaysLeft">
               {{ $activePeriod
-              ? $activePeriod->days_remaining . ' day' . ($activePeriod->days_remaining !== 1 ? 's' : '') . ' remaining'
-              : 'No active period' }}
+                ? $activePeriod->days_remaining . ' day' . ($activePeriod->days_remaining !== 1 ? 's' : '') . ' remaining'
+                : 'No active period' }}
             </p>
           </div>
 
@@ -755,16 +746,14 @@ $activePeriodPayload = $activePeriod
                 </button>
               </div>
 
-              <select name="semester" class="filter-select" onchange="this.form.submit()">
+              <select name="semester" id="semesterFilter" class="filter-select">
                 <option value="">All Semesters</option>
-                <option value="1st Semester" {{ request('semester')==='1st Semester' ? 'selected' : '' }}>1st Semester
-                </option>
-                <option value="2nd Semester" {{ request('semester')==='2nd Semester' ? 'selected' : '' }}>2nd Semester
-                </option>
+                <option value="1st Semester" {{ request('semester')==='1st Semester' ? 'selected' : '' }}>1st Semester</option>
+                <option value="2nd Semester" {{ request('semester')==='2nd Semester' ? 'selected' : '' }}>2nd Semester</option>
                 <option value="Summer" {{ request('semester')==='Summer' ? 'selected' : '' }}>Summer</option>
               </select>
 
-              <select name="status" class="filter-select" onchange="this.form.submit()">
+              <select name="status" id="statusFilter" class="filter-select">
                 <option value="">All Status</option>
                 <option value="Active" {{ request('status')==='Active' ? 'selected' : '' }}>Active</option>
                 <option value="Upcoming" {{ request('status')==='Upcoming' ? 'selected' : '' }}>Upcoming</option>
@@ -772,11 +761,11 @@ $activePeriodPayload = $activePeriod
                 <option value="Inactive" {{ request('status')==='Inactive' ? 'selected' : '' }}>Inactive</option>
               </select>
 
-              <button type="submit" class="filter-btn">Filter</button>
+              <button type="button" class="filter-btn">Filter</button>
 
-              <a href="{{ route('admin.academic_periods') }}" class="reset-btn">
+              <button type="button" class="reset-btn" onclick="resetAcademicFilters()">
                 Reset
-              </a>
+              </button>
             </form>
           </div>
 
@@ -797,31 +786,34 @@ $activePeriodPayload = $activePeriod
                 @forelse($academicPeriods as $index => $period)
                 @php
                 $statusClass = match ($period->status) {
-                'Active' => 's-active',
-                'Upcoming' => 's-upcoming',
-                'Ended' => 's-ended',
-                default => 's-inactive',
+                  'Active' => 's-active',
+                  'Upcoming' => 's-upcoming',
+                  'Ended' => 's-ended',
+                  default => 's-inactive',
                 };
 
                 $semStyle = match ($period->semester) {
-                '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
-                '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
-                'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
-                default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                  '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
+                  '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
+                  'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
+                  default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
                 };
 
                 $periodPayload = [
-                'id' => $period->id,
-                'academic_year' => $period->academic_year,
-                'semester' => $period->semester,
-                'start_date' => optional($period->start_date)->format('Y-m-d'),
-                'end_date' => optional($period->end_date)->format('Y-m-d'),
-                'description' => $period->description,
-                'is_active' => (bool) $period->is_active,
+                  'id' => $period->id,
+                  'academic_year' => $period->academic_year,
+                  'semester' => $period->semester,
+                  'start_date' => optional($period->start_date)->format('Y-m-d'),
+                  'end_date' => optional($period->end_date)->format('Y-m-d'),
+                  'description' => $period->description,
+                  'is_active' => (bool) $period->is_active,
                 ];
                 @endphp
 
-                <tr class="tbl-row {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0">
+                <tr
+                  class="tbl-row {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
+                  data-semester="{{ $period->semester }}"
+                  data-status="{{ $period->status }}">
                   <td class="py-3 px-4 text-sm">{{ $academicPeriods->firstItem() + $index }}</td>
 
                   <td class="py-3 px-4 col-year">
@@ -849,7 +841,8 @@ $activePeriodPayload = $activePeriod
                     {{ optional($period->start_date)->format('M d, Y') }}
                   </td>
                   <td class="py-3 px-4 text-xs text-gray-600">
-                    {{ optional($period->end_date)->format('M d, Y') }}</td>
+                    {{ optional($period->end_date)->format('M d, Y') }}
+                  </td>
 
                   <td class="py-3 px-4 text-center">
                     <span class="status-badge {{ $statusClass }}"
@@ -866,8 +859,7 @@ $activePeriodPayload = $activePeriod
                       </button>
 
                       @if (!$period->is_active)
-                      <form method="POST" action="{{ route('admin.academic_periods.set_active', $period) }}"
-                        class="inline">
+                      <form method="POST" action="{{ route('admin.academic_periods.set_active', $period) }}" class="inline">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="act act-star" title="Set as active">
@@ -915,7 +907,6 @@ $activePeriodPayload = $activePeriod
 
       <div class="space-y-5">
 
-        {{-- 1. Quick Actions (moved to top) --}}
         <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
             <i class="fa-solid fa-bolt text-[#8B0000]"></i>
@@ -952,7 +943,6 @@ $activePeriodPayload = $activePeriod
           </div>
         </div>
 
-        {{-- 2. Date & Time --}}
         <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
             <i class="fa-solid fa-clock text-[#8B0000]"></i>
@@ -961,23 +951,23 @@ $activePeriodPayload = $activePeriod
           </div>
           <div class="p-5 text-center">
             <div id="liveClock" class="text-4xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1">
-              00:00:00</div>
-            <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">AM
+              00:00:00
             </div>
+            <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">AM</div>
             <div id="liveDate" class="text-sm font-semibold text-gray-700 mb-1"></div>
             <div id="liveDay" class="text-xs text-gray-400"></div>
           </div>
         </div>
 
-        {{-- 3. Calendar --}}
         <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden cal-card">
           <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-calendar-days text-[#8B0000]"></i>
               <h2 class="font-bold text-gray-800 text-sm">PUP Academic Calendar</h2>
             </div>
-            <span id="calYear" class="text-[10px] font-bold text-[#8B0000] bg-red-50 px-2 py-0.5 rounded-full">Academic
-              Periods</span>
+            <span id="calYear" class="text-[9px] font-bold text-[#8B0000] bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+              Academic Periods
+            </span>
           </div>
           <div id="calendarList" class="p-4 space-y-1 overflow-y-auto scrollbar-thin" style="max-height:485px;"></div>
           <div class="px-4 pb-4">
@@ -1259,7 +1249,6 @@ $activePeriodPayload = $activePeriod
 
 @section('scripts')
 <script>
-  /* ── ADD PERIOD FORM VALIDATION ── */
   document.addEventListener('DOMContentLoaded', () => {
     const addForm = document.querySelector('#addModal form');
     if (!addForm) return;
@@ -1269,7 +1258,6 @@ $activePeriodPayload = $activePeriod
     const endInput = addForm.querySelector('[name="end_date"]');
     const semRadios = addForm.querySelectorAll('[name="semester"]');
 
-    /* -- helpers -- */
     function getErr(field) {
       return field.parentElement.parentElement.querySelector('.field-error')
         || field.parentElement.querySelector('.field-error');
@@ -1279,7 +1267,10 @@ $activePeriodPayload = $activePeriod
       field.classList.add('field-invalid');
       field.classList.remove('field-valid');
       const err = getErr(field);
-      if (err) { err.textContent = '⚠ ' + msg; err.classList.add('show'); }
+      if (err) {
+        err.textContent = '⚠ ' + msg;
+        err.classList.add('show');
+      }
     }
 
     function clearError(field) {
@@ -1298,17 +1289,33 @@ $activePeriodPayload = $activePeriod
     function validateYear() {
       const v = yearInput.value.trim();
       const pattern = /^\d{4}-\d{4}$/;
-      if (!v) { setError(yearInput, 'Academic year is required.'); return false; }
-      if (!pattern.test(v)) { setError(yearInput, 'Format must be YYYY-YYYY (e.g. 2025-2026).'); return false; }
+      if (!v) {
+        setError(yearInput, 'Academic year is required.');
+        return false;
+      }
+      if (!pattern.test(v)) {
+        setError(yearInput, 'Format must be YYYY-YYYY (e.g. 2025-2026).');
+        return false;
+      }
       const [y1, y2] = v.split('-').map(Number);
-      if (y2 !== y1 + 1) { setError(yearInput, 'Second year must be one after the first.'); return false; }
-      setValid(yearInput); return true;
+      if (y2 !== y1 + 1) {
+        setError(yearInput, 'Second year must be one after the first.');
+        return false;
+      }
+      setValid(yearInput);
+      return true;
     }
 
     function validateSemester() {
       const checked = [...semRadios].some(r => r.checked);
       const semErr = addForm.querySelector('.sem-error');
-      if (!checked) { if (semErr) { semErr.textContent = '⚠ Please select a semester.'; semErr.classList.add('show'); } return false; }
+      if (!checked) {
+        if (semErr) {
+          semErr.textContent = '⚠ Please select a semester.';
+          semErr.classList.add('show');
+        }
+        return false;
+      }
       if (semErr) semErr.classList.remove('show');
       return true;
     }
@@ -1317,25 +1324,32 @@ $activePeriodPayload = $activePeriod
       let ok = true;
       const s = startInput.value;
       const e = endInput.value;
-      const today = new Date().toISOString().split('T')[0];
 
-      if (!s) { setError(startInput, 'Start date is required.'); ok = false; }
-      else { setValid(startInput); }
+      if (!s) {
+        setError(startInput, 'Start date is required.');
+        ok = false;
+      } else {
+        setValid(startInput);
+      }
 
-      if (!e) { setError(endInput, 'End date is required.'); ok = false; }
-      else if (s && e <= s) { setError(endInput, 'End date must be after start date.'); ok = false; }
-      else { setValid(endInput); }
+      if (!e) {
+        setError(endInput, 'End date is required.');
+        ok = false;
+      } else if (s && e <= s) {
+        setError(endInput, 'End date must be after start date.');
+        ok = false;
+      } else {
+        setValid(endInput);
+      }
 
       return ok;
     }
 
-    /* -- live listeners -- */
     yearInput.addEventListener('input', validateYear);
     yearInput.addEventListener('blur', validateYear);
     startInput.addEventListener('change', () => { validateDates(); });
     endInput.addEventListener('change', () => { validateDates(); });
 
-    /* -- submit guard -- */
     addForm.addEventListener('submit', e => {
       const y = validateYear();
       const s = validateSemester();
@@ -1344,7 +1358,6 @@ $activePeriodPayload = $activePeriod
     });
   });
 
-  //const calendarPeriods = @json($calendarPeriods);
   const calendarPeriods = @json($calendarPeriodsPayload);
   const holidayEvents = @json($holidayEvents);
 
@@ -1397,9 +1410,7 @@ $activePeriodPayload = $activePeriod
       const d = new Date(e.date + 'T00:00:00');
       const isToday = e.date === today;
       const isPast = e.date < today;
-      const mon = d.toLocaleDateString('en-US', {
-        month: 'short'
-      });
+      const mon = d.toLocaleDateString('en-US', { month: 'short' });
       const day = d.getDate();
       const isHoliday = e.type === 'holiday';
       let color = e.color;
@@ -1409,23 +1420,23 @@ $activePeriodPayload = $activePeriod
       if (e.type === 'end') color = '#2563eb';
 
       return `
-          <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0 ${isPast ? 'opacity-50' : ''}">
-            <div style="flex-shrink:0;width:38px;text-align:center;background:${isToday ? '#8B0000' : isHoliday ? '#f3f4f6' : '#fef2f2'};
-                        border-radius:8px;padding:4px 2px;border:1px solid ${isToday ? '#8B0000' : isHoliday ? '#e5e7eb' : '#fde8e8'}">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${isToday ? 'rgba(255,255,255,.8)' : isHoliday ? '#6b7280' : '#8B0000'};">${mon}</div>
-              <div style="font-size:16px;font-weight:900;line-height:1;color:${isToday ? '#fff' : isHoliday ? '#374151' : '#8B0000'};">${day}</div>
-            </div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:12px;font-weight:${isToday ? '700' : '600'};color:${isToday ? '#8B0000' : '#374151'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                ${e.label}
-              </div>
-              <div style="font-size:10px;color:#9ca3af;margin-top:1px;">
-                ${e.year}${isHoliday ? ' • Holiday' : ''}${isToday ? ' • Today' : ''}
-              </div>
-            </div>
-            <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px;"></div>
+        <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0 ${isPast ? 'opacity-50' : ''}">
+          <div style="flex-shrink:0;width:38px;text-align:center;background:${isToday ? '#8B0000' : isHoliday ? '#f3f4f6' : '#fef2f2'};
+                      border-radius:8px;padding:4px 2px;border:1px solid ${isToday ? '#8B0000' : isHoliday ? '#e5e7eb' : '#fde8e8'}">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${isToday ? 'rgba(255,255,255,.8)' : isHoliday ? '#6b7280' : '#8B0000'};">${mon}</div>
+            <div style="font-size:16px;font-weight:900;line-height:1;color:${isToday ? '#fff' : isHoliday ? '#374151' : '#8B0000'};">${day}</div>
           </div>
-        `;
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:${isToday ? '700' : '600'};color:${isToday ? '#8B0000' : '#374151'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${e.label}
+            </div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px;">
+              ${e.year}${isHoliday ? ' • Holiday' : ''}${isToday ? ' • Today' : ''}
+            </div>
+          </div>
+          <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:4px;"></div>
+        </div>
+      `;
     }).join('');
   }
 
@@ -1501,8 +1512,10 @@ $activePeriodPayload = $activePeriod
     if (liveAmPm) liveAmPm.textContent = ampm;
     if (liveDate) liveDate.textContent = `${months[ph.getMonth()]} ${ph.getDate()}, ${ph.getFullYear()}`;
     if (liveDay) liveDay.textContent = days[ph.getDay()];
-    if (currentDateTime) currentDateTime.textContent =
-      `${days[ph.getDay()]}, ${months[ph.getMonth()]} ${ph.getDate()}, ${ph.getFullYear()} · ${hh}:${m} ${ampm}`;
+    if (currentDateTime) {
+      currentDateTime.textContent =
+        `${days[ph.getDay()]}, ${months[ph.getMonth()]} ${ph.getDate()}, ${ph.getFullYear()} · ${hh}:${m} ${ampm}`;
+    }
 
     if (timeIcon) {
       if (ph.getHours() >= 6 && ph.getHours() < 18) {
@@ -1514,26 +1527,56 @@ $activePeriodPayload = $activePeriod
   }
 
   function clearAcademicSearch() {
-      const searchInput = document.getElementById('searchInput');
-      const clearBtn = document.getElementById('clearSearch');
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
 
-      if (searchInput) searchInput.value = '';
-      if (clearBtn) clearBtn.classList.remove('visible');
+    if (searchInput) searchInput.value = '';
+    if (clearBtn) clearBtn.classList.remove('visible');
 
-      const rows = document.querySelectorAll('tbody tr.tbl-row');
-      rows.forEach(row => row.style.display = '');
+    const rows = document.querySelectorAll('tbody tr.tbl-row');
+    rows.forEach(row => row.style.display = '');
 
-      const jsEmpty = document.getElementById('jsEmptyState');
-      if (jsEmpty) jsEmpty.style.display = 'none';
+    const jsEmpty = document.getElementById('jsEmptyState');
+    if (jsEmpty) jsEmpty.style.display = 'none';
 
-      const serverEmpty = document.getElementById('serverEmptyState');
-      if (serverEmpty) {
-  const hasRows = rows.length > 0;
-  serverEmpty.style.display = hasRows ? 'none' : '';
-}
+    const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
+    if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
 
-      if (searchInput) searchInput.focus();
+    const serverEmpty = document.getElementById('serverEmptyState');
+    if (serverEmpty) {
+      const hasRows = rows.length > 0;
+      serverEmpty.style.display = hasRows ? 'none' : '';
     }
+
+    if (searchInput) searchInput.focus();
+  }
+
+  function resetAcademicFilters() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    const semesterFilter = document.getElementById('semesterFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const rows = document.querySelectorAll('tbody tr.tbl-row');
+
+    if (searchInput) searchInput.value = '';
+    if (semesterFilter) semesterFilter.value = '';
+    if (statusFilter) statusFilter.value = '';
+    if (clearBtn) clearBtn.classList.remove('visible');
+
+    rows.forEach(row => row.style.display = '');
+
+    const jsEmpty = document.getElementById('jsEmptyState');
+    if (jsEmpty) jsEmpty.style.display = 'none';
+
+    const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
+    if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
+
+    const serverEmpty = document.getElementById('serverEmptyState');
+    if (serverEmpty) {
+      const hasRows = rows.length > 0;
+      serverEmpty.style.display = hasRows ? 'none' : '';
+    }
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     updateClock();
@@ -1541,13 +1584,15 @@ $activePeriodPayload = $activePeriod
     setInterval(updateClock, 1000);
   });
 
-  // ── LIVE SEARCH ──
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
     const tbody = document.querySelector('tbody');
     const allRows = () => tbody.querySelectorAll('tr.tbl-row');
     let searchTimer = null;
+
+    const semesterFilter = document.getElementById('semesterFilter');
+    const statusFilter = document.getElementById('statusFilter');
 
     function getEmptyRow() {
       return document.getElementById('jsEmptyState');
@@ -1596,12 +1641,61 @@ $activePeriodPayload = $activePeriod
       if (el) el.style.display = 'none';
 
       const serverEmpty = document.getElementById('serverEmptyState');
-
       if (serverEmpty) {
         const rows = document.querySelectorAll('tbody tr.tbl-row');
         const hasRows = rows.length > 0;
-
         serverEmpty.style.display = hasRows ? 'none' : '';
+      }
+    }
+
+    function applyDropdownFilters() {
+      const semesterValue = semesterFilter?.value || '';
+      const statusValue = statusFilter?.value || '';
+      const rows = allRows();
+      const searchValue = searchInput.value.trim().toLowerCase();
+
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowSemester = row.dataset.semester || '';
+        const rowStatus = row.dataset.status || '';
+
+        const semesterMatch = !semesterValue || rowSemester === semesterValue;
+        const statusMatch = !statusValue || rowStatus === statusValue;
+        const searchMatch = !searchValue || text.includes(searchValue);
+
+        if (semesterMatch && statusMatch && searchMatch) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const serverEmpty = document.getElementById('serverEmptyState');
+      let jsEmpty = document.getElementById('jsFilterEmptyState');
+
+      if (visibleCount === 0) {
+        if (!jsEmpty) {
+          jsEmpty = document.createElement('tr');
+          jsEmpty.id = 'jsFilterEmptyState';
+          jsEmpty.innerHTML = `
+            <td colspan="7" class="text-center text-gray-400 ap-empty">
+              <div class="flex flex-col items-center justify-center text-center">
+                <i class="fa-solid fa-filter text-3xl mb-3 opacity-30 block"></i>
+                <p class="text-sm font-medium">No academic periods match the selected filters.</p>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(jsEmpty);
+        }
+        jsEmpty.style.display = '';
+        hideEmptyState();
+        if (serverEmpty) serverEmpty.style.display = 'none';
+      } else {
+        if (jsEmpty) jsEmpty.style.display = 'none';
+        if (serverEmpty) serverEmpty.style.display = 'none';
       }
     }
 
@@ -1612,21 +1706,34 @@ $activePeriodPayload = $activePeriod
       clearBtn.classList.toggle('visible', q !== '');
 
       if (q === '') {
-        rows.forEach(r => r.style.display = '');
+        applyDropdownFilters();
         hideEmptyState();
         return;
       }
 
       let visibleCount = 0;
+      const semesterValue = semesterFilter?.value || '';
+      const statusValue = statusFilter?.value || '';
+
       rows.forEach(row => {
         const text = row.textContent.toLowerCase();
-        if (text.includes(q)) {
+        const rowSemester = row.dataset.semester || '';
+        const rowStatus = row.dataset.status || '';
+
+        const searchMatch = text.includes(q);
+        const semesterMatch = !semesterValue || rowSemester === semesterValue;
+        const statusMatch = !statusValue || rowStatus === statusValue;
+
+        if (searchMatch && semesterMatch && statusMatch) {
           row.style.display = '';
           visibleCount++;
         } else {
           row.style.display = 'none';
         }
       });
+
+      const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
+      if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
 
       if (visibleCount === 0) {
         showEmptyState(query.trim());
@@ -1637,6 +1744,7 @@ $activePeriodPayload = $activePeriod
 
     clearBtn.addEventListener('click', () => {
       clearAcademicSearch();
+      applyDropdownFilters();
     });
 
     searchInput.addEventListener('input', () => {
@@ -1648,7 +1756,14 @@ $activePeriodPayload = $activePeriod
       if (e.key === 'Enter') e.preventDefault();
     });
 
-    if (searchInput.value) doSearch(searchInput.value);
+    semesterFilter?.addEventListener('change', applyDropdownFilters);
+    statusFilter?.addEventListener('change', applyDropdownFilters);
+
+    if (searchInput.value) {
+      doSearch(searchInput.value);
+    } else {
+      applyDropdownFilters();
+    }
   });
 </script>
 @endsection
