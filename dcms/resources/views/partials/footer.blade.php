@@ -3,7 +3,6 @@
         background: var(--crimson);
         color: rgba(255, 255, 255, .8);
         padding: 1.25rem 2rem;
-        margin-left: 256px;
     }
 
     .footer-inner {
