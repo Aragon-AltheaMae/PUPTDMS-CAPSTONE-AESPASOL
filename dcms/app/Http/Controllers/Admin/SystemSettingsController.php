@@ -13,7 +13,6 @@ class SystemSettingsController extends Controller
     private const BOOLEAN_KEYS = [
         'maintenance_mode',
         'debug_mode',
-        'show_appt_counter',
 
         'notif_new_appointment',
         'notif_cancellation',
@@ -30,12 +29,8 @@ class SystemSettingsController extends Controller
     private const ALLOWED_GROUPS = [
         'general' => [
             'language',
-            'timezone',
-            'date_format',
-            'time_format',
             'maintenance_mode',
             'debug_mode',
-            'show_appt_counter',
         ],
 
         'clinic' => [
@@ -98,7 +93,6 @@ class SystemSettingsController extends Controller
         foreach (self::ALLOWED_GROUPS as $group => $keys) {
             foreach ($keys as $key) {
                 $value = $this->resolveValue($request, $validated, $key);
-
                 SystemSetting::setSetting($key, $value, $group);
             }
         }
@@ -122,7 +116,6 @@ class SystemSettingsController extends Controller
 
         if ($key === 'notif_channels') {
             $channels = $validated['notif_channels'] ?? [];
-
             return empty($channels) ? '' : implode(',', $channels);
         }
 
@@ -138,17 +131,11 @@ class SystemSettingsController extends Controller
     private function rules(): array
     {
         return [
-            // GENERAL
             'language' => ['nullable', Rule::in(['English (US)', 'Filipino'])],
-            'timezone' => ['nullable', Rule::in(['Asia/Manila (UTC+8)', 'UTC'])],
-            'date_format' => ['nullable', Rule::in(['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'])],
-            'time_format' => ['nullable', Rule::in(['12-hour (AM/PM)', '24-hour'])],
 
             'maintenance_mode' => ['nullable', 'boolean'],
             'debug_mode' => ['nullable', 'boolean'],
-            'show_appt_counter' => ['nullable', 'boolean'],
 
-            // CLINIC
             'clinic_name' => ['nullable', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:50'],
             'email_address' => ['nullable', 'email', 'max:255'],
@@ -157,7 +144,6 @@ class SystemSettingsController extends Controller
             'accreditation_no' => ['nullable', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:5000'],
 
-            // NOTIFICATIONS
             'notif_new_appointment' => ['nullable', 'boolean'],
             'notif_cancellation' => ['nullable', 'boolean'],
             'notif_document_request' => ['nullable', 'boolean'],
@@ -168,7 +154,6 @@ class SystemSettingsController extends Controller
             'notif_channels' => ['nullable', 'array'],
             'notif_channels.*' => [Rule::in(['Email', 'SMS', 'WhatsApp', 'In-App'])],
 
-            // BACKUP
             'backup_frequency' => ['nullable', Rule::in(['Every 6 hours', 'Daily', 'Weekly', 'Monthly'])],
             'backup_retention_days' => ['nullable', 'integer', 'min:7', 'max:365'],
             'backup_storage' => ['nullable', Rule::in(['Local Server', 'Google Drive', 'AWS S3'])],
