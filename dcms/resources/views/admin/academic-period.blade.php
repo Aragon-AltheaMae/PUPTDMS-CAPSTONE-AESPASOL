@@ -672,7 +672,7 @@ $activePeriodPayload = $activePeriod
               <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current Semester</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerSem">
-              {{ $activePeriod?->semester ?? 'No Active Period' }}
+              {{ $activePeriod ? str_replace(['1st','2nd'], ['First','Second'], $activePeriod->semester) : 'No Active Period' }}
             </p>
           </div>
           <div>
@@ -833,7 +833,7 @@ $activePeriodPayload = $activePeriod
                     <span class="sem-pill" style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
                       <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
                         style="font-size:9px;"></i>
-                      {{ $period->semester }}
+                      {{ str_replace(['1st','2nd'], ['First','Second'], $period->semester) }}
                     </span>
                   </td>
 
@@ -870,8 +870,12 @@ $activePeriodPayload = $activePeriod
                       <span class="act act-pinned"><i class="fa-solid fa-star" style="font-size:10px;"></i></span>
                       @endif
 
+                      @php
+                        $label = $period->academic_year . ' — ' . str_replace(['1st','2nd'], ['First','Second'], $period->semester);
+                      @endphp
+
                       <button type="button" class="act act-del" title="Delete"
-                        onclick='openDeleteModal(@json(route("admin.academic_periods.destroy", $period)), @json($period->academic_year . " — " . $period->semester))'>
+                        onclick='openDeleteModal(@json(route("admin.academic_periods.destroy", $period)), @json($label))'>
                         <i class="fa-solid fa-trash" style="font-size:10px;"></i>
                       </button>
                     </div>
@@ -1469,7 +1473,13 @@ $activePeriodPayload = $activePeriod
     document.getElementById('editEnd').value = period.end_date ?? '';
     document.getElementById('editDesc').value = period.description ?? '';
     document.getElementById('editIsActive').checked = !!period.is_active;
-    document.getElementById('editSubtitle').textContent = `${period.academic_year} — ${period.semester}`;
+    const semMap = {
+      '1st Semester': 'First Semester',
+      '2nd Semester': 'Second Semester',
+    };
+
+    document.getElementById('editSubtitle').textContent =
+      `${period.academic_year} — ${semMap[period.semester] || period.semester}`;
 
     document.querySelectorAll('.edit-sem').forEach(radio => {
       radio.checked = radio.value === period.semester;
