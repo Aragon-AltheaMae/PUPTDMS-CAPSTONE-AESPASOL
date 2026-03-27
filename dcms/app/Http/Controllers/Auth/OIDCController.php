@@ -320,7 +320,7 @@ class OIDCController extends Controller
 
             AuditLogger::log('login', 'authentication', 'Patient logged in via OIDC');
 
-            return redirect()->route('patient.dashboard')
+            return redirect()->route('homepage')
                 ->with('login_as', $patient->name)
                 ->with('show_terms_modal', true);
         }

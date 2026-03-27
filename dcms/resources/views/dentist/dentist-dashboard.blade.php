@@ -213,23 +213,6 @@
     <main id="mainContent" class="pt-[100px] px-6 py-6 fade-in min-h-screen">
         <div class="max-w-7xl mx-auto fade-in">
 
-            @if (session('impersonated_role') && session('impersonator_role') === 'super_admin')
-                <div
-                    style="background:#DBEAFE;border:1px solid #93C5FD;color:#1E40AF;padding:14px 18px;margin-bottom:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                    <div>
-                        <strong>You are viewing as {{ ucfirst(session('impersonated_role')) }}</strong><br>
-                        <span style="font-size:13px;">Super Admin impersonation mode is active.</span>
-                    </div>
-                    <form method="POST" action="{{ route('admin.stop_impersonation') }}">
-                        @csrf
-                        <button type="submit"
-                            style="background:#8B0000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;">
-                            Return to Admin
-                        </button>
-                    </form>
-                </div>
-            @endif
-
             <div class="greeting-row">
                 <div class="min-w-0 flex-1">
                     <h1 class="greeting-title font-extrabold fade-in">

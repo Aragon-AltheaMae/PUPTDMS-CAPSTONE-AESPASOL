@@ -37,6 +37,10 @@ use App\Http\Controllers\Admin\AdminAppointmentController;
 
 // routes/web.php
 
+Route::get('/debug-session', function () {
+    return response()->json(session()->all());
+});
+
 Route::middleware(['web'])->group(function () {
     Route::get('/auth/oidc/redirect', [OIDCController::class, 'redirect'])
         ->name('oidc.redirect');
@@ -161,7 +165,7 @@ Route::post('/login', function (Request $request) {
     if ($request->email === 'admin' && $request->password === 'admin123') {
         session([
             'admin_logged_in' => true,
-            'role' => 'super_admin',
+            'role' => 'admin',
             'admin_id' => 1,
             'admin_email' => 'admin'
         ]);
@@ -200,11 +204,12 @@ Route::post('/login', function (Request $request) {
 
     session()->save();
 
-    dd([
-        'message' => 'patient login success',
-        'session' => session()->all(),
-        'redirecting_to' => route('patient.dashboard'),
-    ]);
+    // dd([
+    //     'message' => 'patient login success',
+    //     'session' => session()->all(),
+    //     'redirecting_to' => route('patient.dashboard'),
+    // ]);
+
     return redirect()->route('patient.dashboard')
         ->with('login_as', $patient->name)
         ->with('show_terms_modal', true);
@@ -311,7 +316,7 @@ Route::prefix('admin')->group(function () {
     // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
     Route::get('/patients/list', function () {
 
-        if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+        if (!session('admin_logged_in') || !in_array(session('role'), ['super_admin', 'admin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -396,17 +401,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // START IMPERSONATION
-Route::post('/impersonate', function (Request $request) {
-    if (!session('admin_logged_in') || session('role') !== 'super_admin') {
-        return response()->json(['message' => 'Unauthorized'], 403);
-    }
+// Route::post('/impersonate', function (Request $request) {
+//     if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+//         return response()->json(['message' => 'Unauthorized'], 403);
+//     }
 
-    $patients = Patient::select('id', 'name', 'email', 'phone')
-        ->orderBy('name')
-        ->get();
+//     $patients = Patient::select('id', 'name', 'email', 'phone')
+//         ->orderBy('name')
+//         ->get();
 
-    return response()->json($patients);
-})->name('admin.patients.list');
+//     return response()->json($patients);
+// })->name('admin.patients.list');
 
 // SYSTEM SETTINGS
 Route::get('/admin/system-settings', [SystemSettingsController::class, 'index'])
@@ -459,7 +464,7 @@ Route::prefix('admin')->group(function () {
 
 Route::post('/impersonate', function (Request $request) {
 
-    if (!session('admin_logged_in') || session('role') !== 'super_admin') {
+    if (!session('admin_logged_in') || !in_array(session('role'), ['super_admin', 'admin'])) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
@@ -553,7 +558,7 @@ Route::post('/stop-impersonation', function () {
     ]);
 
     session([
-        'role' => 'super_admin',
+        'role' => 'admin',
         'admin_logged_in' => true,
     ]);
 
