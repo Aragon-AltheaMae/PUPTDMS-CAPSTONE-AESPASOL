@@ -251,6 +251,19 @@
       box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
     }
 
+    .form-ctrl:disabled {
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .setting-note {
+      font-size: .68rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
     .form-sel {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
@@ -466,27 +479,10 @@
 <div class="settings-page">
   <div class="settings-shell">
 
-    @if(session('success'))
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          showToast('Success', @json(session('success')), 'success');
-        });
-      </script>
-    @endif
-
-    @if($errors->any())
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          showToast('Error', @json($errors->first()), 'error');
-        });
-      </script>
-    @endif
-
-    <div class="mb-6">
+    <div class="mb-6 mt-3">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">System Settings</h1>
-          <p class="text-sm text-gray-500 mt-1">Configure clinic system preferences, notifications, and backup settings.</p>
         </div>
         <div class="flex items-center gap-3">
           <button type="button" onclick="document.getElementById('settingsForm').submit();"
@@ -564,29 +560,35 @@
                       @endforeach
                     </select>
                   </div>
+
                   <div>
                     <label class="form-label">Timezone</label>
-                    <select name="timezone" class="form-ctrl form-sel">
+                    <select name="timezone" class="form-ctrl form-sel" disabled>
                       @foreach(['Asia/Manila (UTC+8)', 'UTC'] as $opt)
                         <option {{ old('timezone', $settings['timezone']->value ?? 'Asia/Manila (UTC+8)') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                       @endforeach
                     </select>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div>
                     <label class="form-label">Date Format</label>
-                    <select name="date_format" class="form-ctrl form-sel">
+                    <select name="date_format" class="form-ctrl form-sel" disabled>
                       @foreach(['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] as $opt)
                         <option {{ old('date_format', $settings['date_format']->value ?? 'MM/DD/YYYY') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                       @endforeach
                     </select>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
-                  <div>
+
+                   <div>
                     <label class="form-label">Time Format</label>
-                    <select name="time_format" class="form-ctrl form-sel">
+                    <select name="time_format" class="form-ctrl form-sel" disabled>
                       @foreach(['12-hour (AM/PM)', '24-hour'] as $opt)
                         <option {{ old('time_format', $settings['time_format']->value ?? '12-hour (AM/PM)') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                       @endforeach
                     </select>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
                 </div>
 
@@ -608,17 +610,6 @@
                   </div>
                   <label class="toggle-wrap">
                     <input type="checkbox" name="debug_mode" value="1" {{ old('debug_mode', $settings['debug_mode']->value ?? '0') === '1' ? 'checked' : '' }}>
-                    <span class="toggle-slider"></span>
-                  </label>
-                </div>
-
-                <div class="setting-row">
-                  <div class="setting-row-info">
-                    <div class="setting-row-label">Show Appointment Counter on Dashboard</div>
-                    <div class="setting-row-desc">Display real-time booking stats on admin home</div>
-                  </div>
-                  <label class="toggle-wrap">
-                    <input type="checkbox" name="show_appt_counter" value="1" {{ old('show_appt_counter', $settings['show_appt_counter']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
                 </div>
