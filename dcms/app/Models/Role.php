@@ -17,4 +17,14 @@ class Role extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return match ($this->slug) {
+            'super_admin' => 'Admin',
+            'dentist' => 'Dentist',
+            'patient' => 'Patient',
+            default => $this->name,
+        };
+    }
 }

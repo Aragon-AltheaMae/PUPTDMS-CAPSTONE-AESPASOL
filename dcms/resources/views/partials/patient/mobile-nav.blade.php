@@ -3,8 +3,8 @@
     
     <div class="grid grid-cols-5 items-center w-full h-[66px] relative z-10 px-1">
 
-        @php $isHome = request()->routeIs('patient.dashboard') || request()->is('patient/dashboard'); @endphp
-        <a href="{{ route('patient.dashboard') }}"
+        @php $isHome = request()->routeIs('homepage') || request()->routeIs('patient.dashboard') || request()->is('patient/dashboard'); @endphp
+        <a href="{{ route('homepage') }}"
             class="flex flex-col items-center justify-center w-full h-full relative pb-1 transition-all duration-300 {{ $isHome ? 'text-[#8B0000] dark:text-[#ff6b6b]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500' }}">
             <i class="fa-solid fa-house text-[18px] mb-1 transition-transform duration-300 {{ $isHome ? 'scale-110' : '' }}"></i>
             <span class="text-[10px] font-bold">Home</span>
