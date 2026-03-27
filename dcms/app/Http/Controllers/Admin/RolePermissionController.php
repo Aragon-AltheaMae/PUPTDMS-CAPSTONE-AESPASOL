@@ -31,7 +31,7 @@ class RolePermissionController extends Controller
 
     private function seedDefaultsIfEmpty(): void
     {
-        $coreRoles = ['super_admin', 'dentist', 'patient'];
+        $coreRoles = ['admin', 'dentist', 'patient'];
 
         foreach ($coreRoles as $slug) {
             $role = Role::where('slug', $slug)->first();
@@ -44,7 +44,7 @@ class RolePermissionController extends Controller
     private function applyDefaults(Role $role, string $slug): void
     {
         $map = [
-            'super_admin' => [
+            'admin' => [
                 'access_super_admin_dashboard',
                 'access_patient_dashboard',
                 'receive_notifications',
@@ -156,7 +156,7 @@ class RolePermissionController extends Controller
 
     public function reset()
     {
-        $superAdmin = Role::where('slug', 'super_admin')->firstOrFail();
+        $admin = Role::where('slug', 'admin')->firstOrFail();
         $dentist    = Role::where('slug', 'dentist')->firstOrFail();
         $patient    = Role::where('slug', 'patient')->firstOrFail();
 
@@ -207,7 +207,7 @@ class RolePermissionController extends Controller
             'request_documents',
         ])->pluck('id');
 
-        $superAdmin->permissions()->sync($superAdminPermissions);
+        $admin->permissions()->sync($superAdminPermissions);
         $dentist->permissions()->sync($dentistPermissions);
         $patient->permissions()->sync($patientPermissions);
 

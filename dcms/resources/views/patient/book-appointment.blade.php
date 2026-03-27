@@ -1986,15 +1986,6 @@
                 }
             });
 
-            /* Desktop layout */
-            if (window.innerWidth >= 768) {
-                sidebarOpen = true;
-                applyLayout('220px');
-            } else {
-                var mc = document.getElementById('mainContent');
-                if (mc) mc.style.marginLeft = '0';
-            }
-
             /* Mobile FAB */
             var mobFab = document.getElementById('mobFab');
             var mobFabMenu = document.getElementById('mobFabMenu');

@@ -108,6 +108,13 @@
         transition: background .15s;
     }
 
+    .header-user-btn i {
+        color: #F4F4F4;
+        font-size: 12px;
+        margin-left: 2px;
+        transition: transform 0.2s ease-in-out;
+    }
+
     .header-user-btn:hover {
         background: rgba(255, 255, 255, .18);
     }
@@ -438,8 +445,6 @@
     }
 
     @media (max-width: 767px) {
-
-        /* ── Prevent notification dropdown from bleeding off-screen ── */
         #notifMenu {
             width: min(290px, 88vw);
             right: 0;
@@ -451,7 +456,6 @@
             left: auto;
         }
 
-        /* ── Main content: no sidebar offset, space for floating pill nav ── */
         #mainContent {
             margin-left: 0 !important;
             padding-bottom: 100px;
@@ -497,7 +501,6 @@
             flex-shrink: 0;
         }
 
-        /* ── Profile pill ── */
         .mobile-pill {
             padding: 3px 8px 3px 3px;
             border-radius: 999px;
@@ -508,6 +511,14 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         }
 
+        .mobile-pill i {
+            display: block !important;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-left: 4px;
+            align-self: center;
+        }
+
         .mobile-pill .header-avatar {
             width: 28px;
             height: 28px;
@@ -516,13 +527,6 @@
 
         .mobile-pill .header-user-text {
             display: none !important;
-        }
-
-        .mobile-pill i {
-            display: block !important;
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.75);
-            margin-left: 1px;
         }
     }
 

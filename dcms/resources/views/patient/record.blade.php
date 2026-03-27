@@ -925,12 +925,6 @@
 
         /* ── DOM READY ── */
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.innerWidth >= 768) {
-                sidebarOpen = true;
-                applyLayout('220px');
-            } else {
-                document.getElementById('mainContent').style.marginLeft = '0';
-            }
 
             document.getElementById('modalCloseBtn').addEventListener('click', closeRecModal);
             document.getElementById('modalCloseFooter').addEventListener('click', closeRecModal);

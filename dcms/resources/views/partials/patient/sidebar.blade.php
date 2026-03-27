@@ -3,7 +3,7 @@
         <div class="nav-section-label mt-2">Navigation</div>
 
         <div class="nav-group mt-2">
-            <a href="{{ route('patient.dashboard') }}" class="nav-link {{ request()->routeIs('patient.dashboard') || request()->is('patient/dashboard') ? 'active' : '' }}">
+            <a href="{{ route('homepage') }}" class="nav-link {{ request()->routeIs('homepage') || request()->is('patient/dashboard') ? 'active' : '' }}">
                 <i class="fa-solid fa-house"></i> Home
             </a>
             
