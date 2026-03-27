@@ -16,6 +16,11 @@
         --gold: #C9A84C;
     }
 
+      [data-theme="dark"] body {
+    background-color: #000D1A;
+    color: #E5E7EB;
+  }
+  
     /* ══════ HEADER ══════ */
     .header {
         position: fixed;

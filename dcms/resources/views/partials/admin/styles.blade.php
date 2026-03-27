@@ -234,6 +234,11 @@
         flex-shrink: 0;
     }
 
+      [data-theme="dark"] body {
+    background-color: #000D1A;
+    color: #E5E7EB;
+  }
+  
     [data-theme="dark"] #mobileDrawer {
         background: #0d1117;
     }
