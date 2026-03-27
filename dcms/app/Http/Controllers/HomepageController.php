@@ -15,7 +15,7 @@ class HomepageController extends Controller
 
     public function index()
     {
-        $patientId = session('patient_id');
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')->with('error', 'Please login first!');
@@ -34,24 +34,18 @@ class HomepageController extends Controller
             ->get();
 
         // Upcoming appointment (nearest from today onwards)
-        $nowDate = now()->toDateString();
-        $nowTime = now()->format('H:i:s');
+        $today = now()->toDateString();
 
         $upcomingAppointment = Appointment::where('patient_id', $patient->id)
             ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->where(function ($q) use ($nowDate, $nowTime) {
-                $q->where('appointment_date', '>', $nowDate)
-                    ->orWhere(function ($q2) use ($nowDate, $nowTime) {
-                        $q2->where('appointment_date', '=', $nowDate)
-                            ->where('appointment_time', '>=', $nowTime);
-                    });
-            })
+            ->where('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->first();
 
         // Count appointments per day for the calendar
-        $appointmentCountsPerDay = Appointment::selectRaw('appointment_date, COUNT(*) as count')
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();

@@ -14,6 +14,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
+    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+    
     <script>
         tailwind.config = {
             darkMode: ['class', '[data-theme="dark"]'],
@@ -42,9 +44,19 @@
 
 <body class="@yield('body-class', 'bg-[#F4F4F4]')">
 
-    @include('partials.patient.header')
+    @include('partials.header', [
+    'role' => 'patient',
+    'patient' => $patient ?? null,
+    'notifications' => $notifications ?? [],
+    'showMobileMenu' => false,
+    'showSettings' => false
+])
+
+
     @include('partials.patient.sidebar')
     @include('partials.patient.mobile-nav')
+
+    @include('partials.impersonation-banner')
 
     @yield('content')
 
@@ -68,6 +80,7 @@
     @stack('scripts')
     @yield('scripts')
 
+    <script src="{{ asset('js/header.js') }}"></script>
 </body>
 
 </html>
