@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -994,9 +994,15 @@
                                 <i class="fa-regular fa-comment-dots text-xs"></i> Additional Concerns <span
                                     class="flex-1 h-px bg-[#f9e8e8]"></span>
                             </p>
-                            <textarea name="additional_concerns" id="additional_concerns" rows="4"
+                            <textarea name="additional_concerns" id="additional_concerns" rows="4" maxlength="150"
                                 class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none resize-none"
                                 placeholder="Write any additional concerns here..."></textarea>
+                                <div class="flex justify-between items-center text-xs mt-1">
+                                    <span id="concernWarning" class="text-red-500 hidden">
+                                        Character limit reached
+                                    </span>
+                                    <span id="concernCount" class="text-[#9e9690]">0/150</span>
+                                </div>
                         </div>
                     </div>
 
@@ -1051,9 +1057,10 @@
                             </div>
                             <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
                                 <label class="text-xs text-[#8B0000] italic">If NO, please provide details:</label>
-                                <input type="text" name="good_health_details"
+                                <input type="text" name="good_health_details" maxlength="150" id="good_health_details"
                                     class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                     placeholder="Input here">
+                                    <div class="text-right text-xs"><span id="goodHealthCount">0/150</span></div>
                             </div>
 
                             <div
@@ -1085,9 +1092,10 @@
                             </div>
                             <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
                                 <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
-                                <input type="text" name="treatment_details"
+                                <input type="text" name="treatment_details" maxlength="150" id="treatment_details"
                                     class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                     placeholder="Input here">
+                                    <div class="text-right text-xs"><span id="treatmentCount">0/150</span></div>
                             </div>
 
                             <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
@@ -1100,9 +1108,10 @@
                             </div>
                             <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
                                 <label class="text-xs text-[#8B0000] italic">If YES, please provide details:</label>
-                                <input type="text" name="hospital_details"
+                                <input type="text" name="hospital_details" maxlength="150" id="hospital_details"
                                     class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                     placeholder="Input here">
+                                    <div class="text-right text-xs"><span id="hospitalCount">0/150</span></div>
                             </div>
                         </div>
 
@@ -1166,9 +1175,10 @@
                             </div>
                             <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
                                 <label class="text-xs text-[#8B0000] italic">If YES, please specify:</label>
-                                <input type="text" name="medication_details"
+                                <input type="text" name="medication_details" maxlength="150" id="medication_details"
                                     class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                     placeholder="Input here">
+                                    <div class="text-right text-xs"><span id="medicationCount">0/150</span></div>
                             </div>
                         </div>
 
@@ -1764,6 +1774,47 @@
             });
         });
 
+        function setupCharLimit(inputId, counterId, max = 150, warningId = null) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const warning = warningId ? document.getElementById(warningId) : null;
+
+            if (!input || !counter) return;
+
+            function updateUI() {
+                let length = input.value.length;
+
+                if (length > max) {
+                    input.value = input.value.slice(0, max);
+                    length = max;
+                }
+
+                counter.textContent = `${length}/${max}`;
+
+                counter.classList.remove("text-red-600", "text-yellow-500");
+                input.classList.remove("border-red-500", "ring-1", "ring-red-400");
+
+                if (warning) warning.classList.add("hidden");
+
+                if (length >= max) {
+                    counter.classList.add("text-red-600");
+                    input.classList.add("border-red-500", "ring-1", "ring-red-400");
+                    if (warning) warning.classList.remove("hidden");
+                }
+                else if (length >= max - 10) {
+                    counter.classList.add("text-yellow-500");
+                }
+            }
+
+            input.addEventListener("input", updateUI);
+
+            // init
+            updateUI();
+        }
+
+        // APPLY
+        setupCharLimit("additional_concerns", "concernCount", 150);
+
         /* SUMMARY BUILDER */
         function buildSummary() {
             const form = document.getElementById("appointmentForm");
@@ -2312,6 +2363,12 @@
                 el.style.gridTemplateColumns = window.innerWidth < 640 ? "1fr" : "1fr 1fr";
             });
         });
+
+        setupCharLimit("additional_concerns", "concernCount", 150, "concernWarning");
+            setupCharLimit("good_health_details", "goodHealthCount", 150);
+            setupCharLimit("treatment_details", "treatmentCount", 150);
+            setupCharLimit("hospital_details", "hospitalCount", 150);
+            setupCharLimit("medication_details", "medicationCount", 150);
     </script>
 </body>
 
