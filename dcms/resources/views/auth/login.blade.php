@@ -65,6 +65,15 @@
       }
     }
 
+    @keyframes textShimmer {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: 0% center;
+      }
+    }
+
     @keyframes pulseGlow {
       0% {
         box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
@@ -1100,13 +1109,24 @@
     .hero-title {
       font-size: clamp(2rem, 5vw, 5rem);
       font-weight: 800;
-      line-height: 1.1;
+      line-height: 1.3; 
       letter-spacing: -0.02em;
-      margin-bottom: 32px;
-      background: linear-gradient(90deg, #8B0000 0%, #b5282a 40%, #c8860a 70%, #FFD700 100%);
+      margin-bottom: 24px;
+      padding-bottom: 0.2em;
+      
+      background: linear-gradient(
+        to right, 
+        #8B0000 0%, 
+        #b5282a 25%, 
+        #FFD700 50%, 
+        #b5282a 75%, 
+        #8B0000 100%
+      );
+      background-size: 200% auto; 
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      animation: textShimmer 4s linear infinite;
     }
 
     /* ─── MOBILE HAMBURGER ─── */
