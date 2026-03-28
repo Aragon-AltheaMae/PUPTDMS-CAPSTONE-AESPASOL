@@ -1,666 +1,1784 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PUP Taguig — Dental Clinic</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8" />
+  <title>@yield('title', 'PUP Taguig Dental Clinic')</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     :root {
-      --red-deep:   #8B0000;
-      --red-mid:    #B01020;
-      --red-bright: #CC1A2A;
-      --gold:       #D4A017;
-      --gold-light: #F0C040;
-      --white:      #FFFFFF;
-      --off-white:  #F5F0E8;
-      --dark:       #1A0505;
+      --crimson: #8B0000;
+      --crimson-dark: #660000;
+      --gold: #FFD700;
+
+      --white: #FFFFFF;
+      --bg-light: #F8F9FA;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --text-main: #1F2937;
+      --text-muted: #4B5563;
+
+      --shadow-sm: 0 2px 8px rgba(139, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px rgba(139, 0, 0, 0.08);
+      --shadow-lg: 0 16px 48px rgba(139, 0, 0, 0.12);
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
-      font-family: 'Montserrat', sans-serif;
-      background: var(--dark);
-      color: var(--white);
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-main);
       overflow-x: hidden;
-    }
-
-    /* ── ANIMATED BACKGROUND ── */
-    .bg-wrap {
-      position: fixed; inset: 0;
-      z-index: 0;
-      background: radial-gradient(ellipse 80% 70% at 70% 50%, #7a1a00 0%, #3d0000 40%, #1A0505 100%);
-    }
-
-    /* Grid lines like the reference */
-    .bg-wrap::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(212,160,23,0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(212,160,23,0.07) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-
-    /* Animated floating particles */
-    .particles { position: absolute; inset: 0; overflow: hidden; }
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(212,160,23,0.5);
-      animation: drift linear infinite;
-    }
-
-    /* Decorative tooth shapes in BG (like reference) */
-    .bg-tooth {
-      position: absolute;
-      opacity: 0.06;
-      fill: var(--gold);
-    }
-    .bg-tooth-1 { top: 8%; left: 5%; width: 90px; animation: floatY 7s ease-in-out infinite; }
-    .bg-tooth-2 { bottom: 10%; left: 3%; width: 120px; animation: floatY 9s ease-in-out 2s infinite; }
-    .bg-tooth-3 { bottom: 20%; right: 4%; width: 80px; animation: floatY 6s ease-in-out 1s infinite; }
-
-    @keyframes drift {
-      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-    }
-
-    @keyframes floatY {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50%       { transform: translateY(-18px) rotate(5deg); }
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.2rem 5rem;
-      background: rgba(26, 5, 5, 0.7);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(212,160,23,0.2);
-      z-index: 100;
-      animation: fadeDown 0.8s ease both;
-    }
-
-    .nav-brand {
-      display: flex; align-items: center; gap: 0.8rem;
-    }
-
-    .nav-logo-icon {
-      width: 38px; height: 38px;
-      background: var(--gold);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-    }
-
-    .nav-brand-text {
-      display: flex; flex-direction: column;
-      line-height: 1.1;
-    }
-
-    .nav-brand-title {
-      font-size: 0.95rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--white);
-      text-transform: uppercase;
-    }
-
-    .nav-brand-sub {
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.85);
-      text-transform: uppercase;
-    }
-
-    .nav-links {
-      display: flex; gap: 2.5rem; list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.65);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .nav-links a:hover { color: var(--gold-light); }
-
-    .nav-cta {
-      background: var(--gold);
-      color: var(--dark) !important;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 700 !important;
-      transition: background 0.3s, transform 0.2s !important;
-    }
-
-    .nav-cta:hover {
-      background: var(--gold-light) !important;
-      transform: translateY(-1px);
-    }
-
-    /* ── HERO ── */
-    .hero {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8rem 5rem 5rem;
-    }
-
-    .hero-inner {
-      max-width: 1100px;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-      align-items: center;
-    }
-
-    /* LEFT */
-    .hero-left { animation: fadeUp 1s ease 0.2s both; }
-
-    .badge-pill {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: rgba(212,160,23,0.15);
-      border: 1px solid rgba(212,160,23,0.35);
-      border-radius: 40px;
-      padding: 0.4rem 1rem;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold-light);
-      margin-bottom: 1.8rem;
-    }
-
-    .badge-dot {
-      width: 6px; height: 6px;
-      background: var(--gold-light);
-      border-radius: 50%;
-      animation: pulse 2s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.5); }
-    }
-
-    h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: clamp(2.6rem, 4.5vw, 3.8rem);
-      font-weight: 900;
-      line-height: 1.08;
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 .line-gold {
-      background: linear-gradient(90deg,
-        #6B0000 0%,
-        #FFD700 35%,
-        #fff 50%,
-        #FFD700 65%,
-        #6B0000 100%);
-      background-size: 250% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shine 16s linear infinite;
-      display: block;
-    }
-
-    h1 .line-white {
-      display: block;
-      color: var(--white);
-    }
-
-    @keyframes shine {
-      0%   { background-position: 200% center; }
-      100% { background-position: -200% center; }
-    }
-
-    .subtitle-row {
-      display: flex; align-items: center; gap: 0.75rem;
-      margin-bottom: 1.8rem;
-    }
-
-    .subtitle-line { flex: 1; height: 1px; background: rgba(212,160,23,0.3); }
-
-    .subtitle-text {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.9);
-      white-space: nowrap;
-    }
-
-    .hero-desc {
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.9);
-      font-weight: 400;
-      margin-bottom: 2.5rem;
-      max-width: 440px;
-    }
-
-    /* Feature list */
-    .features {
-      list-style: none;
-      display: flex; flex-direction: column; gap: 0.75rem;
-      margin-bottom: 3rem;
-    }
-
-    .features li {
-      display: flex; align-items: center; gap: 0.8rem;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.95);
-      font-weight: 500;
-    }
-
-    .feat-icon {
-      width: 30px; height: 30px;
-      background: rgba(212,160,23,0.15);
-      border: 1px solid rgba(212,160,23,0.3);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    /* CTA */
-    .cta-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.8rem;
-      background: linear-gradient(135deg, var(--red-bright), var(--red-deep));
-      color: var(--white);
-      border: none;
-      padding: 1rem 2rem;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-radius: 50px;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 8px 30px rgba(176, 16, 32, 0.5);
-      transition: transform 0.3s, box-shadow 0.3s;
-      position: relative; overflow: hidden;
-    }
-
-    .btn-primary::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, var(--gold), var(--red-bright));
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(176,16,32,0.6); }
-    .btn-primary:hover::before { opacity: 1; }
-
-    .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
-
-    .btn-arrow {
-      width: 28px; height: 28px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.3s;
-    }
-
-    .btn-primary:hover .btn-arrow { transform: translateX(4px); }
-
-    .btn-secondary {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.85);
-      display: flex; align-items: center; gap: 0.4rem;
-      transition: color 0.3s;
-    }
-
-    .btn-secondary:hover { color: var(--gold-light); }
-
-    /* RIGHT */
-    .hero-right {
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
-      animation: fadeUp 1s ease 0.45s both;
-    }
-
-    /* Glow circle */
-    .glow-ring {
-      position: absolute;
-      width: 380px; height: 380px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(176,16,32,0.4) 0%, transparent 70%);
-      animation: glowPulse 4s ease-in-out infinite;
-    }
-
-    @keyframes glowPulse {
-      0%, 100% { transform: scale(1); opacity: 0.7; }
-      50%       { transform: scale(1.1); opacity: 1; }
-    }
-
-    /* Center card */
-    .clinic-card {
-      position: relative; z-index: 2;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 2rem;
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 360px;
-      backdrop-filter: blur(20px);
-      text-align: center;
-    }
-
-    .card-logos {
-      display: flex; align-items: center; justify-content: center; gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .logo-circle {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.08);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .logo-img-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.12), rgba(0,0,0,0.2));
-    }
-
-    .logo-sep { color: rgba(212,160,23,0.4); font-size: 1.2rem; }
-
-    .card-title {
-      font-family: 'Lora', serif;
-      font-style: italic;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.9);
-      letter-spacing: 0.05em;
-      padding-bottom: 1.2rem;
-      margin-bottom: 1.2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .card-stats {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 0.5rem;
-      padding: 1.2rem 0;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 1.5rem;
-    }
-
-    .stat-item { text-align: center; }
-
-    .stat-num {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: var(--gold);
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .stat-label {
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-      margin-top: 0.2rem;
-    }
-
-    .card-motto {
-      margin-top: 1.2rem;
-      font-family: 'Lora', serif;
-      font-style: italic;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--gold-light);
-      letter-spacing: 0.03em;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      padding-top: 1rem;
-    }
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.9);
       line-height: 1.6;
     }
 
-    /* Floating small badges */
-    .float-badge {
-      position: absolute;
-      background: rgba(26,5,5,0.85);
-      border: 1px solid rgba(212,160,23,0.3);
-      border-radius: 12px;
-      padding: 0.6rem 0.9rem;
-      display: flex; align-items: center; gap: 0.5rem;
+    /* ─── KEYFRAMES / ANIMATIONS ─── */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes textShimmer {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: 0% center;
+      }
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 12px rgba(255, 255, 255, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+      }
+    }
+
+    @keyframes floatCard {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4rem;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.531);
       backdrop-filter: blur(10px);
-      z-index: 3;
-      animation: floatY 5s ease-in-out infinite;
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      /* Nav animation */
+      animation: fadeInUp 0.8s ease-out;
     }
 
-    .float-badge-icon { font-size: 1rem; }
-    .float-badge-text { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,1); white-space: nowrap; }
-
-    .fb1 { top: -5%; right: -10%; animation-delay: 0s; }
-    .fb2 { bottom: 5%; left: -12%; animation-delay: 2s; }
-
-    /* ── FOOTER ── */
-    footer {
-      position: relative; z-index: 1;
-      text-align: center;
-      padding: 2rem;
-      border-top: 1px solid rgba(212,160,23,0.1);
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s ease;
     }
 
-    .footer-inner {
-      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 0.5rem;
+    .nav-brand:hover {
+      transform: scale(1.02);
     }
 
-    .footer-sep { color: rgba(212,160,23,0.4); }
+    .nav-brand-text {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--crimson);
+      margin-top: 2px;
+    }
 
-    .footer-links { display: flex; gap: 1.5rem; justify-content: center; }
-    .footer-links a {
-      font-size: 0.68rem;
-      color: var(--gold);
-      text-decoration: none;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 12px;
+      font-weight: 600;
       letter-spacing: 0.05em;
-      opacity: 0.7;
-      transition: opacity 0.3s;
-    }
-    .footer-links a:hover { opacity: 1; }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      text-transform: uppercase;
+      color: #1F2937;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
     }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 880px) {
-      nav { padding: 1rem 1.5rem; }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--crimson);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-links a:hover {
+      color: var(--crimson);
+    }
+
+    .nav-cta {
+      background: var(--crimson) !important;
+      color: var(--white) !important;
+      padding: 10px 20px !important;
+      border-radius: 6px !important;
+      letter-spacing: 0.05em !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--crimson-dark) !important;
+      transform: translateY(-2px);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      background: url('{{ asset("images/PUP TAGUIG CAMPUS.jpg") }}') center center / cover no-repeat;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
+      z-index: -1;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* GLASSMORPHISM LOGOS */
+    .hero-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.18);
+      /* Glass base */
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgb(241, 241, 241);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    /* HERO LOAD ANIMATIONS */
+    .hero-content>.hero-logos {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 0.1s;
+    }
+
+    .hero-content>.eyebrow {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 0.3s;
+    }
+
+    .hero-content>.hero-title {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    .hero-content>.hero-desc {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 0.7s;
+    }
+
+    .hero-content>.hero-features {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 0.9s;
+    }
+
+    .hero-content>#login {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      animation-delay: 1.1s;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow-line {
+      width: 30px;
+      height: 2px;
+      background: var(--gold);
+    }
+
+    .eyebrow-text {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+    }
+
+    /* hero-title — defined below in responsive block with gradient */
+
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-main);
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
+
+    .hero-features {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .hero-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: transform 0.2s ease;
+    }
+
+    .hero-features li:hover {
+      transform: translateX(5px);
+    }
+
+    .feat-dot {
+      width: 22px;
+      height: 22px;
+      background: rgba(139, 0, 0, 0.08);
+      color: var(--crimson);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    /* GLASSMORPHISM BUTTON WITH PULSE */
+    .btn-sso {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--crimson);
+
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 0, 0, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(139, 0, 0, 0.08);
+
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: fit-content;
+      margin: 0 auto;
+
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    .btn-sso:hover {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(139, 0, 0, 0.3);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 40px 0 rgba(139, 0, 0, 0.15);
+      animation: none;
+      /* Stop pulse on hover */
+    }
+
+    .btn-sso-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(139, 0, 0, 0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-sso:hover .btn-sso-icon {
+      background: rgba(139, 0, 0, 0.15);
+      transform: translateX(3px);
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 4rem;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-label-line {
+      width: 30px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .section-label-text {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--crimson);
+    }
+
+    .section-heading {
+      font-size: clamp(2rem, 3vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      padding: 100px 0;
+      background: var(--white);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .about-statement {
+      font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+      font-weight: 800;
+      line-height: 1.5;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+
+    .about-statement strong {
+      color: var(--crimson);
+    }
+
+    .about-body {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .about-right {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .pillar-card {
+      background: var(--bg-light);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .pillar-card:hover {
+      background: var(--white);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(139, 0, 0, 0.2);
+      transform: translateX(8px);
+      /* Slide in effect */
+    }
+
+    .pillar-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(139, 0, 0, 0.08);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--crimson);
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .pillar-card:hover .pillar-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .pillar-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--crimson-dark);
+      margin-bottom: 6px;
+    }
+
+    .pillar-body {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── DENTIST ─── */
+    #dentist {
+      padding: 100px 0;
+      background: var(--bg-light);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .dentist-inner {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .dentist-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+
+    .dtag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dtag:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .dtag i {
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .dentist-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dentist-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-5px);
+    }
+
+    .dentist-card-top {
+      background: var(--crimson);
+      padding: 40px 32px 32px;
+      text-align: center;
+    }
+
+    .dentist-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 4px solid var(--white);
+      overflow: hidden;
+      margin: 0 auto 16px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--crimson);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dentist-card:hover .dentist-avatar {
+      transform: scale(1.1);
+    }
+
+    .dentist-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .dentist-name {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .dentist-role {
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    .dentist-card-body {
+      padding: 32px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .info-row:hover {
+      color: var(--crimson);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-row i {
+      color: var(--crimson);
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* ─── SERVICES ─── */
+    #services {
+      padding: 100px 0;
+      background: var(--white);
+    }
+
+    .services-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .svc-card {
+      background: var(--bg-light);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .svc-card:hover {
+      background: var(--white);
+      border-color: var(--crimson);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-6px);
+    }
+
+    .svc-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--crimson);
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .svc-card:hover .svc-icon {
+      background: var(--crimson);
+      color: var(--white);
+      border-color: var(--crimson);
+      transform: rotate(-10deg);
+    }
+
+    .svc-body h4 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .svc-body p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── FAQ ─── */
+    .faq-section {
+      padding: 100px 0;
+      background: var(--bg-light);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .faq-header-row {
+      text-align: center;
+      margin-bottom: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .section-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139, 0, 0, 0.08);
+      color: var(--crimson);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .faq-section-title {
+      font-size: clamp(2rem, 3vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .faq-section-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    #faqList {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item-new {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item-new:hover {
+      border-color: rgba(139, 0, 0, 0.3);
+      transform: translateX(4px);
+    }
+
+    .faq-item-new.open {
+      border-color: var(--crimson);
+      box-shadow: var(--shadow-md);
+      transform: translateX(0);
+    }
+
+    .faq-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-trigger-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .faq-num {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--crimson);
+      background: rgba(139, 0, 0, 0.08);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item-new.open .faq-num {
+      background: var(--crimson);
+      color: var(--white);
+    }
+
+    .faq-q {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      transition: color 0.3s ease;
+    }
+
+    .faq-item-new.open .faq-q {
+      color: var(--crimson);
+    }
+
+    .faq-chevron {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .faq-item-new.open .faq-chevron {
+      transform: rotate(180deg);
+      background: rgba(139, 0, 0, 0.1);
+      color: var(--crimson);
+    }
+
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+    }
+
+    .faq-item-new.open .faq-body {
+      opacity: 1;
+    }
+
+    .faq-body-inner {
+      padding: 0 24px 24px 72px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .faq-body-inner {
+        padding-left: 24px;
+      }
+    }
+
+    /* ─── TEAM ─── */
+    #team {
+      padding: 100px 0;
+      background: var(--white);
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .team-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    }
+
+    .team-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-6px);
+      border-color: rgba(139, 0, 0, 0.2);
+    }
+
+    .team-img {
+      aspect-ratio: 1;
+      background: var(--bg-light);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+      transition: background 0.3s ease;
+    }
+
+    .team-card:hover .team-img {
+      background: var(--gray-100);
+    }
+
+    .team-img img {
+      transition: transform 0.4s ease;
+    }
+
+    .team-card:hover .team-img img {
+      transform: scale(1.08);
+    }
+
+    .team-info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .team-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .team-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      background: rgba(139, 0, 0, 0.08);
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+
+    /* ─── CLOSING ─── */
+    .closing {
+      background: var(--ink, #1C0A0A);
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .closing::before {
+      content: '';
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 0, 0, 0.25) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .closing-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .closing-inner .eyebrow-text {
+      color: var(--gold);
+    }
+
+    .closing-inner .eyebrow-line {
+      background: var(--gold);
+    }
+
+    .closing-heading {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .closing-heading em {
+      color: var(--gold-light, #F5C842);
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .closing-desc {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.45);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+    }
+
+    .closing-eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .btn-sso-alt {
+      background: var(--white);
+      color: var(--crimson-dark);
+      animation: none;
+    }
+
+    .btn-sso-alt:hover {
+      background: var(--gray-100);
+      color: var(--crimson);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-sso-alt .btn-sso-icon {
+      background: rgba(139, 0, 0, 0.1);
+    }
+
+    /* ─── IMPROVED REVEAL (Scroll Animation) ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(35px) scale(0.98);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .reveal-d1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-d2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-d3 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-d4 {
+      transition-delay: 0.4s;
+    }
+
+    /* ─── HERO TITLE GRADIENT ─── */
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 5rem);
+      font-weight: 800;
+      line-height: 1.3; 
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      padding-bottom: 0.2em;
+      
+      background: linear-gradient(
+        to right, 
+        #8B0000 0%, 
+        #b5282a 25%, 
+        #FFD700 50%, 
+        #b5282a 75%, 
+        #8B0000 100%
+      );
+      background-size: 200% auto; 
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: textShimmer 4s linear infinite;
+    }
+
+    /* ─── MOBILE HAMBURGER ─── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      z-index: 300;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--crimson);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ─── MOBILE MENU — compact slide-down panel ─── */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 150;
+      flex-direction: column;
+      align-items: stretch;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 0.5rem 0 0.75rem;
+    }
+
+    .mobile-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .mobile-menu a {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-main);
+      text-decoration: none;
+      text-transform: uppercase;
+      padding: 0.7rem 1.5rem;
+      transition: background 0.15s, color 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    .mobile-menu a:hover {
+      background: rgba(139,0,0,0.04);
+      color: var(--crimson);
+      border-left-color: var(--crimson);
+    }
+
+    .mobile-menu .mob-divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 0.4rem 1.5rem;
+    }
+
+    .mobile-menu .nav-cta-mob {
+      margin: 0.4rem 1.5rem 0 !important;
+      background: var(--crimson) !important;
+      color: #fff !important;
+      padding: 0.65rem 1.25rem !important;
+      border-radius: 8px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.06em !important;
+      text-align: center !important;
+      border-left: none !important;
+    }
+
+    .mobile-menu .nav-cta-mob:hover {
+      background: var(--crimson-dark) !important;
+      border-left-color: transparent !important;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .about-grid,
+      .dentist-inner,
+      .faq-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .faq-sticky { position: static; }
+
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .dentist-card {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      /* Nav */
+      nav {
+        padding: 0 1.25rem;
+      }
+
       .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .mobile-menu { display: flex; }
 
-      .hero { padding: 7rem 1.5rem 4rem; }
-      .hero-inner { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
-      .hero-desc { margin: 0 auto 2.5rem; }
-      .features li { justify-content: center; }
-      .cta-row { justify-content: center; }
-      .hero-right { display: none; }
+      /* Hero */
+      .hero {
+        padding: 0 1.25rem;
+        min-height: 100svh;
+      }
+
+      .hero-content {
+        padding: 90px 0 2.5rem;
+        width: 100%;
+      }
+
+      .hero-logos {
+        gap: 16px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+      }
+
+      .hero-logo-img { width: 32px; height: 32px; }
+
+      .hero-title {
+        font-size: clamp(2rem, 9vw, 2.8rem);
+        margin-bottom: 18px;
+      }
+
+      .hero-desc {
+        font-size: 14px;
+        margin-bottom: 24px;
+        padding: 0 0.25rem;
+      }
+
+      .hero-features {
+        gap: 12px;
+        margin-bottom: 32px;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 0.25rem;
+      }
+
+      .hero-features li { font-size: 13px; }
+
+      .btn-sso {
+        padding: 12px 24px;
+        font-size: 12px;
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+      }
+
+      /* Sections */
+      .section-wrap {
+        padding: 0 1.25rem;
+      }
+
+      #about,
+      #dentist,
+      #services,
+      #team,
+      .faq-section {
+        padding: 60px 0;
+      }
+
+      .section-heading { font-size: 1.6rem; }
+
+      .services-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .services-header .section-sub { text-align: left !important; max-width: 100%; }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .svc-card {
+        padding: 20px;
+        gap: 16px;
+      }
+
+      .svc-icon { width: 48px; height: 48px; font-size: 20px; border-radius: 12px; }
+
+      .about-right { grid-template-columns: 1fr; }
+
+      .pillar-card { padding: 18px; }
+
+      .dentist-inner { gap: 32px; }
+
+      .dentist-card { max-width: 100%; }
+
+      .dentist-card-top { padding: 28px 20px 24px; }
+
+      .dentist-avatar { width: 76px; height: 76px; font-size: 28px; }
+
+      .dentist-name { font-size: 18px; }
+
+      .dentist-card-body { padding: 20px; }
+
+      .info-row { font-size: 13px; }
+
+      .team-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+      .team-info { padding: 14px; }
+
+      .team-name { font-size: 13px; }
+
+      .faq-body-inner { padding-left: 24px; }
+
+      .faq-trigger { padding: 16px; }
+
+      .faq-q { font-size: 13px; }
+
+      .faq-section-title { font-size: 1.6rem; }
+
+      .closing { padding: 60px 0; }
+
+      .closing-heading { font-size: clamp(1.8rem, 6vw, 2.5rem); }
+
+      footer {
+        padding: 24px 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: clamp(1.7rem, 8vw, 2.2rem); }
+
+      .team-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+      .team-name { font-size: 12px; }
+
+      .dtag { font-size: 11px; padding: 6px 12px; }
+
+      .dentist-tags { gap: 8px; }
     }
   </style>
 </head>
+
 <body>
 
-  <!-- BG -->
-  <div class="bg-wrap">
-    <div class="particles" id="particles"></div>
-
-    <!-- Tooth decorations -->
-    <svg class="bg-tooth bg-tooth-1" viewBox="0 0 100 120">
-      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
-    </svg>
-    <svg class="bg-tooth bg-tooth-2" viewBox="0 0 100 120">
-      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
-    </svg>
-    <svg class="bg-tooth bg-tooth-3" viewBox="0 0 100 120">
-      <path d="M50 5C35 5 20 15 18 32C16 45 20 55 22 65C24 80 22 105 32 110C40 114 42 98 46 88C48 82 49 78 50 78C51 78 52 82 54 88C58 98 60 114 68 110C78 105 76 80 78 65C80 55 84 45 82 32C80 15 65 5 50 5Z" fill="currentColor"/>
-    </svg>
-  </div>
-
-  <!-- NAV -->
   <nav>
     <div class="nav-brand">
-      <span class="nav-brand-title">PUP Taguig Dental Clinic</span>
+      <span class="nav-brand-text">PUP Taguig Dental Clinic</span>
     </div>
 
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="/auth/oidc/redirect" class="nav-cta">Login</a></li>
+    </ul>
+
+    <button class="nav-hamburger" id="hamburgerBtn" aria-label="Toggle menu" onclick="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-inner">
+  <!-- Mobile Menu — compact dropdown panel -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home"     onclick="closeMobileMenu()">Home</a>
+    <a href="#about"    onclick="closeMobileMenu()">About</a>
+    <a href="#services" onclick="closeMobileMenu()">Services</a>
+    <a href="#faq"      onclick="closeMobileMenu()">FAQ</a>
+    <a href="#team"     onclick="closeMobileMenu()">Team</a>
+    <div class="mob-divider"></div>
+    <a href="/auth/oidc/redirect" class="nav-cta-mob">
+      <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;font-size:11px;"></i>Login with SSO
+    </a>
+  </div>
 
-      <!-- LEFT -->
-      <div class="hero-left">
-        <h1>
-          <span class="line-gold">PUP Taguig</span>
-          <span class="line-white">Dental Clinic</span>
-        </h1>
+  <section class="hero" id="home">
+    <div class="hero-content">
 
-
-        <p class="hero-desc">
-          Quality dental care for PUP Taguig students, faculty, and staff. Book appointments online, access your records, and take charge of your oral health — anytime, anywhere.
-        </p>
-
-        <ul class="features">
-          <li>
-            <span class="feat-icon">🗓</span>
-            Book appointments online, anytime
-          </li>
-          <li>
-            <span class="feat-icon">📋</span>
-            View your dental records &amp; history
-          </li>
-          <li>
-            <span class="feat-icon">🔒</span>
-            Secure &amp; private patient portal
-          </li>
-        </ul>
-
-        <div class="cta-row">
-          <a href="/auth/oidc/redirect" class="btn-primary">
-    <span>Login with SSO</span>
-    <span class="btn-arrow">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </span>
-</a>
-
-        </div>
+      <div class="hero-logos reveal">
+        <img src="{{ asset('images/PUP.png') }}" class="hero-logo-img" alt="PUP Logo">
+        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="hero-logo-img" alt="Clinic Logo">
       </div>
+    </div>
 
-      <!-- RIGHT -->
-      <div class="hero-right">
-        <div class="glow-ring"></div>
+    <h1 class="hero-title reveal reveal-d2">
+      <span class="t1">PUP</span>
+      <span class="t2">Taguig</span>
+      <span class="t3">Dental Clinic</span>
+    </h1>
 
-<div class="clinic-card">
-          <div class="card-logos">
-            <div class="logo-circle">
-              <div class="logo-img-placeholder">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <path d="M16 8l1.5 4.5H22l-3.7 2.7 1.4 4.4L16 17l-3.7 2.6 1.4-4.4L10 12.5h4.5z" fill="rgba(255,255,255,0.25)"/>
-                  <text x="16" y="28" text-anchor="middle" font-size="6" fill="rgba(255,255,255,0.4)" font-family="Montserrat,sans-serif" font-weight="600">PUP LOGO</text>
-                </svg>
-              </div>
-            </div>
-            <span class="logo-sep">+</span>
-            <div class="logo-circle">
-              <div class="logo-img-placeholder">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <path d="M16 7c-3 0-6 2-6.4 5.4-.3 2.6.8 4.8 1.2 7 .4 2.4-.1 6 2 6.8 1.6.6 2-1.6 2.8-3.4.3-.8.4-1.4.4-1.4s.1.6.4 1.4c.8 1.8 1.2 4 2.8 3.4 2.1-.8 1.6-4.4 2-6.8.4-2.2 1.5-4.4 1.2-7C22 9 19 7 16 7z" fill="rgba(255,255,255,0.25)"/>
-                  <text x="16" y="29" text-anchor="middle" font-size="5.5" fill="rgba(255,255,255,0.4)" font-family="Montserrat,sans-serif" font-weight="600">CLINIC</text>
-                </svg>
-              </div>
-            </div>
-          </div>
+    <p class="hero-desc reveal reveal-d3">
+      Professional, accessible, and high-quality dental care exclusively for students, faculty, staff, and alumni of
+      PUP Taguig. Manage your oral health seamlessly.
+    </p>
 
-          <div class="card-title">Serving the PUP Community</div>
+    <ul class="hero-features reveal reveal-d4">
+      <li><span class="feat-dot"><i class="fa-solid fa-check"></i></span> Secure online appointment booking</li>
+      <li><span class="feat-dot"><i class="fa-solid fa-check"></i></span> Comprehensive digital patient records</li>
+      <li><span class="feat-dot"><i class="fa-solid fa-check"></i></span> Professional campus dental services</li>
+    </ul>
 
-          <p class="card-tagline">
-            Your smile is our priority.<br>
-            Accessible, compassionate dental care<br>right on campus.
-          </p>
-          <div class="card-motto">"Mula Sayo, Para Sa Bayan."</div>
+    <div id="login" class="reveal" style="animation-delay: 1.1s;">
+      <a href="/auth/oidc/redirect" class="btn-sso">
+        <div class="btn-sso-icon">
+          <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px;"></i>
         </div>
-      </div>
-
+        Login with SSO
+      </a>
+    </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-inner">
-      <span>© 1998–2026</span>
-      <span class="footer-sep">•</span>
-      <strong style="color:rgba(255,255,255,0.55)">Polytechnic University of the Philippines</strong>
-      <span class="footer-sep">🦷</span>
-      <span>Taguig Campus</span>
+  <section id="about">
+    <div class="section-wrap">
+      <div class="about-grid reveal">
+        <div class="about-left">
+          <div class="section-label">
+            <span class="section-label-line"></span>
+            <span class="section-label-text">About the Clinic</span>
+          </div>
+          <h2 class="section-heading">Commitment to Oral Health</h2>
+          <p class="about-statement">
+            Providing <strong>free, professional dental care</strong> to the PUP Taguig community in a safe and
+            welcoming clinical environment.
+          </p>
+          <p class="about-body">
+            The PUP Taguig Dental Clinic was established to ensure every member of the university community has access
+            to quality oral health services — without cost or barriers. Operated by a licensed campus dentist, the
+            clinic handles everything from routine check-ups to comprehensive dental procedures.
+          </p>
+        </div>
+        <div class="about-right">
+          <div class="pillar-card reveal reveal-d1">
+            <div class="pillar-icon"><i class="fa-solid fa-shield-heart"></i></div>
+            <div>
+              <div class="pillar-title">Free Dental Care</div>
+              <div class="pillar-body">All standard dental services are provided at no cost to eligible PUP Taguig
+                students,
+                alumni, faculty, and staff.</div>
+            </div>
+          </div>
+          <div class="pillar-card reveal reveal-d2">
+            <div class="pillar-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <div>
+              <div class="pillar-title">Easy Scheduling</div>
+              <div class="pillar-body">Book real-time slots online through the Dental Management System with instant
+                confirmations.</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="footer-links">
-      <a href="#">Terms of Use</a>
-      <a href="#">Privacy Statement</a>
+  </section>
+
+  <section id="dentist">
+    <div class="section-wrap">
+      <div class="dentist-inner reveal">
+        <div class="dentist-left">
+          <div class="section-label">
+            <span class="section-label-line"></span>
+            <span class="section-label-text">Our Dentist</span>
+          </div>
+          <h2 class="section-heading">Led by an Experienced Professional</h2>
+          <p class="section-sub">
+            The clinic is headed by <strong>Dr. Nelson P. Angeles</strong>, providing professional, safe, and reliable
+            dental care to the university community. With a commitment to
+            patient comfort and oral health excellence, the clinic supports consultations, treatment planning, and
+            preventive care.
+          </p>
+          <div class="dentist-tags">
+            <span class="dtag"><i class="fa-solid fa-circle-check"></i> Licensed Dentist</span>
+            <span class="dtag"><i class="fa-solid fa-circle-check"></i> Campus Specialist</span>
+          </div>
+        </div>
+
+        <div class="dentist-card">
+          <div class="dentist-card-top">
+            <div class="dentist-avatar">
+              <img src="{{ asset('images/Nelson-Angeles.jpg') }}" alt="Dr. Nelson P. Angeles"
+                onerror="this.src='https://ui-avatars.com/api/?name=Nelson+Angeles&background=660000&color=FFFFFF&size=88'">
+            </div>
+            <div class="dentist-name">Dr. Nelson P. Angeles</div>
+            <div class="dentist-role">University Campus Dentist</div>
+          </div>
+          <div class="dentist-card-body">
+            <div class="info-row"><i class="fa-solid fa-location-dot"></i> PUP Taguig Campus Dental Clinic</div>
+            <div class="info-row"><i class="fa-regular fa-clock"></i> Mon – Fri, 8:00 AM – 5:00 PM</div>
+            <div class="info-row"><i class="fa-solid fa-users"></i> Students, Alumni, Faculty & Staff</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </footer>
+  </section>
+
+  <section id="services">
+    <div class="section-wrap">
+      <div class="services-header reveal">
+        <div>
+          <div class="section-label">
+            <span class="section-label-line"></span>
+            <span class="section-label-text">Services</span>
+          </div>
+          <h2 class="section-heading">What We Offer</h2>
+        </div>
+        <p class="section-sub" style="max-width:360px; text-align:right;">Preventive and restorative dental procedures
+          provided safely and efficiently.</p>
+      </div>
+
+      <div class="services-grid reveal">
+        <div class="svc-card">
+          <div class="svc-icon"><i class="fa-solid fa-hand-holding-medical"></i></div>
+          <div class="svc-body">
+            <h4>Oral Check-Up & Consultation</h4>
+            <p>Routine oral examinations, dental consultations, and comprehensive oral health assessments.</p>
+          </div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-icon"><i class="fa-solid fa-droplet"></i></div>
+          <div class="svc-body">
+            <h4>Dental Cleaning</h4>
+            <p>Professional oral hygiene treatment to remove plaque, tartar, and surface stains securely.</p>
+          </div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-icon"><i class="fa-solid fa-teeth"></i></div>
+          <div class="svc-body">
+            <h4>Restoration & Prosthesis</h4>
+            <p>Fillings, crowns, inlays, and other repairs to effectively restore damaged or missing teeth.</p>
+          </div>
+        </div>
+        <div class="svc-card">
+          <div class="svc-icon"><i class="fa-solid fa-crutch"></i></div>
+          <div class="svc-body">
+            <h4>Dental Surgery</h4>
+            <p>Tooth extractions, supernumerary removal, and other minor surgical dental procedures.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="faq-section reveal">
+    <div class="section-wrap">
+      <div class="faq-header-row">
+        <div>
+          <div class="section-pill"><i class="fa-solid fa-circle-question"></i> FAQs</div>
+          <h2 class="faq-section-title">Frequently Asked Questions</h2>
+          <p class="faq-section-sub">Quick answers about the PUP Taguig Dental Management System.</p>
+        </div>
+      </div>
+
+      @php
+      $faqs = [
+      [
+      'q' => 'Who can avail of the dental services?',
+      'a' => 'All students, alumni, faculty, and staff of the Polytechnic University of the Philippines – Taguig Campus
+      are eligible for free dental services.',
+      ],
+      [
+      'q' => 'How do I book an appointment?',
+      'a' => 'You can book an appointment online through the Dental Management System portal. Simply log in, choose your
+      preferred schedule, and confirm your booking.',
+      ],
+      [
+      'q' => 'Will the dentist prescribe medications?',
+      'a' => 'Yes. Depending on your dental condition, Dr. Angeles may prescribe antibiotics, pain relievers, or other
+      necessary medications during your visit.',
+      ],
+      [
+      'q' => 'Can I book an appointment anytime?',
+      'a' => 'Appointments are subject to slot availability. Since the clinic operates with a single dentist and limited
+      daily slots, early booking is highly recommended.',
+      ],
+      [
+      'q' => 'How do I cancel or reschedule?',
+      'a' => 'You can cancel or reschedule through the Dental Management System portal or by contacting the clinic
+      directly — at least three (3) days before your scheduled appointment.',
+      ],
+      [
+      'q' => 'What if the dentist is unavailable on my scheduled day?',
+      'a' => 'If Dr. Angeles is unavailable, your confirmed appointment will be rescheduled to the next available slot
+      and you will be notified accordingly.',
+      ],
+      [
+      'q' => 'What services are available at the clinic?',
+      'a' => 'The clinic provides oral check-ups, dental cleaning, fillings, extractions, dental surgery, restoration,
+      prosthetics, and preventive care services.',
+      ],
+      [
+      'q' => 'Are urgent dental cases given priority?',
+      'a' => 'Yes, urgent cases may be prioritized depending on the daily schedule and the dentist\'s discretion.
+      Contact the clinic directly for urgent concerns.',
+      ],
+      [
+      'q' => 'Are there restrictions for certain treatments?',
+      'a' => 'Some advanced procedures may not be available due to the clinic\'s resources and equipment. The dentist
+      will guide you on available alternatives if needed.',
+      ],
+      [
+      'q' => 'Are follow-up appointments required?',
+      'a' => 'Some treatments require follow-up visits. Dr. Angeles will advise you if a follow-up is necessary after
+      your initial treatment.',
+      ],
+      ];
+      @endphp
+
+      <div id="faqList">
+        @foreach ($faqs as $i => $faq)
+        <div class="faq-item-new reveal" style="transition-delay: {{ $i * 0.04 }}s;">
+          <button class="faq-trigger" onclick="toggleFaq(this)" aria-expanded="false">
+            <div class="faq-trigger-left">
+              <span class="faq-num">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
+              <span class="faq-q">{{ $faq['q'] }}</span>
+            </div>
+            <span class="faq-chevron"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+          </button>
+          <div class="faq-body">
+            <div class="faq-body-inner">{{ $faq['a'] }}</div>
+          </div>
+        </div>
+        @endforeach
+      </div>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="section-wrap">
+      <div class="section-label reveal">
+        <span class="section-label-line"></span>
+        <span class="section-label-text">Development Team</span>
+      </div>
+      <h2 class="section-heading reveal">The System Developers</h2>
+
+      @php
+      $devs = [
+      ['img' => 'Althea-Aragon.jpg', 'name' => 'Althea Mae Aragon', 'role' => 'Developer'],
+      ['img' => 'Grace-Lim.jpg', 'name' => 'Grace Anne Lim', 'role' => 'Developer'],
+      ['img' => 'Hoshea-Lopez.jpg', 'name' => 'Hoshea Shania Lopez', 'role' => 'Developer'],
+      ['img' => 'Rain-Romero.jpg', 'name' => 'Dianna Rain Romero', 'role' => 'Developer'],
+      ];
+      @endphp
+
+      <div class="team-grid">
+        @foreach ($devs as $i => $dev)
+        <div class="team-card reveal {{ $i > 0 ? 'reveal-d' . $i : '' }}">
+          <div class="team-img">
+            <img src="{{ asset('images/' . $dev['img']) }}" alt="{{ $dev['name'] }}"
+              onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($dev['name']) }}&background=660000&color=FFFFFF&size=250'">
+          </div>
+          <div class="team-info">
+            <div class="team-name">{{ $dev['name'] }}</div>
+            <span class="team-badge">{{ $dev['role'] }}</span>
+          </div>
+        </div>
+        @endforeach
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="section-wrap">
+      <div class="closing-inner reveal">
+        <div class="closing-eyebrow">
+          <span class="eyebrow-line" style="background:var(--gold);"></span>
+          <span class="eyebrow-text" style="color:var(--gold);">PUP Taguig Dental Clinic</span>
+          <span class="eyebrow-line" style="background:var(--gold);"></span>
+        </div>
+        <h2 class="closing-heading">Mula Sayo,<br><em>Para Sa Bayan.</em></h2>
+        <p class="closing-desc">Developed to manage appointments and records more effectively, supporting accessible and
+          efficient dental care for the entire PUP Taguig community.</p>
+        <a href="/auth/oidc/redirect" class="btn-sso btn-sso-alt" style="margin:0 auto;">
+          <div class="btn-sso-icon"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:11px;"></i></div>
+          Login with SSO
+        </a>
+      </div>
+    </div>
+  </section>
+
+  @include('partials.footer')
 
   <script>
-    // Generate floating particles
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const size = Math.random() * 4 + 2;
-      p.style.cssText = `
-        width:${size}px; height:${size}px;
-        left:${Math.random()*100}%;
-        animation-duration:${8 + Math.random()*12}s;
-        animation-delay:${Math.random()*10}s;
-      `;
-      container.appendChild(p);
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const btn  = document.getElementById('hamburgerBtn');
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
     }
+
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('hamburgerBtn').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item-new');
+      const answer = item.querySelector('.faq-body');
+      const isOpen = item.classList.contains('open');
+
+      document.querySelectorAll('.faq-item-new.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-body').style.maxHeight = '0';
+        el.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+      });
+
+      if (!isOpen) {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    const revealObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
   </script>
 </body>
+
 </html>
