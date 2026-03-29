@@ -189,45 +189,62 @@
             border-radius: 10px;
         }
 
-        /* Page Header */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
+    /* Page Banner */
+    .page-banner {
+        background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+        padding: 1.75rem 2rem 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+    }
 
-        .page-kicker {
-            font-size: .7rem;
-            font-weight: 800;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
 
-        .page-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #111827;
-            line-height: 1.1;
-            margin: 0;
-        }
+    .page-banner-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-        .page-title span {
-            color: var(--crimson);
-        }
+    .page-banner-date {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        font-size: .75rem;
+        color: rgba(255,255,255,.85);
+        margin-bottom: .3rem;
+    }
 
-        .page-subtitle {
-            font-size: .85rem;
-            color: #6b7280;
-            margin-top: .5rem;
-        }
+    .page-banner-date i {
+        color: #fff;
+    }
+
+    .page-banner-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
+    }
+
+    .page-banner-title span {
+        color: #ffdede;
+    }
+
+    .page-banner-subtitle {
+        font-size: .8rem;
+        color: rgba(255,255,255,.7);
+        margin-top: .3rem;
+    }
 
         .btn-new-role {
             background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
@@ -1221,24 +1238,18 @@
 @endphp
 
 @section('content')
-    <main id="mainContent" style="padding-top: var(--header-h); min-height: 100vh;">
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
+        <div style="max-width: 1300px; margin: 0 auto; padding: 1.5rem 1.75rem 2rem;">
 
-        <div style="max-width: 1300px; margin: 0 auto; padding: 2.5rem 1.75rem;">
-
-            <div class="page-header">
-                <div>
-                    <div class="page-kicker">
-                        <i class="fa-solid fa-user-shield"></i> Configuration
-                    </div>
-                    <h1 class="page-title">Roles & <span>Permissions</span></h1>
-                    <p class="page-subtitle">Define what each role can see and do across the clinic system.</p>
-                </div>
-                <div>
-                    <button type="button" class="btn-new-role" onclick="openNewRoleModal()">
-                        <i class="fa-solid fa-plus"></i> New Role
-                    </button>
-                </div>
+            <div class="page-banner">
+                <div class="page-banner-inner">
+                    <h1 class="page-banner-title">Roles & Permissions</h1>
+                <button type="button" class="btn-new-role" onclick="openNewRoleModal()"
+                style="background:white; color:#8B0000;">
+                    <i class="fa-solid fa-plus"></i> New Role
+                </button>
             </div>
+        </div>
 
             <div class="main-grid">
 

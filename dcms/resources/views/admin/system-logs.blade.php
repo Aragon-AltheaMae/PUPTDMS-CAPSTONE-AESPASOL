@@ -72,7 +72,7 @@
             }
         }
 
-        /* ── Page banner ── */
+        /* Page Banner */
         .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
             padding: 1.75rem 2rem 2rem;
@@ -105,13 +105,7 @@
             line-height: 1.1;
             letter-spacing: -.02em;
         }
-
-        .page-subtitle {
-            font-size: .78rem;
-            color: rgba(255, 255, 255, .65) !important;
-            margin-top: .4rem;
-        }
-
+        
         /* ── Stat grid ── */
         .stat-grid {
             display: grid;
@@ -1168,7 +1162,6 @@
                 <div class="page-banner-inner">
                     <div>
                         <h1 class="page-title">System Logs</h1>
-                        <p class="page-subtitle">View recorded activities of admin, dentist, and patient users.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-shrink-0">
                         <span class="sl-live"><span class="sl-live-dot"></span> Live Monitoring</span>

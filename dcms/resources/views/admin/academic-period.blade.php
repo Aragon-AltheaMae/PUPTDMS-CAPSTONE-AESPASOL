@@ -38,6 +38,56 @@
     gap: 1rem;
   }
 
+  /* Page Banner */
+  .page-banner {
+    background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+    padding: 1.75rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+    border-radius: 16px;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .page-banner-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .page-subtitle {
+    font-size: .8rem;
+    color: rgba(255,255,255,.7);
+    margin-top: .35rem;
+  }
+
+  .page-banner-date {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.8);
+    margin-bottom: .3rem;
+  }
+
   @media (min-width:1024px) {
     .active-banner-inner {
       flex-direction: row;
@@ -653,15 +703,21 @@ $activePeriodPayload = $activePeriod
     </div>
     @endif
 
-    <div class="mb-6 mt-3">
-      <div class="flex items-end justify-between flex-wrap gap-3">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">Academic Periods</h1>
+    <div class="page-banner">
+      <div class="page-banner-inner">
+    
+        <div>
+          <h1 class="page-title">Academic Periods</h1>
+        </div>
+
         <button onclick="openModal('addModal')" type="button"
-          class="flex items-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
-          <i class="fa-solid fa-plus"></i> Add Period
+          class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
+          px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+          <i class="fa-solid fa-plus"></i>
+          Add Period
         </button>
-      </div>
     </div>
+  </div>
 
     <div class="active-banner mb-6" id="activeBannerWrap">
       <div class="active-banner-inner">
@@ -672,7 +728,9 @@ $activePeriodPayload = $activePeriod
               <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current Semester</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerSem">
-              {{ $activePeriod ? str_replace(['1st','2nd'], ['First','Second'], $activePeriod->semester) : 'No Active Period' }}
+              {{ $activePeriod?->semester ??
+              'No Active
+              Period' }}
             </p>
           </div>
           <div>
