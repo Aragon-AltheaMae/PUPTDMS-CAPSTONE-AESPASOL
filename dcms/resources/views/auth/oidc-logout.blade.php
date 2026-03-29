@@ -64,20 +64,26 @@
     <p>Please wait while we securely log you out.</p>
 </div>
 
-<!-- hidden iframe for POST logout -->
-<iframe name="idpLogoutFrame" style="display:none;"></iframe>
-
-<form id="idpLogoutForm" method="POST" action="{{ $logoutUrl }}" target="idpLogoutFrame">
-</form>
-
 <script>
-    // Step 1: trigger IdP logout
-    document.getElementById('idpLogoutForm').submit();
+    window.addEventListener('load', async function () {
+        try {
+            await fetch(@json($logoutUrl), {
+                method: 'POST',
+                credentials: 'include', // VERY IMPORTANT
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_id: @json($clientId)
+                })
+            });
+        } catch (e) {
+            console.error('IDP logout failed:', e);
+        }
 
-    // Step 2: redirect to IdP login page after delay
-    setTimeout(function () {
-        window.location.href = @json($loginUrl);
-    }, 1200);
+        // redirect back to your system login
+        window.location.href = @json($redirectUrl);
+    });
 </script>
 
 </body>

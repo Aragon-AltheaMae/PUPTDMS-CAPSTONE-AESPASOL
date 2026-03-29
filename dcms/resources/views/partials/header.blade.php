@@ -50,7 +50,7 @@
         }
     }
 
-    $logoutRoute = in_array($role, ['admin', 'super_admin']) ? route('admin.logout') : route('logout');
+    $logoutRoute = route('logout');
     $settingsRoute = $settingsRoute ?? (Route::has('admin.system_settings') ? route('admin.system_settings') : '#');
 @endphp
 
