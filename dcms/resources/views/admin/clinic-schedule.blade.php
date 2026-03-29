@@ -495,6 +495,41 @@
             border-color: #30363d;
             color: #8b949e;
         }
+        /* Page Banner */
+        .page-banner {
+            background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+            padding: 1.75rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-banner-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+        }
 
         @media (max-width: 767px) {
 
@@ -1255,7 +1290,6 @@
                 width: 100%;
                 justify-content: center;
             }
-        }
 
         .blocked-remove-btn {
             width: 30px;
@@ -1275,6 +1309,7 @@
             background: #fef2f2;
             border-color: #fecaca;
         }
+    }
     </style>
 @endsection
 
@@ -1367,18 +1402,23 @@
             @endif
 
             {{-- ── Title row ── --}}
-            <div class="mb-6 mt-3">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="page-banner">
+                <div class="page-banner-inner">
+
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">Clinic Schedule</h1>
+                        <h1 class="page-title">Clinic Schedule</h1>
                     </div>
+
                     <div class="flex items-center gap-3">
                         <button onclick="openRuleModal()"
-                            class="flex items-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
+                            class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000]
+                             px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
                             <i class="fa-solid fa-plus"></i> Add Schedule Rule
                         </button>
+
                         <button onclick="openBlockModal()"
-                            class="flex items-center gap-2 bg-white hover:bg-red-50 text-[#8B0000] border border-red-200 px-4 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all">
+                            class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
+                            px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
                             <i class="fa-solid fa-ban"></i> Block Date
                         </button>
                     </div>

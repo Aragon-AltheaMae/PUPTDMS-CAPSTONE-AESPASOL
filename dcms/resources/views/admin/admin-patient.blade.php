@@ -27,7 +27,7 @@
                 transform: translateY(0);
             }
         }
-
+        /* Page Banner */
         .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
             padding: 1.75rem 2rem 2rem;
@@ -978,7 +978,6 @@
                 <div class="page-banner-inner">
                     <div>
                         <h1 class="page-title">Patient List</h1>
-                        <p class="page-subtitle">View, search, and filter patient appointments and access patient profiles.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-shrink-0">
                         <span class="page-badge">
