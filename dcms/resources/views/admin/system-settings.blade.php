@@ -5,154 +5,173 @@
 @section('styles')
 <style>
     :root {
-      --crimson: #8B0000;
-      --crimson-dark: #6b0000;
-      --crimson-light: #fef2f2;
-      --header-h: 64px;
-      --sidebar-w: 240px;
-    }
+    --crimson: #8B0000;
+    --crimson-dark: #6b0000;
+    --crimson-light: #fef2f2;
+    --header-h: 64px;
+    --sidebar-w: 240px;
+  }
+  /* Page Banner */
+  .page-banner {
+    background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+    padding: 1.75rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+  }
 
-    .settings-page {
-      padding-top: 82px;
-      padding-bottom: 2rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-      min-height: 100vh;
-      margin-left: var(--sidebar-w, 240px);
-    }
+  .page-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
 
-    .settings-shell {
-      max-width: 1280px;
-      margin: 0 auto;
-    }
+  .page-banner-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 6px;
-    }
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+  }
 
-    .scrollbar-thin::-webkit-scrollbar-track {
-      background: transparent;
-    }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
 
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #d1d5db;
-      border-radius: 10px;
-    }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    #toastContainer {
-      position: fixed !important;
-      top: calc(var(--header-h, 64px) + 20px) !important;
-      right: 20px !important;
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-    }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+  }
 
-    #toastContainer .toast {
-      min-width: 300px;
-      max-width: 360px;
-      background: white !important;
-      border-radius: 14px !important;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, .18) !important;
-      padding: 14px 18px 14px 16px !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px;
-      opacity: 0;
-      transform: translateX(340px);
-      transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
-      position: relative;
-      overflow: hidden;
-      pointer-events: all;
-      flex-direction: row !important;
-    }
+  #toastContainer {
+    position: fixed !important;
+    top: calc(var(--header-h, 64px) + 20px) !important;
+    right: 20px !important;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
 
-    #toastContainer .toast::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-    }
+  #toastContainer .toast {
+    min-width: 300px;
+    max-width: 360px;
+    background: white !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .18) !important;
+    padding: 14px 18px 14px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(340px);
+    transition: all .35s cubic-bezier(.68, -.55, .265, 1.55);
+    position: relative;
+    overflow: hidden;
+    pointer-events: all;
+    flex-direction: row !important;
+  }
 
-    #toastContainer .toast.error::before {
-      background: #8B0000 !important;
-    }
+  #toastContainer .toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
 
-    #toastContainer .toast.success::before {
-      background: #15803d !important;
-    }
+  #toastContainer .toast.error::before {
+    background: #8B0000 !important;
+  }
 
-    #toastContainer .toast.show {
-      opacity: 1 !important;
-      transform: translateX(0) !important;
-    }
+  #toastContainer .toast.success::before {
+    background: #15803d !important;
+  }
 
-    #toastContainer .toast.hide {
-      opacity: 0 !important;
-      transform: translateX(340px) !important;
-    }
+  #toastContainer .toast.show {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
 
-    #toastContainer .toast-icon-wrap {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+  #toastContainer .toast.hide {
+    opacity: 0 !important;
+    transform: translateX(340px) !important;
+  }
 
-    #toastContainer .toast.error .toast-icon-wrap {
-      background: rgba(139, 0, 0, .08);
-    }
+  #toastContainer .toast-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-    #toastContainer .toast.success .toast-icon-wrap {
-      background: rgba(21, 128, 61, .08);
-    }
+  #toastContainer .toast.error .toast-icon-wrap {
+    background: rgba(139, 0, 0, .08);
+  }
 
-    #toastContainer .toast-icon {
-      font-size: 17px;
-    }
+  #toastContainer .toast.success .toast-icon-wrap {
+    background: rgba(21, 128, 61, .08);
+  }
 
-    #toastContainer .toast.error .toast-icon {
-      color: #8B0000 !important;
-    }
+  #toastContainer .toast-icon {
+    font-size: 17px;
+  }
 
-    #toastContainer .toast.success .toast-icon {
-      color: #15803d !important;
-    }
+  #toastContainer .toast.error .toast-icon {
+    color: #8B0000 !important;
+  }
 
-    #toastContainer .toast-body {
-      flex: 1;
-      min-width: 0;
-    }
+  #toastContainer .toast.success .toast-icon {
+    color: #15803d !important;
+  }
 
-    #toastContainer .toast-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1A0A0A !important;
-    }
+  #toastContainer .toast-body {
+    flex: 1;
+    min-width: 0;
+  }
 
-    #toastContainer .toast-msg {
-      font-size: 12px;
-      color: #888 !important;
-      margin-top: 2px;
-      line-height: 1.4;
-    }
+  #toastContainer .toast-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A0A0A !important;
+  }
 
-    #toastContainer .toast-close {
-      background: none !important;
-      border: none;
-      cursor: pointer;
-      color: #CCC;
-      font-size: 13px;
-      flex-shrink: 0;
-      padding: 2px 4px;
-    }
+  #toastContainer .toast-msg {
+    font-size: 12px;
+    color: #888 !important;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  #toastContainer .toast-close {
+    background: none !important;
+    border: none;
+    cursor: pointer;
+    color: #CCC;
+    font-size: 13px;
+    flex-shrink: 0;
+    padding: 2px 4px;
+  }
 
     .stat-mini {
       transition: transform .2s ease, box-shadow .2s ease;
@@ -476,20 +495,26 @@
 @section('content')
 <div id="toastContainer" role="region" aria-live="polite"></div>
 
-<div class="settings-page">
-  <div class="settings-shell">
+<main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-[calc(100vh-82px)]">
+  <div class="max-w-[1280px] mx-auto">
 
-    <div class="mb-6 mt-3">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="page-banner">
+      <div class="page-banner-inner">
+
         <div>
-          <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">System Settings</h1>
+          <h1 class="page-title">System Settings</h1>
         </div>
+
         <div class="flex items-center gap-3">
-          <button type="button" onclick="document.getElementById('settingsForm').submit();"
-            class="flex items-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
-            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+          <button type="button"
+            onclick="document.getElementById('settingsForm').submit();"
+            class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000]
+            px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Changes
           </button>
         </div>
+
       </div>
     </div>
 
@@ -926,7 +951,7 @@
       </div>
     </form>
   </div>
-</div>
+</main>
 @endsection
 
 @section('scripts')

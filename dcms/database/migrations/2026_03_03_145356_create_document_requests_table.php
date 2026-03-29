@@ -18,9 +18,7 @@ return new class extends Migration {
 
             $table->string('document_type', 100);
             $table->string('purpose', 150);
-
-            $table->enum('priority', ['high', 'normal', 'low'])->default('normal');
-
+            
             $table->date('request_date');
             $table->time('request_time');
 

@@ -146,15 +146,15 @@
         [data-theme="dark"] .toast.success .toast-icon-wrap {
             background: rgba(34, 197, 94, .1);
         }
-
-        /* ══════════════════════════════════════
-                               SHARED DASHBOARD STYLES
-                            ══════════════════════════════════════ */
-        .page-banner {
+        /* Page Banner */
+       .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
-            padding: 2rem 2rem 3.5rem;
+            padding: 1.75rem 2rem 2rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
         }
 
         .page-banner::before {
@@ -162,18 +162,6 @@
             position: absolute;
             inset: 0;
             background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .page-banner::after {
-            content: '';
-            position: absolute;
-            right: -60px;
-            top: -60px;
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, .04);
-            pointer-events: none;
         }
 
         .page-banner-inner {
@@ -211,41 +199,8 @@
             margin-top: .4rem;
         }
 
-        .period-pill {
-            background: rgba(255, 255, 255, .12);
-            border: 1px solid rgba(255, 255, 255, .2);
-            border-radius: 14px;
-            padding: .75rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            backdrop-filter: blur(8px);
-            flex-wrap: wrap;
-        }
-
-        .period-item {
-            text-align: left;
-        }
-
-        .period-label {
-            font-size: .6rem;
-            font-weight: 700;
-            color: rgba(255, 255, 255, .55);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            display: block;
-        }
-
-        .period-value {
-            font-size: .95rem;
-            font-weight: 800;
-            color: #fff;
-            display: block;
-            margin-top: 2px;
-        }
-
         .content-lift {
-            margin-top: -2rem;
+            margin-top: 0;
             padding: 0 1.75rem 2rem;
             position: relative;
             z-index: 2;
@@ -704,24 +659,27 @@
 @endsection
 
 @section('content')
-    <main id="mainContent" style="padding-top: var(--header-h); min-height: 100vh;">
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
 
         <div class="page-banner">
             <div class="page-banner-inner">
                 <div>
-                    <div class="page-greeting">
-                        <i class="fa-solid fa-screwdriver-wrench" style="color:#fcd34d;"></i>
-                        <span>Configuration</span>
-                    </div>
                     <h1 class="page-title">Service Types</h1>
-                    <p class="page-subtitle">Manage and categorize the dental treatments and services offered.</p>
                 </div>
-                <div class="period-pill">
-                    <div class="period-item">
-                        <span class="period-label"><i class="fa-solid fa-layer-group" style="margin-right:3px;"></i> Total
-                            Services</span>
-                        <span class="period-value">{{ $services->count() }}</span>
-                    </div>
+
+                <div class="flex items-center gap-3">
+                    <span style="
+                        background: rgba(255,255,255,.12);
+                        border: 1px solid rgba(255,255,255,.18);
+                        color: #fff;
+                        padding: .6rem 1rem;
+                        border-radius: 10px;
+                        font-size: .75rem;
+                        font-weight: 700;
+                        line-height: 1;
+                    ">
+                        Active Services: {{ $services->count() }} 
+                    </span>
                 </div>
             </div>
         </div>

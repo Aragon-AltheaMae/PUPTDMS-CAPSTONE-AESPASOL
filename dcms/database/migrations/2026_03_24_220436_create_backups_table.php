@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->enum('type', ['full', 'incremental'])->default('full');
             $table->bigInteger('size_bytes')->default(0);
             $table->string('file_path')->nullable();
-            $table->enum('status', ['completed', 'failed', 'in_progress'])->default('completed');
+            $table->enum('status', ['completed', 'failed', 'in_progress'])->default('in_progress');
             $table->timestamps();
         });
     }

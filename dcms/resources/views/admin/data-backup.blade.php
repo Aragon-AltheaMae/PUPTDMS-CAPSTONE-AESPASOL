@@ -4,19 +4,6 @@
 
 @section('styles')
 <style>
-    .backup-page {
-        padding: 1.25rem 1.5rem 2rem;
-        margin-left: var(--sidebar-w, 240px);
-        margin-top: var(--header-h, 70px);
-        min-height: calc(100vh - var(--header-h, 70px));
-        background: #f6f7f9;
-    }
-
-    .backup-shell {
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
     .backup-topbar {
         display: flex;
         align-items: flex-start;
@@ -60,6 +47,39 @@
 
     .backup-run-btn:hover {
         transform: translateY(-1px);
+    }
+    /* Page Banner */
+    .page-banner {
+        background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+        padding: 1.75rem 2rem 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .page-banner-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
     }
 
     .backup-stats {
@@ -973,18 +993,27 @@
     </div>
 </div>
 
-<div class="backup-page">
-    <div class="backup-shell">
+<main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-[calc(100vh-82px)]">
+    <div class="max-w-[1280px] mx-auto">
+        
+        <div class="page-banner">
+            <div class="page-banner-inner">
 
-        <div class="backup-topbar">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-[#8B0000]">Data Backup</h1>
-            </div>
+        <div>
+            <h1 class="page-title">Data Backup</h1>
+        </div>
 
-            <button class="backup-run-btn" id="backupNowBtn" onclick="startBackup()">
-                <i class="fa-solid fa-database"></i> Backup Now
+        <div class="flex items-center gap-3">
+            <button onclick="startBackup()"
+                class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
+                px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+                <i class="fa-solid fa-database"></i>
+                Backup Now
             </button>
         </div>
+
+    </div>
+</div>
 
         <div class="backup-stats" id="backupStats">
             <span class="stats-indicator" id="statsIndicator"></span>
@@ -1246,7 +1275,7 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 @endsection
 
 @section('scripts')
