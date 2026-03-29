@@ -28,6 +28,77 @@
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
+        /* Page Banner */
+        .page-banner {
+            background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
+            padding: 1.75rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-banner-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+        }
+
+        .page-subtitle {
+            font-size: .8rem;
+            color: rgba(255, 255, 255, .7);
+            margin-top: .35rem;
+        }
+
+        .page-banner-date {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .78rem;
+            color: rgba(255, 255, 255, .82);
+            margin-bottom: .35rem;
+        }
+
+        .page-banner-date i {
+            color: #fff;
+            font-size: .75rem;
+        }
+
+        @media (max-width: 767px) {
+            .page-banner {
+                border-radius: 14px;
+                padding: 1.1rem 1.1rem 1.4rem;
+            }
+
+            .page-title {
+                font-size: 1.45rem;
+            }
+
+            .page-banner-inner {
+                flex-direction: column;
+                gap: .75rem;
+            }
+        }
 
         /* ── DARK MODE ── */
         body,
@@ -564,19 +635,18 @@
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
 
-            <div class="mb-6">
-                <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <i class="fa-solid fa-user-gear text-[#8B0000] text-xs"></i>
-                    <p id="currentDate"></p>
-                </div>
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="page-banner">
+                <div class="page-banner-inner">
                     <div>
-                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#8B0000]">User Management</h1>
-                        <p class="text-gray-500 text-sm mt-1">Manage system accounts, roles, and access permissions</p>
+                        <h1 class="page-title">User Management</h1>
                     </div>
-                    <button onclick="openModal('addModal')"
-                        class="flex items-center justify-center gap-2 bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
-                        <i class="fa-solid fa-user-plus"></i> Add New User
+
+                    <button
+                        onclick="openModal('addModal')"
+                        class="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
+                        px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Add New User
                     </button>
                 </div>
             </div>

@@ -96,8 +96,39 @@ class DocumentRequestController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $requests = DocumentRequest::with('patient')
+        $query = DocumentRequest::with('patient');
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                ->orWhere('document_type', 'like', "%{$search}%")
+                ->orWhere('purpose', 'like', "%{$search}%")
+                ->orWhereHas('patient', function ($patientQuery) use ($search) {
+                    $patientQuery->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('student_id', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type')) {
+            $query->whereRaw('LOWER(document_type) = ?', 
+            [strtolower($request->type)]);
+        }
+
+        if ($request->filled('purpose')) {
+            $query->where('purpose', $request->purpose);
+        }
+
+        $requests = $query
             ->latest('request_date')
+            ->latest('request_time')
             ->get()
             ->map(function ($req) {
                 $fullName = $req->patient->full_name ?? $req->patient->name ?? 'Unknown Patient';
@@ -113,7 +144,6 @@ class DocumentRequestController extends Controller
                     'status' => $req->status,
                     'document_type' => $req->document_type,
                     'purpose' => $req->purpose ?? '—',
-                    'priority' => $req->priority ?? 'normal',
                     'request_date' => Carbon::parse($req->request_date)->format('M d, Y'),
                     'request_time' => Carbon::parse($req->request_time)->format('h:i A'),
                     'patient_name' => $displayName,
@@ -128,6 +158,22 @@ class DocumentRequestController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
+        $purposes = DocumentRequest::query()
+            ->whereNotNull('purpose')
+            ->where('purpose', '!=', '')
+            ->distinct()
+            ->orderBy('purpose')
+            ->pluck('purpose')
+            ->values();
+        
+        $types = DocumentRequest::query()
+            ->whereNotNull('document_type')
+            ->where('document_type', '!=', '')
+            ->distinct()
+            ->orderBy('document_type')
+            ->pluck('document_type')
+            ->values();
+
         return response()->json([
             'requests' => $requests,
             'stats' => [
@@ -138,6 +184,8 @@ class DocumentRequestController extends Controller
                 'released' => $counts['released'] ?? 0,
                 'rejected' => $counts['rejected'] ?? 0,
             ],
+            'purposes' => $purposes,
+            'types' => $types,
         ]);
     }
 

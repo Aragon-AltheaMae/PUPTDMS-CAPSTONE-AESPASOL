@@ -9,7 +9,7 @@
         --crimson-dark: #6b0000;
         --crimson-light: #fef2f2;
     }
-
+    /* Page Banner */
     .page-banner {
         background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
         padding: 1.75rem 2rem 2rem;
@@ -31,7 +31,7 @@
         position: relative;
         z-index: 1;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         gap: 1rem;
         flex-wrap: wrap;
@@ -741,16 +741,24 @@
         <div class="page-banner mt-2">
             <div class="page-banner-inner">
                 <div>
-                    <h1 class="page-title">Appointments</h1>
-                    <p class="page-subtitle">Manage upcoming visits, review past records, and handle patient appointment actions.</p>
+                    <h1 class="page-title">Appointment Management</h1>
                 </div>
-                <span class="page-badge">
-                    <span class="page-badge-dot"></span>
-                    {{ $upcomingTotal + $pastTotal }} total records
-                </span>
+                <div class="tab-toggle-wrap self-start sm:self-auto">
+                    <button id="btnUpcoming" class="tab-btn-toggle active">
+                        <i class="fa-solid fa-calendar-days text-xs"></i>
+                        Upcoming
+                        <span class="tab-count-badge">{{ $upcomingTotal }}</span>
+                    </button>
+                    <button id="btnPast" class="tab-btn-toggle">
+                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                        Past
+                        <span class="tab-count-badge">{{ $pastTotal }}</span>
+                    </button>
+                </div>
             </div>
         </div>
 
+        {{-- ── Summary Bar ── --}}
         <div class="summary-bar">
             <i class="fa-solid fa-circle-info text-white/60 text-sm"></i>
             <span class="text-white/70 text-xs font-medium hidden sm:inline">Today's snapshot:</span>
@@ -780,30 +788,8 @@
             </span>
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-4 mb-6 px-1">
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-[#660000]">Appointment Management</h2>
-                <div class="flex items-center gap-2 mt-1">
-                    <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
-                    <p id="currentDate" class="text-xs sm:text-sm text-[#757575]"></p>
-                </div>
-            </div>
-
-            <div class="tab-toggle-wrap self-start sm:self-auto">
-                <button id="btnUpcoming" class="tab-btn-toggle active">
-                    <i class="fa-solid fa-calendar-days text-xs"></i>
-                    Upcoming
-                    <span class="tab-count-badge">{{ $upcomingTotal }}</span>
-                </button>
-                <button id="btnPast" class="tab-btn-toggle">
-                    <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-                    Past
-                    <span class="tab-count-badge">{{ $pastTotal }}</span>
-                </button>
-            </div>
-        </div>
-
-        <section id="upcomingSection" class="pb-16">
+        {{-- ── Upcoming Section ── --}}
+        <section id="upcomingSection" class="pb-16 mt-2">
             @forelse($upcomingGrouped as $month => $items)
                 <div class="mb-10 sm:mb-14">
                     <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-5">
@@ -1025,7 +1011,8 @@
             @endforelse
         </section>
 
-        <section id="pastSection" class="pb-16 hidden">
+        {{-- ── Past Section ── --}}
+        <section id="pastSection" class="pb-16 mt-2 hidden">
             @forelse($pastGrouped as $month => $items)
                 <div class="mb-10 sm:mb-14">
                     <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-5 pl-2">
@@ -1147,11 +1134,13 @@
                 </div>
             @endforelse
         </section>
+
     </div>
 </main>
 
 <div id="toastContainer"></div>
 
+{{-- ── Start Procedure Modal ── --}}
 <div id="startProcedureModal" class="fixed inset-0 bg-black/45 hidden z-[1000] flex items-center justify-center p-4" onclick="handleStartBackdropClick(event)">
     <div class="start-modal-panel bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
@@ -1171,6 +1160,7 @@
     </div>
 </div>
 
+{{-- ── Reschedule Modal ── --}}
 <div id="rescheduleModal" class="fixed inset-0 bg-black/45 hidden z-[1000] flex items-center justify-center p-4" onclick="handleRescheduleBackdropClick(event)">
     <div class="reschedule-modal-panel bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
@@ -1190,6 +1180,7 @@
     </div>
 </div>
 
+{{-- ── Cancel Modal ── --}}
 <div id="cancelAppointmentModal" class="fixed inset-0 bg-black/45 hidden z-[1000] flex items-center justify-center p-4" onclick="handleCancelBackdropClick(event)">
     <div class="cancel-modal-panel bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
@@ -1229,16 +1220,6 @@
 
 @section('scripts')
 <script>
-    const currentDateEl = document.getElementById('currentDate');
-    if (currentDateEl) {
-        currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    }
-
     const btnUpcoming = document.getElementById('btnUpcoming');
     const btnPast = document.getElementById('btnPast');
     const upcomingSection = document.getElementById('upcomingSection');
@@ -1316,8 +1297,6 @@
 
     function confirmReschedule() {
         if (!selectedApptId) return;
-
-        // admin route version
         var url = "{{ route('admin.admin.appointments.reschedule', ['id' => ':id']) }}".replace(':id', selectedApptId);
         window.location.href = url;
     }
@@ -1334,10 +1313,14 @@
         selectedApptId = null;
     }
 
+    function handleStartBackdropClick(e) {
+        if (e.target === document.getElementById('startProcedureModal')) {
+            closeStartProcedureModal();
+        }
+    }
+
     function confirmStartProcedure() {
         if (!selectedApptId) return;
-
-        // admin route version
         window.location.href = `/admin/appointments/${selectedApptId}/start`;
     }
 
