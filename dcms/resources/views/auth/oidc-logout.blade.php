@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signing out...</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
     <style>
         body {
             margin: 0;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: radial-gradient(ellipse at center, #7a1a00 0%, #3d0000 40%, #1A0505 100%);
             color: white;
             display: flex;
@@ -47,7 +49,6 @@
         h2 {
             font-weight: 800;
             margin-bottom: 0.8rem;
-            letter-spacing: 0.05em;
         }
 
         p {
