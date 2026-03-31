@@ -1,6 +1,6 @@
 @extends('layouts.dentist')
 
-@section('title', 'Appointments | PUP Taguig Dental Clinic')
+@section('title', 'Inventory | PUP Taguig Dental Clinic')
 
 @section('styles')
 <style>
@@ -9,8 +9,6 @@
         --crimson-dark: #6b0000;
         --crimson-light: #fef2f2;
         --crimson-mid: #fce8e8;
-        --sidebar-w: 220px;
-        --header-h: 64px;
     }
 
     body {
@@ -301,9 +299,6 @@
     }
 
     .search-clear-btn {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
         border: none;
         background: #E0DDD8;
         color: #7A7370;
@@ -328,7 +323,7 @@
 
     .tab-group {
         display: flex;
-        background: #F5F2EE;
+        background: #F4F4F4;
         border: 1px solid #E8E4DE;
         border-radius: 10px;
         padding: 3px;
@@ -376,6 +371,23 @@
         border-color: #8B0000;
         color: #8B0000;
         background: #FFF8F8;
+    }
+
+    .btn-filter.filter-active {
+        border-color: #8B0000;
+        color: #8B0000;
+        background: #FFF8F8;
+    }
+
+    .btn-filter.btn-reset {
+        color: #DC2626;
+        border-color: #FECACA;
+    }
+
+    .btn-filter.btn-reset:hover {
+        color: #B91C1C;
+        border-color: #FCA5A5;
+        background: #FFF5F5;
     }
 
     .btn-add {
@@ -474,7 +486,7 @@
     .stock-no {
         font-size: 12px;
         font-weight: 500;
-        background: #F5F2EE;
+        background: #F4F4F4;
         border: 1px solid #E8E4DE;
         padding: 3px 7px;
         border-radius: 6px;
@@ -589,9 +601,6 @@
         border-radius: 0 0 12px 12px;
     }
 
-    /* ════════════════════
-           FILTER PANEL
-        ════════════════════ */
     .filter-overlay {
         display: none;
         position: fixed;
@@ -607,17 +616,86 @@
 
     .filter-panel {
         position: fixed;
-        right: -360px;
-        top: 0;
         bottom: 0;
-        width: 320px;
-        z-index: 200;
+        left: 0;
+        top: auto;
+        right: auto;
+        width: 100%;
+        height: 85vh;
+        max-width: none;
         background: #fff;
-        border-left: 1px solid #E8E4DE;
-        box-shadow: -4px 0 24px rgba(0, 0, 0, .1);
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
         display: flex;
         flex-direction: column;
-        transition: right .3s cubic-bezier(.4, 0, .2, 1);
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 200;
+    }
+
+    .filter-panel.open {
+        transform: translateY(0);
+    }
+
+    .active-filters-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #ffffff;
+        border: 1px solid #E5E7EB;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #4B5563;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s;
+    }
+
+    .filter-chip:hover {
+        border-color: #D1D5DB;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .filter-chip-remove {
+        color: #333333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin-left: 2px;
+    }
+
+    .filter-chip-remove:hover {
+        color: #EF4444;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (min-width: 768px) {
+        .filter-panel {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: auto;
+            width: 360px;
+            height: 100vh;
+            border-radius: 24px 0 0 24px;
+            transform: translateX(100%);
+        }
+
+        .filter-panel.open {
+            transform: translateX(0);
+        }
     }
 
     @media (max-width: 480px) {
@@ -625,10 +703,6 @@
             width: 100%;
             right: -100%;
         }
-    }
-
-    .filter-panel.open {
-        right: 0;
     }
 
     .fp-header {
@@ -912,7 +986,7 @@
         padding: 0 18px;
         border-radius: 9px;
         border: 1.5px solid #E0DDD8;
-        background: #F5F2EE;
+        background: #F4F4F4;
         font-size: 13px;
         font-weight: 600;
         color: #6B6661;
@@ -998,6 +1072,309 @@
         color: #C0392B;
         font-weight: 700;
     }
+
+    @media (max-width: 767px) {
+        .toolbar-actions {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100%;
+        }
+
+        .search-wrap {
+            width: 100% !important;
+            max-width: none;
+        }
+
+        .mobile-action-row {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .mobile-action-row>* {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .tab-group {
+            width: 100%;
+            display: flex;
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+        }
+    }
+
+    .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        background: #F4F4F4;
+        border: 1px solid #E8E4DE;
+        border-radius: 10px;
+        padding: 3px;
+        gap: 2px;
+        flex-shrink: 0;
+    }
+
+    .view-btn {
+        width: 36px;
+        height: 34px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #9A9490;
+        cursor: pointer;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    .view-btn.active {
+        background: #8B0000;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(139, 0, 0, .25);
+    }
+
+    .inventory-grid {
+        display: none;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .inventory-card {
+        background: #fff;
+        border: 1px solid #EDE9E4;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+        transition: all .2s;
+    }
+
+    .inventory-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+    }
+
+    .inventory-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .inventory-card-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1A1614;
+        line-height: 1.3;
+    }
+
+    .inventory-card-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 12px;
+        margin-top: 12px;
+    }
+
+    .inventory-card-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #9A9490;
+        margin-bottom: 4px;
+    }
+
+    .inventory-card-value {
+        font-size: 13px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .inventory-card-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 14px;
+        justify-content: flex-end;
+    }
+
+    @media (max-width: 1024px) {
+        .inventory-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .inventory-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .view-toggle {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .inventory-search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.inventory-search-wrap {
+    flex: 1;
+    min-width: 0;
+}
+
+.inventory-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.inventory-view-toggle {
+    flex-shrink: 0;
+}
+
+.inventory-filter-btn {
+    flex: 1;
+}
+
+.inventory-add-btn {
+    flex: 1.15;
+}
+
+.inventory-reset-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+    min-height: 16px;
+}
+
+@media (min-width: 768px) {
+    .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: auto;
+    }
+
+    .inventory-search-row {
+        width: auto;
+    }
+
+    .inventory-search-wrap {
+        width: 240px;
+        flex: 0 0 auto;
+    }
+
+    .inventory-mobile-actions {
+        width: auto;
+    }
+
+    .inventory-filter-btn,
+    .inventory-add-btn {
+        flex: 0 0 auto;
+    }
+
+    .inventory-reset-row {
+        margin-top: 0;
+        justify-content: flex-start;
+        width: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    #mainContent {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .stat-grid {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+
+    .stat-label {
+        font-size: 9px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    .toolbar-actions {
+        width: 100%;
+    }
+
+    .inventory-search-row {
+        margin-bottom: 10px;
+    }
+
+    .inventory-mobile-actions {
+        gap: 8px;
+    }
+
+    .inventory-view-toggle {
+        width: auto;
+        justify-content: center;
+    }
+
+    .inventory-view-toggle .view-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .inventory-filter-btn,
+    .inventory-add-btn {
+        height: 42px;
+    }
+
+    .table-footer-bar {
+        padding: 10px 12px;
+    }
+
+    #tableWrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .inv-table {
+        min-width: 760px;
+    }
+}
+
+.filter-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #8B0000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  pointer-events: none;
+}
+
 </style>
 @endsection
 
@@ -1009,19 +1386,15 @@ $notifCount = $notifications->count();
 
 <div id="toastContainer"></div>
 
-<!-- ════════ MAIN ════════ -->
-<main id="mainContent" class="pt-[100px] px-6 py-6 fade-in min-h-screen">
-    <div class="max-w-7xl mx-auto fade-in">
+<main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
+    <div class="w-full fade-in">
 
         <div class="mb-5">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[#C9A84C] mb-1">
-                <i class="fa-solid fa-box mr-1"></i> Stock Management
-            </p>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-[#660000] leading-tight">Inventory</h1>
-            <p class="text-sm text-gray-400 mt-1">Track and manage dental supplies &amp; medicines</p>
+            <h1 class="text-xl md:text-2xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1.5">
+                Inventory
+            </h1>
         </div>
 
-        <!-- STAT CARDS -->
         <div class="stat-grid">
             <div class="stat-card s-total">
                 <div class="stat-label">Total Items</div>
@@ -1049,45 +1422,70 @@ $notifCount = $notifications->count();
             </div>
         </div>
 
-        <!-- TABLE CARD -->
         <div class="bg-white rounded-xl shadow-sm border border-[#EDE9E4] overflow-hidden">
 
-            <!-- TOOLBAR -->
-            <div class="px-4 sm:px-5 py-4 border-b border-[#EDE9E4] flex flex-col gap-3">
-                <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <div class="search-wrap flex-1 sm:flex-none">
-                        <i class="fa fa-search"></i>
-                        <input id="searchInput" placeholder="Search Stock No., Name…"
-                            oninput="renderTable(); toggleSearchClear(this)" />
-                        <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()"
-                            title="Clear">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+            <div class="px-4 sm:px-5 py-4 border-b border-[#EDE9E4] flex flex-col gap-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+                    <div class="flex items-center justify-between sm:justify-start gap-3 w-full lg:w-auto">
+                        <div class="tab-group w-full sm:w-auto flex">
+                            <button class="tab-btn active flex-1 sm:flex-none" onclick="setTab('all',this)">All</button>
+                            <button class="tab-btn flex-1 sm:flex-none" onclick="setTab('medicine',this)">Med</button>
+                            <button class="tab-btn flex-1 sm:flex-none" onclick="setTab('supplies',this)">Sup</button>
+                        </div>
+                        <span class="row-count hidden sm:inline-block" id="rowCount"></span>
                     </div>
-                    <div class="tab-group">
-                        <button class="tab-btn active" onclick="setTab('all',this)">All</button>
-                        <button class="tab-btn" onclick="setTab('medicine',this)">Med</button>
-                        <button class="tab-btn" onclick="setTab('supplies',this)">Sup</button>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between gap-2 flex-wrap">
-                    <span class="row-count" id="rowCount"></span>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="openFilterPanel()" class="btn-filter">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span class="hidden sm:inline">Filter</span>
-                        </button>
-                        <button onclick="resetAddForm(); document.getElementById('addModal').showModal()"
-                            class="btn-add">
-                            <span class="add-icon"><i class="fa-solid fa-plus"></i></span>
-                            <span>Add Item</span>
-                        </button>
+
+                    <div class="toolbar-actions w-full lg:w-auto">
+
+                        <div class="inventory-search-row">
+                            <div class="search-wrap inventory-search-wrap">
+                                <i class="fa fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search Stock No., Name…"
+                                    oninput="renderTable(); toggleSearchClear(this)" />
+                            </div>
+
+                            <button type="button" id="searchClearBtn"
+                                class="hidden text-sm font-semibold text-red-600 hover:text-red-800 transition-colors flex-shrink-0"
+                                onclick="clearSearch()">
+                                Clear
+                            </button>
+                        </div>
+
+                        <div class="inventory-mobile-actions">
+                            <div class="view-toggle inventory-view-toggle" id="viewToggle">
+                                <button type="button" class="view-btn active" data-view="list" onclick="setViewMode('list', this)">
+                                    <i class="fa-solid fa-list"></i>
+                                </button>
+                                <button type="button" class="view-btn" data-view="grid" onclick="setViewMode('grid', this)">
+                                    <i class="fa-solid fa-table-cells-large"></i>
+                                </button>
+                            </div>
+
+                            <button id="openFilter" type="button" onclick="openFilterPanel()"
+                                class="btn-filter inventory-filter-btn relative justify-center">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span>Filter</span>
+                                <span id="filterDot" class="filter-badge hidden"></span>
+                            </button>
+
+                            <button id="externalClearFilterBtn" type="button" onclick="clearFilterPanel()"
+                                class="hidden flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white text-red-600 hover:bg-red-50 hover:border-red-300 transition-all flex-shrink-0"
+                                title="Reset filters">
+                                <i class="fa-solid fa-rotate-left text-sm"></i>
+                            </button>
+
+                            <button onclick="resetAddForm(); document.getElementById('addModal').showModal()"
+                                class="btn-add inventory-add-btn justify-center">
+                                <span class="add-icon"><i class="fa-solid fa-plus"></i></span>
+                                <span>Add Item</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TABLE -->
-            <div class="overflow-x-auto">
+            <div id="tableWrapper" class="overflow-x-auto">
                 <table class="inv-table">
                     <thead>
                         <tr>
@@ -1105,6 +1503,7 @@ $notifCount = $notifications->count();
                 </table>
             </div>
 
+            <div id="inventoryGrid" class="inventory-grid"></div>
             <div id="emptyState" style="display:none;"></div>
 
             <div class="table-footer-bar">
@@ -1112,10 +1511,8 @@ $notifCount = $notifications->count();
                 <div></div>
             </div>
         </div>
-    </div>
 </main>
 
-<!-- ════════ FILTER PANEL ════════ -->
 <div class="filter-overlay" id="filterOverlay" onclick="closeFilterPanel()"></div>
 <div class="filter-panel" id="filterPanel">
     <div class="fp-header">
@@ -1123,6 +1520,17 @@ $notifCount = $notifications->count();
         <button class="fp-close-btn" onclick="closeFilterPanel()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="fp-body">
+
+        <div id="activeFiltersSection" class="hidden" style="margin-bottom: 22px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px;">
+                <span style="font-size:13px; font-weight:700; color:#333;">Active Filters</span>
+                <button id="clearAllChipsBtn" type="button"
+                    style="font-size:11.5px; font-weight:700; color:#8B0000; background:none; border:none; cursor:pointer;">Clear
+                    All</button>
+            </div>
+            <div id="activeChipsContainer" class="active-filters-container"></div>
+        </div>
+
         <div class="fp-section">
             <div class="fp-section-title">Sort by Name</div>
             <label class="fp-radio-item"><input type="radio" name="fp_sort" value="az"><label>A → Z</label></label>
@@ -1154,13 +1562,11 @@ $notifCount = $notifications->count();
         </div>
     </div>
     <div class="fp-footer">
-        <button class="fp-btn-clear" onclick="clearFilterPanel()">Clear All</button>
-        <button class="fp-btn-apply" onclick="saveFilterPanel()"><i class="fa-solid fa-check mr-1"></i>
-            Apply</button>
+        <button class="fp-btn-clear" onclick="clearFilterPanelModal()">Clear All</button>
+        <button class="fp-btn-apply" onclick="saveFilterPanel()"><i class="fa-solid fa-check mr-1"></i> Apply</button>
     </div>
 </div>
 
-<!-- ════════ ADD MODAL ════════ -->
 <dialog id="addModal" class="modal backdrop-blur-sm">
     <div class="modal-box-custom">
         <div class="modal-header-custom">
@@ -1232,7 +1638,6 @@ $notifCount = $notifications->count();
     </div>
 </dialog>
 
-<!-- ════════ EDIT MODAL ════════ -->
 <dialog id="editModal" class="modal">
     <div class="modal-box-custom">
         <div class="modal-header-custom">
@@ -1290,7 +1695,6 @@ $notifCount = $notifications->count();
     </div>
 </dialog>
 
-<!-- ════════ DELETE MODAL ════════ -->
 <dialog id="deleteModal" class="modal">
     <div class="modal-box-custom" style="max-width:380px;text-align:center;">
         <div
@@ -1329,11 +1733,31 @@ $notifCount = $notifications->count();
         }, duration);
     }
 
+
+    var currentViewMode = window.innerWidth <= 767 ? 'grid' : 'list';
+
+    function setViewMode(mode, btn) {
+        currentViewMode = mode;
+
+        document.querySelectorAll('.view-btn').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        if (btn) btn.classList.add('active');
+
+        renderTable();
+    }
+
     /* ════════════════════════
        INVENTORY
     ════════════════════════ */
     var inventory = [];
     var activeTab = 'all';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.remove('active'); });
+        var defaultBtn = document.querySelector('.view-btn[data-view="' + currentViewMode + '"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
+    });
 
     async function loadInventory() {
         var res = await fetch('/dentist/inventory/data', { cache: 'no-store' });
@@ -1343,6 +1767,17 @@ $notifCount = $notifications->count();
         renderTable();
     }
     loadInventory();
+
+    window.addEventListener('resize', function () {
+        var shouldBeGrid = window.innerWidth <= 767;
+        if (shouldBeGrid && currentViewMode !== 'grid') {
+            currentViewMode = 'grid';
+            document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.remove('active'); });
+            var gridBtn = document.querySelector('.view-btn[data-view="grid"]');
+            if (gridBtn) gridBtn.classList.add('active');
+            renderTable();
+        }
+    });
 
     function updateStats() {
         document.getElementById('statTotal').textContent = inventory.length;
@@ -1364,82 +1799,376 @@ $notifCount = $notifications->count();
         setRadio('fp_sort', activeFilters.sort); setRadio('fp_dateOrder', activeFilters.dateOrder); setRadio('fp_stock', activeFilters.stock);
         document.getElementById('fp_dateFrom').value = activeFilters.dateFrom || '';
         document.getElementById('fp_dateTo').value = activeFilters.dateTo || '';
+
+        renderFilterChips();
+
         document.getElementById('filterPanel').classList.add('open');
         document.getElementById('filterOverlay').classList.add('open');
     }
+
     function closeFilterPanel() {
         document.getElementById('filterPanel').classList.remove('open');
         document.getElementById('filterOverlay').classList.remove('open');
     }
+
     function setRadio(name, val) {
         document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) { r.checked = (val && r.value === val); });
     }
+
     function getRadio(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
-    function clearFilterPanel() {
+
+    function clearFormState() {
         ['fp_sort', 'fp_dateOrder', 'fp_stock'].forEach(function (n) { setRadio(n, ''); });
-        document.getElementById('fp_dateFrom').value = ''; document.getElementById('fp_dateTo').value = '';
-        Object.keys(activeFilters).forEach(function (k) { activeFilters[k] = ''; });
-        closeFilterPanel(); renderTable();
+        document.getElementById('fp_dateFrom').value = '';
+        document.getElementById('fp_dateTo').value = '';
     }
+
+    function clearFilterPanel() {
+        clearFormState();
+        Object.keys(activeFilters).forEach(function (k) { activeFilters[k] = ''; });
+        updateFilterButtonState();
+        renderTable();
+    }
+
+    function clearFilterPanelModal() {
+        clearFormState();
+        renderFilterChips();
+    }
+
+    function renderFilterChips() {
+        var container = document.getElementById("activeChipsContainer");
+        var section = document.getElementById("activeFiltersSection");
+        if (!container || !section) return;
+
+        container.innerHTML = "";
+        var hasChips = false;
+
+        function addChip(label, callback) {
+            hasChips = true;
+            var chip = document.createElement("div");
+            chip.className = "filter-chip";
+            chip.innerHTML = "<span>" + label + "</span><span class='filter-chip-remove'><i class='fa-solid fa-xmark'></i></span>";
+            chip.querySelector(".filter-chip-remove").onclick = function () {
+                callback();
+                renderFilterChips();
+            };
+            container.appendChild(chip);
+        }
+
+        var sortVal = getRadio('fp_sort');
+        if (sortVal === 'az') addChip('Sort: A → Z', () => setRadio('fp_sort', ''));
+        if (sortVal === 'za') addChip('Sort: Z → A', () => setRadio('fp_sort', ''));
+
+        var dateOrd = getRadio('fp_dateOrder');
+        if (dateOrd === 'asc') addChip('Date: Ascending', () => setRadio('fp_dateOrder', ''));
+        if (dateOrd === 'desc') addChip('Date: Descending', () => setRadio('fp_dateOrder', ''));
+
+        var stockVal = getRadio('fp_stock');
+        if (stockVal === 'low-high') addChip('Stock: Low → High', () => setRadio('fp_stock', ''));
+        if (stockVal === 'high-low') addChip('Stock: High → Low', () => setRadio('fp_stock', ''));
+
+        var fDate = document.getElementById('fp_dateFrom').value;
+        var tDate = document.getElementById('fp_dateTo').value;
+        if (fDate || tDate) {
+            var lbl = (fDate && tDate) ? (fDate + " to " + tDate) : (fDate ? "From " + fDate : "Until " + tDate);
+            addChip("Date: " + lbl, function () { document.getElementById('fp_dateFrom').value = ""; document.getElementById('fp_dateTo').value = ""; });
+        }
+
+        if (hasChips) {
+            section.classList.remove("hidden");
+            var clearAllBtn = document.getElementById("clearAllChipsBtn");
+            if (clearAllBtn) {
+                clearAllBtn.onclick = function () {
+                    clearFormState();
+                    renderFilterChips();
+                };
+            }
+        } else {
+            section.classList.add("hidden");
+        }
+    }
+
+    document.querySelectorAll('#filterPanel input').forEach(function (inp) {
+        inp.addEventListener('change', renderFilterChips);
+    });
+
     function saveFilterPanel() {
         activeFilters.sort = getRadio('fp_sort'); activeFilters.dateOrder = getRadio('fp_dateOrder'); activeFilters.stock = getRadio('fp_stock');
         activeFilters.dateFrom = document.getElementById('fp_dateFrom').value || ''; activeFilters.dateTo = document.getElementById('fp_dateTo').value || '';
+
+        updateFilterButtonState();
         closeFilterPanel(); renderTable();
+    }
+
+    function updateFilterButtonState() {
+        var count = 0;
+        if (activeFilters.sort) count++;
+        if (activeFilters.dateOrder) count++;
+        if (activeFilters.stock) count++;
+        if (activeFilters.dateFrom || activeFilters.dateTo) count++;
+
+        var has = count > 0;
+        var filterPill = document.getElementById("openFilter");
+        var filterDot = document.getElementById("filterDot");
+        var externalClearFilterBtn = document.getElementById("externalClearFilterBtn");
+
+        if (filterPill) filterPill.classList.toggle("filter-active", has);
+        if (filterDot) {
+            if (has) {
+                filterDot.classList.remove("hidden");
+                filterDot.textContent = count;
+            } else {
+                filterDot.classList.add("hidden");
+                filterDot.textContent = "";
+            }
+        }
+        if (externalClearFilterBtn) {
+            if (has) {
+                externalClearFilterBtn.classList.remove("hidden");
+            } else {
+                externalClearFilterBtn.classList.add("hidden");
+            }
+        }
     }
 
     function renderTable() {
         var tbody = document.getElementById('tableBody');
+        var grid = document.getElementById('inventoryGrid');
+        var tableWrapper = document.getElementById('tableWrapper');
+        var emptyState = document.getElementById('emptyState');
+
         tbody.innerHTML = '';
+        if (grid) grid.innerHTML = '';
+
         var data = inventory.slice();
-        if (activeTab === 'medicine') data = data.filter(function (i) { return i.category === 'Medicine'; });
-        if (activeTab === 'supplies') data = data.filter(function (i) { return i.category === 'Supplies'; });
+
+        if (activeTab === 'medicine') {
+            data = data.filter(function (i) { return i.category === 'Medicine'; });
+        }
+        if (activeTab === 'supplies') {
+            data = data.filter(function (i) { return i.category === 'Supplies'; });
+        }
+
         var q = (document.getElementById('searchInput').value || '').toLowerCase();
-        if (q) data = data.filter(function (i) { return String(i.stock_no || '').toLowerCase().includes(q) || String(i.name || '').toLowerCase().includes(q); });
+        if (q) {
+            data = data.filter(function (i) {
+                return String(i.stock_no || '').toLowerCase().includes(q) ||
+                    String(i.name || '').toLowerCase().includes(q);
+            });
+        }
+
         var from = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null;
         var to = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null;
-        if (from) { from.setHours(0, 0, 0, 0); data = data.filter(function (i) { return i.date_received && new Date(i.date_received) >= from; }); }
-        if (to) { to.setHours(23, 59, 59, 999); data = data.filter(function (i) { return i.date_received && new Date(i.date_received) <= to; }); }
-        function n(v) { var x = Number(v); return isFinite(x) ? x : 0; }
-        function dt(v) { if (!v) return 0; var t = new Date(v).getTime(); return isFinite(t) ? t : 0; }
-        if (activeFilters.stock === 'low-high') data.sort(function (a, b) { return (n(a.qty) - n(a.used)) - (n(b.qty) - n(b.used)); });
-        else if (activeFilters.stock === 'high-low') data.sort(function (a, b) { return (n(b.qty) - n(b.used)) - (n(a.qty) - n(a.used)); });
-        else if (activeFilters.sort === 'az') data.sort(function (a, b) { return String(a.name || '').localeCompare(String(b.name || '')); });
-        else if (activeFilters.sort === 'za') data.sort(function (a, b) { return String(b.name || '').localeCompare(String(a.name || '')); });
-        else if (activeFilters.dateOrder === 'asc') data.sort(function (a, b) { return dt(a.date_received) - dt(b.date_received); });
-        else if (activeFilters.dateOrder === 'desc') data.sort(function (a, b) { return dt(b.date_received) - dt(a.date_received); });
+
+        if (from) {
+            from.setHours(0, 0, 0, 0);
+            data = data.filter(function (i) {
+                return i.date_received && new Date(i.date_received) >= from;
+            });
+        }
+
+        if (to) {
+            to.setHours(23, 59, 59, 999);
+            data = data.filter(function (i) {
+                return i.date_received && new Date(i.date_received) <= to;
+            });
+        }
+
+        function n(v) {
+            var x = Number(v);
+            return isFinite(x) ? x : 0;
+        }
+
+        function dt(v) {
+            if (!v) return 0;
+            var t = new Date(v).getTime();
+            return isFinite(t) ? t : 0;
+        }
+
+        if (activeFilters.stock === 'low-high') {
+            data.sort(function (a, b) {
+                return (n(a.qty) - n(a.used)) - (n(b.qty) - n(b.used));
+            });
+        } else if (activeFilters.stock === 'high-low') {
+            data.sort(function (a, b) {
+                return (n(b.qty) - n(b.used)) - (n(a.qty) - n(a.used));
+            });
+        } else if (activeFilters.sort === 'az') {
+            data.sort(function (a, b) {
+                return String(a.name || '').localeCompare(String(b.name || ''));
+            });
+        } else if (activeFilters.sort === 'za') {
+            data.sort(function (a, b) {
+                return String(b.name || '').localeCompare(String(a.name || ''));
+            });
+        } else if (activeFilters.dateOrder === 'asc') {
+            data.sort(function (a, b) {
+                return dt(a.date_received) - dt(b.date_received);
+            });
+        } else if (activeFilters.dateOrder === 'desc') {
+            data.sort(function (a, b) {
+                return dt(b.date_received) - dt(a.date_received);
+            });
+        }
+
         updateStats();
         document.getElementById('rowCount').textContent = data.length + ' item' + (data.length !== 1 ? 's' : '');
         document.getElementById('pageInfo').textContent = 'Showing ' + data.length + ' of ' + inventory.length + ' items';
-        var emptyState = document.getElementById('emptyState');
+
         if (!data.length) {
+            if (tableWrapper) tableWrapper.style.display = 'none';
+            if (grid) grid.style.display = 'none';
+
             emptyState.style.display = 'block';
-            var isSearching = q.length > 0; var hasFilters = Object.values(activeFilters).some(Boolean);
+
+            var isSearching = q.length > 0;
+            var hasFilters = Object.values(activeFilters).some(Boolean);
             var icon, title, sub, extraHtml = '';
+
             if (isSearching) {
-                icon = 'fa-magnifying-glass'; title = 'No results for "' + q + '"'; sub = 'Try a different stock number or supply name.';
+                icon = 'fa-magnifying-glass';
+                title = 'No results for "' + q + '"';
+                sub = 'Try a different stock number or supply name.';
                 extraHtml = '<button onclick="clearSearch()" class="mt-3 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-sm text-gray-400 hover:border-[#8B0000] hover:text-[#8B0000] transition-all duration-200"><i class="fa-solid fa-xmark mr-1.5 text-xs"></i> Clear search</button>';
             } else if (hasFilters) {
-                icon = 'fa-sliders'; title = 'No matches for your filters'; sub = 'Try removing or adjusting your filter criteria.';
-                extraHtml = '<button onclick="clearFilterPanel()" class="mt-3 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-sm text-gray-400 hover:border-[#8B0000] hover:text-[#8B0000] transition-all duration-200"><i class="fa-solid fa-xmark mr-1.5 text-xs"></i> Clear filters</button>';
+                icon = 'fa-sliders';
+                title = 'No matches for your filters';
+                sub = 'Try removing or adjusting your filter criteria.';
+                extraHtml = '<button onclick="clearFilterPanel()" class="mt-3 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-sm text-gray-400 hover:border-[#8B0000] hover:text-[#8B0000] transition-all duration-200"><i class="fa-solid fa-xmark mr-1.5 text-xs"></i> Reset</button>';
             } else {
-                var msgs = { all: { icon: 'fa-box-open', title: 'No items in the inventory', sub: 'Add your first item using the "Add Item" button above.' }, medicine: { icon: 'fa-pills', title: 'No medicines in the inventory', sub: 'Add a medicine item above.' }, supplies: { icon: 'fa-syringe', title: 'No dental supplies in the inventory', sub: 'Add a supply item above.' } };
-                var msg = msgs[activeTab] || msgs.all; icon = msg.icon; title = msg.title; sub = msg.sub;
+                var msgs = {
+                    all: {
+                        icon: 'fa-box-open',
+                        title: 'No items in the inventory',
+                        sub: 'Add your first item using the "Add Item" button above.'
+                    },
+                    medicine: {
+                        icon: 'fa-pills',
+                        title: 'No medicines in the inventory',
+                        sub: 'Add a medicine item above.'
+                    },
+                    supplies: {
+                        icon: 'fa-syringe',
+                        title: 'No dental supplies in the inventory',
+                        sub: 'Add a supply item above.'
+                    }
+                };
+                var msg = msgs[activeTab] || msgs.all;
+                icon = msg.icon;
+                title = msg.title;
+                sub = msg.sub;
             }
-            emptyState.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-center gap-2"><div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-3"><i class="fa-solid ' + icon + ' text-3xl text-gray-300"></i></div><p class="text-base font-semibold text-gray-500">' + title + '</p><p class="text-sm text-gray-400 max-w-xs">' + sub + '</p>' + extraHtml + '</div>';
+
+            emptyState.innerHTML =
+                '<div class="flex flex-col items-center justify-center py-16 text-center gap-2">' +
+                '<div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">' +
+                '<i class="fa-solid ' + icon + ' text-3xl text-gray-300"></i></div>' +
+                '<p class="text-base font-semibold text-gray-500">' + title + '</p>' +
+                '<p class="text-sm text-gray-400 max-w-xs">' + sub + '</p>' +
+                extraHtml +
+                '</div>';
             return;
         }
+
         emptyState.style.display = 'none';
+
+        if (currentViewMode === 'grid') {
+            if (tableWrapper) tableWrapper.style.display = 'none';
+            if (grid) grid.style.display = 'grid';
+        } else {
+            if (tableWrapper) tableWrapper.style.display = 'block';
+            if (grid) grid.style.display = 'none';
+        }
+
         data.forEach(function (item) {
             var balance = n(item.qty) - n(item.used);
             var balClass = balance <= 0 ? 'critical' : balance <= 5 ? 'low' : 'ok';
             var balLabel = balance <= 0 ? 'Out of stock' : balance <= 5 ? 'Low stock' : 'In stock';
             var catClass = item.category === 'Medicine' ? 'medicine' : 'supplies';
-            tbody.innerHTML += '<tr><td style="color:#9A9490;font-size:12px;white-space:nowrap;">' + (item.formatted_date || '') + '</td><td><span class="stock-no">' + (item.stock_no || '') + '</span></td><td><div class="supply-name">' + (item.name || '') + '</div><span class="supply-cat ' + catClass + '">' + (item.category || '') + '</span></td><td style="color:#9A9490;">' + (item.unit || '') + '</td><td style="font-weight:700;">' + (item.qty || 0) + '</td><td style="color:#9A9490;">' + (item.used || 0) + '</td><td><span class="bal-chip ' + balClass + '">' + balance + ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span></span></td><td><div style="display:flex;justify-content:center;gap:6px;"><button class="act-btn edit" title="Edit" onclick="openEdit(' + item.id + ')"><i class="fa fa-pen"></i></button><button class="act-btn delete" title="Delete" onclick="deleteItem(' + item.id + ')"><i class="fa fa-trash"></i></button></div></td></tr>';
+
+            if (currentViewMode === 'grid') {
+                grid.innerHTML += `
+                <div class="inventory-card">
+                    <div class="inventory-card-head">
+                        <div>
+                            <div class="inventory-card-name">${item.name || ''}</div>
+                            <div style="margin-top:6px;">
+                                <span class="stock-no">${item.stock_no || ''}</span>
+                            </div>
+                            <span class="supply-cat ${catClass}" style="margin-top:8px;">${item.category || ''}</span>
+                        </div>
+                        <span class="bal-chip ${balClass}">
+                            ${balance} <span style="font-weight:400;font-size:10px;">${balLabel}</span>
+                        </span>
+                    </div>
+
+                    <div class="inventory-card-meta">
+                        <div>
+                            <div class="inventory-card-label">Date</div>
+                            <div class="inventory-card-value">${item.formatted_date || ''}</div>
+                        </div>
+                        <div>
+                            <div class="inventory-card-label">Unit</div>
+                            <div class="inventory-card-value">${item.unit || ''}</div>
+                        </div>
+                        <div>
+                            <div class="inventory-card-label">Qty</div>
+                            <div class="inventory-card-value">${item.qty || 0}</div>
+                        </div>
+                        <div>
+                            <div class="inventory-card-label">Used</div>
+                            <div class="inventory-card-value">${item.used || 0}</div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card-actions">
+                        <button class="act-btn edit" title="Edit" onclick="openEdit(${item.id})">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button class="act-btn delete" title="Delete" onclick="deleteItem(${item.id})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            } else {
+                tbody.innerHTML +=
+                    '<tr>' +
+                    '<td style="color:#9A9490;font-size:12px;white-space:nowrap;">' + (item.formatted_date || '') + '</td>' +
+                    '<td><span class="stock-no">' + (item.stock_no || '') + '</span></td>' +
+                    '<td><div class="supply-name">' + (item.name || '') + '</div><span class="supply-cat ' + catClass + '">' + (item.category || '') + '</span></td>' +
+                    '<td style="color:#9A9490;">' + (item.unit || '') + '</td>' +
+                    '<td style="font-weight:700;">' + (item.qty || 0) + '</td>' +
+                    '<td style="color:#9A9490;">' + (item.used || 0) + '</td>' +
+                    '<td><span class="bal-chip ' + balClass + '">' + balance + ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span></span></td>' +
+                    '<td><div style="display:flex;justify-content:center;gap:6px;"><button class="act-btn edit" title="Edit" onclick="openEdit(' + item.id + ')"><i class="fa fa-pen"></i></button><button class="act-btn delete" title="Delete" onclick="deleteItem(' + item.id + ')"><i class="fa fa-trash"></i></button></div></td>' +
+                    '</tr>';
+            }
         });
     }
 
-    function toggleSearchClear(input) { document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0); }
-    function clearSearch() { var input = document.getElementById('searchInput'); input.value = ''; document.getElementById('searchClearBtn').classList.remove('visible'); renderTable(); input.focus(); }
+    function toggleSearchClear(input) {
+        var btn = document.getElementById('searchClearBtn');
+        if (!btn) return;
+
+        if ((input.value || '').trim().length > 0) {
+            btn.classList.remove('hidden');
+        } else {
+            btn.classList.add('hidden');
+        }
+    }
+
+    function clearSearch() {
+        var input = document.getElementById('searchInput');
+        var btn = document.getElementById('searchClearBtn');
+
+        if (input) input.value = '';
+        if (btn) btn.classList.add('hidden');
+
+        renderTable();
+
+        if (input) input.focus();
+    }
 
     function formatStockNo(input) {
         var digits = input.value.replace(/\D/g, ''); if (digits.length > 5) digits = digits.slice(0, 5);

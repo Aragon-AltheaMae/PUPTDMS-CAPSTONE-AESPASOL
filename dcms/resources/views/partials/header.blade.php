@@ -9,7 +9,7 @@
     $showMobileMenu = $showMobileMenu ?? in_array($role, ['admin', 'super_admin', 'dentist']);
     $showSettings = $showSettings ?? in_array($role, ['admin', 'super_admin']);
 
-    $clinicTitle = $clinicTitle ?? 'PUP Taguig Dental Clinic';
+    $clinicTitle = $clinicTitle ?? 'PUP TAGUIG DENTAL CLINIC';
 
     if ($role === 'patient') {
         $displayName = ucwords(strtolower(optional($patient)->name ?? ($authUser->name ?? 'Patient User')));
@@ -94,7 +94,7 @@
                         </a>
                     @empty
                         <div class="header-notif-empty">
-                            <i class="fa-regular fa-bell-slash"></i>
+                            <i class="fa-solid fa-bell-slash"></i>
                             <span>You're all caught up.</span>
                         </div>
                     @endforelse
@@ -110,47 +110,55 @@
 
         <div id="userDropdown">
             <button class="header-user-btn" id="userBtn" type="button">
-                <img src="{{ $avatarUrl }}" class="header-avatar" alt="Avatar">
+                <div class="avatar-wrapper">
+                    <img src="{{ $avatarUrl }}" class="header-avatar" alt="Profile avatar">
+                    <div class="mobile-chevron-badge">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
 
-                <div>
+                <div class="header-user-info">
                     <div class="header-name">{{ $displayName }}</div>
                     <div class="header-role">{{ $displayRole }}</div>
                 </div>
 
-                <i class="fa-solid fa-chevron-down" style="font-size:.7rem; opacity:.75; margin-left:2px;"></i>
+                <i class="fa-solid fa-chevron-down desktop-chevron"
+                    style="font-size:.65rem; opacity:.75; margin-left:4px;"></i>
             </button>
 
             <div id="userMenu" class="header-dropdown-menu header-user-menu">
-                <div class="header-user-card">
-                    <img src="{{ $avatarUrl }}" class="header-user-card-avatar" alt="Avatar">
-                    <div>
-                        <div class="header-user-card-name">{{ $displayName }}</div>
-                        <div class="header-user-card-role">{{ $displayRole }}</div>
+
+                <div class="dropdown-profile-card">
+                    <img src="{{ $avatarUrl }}" class="dropdown-avatar" alt="Profile large avatar">
+                    <div class="dropdown-user-details">
+                        <div class="dropdown-name">{{ $displayName }}</div>
+                        <div class="dropdown-role">{{ $displayRole }}</div>
                     </div>
                 </div>
 
-                <div class="header-menu-section">
-                    <div class="header-menu-label">Appearance</div>
+                <div class="dropdown-divider"></div>
 
-                    <div class="theme-toggle-container" id="userMenuThemeToggle">
-                        <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                <div class="dropdown-menu-list">
+                    <label class="dropdown-menu-item" id="darkModeToggleItem">
+                        <div class="dropdown-item-content">
+                            <i class="fa-regular fa-sun text-gray-400 text-base" id="themeIcon"></i>
+                            <span class="dropdown-item-text">Dark Mode</span>
+                        </div>
+                        <div class="modern-switch">
+                            <input type="checkbox" id="themeSwitchCheckbox" class="theme-switch-input"
+                                aria-label="Toggle Dark Mode">
+                            <span class="switch-slider"></span>
+                        </div>
+                    </label>
 
-                        <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
-                            <i class="fa-regular fa-moon"></i>
-                        </button>
-
-                        <div class="theme-indicator" aria-hidden="true"></div>
-                    </div>
-                </div>
-
-                <div class="header-menu-actions">
-                    <form method="POST" action="{{ $logoutRoute }}">
+                    <form method="POST" action="{{ $logoutRoute }}" style="margin: 0;">
                         @csrf
-                        <button type="submit" class="header-menu-item">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Log out</span>
+                        <button type="submit" class="dropdown-menu-item dropdown-logout-item">
+                            <div class="dropdown-item-content">
+                                <i class="fa-solid fa-right-from-bracket text-red-500 text-base"></i>
+                                <span class="dropdown-item-text text-red-600">Log out</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
                         </button>
                     </form>
                 </div>
