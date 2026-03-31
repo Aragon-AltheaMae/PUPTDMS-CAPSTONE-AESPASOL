@@ -1,19 +1,18 @@
 @extends('layouts.dentist')
 
-@section('title', 'Records | PUP Taguig Dental Clinic')
+@section('title', 'Reports & Analytics | PUP Taguig Dental Clinic')
 
 @section('styles')
-
 <style>
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(6px)
+      transform: translateY(6px);
     }
 
     to {
       opacity: 1;
-      transform: translateY(0)
+      transform: translateY(0);
     }
   }
 
@@ -21,54 +20,28 @@
     animation: fadeIn .6s ease-out forwards;
   }
 
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%) skewX(-15deg)
-    }
-
-    100% {
-      transform: translateX(300%) skewX(-15deg)
-    }
-  }
-
-  .btn-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-shimmer::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 40%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
-    animation: shimmer 2.4s infinite;
-  }
-
-  /* KPI */
   .kpi-card {
     background: white;
-    border-radius: 14px;
-    padding: 18px 22px;
+    border-radius: 16px;
+    padding: 18px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
-    border: 1.5px solid #f0f0f0;
-    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+    border: 1px solid #E5E7EB;
+    transition: all .2s ease;
     text-decoration: none;
   }
 
   .kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(139, 0, 0, .10);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 0, 0, .08);
+    border-color: #fca5a5;
   }
 
   .kpi-icon {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -78,25 +51,28 @@
   }
 
   .kpi-value {
-    font-size: 1.55rem;
+    font-size: 1.5rem;
     font-weight: 800;
     line-height: 1;
-    color: #1a1a1a;
+    color: #111827;
+    margin-bottom: 4px;
   }
 
   .kpi-label {
-    font-size: .72rem;
-    font-weight: 500;
-    color: #888;
-    margin-top: 3px;
-    letter-spacing: .03em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #6B7280;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .kpi-delta {
-    font-size: .7rem;
+    font-size: 0.7rem;
     font-weight: 600;
     margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
 
   .kpi-delta.up {
@@ -109,122 +85,130 @@
 
   .kpi-arrow {
     margin-left: auto;
-    color: #ccc;
-    font-size: .75rem;
-    align-self: center;
+    color: #D1D5DB;
+    font-size: 0.8rem;
+    transition: color .2s;
   }
 
   .kpi-card:hover .kpi-arrow {
     color: #8B0000;
   }
 
-  /* Chart card */
   .chart-card {
     background: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
-    border: 1.5px solid #f0f0f0;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+    border: 1px solid #E5E7EB;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
   }
 
   .chart-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   .chart-title {
-    font-size: .88rem;
+    font-size: 0.9rem;
     font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .chart-title i {
     color: #8B0000;
   }
 
   .period-select {
-    font-size: .72rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: #8B0000;
-    background: #fff5f5;
-    border: 1.5px solid #f9b2b2;
-    border-radius: 20px;
-    padding: 3px 24px 3px 12px;
+    color: #1e293b;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 99px;
+    padding: 6px 28px 6px 14px;
     cursor: pointer;
     outline: none;
     appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238B0000'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center;
+    background-position: right 12px center;
+    transition: all .2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
-  /* Quick buttons */
-  .quick-btn {
-    position: relative;
-    flex: 1;
-    border-radius: 14px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #8B0000 0%, #5a0000 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: white;
-    font-weight: 700;
-    font-size: .85rem;
-    text-align: center;
+  .period-select:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .period-select:focus {
+    border-color: #8B0000;
+    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
     padding: 16px;
-    transition: transform .2s, box-shadow .2s;
-    box-shadow: 0 4px 16px rgba(139, 0, 0, .25);
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all .2s ease;
+    cursor: pointer;
   }
 
-  .quick-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(139, 0, 0, .35);
+  .action-card:hover {
+    border-color: #8B0000;
+    box-shadow: 0 4px 12px rgba(139, 0, 0, .05);
+    transform: translateY(-2px);
   }
 
-  .quick-btn .qb-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, .15);
+  .action-icon {
+    width: 42px;
+    height: 42px;
+    background: #FFF5F5;
+    color: #8B0000;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    transition: all .2s;
   }
 
-  .quick-btn::before {
-    content: '';
-    position: absolute;
-    top: -30%;
-    right: -20%;
-    width: 100px;
-    height: 100px;
-    background: rgba(255, 215, 0, .12);
-    border-radius: 50%;
+  .action-card:hover .action-icon {
+    background: #8B0000;
+    color: white;
   }
 
-  /* Stock bars */
   .stock-row {
     padding: 10px 0;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid #F3F4F6;
+  }
+
+  .stock-row:last-child {
+    border-bottom: none;
   }
 
   .stock-name {
-    font-size: .78rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: #333;
+    color: #374151;
     margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
   }
 
   .stock-bar-bg {
-    height: 7px;
-    background: #f0f0f0;
+    height: 6px;
+    background: #F3F4F6;
     border-radius: 10px;
     overflow: hidden;
   }
@@ -235,7 +219,6 @@
     transition: width .8s cubic-bezier(.4, 0, .2, 1);
   }
 
-  /* Chart empty/loading states */
   .chart-empty {
     display: flex;
     flex-direction: column;
@@ -243,21 +226,26 @@
     justify-content: center;
     height: 100%;
     gap: 10px;
-    color: #bbb;
+    color: #9CA3AF;
+    text-align: center;
   }
 
   .chart-empty i {
-    font-size: 2rem;
+    font-size: 2.5rem;
+    color: #E5E7EB;
+    margin-bottom: 4px;
   }
 
   .chart-empty p {
-    font-size: .8rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    color: #6B7280;
+    margin: 0;
   }
 
   .chart-empty span {
-    font-size: .72rem;
-    color: #ccc;
+    font-size: 0.75rem;
+    color: #9CA3AF;
   }
 
   .chart-loading {
@@ -279,197 +267,83 @@
     }
   }
 
-  [data-theme="dark"] .kpi-card {
-    background: #111827;
-    border-color: #1f2937;
+  @media (max-width: 1024px) {
+    .kpi-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .main-dashboard-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
-  [data-theme="dark"] .kpi-value {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .chart-card {
-    background: #111827;
-    border-color: #1f2937;
-  }
-
-  /* ════════════════════════════════
-       MOBILE RESPONSIVE
-    ════════════════════════════════ */
   @media (max-width: 767px) {
 
-    /* Page title row */
+    /* Header layout */
     .page-title-row {
       flex-direction: column !important;
       align-items: flex-start !important;
-      gap: .4rem !important;
-      margin-bottom: 1rem !important;
+      gap: 1rem !important;
     }
 
-    .page-title-row h1 {
-      font-size: 1.35rem !important;
+    .header-actions-container {
+      width: 100% !important;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .page-last-updated {
-      font-size: .68rem !important;
+    .header-actions-container button {
+      width: 100% !important;
+      justify-content: center !important;
     }
 
-    /* KPI strip: 2-col grid */
-    .kpi-strip {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: .65rem !important;
-      margin-bottom: 1.1rem !important;
+    .header-actions-container span {
+      width: 100% !important;
+      text-align: center !important;
+    }
+
+    /* KPI STATS FIX FOR MOBILE */
+    .grid.grid-cols-2 {
+      gap: 10px !important;
     }
 
     .kpi-card {
-      padding: 14px 14px !important;
+      padding: 12px 10px !important;
+      /* Smaller padding */
       gap: 10px !important;
-      border-radius: 12px !important;
+      flex-direction: row !important;
+      /* Keep it side by side */
+      align-items: center !important;
+    }
+
+    .kpi-icon {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 14px !important;
+      border-radius: 8px !important;
     }
 
     .kpi-value {
       font-size: 1.25rem !important;
+      /* Smaller number */
+      margin-bottom: 2px !important;
     }
 
     .kpi-label {
-      font-size: .65rem !important;
+      font-size: 0.6rem !important;
+      white-space: normal !important;
+      /* Allows text to wrap instead of cutting off */
+      line-height: 1.2 !important;
     }
 
     .kpi-delta {
-      font-size: .62rem !important;
-    }
-
-    .kpi-icon {
-      width: 38px !important;
-      height: 38px !important;
-      font-size: 16px !important;
-      border-radius: 10px !important;
+      font-size: 0.55rem !important;
     }
 
     .kpi-arrow {
       display: none !important;
-    }
-
-    /* Create report button */
-    .create-report-btn {
-      padding: .85rem 1rem !important;
-      font-size: .82rem !important;
-      border-radius: 14px !important;
-      gap: .6rem !important;
-    }
-
-    .create-report-plus {
-      width: 28px !important;
-      height: 28px !important;
-      font-size: 1rem !important;
-    }
-
-    /* Charts + quick buttons: stack vertically */
-    .charts-quick-row {
-      flex-direction: column !important;
-      gap: .85rem !important;
-    }
-
-    .gad-chart-col {
-      width: 100% !important;
-    }
-
-    .weekly-chart-col {
-      width: 100% !important;
-    }
-
-    .quick-btns-col {
-      width: 100% !important;
-      flex-direction: row !important;
-      min-height: unset !important;
-      gap: .65rem !important;
-    }
-
-    .quick-btn {
-      flex: 1 !important;
-      padding: 14px 10px !important;
-      border-radius: 12px !important;
-    }
-
-    .quick-btn .qb-icon {
-      width: 34px !important;
-      height: 34px !important;
-      font-size: 15px !important;
-    }
-
-    .quick-btn span {
-      font-size: .78rem !important;
-    }
-
-    /* Inventory analytics: stack pies + low stock */
-    .inv-grid {
-      flex-direction: column !important;
-      gap: .85rem !important;
-    }
-
-    .inv-pies {
-      width: 100% !important;
-      flex-direction: column !important;
-    }
-
-    .inv-pie-item {
-      width: 100% !important;
-    }
-
-    .inv-pie-item canvas-wrap {
-      height: 220px !important;
-    }
-
-    .inv-low-stock {
-      width: 100% !important;
-    }
-
-    /* Modal adjustments */
-    .modal-box {
-      max-width: calc(100vw - 2rem) !important;
-      margin: 0 1rem !important;
-    }
-  }
-
-  /* Tablet: 768–1023px */
-  @media (min-width: 768px) and (max-width: 1023px) {
-
-    .kpi-strip {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: .85rem !important;
-    }
-
-    .charts-quick-row {
-      flex-wrap: wrap !important;
-    }
-
-    .gad-chart-col {
-      width: calc(50% - .5rem) !important;
-    }
-
-    .weekly-chart-col {
-      width: calc(50% - .5rem) !important;
-    }
-
-    .quick-btns-col {
-      width: 100% !important;
-      flex-direction: row !important;
-      gap: .85rem !important;
-      min-height: unset !important;
-    }
-
-    .quick-btn {
-      flex-direction: row !important;
-      justify-content: flex-start !important;
-      padding: 1rem 1.25rem !important;
-    }
-
-    .inv-pies {
-      flex-direction: row !important;
-    }
-
-    .inv-pie-item {
-      flex: 1 !important;
+      /* Hide arrow on phone to give text more space */
     }
   }
 </style>
@@ -482,87 +356,88 @@ $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 @endphp
 
-<!-- ══════════ MAIN ══════════ -->
-<main id="mainContent" class="pt-[100px] px-6 py-6 fade-up min-h-screen">
-  <div class="max-w-7xl mx-auto fade-in">
+<main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
+  <div class="w-full fade-in">
 
-    <!-- PAGE TITLE -->
-    <div class="page-title-row flex items-center justify-between mb-6">
+    <div class="page-title-row flex items-start md:items-center justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-[#660000]">Reports &amp; Analytics</h1>
-        <p class="text-xs text-gray-500 mt-0.5">Overview of clinic data, trends, and inventory status</p>
+        <h2 class="text-xl md:text-2xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1.5">
+          Reports & Analytics
+        </h2>
       </div>
-      <span class="page-last-updated text-xs text-gray-400 font-medium">
-        <i class="fa-regular fa-clock mr-1"></i> Last updated: {{ now()->format('M d, Y h:i A') }}
-      </span>
+      <div class="header-actions-container flex flex-col items-end gap-2 mt-3 md:mt-0">
+        <button onclick="document.getElementById('createReportModal').showModal()"
+          class="bg-[#8B0000] hover:bg-[#6b0000] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Create Report
+        </button>
+        <span class="text-[11px] text-gray-400 font-medium">
+          <i class="fa-regular fa-clock mr-1"></i> Last updated: {{ now()->format('M d, Y h:i A') }}
+        </span>
+      </div>
     </div>
 
-    <!-- KPI STRIP -->
-    <div class="kpi-strip grid grid-cols-4 gap-4 mb-7">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mb-8">
 
-      <a href="{{ route('dentist.dentist.patients') }}" class="kpi-card">
-        <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-users" style="color:#8B0000;"></i>
-        </div>
-        <div class="flex-1">
+      <a href="{{ route('dentist.dentist.patients') }}" class="kpi-card group">
+        <div class="kpi-icon bg-red-50 group-hover:bg-[#8B0000] transition-colors"><i
+            class="fa-solid fa-users text-[#8B0000] group-hover:text-white transition-colors"></i></div>
+        <div class="flex-1 min-w-0">
           <div class="kpi-value">{{ $patientsThisMonth }}</div>
           <div class="kpi-label">Patients This Month</div>
           @if(!is_null($patientsDelta))
           <div class="kpi-delta {{ $patientsDelta >= 0 ? 'up' : 'down' }}">
-            <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }} text-[10px]"></i> {{
-            abs($patientsDelta) }}% vs last month
+            <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }}"></i> {{ abs($patientsDelta) }}%
           </div>
           @else
-          <div class="kpi-delta" style="color:#888;">No data last month</div>
+          <div class="kpi-delta text-gray-400 font-normal">No data last month</div>
           @endif
         </div>
         <i class="fa-solid fa-chevron-right kpi-arrow"></i>
       </a>
 
-      <a href="{{ route('dentist.dentist.appointments') }}" class="kpi-card">
-        <div class="kpi-icon" style="background:#fffbeb;"><i class="fa-solid fa-calendar-check"
-            style="color:#d97706;"></i></div>
-        <div class="flex-1">
+      <a href="{{ route('dentist.dentist.appointments') }}" class="kpi-card group">
+        <div class="kpi-icon bg-amber-50 group-hover:bg-amber-500 transition-colors"><i
+            class="fa-solid fa-calendar-check text-amber-600 group-hover:text-white transition-colors"></i></div>
+        <div class="flex-1 min-w-0">
           <div class="kpi-value">{{ $appointmentsToday }}</div>
           <div class="kpi-label">Appointments Today</div>
           @if($appointmentsDelta > 0)
-          <div class="kpi-delta up"><i class="fa-solid fa-arrow-up text-[10px]"></i> {{ $appointmentsDelta }} more
-            than yesterday</div>
-          @elseif($appointmentsDelta < 0) <div class="kpi-delta down"><i class="fa-solid fa-arrow-down text-[10px]"></i>
-            {{ abs($appointmentsDelta) }} fewer than yesterday
+          <div class="kpi-delta up"><i class="fa-solid fa-arrow-up"></i> {{ $appointmentsDelta }} more</div>
+          @elseif($appointmentsDelta < 0) <div class="kpi-delta down"><i class="fa-solid fa-arrow-down"></i> {{
+            abs($appointmentsDelta) }} fewer
         </div>
         @else
-        <div class="kpi-delta" style="color:#888;">Same as yesterday</div>
+        <div class="kpi-delta text-gray-400 font-normal">Same as yesterday</div>
         @endif
     </div>
     <i class="fa-solid fa-chevron-right kpi-arrow"></i>
     </a>
 
     <div class="kpi-card">
-      <div class="kpi-icon" style="background:#f0fdf4;"><i class="fa-solid fa-tooth" style="color:#16a34a;"></i></div>
-      <div>
+      <div class="kpi-icon bg-green-50"><i class="fa-solid fa-tooth text-green-600"></i></div>
+      <div class="flex-1 min-w-0">
         <div class="kpi-value">{{ $casesThisMonth }}</div>
-        <div class="kpi-label">Dental Cases ({{ now()->format('M') }})</div>
+        <div class="kpi-label">Cases ({{ now()->format('M') }})</div>
         @if(!is_null($casesDelta))
         <div class="kpi-delta {{ $casesDelta >= 0 ? 'up' : 'down' }}">
-          <i class="fa-solid fa-arrow-{{ $casesDelta >= 0 ? 'up' : 'down' }} text-[10px]"></i> {{ abs($casesDelta) }}%
-          vs last month
+          <i class="fa-solid fa-arrow-{{ $casesDelta >= 0 ? 'up' : 'down' }}"></i> {{ abs($casesDelta) }}%
         </div>
         @else
-        <div class="kpi-delta" style="color:#888;">No data last month</div>
+        <div class="kpi-delta text-gray-400 font-normal">No data last month</div>
         @endif
       </div>
     </div>
 
-    <a href="{{ route('dentist.dentist.inventory') }}" class="kpi-card" style="border-color:#fee2e2;">
-      <div class="kpi-icon" style="background:#fff0f0;"><i class="fa-solid fa-triangle-exclamation"
-          style="color:#dc2626;"></i></div>
-      <div class="flex-1">
-        <div class="kpi-value" style="color:#dc2626;">{{ $lowStockItems }}</div>
-        <div class="kpi-label">Low Stock Items</div>
+    <a href="{{ route('dentist.dentist.inventory') }}" class="kpi-card group !border-red-200 bg-red-50/30">
+      <div class="kpi-icon bg-red-100 group-hover:bg-red-600 transition-colors"><i
+          class="fa-solid fa-triangle-exclamation text-red-600 group-hover:text-white transition-colors"></i></div>
+      <div class="flex-1 min-w-0">
+        <div class="kpi-value text-red-600">{{ $lowStockItems }}</div>
+        <div class="kpi-label text-red-800">Low Stock Items</div>
         @if($lowStockItems > 0)
-        <div class="kpi-delta down"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> Requires reorder</div>
+        <div class="kpi-delta down"><i class="fa-solid fa-circle-exclamation"></i> Requires reorder</div>
         @else
-        <div class="kpi-delta up"><i class="fa-solid fa-circle-check text-[10px]"></i> All stocked up</div>
+        <div class="kpi-delta up"><i class="fa-solid fa-circle-check"></i> All stocked up</div>
         @endif
       </div>
       <i class="fa-solid fa-chevron-right kpi-arrow"></i>
@@ -570,148 +445,151 @@ $notifCount = $notifications->count();
 
   </div>
 
-  <!-- CREATE REPORT BUTTON -->
-  <div class="flex justify-center mb-7">
-    <button onclick="document.getElementById('createReportModal').showModal()" class="create-report-btn btn-shimmer w-full max-w-4xl bg-gradient-to-r from-[#8B0000] via-[#b30000] to-[#FFD700]
-                   text-white py-4 rounded-2xl flex items-center justify-center gap-4
-                   text-base font-bold shadow-lg hover:opacity-90 transition-opacity">
-      <i class="fa-solid fa-file-circle-plus text-xl"></i>
-      <span>Create New Report</span>
-      <span
-        class="create-report-plus bg-white text-[#8B0000] w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold leading-none">+</span>
-    </button>
-  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 mb-8">
 
-  <!-- CHARTS + QUICK BUTTONS -->
-  {{-- Use a flex row that wraps on mobile via CSS classes --}}
-  <div class="charts-quick-row flex gap-5 mb-5">
+    @php
+    $cleanPeriods = collect($periodOptions)->unique()->sortByDesc(function($date) {
+    return \Carbon\Carbon::parse($date);
+    });
+    @endphp
 
-    <!-- GAD REPORT -->
-    <div class="gad-chart-col chart-card" style="flex:5;">
+    <div class="chart-card lg:col-span-1">
       <div class="chart-card-header">
-        <span class="chart-title"><i class="fa-solid fa-chart-column mr-1.5 opacity-70"></i>GAD Report</span>
+        <span class="chart-title"><i class="fa-solid fa-chart-column"></i> GAD Report</span>
         <select class="period-select" id="gadPeriodSelect">
-          @foreach($periodOptions as $opt)
-          <option>{{ $opt }}</option>
-          @endforeach
+          @foreach($cleanPeriods as $opt) <option value="{{ $opt }}">{{ $opt }}</option> @endforeach
         </select>
       </div>
-      <div id="gadChartWrap" style="height:300px;width:100%;position:relative;">
+      <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
         <canvas id="gadChart"></canvas>
-        <div id="gadEmptyState" class="chart-empty" style="display:none;position:absolute;inset:0;">
-          <i class="fa-solid fa-chart-column" style="color:#e5e7eb;"></i>
-          <p>No GAD records found</p>
-          <span>for the selected period</span>
+        <div id="gadEmptyState" class="chart-empty hidden absolute inset-0 bg-white">
+          <i class="fa-solid fa-chart-column"></i>
+          <p>No records found</p><span>for the selected period</span>
         </div>
-        <div id="gadLoadingState" class="chart-loading"
-          style="display:none;position:absolute;inset:0;background:white;">
-          <i class="fa-solid fa-spinner"></i>
-        </div>
+        <div id="gadLoadingState" class="chart-loading hidden absolute inset-0 bg-white"><i
+            class="fa-solid fa-spinner"></i></div>
       </div>
     </div>
 
-    <!-- WEEKLY DENTAL CASES -->
-    <div class="weekly-chart-col chart-card" style="flex:5;">
+    <div class="chart-card lg:col-span-1">
       <div class="chart-card-header">
-        <span class="chart-title"><i class="fa-solid fa-chart-line mr-1.5 opacity-70"></i>Weekly Dental Cases</span>
+        <span class="chart-title"><i class="fa-solid fa-chart-line"></i> Weekly Cases</span>
         <select class="period-select" id="weeklyPeriodSelect">
-          @foreach($periodOptions as $opt)
-          <option>{{ $opt }}</option>
-          @endforeach
+          @foreach($cleanPeriods as $opt) <option value="{{ $opt }}">{{ $opt }}</option> @endforeach
         </select>
       </div>
-      <div id="weeklyChartWrap" style="height:300px;width:100%;position:relative;">
+      <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
         <canvas id="weeklyDentalCasesChart"></canvas>
-        <div id="weeklyEmptyState" class="chart-empty" style="display:none;position:absolute;inset:0;">
-          <i class="fa-solid fa-chart-line" style="color:#e5e7eb;"></i>
-          <p>No appointment data found</p>
-          <span>for the selected period</span>
+        <div id="weeklyEmptyState" class="chart-empty hidden absolute inset-0 bg-white">
+          <i class="fa-solid fa-chart-line"></i>
+          <p>No appointment data</p><span>for the selected period</span>
         </div>
-        <div id="weeklyLoadingState" class="chart-loading"
-          style="display:none;position:absolute;inset:0;background:white;">
-          <i class="fa-solid fa-spinner"></i>
-        </div>
+        <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0 bg-white"><i
+            class="fa-solid fa-spinner"></i></div>
       </div>
     </div>
 
-    <!-- QUICK BUTTONS -->
-    <div class="quick-btns-col flex flex-col gap-4" style="flex:2;min-height:360px;">
-      <a href="{{ route('dentist.dentist.report.dental-services') }}" class="quick-btn">
-        <div class="qb-icon"><i class="fa-solid fa-tooth"></i></div>
-        <span>Dental Services</span>
+    <div class="lg:col-span-1 flex flex-col gap-4">
+      <h3 class="text-sm font-extrabold text-gray-800 uppercase tracking-wide px-1">Quick Reports</h3>
+
+      <a href="{{ route('dentist.dentist.report.dental-services') }}" class="action-card group">
+        <div class="action-icon"><i class="fa-solid fa-tooth"></i></div>
+        <div>
+          <h4 class="text-sm font-bold text-gray-800 group-hover:text-[#8B0000] transition-colors">Dental Services</h4>
+          <p class="text-[11px] text-gray-400 mt-0.5">View and export full service logs</p>
+        </div>
+        <i
+          class="fa-solid fa-chevron-right text-gray-300 ml-auto text-xs group-hover:text-[#8B0000] transition-colors"></i>
       </a>
-      <a href="{{ route('dentist.dentist.report.daily-treatment') }}" class="quick-btn">
-        <div class="qb-icon"><i class="fa-solid fa-notes-medical"></i></div>
-        <span style="line-height:1.3;">Daily Treatment<br>Record</span>
+
+      <a href="{{ route('dentist.dentist.report.daily-treatment') }}" class="action-card group">
+        <div class="action-icon"><i class="fa-solid fa-notes-medical"></i></div>
+        <div>
+          <h4 class="text-sm font-bold text-gray-800 group-hover:text-[#8B0000] transition-colors">Daily Treatment
+            Record</h4>
+          <p class="text-[11px] text-gray-400 mt-0.5">Track daily patient treatments</p>
+        </div>
+        <i
+          class="fa-solid fa-chevron-right text-gray-300 ml-auto text-xs group-hover:text-[#8B0000] transition-colors"></i>
       </a>
     </div>
 
   </div>
 
-  <!-- INVENTORY ANALYTICS -->
-  <div class="chart-card mb-5" style="border:1.5px solid #fde68a;">
-    <div class="chart-card-header mb-4">
-      <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked mr-1.5 opacity-70"></i>Inventory
-        Analytics</span>
-      <a href="{{ route('dentist.dentist.inventory') }}" class="text-xs font-semibold text-[#8B0000] hover:underline">
-        View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+  <div class="chart-card mb-8">
+    <div class="chart-card-header mb-6">
+      <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory Analytics</span>
+      <a href="{{ route('dentist.dentist.inventory') }}"
+        class="text-[11px] font-bold text-[#8B0000] bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
+        Manage Inventory
       </a>
     </div>
 
-    {{-- inv-grid: flex row on desktop, column on mobile via CSS --}}
-    <div class="inv-grid flex gap-6 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-      <!-- PIE CHARTS -->
-      <div class="inv-pies flex gap-6" style="flex:7;">
-        <div class="inv-pie-item" style="flex:1;">
-          <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medicine Inventory
-          </h3>
-          <div style="height:280px;width:100%;position:relative;">
-            @if($medicineItems->count() > 0)
-            <canvas id="medicinePieChart"></canvas>
-            @else
-            <div class="chart-empty" style="position:absolute;inset:0;">
-              <i class="fa-solid fa-capsules" style="color:#e5e7eb;"></i>
-              <p>No medicine items</p>
-              <span>Add inventory to see chart</span>
-            </div>
-            @endif
+      <div class="col-span-1">
+        <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">Medicine Stock</h3>
+        <div class="relative h-[220px] w-full">
+          @if($medicineItems->count() > 0)
+          <canvas id="medicinePieChart"></canvas>
+          @else
+          <div class="chart-empty absolute inset-0">
+            <i class="fa-solid fa-pills"></i>
+            <p>No data</p>
           </div>
-        </div>
-        <div class="inv-pie-item" style="flex:1;">
-          <h3 class="text-center text-xs font-bold text-[#8B0000] mb-3 uppercase tracking-wider">Medical Supplies
-            Inventory</h3>
-          <div style="height:280px;width:100%;position:relative;">
-            @if($suppliesItems->count() > 0)
-            <canvas id="suppliesPieChart"></canvas>
-            @else
-            <div class="chart-empty" style="position:absolute;inset:0;">
-              <i class="fa-solid fa-box-open" style="color:#e5e7eb;"></i>
-              <p>No supply items</p>
-              <span>Add inventory to see chart</span>
-            </div>
-            @endif
-          </div>
+          @endif
         </div>
       </div>
 
-      <!-- LOW STOCK PANEL -->
-      <div class="inv-low-stock" style="flex:5;">
-        <div class="flex items-center gap-2 mb-3">
-          <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i>
-          <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Low Stock Alerts</span>
+      <div class="col-span-1">
+        <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">Medical Supplies</h3>
+        <div class="relative h-[220px] w-full">
+          @if($suppliesItems->count() > 0)
+          <canvas id="suppliesPieChart"></canvas>
+          @else
+          <div class="chart-empty absolute inset-0">
+            <i class="fa-solid fa-box-open"></i>
+            <p>No data</p>
+          </div>
+          @endif
+        </div>
+      </div>
+
+      <div class="col-span-1 bg-gray-50 rounded-xl p-5 border border-gray-100">
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+          <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
         </div>
 
-        @if($lowStockMedicine->count() > 0)
-        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Medicine</p>
-        @foreach($lowStockMedicine as $item)
+        @if($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
+        <div class="overflow-y-auto max-h-[190px] pr-2 scroll-smooth">
+
+          @if($lowStockMedicine->count() > 0)
+          @foreach($lowStockMedicine as $item)
+          @php
+          $remaining = $item->qty - $item->used;
+          $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+          $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
+            <div class="stock-name">
+              <span class="truncate pr-2">{{ $item->name }}</span>
+              <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }} left</span>
+            </div>
+            <div class="stock-bar-bg">
+              <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+            </div>
+        </div>
+        @endforeach
+        @endif
+
+        @if($lowStockSupplies->count() > 0)
+        @foreach($lowStockSupplies as $item)
         @php
         $remaining = $item->qty - $item->used;
         $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-        $barClass = $pct <= 15 ? 'bg-red-400' : 'bg-orange-400' ; @endphp <div class="stock-row">
+        $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
           <div class="stock-name">
-            <span>{{ $item->name }}</span>
-            <span class="text-red-500 font-bold text-[11px]">{{ $remaining }} / {{ $item->qty }}</span>
+            <span class="truncate pr-2">{{ $item->name }}</span>
+            <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }} left</span>
           </div>
           <div class="stock-bar-bg">
             <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
@@ -720,29 +598,14 @@ $notifCount = $notifications->count();
       @endforeach
       @endif
 
-      @if($lowStockSupplies->count() > 0)
-      <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2">Medical Supplies</p>
-      @foreach($lowStockSupplies as $item)
-      @php
-      $remaining = $item->qty - $item->used;
-      $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-      $barClass = $pct <= 15 ? 'bg-red-400' : 'bg-orange-400' ; @endphp <div class="stock-row">
-        <div class="stock-name">
-          <span>{{ $item->name }}</span>
-          <span class="text-red-500 font-bold text-[11px]">{{ $remaining }} / {{ $item->qty }}</span>
-        </div>
-        <div class="stock-bar-bg">
-          <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
-        </div>
     </div>
-    @endforeach
-    @endif
-
-    @if($lowStockMedicine->count() === 0 && $lowStockSupplies->count() === 0)
-    <div class="flex flex-col items-center justify-center h-full py-8 text-center min-h-[200px]">
-      <i class="fa-solid fa-circle-check text-green-400 text-3xl mb-2"></i>
-      <p class="text-sm font-semibold text-green-600">No low stock items found.</p>
-      <p class="text-xs text-gray-400 mt-1">No reorder needed at this time.</p>
+    @else
+    <div class="flex flex-col items-center justify-center h-[160px] text-center">
+      <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-3">
+        <i class="fa-solid fa-check text-green-500 text-xl"></i>
+      </div>
+      <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
+      <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
     </div>
     @endif
   </div>
@@ -753,7 +616,6 @@ $notifCount = $notifications->count();
   </div>
 </main>
 
-<!-- CREATE REPORT MODAL -->
 <dialog id="createReportModal" class="modal">
   <div class="modal-box max-w-xl p-0 rounded-2xl overflow-hidden bg-white shadow-2xl flex flex-col"
     style="max-height:min(90vh,640px);">
@@ -763,7 +625,7 @@ $notifCount = $notifications->count();
           <i class="fa-solid fa-file-circle-plus text-white text-base"></i>
         </div>
         <div>
-          <h2 class="text-base font-bold text-white leading-tight">Create New Report</h2>
+          <h2 class="text-base font-bold text-white leading-tight">Create Custom Report</h2>
           <p class="text-white/65 text-[11px] mt-0.5">Fields marked <span class="text-yellow-300 font-bold">*</span>
             are required</p>
         </div>
@@ -782,7 +644,7 @@ $notifCount = $notifications->count();
             <span id="reportNameCounter" class="text-[11px] font-semibold text-gray-400">0 / 100</span>
           </div>
           <input id="reportName" type="text" maxlength="100" placeholder="e.g. GAD Monthly Report — Dec 2025"
-            class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors placeholder-gray-300" />
+            class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors placeholder-gray-400" />
           <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
             <i class="fa-solid fa-circle-exclamation"></i> Report name is required.
           </p>
@@ -792,7 +654,7 @@ $notifCount = $notifications->count();
               class="text-red-500">*</span></label>
           <div class="relative">
             <select id="reportType"
-              class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors appearance-none pr-10 text-gray-500">
+              class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors appearance-none pr-10 text-gray-700">
               <option value="" disabled selected>Select a report type...</option>
               <option class="text-gray-800">GAD Report</option>
               <option class="text-gray-800">Medicine Supply Report</option>
@@ -801,7 +663,7 @@ $notifCount = $notifications->count();
               <option class="text-gray-800">Dental Services Report</option>
             </select>
             <i
-              class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8B0000] text-xs pointer-events-none"></i>
+              class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
           </div>
           <p id="reportTypeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
             <i class="fa-solid fa-circle-exclamation"></i> Please select a report type.
@@ -812,19 +674,19 @@ $notifCount = $notifications->count();
               class="text-red-500">*</span></label>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">From <span class="text-red-400">*</span>
+              <p class="text-[10px] text-gray-500 font-semibold uppercase mb-1">From <span class="text-red-400">*</span>
               </p>
               <input id="dateFrom" type="date"
-                class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
+                class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
             </div>
             <div>
-              <p class="text-[10px] text-gray-400 font-semibold uppercase mb-1">To <span
+              <p class="text-[10px] text-gray-500 font-semibold uppercase mb-1">To <span
                   class="text-gray-400 normal-case font-normal">(optional)</span></p>
               <input id="dateTo" type="date"
-                class="w-full px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
+                class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
             </div>
           </div>
-          <p class="text-[10px] text-gray-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>Leave "To" empty to
+          <p class="text-[10px] text-gray-400 mt-1.5"><i class="fa-solid fa-circle-info mr-1"></i>Leave "To" empty to
             report on a single date.</p>
           <p id="dateFromErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1"><i
               class="fa-solid fa-circle-exclamation"></i> Start date is required.</p>
@@ -837,8 +699,8 @@ $notifCount = $notifications->count();
           <label class="block text-[11px] font-bold text-[#8B0000] uppercase tracking-wider mb-1">Quantity <span
               class="text-red-500">*</span></label>
           <input id="reportQty" type="number" min="1" max="100" step="1" placeholder="1 – 100"
-            class="w-36 px-3.5 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
-          <span class="text-[11px] text-gray-400 ml-2">Whole numbers only (1–100)</span>
+            class="w-36 px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
+          <span class="text-[11px] text-gray-400 ml-2">Whole numbers only</span>
           <p id="reportQtyErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
             <i class="fa-solid fa-circle-exclamation"></i> <span id="reportQtyErrMsg">Quantity must be between 1 and
               100.</span>
@@ -846,24 +708,23 @@ $notifCount = $notifications->count();
         </div>
         <div id="formErrorBanner"
           class="hidden items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2.5 text-sm font-medium">
-          <i class="fa-solid fa-triangle-exclamation text-red-400 flex-shrink-0"></i>
+          <i class="fa-solid fa-triangle-exclamation text-red-500 flex-shrink-0"></i>
           Please complete all required fields before downloading.
         </div>
       </form>
     </div>
-    <div class="flex-shrink-0 border-t border-gray-100 px-6 py-4 flex justify-end gap-3 bg-white">
+    <div class="flex-shrink-0 border-t border-gray-100 px-6 py-4 flex justify-end gap-3 bg-gray-50">
       <button type="button" onclick="closeCreateModal()"
-        class="px-5 py-2 rounded-xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all">Cancel</button>
+        class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-600 bg-white text-sm font-bold hover:bg-gray-50 transition-all">Cancel</button>
       <button type="button" id="downloadReportBtn"
-        class="px-6 py-2 rounded-xl bg-[#8B0000] hover:bg-[#7a0000] text-white text-sm font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
-        <i class="fa-solid fa-download"></i> Download Report
+        class="px-6 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#6b0000] text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all">
+        <i class="fa-solid fa-download"></i> Download
       </button>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop"><button onclick="closeCreateModal()"></button></form>
 </dialog>
 
-<!-- DOWNLOAD COMPLETE MODAL -->
 <dialog id="downloadCompleteModal" class="modal">
   <div class="modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-sm">
     <div class="h-1.5 bg-gradient-to-r from-[#8B0000] to-[#FFD700] w-full"></div>
@@ -873,12 +734,13 @@ $notifCount = $notifications->count();
         <i class="fa-solid fa-check text-green-500 text-2xl"></i>
       </div>
       <h3 class="text-xl font-bold text-[#8B0000] mb-2">Download Complete!</h3>
-      <p class="text-gray-400 text-sm leading-relaxed mb-7">Your report has been successfully generated and
+      <p class="text-gray-500 text-sm leading-relaxed mb-7">Your report has been successfully generated and
         downloaded.</p>
       <button onclick="closeDownloadModal()"
-        class="px-8 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#7A0000] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300">Done</button>
+        class="px-8 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#6b0000] text-white font-bold text-sm shadow-sm transition-all w-full">Done</button>
     </div>
   </div>
+  <form method="dialog" class="modal-backdrop"><button onclick="closeDownloadModal()"></button></form>
 </dialog>
 @endsection
 
@@ -894,28 +756,33 @@ $notifCount = $notifications->count();
 </script>
 
 <script>
-  /* ── Modal helpers ─────────────────────────────────────── */
   function closeCreateModal() {
     document.getElementById('createReportModal').close();
     document.getElementById('reportForm').reset();
     document.getElementById('reportNameCounter').textContent = '0 / 100';
     document.getElementById('reportNameCounter').classList.replace('text-red-500', 'text-gray-400');
     ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr', 'formErrorBanner']
-      .forEach(id => { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); });
+      .forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
     ['reportName', 'reportType', 'dateFrom', 'dateTo', 'reportQty']
-      .forEach(id => { document.getElementById(id).classList.remove('border-red-400'); document.getElementById(id).classList.add('border-gray-200'); });
+      .forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.remove('border-red-400'); el.classList.add('border-gray-300'); }
+      });
   }
   function closeDownloadModal() { document.getElementById('downloadCompleteModal').close(); }
 
-  /* ── Chart instances ───────────────────────────────────── */
   let gadChartInstance = null, weeklyChartInstance = null;
 
-  function showGadEmpty() { document.getElementById('gadChart').style.display = 'none'; document.getElementById('gadEmptyState').style.display = 'flex'; document.getElementById('gadLoadingState').style.display = 'none'; }
-  function showGadLoading() { document.getElementById('gadChart').style.display = 'none'; document.getElementById('gadEmptyState').style.display = 'none'; document.getElementById('gadLoadingState').style.display = 'flex'; }
-  function showGadChart() { document.getElementById('gadChart').style.display = 'block'; document.getElementById('gadEmptyState').style.display = 'none'; document.getElementById('gadLoadingState').style.display = 'none'; }
-  function showWeeklyEmpty() { document.getElementById('weeklyDentalCasesChart').style.display = 'none'; document.getElementById('weeklyEmptyState').style.display = 'flex'; document.getElementById('weeklyLoadingState').style.display = 'none'; }
-  function showWeeklyLoading() { document.getElementById('weeklyDentalCasesChart').style.display = 'none'; document.getElementById('weeklyEmptyState').style.display = 'none'; document.getElementById('weeklyLoadingState').style.display = 'flex'; }
-  function showWeeklyChart() { document.getElementById('weeklyDentalCasesChart').style.display = 'block'; document.getElementById('weeklyEmptyState').style.display = 'none'; document.getElementById('weeklyLoadingState').style.display = 'none'; }
+  function showGadEmpty() { document.getElementById('gadChart').style.display = 'none'; document.getElementById('gadEmptyState').classList.remove('hidden'); document.getElementById('gadEmptyState').classList.add('flex'); document.getElementById('gadLoadingState').classList.add('hidden'); }
+  function showGadLoading() { document.getElementById('gadChart').style.display = 'none'; document.getElementById('gadEmptyState').classList.add('hidden'); document.getElementById('gadLoadingState').classList.remove('hidden'); document.getElementById('gadLoadingState').classList.add('flex'); }
+  function showGadChart() { document.getElementById('gadChart').style.display = 'block'; document.getElementById('gadEmptyState').classList.add('hidden'); document.getElementById('gadLoadingState').classList.add('hidden'); }
+
+  function showWeeklyEmpty() { document.getElementById('weeklyDentalCasesChart').style.display = 'none'; document.getElementById('weeklyEmptyState').classList.remove('hidden'); document.getElementById('weeklyEmptyState').classList.add('flex'); document.getElementById('weeklyLoadingState').classList.add('hidden'); }
+  function showWeeklyLoading() { document.getElementById('weeklyDentalCasesChart').style.display = 'none'; document.getElementById('weeklyEmptyState').classList.add('hidden'); document.getElementById('weeklyLoadingState').classList.remove('hidden'); document.getElementById('weeklyLoadingState').classList.add('flex'); }
+  function showWeeklyChart() { document.getElementById('weeklyDentalCasesChart').style.display = 'block'; document.getElementById('weeklyEmptyState').classList.add('hidden'); document.getElementById('weeklyLoadingState').classList.add('hidden'); }
 
   function buildGadChart(labels, female, male) {
     if (gadChartInstance) { gadChartInstance.destroy(); gadChartInstance = null; }
@@ -924,8 +791,8 @@ $notifCount = $notifications->count();
       data: { labels, datasets: [{ label: 'Female', data: female, backgroundColor: '#FFC0CB', borderRadius: 4 }, { label: 'Male', data: male, backgroundColor: '#89CFF0', borderRadius: 4 }] },
       options: {
         responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-        plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 } } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x} cases` } } },
-        scales: { x: { beginAtZero: true, grid: { borderDash: [4, 4] }, title: { display: true, text: 'Number of Cases', font: { family: 'Inter' } } }, y: { grid: { display: false }, ticks: { font: { family: 'Inter' } } } }
+        plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, usePointStyle: true, boxWidth: 8 } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x} cases` } } },
+        scales: { x: { beginAtZero: true, grid: { borderDash: [4, 4] }, title: { display: true, text: 'Number of Cases', font: { family: 'Inter', size: 10 } } }, y: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } } }
       }
     });
   }
@@ -937,8 +804,8 @@ $notifCount = $notifications->count();
       data: { labels, datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 } } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} cases` } } },
-        scales: { x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }, y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ticks: { precision: 0, font: { family: 'Inter' } }, title: { display: true, text: 'Dental Cases', font: { family: 'Inter' } } } }
+        plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, usePointStyle: true, boxWidth: 8 } }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} cases` } } },
+        scales: { x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }, y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ticks: { precision: 0, font: { family: 'Inter', size: 10 } }, title: { display: false } } }
       }
     });
   }
@@ -949,13 +816,12 @@ $notifCount = $notifications->count();
       type: 'doughnut',
       data: { labels: items.map(i => i.name), datasets: [{ data: items.map(i => Math.max(0, i.qty - i.used)), backgroundColor: PIE_COLORS.slice(0, items.length), borderWidth: 2, borderColor: '#fff' }] },
       options: {
-        responsive: true, maintainAspectRatio: false, cutout: '50%',
-        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12, padding: 8 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} remaining` } } }
+        responsive: true, maintainAspectRatio: false, cutout: '65%',
+        plugins: { legend: { position: 'right', labels: { font: { family: 'Inter', size: 10 }, usePointStyle: true, boxWidth: 6, padding: 12 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} remaining` } } }
       }
     });
   }
 
-  /* ── Period AJAX ───────────────────────────────────────── */
   async function reloadGadChart(period) {
     showGadLoading();
     try {
@@ -975,12 +841,7 @@ $notifCount = $notifications->count();
     } catch (e) { showWeeklyEmpty(); }
   }
 
-  /* ── DOMContentLoaded ──────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function () {
-    applyLayout('220px');
-    applyTheme(localStorage.getItem('theme') || 'light');
-    document.querySelectorAll('.theme-option').forEach(o =>
-      o.addEventListener('click', () => applyTheme(o.getAttribute('data-theme'))));
 
     setTimeout(function () {
       const gadHasData = GAD_DATA.female.reduce((a, b) => a + b, 0) + GAD_DATA.male.reduce((a, b) => a + b, 0) > 0;
@@ -993,7 +854,6 @@ $notifCount = $notifications->count();
     document.getElementById('gadPeriodSelect').addEventListener('change', function () { reloadGadChart(this.value); });
     document.getElementById('weeklyPeriodSelect').addEventListener('change', function () { reloadWeeklyChart(this.value); });
 
-    /* ── Modal validation ── */
     const todayStr = new Date().toISOString().split('T')[0];
     document.getElementById('dateFrom').setAttribute('max', todayStr);
     document.getElementById('dateTo').setAttribute('max', todayStr);
@@ -1001,8 +861,8 @@ $notifCount = $notifications->count();
     function setError(inputId, errId, show) {
       const input = document.getElementById(inputId), err = document.getElementById(errId);
       if (!input || !err) return;
-      if (show) { err.classList.remove('hidden'); err.classList.add('flex'); input.classList.add('border-red-400'); input.classList.remove('border-gray-200'); }
-      else { err.classList.add('hidden'); err.classList.remove('flex'); input.classList.remove('border-red-400'); input.classList.add('border-gray-200'); }
+      if (show) { err.classList.remove('hidden'); err.classList.add('flex'); input.classList.add('border-red-400'); input.classList.remove('border-gray-300'); }
+      else { err.classList.add('hidden'); err.classList.remove('flex'); input.classList.remove('border-red-400'); input.classList.add('border-gray-300'); }
     }
     const clearError = (a, b) => setError(a, b, false);
 
@@ -1017,23 +877,29 @@ $notifCount = $notifications->count();
       setError('reportName', 'reportNameErr', !name); if (!name) valid = false;
       setError('reportType', 'reportTypeErr', !type); if (!type) valid = false;
 
-      ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); });
-      ['dateFrom', 'dateTo'].forEach(id => { document.getElementById(id).classList.remove('border-red-400'); document.getElementById(id).classList.add('border-gray-200'); });
+      ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
+      ['dateFrom', 'dateTo'].forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.remove('border-red-400'); el.classList.add('border-gray-300'); }
+      });
 
       if (!from) {
         document.getElementById('dateFromErr').classList.remove('hidden'); document.getElementById('dateFromErr').classList.add('flex');
-        document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-200');
+        document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-300');
         valid = false;
       } else {
         const fromFuture = from > todayStr, toFuture = to && to > todayStr;
         if (fromFuture || toFuture) {
           document.getElementById('dateFutureErr').classList.remove('hidden'); document.getElementById('dateFutureErr').classList.add('flex');
-          if (fromFuture) { document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-200'); }
-          if (toFuture) { document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-200'); }
+          if (fromFuture) { document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-300'); }
+          if (toFuture) { document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-300'); }
           valid = false;
         } else if (to && new Date(to) < new Date(from)) {
           document.getElementById('dateRangeErr').classList.remove('hidden'); document.getElementById('dateRangeErr').classList.add('flex');
-          document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-200');
+          document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-300');
           valid = false;
         }
       }
@@ -1055,7 +921,10 @@ $notifCount = $notifications->count();
         document.getElementById('reportNameCounter').textContent = '0 / 100';
         document.getElementById('reportNameCounter').classList.remove('text-red-500'); document.getElementById('reportNameCounter').classList.add('text-gray-400');
         ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr']
-          .forEach(id => { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); });
+          .forEach(id => {
+            let el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+          });
       }
     });
 
@@ -1073,19 +942,25 @@ $notifCount = $notifications->count();
 
     function checkDates() {
       const from = document.getElementById('dateFrom').value, to = document.getElementById('dateTo').value;
-      ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); });
-      ['dateFrom', 'dateTo'].forEach(id => { document.getElementById(id).classList.remove('border-red-400'); document.getElementById(id).classList.add('border-gray-200'); });
+      ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
+      ['dateFrom', 'dateTo'].forEach(id => {
+        let el = document.getElementById(id);
+        if (el) { el.classList.remove('border-red-400'); el.classList.add('border-gray-300'); }
+      });
       if (!from && !to) return;
       const fromFuture = from && from > todayStr, toFuture = to && to > todayStr;
       if (fromFuture || toFuture) {
         document.getElementById('dateFutureErr').classList.remove('hidden'); document.getElementById('dateFutureErr').classList.add('flex');
-        if (fromFuture) { document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-200'); }
-        if (toFuture) { document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-200'); }
+        if (fromFuture) { document.getElementById('dateFrom').classList.add('border-red-400'); document.getElementById('dateFrom').classList.remove('border-gray-300'); }
+        if (toFuture) { document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-300'); }
         return;
       }
       if (from && to && new Date(to) < new Date(from)) {
         document.getElementById('dateRangeErr').classList.remove('hidden'); document.getElementById('dateRangeErr').classList.add('flex');
-        document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-200');
+        document.getElementById('dateTo').classList.add('border-red-400'); document.getElementById('dateTo').classList.remove('border-gray-300');
       }
       document.getElementById('formErrorBanner').classList.add('hidden');
     }

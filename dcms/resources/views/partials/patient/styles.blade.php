@@ -1,4 +1,5 @@
-<style>
+
+<style>    
     :root {
         --crimson: #8B0000;
         --crimson-dark: #6b0000;
@@ -16,310 +17,10 @@
         --gold: #C9A84C;
     }
 
-      [data-theme="dark"] body {
-    background-color: #000D1A;
-    color: #E5E7EB;
-  }
-  
-    /* ══════ HEADER ══════ */
-    .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 50;
-        height: var(--header-h);
-        background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 1.5rem;
-        box-shadow: 0 1px 0 rgba(255, 255, 255, .08), 0 4px 24px rgba(139, 0, 0, .3);
+    [data-theme="dark"] body {
+        background-color: #000D1A;
+        color: #E5E7EB;
     }
-
-    .header-left,
-    .header-right {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-    }
-
-    .header-logo {
-        width: 34px;
-        height: 34px;
-        object-fit: contain;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
-    }
-
-    .header-divider {
-        width: 1px;
-        height: 28px;
-        background: rgba(255, 255, 255, .2);
-        margin: 0 .25rem;
-    }
-
-    .header-title {
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: .02em;
-        text-transform: uppercase;
-    }
-
-    .hdr-icon-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, .1);
-        border: 1px solid rgba(255, 255, 255, .12);
-        color: #fff;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background .15s;
-        position: relative;
-    }
-
-    .hdr-icon-btn:hover {
-        background: rgba(255, 255, 255, .2);
-    }
-
-    .notif-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: #ff4757;
-        color: #fff;
-        font-size: .58rem;
-        font-weight: 800;
-        width: 17px;
-        height: 17px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--crimson);
-    }
-
-    .header-user-btn {
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-        padding: .35rem .75rem .35rem .35rem;
-        background: rgba(255, 255, 255, .1);
-        border: 1px solid rgba(255, 255, 255, .12);
-        border-radius: 40px;
-        cursor: pointer;
-        transition: background .15s;
-    }
-
-    .header-user-btn i {
-        color: #F4F4F4;
-        font-size: 12px;
-        margin-left: 2px;
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .header-user-btn:hover {
-        background: rgba(255, 255, 255, .18);
-    }
-
-    .header-avatar {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 2px solid rgba(255, 255, 255, .4);
-        object-fit: cover;
-    }
-
-    .header-name {
-        font-size: .78rem;
-        font-weight: 700;
-        color: #fff;
-        line-height: 1;
-    }
-
-    .header-role {
-        font-size: .64rem;
-        color: rgba(255, 255, 255, .65);
-        margin-top: 2px;
-        line-height: 1;
-    }
-
-    /* ══════ DROPDOWN MENUS (Notifications & User) ══════ */
-    #notifDropdown,
-    #userDropdown {
-        position: relative;
-    }
-
-    #notifMenu,
-    #userMenu {
-        position: absolute;
-        right: 0;
-        top: calc(100% + 10px);
-        background: #fff;
-        opacity: 0;
-        transform: scale(.95) translateY(-8px);
-        pointer-events: none;
-        transition: all .2s cubic-bezier(.4, 0, .2, 1);
-        transform-origin: top right;
-        z-index: 100;
-        overflow: hidden;
-    }
-
-    #notifMenu {
-        width: 320px;
-        border-radius: 16px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-    }
-
-    #userMenu {
-        width: 210px;
-        border-radius: 14px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-    }
-
-    #notifMenu.open,
-    #userMenu.open {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        pointer-events: auto;
-    }
-
-    .notif-header {
-        padding: .85rem 1.1rem .7rem;
-        font-weight: 800;
-        color: var(--crimson);
-        font-size: .8rem;
-        border-bottom: 1px solid #fce8e8;
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-    }
-
-    .user-menu-header {
-        padding: .85rem 1rem .7rem;
-        border-bottom: 1px solid #f3f4f6;
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-    }
-
-    .user-menu-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 2px solid #e5e7eb;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .user-menu-name {
-        font-size: .78rem;
-        font-weight: 800;
-        color: #1a202c;
-    }
-
-    .user-menu-role {
-        font-size: .65rem;
-        color: #9ca3af;
-    }
-
-    .user-menu-item {
-        display: flex;
-        align-items: center;
-        gap: .65rem;
-        padding: .65rem 1rem;
-        font-size: .76rem;
-        font-weight: 600;
-        color: #374151;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background .12s;
-        border: none;
-        background: none;
-        width: 100%;
-        text-align: left;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .user-menu-item:hover {
-        background: #f9fafb;
-    }
-
-    .user-menu-item i {
-        width: 14px;
-        text-align: center;
-        color: #9ca3af;
-        font-size: 12px;
-    }
-
-    .user-menu-item.danger,
-    .user-menu-item.danger i {
-        color: #ef4444;
-    }
-
-    .user-menu-item.danger:hover {
-        background: #fef2f2;
-    }
-
-    .user-menu-sep {
-        height: 1px;
-        background: #f3f4f6;
-        margin: 3px 0;
-    }
-
-    /* ══════ THEME TOGGLE ══════ */
-    .theme-toggle-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 36px;
-        background: #f3f4f6;
-        border: 1px solid #e5e7eb;
-        border-radius: 40px;
-        padding: 3px;
-    }
-
-    .theme-option {
-        position: relative;
-        z-index: 2;
-        flex: 1;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        color: #9ca3af;
-        transition: color .2s;
-        border-radius: 40px;
-        font-size: 13px;
-    }
-
-    .theme-option.active {
-        color: #374151;
-    }
-
-    .theme-indicator {
-        position: absolute;
-        background: #fff;
-        border-radius: 40px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-        transition: all .3s cubic-bezier(.4, 0, .2, 1);
-        pointer-events: none;
-        width: calc(50% - 3px);
-        height: calc(100% - 6px);
-        left: 3px;
-        top: 3px;
-    }
-
-    .theme-indicator.dark-mode {
-        transform: translateX(calc(100% + 0px));
-    }
-
 
     /* ══════ DESKTOP SIDEBAR ══════ */
     #sidebar {
@@ -424,8 +125,6 @@
     }
 
     /* ══════ FAB MENU ANIMATION ══════ */
-    /* The menu uses absolute positioning inside the floating pill nav,
-       so it pops up above the center FAB button correctly. */
     #mobFabMenu {
         visibility: hidden;
         opacity: 0;
@@ -450,87 +149,12 @@
     }
 
     @media (max-width: 767px) {
-        #notifMenu {
-            width: min(290px, 88vw);
-            right: 0;
-            left: auto;
-        }
-
-        #userMenu {
-            right: 0;
-            left: auto;
-        }
-
         #mainContent {
             margin-left: 0 !important;
             padding-bottom: 100px;
-            /* clear the floating pill nav */
         }
 
         #sidebar {
-            display: none !important;
-        }
-
-        /* ── Header ── */
-        .header {
-            padding: 0 .85rem;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            flex-shrink: 0;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: .45rem;
-            min-width: 0;
-            flex: 1;
-        }
-
-        .header-logo {
-            width: 28px;
-            height: 28px;
-            flex-shrink: 0;
-        }
-
-        .hdr-icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            flex-shrink: 0;
-        }
-
-        .mobile-pill {
-            padding: 3px 8px 3px 3px;
-            border-radius: 999px;
-            gap: .3rem;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(6px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .mobile-pill i {
-            display: block !important;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            margin-left: 4px;
-            align-self: center;
-        }
-
-        .mobile-pill .header-avatar {
-            width: 28px;
-            height: 28px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .mobile-pill .header-user-text {
             display: none !important;
         }
     }
@@ -548,7 +172,7 @@
         text-size-adjust: 100%;
     }
 
-    /* ══════ DARK MODE OVERRIDES ══════ */
+    /* ══════ DARK MODE OVERRIDES (For Sidebar/Content only) ══════ */
     [data-theme="dark"] .nav-link {
         color: #d1d5db;
     }
@@ -562,9 +186,7 @@
     }
 
     [data-theme="dark"] #sidebar,
-    [data-theme="dark"] #mobileBottomNav,
-    [data-theme="dark"] #notifMenu,
-    [data-theme="dark"] #userMenu {
+    [data-theme="dark"] #mobileBottomNav {
         background-color: #0d1117;
         border-color: #21262d;
     }
@@ -577,69 +199,11 @@
         border-color: #21262d;
     }
 
-    [data-theme="dark"] .user-menu-header {
-        border-color: #21262d;
-    }
-
-    [data-theme="dark"] .user-menu-name {
-        color: #f3f4f6;
-    }
-
-    [data-theme="dark"] .user-menu-item {
-        color: #d1d5db;
-    }
-
-    [data-theme="dark"] .user-menu-item:hover {
-        background: #1c2128;
-    }
-
-    [data-theme="dark"] .user-menu-item.danger {
-        color: #f87171;
-    }
-
-    [data-theme="dark"] .user-menu-item.danger:hover {
-        background: rgba(239, 68, 68, .1);
-    }
-
-    [data-theme="dark"] .user-menu-sep {
-        background: #21262d;
-    }
-
-    [data-theme="dark"] .notif-header {
-        border-color: #21262d;
-    }
-
-    [data-theme="dark"] #notifMenu a {
-        color: #d1d5db !important;
-        border-bottom-color: #21262d !important;
-    }
-
-    [data-theme="dark"] #notifMenu a:hover {
-        background: #1c2128 !important;
-    }
-
-    [data-theme="dark"] .theme-toggle-container {
-        background: #1F1F1F;
-        border-color: #2A2A2A;
-    }
-
-    [data-theme="dark"] .theme-option {
-        color: #6B7280;
-    }
-
-    [data-theme="dark"] .theme-option.active {
-        color: #F3F4F6;
-    }
-
-    [data-theme="dark"] .theme-indicator {
-        background: #2A2A2A;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-    }
-
     [data-theme="dark"] #mobFab {
         border-color: #000D1A;
     }
 
+    /* ══════ TERMS MODAL ══════ */
     #termsModal {
         border: none;
         padding: 0;

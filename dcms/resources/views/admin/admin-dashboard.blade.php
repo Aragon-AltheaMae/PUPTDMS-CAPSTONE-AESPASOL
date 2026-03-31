@@ -95,6 +95,7 @@
         /* ════════════════════════════════
            PAGE BANNER
         ════════════════════════════════ */
+
         .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
             padding: 2rem 2rem 3.5rem;
