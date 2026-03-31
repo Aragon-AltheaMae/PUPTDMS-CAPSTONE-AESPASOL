@@ -1,6 +1,6 @@
 @extends('layouts.dentist')
 
-@section('title', 'Appointments | PUP Taguig Dental Clinic')
+@section('title', 'Document Request | PUP Taguig Dental Clinic')
 
 @section('styles')
 <style>
@@ -15,8 +15,6 @@
     --crimson-dark: #6b0000;
     --crimson-light: #fef2f2;
     --crimson-mid: #fce8e8;
-    --sidebar-w: 256px;
-    --header-h: 64px;
   }
 
   body {
@@ -41,852 +39,403 @@
     }
   }
 
-  /* ════════════════════════════════
-       HEADER
-    ════════════════════════════════ */
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    height: var(--header-h);
-    background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1.5rem;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .08), 0 4px 24px rgba(139, 0, 0, .3);
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-  }
-
-  .header-logo {
-    width: 34px;
-    height: 34px;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
-  }
-
-  .header-divider {
-    width: 1px;
-    height: 28px;
-    background: rgba(255, 255, 255, .2);
-    margin: 0 .25rem;
-  }
-
-  .header-title {
-    font-size: .85rem;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: .02em;
-    text-transform: uppercase;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-  }
-
-  .hdr-icon-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .1);
-    border: 1px solid rgba(255, 255, 255, .12);
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .9rem;
-    transition: background .15s, transform .15s;
-    position: relative;
-  }
-
-  .hdr-icon-btn i,
-  .hdr-icon-btn svg {
-    display: block;
-    line-height: 1;
-    margin: 0;
-  }
-
-  .hdr-icon-btn:hover {
-    background: rgba(255, 255, 255, .2);
-    transform: translateY(-1px);
-  }
-
-  .notif-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ff4757;
-    color: #fff;
-    font-size: .58rem;
-    font-weight: 800;
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--crimson);
-    box-shadow: 0 2px 6px rgba(255, 71, 87, .5);
-  }
-
-  .header-user-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 6px 12px;
-    border-radius: 999px;
-    cursor: pointer;
-  }
-
-  .header-user-btn img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-  }
-
-  .header-user-btn:hover {
-    background: rgba(255, 255, 255, .18);
-  }
-
-  .header-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, .4);
-    object-fit: cover;
-  }
-
-  .header-user-text {
-    line-height: 1;
-  }
-
-  .header-name {
-    font-size: .78rem;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  .header-role {
-    font-size: .64rem;
-    color: rgba(255, 255, 255, .65);
-    margin-top: 2px;
-  }
-
-  /* Notification dropdown */
-  #notifDropdown {
-    position: relative;
-  }
-
-  #notifMenu {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 10px);
-    width: 320px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-    opacity: 0;
-    transform: scale(.95) translateY(-8px);
-    pointer-events: none;
-    transition: all .2s cubic-bezier(.4, 0, .2, 1);
-    transform-origin: top right;
-    z-index: 100;
-    overflow: hidden;
-  }
-
-  #notifMenu.open {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    pointer-events: auto;
-  }
-
-  .notif-header {
-    padding: .85rem 1.1rem .7rem;
-    font-weight: 800;
-    color: var(--crimson);
-    font-size: .8rem;
-    border-bottom: 1px solid #fce8e8;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-  }
-
-  /* ════════════════════════════════
-       SIDEBAR
-    ════════════════════════════════ */
-  #sidebar {
-    position: fixed;
-    left: 0;
-    top: var(--header-h);
-    width: 220px;
-    height: calc(100vh - var(--header-h));
-    background: #fff;
-    border-right: 1px solid #eff0f2;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, .04);
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: width .25s cubic-bezier(.4, 0, .2, 1);
-  }
-
-  .sidebar-inner {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 16px 10px 8px;
-  }
-
-  .sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #4a5568;
-    font-size: .78rem;
-    font-weight: 600;
-    transition: all .15s ease;
-    white-space: nowrap;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .sidebar-nav-item:hover {
-    background: #fef2f2;
-    color: #8B0000;
-  }
-
-  .sidebar-nav-item.active {
-    background: linear-gradient(135deg, #8B0000, #6b0000);
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(139, 0, 0, .25);
-  }
-
-  .sidebar-nav-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(139, 0, 0, .07);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-    color: #8B0000;
-    transition: background .15s;
-  }
-
-  .sidebar-nav-item.active .sidebar-nav-icon {
-    background: rgba(255, 255, 255, .2);
-    color: #fff;
-  }
-
-  .sidebar-nav-text {
-    flex: 1;
-    overflow: hidden;
-    transition: opacity .2s, max-width .25s;
-    max-width: 160px;
-    opacity: 1;
-  }
-
-  #sidebar.collapsed {
-    width: 64px !important;
-  }
-
-  #sidebar.collapsed .sidebar-nav-text,
-  #sidebar.collapsed .nav-section-label,
-  #sidebar.collapsed #sidebarNavLabel {
-    display: none;
-  }
-
-  #sidebar.collapsed .sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    width: 48px;
-    gap: 0;
-  }
-
-  #sidebar.collapsed .sidebar-inner {
-    padding: 16px 0 8px;
-  }
-
-  #sidebar.collapsed nav {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    width: 100%;
-  }
-
-  #sidebar.collapsed #sidebarToggleBtn {
-    margin: 0 auto;
-  }
-
-  #sidebar.collapsed>.sidebar-inner>div:first-child {
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    margin-bottom: 12px;
-  }
-
-  .nav-section-label {
-    font-size: .6rem;
-    font-weight: 800;
-    color: #b0b7c3;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    padding: 0 8px 6px;
-    margin-top: 4px;
-  }
-
-  /* Theme toggle */
-  .theme-toggle-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 36px;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    border-radius: 40px;
-    padding: 3px;
-  }
-
-  .theme-option {
-    position: relative;
-    z-index: 2;
-    flex: 1;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #9ca3af;
-    transition: color .2s;
-    border-radius: 40px;
-    font-size: 13px;
-  }
-
-  .theme-option.active {
-    color: #374151;
-  }
-
-  .theme-indicator {
-    position: absolute;
-    background: #fff;
-    border-radius: 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-    transition: all .3s cubic-bezier(.4, 0, .2, 1);
-    pointer-events: none;
-    width: calc(50% - 3px);
-    height: calc(100% - 6px);
-    left: 3px;
-    top: 3px;
-  }
-
-  .theme-indicator.dark-mode {
-    transform: translateX(calc(100% + 0px));
-  }
-
-  /* User dropdown */
-  #userDropdown {
-    position: relative;
-  }
-
-  #userMenu {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 10px);
-    width: 200px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .15), 0 0 0 1px rgba(0, 0, 0, .06);
-    opacity: 0;
-    transform: scale(.95) translateY(-8px);
-    pointer-events: none;
-    transition: all .2s cubic-bezier(.4, 0, .2, 1);
-    transform-origin: top right;
-    z-index: 100;
-    overflow: hidden;
-  }
-
-  #userMenu.open {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    pointer-events: auto;
-  }
-
-  .user-menu-header {
-    padding: .85rem 1rem .7rem;
-    border-bottom: 1px solid #f3f4f6;
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-  }
-
-  .user-menu-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid #e5e7eb;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .user-menu-name {
-    font-size: .78rem;
-    font-weight: 800;
-    color: #1a202c;
-  }
-
-  .user-menu-role {
-    font-size: .65rem;
-    color: #9ca3af;
-  }
-
-  .user-menu-item {
-    display: flex;
-    align-items: center;
-    gap: .65rem;
-    padding: .65rem 1rem;
-    font-size: .76rem;
-    font-weight: 600;
-    color: #374151;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .12s;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-  }
-
-  .user-menu-item:hover {
-    background: #f9fafb;
-  }
-
-  .user-menu-item i {
-    width: 14px;
-    text-align: center;
-    color: #9ca3af;
-    font-size: 12px;
-  }
-
-  .user-menu-item.danger {
-    color: #ef4444;
-  }
-
-  .user-menu-item.danger i {
-    color: #ef4444;
-  }
-
-  .user-menu-item.danger:hover {
-    background: #fef2f2;
-  }
-
-  .user-menu-sep {
-    height: 1px;
-    background: #f3f4f6;
-    margin: 3px 0;
-  }
-
-  /* ════════════════════════════════
-       MOBILE DRAWER
-    ════════════════════════════════ */
-  #mobileMenuBtn {
-    display: none;
-    background: rgba(255, 255, 255, .12);
-    border: none;
-    color: #fff;
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: background .15s;
-    flex-shrink: 0;
-  }
-
-  #mobileMenuBtn:hover {
-    background: rgba(255, 255, 255, .22);
-  }
-
-  #mobileDrawerOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .45);
-    z-index: 998;
-    backdrop-filter: blur(2px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s;
-  }
-
-  #mobileDrawerOverlay.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  #mobileDrawer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 280px;
-    height: 100vh;
-    background: #fff;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
-    box-shadow: 4px 0 32px rgba(0, 0, 0, .15);
-    overflow: hidden;
-  }
-
-  #mobileDrawer.open {
-    transform: translateX(0);
-  }
-
-  .drawer-header {
-    background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
-    padding: 20px 18px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-
-  .drawer-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .drawer-brand-text {
-    font-size: .75rem;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: .03em;
-    line-height: 1.25;
-    text-transform: uppercase;
-  }
-
-  .drawer-close-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, .15);
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    transition: background .15s;
-    flex-shrink: 0;
-  }
-
-  .drawer-close-btn:hover {
-    background: rgba(255, 255, 255, .28);
-  }
-
-  .drawer-nav {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px 10px 6px;
-  }
-
-  .drawer-section-label {
-    font-size: .6rem;
-    font-weight: 800;
-    color: #b0b7c3;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    padding: 6px 8px 8px;
-  }
-
-  .drawer-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #4a5568;
-    font-size: .8rem;
-    font-weight: 600;
-    transition: all .15s ease;
-    margin-bottom: 3px;
-  }
-
-  .drawer-nav-link:hover {
-    background: #fef2f2;
-    color: #8B0000;
-    transform: translateX(3px);
-  }
-
-  .drawer-nav-link.active {
-    background: linear-gradient(135deg, #8B0000, #6b0000);
-    color: #fff;
-    box-shadow: 0 3px 12px rgba(139, 0, 0, .25);
-  }
-
-  .dnav-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(139, 0, 0, .08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-    color: #8B0000;
-  }
-
-  .drawer-nav-link.active .dnav-icon {
-    background: rgba(255, 255, 255, .2);
-    color: #fff;
-  }
-
-  .drawer-footer {
-    padding: 10px 12px 16px;
-    border-top: 1px solid #f3f4f6;
-    flex-shrink: 0;
-  }
-
-  /* ════════════════════════════════
-       LAYOUT
-    ════════════════════════════════ */
-  #mainContent,
-  #siteFooter {
-    margin-left: 220px;
-    transition: margin-left .25s cubic-bezier(.4, 0, .2, 1);
-  }
-
-  /* ════════════════════════════════
-       FOOTER
-    ════════════════════════════════ */
-  #siteFooter {
-    background: var(--crimson);
-    color: rgba(255, 255, 255, .8);
-    padding: 1.25rem 2rem;
-  }
-
-  .footer-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    font-size: .74rem;
-  }
-
-  .footer-inner a {
-    color: rgba(255, 255, 255, .7);
-    text-decoration: none;
-    transition: color .15s;
-  }
-
-  .footer-inner a:hover {
-    color: #fff;
-  }
-
-  .footer-dot {
-    color: rgba(255, 255, 255, .3);
-  }
-
-  /* ════════════════════════════════
-       STAT CARDS
-    ════════════════════════════════ */
   .stat-card {
-    background: #8B0000;
-    border-radius: 16px;
-    padding: 1.35rem 1.5rem;
-    color: #fff;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: transform .18s, box-shadow .18s, background .18s;
-    text-decoration: none;
-    display: block;
-    border: 2px solid transparent;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    right: -16px;
-    top: -16px;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .07);
-  }
-
-  .stat-card::after {
-    content: '';
-    position: absolute;
-    right: 12px;
-    bottom: -20px;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .05);
+    min-height: 80px;
   }
 
   .stat-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(139, 0, 0, .3);
   }
 
-  .stat-card.stat-active {
-    background: #6b0000;
-    border-color: rgba(255, 255, 255, .2);
-    box-shadow: 0 6px 20px rgba(139, 0, 0, .45);
+  .stat-card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .stat-num {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #111827;
     line-height: 1;
+    margin-bottom: 0.2rem;
   }
 
   .stat-label {
-    font-size: .75rem;
+    font-size: 0.65rem;
     font-weight: 700;
-    opacity: .8;
-    margin-top: .3rem;
-    letter-spacing: .04em;
+    color: #6B7280;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
-  .stat-icon {
-    position: absolute;
-    right: 1.1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.7rem;
-    opacity: .15;
-  }
-
-  /* ════════════════════════════════
-       SEARCH
-    ════════════════════════════════ */
-  .search-wrap {
+  .stat-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #FAFAF9;
-    border: 1.5px solid #E0DDD8;
-    border-radius: 12px;
-    padding: 0 16px;
-    height: 40px;
-    transition: border-color .2s, box-shadow .2s;
-    width: 288px;
-  }
-
-  .search-wrap:focus-within {
-    border-color: #8B0000;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
-  }
-
-  .search-wrap i.search-icon {
-    color: #8B0000;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-
-  .search-wrap input {
-    border: none;
-    background: none;
-    outline: none;
-    font-size: 13px;
-    color: #333;
-    width: 100%;
-  }
-
-  .search-wrap input::placeholder {
-    color: #B0ABA6;
-  }
-
-  .search-clear-btn {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: none;
-    background: #E0DDD8;
-    color: #7A7370;
-    font-size: 10px;
-    cursor: pointer;
-    display: none;
     align-items: center;
     justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s ease;
     flex-shrink: 0;
-    transition: all .2s;
-    padding: 0;
   }
 
-  .search-clear-btn:hover {
-    background: rgba(139, 0, 0, .47);
-    color: #fff;
+  .stat-card[data-filter="all"] .stat-icon-wrapper {
+    background: #F3F4F6;
+    color: #4B5563;
   }
 
-  .search-clear-btn.visible {
+  .stat-card[data-filter="all"].stat-active {
+    border-color: #6B7280;
+    box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.15);
+  }
+
+  .stat-card[data-filter="pending"] .stat-icon-wrapper {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+
+  .stat-card[data-filter="pending"].stat-active {
+    border-color: #D97706;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+  }
+
+  .stat-card[data-filter="approved"] .stat-icon-wrapper {
+    background: #DCFCE7;
+    color: #15803D;
+  }
+
+  .stat-card[data-filter="approved"].stat-active {
+    border-color: #15803D;
+    box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.15);
+  }
+
+  .stat-card[data-filter="rejected"] .stat-icon-wrapper {
+    background: #FEE2E2;
+    color: #B91C1C;
+  }
+
+  .stat-card[data-filter="rejected"].stat-active {
+    border-color: #B91C1C;
+    box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.15);
+  }
+
+  [data-theme="dark"] .stat-card {
+    background: #1F2937;
+    border-color: #374151;
+  }
+
+  [data-theme="dark"] .stat-num {
+    color: #F9FAFB;
+  }
+
+  [data-theme="dark"] .stat-label {
+    color: #9CA3AF;
+  }
+
+  .active-filters-container {
     display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .row-count {
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #F3F4F6;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4B5563;
+  }
+
+  .filter-chip-remove {
+    cursor: pointer;
+    color: #9CA3AF;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+  }
+
+  .filter-chip-remove:hover {
+    color: #111827;
+  }
+
+  .filter-chip-remove:hover {
+    color: #EF4444;
+  }
+
+  .clear-all-chips {
     font-size: 12px;
-    color: #9A9490;
+    font-weight: 700;
+    color: #D97706;
+    background: #FFF7ED;
+    border: 1px solid #FFEDD5;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s;
   }
 
-  /* ════════════════════════════════
-       TABLE CARD
-    ════════════════════════════════ */
-  .table-card {
-    background: #fff;
-    border-radius: 14px;
-    border: 1px solid #EDE9E4;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
-    overflow: hidden;
+  .clear-all-chips:hover {
+    background: #FFEDD5;
   }
 
   .toolbar-wrap {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
+    padding: 16px 20px;
     border-bottom: 1px solid #EDE9E4;
     background: #FAFAF9;
     flex-wrap: wrap;
-    gap: .75rem;
+    gap: 1rem;
   }
 
-  /* ════════════════════════════════
-       REQUEST ROWS
-    ════════════════════════════════ */
+  .search-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  @media (min-width: 1024px) {
+    .search-filter-row {
+      width: auto;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+    }
+  }
+
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .search-wrap i.search-icon {
+    position: absolute;
+    left: 14px;
+    color: #9CA3AF;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    height: 42px;
+    padding: 0 16px 0 38px;
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 9999px;
+    font-size: 14px;
+    color: #374151;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .search-wrap input::placeholder {
+    color: #9CA3AF;
+  }
+
+  .search-wrap input:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+  }
+
+  .empty-state-wrapper {
+    padding: 5rem 2rem;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .empty-icon-box {
+    width: 72px;
+    height: 72px;
+    background: #F3F4F6;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .empty-icon-box i {
+    font-size: 2rem;
+    color: #a3a3a3;
+  }
+
+  .empty-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #5c616a;
+    margin-bottom: 0.4rem;
+  }
+
+  .empty-sub {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #8a95a6;
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: #ffffff;
+    border: 1px dashed #9f9f9f;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #94A3B8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .empty-clear-btn:hover {
+    background: #8b00001a;
+    color: #8B0000;
+    border-color: #660000;
+  }
+
+  [data-theme="dark"] .empty-icon-box {
+    background: #1E293B;
+  }
+
+  [data-theme="dark"] .empty-title {
+    color: #F4F4F4;
+  }
+
+  [data-theme="dark"] .empty-sub {
+    color: #757575;
+  }
+
+  [data-theme="dark"] .empty-clear-btn {
+    background: transparent;
+    border-color: #475569;
+    color: #94A3B8;
+  }
+
+  [data-theme="dark"] .empty-clear-btn:hover {
+    background: #1E293B;
+    color: #E2E8F0;
+    border-color: #757575;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    height: 42px;
+    padding: 0 38px 0 38px;
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 9999px;
+    font-size: 14px;
+    color: #374151;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .search-clear-text-btn {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #DC2626;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 8px;
+    transition: color 0.2s;
+    display: none;
+  }
+
+  .search-clear-text-btn:hover {
+    color: #991B1B;
+  }
+
+  .search-clear-text-btn.visible {
+    display: block;
+  }
+
+  .row-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B7280;
+  }
+
+  .btn-filter-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 20px;
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4B5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-filter-open:hover {
+    border-color: #8B0000;
+    color: #8B0000;
+    background: rgba(139, 0, 0, 0.03);
+  }
+
+  .btn-filter-open.has-filters {
+    border-color: #8B0000;
+    color: #8B0000;
+    background: rgba(139, 0, 0, 0.05);
+  }
+
+  .filter-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #8B0000;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+  }
+
   .req-row {
     position: relative;
     background: #fff;
@@ -915,9 +464,6 @@
     padding: 1rem 1.3rem 1rem 1.5rem;
   }
 
-  /* ════════════════════════════════
-       STATUS BADGE
-    ════════════════════════════════ */
   .status-badge {
     display: inline-flex;
     align-items: center;
@@ -954,9 +500,6 @@
     color: #b91c1c;
   }
 
-  /* ════════════════════════════════
-       DETAIL PANEL — smooth collapse
-    ════════════════════════════════ */
   .detail-panel {
     border-top: 1px solid #f3f3f3;
     background: #fafafa;
@@ -988,9 +531,6 @@
     color: #222;
   }
 
-  /* ════════════════════════════════
-       BUTTONS
-    ════════════════════════════════ */
   .btn-approve {
     background: #15803d;
     color: #fff;
@@ -1068,81 +608,77 @@
     background: #e8e8e8;
   }
 
-  /* ════════════════════════════════
-       FILTER BUTTON
-    ════════════════════════════════ */
   .btn-filter-open {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: .45rem;
-    padding: .42rem 1rem;
-    background: #fff;
-    border: 2px solid #e8e0e0;
-    border-radius: 10px;
-    font-size: .8rem;
-    font-weight: 700;
-    color: #555;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 20px;
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 9999px;
+    /* Pill shape */
+    font-size: 14px;
+    font-weight: 600;
+    color: #4B5563;
     cursor: pointer;
-    transition: all .18s;
-    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .btn-filter-open:hover {
     border-color: #8B0000;
     color: #8B0000;
-    background: #fff8f8;
+    background: rgba(139, 0, 0, 0.03);
   }
 
   .btn-filter-open.has-filters {
     border-color: #8B0000;
     color: #8B0000;
-    background: #fff1f1;
+    background: rgba(139, 0, 0, 0.05);
   }
 
   .filter-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
     min-width: 18px;
     height: 18px;
-    border-radius: 999px;
+    border-radius: 50%;
     background: #8B0000;
     color: #fff;
-    font-size: .65rem;
+    font-size: 10px;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 4px;
-    margin-left: .1rem;
+    border: 2px solid #ffffff;
   }
 
-  /* ════════════════════════════════
-       FILTER TAGS
-    ════════════════════════════════ */
   .ftag {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    padding: .38rem .9rem;
-    border-radius: 999px;
-    border: 2px solid #e8e0e0;
-    background: #fafafa;
-    color: #666;
-    font-size: .78rem;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
     font-weight: 600;
+    color: #4B5563;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    transition: all .15s;
-    white-space: nowrap;
+    transition: all 0.2s ease;
+    text-align: center;
   }
 
   .ftag:hover {
-    border-color: #8B0000;
-    color: #8B0000;
-    background: #fff8f8;
+    color: #111827;
   }
 
   .ftag.ftag-active {
     background: #8B0000;
-    border-color: #8B0000;
-    color: #fff;
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   .ftag-dot {
@@ -1156,9 +692,6 @@
     background: rgba(255, 255, 255, .8) !important;
   }
 
-  /* ════════════════════════════════
-       EMPTY STATE
-    ════════════════════════════════ */
   .state-box {
     text-align: center;
     padding: 4rem 2rem;
@@ -1214,7 +747,6 @@
     margin: 0 !important;
   }
 
-  /* Tfoot bar */
   .tfoot-bar {
     display: flex;
     align-items: center;
@@ -1251,9 +783,6 @@
     color: #8B0000;
   }
 
-  /* ════════════════════════════════
-       MODALS
-    ════════════════════════════════ */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -1372,7 +901,6 @@
     background: #e8e8e8;
   }
 
-  /* Approve modal */
   .approve-hero {
     background: linear-gradient(145deg, #052e16 0%, #14532d 40%, #166534 100%);
     padding: 2.2rem 1.75rem 1.8rem;
@@ -1497,7 +1025,6 @@
     background: #fafaf9;
   }
 
-  /* Reject modal */
   .reject-hero {
     background: linear-gradient(145deg, #450a0a 0%, #7f1d1d 40%, #991b1b 100%);
     padding: 2.2rem 1.75rem 1.8rem;
@@ -1657,7 +1184,6 @@
     background: #fffafa;
   }
 
-  /* Shared modal buttons */
   .modal-float-x {
     position: absolute;
     top: 1rem;
@@ -1783,9 +1309,6 @@
     flex-shrink: 0;
   }
 
-  /* ════════════════════════════════
-       SKELETON
-    ════════════════════════════════ */
   @keyframes shimmer {
     0% {
       background-position: -468px 0
@@ -1803,15 +1326,77 @@
     border-radius: 6px;
   }
 
-  /* ════════════════════════════════
-       DARK MODE
-    ════════════════════════════════ */
-  body,
-  #sidebar,
-  main,
-  .card,
-  .modal-box {
-    transition: background-color .3s ease, color .3s ease;
+  .filter-drawer-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    visibility: hidden;
+  }
+
+  .filter-drawer-wrapper.open {
+    visibility: visible;
+  }
+
+  .filter-drawer-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .filter-drawer-wrapper.open .filter-drawer-overlay {
+    opacity: 1;
+  }
+
+  .filter-drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-radius: 24px 0 0 24px;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .filter-drawer-wrapper.open .filter-drawer-panel {
+    transform: translateX(0);
+  }
+
+  [data-theme="dark"] .filter-drawer-panel {
+    background: #1e2535;
+  }
+
+  @media (max-width: 767px) {
+    .filter-drawer-panel {
+      top: auto;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      height: auto;
+      max-height: 85vh;
+      max-width: 100%;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(100%);
+    }
+
+    .filter-drawer-wrapper.open .filter-drawer-panel {
+      transform: translateY(0);
+    }
+
+    #externalClearFilterBtn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
   }
 
   [data-theme="dark"] body {
@@ -1901,39 +1486,6 @@
 
   [data-theme="dark"] .dv {
     color: #e5e7eb;
-  }
-
-  [data-theme="dark"] #userMenu {
-    background: #161b22;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .06);
-  }
-
-  [data-theme="dark"] .user-menu-header {
-    border-color: #21262d;
-  }
-
-  [data-theme="dark"] .user-menu-name {
-    color: #f3f4f6;
-  }
-
-  [data-theme="dark"] .user-menu-item {
-    color: #d1d5db;
-  }
-
-  [data-theme="dark"] .user-menu-item:hover {
-    background: #1c2128;
-  }
-
-  [data-theme="dark"] .user-menu-item.danger {
-    color: #f87171;
-  }
-
-  [data-theme="dark"] .user-menu-item.danger:hover {
-    background: rgba(239, 68, 68, .1);
-  }
-
-  [data-theme="dark"] .user-menu-sep {
-    background: #21262d;
   }
 
   [data-theme="dark"] .ftag {
@@ -2039,9 +1591,6 @@
     color: #9ca3af !important;
   }
 
-  /* ════════════════════════════════
-       MOBILE CARD STYLES
-    ════════════════════════════════ */
   .mobile-req-card {
     background: #fff;
     border-bottom: 1px solid #F0ECE8;
@@ -2138,7 +1687,6 @@
     flex-wrap: wrap;
   }
 
-  /* Smooth detail collapse for mobile */
   .mobile-detail-panel {
     overflow: hidden;
     max-height: 0;
@@ -2173,7 +1721,6 @@
     justify-content: center;
   }
 
-  /* View button toggle animation */
   .btn-view .btn-view-text {
     transition: opacity .2s ease;
   }
@@ -2183,11 +1730,6 @@
     pointer-events: none;
   }
 
-  /* ════════════════════════════════
-       RESPONSIVE BREAKPOINTS
-    ════════════════════════════════ */
-
-  /* Tablet: 768px – 1023px */
   @media (max-width:1023px) and (min-width:768px) {
 
     #mainContent,
@@ -2195,7 +1737,6 @@
       margin-left: 220px;
     }
 
-    /* Stack stat cards 2×2 */
     #statCards {
       grid-template-columns: repeat(2, 1fr) !important;
     }
@@ -2204,7 +1745,6 @@
       font-size: 2rem;
     }
 
-    /* Simplify row layout to 2-col on tablet */
     .req-inner {
       grid-template-columns: 1fr auto !important;
       row-gap: .5rem;
@@ -2224,52 +1764,8 @@
     }
   }
 
-  /* Mobile: <768px */
   @media (max-width:767px) {
-    #sidebar {
-      display: none !important;
-    }
 
-    #mainContent,
-    #siteFooter {
-      margin-left: 0 !important;
-    }
-
-    #siteFooter {
-      padding: 1rem;
-    }
-
-    .footer-inner {
-      gap: .75rem;
-      font-size: .7rem;
-    }
-
-
-    #mobileMenuBtn {
-      display: flex;
-    }
-
-    .header {
-      padding: 0 1rem;
-    }
-
-    .header-title {
-      display: none;
-    }
-
-    .header-divider {
-      display: none;
-    }
-
-    /* Main content top padding on mobile */
-    #mainContent {
-      padding-top: 80px !important;
-      padding-left: .85rem !important;
-      padding-right: .85rem !important;
-      padding-bottom: 1rem !important;
-    }
-
-    /* Stat cards: 2-col grid on mobile */
     #statCards {
       grid-template-columns: repeat(2, 1fr) !important;
       gap: .65rem !important;
@@ -2293,12 +1789,11 @@
       font-size: 1.4rem;
     }
 
-    /* Toolbar: stack on mobile */
     .toolbar-wrap {
       flex-direction: column;
       align-items: stretch !important;
-      gap: .6rem !important;
-      padding: 12px 14px !important;
+      gap: 12px !important;
+      padding: 16px !important;
     }
 
     .search-wrap {
@@ -2311,7 +1806,6 @@
       justify-content: space-between;
     }
 
-    /* Hide desktop table rows, show mobile cards */
     .desktop-req-row {
       display: none !important;
     }
@@ -2320,7 +1814,6 @@
       display: block !important;
     }
 
-    /* Tfoot */
     .tfoot-bar {
       flex-direction: column;
       gap: .6rem;
@@ -2338,7 +1831,6 @@
       font-size: .75rem;
     }
 
-    /* Modals full-screen on mobile */
     .modal-overlay {
       padding: .5rem;
       align-items: flex-end;
@@ -2372,7 +1864,6 @@
       justify-content: center;
     }
 
-    /* Filter modal */
     #filterModal .modal-box-inner {
       border-radius: 20px 20px 14px 14px;
     }
@@ -2391,7 +1882,6 @@
       justify-content: center;
     }
 
-    /* Page heading */
     #mainContent h1 {
       font-size: 1.4rem !important;
     }
@@ -2402,7 +1892,6 @@
 
   }
 
-  /* Very small phones */
   @media (max-width:380px) {
     #statCards {
       grid-template-columns: repeat(2, 1fr) !important;
@@ -2426,9 +1915,6 @@
     }
   }
 
-  /* ════════════════════════════════
-       HIDE/SHOW HELPERS
-    ════════════════════════════════ */
   .mobile-req-card {
     display: none;
   }
@@ -2442,167 +1928,221 @@ $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 @endphp
 
-{{-- ══════════════ MAIN ══════════════ --}}
 <main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
-  <div class="max-w-7xl mx-auto">
+    <div class="w-full fade-in">
 
-    {{-- Page heading --}}
-    <div style="margin-bottom:1.75rem;">
-      <h1 style="font-size:1.9rem;font-weight:800;color:#8B0000;line-height:1.1;margin:0;">Document Requests</h1>
-      <p style="color:#999;font-size:.83rem;margin:.3rem 0 0;">Review, approve or reject patient document requests</p>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-4 mb-6">
 
-    {{-- Stat cards --}}
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.75rem;" id="statCards">
-      <button class="stat-card stat-active" data-filter="all" onclick="setFilter('all')">
-        <div class="stat-num" id="statAll">0</div>
-        <div class="stat-label">All Requests</div>
-        <i class="fa-solid fa-layer-group stat-icon"></i>
-      </button>
-      <button class="stat-card" data-filter="pending" onclick="setFilter('pending')">
-        <div class="stat-num" id="statPending">0</div>
-        <div class="stat-label">Pending</div>
-        <i class="fa-solid fa-hourglass-half stat-icon"></i>
-      </button>
-      <button class="stat-card" data-filter="approved" onclick="setFilter('approved')">
-        <div class="stat-num" id="statApproved">0</div>
-        <div class="stat-label">Approved</div>
-        <i class="fa-solid fa-circle-check stat-icon"></i>
-      </button>
-      <button class="stat-card" data-filter="rejected" onclick="setFilter('rejected')">
-        <div class="stat-num" id="statRejected">0</div>
-        <div class="stat-label">Rejected</div>
-        <i class="fa-solid fa-circle-xmark stat-icon"></i>
-      </button>
-    </div>
-
-    {{-- Table card --}}
-    <div class="table-card">
-
-      {{-- Toolbar --}}
-      <div class="toolbar-wrap">
-        <div class="search-wrap">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input id="searchInput" type="text" placeholder="Search by patient name…" oninput="onSearch(this)" />
-          <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" title="Clear">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-        <div class="toolbar-right-group" style="display:flex;align-items:center;gap:.75rem;">
-          <span class="row-count" id="rowCount"></span>
-          <button id="filterBtn" onclick="openFilterModal()" class="btn-filter-open">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Filter</span>
-            <span id="filterBadge" class="filter-badge" style="display:none;"></span>
-          </button>
+      <div class="order-1 flex items-center gap-3">
+        <div>
+          <h2 class="text-xl md:text-2xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-0.5">
+            Document Requests
+          </h2>
         </div>
       </div>
 
-      {{-- Request list --}}
-      <div id="requestContainer"></div>
+      <div id="statCards" class="order-2 md:order-3 md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-2">
+        <button class="stat-card stat-active" data-filter="all" onclick="setFilter('all')">
+          <div class="stat-card-info">
+            <div class="stat-num" id="statAll">0</div>
+            <div class="stat-label">Total Requests</div>
+          </div>
+          <div class="stat-icon-wrapper"><i class="fa-solid fa-file-medical"></i></div>
+        </button>
+        <button class="stat-card" data-filter="pending" onclick="setFilter('pending')">
+          <div class="stat-card-info">
+            <div class="stat-num" id="statPending">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-icon-wrapper"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        </button>
+        <button class="stat-card" data-filter="approved" onclick="setFilter('approved')">
+          <div class="stat-card-info">
+            <div class="stat-num" id="statApproved">0</div>
+            <div class="stat-label">Approved</div>
+          </div>
+          <div class="stat-icon-wrapper"><i class="fa-solid fa-file-circle-check"></i></div>
+        </button>
+        <button class="stat-card" data-filter="rejected" onclick="setFilter('rejected')">
+          <div class="stat-card-info">
+            <div class="stat-num" id="statRejected">0</div>
+            <div class="stat-label">Rejected</div>
+          </div>
+          <div class="stat-icon-wrapper"><i class="fa-solid fa-file-circle-xmark"></i></div>
+        </button>
+      </div>
 
-      {{-- Footer / pagination --}}
+    </div>
+
+    <div class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden bg-white">
+
+      <div class="px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          
+          <div class="order-2 md:order-1">
+            <span id="rowCount" class="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-wider">
+              0 requests
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
+            <div class="relative flex-1 md:flex-none flex items-center gap-2">
+              <div class="relative flex-1">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                  <i class="fa-solid fa-magnifying-glass text-[#333333] text-xs"></i>
+                </span>
+                <input id="searchInput" type="text" placeholder="Search patient name…"
+                  class="pl-9 pr-4 py-2 w-full md:w-64 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8B0000]/10 focus:border-[#8B0000] transition-all"
+                  oninput="onSearch(this)" />
+              </div>
+              
+              <button type="button" id="searchClearBtn" onclick="clearSearch()"
+                class="text-xs font-bold text-red-600 hover:text-red-800 transition-colors hidden flex-shrink-0 px-1">
+                Clear
+              </button>
+            </div>
+
+            <button id="filterBtn" type="button" onclick="openFilterModal()"
+              class="relative flex items-center justify-center gap-2 px-3 md:px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 shadow-sm hover:border-[#8B0000] hover:text-[#8B0000] transition-all flex-shrink-0">
+              <i class="fa-solid fa-sliders text-sm"></i>
+              <span class="text-xs md:text-sm font-bold">Filter</span>
+              <span id="filterBadge" class="filter-badge" style="display:none;"></span>
+            </button>
+
+            <button id="externalClearFilterBtn" type="button" onclick="resetAllFilters()"
+              class="hidden flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white text-red-600 hover:bg-red-50 hover:border-red-300 transition-all flex-shrink-0"
+              title="Reset filters">
+              <i class="fa-solid fa-rotate-left text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="hidden md:grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border-b border-gray-200"
+        style="grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1fr) 100px;">
+        <div class="text-left">Patient</div>
+        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date Requested</div>
+        <div class="text-left">Document</div>
+        <div class="text-left">Purpose</div>
+        <div class="text-left">Status</div>
+        <div class="text-right">Actions</div>
+      </div>
+
+      <div id="requestContainer" class="pb-2"></div>
+
       <div class="tfoot-bar">
         <span style="font-size:12px;color:#9A9490;" id="pageInfo"></span>
         <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;" id="pagControls"></div>
       </div>
 
     </div>
-  </div>
 </main>
 
-{{-- ══════════ FILTER MODAL ══════════ --}}
-<div id="filterModal" class="modal-overlay">
-  <div class="modal-box-inner" style="max-width:480px;">
-    <div class="modal-hd" style="background:linear-gradient(135deg,#6b0000,#8B0000);border-bottom:none;">
-      <div>
-        <div class="modal-title" style="color:#fff;font-weight:800;">
-          <i class="fa-solid fa-sliders" style="margin-right:.45rem;font-size:1rem;"></i>Filter Requests
-        </div>
-        <div style="font-size:.74rem;color:rgba(255,255,255,.65);margin-top:.18rem;">Narrow down the list by applying
-          filters below</div>
+<div id="filterModal" class="filter-drawer-wrapper">
+  <div class="filter-drawer-overlay" onclick="document.getElementById('filterCloseBtn').click()"></div>
+
+  <div class="filter-drawer-panel flex flex-col bg-white">
+
+    <div class="px-6 py-5 flex items-center justify-between flex-shrink-0 bg-white">
+      <div class="flex items-center gap-2 text-[#8B0000]">
+        <i class="fa-solid fa-sliders text-xl"></i>
+        <h2 class="text-xl font-extrabold">Filters</h2>
       </div>
-      <button class="modal-x" id="filterCloseBtn" style="color:rgba(255,255,255,.6);"
-        onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,.6)'">
-        <i class="fa-solid fa-xmark"></i>
+      <button class="text-gray-400 hover:text-gray-700 transition-colors" id="filterCloseBtn">
+        <i class="fa-solid fa-xmark text-xl"></i>
       </button>
     </div>
-    <div class="modal-bd" style="padding:1.4rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;">
+
+    <div class="px-6 py-2 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
+
+      <div id="activeFiltersSection" class="hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
+          <button id="clearAllChipsBtn" type="button" class="text-xs font-bold text-[#8B0000] hover:underline">Clear
+            All</button>
+        </div>
+        <div id="activeChipsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+      </div>
+
       <div>
-        <label class="form-label" style="margin-bottom:.55rem;">Status</label>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;" id="fStatusGroup">
-          <button class="ftag ftag-active" data-val="all">All</button>
-          <button class="ftag" data-val="pending"><span class="ftag-dot" style="background:#c2410c;"></span>
-            Pending</button>
-          <button class="ftag" data-val="approved"><span class="ftag-dot" style="background:#15803d;"></span>
-            Approved</button>
-          <button class="ftag" data-val="rejected"><span class="ftag-dot" style="background:#b91c1c;"></span>
-            Rejected</button>
+        <label class="block text-[13px] font-bold text-gray-800 mb-2">Status</label>
+        <div class="flex bg-gray-100 p-1 rounded-lg w-full gap-2" id="fStatusGroup">
+          <button class="ftag ftag-active flex-1" data-val="all">All</button>
+          <button class="ftag flex-1" data-val="pending">Pending</button>
+          <button class="ftag flex-1" data-val="approved">Approved</button>
+          <button class="ftag flex-1" data-val="rejected">Rejected</button>
         </div>
       </div>
+
       <div>
-        <label class="form-label" style="margin-bottom:.55rem;">Document Type</label>
-        <div style="position:relative;">
-          <i class="fa-solid fa-file-lines"
-            style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
-          <select id="fDocType" class="form-input"
-            style="padding-left:2rem;appearance:none;cursor:pointer;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%238B0000%22 stroke-width=%222.5%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 12px center;">
-            <option value="">All Document Types</option>
-            <option>Dental Clearance</option>
-            <option>Dental Health Record</option>
-            <option>Annual Dental Clearance</option>
-            <option>Medical Certificate</option>
-            <option>Other</option>
+        <label class="block text-[13px] font-bold text-gray-800 mb-2">Document Details</label>
+        <div class="relative">
+          <i class="fa-regular fa-file-lines absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <select id="fDocType"
+            class="w-full pl-10 pr-8 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none"
+            style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%239CA3AF%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 12px center; background-size:16px;">
+            <option value="">Document Type</option>
+            <option value="Dental Clearance">Dental Clearance</option>
+            <option value="Dental Health Record">Dental Health Record</option>
+            <option value="Annual Dental Clearance">Annual Dental Clearance</option>
+            <option value="Medical Certificate">Medical Certificate</option>
+            <option value="Other">Other</option>
           </select>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
-        <div>
-          <label class="form-label">Date From</label>
-          <div style="position:relative;">
-            <i class="fa-regular fa-calendar"
-              style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
-            <input id="fDateFrom" type="date" class="form-input" style="padding-left:2rem;cursor:pointer;">
+
+      <div>
+        <label class="block text-[13px] font-bold text-gray-800 mb-2">Date Range</label>
+        <div class="flex gap-3">
+          <div class="relative flex-1">
+            <input id="fDateFrom" type="date"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer">
+            <i class="fa-regular fa-calendar absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-800 z-0"></i>
           </div>
-        </div>
-        <div>
-          <label class="form-label">Date To</label>
-          <div style="position:relative;">
-            <i class="fa-regular fa-calendar"
-              style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:12px;pointer-events:none;"></i>
-            <input id="fDateTo" type="date" class="form-input" style="padding-left:2rem;cursor:pointer;">
+          <div class="relative flex-1">
+            <input id="fDateTo" type="date"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer">
+            <i class="fa-regular fa-calendar absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-800 z-0"></i>
           </div>
         </div>
       </div>
-      <div>
-        <label class="form-label" style="margin-bottom:.55rem;">Sort By</label>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;" id="fSortGroup">
-          <button class="ftag ftag-active" data-val="newest"><i class="fa-solid fa-arrow-down-short-wide"
-              style="font-size:.7rem;"></i> Newest First</button>
-          <button class="ftag" data-val="oldest"><i class="fa-solid fa-arrow-up-short-wide"
-              style="font-size:.7rem;"></i> Oldest First</button>
-          <button class="ftag" data-val="name_asc"><i class="fa-solid fa-arrow-down-a-z" style="font-size:.7rem;"></i>
-            Name A–Z</button>
-          <button class="ftag" data-val="name_desc"><i class="fa-solid fa-arrow-up-a-z" style="font-size:.7rem;"></i>
-            Name Z–A</button>
+
+      <div class="pb-6">
+        <label class="block text-[13px] font-bold text-gray-800 mb-2">Sort By</label>
+        <div class="flex bg-gray-100 p-1 rounded-lg w-full" id="fSortGroup">
+          <button class="ftag ftag-active flex-1 text-[11px] leading-tight" data-val="newest">Newest First</button>
+          <button class="ftag flex-1 text-[11px] leading-tight" data-val="oldest">Oldest First</button>
+          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_asc">Patient<br>Name A-Z</button>
+          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_desc">Patient<br>Name Z-A</button>
         </div>
       </div>
     </div>
-    <div class="modal-ft" style="justify-content:space-between;">
-      <button id="filterResetBtn" class="btn-close-modal" style="display:flex;align-items:center;gap:.4rem;">
-        <i class="fa-solid fa-rotate-left" style="font-size:.75rem;"></i> Reset All
+
+    <div
+      class="px-6 py-5 bg-white flex flex-col sm:flex-row items-center justify-between flex-shrink-0 border-t border-gray-100 gap-4 sm:gap-0 relative z-20">
+
+      <button id="filterResetBtn"
+        class="flex items-center gap-2 text-[#8B0000] hover:text-[#6b0000] transition-colors w-full sm:w-auto justify-center sm:justify-start">
+        <i class="fa-regular fa-trash-can text-lg"></i>
+        <div class="text-left leading-tight text-[13px] font-bold">Clear<br>Filters</div>
       </button>
-      <div style="display:flex;gap:.6rem;">
-        <button class="btn-close-modal" id="filterCancelBtn">Cancel</button>
-        <button id="filterApplyBtn" class="btn-approve" style="padding:.55rem 1.6rem;">
-          <i class="fa-solid fa-check"></i> Apply Filters
+
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button id="filterCancelBtn"
+          class="flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button id="filterApplyBtn"
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-[#8B0000] rounded-lg hover:bg-[#6b0000] transition-colors shadow-sm">
+          <i class="fa-solid fa-check"></i> Apply
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
-{{-- ══════════ APPROVE MODAL ══════════ --}}
 <div id="approveModal" class="modal-overlay">
   <div class="modal-box-inner" style="max-width:440px;border-radius:24px;overflow:hidden;">
     <button class="modal-float-x" id="approveCancelBtn"><i class="fa-solid fa-xmark"></i></button>
@@ -2642,7 +2182,6 @@ $notifCount = $notifications->count();
 </div>
 <input type="hidden" id="approveRequestId">
 
-{{-- ══════════ REJECT MODAL ══════════ --}}
 <div id="rejectModal" class="modal-overlay">
   <div class="modal-box-inner" style="max-width:440px;border-radius:24px;overflow:hidden;">
     <button class="modal-float-x modal-float-x--red" id="rejectCancelBtn"><i class="fa-solid fa-xmark"></i></button>
@@ -2672,7 +2211,8 @@ $notifCount = $notifications->count();
       <div class="reject-warning-row">
         <i class="fa-solid fa-triangle-exclamation"
           style="color:#fca5a5;font-size:.8rem;flex-shrink:0;margin-top:1px;"></i>
-        <span>The patient will be notified of this rejection. Make sure you've reviewed the request carefully.</span>
+        <span>The patient will be notified of this rejection. Make sure you've reviewed the request
+          carefully.</span>
       </div>
     </div>
     <div class="reject-footer">
@@ -2687,7 +2227,6 @@ $notifCount = $notifications->count();
 </div>
 <input type="hidden" id="rejectRequestId">
 
-{{-- ══════════ APPROVED RESULT ══════════ --}}
 <div id="approvedResultModal" class="modal-overlay">
   <div class="modal-box-inner">
     <div style="background:linear-gradient(135deg,#15803d,#16a34a);padding:2.5rem 2rem;text-align:center;color:#fff;">
@@ -2696,7 +2235,8 @@ $notifCount = $notifications->count();
         <i class="fa-solid fa-circle-check" style="font-size:1.7rem;"></i>
       </div>
       <div style="font-size:1.55rem;margin-bottom:.5rem;">Request Approved!</div>
-      <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The document has been approved and will be<br>prepared
+      <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The document has been approved and will
+        be<br>prepared
         for printing. The patient will be notified.</p>
       <button id="approvedResultClose"
         style="margin-top:1.4rem;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:9px;padding:.5rem 1.5rem;font-weight:700;cursor:pointer;font-size:.83rem;">
@@ -2706,7 +2246,6 @@ $notifCount = $notifications->count();
   </div>
 </div>
 
-{{-- ══════════ REJECTED RESULT ══════════ --}}
 <div id="rejectedResultModal" class="modal-overlay">
   <div class="modal-box-inner">
     <div style="background:linear-gradient(135deg,#991b1b,#b91c1c);padding:2.5rem 2rem;text-align:center;color:#fff;">
@@ -2715,7 +2254,8 @@ $notifCount = $notifications->count();
         <i class="fa-solid fa-circle-xmark" style="font-size:1.7rem;"></i>
       </div>
       <div style="font-size:1.55rem;margin-bottom:.5rem;">Request Rejected</div>
-      <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The request has been rejected. The patient<br>will be
+      <p style="font-size:.82rem;opacity:.85;line-height:1.6;">The request has been rejected. The patient<br>will
+        be
         notified of the decision.</p>
       <button id="rejectedResultClose"
         style="margin-top:1.4rem;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:9px;padding:.5rem 1.5rem;font-weight:700;cursor:pointer;font-size:.83rem;">
@@ -2730,9 +2270,6 @@ $notifCount = $notifications->count();
 <script>
   const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-  /* ════════════════════════════════════
-     DATA + RENDER ENGINE
-  ════════════════════════════════════ */
   let allRequests = [];
   let activeFilter = 'all';
   let searchQuery = '';
@@ -2747,7 +2284,9 @@ $notifCount = $notifications->count();
   async function loadData() {
     showSkeleton();
     try {
-      const res = await fetch('/dentist/document-requests/data', { cache: 'no-store' });
+      const res = await fetch('/dentist/document-requests/data', {
+        cache: 'no-store'
+      });
       const json = await res.json();
       allRequests = json.requests || [];
       updateStats(json.stats || {});
@@ -2765,39 +2304,43 @@ $notifCount = $notifications->count();
   function showSkeleton() {
     let html = '';
     for (let i = 0; i < 4; i++) {
-      if (isMobile()) {
-        html += `<div class="mobile-req-card">
-            <div class="mobile-card-inner">
-              <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.75rem;">
-                <div class="skeleton" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;"></div>
-                <div style="flex:1;">
-                  <div class="skeleton" style="height:13px;width:130px;margin-bottom:5px;"></div>
-                  <div class="skeleton" style="height:10px;width:80px;"></div>
-                </div>
-                <div class="skeleton" style="height:28px;width:60px;border-radius:9px;"></div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;">
-                <div><div class="skeleton" style="height:9px;width:60px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:80px;"></div></div>
-                <div><div class="skeleton" style="height:9px;width:50px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:90px;"></div></div>
-              </div>
+      html += `
+      <div class="req-row desktop-req-row border-b border-gray-100 hidden md:block">
+        <div class="req-inner" style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1.5fr 1fr 100px;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:center;gap:.8rem;">
+            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;"></div>
+            <div><div class="skeleton" style="height:13px;width:110px;margin-bottom:6px;"></div><div class="skeleton" style="height:10px;width:70px;"></div></div>
+          </div>
+          <div><div class="skeleton" style="height:13px;width:80px;margin-bottom:5px;"></div><div class="skeleton" style="height:10px;width:60px;"></div></div>
+          <div><div class="skeleton" style="height:13px;width:120px;"></div></div>
+          <div><div class="skeleton" style="height:13px;width:140px;"></div></div>
+          <div><div class="skeleton" style="height:20px;width:60px;border-radius:999px;"></div></div>
+          <div class="skeleton" style="height:28px;width:70px;border-radius:8px;"></div>
+        </div>
+      </div>
+      
+      <div class="mobile-req-card md:hidden bg-white border border-gray-200 rounded-xl p-4 mb-3 mx-2">
+        <div class="mobile-card-inner">
+          <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.75rem;">
+            <div class="skeleton" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div class="skeleton" style="height:13px;width:130px;margin-bottom:5px;"></div>
+              <div class="skeleton" style="height:10px;width:80px;"></div>
             </div>
-          </div>`;
-      } else {
-        html += `<div class="req-row desktop-req-row">
-            <div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">
-              <div style="display:flex;align-items:center;gap:.8rem;">
-                <div class="skeleton" style="width:40px;height:40px;border-radius:11px;flex-shrink:0;"></div>
-                <div><div class="skeleton" style="height:13px;width:110px;margin-bottom:6px;"></div><div class="skeleton" style="height:10px;width:70px;"></div></div>
-              </div>
-              <div><div class="skeleton" style="height:10px;width:60px;margin-bottom:5px;"></div><div class="skeleton" style="height:13px;width:80px;"></div></div>
-              <div><div class="skeleton" style="height:10px;width:55px;margin-bottom:5px;"></div><div class="skeleton" style="height:13px;width:120px;margin-bottom:6px;"></div><div class="skeleton" style="height:18px;width:60px;border-radius:999px;"></div></div>
-              <div class="skeleton" style="height:32px;width:70px;border-radius:9px;"></div>
-            </div>
-          </div>`;
-      }
+            <div class="skeleton" style="height:28px;width:60px;border-radius:9px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;">
+            <div><div class="skeleton" style="height:9px;width:60px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:80px;"></div></div>
+            <div><div class="skeleton" style="height:9px;width:50px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:90px;"></div></div>
+          </div>
+        </div>
+      </div>`;
     }
     document.getElementById('requestContainer').innerHTML = html;
-    document.getElementById('rowCount').textContent = '';
+
+    const rowCountEl = document.getElementById('rowCount');
+    if (rowCountEl) rowCountEl.textContent = 'Loading...';
+
     document.getElementById('pageInfo').textContent = '';
     document.getElementById('pagControls').innerHTML = '';
   }
@@ -2818,8 +2361,15 @@ $notifCount = $notifications->count();
       data = data.filter(r => r.patient_name.toLowerCase().includes(q));
     }
     if (filterDocType) data = data.filter(r => r.document_type === filterDocType);
-    if (filterDateFrom) { const from = new Date(filterDateFrom); data = data.filter(r => new Date(r.request_date) >= from); }
-    if (filterDateTo) { const to = new Date(filterDateTo); to.setHours(23, 59, 59, 999); data = data.filter(r => new Date(r.request_date) <= to); }
+    if (filterDateFrom) {
+      const from = new Date(filterDateFrom);
+      data = data.filter(r => new Date(r.request_date) >= from);
+    }
+    if (filterDateTo) {
+      const to = new Date(filterDateTo);
+      to.setHours(23, 59, 59, 999);
+      data = data.filter(r => new Date(r.request_date) <= to);
+    }
     data = [...data].sort((a, b) => {
       if (filterSort === 'oldest') return new Date(a.request_date) - new Date(b.request_date);
       if (filterSort === 'name_asc') return a.patient_name.localeCompare(b.patient_name);
@@ -2830,8 +2380,10 @@ $notifCount = $notifications->count();
   }
 
   function hasActiveFilters() {
-    return searchQuery !== '' || activeFilter !== 'all' || filterDocType !== '' || filterDateFrom !== '' || filterDateTo !== '' || filterSort !== 'newest';
+    return searchQuery !== '' || activeFilter !== 'all' || filterDocType !== '' || filterDateFrom !== '' ||
+      filterDateTo !== '' || filterSort !== 'newest';
   }
+
   function countAdvancedFilters() {
     let n = 0;
     if (filterStatus !== 'all') n++;
@@ -2840,12 +2392,22 @@ $notifCount = $notifications->count();
     if (filterSort !== 'newest') n++;
     return n;
   }
-  function updateFilterBtn() {
-    const btn = document.getElementById('filterBtn');
+
+function updateFilterBtn() {
     const badge = document.getElementById('filterBadge');
+    const externalClear = document.getElementById('externalClearFilterBtn');
     const count = countAdvancedFilters();
-    if (count > 0) { btn.classList.add('has-filters'); badge.textContent = count; badge.style.display = 'inline-flex'; }
-    else { btn.classList.remove('has-filters'); badge.style.display = 'none'; }
+    
+    if (count > 0) {
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+      }
+      if (externalClear) externalClear.classList.remove('hidden');
+    } else {
+      if (badge) badge.style.display = 'none';
+      if (externalClear) externalClear.classList.add('hidden');
+    }
   }
 
   function buildClearFilterBtn() {
@@ -2855,21 +2417,50 @@ $notifCount = $notifications->count();
     if (filterDocType) parts.push(filterDocType);
     if (filterDateFrom || filterDateTo) parts.push('Date range');
     if (filterSort !== 'newest') parts.push('Sort');
-    const label = parts.length ? `Clear filter${parts.length > 1 ? 's' : ''} (${parts.join(', ')})` : 'Clear filters';
+    const label = parts.length ? `Clear filter${parts.length > 1 ? 's' : ''} (${parts.join(', ')})` :
+      'Reset';
     return `<div style="margin-top:1.25rem;"><button class="btn-clear-filter" onclick="resetAllFilters()"><i class="fa-solid fa-filter-circle-xmark"></i>${label}</button></div>`;
   }
 
   function resetAllFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchClearBtn').classList.remove('visible');
-    searchQuery = '';
-    activeFilter = 'all'; filterStatus = 'all'; filterDocType = ''; filterDateFrom = ''; filterDateTo = ''; filterSort = 'newest';
-    document.querySelectorAll('#statCards .stat-card').forEach(c =>
-      c.getAttribute('data-filter') === 'all' ? c.classList.add('stat-active') : c.classList.remove('stat-active'));
-    updateFilterBtn();
-    currentPage = 1;
-    renderList();
-  }
+  const searchInput = document.getElementById('searchInput');
+  const searchClearBtn = document.getElementById('searchClearBtn');
+
+  if (searchInput) searchInput.value = '';
+  if (searchClearBtn) searchClearBtn.classList.add('hidden');
+
+  searchQuery = '';
+
+  activeFilter = 'all';
+  filterStatus = 'all';
+  filterDocType = '';
+  filterDateFrom = '';
+  filterDateTo = '';
+  filterSort = 'newest';
+
+  document.querySelectorAll('#statCards .stat-card').forEach(c =>
+    c.getAttribute('data-filter') === 'all'
+      ? c.classList.add('stat-active')
+      : c.classList.remove('stat-active')
+  );
+
+  syncFilterTagGroup('fStatusGroup', 'all');
+  syncFilterTagGroup('fSortGroup', 'newest');
+
+  const fDoc = document.getElementById('fDocType');
+  if (fDoc) fDoc.value = '';
+
+  const fFrom = document.getElementById('fDateFrom');
+  if (fFrom) fFrom.value = '';
+
+  const fTo = document.getElementById('fDateTo');
+  if (fTo) fTo.value = '';
+
+  updateFilterBtn();
+  renderFilterChips();
+  currentPage = 1;
+  renderList();
+}
 
   function renderList() {
     const filtered = getFiltered();
@@ -2879,7 +2470,9 @@ $notifCount = $notifications->count();
     const start = (currentPage - 1) * PER_PAGE;
     const page = filtered.slice(start, start + PER_PAGE);
 
-    document.getElementById('rowCount').textContent = `${total} ${total === 1 ? 'request' : 'requests'}`;
+    const rowCountEl = document.getElementById('rowCount');
+    if (rowCountEl) rowCountEl.textContent = `${total} ${total === 1 ? 'request' : 'requests'}`;
+
     document.getElementById('pageInfo').textContent = total === 0 ? '' : `Showing ${start + 1}–${Math.min(start + PER_PAGE, total)} of ${total} requests`;
 
     renderPagination(total, lastPage);
@@ -2887,56 +2480,82 @@ $notifCount = $notifications->count();
     const container = document.getElementById('requestContainer');
 
     if (!page.length) {
-      const isSearchMiss = searchQuery !== '' && activeFilter === 'all';
-      const isFilterMiss = searchQuery === '' && activeFilter !== 'all';
-      const isCombinedMiss = searchQuery !== '' && activeFilter !== 'all';
+      const isSearchMiss = searchQuery !== '';
+      const isFilterMiss = !searchQuery && activeFilter !== 'all';
       const isDataEmpty = allRequests.length === 0;
-      let icon, title, subtitle, showClear;
-      if (isDataEmpty) { icon = 'fa-regular fa-folder-open'; title = 'No requests yet'; subtitle = 'Incoming document requests will appear here.'; showClear = false; }
-      else if (isSearchMiss) { icon = 'fa-solid fa-magnifying-glass'; title = `No results for "${esc(searchQuery)}"`; subtitle = 'Try a different name or spelling.'; showClear = true; }
-      else if (isFilterMiss) { icon = 'fa-regular fa-folder-open'; title = `No ${activeFilter} requests`; subtitle = `There are no ${activeFilter} document requests at the moment.`; showClear = true; }
-      else if (isCombinedMiss) { icon = 'fa-solid fa-magnifying-glass'; title = 'No matching requests'; subtitle = `No ${activeFilter} requests found for "${esc(searchQuery)}".`; showClear = true; }
-      else { icon = 'fa-regular fa-folder-open'; title = 'No requests found'; subtitle = 'Try adjusting your filters.'; showClear = hasActiveFilters(); }
-      container.innerHTML = `<div class="state-box"><i class="${icon}"></i><strong>${title}</strong><span>${subtitle}</span>${showClear ? buildClearFilterBtn() : ''}</div>`;
+
+      let iconHtml, title, subtitle, showClear;
+
+      if (isDataEmpty && !isSearchMiss && !isFilterMiss) {
+        iconHtml = '<i class="fa-regular fa-folder-open"></i>';
+        title = 'No requests yet';
+        subtitle = 'Incoming document requests will appear here.';
+        showClear = false;
+      } else if (isSearchMiss) {
+        iconHtml = '<i class="fa-solid fa-magnifying-glass"></i>';
+        title = `No results for "${esc(searchQuery)}"`;
+        subtitle = 'Try checking the spelling or search for a different patient name.';
+        showClear = true;
+      } else {
+        iconHtml = '<i class="fa-solid fa-filter"></i>';
+        title = 'No matching requests found';
+        subtitle = 'Try adjusting or clearing your filters.';
+        showClear = true;
+      }
+
+      container.innerHTML = `
+        <div class="empty-state-wrapper">
+          <div class="empty-icon-box">${iconHtml}</div>
+          <div class="empty-title">${title}</div>
+          <div class="empty-sub">${subtitle}</div>
+          ${showClear ? `<button onclick="resetAllFilters()" class="empty-clear-btn"><i class="fa-solid fa-xmark"></i> Clear search</button>` : ''}
+        </div>`;
       return;
     }
 
-    // Render both desktop rows and mobile cards; CSS media queries show/hide
     container.innerHTML = page.map(r => buildDesktopRow(r) + buildMobileCard(r)).join('');
   }
 
-  /* ─── DESKTOP ROW ─── */
   function buildDesktopRow(r) {
     const accentHex = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
     const avatarBg = r.status === 'approved' ? '#dcfce7' : r.status === 'rejected' ? '#fee2e2' : '#fff7ed';
     const avatarCol = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
-    const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
-    const sub = r.sub_label ? `<div style="font-size:.72rem;color:#aaa;margin-top:.08rem;">${esc(r.sub_label)}</div>` : `<div style="font-size:.72rem;color:#ddd;">—</div>`;
+    const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' :
+      'badge-pending';
+    const sub = r.sub_label ?
+      `<div style="font-size:.72rem;color:#aaa;margin-top:.08rem;">${esc(r.sub_label)}</div>` :
+      `<div style="font-size:.72rem;color:#ddd;">—</div>`;
 
-    const nameCol = `<div style="display:flex;align-items:center;gap:.8rem;"><div style="width:40px;height:40px;border-radius:11px;background:${avatarBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-user" style="color:${avatarCol};font-size:.88rem;"></i></div><div><div style="font-weight:700;font-size:.88rem;color:#1a1a1a;line-height:1.25;">${esc(r.patient_name)}</div>${sub}</div></div>`;
-    const dateCol = `<div class="req-date-col"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Date Requested</div><div style="font-size:.85rem;font-weight:600;color:#333;">${esc(r.request_date)}</div><div style="font-size:.72rem;color:#ccc;">${esc(r.request_time)}</div></div>`;
-    const docCol = `<div class="req-doc-col"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Document</div><div style="font-size:.85rem;font-weight:600;color:#333;margin-bottom:.35rem;">${esc(r.document_type)}</div><span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></div>`;
+    const nameCol =
+      `<div style="display:flex;align-items:center;gap:.8rem;"><div style="width:40px;height:40px;border-radius:11px;background:${avatarBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-user" style="color:${avatarCol};font-size:.88rem;"></i></div><div><div style="font-weight:700;font-size:.88rem;color:#1a1a1a;line-height:1.25;">${esc(r.patient_name)}</div>${sub}</div></div>`;
+    const dateCol =
+      `<div class="req-date-col"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Date Requested</div><div style="font-size:.85rem;font-weight:600;color:#333;">${esc(r.request_date)}</div><div style="font-size:.72rem;color:#ccc;">${esc(r.request_time)}</div></div>`;
+    const docCol =
+      `<div class="req-doc-col"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Document</div><div style="font-size:.85rem;font-weight:600;color:#333;margin-bottom:.35rem;">${esc(r.document_type)}</div><span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></div>`;
 
     if (r.status === 'pending') {
-      const actionCol = `<button class="btn-view" data-id="${r.id}" onclick="toggleDesktopDetail(this,${r.id})"><i class="fa-solid fa-eye"></i> View</button>`;
-      const detail = `<div class="detail-panel" id="detail-${r.id}"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.1rem;"><div style="font-size:.8rem;color:#888;">Pending request from <strong style="color:#333;">${esc(r.patient_name)}</strong></div><div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;"><button class="btn-approve" onclick="openApprove(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-check"></i> Approve</button><button class="btn-reject" onclick="openReject(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-xmark"></i> Reject</button><button class="btn-close-detail" onclick="closeDesktopDetail(${r.id})">Close</button></div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1.1rem;padding-top:.9rem;border-top:1px solid #f0f0f0;"><div><div class="dl">Patient</div><div class="dv">${esc(r.patient_name)}</div></div>${r.sub_label ? `<div><div class="dl">Department</div><div class="dv">${esc(r.sub_label)}</div></div>` : ''}<div><div class="dl">Date</div><div class="dv">${esc(r.request_date)}</div></div><div><div class="dl">Time</div><div class="dv">${esc(r.request_time)}</div></div><div><div class="dl">Document</div><div class="dv">${esc(r.document_type)}</div></div><div><div class="dl">Purpose</div><div class="dv">${esc(r.purpose)}</div></div></div></div>`;
+      const actionCol =
+        `<button class="btn-view" data-id="${r.id}" onclick="toggleDesktopDetail(this,${r.id})"><i class="fa-solid fa-eye"></i> View</button>`;
+      const detail =
+        `<div class="detail-panel" id="detail-${r.id}"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.1rem;"><div style="font-size:.8rem;color:#888;">Pending request from <strong style="color:#333;">${esc(r.patient_name)}</strong></div><div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;"><button class="btn-approve" onclick="openApprove(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-check"></i> Approve</button><button class="btn-reject" onclick="openReject(${r.id},'${esc(r.patient_name)}')"><i class="fa-solid fa-xmark"></i> Reject</button><button class="btn-close-detail" onclick="closeDesktopDetail(${r.id})">Close</button></div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1.1rem;padding-top:.9rem;border-top:1px solid #f0f0f0;"><div><div class="dl">Patient</div><div class="dv">${esc(r.patient_name)}</div></div>${r.sub_label ? `<div><div class="dl">Department</div><div class="dv">${esc(r.sub_label)}</div></div>` : ''}<div><div class="dl">Date</div><div class="dv">${esc(r.request_date)}</div></div><div><div class="dl">Time</div><div class="dv">${esc(r.request_time)}</div></div><div><div class="dl">Document</div><div class="dv">${esc(r.document_type)}</div></div><div><div class="dl">Purpose</div><div class="dv">${esc(r.purpose)}</div></div></div></div>`;
       return `<div class="req-row desktop-req-row" id="row-d-${r.id}"><div class="accent-bar" style="background:${accentHex};"></div><div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">${nameCol}${dateCol}${docCol}${actionCol}</div>${detail}</div>`;
     }
-    const purposeCol = `<div class="req-purpose-col" style="text-align:right;"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Purpose</div><div style="font-size:.8rem;color:#666;">${esc(r.purpose)}</div></div>`;
+    const purposeCol =
+      `<div class="req-purpose-col" style="text-align:right;"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Purpose</div><div style="font-size:.8rem;color:#666;">${esc(r.purpose)}</div></div>`;
     return `<div class="req-row desktop-req-row"><div class="accent-bar" style="background:${accentHex};"></div><div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">${nameCol}${dateCol}${docCol}${purposeCol}</div></div>`;
   }
 
-  /* ─── MOBILE CARD ─── */
   function buildMobileCard(r) {
     const accentHex = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
     const avatarBg = r.status === 'approved' ? '#dcfce7' : r.status === 'rejected' ? '#fee2e2' : '#fff7ed';
     const avatarCol = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
-    const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+    const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' :
+      'badge-pending';
     const sub = r.sub_label ? `<div class="mobile-sub-label">${esc(r.sub_label)}</div>` : '';
 
-    const viewBtn = r.status === 'pending'
-      ? `<button class="btn-view" style="font-size:.74rem;padding:.38rem .85rem;" id="mbtn-${r.id}" onclick="toggleMobileDetail(this,${r.id})"><i class="fa-solid fa-eye" id="micon-${r.id}"></i> <span id="mtext-${r.id}">View</span></button>`
-      : `<span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span>`;
+    const viewBtn = r.status === 'pending' ?
+      `<button class="btn-view" style="font-size:.74rem;padding:.38rem .85rem;" id="mbtn-${r.id}" onclick="toggleMobileDetail(this,${r.id})"><i class="fa-solid fa-eye" id="micon-${r.id}"></i> <span id="mtext-${r.id}">View</span></button>` :
+      `<span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span>`;
 
     const detailContent = r.status === 'pending' ? `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
@@ -2994,23 +2613,25 @@ $notifCount = $notifications->count();
         </div>`;
   }
 
-  /* ─── Desktop detail toggle ─── */
   function toggleDesktopDetail(btn, id) {
     const panel = document.getElementById(`detail-${id}`);
     const opening = !panel.classList.contains('open');
     panel.classList.toggle('open');
-    btn.innerHTML = opening
-      ? '<i class="fa-solid fa-eye-slash"></i> Hide'
-      : '<i class="fa-solid fa-eye"></i> View';
+    btn.innerHTML = opening ?
+      '<i class="fa-solid fa-eye-slash"></i> Hide' :
+      '<i class="fa-solid fa-eye"></i> View';
   }
+
   function closeDesktopDetail(id) {
     const panel = document.getElementById(`detail-${id}`);
     if (panel) panel.classList.remove('open');
     const row = document.getElementById(`row-d-${id}`);
-    if (row) { const vb = row.querySelector('.btn-view'); if (vb) vb.innerHTML = '<i class="fa-solid fa-eye"></i> View'; }
+    if (row) {
+      const vb = row.querySelector('.btn-view');
+      if (vb) vb.innerHTML = '<i class="fa-solid fa-eye"></i> View';
+    }
   }
 
-  /* ─── Mobile detail toggle (smooth collapse) ─── */
   function toggleMobileDetail(btn, id) {
     const panel = document.getElementById(`mdetail-${id}`);
     const textEl = document.getElementById(`mtext-${id}`);
@@ -3020,6 +2641,7 @@ $notifCount = $notifications->count();
     if (textEl) textEl.textContent = opening ? 'Hide' : 'View';
     if (iconEl) iconEl.className = opening ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
   }
+
   function closeMobileDetail(id) {
     const panel = document.getElementById(`mdetail-${id}`);
     const textEl = document.getElementById(`mtext-${id}`);
@@ -3029,28 +2651,36 @@ $notifCount = $notifications->count();
     if (iconEl) iconEl.className = 'fa-solid fa-eye';
   }
 
-  /* ── XSS escape ── */
   function esc(str) {
-    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,
+      '&quot;');
   }
 
-  /* ── Pagination ── */
   function renderPagination(total, lastPage) {
     const ctrl = document.getElementById('pagControls');
-    if (lastPage <= 1) { ctrl.innerHTML = ''; return; }
+    if (lastPage <= 1) {
+      ctrl.innerHTML = '';
+      return;
+    }
     let html = '';
-    html += `<button class="pag-btn" ${currentPage > 1 ? '' : 'disabled'} onclick="goPage(${currentPage - 1})">‹ Prev</button>`;
-    for (let p = 1; p <= lastPage; p++) html += `<button class="pag-btn ${p === currentPage ? 'pag-active' : ''}" onclick="goPage(${p})">${p}</button>`;
-    html += `<button class="pag-btn" ${currentPage < lastPage ? '' : 'disabled'} onclick="goPage(${currentPage + 1})">Next ›</button>`;
+    html +=
+      `<button class="pag-btn" ${currentPage > 1 ? '' : 'disabled'} onclick="goPage(${currentPage - 1})">‹ Prev</button>`;
+    for (let p = 1; p <= lastPage; p++) html +=
+      `<button class="pag-btn ${p === currentPage ? 'pag-active' : ''}" onclick="goPage(${p})">${p}</button>`;
+    html +=
+      `<button class="pag-btn" ${currentPage < lastPage ? '' : 'disabled'} onclick="goPage(${currentPage + 1})">Next ›</button>`;
     ctrl.innerHTML = html;
   }
+
   function goPage(p) {
     currentPage = p;
     renderList();
-    document.getElementById('requestContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('requestContainer').scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 
-  /* ── Filter / Search ── */
   function setFilter(f) {
     activeFilter = f;
     currentPage = 1;
@@ -3058,30 +2688,57 @@ $notifCount = $notifications->count();
       c.getAttribute('data-filter') === f ? c.classList.add('stat-active') : c.classList.remove('stat-active'));
     renderList();
   }
+
   function onSearch(input) {
-    searchQuery = input.value.trim();
-    currentPage = 1;
-    document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0);
-    renderList();
-  }
+      searchQuery = input.value.trim();
+      currentPage = 1;
+      
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) {
+        if (searchQuery.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+      renderList();
+    }
+
   function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchClearBtn').classList.remove('visible');
-    searchQuery = '';
-    currentPage = 1;
-    renderList();
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (searchInput) {
+      searchInput.value = '';
+      searchQuery = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      currentPage = 1;
+      renderList();
+      searchInput.focus();
+    }
   }
 
-  /* ── Modal helpers ── */
-  function openModal(el) { el.classList.add('open'); document.body.style.overflow = 'hidden'; }
-  function closeModal(el) { el.classList.remove('open'); document.body.style.overflow = ''; }
-  function outside(el) { el.addEventListener('click', e => { if (e.target === el) closeModal(el); }); }
+  function openModal(el) {
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(el) {
+    el.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function outside(el) {
+    el.addEventListener('click', e => {
+      if (e.target === el) closeModal(el);
+    });
+  }
 
   function openApprove(id, name) {
     document.getElementById('approvePatientName').textContent = name;
     document.getElementById('approveRequestId').value = id;
     openModal(document.getElementById('approveModal'));
   }
+
   function openReject(id, name) {
     document.getElementById('rejectPatientName').textContent = name;
     document.getElementById('rejectRequestId').value = id;
@@ -3090,37 +2747,106 @@ $notifCount = $notifications->count();
     setTimeout(() => document.getElementById('rejectNotes').focus(), 60);
   }
 
-  /* ── Filter modal ── */
   function openFilterModal() {
     syncFilterTagGroup('fStatusGroup', filterStatus);
     syncFilterTagGroup('fSortGroup', filterSort);
     document.getElementById('fDocType').value = filterDocType;
     document.getElementById('fDateFrom').value = filterDateFrom;
     document.getElementById('fDateTo').value = filterDateTo;
+    renderFilterChips();
     openModal(document.getElementById('filterModal'));
   }
+
   function syncFilterTagGroup(groupId, activeVal) {
     document.querySelectorAll(`#${groupId} .ftag`).forEach(btn =>
-      btn.getAttribute('data-val') === activeVal ? btn.classList.add('ftag-active') : btn.classList.remove('ftag-active'));
+      btn.getAttribute('data-val') === activeVal ? btn.classList.add('ftag-active') : btn.classList.remove(
+        'ftag-active'));
   }
+
   function applyFilterModal() {
     const statusActive = document.querySelector('#fStatusGroup .ftag.ftag-active');
     filterStatus = statusActive ? statusActive.getAttribute('data-val') : 'all';
     activeFilter = filterStatus;
     document.querySelectorAll('#statCards .stat-card').forEach(c =>
-      c.getAttribute('data-filter') === activeFilter ? c.classList.add('stat-active') : c.classList.remove('stat-active'));
+      c.getAttribute('data-filter') === activeFilter ? c.classList.add('stat-active') : c.classList.remove('stat-active')
+    );
     const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
     filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
     filterDocType = document.getElementById('fDocType').value;
     filterDateFrom = document.getElementById('fDateFrom').value;
     filterDateTo = document.getElementById('fDateTo').value;
+
     updateFilterBtn();
+    renderFilterChips();
     currentPage = 1;
     closeModal(document.getElementById('filterModal'));
     renderList();
   }
+
+  function renderFilterChips() {
+    const container = document.getElementById("activeChipsContainer");
+    const section = document.getElementById("activeFiltersSection");
+    if (!container || !section) return;
+
+    container.innerHTML = "";
+    let hasChips = false;
+
+    function addChip(label, onRemove) {
+      hasChips = true;
+      const chip = document.createElement("div");
+      chip.className = "filter-chip";
+      chip.innerHTML = `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
+      chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
+        onRemove();
+        renderFilterChips();
+      });
+      container.appendChild(chip);
+    }
+
+    const statusActive = document.querySelector('#fStatusGroup .ftag.ftag-active');
+    if (statusActive && statusActive.getAttribute('data-val') !== 'all') {
+      addChip(`Status: ${statusActive.textContent.trim()}`, () => syncFilterTagGroup('fStatusGroup', 'all'));
+    }
+
+    const docType = document.getElementById('fDocType').value;
+    if (docType) {
+      addChip(`Doc: ${docType}`, () => document.getElementById('fDocType').value = "");
+    }
+
+    const fDate = document.getElementById('fDateFrom').value;
+    const tDate = document.getElementById('fDateTo').value;
+    if (fDate || tDate) {
+      let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
+      addChip(`Date: ${lbl}`, () => { document.getElementById('fDateFrom').value = ""; document.getElementById('fDateTo').value = ""; });
+    }
+
+    const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+    if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
+      addChip(`Sort: ${sortActive.textContent.trim()}`, () => syncFilterTagGroup('fSortGroup', 'newest'));
+    }
+
+    if (hasChips) {
+      section.classList.remove("hidden");
+      // Bind the new Clear All button
+      document.getElementById("clearAllChipsBtn").onclick = () => {
+        syncFilterTagGroup('fStatusGroup', 'all');
+        document.getElementById('fDocType').value = "";
+        document.getElementById('fDateFrom').value = "";
+        document.getElementById('fDateTo').value = "";
+        syncFilterTagGroup('fSortGroup', 'newest');
+        renderFilterChips();
+      };
+    } else {
+      section.classList.add("hidden");
+    }
+  }
+
   function resetFilterModal() {
-    filterStatus = 'all'; filterDocType = ''; filterDateFrom = ''; filterDateTo = ''; filterSort = 'newest';
+    filterStatus = 'all';
+    filterDocType = '';
+    filterDateFrom = '';
+    filterDateTo = '';
+    filterSort = 'newest';
     syncFilterTagGroup('fStatusGroup', 'all');
     syncFilterTagGroup('fSortGroup', 'newest');
     document.getElementById('fDocType').value = '';
@@ -3128,15 +2854,29 @@ $notifCount = $notifications->count();
     document.getElementById('fDateTo').value = '';
   }
 
-  /* ── DOMContentLoaded ── */
   document.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById('fDocType').addEventListener('change', renderFilterChips);
+    document.getElementById('fDateFrom').addEventListener('change', renderFilterChips);
+    document.getElementById('fDateTo').addEventListener('change', renderFilterChips);
+
+    ['fStatusGroup', 'fSortGroup'].forEach(groupId => {
+      document.getElementById(groupId).addEventListener('click', e => {
+        const btn = e.target.closest('.ftag');
+        if (!btn) return;
+        document.querySelectorAll(`#${groupId} .ftag`).forEach(b => b.classList.remove('ftag-active'));
+        btn.classList.add('ftag-active');
+        renderFilterChips();
+      });
+    });
 
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      ['approveModal', 'rejectModal', 'approvedResultModal', 'rejectedResultModal', 'filterModal'].forEach(id => {
-        const m = document.getElementById(id);
-        if (m?.classList.contains('open')) closeModal(m);
-      });
+      ['approveModal', 'rejectModal', 'approvedResultModal', 'rejectedResultModal', 'filterModal']
+        .forEach(id => {
+          const m = document.getElementById(id);
+          if (m?.classList.contains('open')) closeModal(m);
+        });
     });
 
     ['approveModal', 'rejectModal', 'approvedResultModal', 'rejectedResultModal', 'filterModal']
@@ -3146,39 +2886,48 @@ $notifCount = $notifications->count();
     document.getElementById('filterCloseBtn').addEventListener('click', () => closeModal(filterModal));
     document.getElementById('filterCancelBtn').addEventListener('click', () => closeModal(filterModal));
     document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
-    document.getElementById('filterResetBtn').addEventListener('click', resetFilterModal);
-
-    ['fStatusGroup', 'fSortGroup'].forEach(groupId => {
-      document.getElementById(groupId).addEventListener('click', e => {
-        const btn = e.target.closest('.ftag');
-        if (!btn) return;
-        document.querySelectorAll(`#${groupId} .ftag`).forEach(b => b.classList.remove('ftag-active'));
-        btn.classList.add('ftag-active');
-      });
+    document.getElementById('filterResetBtn').addEventListener('click', () => {
+      resetAllFilters();
+      resetFilterModal();
+      renderFilterChips();
     });
 
     const approveModal = document.getElementById('approveModal');
     const approvedModal = document.getElementById('approvedResultModal');
     ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
       document.getElementById(id)?.addEventListener('click', () => closeModal(approveModal)));
-    document.getElementById('approvedResultClose').addEventListener('click', () => { closeModal(approvedModal); loadData(); });
+    document.getElementById('approvedResultClose').addEventListener('click', () => {
+      closeModal(approvedModal);
+      loadData();
+    });
     document.getElementById('approveConfirmBtn').addEventListener('click', async () => {
       const id = document.getElementById('approveRequestId').value;
       const btn = document.getElementById('approveConfirmBtn');
       if (!id) return;
       btn.disabled = true;
       const res = await fetch(`/dentist/document-requests/${id}/approve`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: '{}'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': CSRF
+        },
+        body: '{}'
       });
       btn.disabled = false;
-      if (res.ok) { closeModal(approveModal); openModal(approvedModal); } else alert('Something went wrong.');
+      if (res.ok) {
+        closeModal(approveModal);
+        openModal(approvedModal);
+      } else alert('Something went wrong.');
     });
 
     const rejectModal = document.getElementById('rejectModal');
     const rejectedModal = document.getElementById('rejectedResultModal');
     ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
       document.getElementById(id)?.addEventListener('click', () => closeModal(rejectModal)));
-    document.getElementById('rejectedResultClose').addEventListener('click', () => { closeModal(rejectedModal); loadData(); });
+    document.getElementById('rejectedResultClose').addEventListener('click', () => {
+      closeModal(rejectedModal);
+      loadData();
+    });
     document.getElementById('rejectConfirmBtn').addEventListener('click', async () => {
       const id = document.getElementById('rejectRequestId').value;
       const btn = document.getElementById('rejectConfirmBtn');
@@ -3186,11 +2935,20 @@ $notifCount = $notifications->count();
       if (!id) return;
       btn.disabled = true;
       const res = await fetch(`/dentist/document-requests/${id}/reject`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
-        body: JSON.stringify({ rejection_notes: notes })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': CSRF
+        },
+        body: JSON.stringify({
+          rejection_notes: notes
+        })
       });
       btn.disabled = false;
-      if (res.ok) { closeModal(rejectModal); openModal(rejectedModal); } else alert('Something went wrong.');
+      if (res.ok) {
+        closeModal(rejectModal);
+        openModal(rejectedModal);
+      } else alert('Something went wrong.');
     });
 
     loadData();

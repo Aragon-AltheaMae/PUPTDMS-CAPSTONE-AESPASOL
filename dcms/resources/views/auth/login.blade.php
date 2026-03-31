@@ -230,20 +230,12 @@
       align-items: center;
       justify-content: center;
       gap: 24px;
-      margin-bottom: 24px;
       padding: 18px 20px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.18);
-      /* Glass base */
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgb(241, 241, 241);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
     .hero-logo-img {
-      width: 40px;
-      height: 40px;
+      width: 70px;
+      height: 70px;
       object-fit: contain;
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     }
@@ -312,7 +304,7 @@
       font-size: 16px;
       line-height: 1.7;
       color: var(--text-main);
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto 60px;
     }
 
@@ -424,7 +416,7 @@
     }
 
     .section-label-line {
-      width: 30px;
+      width: 15px;
       height: 3px;
       background: var(--gold);
       border-radius: 2px;
@@ -1267,10 +1259,9 @@
       .hero-logos {
         gap: 16px;
         padding: 14px 16px;
-        margin-bottom: 20px;
       }
 
-      .hero-logo-img { width: 32px; height: 32px; }
+      .hero-logo-img { width: 56px; height: 56px; }
 
       .hero-title {
         font-size: clamp(2rem, 9vw, 2.8rem);
@@ -1446,7 +1437,7 @@
     </h1>
 
     <p class="hero-desc reveal reveal-d3">
-      Professional, accessible, and high-quality dental care exclusively for students, faculty, staff, and alumni of
+      Professional, accessible, and high-quality dental care exclusively for students, faculty, and staff of
       PUP Taguig. Manage your oral health seamlessly.
     </p>
 
@@ -1492,8 +1483,7 @@
             <div>
               <div class="pillar-title">Free Dental Care</div>
               <div class="pillar-body">All standard dental services are provided at no cost to eligible PUP Taguig
-                students,
-                alumni, faculty, and staff.</div>
+                students, faculty, and staff.</div>
             </div>
           </div>
           <div class="pillar-card reveal reveal-d2">
@@ -1610,7 +1600,7 @@
       $faqs = [
       [
       'q' => 'Who can avail of the dental services?',
-      'a' => 'All students, alumni, faculty, and staff of the Polytechnic University of the Philippines – Taguig Campus
+      'a' => 'All students, faculty, and staff of the Polytechnic University of the Philippines – Taguig Campus
       are eligible for free dental services.',
       ],
       [

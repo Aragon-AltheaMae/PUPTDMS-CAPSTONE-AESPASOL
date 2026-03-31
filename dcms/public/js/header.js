@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+
     const notifBtn = document.getElementById('notifBtn');
     const notifMenu = document.getElementById('notifMenu');
     const notifDropdown = document.getElementById('notifDropdown');
@@ -40,41 +41,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    const themeToggle = document.getElementById('userMenuThemeToggle');
-    if (themeToggle) {
-        const options = themeToggle.querySelectorAll('.theme-option');
+    const themeCheckbox = document.getElementById('themeSwitchCheckbox');
+    const themeIcon = document.getElementById('themeIcon');
 
-        options.forEach(option => {
-            option.addEventListener('click', function () {
-                options.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
+    if (themeCheckbox && themeIcon) {
+        const currentTheme = localStorage.getItem('theme') || 'light';
 
-                const selectedTheme = this.dataset.theme;
-
-                if (selectedTheme === 'dark') {
-                    themeToggle.classList.add('dark-active');
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeToggle.classList.remove('dark-active');
-                    document.documentElement.setAttribute('data-theme', 'light');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        });
-
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        const activeBtn = themeToggle.querySelector(`[data-theme="${savedTheme}"]`);
-
-        options.forEach(btn => btn.classList.remove('active'));
-        activeBtn?.classList.add('active');
-
-        if (savedTheme === 'dark') {
-            themeToggle.classList.add('dark-active');
+        if (currentTheme === 'dark') {
+            themeCheckbox.checked = true;
             document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fa-solid fa-moon text-gray-400 text-base';
         } else {
-            themeToggle.classList.remove('dark-active');
+            themeCheckbox.checked = false;
             document.documentElement.setAttribute('data-theme', 'light');
+            themeIcon.className = 'fa-regular fa-sun text-gray-400 text-base';
         }
+
+        themeCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.className = 'fa-solid fa-moon text-gray-400 text-base';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeIcon.className = 'fa-regular fa-sun text-gray-400 text-base';
+            }
+        });
     }
 });

@@ -17,10 +17,11 @@
                 ['route'=>'dentist.dentist.inventory','icon'=>'fa-box','label'=>'Inventory'],
                 ['route'=>'dentist.dentist.report','icon'=>'fa-file','label'=>'Reports'],
             ] as $nav)
-            <a href="{{ route($nav['route']) }}" title="{{ $nav['label'] }}"
+            <a href="{{ route($nav['route']) }}"
                 class="sidebar-nav-item {{ request()->routeIs($nav['route']) ? 'active' : '' }}">
                 <span class="sidebar-nav-icon"><i class="fa-solid {{ $nav['icon'] }}"></i></span>
                 <span class="sidebar-nav-text">{{ $nav['label'] }}</span>
+                <span class="sidebar-tooltip">{{ $nav['label'] }}</span>
             </a>
             @endforeach
         </nav>

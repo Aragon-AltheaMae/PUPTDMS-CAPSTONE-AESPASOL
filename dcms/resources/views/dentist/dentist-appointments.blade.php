@@ -713,11 +713,9 @@ $notifCount = $notifications->count();
 @endphp
 
 
-<!-- ═══════ MAIN ═══════ -->
-<main id="mainContent" class="pt-[80px] sm:pt-[88px] px-3 sm:px-6 pb-6 fade-in min-h-screen">
-  <div class="max-w-7xl mx-auto">
+<main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
+    <div class="w-full fade-in">
 
-    <!-- Summary Bar -->
     <div class="summary-bar rounded-2xl px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3 flex-wrap mb-5 mt-2">
       <i class="fa-solid fa-circle-info text-white/60 text-sm"></i>
       <span class="text-white/70 text-xs font-medium hidden sm:inline">Today's snapshot:</span>
@@ -731,20 +729,26 @@ $notifCount = $notifications->count();
       <span class="summary-chip hidden sm:inline-flex"><i class="fa-solid fa-clock text-xs"></i>Next: <strong>{{
           $nextName }}</strong> — {{ $nextDate }} at {{ $nextTime }}</span>
       @endif
-      <span class="summary-chip ml-auto"><i class="fa-solid fa-list text-xs"></i>{{ $upcomingTotal }} upcoming · {{
-        $pastTotal }} past</span>
+      {{-- <span class="summary-chip ml-auto"><i class="fa-solid fa-list text-xs"></i>{{ $upcomingTotal }} upcoming · {{
+        $pastTotal }} past</span> --}}
     </div>
 
     <!-- Page Header & Tabs -->
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-4 mb-6 px-1">
-      <div>
-        <h1 class="text-xl sm:text-2xl font-bold text-[#660000]">Appointments</h1>
-        <div class="flex items-center gap-2 mt-1">
-          <i class="fa-solid fa-sun text-yellow-400 text-sm"></i>
-          <p id="currentDate" class="text-xs sm:text-sm text-[#757575]"></p>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-5 mb-8 px-1">
+
+      <div class="flex items-center gap-3">
+        <div>
+          <h2 class="text-xl md:text-2xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1.5">
+            Appointments
+          </h2>
+          <div class="flex items-center gap-2 mt-1.5">
+            <i class="fa-solid fa-sun text-yellow-500 text-sm"></i>
+            <p id="currentDate" class="text-xs md:text-sm font-normal text-gray-700"></p>
+          </div>
         </div>
       </div>
-      <div class="tab-toggle-wrap self-start sm:self-auto">
+
+      <div class="tab-toggle-wrap self-start md:self-auto flex-shrink-0">
         <button id="btnUpcoming" class="tab-btn-toggle active">
           <i class="fa-solid fa-calendar-clock text-xs"></i>
           Upcoming
@@ -756,6 +760,7 @@ $notifCount = $notifications->count();
           <span class="tab-count-badge">{{ $pastTotal }}</span>
         </button>
       </div>
+
     </div>
 
     <!-- ═══ UPCOMING SECTION ═══ -->
@@ -776,16 +781,18 @@ $notifCount = $notifications->count();
           <div
             class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#8b0000]/30 to-[#8b0000]/05 rounded-full">
           </div>
-          <div
-            class="grid grid-cols-[1.2fr_0.9fr_1.3fr_1.3fr_0.8fr_0.8fr_auto] text-[11px] font-semibold uppercase tracking-wider text-gray-600 pb-2 border-b border-gray-200 mb-3 px-5">
-            <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</span>
-            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</span>
-            <span>Service</span>
-            <span>Patient</span>
-            <span>Program</span>
-            <span>Status</span>
-            <span class="text-right">Actions</span>
+
+          <div class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
+               style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) 310px;">
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</div>
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</div>
+            <div class="text-left">Service</div>
+            <div class="text-left">Patient</div>
+            <div class="text-left">Program</div>
+            <div class="text-left">Status</div>
+            <div class="text-right">Actions</div>
           </div>
+
           <div class="space-y-2.5">
             @foreach($items as $i => $appt)
             @php
@@ -805,21 +812,37 @@ $notifCount = $notifications->count();
             elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
             elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
             @endphp
+
             <div class="appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
               style="animation-delay:{{ $i * 0.04 }}s">
-              <div class="grid grid-cols-[1.2fr_0.9fr_1.3fr_1.3fr_0.8fr_0.8fr_auto] items-center px-5 py-3.5 gap-2">
+
+              <div class="grid gap-3 items-center px-5 py-3.5"
+                style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 0.9fr) minmax(0, 1fr) 310px;">
+
                 <div>
                   <p class="text-[13px] font-semibold text-gray-800">{{ $dateLabel }}</p>
                   <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
                   @if($isToday)<span
                     class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide bg-green-500 text-white px-2 py-0.5 rounded-md">Today</span>@endif
                 </div>
+
                 <div><span class="time-chip"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}</span></div>
-                <div><span class="service-badge {{ $badgeClass }}">{{ $serviceLabel }}</span></div>
-                <div>
-                  <p class="text-[13px] font-semibold text-gray-800">{{ $patientName }}</p>
+
+                <div class="flex items-center justify-start"><span class="service-badge {{ $badgeClass }}">{{
+                    $serviceLabel }}</span></div>
+
+                <div class="flex items-center justify-start gap-3">
+                  <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=8B0000&color=ffffff&bold=true' }}" 
+                       alt="{{ $patientName }}" 
+                       class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0">
+                  <div class="text-left min-w-0">
+                    <p class="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[140px]">{{ $patientName
+                      }}</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID #{{ $appt->patient_id ?? 'N/A' }}</p>
+                  </div>
                 </div>
-                <div>
+
+                <div class="text-left">
                   @if($program === '—')
                   <span class="text-[12px] text-gray-400">—</span>
                   @else
@@ -828,13 +851,15 @@ $notifCount = $notifications->count();
                     $program }}</span>
                   @endif
                 </div>
-                <div>
+
+                <div class="text-left">
                   @if($isToday)
                   <span class="status-pill status-confirmed"><span class="status-dot"></span>Confirmed</span>
                   @else
                   <span class="status-pill status-pending"><span class="status-dot"></span>Upcoming</span>
                   @endif
                 </div>
+
                 <div class="flex items-center justify-end gap-1 flex-nowrap">
                   <a href="{{ route('dentist.dentist.appointments.patientProfile', $appt->id) }}"
                     class="action-btn action-btn-view">
@@ -958,15 +983,18 @@ $notifCount = $notifications->count();
           </span>
         </div>
 
-        <!-- Desktop past table -->
         <div class="desktop-appointments-table relative pl-10">
           <div class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gray-200 rounded-full"></div>
-          <div
-            class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr] text-[11px] font-semibold uppercase tracking-wider text-gray-400 pb-2 border-b border-gray-200 mb-3 px-5">
-            <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</span>
-            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</span>
-            <span>Service</span><span>Patient</span><span>Program</span>
+
+          <div class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
+               style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr);">
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</div>
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</div>
+            <div class="text-left">Service</div>
+            <div class="text-left">Patient</div>
+            <div class="text-left">Program</div>
           </div>
+
           <div class="space-y-2.5">
             @foreach($items as $i => $appt)
             @php
@@ -985,19 +1013,35 @@ $notifCount = $notifications->count();
             elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
             elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
             @endphp
+
             <div class="appt-card opacity-70" style="animation-delay:{{ $i * 0.04 }}s">
-              <div class="grid grid-cols-[1.4fr_1fr_1.5fr_1.5fr_1fr] items-center px-5 py-3.5 gap-2">
+
+              <div class="grid gap-3 items-center px-5 py-3.5"
+                style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr);">
+
                 <div>
                   <p class="text-[13px] font-semibold text-gray-500">{{ $dateLabel }}</p>
                   <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
                 </div>
+
                 <div><span class="time-chip text-gray-400"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel
                     }}</span></div>
-                <div><span class="service-badge {{ $badgeClass }} opacity-70">{{ $serviceLabel }}</span></div>
-                <div>
-                  <p class="text-[13px] font-medium text-gray-500">{{ $patientName }}</p>
+
+                <div class="flex items-center justify-start"><span class="service-badge {{ $badgeClass }} opacity-70">{{
+                    $serviceLabel }}</span></div>
+
+                <div class="flex items-center justify-start gap-3">
+                  <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=9ca3af&color=ffffff&bold=true' }}" 
+                       alt="{{ $patientName }}" 
+                       class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 opacity-80">
+                  <div class="text-left min-w-0">
+                    <p class="text-[13px] font-bold text-gray-500 leading-tight truncate max-w-[140px]">{{ $patientName
+                      }}</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID #{{ $appt->patient_id ?? 'N/A' }}</p>
+                  </div>
                 </div>
-                <div>
+
+                <div class="text-left">
                   @if($program === '—')
                   <span class="text-[12px] text-gray-400">—</span>
                   @else
@@ -1006,6 +1050,7 @@ $notifCount = $notifications->count();
                     $program }}</span>
                   @endif
                 </div>
+
               </div>
             </div>
             @endforeach
