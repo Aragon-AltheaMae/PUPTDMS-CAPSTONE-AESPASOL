@@ -72,6 +72,18 @@ class DocumentRequestController extends Controller
             'documentTypes',
             'notifications'
         ));
+
+        $sort = $request->get('sort', 'newest');
+
+        $query = DocumentRequest::with('patient');
+
+        match ($sort) {
+            'oldest' => $query->oldest(),
+            'alpha'  => $query->join('patients', 'document_requests.patient_id', '=', 'patients.id')
+                            ->orderBy('patients.last_name')
+                            ->select('document_requests.*'),
+            default  => $query->latest(),
+        };
     }
 
     public function show(DocumentRequest $documentRequest)

@@ -11,6 +11,7 @@
         background: #f6f7f9;
         overflow-x: hidden;
     }
+
     /* Page Banner */
     .page-banner {
         background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
@@ -127,29 +128,12 @@
         border-radius: 14px 14px 0 0;
     }
 
-    .stat-card.total::before {
-        background: #e5e7eb;
-    }
-
-    .stat-card.pending::before {
-        background: linear-gradient(90deg, #f59e0b, #fbbf24);
-    }
-
-    .stat-card.approved::before {
-        background: linear-gradient(90deg, #10b981, #34d399);
-    }
-
-    .stat-card.ready::before {
-        background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    }
-
-    .stat-card.released::before {
-        background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-    }
-
-    .stat-card.rejected::before {
-        background: linear-gradient(90deg, #ef4444, #f87171);
-    }
+    .stat-card.total::before { background: #e5e7eb; }
+    .stat-card.pending::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .stat-card.approved::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .stat-card.ready::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .stat-card.released::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .stat-card.rejected::before { background: linear-gradient(90deg, #ef4444, #f87171); }
 
     .stat-icon {
         width: 34px;
@@ -162,35 +146,12 @@
         margin-bottom: .75rem;
     }
 
-    .stat-card.total .stat-icon {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-
-    .stat-card.pending .stat-icon {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .stat-card.approved .stat-icon {
-        background: #d1fae5;
-        color: #059669;
-    }
-
-    .stat-card.ready .stat-icon {
-        background: #dbeafe;
-        color: #2563eb;
-    }
-
-    .stat-card.released .stat-icon {
-        background: #ede9fe;
-        color: #7c3aed;
-    }
-
-    .stat-card.rejected .stat-icon {
-        background: #fee2e2;
-        color: #dc2626;
-    }
+    .stat-card.total .stat-icon { background: #f3f4f6; color: #6b7280; }
+    .stat-card.pending .stat-icon { background: #fef3c7; color: #d97706; }
+    .stat-card.approved .stat-icon { background: #d1fae5; color: #059669; }
+    .stat-card.ready .stat-icon { background: #dbeafe; color: #2563eb; }
+    .stat-card.released .stat-icon { background: #ede9fe; color: #7c3aed; }
+    .stat-card.rejected .stat-icon { background: #fee2e2; color: #dc2626; }
 
     .stat-val {
         font-size: 1.75rem;
@@ -200,29 +161,12 @@
         margin-bottom: .25rem;
     }
 
-    .stat-card.total .stat-val {
-        color: #111827;
-    }
-
-    .stat-card.pending .stat-val {
-        color: #d97706;
-    }
-
-    .stat-card.approved .stat-val {
-        color: #059669;
-    }
-
-    .stat-card.ready .stat-val {
-        color: #2563eb;
-    }
-
-    .stat-card.released .stat-val {
-        color: #7c3aed;
-    }
-
-    .stat-card.rejected .stat-val {
-        color: #dc2626;
-    }
+    .stat-card.total .stat-val { color: #111827; }
+    .stat-card.pending .stat-val { color: #d97706; }
+    .stat-card.approved .stat-val { color: #059669; }
+    .stat-card.ready .stat-val { color: #2563eb; }
+    .stat-card.released .stat-val { color: #7c3aed; }
+    .stat-card.rejected .stat-val { color: #dc2626; }
 
     .stat-lbl {
         font-size: .67rem;
@@ -242,16 +186,10 @@
         border-radius: 999px;
     }
 
-    .stat-card.pending .stat-trend {
-        background: #fef3c7;
-        color: #92400e;
-    }
+    .stat-card.pending .stat-trend { background: #fef3c7; color: #92400e; }
+    .stat-card.rejected .stat-trend { background: #fee2e2; color: #991b1b; }
 
-    .stat-card.rejected .stat-trend {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
+    /* ── Toolbar ── */
     .toolbar {
         display: flex;
         align-items: center;
@@ -260,80 +198,395 @@
         flex-wrap: wrap;
     }
 
+    /* ── Search ── */
     .search-wrap {
-        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #FAFAF9;
+        border: 1.5px solid #E0DDD8;
+        border-radius: 12px;
+        padding: 0 14px;
+        height: 38px;
+        transition: border-color .2s, box-shadow .2s;
         flex: 1;
         min-width: 200px;
         max-width: 320px;
     }
 
-    .search-wrap input {
-        width: 100%;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 8px;
-        padding: .5rem 4.8rem .5rem 2.2rem;
-        font-size: .82rem;
-        background: #fff;
-        outline: none;
-    }
-
-    .search-wrap input:focus,
-    .form-sel-sm:focus {
+    .search-wrap:focus-within {
         border-color: #8B0000;
-        box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
     }
 
     .search-wrap .search-icon {
-        position: absolute;
-        left: .75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #d1d5db;
-        font-size: .78rem;
+        color: #8B0000;
+        font-size: 13px;
+        flex-shrink: 0;
         pointer-events: none;
-        z-index: 3;
+    }
+
+    .search-wrap input {
+        border: none;
+        background: none;
+        outline: none;
+        font-size: 13px;
+        color: #333;
+        width: 100%;
+        padding: 0;
+    }
+
+    .search-wrap input::placeholder {
+        color: #B0ABA6;
     }
 
     .search-clear-btn {
-        position: absolute;
-        right: 2.4rem;
-        top: 50%;
-        transform: translateY(-50%);
         width: 20px;
         height: 20px;
-        border-radius: 999px;
+        border-radius: 50%;
         border: none;
-        background: #e5e7eb;
-        color: #6b7280;
+        background: #E0DDD8;
+        color: #7A7370;
         font-size: 10px;
         cursor: pointer;
         display: none;
         align-items: center;
         justify-content: center;
-        transition: .15s ease;
+        flex-shrink: 0;
+        transition: all .2s;
         padding: 0;
-        z-index: 4;
     }
 
-    .search-clear-btn:hover {
+    .search-clear-btn:hover { background: rgba(139,0,0,.47); color: #fff; }
+    .search-clear-btn.visible { display: flex; }
+
+    /* ── Filter Button ── */
+    .filter-btn {
+        height: 38px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1.5px solid #E0DDD8;
+        background: #FAFAF9;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all .2s;
+        white-space: nowrap;
+        position: relative;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        border-color: #8B0000;
+        color: #8B0000;
+        background: #fef2f2;
+    }
+
+    .filter-dot {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
         background: #8B0000;
+        border: 2px solid #fff;
+        display: none;
+    }
+
+    .filter-dot.visible {
+        display: block;
+    }
+
+    /* ── Filter Modal ── */
+    .filter-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        padding: 1rem;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+    }
+
+    .filter-modal-backdrop.show {
+        display: flex;
+    }
+
+    .filter-modal {
+        background: #fff;
+        width: 100%;
+        max-width: 760px;
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+        overflow: hidden;
+        border: 1px solid #ececec;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        animation: filterModalIn .2s ease;
+    }
+
+    @keyframes filterModalIn {
+        from { opacity: 0; transform: scale(.97) translateY(8px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .filter-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f3f4f6;
+        background: #fafafa;
+        flex-shrink: 0;
+    }
+
+    .filter-modal-title {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: .92rem;
+        font-weight: 700;
+        color: #111;
+    }
+
+    .filter-modal-title-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #8B0000, #6b0000);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: .72rem;
+        flex-shrink: 0;
+    }
+
+    .filter-modal-close {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        border: none;
+        background: #f3f4f6;
+        color: #6b7280;
+        font-size: .78rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .15s ease;
+        flex-shrink: 0;
+    }
+
+    .filter-modal-close:hover { background: #fee2e2; color: #dc2626; }
+
+    .filter-modal-body {
+        overflow-y: auto;
+        padding: 1.25rem;
+        flex: 1;
+    }
+
+    .filter-section-label {
+        font-size: .67rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .09em;
+        color: #9ca3af;
+        margin-bottom: .6rem;
+    }
+
+    .filter-section {
+        margin-bottom: 1.4rem;
+    }
+
+    .filter-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .filter-chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .45rem;
+    }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+        border: 1.5px solid #e5e7eb;
+        background: #fff;
+        font-size: .75rem;
+        font-weight: 600;
+        color: #6b7280;
+        cursor: pointer;
+        transition: .12s ease;
+        user-select: none;
+    }
+
+    .filter-chip:hover { border-color: #8B0000; color: #8B0000; background: #fff8f8; }
+
+    .filter-chip.active {
+        background: #8B0000;
+        border-color: #8B0000;
         color: #fff;
     }
 
-    .search-clear-btn.visible {
-        display: inline-flex;
+    .filter-chip .chip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
     }
 
-    .form-sel-sm {
+    .filter-chip[data-value="pending"] .chip-dot { background: #f59e0b; }
+    .filter-chip[data-value="approved"] .chip-dot { background: #10b981; }
+    .filter-chip[data-value="ready"] .chip-dot { background: #3b82f6; }
+    .filter-chip[data-value="released"] .chip-dot { background: #8b5cf6; }
+    .filter-chip[data-value="rejected"] .chip-dot { background: #ef4444; }
+    .filter-chip.active .chip-dot { background: rgba(255,255,255,.7); }
+
+    .filter-sel {
+        width: 100%;
         border: 1.5px solid #e5e7eb;
         border-radius: 8px;
         padding: .5rem .75rem;
         font-size: .82rem;
         background: #fff;
         outline: none;
-        min-width: 170px;
+        color: #374151;
+        transition: border-color .15s;
     }
 
+    .filter-sel:focus {
+        border-color: #8B0000;
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
+    }
+
+    .filter-date-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .filter-date-wrap label {
+        display: block;
+        font-size: .72rem;
+        font-weight: 600;
+        color: #9ca3af;
+        margin-bottom: .3rem;
+    }
+
+    .filter-date-wrap input[type="date"] {
+        width: 100%;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: .45rem .75rem;
+        font-size: .82rem;
+        background: #fff;
+        color: #374151;
+        outline: none;
+        transition: border-color .15s;
+    }
+
+    .filter-date-wrap input[type="date"]:focus {
+        border-color: #8B0000;
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
+    }
+
+    .filter-divider {
+        border: none;
+        border-top: 1px solid #f3f4f6;
+        margin: 1.25rem 0;
+    }
+
+    .filter-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .9rem 1.25rem;
+        border-top: 1px solid #f3f4f6;
+        background: #fafafa;
+        flex-shrink: 0;
+    }
+
+    .filter-reset-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        font-size: .78rem;
+        font-weight: 600;
+        color: #9ca3af;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: .3rem .5rem;
+        border-radius: 6px;
+        transition: .12s ease;
+    }
+
+    .filter-reset-btn:hover { color: #dc2626; background: #fee2e2; }
+
+    .filter-apply-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .52rem 1.25rem;
+        border-radius: 8px;
+        background: #8B0000;
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: .15s ease;
+    }
+
+    .filter-apply-btn:hover { background: #6b0000; }
+
+    /* Dark theme support */
+    [data-theme="dark"] .filter-modal {
+        background: #161b22 !important;
+        border-color: #21262d !important;
+    }
+
+    [data-theme="dark"] .filter-modal-header,
+    [data-theme="dark"] .filter-modal-footer {
+        background: #0d1117 !important;
+        border-color: #21262d !important;
+    }
+
+    [data-theme="dark"] .filter-modal-body input[type="date"] {
+        background: #0d1117;
+        color: #f3f4f6;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .filter-chip {
+        background: #0d1117;
+        border-color: #21262d;
+        color: #9ca3af;
+    }
+
+    [data-theme="dark"] .filter-sel {
+        background: #0d1117;
+        border-color: #21262d;
+        color: #f3f4f6;
+    }
+
+    /* ── Buttons ── */
     .btn-primary,
     .btn-secondary {
         display: inline-flex;
@@ -354,9 +607,7 @@
         color: #fff;
     }
 
-    .btn-primary:hover {
-        background: #6b0000;
-    }
+    .btn-primary:hover { background: #6b0000; }
 
     .btn-secondary {
         padding: .5rem 1rem;
@@ -365,14 +616,13 @@
         border: 1.5px solid #e5e7eb;
     }
 
-    .btn-secondary:hover {
-        background: #f9fafb;
-    }
+    .btn-secondary:hover { background: #f9fafb; }
 
+    /* ── Table ── */
     .table-responsive-fix {
-    width: 100%;
-    overflow-x: hidden;
-}
+        width: 100%;
+        overflow-x: hidden;
+    }
 
     .tbl {
         width: 100%;
@@ -389,17 +639,11 @@
 
     .cell-patient-name,
     .cell-purpose,
-    .cell-document {
-        white-space: normal;
-    }
+    .cell-document { white-space: normal; }
 
     .cell-purpose,
-    .cell-patient-name {
-        max-width: 180px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-    
+    .cell-patient-name { max-width: 180px; word-wrap: break-word; overflow-wrap: break-word; }
+
     .tbl-wrap {
         background: #fff;
         border: 1px solid #f0eaea;
@@ -427,13 +671,8 @@
         vertical-align: middle;
     }
 
-    .tbl tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .tbl tbody tr:hover td {
-        background: #fffafa;
-    }
+    .tbl tbody tr:last-child td { border-bottom: none; }
+    .tbl tbody tr:hover td { background: #fffafa; }
 
     .document-badge {
         display: inline-block;
@@ -448,10 +687,7 @@
         transition: .15s ease;
     }
 
-    .document-badge:hover {
-        background: #8B0000;
-        color: #fff;
-    }
+    .document-badge:hover { background: #8B0000; color: #fff; }
 
     .empty-state {
         text-align: center;
@@ -492,35 +728,14 @@
         transition: .12s ease;
     }
 
-    .act-btn.view {
-        background: #fef2f2;
-        color: #8B0000;
-    }
+    .act-btn.view { background: #fef2f2; color: #8B0000; }
+    .act-btn.view:hover { background: #8B0000; color: #fff; }
+    .act-btn.tog-on { background: #f0fdf4; color: #166534; }
+    .act-btn.tog-on:hover { background: #166534; color: #fff; }
+    .act-btn.del { background: transparent; color: #dc2626; }
+    .act-btn.del:hover { background: #fef2f2; }
 
-    .act-btn.view:hover {
-        background: #8B0000;
-        color: #fff;
-    }
-
-    .act-btn.tog-on {
-        background: #f0fdf4;
-        color: #166534;
-    }
-
-    .act-btn.tog-on:hover {
-        background: #166534;
-        color: #fff;
-    }
-
-    .act-btn.del {
-        background: transparent;
-        color: #dc2626;
-    }
-
-    .act-btn.del:hover {
-        background: #fef2f2;
-    }
-
+    /* ── Side Panel ── */
     .panel-card {
         background: #fff;
         border: 1px solid #f0eaea;
@@ -556,26 +771,18 @@
         transition: opacity .15s ease;
     }
 
+    /* ── Responsive ── */
     @media (max-width: 1280px) {
-        .stats-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
+        .stats-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (max-width: 1024px) {
-        .content-grid {
-            grid-template-columns: 1fr !important;
-        }
-
-        .panel-card {
-            position: static;
-        }
+        .content-grid { grid-template-columns: 1fr !important; }
+        .panel-card { position: static; }
     }
 
     @media (max-width: 900px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 767px) {
@@ -584,33 +791,17 @@
             padding: calc(var(--header-h, 70px) + 12px) 1rem 2rem;
         }
 
-        .form-sel-sm {
-            min-width: 100%;
-        }
-
-        .search-wrap {
-            max-width: 100%;
-        }
-
-        .page-banner {
-            border-radius: 14px;
-            padding: 1.1rem 1.1rem 1.4rem;
-        }
-
-        .page-title {
-            font-size: 1.45rem;
-        }
-
-        .page-banner-inner {
-            flex-direction: column;
-            gap: .6rem;
-        }
+        .search-wrap { max-width: 100%; width: 100%; height: 42px; }
+        .toolbar { gap: .5rem; }
+        .filter-btn { height: 42px; flex: 1; justify-content: center; }
+        .page-banner { border-radius: 14px; padding: 1.1rem 1.1rem 1.4rem; }
+        .page-title { font-size: 1.45rem; }
+        .page-banner-inner { flex-direction: column; gap: .6rem; }
+        .filter-date-row { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 480px) {
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-        }
+        .stats-grid { grid-template-columns: 1fr 1fr; }
     }
 </style>
 @endsection
@@ -627,18 +818,11 @@
                     </div>
 
                     <div class="flex gap-2 flex-wrap">
-                        <a
-                            href="{{ route('admin.document-requests.export') }}"
-                            class="btn-secondary"
-                        >
+                        <a href="{{ route('admin.document-requests.export') }}" class="btn-secondary">
                             <i class="fa-solid fa-file-export text-xs"></i>
                             Export CSV
                         </a>
-
-                        <a
-                            href="{{ route('admin.document-requests.print-queue') }}"
-                            class="btn-primary"
-                        >
+                        <a href="{{ route('admin.document-requests.print-queue') }}" class="btn-primary">
                             <i class="fa-solid fa-print text-xs"></i>
                             Print Queue
                         </a>
@@ -648,174 +832,229 @@
 
             @php
                 $_s = $stats ?? [];
-                $_total = $_s['total'] ?? 0;
-                $_pending = $_s['pending'] ?? 0;
+                $_total    = $_s['total']    ?? 0;
+                $_pending  = $_s['pending']  ?? 0;
                 $_approved = $_s['approved'] ?? 0;
-                $_ready = $_s['ready'] ?? 0;
+                $_ready    = $_s['ready']    ?? 0;
                 $_released = $_s['released'] ?? 0;
                 $_rejected = $_s['rejected'] ?? 0;
+                $currentQuery = request()->only(['status', 'type', 'sort', 'date_from', 'date_to']);
 
-                $currentQuery = request()->only(['status', 'type']);
+                $activeFilterCount = (request('status') ? 1 : 0)
+                    + (request('type') ? 1 : 0)
+                    + (request('sort') && request('sort') !== 'newest' ? 1 : 0)
+                    + (request('date_from') ? 1 : 0)
+                    + (request('date_to') ? 1 : 0);
             @endphp
 
             <div id="documentRequestsFragment">
+
                 <div class="stats-grid">
-                    <a
-                        href="{{ route('admin.document-requests.index', array_filter(array_merge($currentQuery, ['status' => null]))) }}"
-                        class="stat-card total js-ajax-nav {{ !request('status') ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_filter(array_merge($currentQuery, ['status' => null]))) }}"
+                       class="stat-card total js-ajax-nav {{ !request('status') ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
                         <div class="stat-val">{{ $_total }}</div>
                         <div class="stat-lbl">Total Requests</div>
                     </a>
 
-                    <a
-                        href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'pending'])) }}"
-                        class="stat-card pending js-ajax-nav {{ request('status') === 'pending' ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-hourglass-half"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'pending'])) }}"
+                       class="stat-card pending js-ajax-nav {{ request('status') === 'pending' ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
                         <div class="stat-val">{{ $_pending }}</div>
                         <div class="stat-lbl">Pending Review</div>
-
-                        @if($_pending > 0)
-                            <span class="stat-trend">Needs action</span>
-                        @endif
+                        @if($_pending > 0)<span class="stat-trend">Needs action</span>@endif
                     </a>
 
-                    <a
-                        href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'approved'])) }}"
-                        class="stat-card approved js-ajax-nav {{ request('status') === 'approved' ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'approved'])) }}"
+                       class="stat-card approved js-ajax-nav {{ request('status') === 'approved' ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
                         <div class="stat-val">{{ $_approved }}</div>
                         <div class="stat-lbl">Approved</div>
                     </a>
 
-                    <a
-                        href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'ready'])) }}"
-                        class="stat-card ready js-ajax-nav {{ request('status') === 'ready' ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-file-circle-check"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'ready'])) }}"
+                       class="stat-card ready js-ajax-nav {{ request('status') === 'ready' ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-file-circle-check"></i></div>
                         <div class="stat-val">{{ $_ready }}</div>
                         <div class="stat-lbl">Ready for Pickup</div>
                     </a>
 
-                    <a
-                        href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'released'])) }}"
-                        class="stat-card released js-ajax-nav {{ request('status') === 'released' ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'released'])) }}"
+                       class="stat-card released js-ajax-nav {{ request('status') === 'released' ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
                         <div class="stat-val">{{ $_released }}</div>
                         <div class="stat-lbl">Released</div>
                     </a>
 
-                    <a
-                        href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'rejected'])) }}"
-                        class="stat-card rejected js-ajax-nav {{ request('status') === 'rejected' ? 'stat-active' : '' }}"
-                    >
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-ban"></i>
-                        </div>
+                    <a href="{{ route('admin.document-requests.index', array_merge($currentQuery, ['status' => 'rejected'])) }}"
+                       class="stat-card rejected js-ajax-nav {{ request('status') === 'rejected' ? 'stat-active' : '' }}">
+                        <div class="stat-icon"><i class="fa-solid fa-ban"></i></div>
                         <div class="stat-val">{{ $_rejected }}</div>
                         <div class="stat-lbl">Rejected</div>
-
-                        @if($_rejected > 0)
-                            <span class="stat-trend">Review needed</span>
-                        @endif
+                        @if($_rejected > 0)<span class="stat-trend">Review needed</span>@endif
                     </a>
                 </div>
 
-                <form
-                    method="GET"
-                    action="{{ route('admin.document-requests.index') }}"
-                    class="toolbar js-ajax-filter-form"
-                    id="documentRequestsFilterForm"
-                >
+                <div class="toolbar">
                     <div class="search-wrap">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
+                        <i class="fa fa-search search-icon"></i>
                         <input
                             type="text"
                             id="documentRequestSearch"
                             placeholder="Patient name or request ID..."
                             value=""
                             autocomplete="off"
-                            data-voice-search="1"
                         >
-
-                        <button
-                            type="button"
-                            id="documentRequestClearBtn"
-                            class="search-clear-btn"
-                            title="Clear"
-                        >
+                        <button type="button" id="documentRequestClearBtn" class="search-clear-btn" title="Clear">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
 
-                    <select name="status" class="form-sel-sm">
-                        <option value="">All Status</option>
-                        @foreach(['pending', 'approved', 'ready', 'released', 'rejected'] as $status)
-                            <option
-                                value="{{ $status }}"
-                                {{ request('status') === $status ? 'selected' : '' }}
-                            >
-                                {{ ucfirst($status) }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <select name="type" class="form-sel-sm">
-                        <option value="">All Types</option>
-
-                        <option value="dental records" {{ request('type') === 'dental records' ? 'selected' : '' }}>
-                            Dental Records
-                        </option>
-
-                        <option value="medical records" {{ request('type') === 'medical records' ? 'selected' : '' }}>
-                            Medical Records
-                        </option>
-
-                        <option value="dental clearance" {{ request('type') === 'dental clearance' ? 'selected' : '' }}>
-                            Dental Clearance
-                        </option>
-
-                        <option value="annual dental clearance" {{ request('type') === 'annual dental clearance' ? 'selected' : '' }}>
-                            Annual Clearance
-                        </option>
-                    </select>
-
                     <button
-                        type="submit"
-                        class="btn-primary"
-                        style="margin-left: auto;"
+                        type="button"
+                        id="filterModalOpenBtn"
+                        class="filter-btn {{ $activeFilterCount > 0 ? 'active' : '' }}"
                     >
-                        <i class="fa-solid fa-filter text-xs"></i>
+                        <i class="fa-solid fa-sliders"></i>
                         Filter
+                        <span class="filter-dot {{ $activeFilterCount > 0 ? 'visible' : '' }}"></span>
                     </button>
-                </form>
 
-                <div
-                    class="content-grid"
-                    style="display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; align-items: start;"
-                >
+                    <form
+                        method="GET"
+                        action="{{ route('admin.document-requests.index') }}"
+                        class="js-ajax-filter-form"
+                        id="documentRequestsFilterForm"
+                        style="display: none;"
+                    >
+                        <input type="hidden" name="status"    id="hiddenStatus"   value="{{ request('status') }}">
+                        <input type="hidden" name="type"      id="hiddenType"     value="{{ request('type') }}">
+                        <input type="hidden" name="date_from" id="hiddenDateFrom" value="{{ request('date_from') }}">
+                        <input type="hidden" name="date_to"   id="hiddenDateTo"   value="{{ request('date_to') }}">
+                        <input type="hidden" name="sort"      id="hiddenSort"     value="{{ request('sort', 'newest') }}">
+                    </form>
+                </div>
+
+                <div class="filter-modal-backdrop" id="filterModalBackdrop">
+                    <div class="filter-modal" role="dialog" aria-modal="true" aria-label="Filter requests">
+
+                        <div class="filter-modal-header">
+                            <div class="filter-modal-title">
+                                <div class="filter-modal-title-icon">
+                                    <i class="fa-solid fa-sliders"></i>
+                                </div>
+                                Filter Requests
+                            </div>
+                            <button type="button" class="filter-modal-close" id="filterModalCloseBtn" title="Close">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <div class="filter-modal-body">
+
+                            <div class="filter-section">
+                                <div class="filter-section-label">Status</div>
+                                <div class="filter-chip-group" id="filterStatusChips">
+                                    <button type="button" class="filter-chip {{ !request('status') ? 'active' : '' }}" data-value="">
+                                        All
+                                    </button>
+                                    @foreach([
+                                        'pending'  => 'Pending',
+                                        'approved' => 'Approved',
+                                        'ready'    => 'Ready for Pickup',
+                                        'released' => 'Released',
+                                        'rejected' => 'Rejected',
+                                    ] as $val => $label)
+                                        <button
+                                            type="button"
+                                            class="filter-chip {{ request('status') === $val ? 'active' : '' }}"
+                                            data-value="{{ $val }}"
+                                        >
+                                            <span class="chip-dot"></span>
+                                            {{ $label }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <hr class="filter-divider">
+
+                            <div class="filter-section">
+                                <div class="filter-section-label">Document Type</div>
+                                <select class="filter-sel" id="filterTypeSelect">
+                                    <option value="">All Types</option>
+                                    <option value="dental records"          {{ request('type') === 'dental records' ? 'selected' : '' }}>Dental Records</option>
+                                    <option value="medical records"         {{ request('type') === 'medical records' ? 'selected' : '' }}>Medical Records</option>
+                                    <option value="dental clearance"        {{ request('type') === 'dental clearance' ? 'selected' : '' }}>Dental Clearance</option>
+                                    <option value="annual dental clearance" {{ request('type') === 'annual dental clearance' ? 'selected' : '' }}>Annual Dental Clearance</option>
+                                </select>
+                            </div>
+
+                            <hr class="filter-divider">
+
+                            <div class="filter-section">
+                                <div class="filter-section-label">Date Range</div>
+                                <div class="filter-date-row">
+                                    <div class="filter-date-wrap">
+                                        <label for="filterDateFrom">From</label>
+                                        <input type="date" id="filterDateFrom" value="{{ request('date_from') }}">
+                                    </div>
+                                    <div class="filter-date-wrap">
+                                        <label for="filterDateTo">To</label>
+                                        <input type="date" id="filterDateTo" value="{{ request('date_to') }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="filter-divider">
+
+                            <div class="filter-section">
+                                <div class="filter-section-label">Sort Order</div>
+                                <div class="filter-chip-group" id="filterSortChips">
+                                    <button type="button"
+                                        class="filter-chip {{ request('sort', 'newest') === 'newest' ? 'active' : '' }}"
+                                        data-value="newest">
+                                        <i class="fa-solid fa-arrow-down-wide-short" style="font-size:.65rem;"></i>
+                                        Newest First
+                                    </button>
+                                    <button type="button"
+                                        class="filter-chip {{ request('sort') === 'oldest' ? 'active' : '' }}"
+                                        data-value="oldest">
+                                        <i class="fa-solid fa-arrow-up-wide-short" style="font-size:.65rem;"></i>
+                                        Oldest First
+                                    </button>
+                                    <button type="button"
+                                        class="filter-chip {{ request('sort') === 'alpha' ? 'active' : '' }}"
+                                        data-value="alpha">
+                                        <i class="fa-solid fa-arrow-down-a-z" style="font-size:.65rem;"></i>
+                                        Alphabetical
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="filter-modal-footer">
+                            <button type="button" class="filter-reset-btn" id="filterResetBtn">
+                                <i class="fa-solid fa-rotate-left text-xs"></i>
+                                Reset all filters
+                            </button>
+                            <button type="button" class="filter-apply-btn" id="filterApplyBtn">
+                                <i class="fa-solid fa-check text-xs"></i>
+                                Apply Filters
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="content-grid" style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
+
                     <div class="tbl-wrap">
                         @if(empty($requests) || $requests->isEmpty())
                             <div class="empty-state">
                                 <i class="fa-solid fa-inbox"></i>
-                                <p class="font-semibold text-gray-500 mb-1">
-                                    No requests found
-                                </p>
+                                <p class="font-semibold text-gray-500 mb-1">No requests found</p>
                                 <p class="text-sm">Try adjusting your filters.</p>
                             </div>
                         @else
@@ -832,31 +1071,27 @@
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
                                         @foreach($requests as $req)
                                             @php
                                                 $sBg = [
-                                                    'pending' => '#fef3c7',
+                                                    'pending'  => '#fef3c7',
                                                     'approved' => '#d1fae5',
-                                                    'ready' => '#dbeafe',
+                                                    'ready'    => '#dbeafe',
                                                     'released' => '#ede9fe',
                                                     'rejected' => '#fef2f2',
                                                 ];
-
                                                 $sTx = [
-                                                    'pending' => '#92400e',
+                                                    'pending'  => '#92400e',
                                                     'approved' => '#065f46',
-                                                    'ready' => '#1e40af',
+                                                    'ready'    => '#1e40af',
                                                     'released' => '#5b21b6',
                                                     'rejected' => '#8B0000',
                                                 ];
-
-                                                $patientName = $req->patient->full_name ?? 'Unknown Patient';
+                                                $patientName      = $req->patient->full_name ?? 'Unknown Patient';
                                                 $patientStudentId = $req->patient->student_id ?? 'No ID';
-                                                $patientInitial = strtoupper(substr($patientName, 0, 1));
+                                                $patientInitial   = strtoupper(substr($patientName, 0, 1));
                                             @endphp
-
                                             <tr
                                                 class="document-request-row"
                                                 data-reference="{{ strtolower($req->reference_number) }}"
@@ -871,136 +1106,55 @@
                                                         {{ $req->reference_number }}
                                                     </span>
                                                 </td>
-
                                                 <td>
                                                     <div class="flex items-center gap-2">
-                                                        <div
-                                                            style="
-                                                                width: 28px;
-                                                                height: 28px;
-                                                                border-radius: 50%;
-                                                                background: linear-gradient(135deg, #8B0000, #6b0000);
-                                                                color: #fff;
-                                                                display: flex;
-                                                                align-items: center;
-                                                                justify-content: center;
-                                                                font-size: .72rem;
-                                                                font-weight: 700;
-                                                                flex-shrink: 0;
-                                                            "
-                                                        >
+                                                        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">
                                                             {{ $patientInitial }}
                                                         </div>
-
                                                         <div>
-                                                            <div class="font-semibold text-gray-800 text-xs leading-tight cell-patient-name">
-                                                                {{ $patientName }}
-                                                            </div>
-                                                            <div class="text-[10px] text-gray-400 whitespace-nowrap">
-                                                                {{ $patientStudentId }}
-                                                            </div>
+                                                            <div class="font-semibold text-gray-800 text-xs leading-tight cell-patient-name">{{ $patientName }}</div>
+                                                            <div class="text-[10px] text-gray-400 whitespace-nowrap">{{ $patientStudentId }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-
                                                 <td class="cell-document">
-                                                    <a
-                                                        href="{{ route('admin.document-requests.index', array_merge(request()->only(['status']), ['type' => $req->document_type])) }}"
-                                                        class="document-badge js-ajax-nav"
-                                                    >
+                                                    <a href="{{ route('admin.document-requests.index', array_merge(request()->only(['status', 'sort', 'date_from', 'date_to']), ['type' => $req->document_type])) }}"
+                                                       class="document-badge js-ajax-nav">
                                                         {{ ucwords(str_replace('_', ' ', $req->document_type)) }}
                                                     </a>
                                                 </td>
-
-                                                <td class="text-xs text-gray-500 cell-purpose">
-                                                    {{ $req->purpose ?: '—' }}
-                                                </td>
-
-                                                <td class="text-xs text-gray-400 whitespace-nowrap">
-                                                    {{ $req->created_at->format('M d, Y') }}
-                                                </td>
-
+                                                <td class="text-xs text-gray-500 cell-purpose">{{ $req->purpose ?: '—' }}</td>
+                                                <td class="text-xs text-gray-400 whitespace-nowrap">{{ $req->created_at->format('M d, Y') }}</td>
                                                 <td>
-                                                    <span
-                                                        style="
-                                                            background: {{ $sBg[$req->status] ?? '#f3f4f6' }};
-                                                            color: {{ $sTx[$req->status] ?? '#6b7280' }};
-                                                            padding: .2rem .65rem;
-                                                            border-radius: 999px;
-                                                            font-size: .68rem;
-                                                            font-weight: 700;
-                                                            display: inline-block;
-                                                        "
-                                                    >
+                                                    <span style="background:{{ $sBg[$req->status] ?? '#f3f4f6' }};color:{{ $sTx[$req->status] ?? '#6b7280' }};padding:.2rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;display:inline-block;">
                                                         {{ ucfirst($req->status) }}
                                                     </span>
                                                 </td>
-
                                                 <td>
                                                     <div class="flex items-center gap-1">
-                                                        <button
-                                                            type="button"
-                                                            class="act-btn view"
-                                                            onclick="openPanel({{ $req->id }})"
-                                                            title="View"
-                                                        >
+                                                        <button type="button" class="act-btn view" onclick="openPanel({{ $req->id }})" title="View">
                                                             <i class="fa-solid fa-eye"></i>
                                                         </button>
-
                                                         @if($req->status === 'pending')
-                                                            <form
-                                                                action="{{ route('admin.document-requests.approve', $req) }}"
-                                                                method="POST"
-                                                                style="display: inline;"
-                                                            >
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <button
-                                                                    type="submit"
-                                                                    class="act-btn tog-on"
-                                                                    title="Approve"
-                                                                >
+                                                            <form action="{{ route('admin.document-requests.approve', $req) }}" method="POST" style="display:inline;">
+                                                                @csrf @method('PATCH')
+                                                                <button type="submit" class="act-btn tog-on" title="Approve">
                                                                     <i class="fa-solid fa-check"></i>
                                                                 </button>
                                                             </form>
                                                         @endif
-
                                                         @if(in_array($req->status, ['approved', 'ready']))
-                                                            <form
-                                                                action="{{ route('admin.document-requests.release', $req) }}"
-                                                                method="POST"
-                                                                style="display: inline;"
-                                                            >
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <button
-                                                                    type="submit"
-                                                                    class="act-btn"
-                                                                    style="background: #dbeafe; color: #1e40af;"
-                                                                    title="Release"
-                                                                >
+                                                            <form action="{{ route('admin.document-requests.release', $req) }}" method="POST" style="display:inline;">
+                                                                @csrf @method('PATCH')
+                                                                <button type="submit" class="act-btn" style="background:#dbeafe;color:#1e40af;" title="Release">
                                                                     <i class="fa-solid fa-paper-plane"></i>
                                                                 </button>
                                                             </form>
                                                         @endif
-
                                                         @if(in_array($req->status, ['pending', 'approved']))
-                                                            <form
-                                                                action="{{ route('admin.document-requests.reject', $req) }}"
-                                                                method="POST"
-                                                                style="display: inline;"
-                                                                onsubmit="return confirm('Reject this request?')"
-                                                            >
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <button
-                                                                    type="submit"
-                                                                    class="act-btn del"
-                                                                    title="Reject"
-                                                                >
+                                                            <form action="{{ route('admin.document-requests.reject', $req) }}" method="POST" style="display:inline;" onsubmit="return confirm('Reject this request?')">
+                                                                @csrf @method('PATCH')
+                                                                <button type="submit" class="act-btn del" title="Reject">
                                                                     <i class="fa-solid fa-xmark"></i>
                                                                 </button>
                                                             </form>
@@ -1013,27 +1167,16 @@
                                 </table>
                             </div>
 
-                            <div
-                                id="documentRequestClientEmpty"
-                                class="empty-state"
-                                style="display: none;"
-                            >
+                            <div id="documentRequestClientEmpty" class="empty-state" style="display:none;">
                                 <i class="fa-solid fa-magnifying-glass"></i>
-                                <p class="font-semibold text-gray-500 mb-1">
-                                    No matching requests found
-                                </p>
+                                <p class="font-semibold text-gray-500 mb-1">No matching requests found</p>
                                 <p class="text-sm">Try a different patient name or reference number.</p>
                             </div>
 
                             @if(!empty($requests) && $requests->hasPages())
                                 <div class="tbl-pagination">
-                                    <span>
-                                        Showing {{ $requests->firstItem() }}–{{ $requests->lastItem() }} of {{ $requests->total() }} requests
-                                    </span>
-
-                                    <div>
-                                        {{ $requests->withQueryString()->links() }}
-                                    </div>
+                                    <span>Showing {{ $requests->firstItem() }}–{{ $requests->lastItem() }} of {{ $requests->total() }} requests</span>
+                                    <div>{{ $requests->withQueryString()->links() }}</div>
                                 </div>
                             @endif
                         @endif
@@ -1042,77 +1185,27 @@
                     <div class="panel-card">
                         <div class="panel-header">
                             <div class="panel-header-icon">
-                                <i
-                                    class="fa-solid fa-file-circle-check text-white"
-                                    style="font-size: .7rem;"
-                                ></i>
+                                <i class="fa-solid fa-file-circle-check text-white" style="font-size:.7rem;"></i>
                             </div>
-
                             <div>
-                                <div class="font-bold text-gray-800 text-sm" id="panelRefNo">
-                                    Select a request
-                                </div>
-                                <div class="text-[11px] text-gray-400">
-                                    Document Request
-                                </div>
+                                <div class="font-bold text-gray-800 text-sm" id="panelRefNo">Select a request</div>
+                                <div class="text-[11px] text-gray-400">Document Request</div>
                             </div>
                         </div>
 
-                        <div style="padding: 1.25rem;" id="panelBody">
-                            <div
-                                style="
-                                    text-align: center;
-                                    padding: 2.5rem 0 2rem;
-                                    color: #d1d5db;
-                                "
-                            >
-                                <div
-                                    style="
-                                        width: 52px;
-                                        height: 52px;
-                                        border-radius: 14px;
-                                        background: #fef2f2;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        margin: 0 auto .9rem;
-                                    "
-                                >
-                                    <i
-                                        class="fa-solid fa-file-circle-check"
-                                        style="font-size: 1.4rem; color: #f9c1c1;"
-                                    ></i>
+                        <div style="padding:1.25rem;" id="panelBody">
+                            <div style="text-align:center;padding:2.5rem 0 2rem;color:#d1d5db;">
+                                <div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;">
+                                    <i class="fa-solid fa-file-circle-check" style="font-size:1.4rem;color:#f9c1c1;"></i>
                                 </div>
-
-                                <p
-                                    style="
-                                        font-size: .78rem;
-                                        font-weight: 600;
-                                        color: #cbd5e1;
-                                        margin-bottom: .25rem;
-                                    "
-                                >
-                                    No request selected
-                                </p>
-
-                                <p style="font-size: .7rem; color: #e2e8f0;">
-                                    Click a row to view details
-                                </p>
+                                <p style="font-size:.78rem;font-weight:600;color:#cbd5e1;margin-bottom:.25rem;">No request selected</p>
+                                <p style="font-size:.7rem;color:#e2e8f0;">Click a row to view details</p>
                             </div>
                         </div>
 
-                        <div
-                            id="panelFoot"
-                            style="
-                                padding: .9rem 1.25rem;
-                                border-top: 1px solid #f3f4f6;
-                                background: #fafafa;
-                                display: none;
-                                gap: .5rem;
-                                flex-wrap: wrap;
-                            "
-                        ></div>
+                        <div id="panelFoot" style="padding:.9rem 1.25rem;border-top:1px solid #f3f4f6;background:#fafafa;display:none;gap:.5rem;flex-wrap:wrap;"></div>
                     </div>
+
                 </div>
             </div>
 
@@ -1123,160 +1216,182 @@
 
 @section('scripts')
 <script>
-    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfMeta  = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
-    const statusBackground = {
-        pending: '#fef3c7',
-        approved: '#d1fae5',
-        ready: '#dbeafe',
-        released: '#ede9fe',
-        rejected: '#fef2f2'
-    };
+    const statusBackground = { pending:'#fef3c7', approved:'#d1fae5', ready:'#dbeafe', released:'#ede9fe', rejected:'#fef2f2' };
+    const statusText       = { pending:'#92400e', approved:'#065f46', ready:'#1e40af', released:'#5b21b6', rejected:'#8B0000' };
 
-    const statusText = {
-        pending: '#92400e',
-        approved: '#065f46',
-        ready: '#1e40af',
-        released: '#5b21b6',
-        rejected: '#8B0000'
-    };
+    function updateFilterButtonState() {
+        const btn = document.getElementById('filterModalOpenBtn');
+        const dot = btn ? btn.querySelector('.filter-dot') : null;
+
+        const statusVal = document.getElementById('hiddenStatus')?.value || '';
+        const typeVal   = document.getElementById('hiddenType')?.value || '';
+        const dateFrom  = document.getElementById('hiddenDateFrom')?.value || '';
+        const dateTo    = document.getElementById('hiddenDateTo')?.value || '';
+        const sortVal   = document.getElementById('hiddenSort')?.value || 'newest';
+
+        const hasFilters = !!statusVal || !!typeVal || !!dateFrom || !!dateTo || (sortVal && sortVal !== 'newest');
+
+        if (btn) btn.classList.toggle('active', hasFilters);
+        if (dot) dot.classList.toggle('visible', hasFilters);
+    }
+
+    function initFilterModal() {
+        const backdrop  = document.getElementById('filterModalBackdrop');
+        const openBtn   = document.getElementById('filterModalOpenBtn');
+        const closeBtn  = document.getElementById('filterModalCloseBtn');
+        const applyBtn  = document.getElementById('filterApplyBtn');
+        const resetBtn  = document.getElementById('filterResetBtn');
+
+        if (!backdrop || !openBtn) return;
+
+        openBtn.addEventListener('click', () => {
+            backdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeModal() {
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        closeBtn && closeBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        const chipGroup = document.getElementById('filterStatusChips');
+        if (chipGroup) {
+            chipGroup.addEventListener('click', e => {
+                const chip = e.target.closest('.filter-chip');
+                if (!chip) return;
+                chipGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        }
+
+        const sortGroup = document.getElementById('filterSortChips');
+        if (sortGroup) {
+            sortGroup.addEventListener('click', e => {
+                const chip = e.target.closest('.filter-chip');
+                if (!chip) return;
+                sortGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        }
+
+        applyBtn && applyBtn.addEventListener('click', () => {
+            const activeChip     = chipGroup ? chipGroup.querySelector('.filter-chip.active') : null;
+            const activeSortChip = sortGroup ? sortGroup.querySelector('.filter-chip.active') : null;
+
+            const statusVal = activeChip ? activeChip.dataset.value : '';
+            const sortVal   = activeSortChip ? activeSortChip.dataset.value : 'newest';
+            const typeVal   = document.getElementById('filterTypeSelect')?.value || '';
+            const dateFrom  = document.getElementById('filterDateFrom')?.value || '';
+            const dateTo    = document.getElementById('filterDateTo')?.value || '';
+
+            document.getElementById('hiddenStatus').value   = statusVal;
+            document.getElementById('hiddenType').value     = typeVal;
+            document.getElementById('hiddenDateFrom').value = dateFrom;
+            document.getElementById('hiddenDateTo').value   = dateTo;
+            document.getElementById('hiddenSort').value     = sortVal;
+
+            updateFilterButtonState();
+            closeModal();
+
+            const form = document.getElementById('documentRequestsFilterForm');
+            const url  = new URL(form.action, window.location.origin);
+            url.search = '';
+
+            if (statusVal)                       url.searchParams.set('status', statusVal);
+            if (typeVal)                         url.searchParams.set('type', typeVal);
+            if (dateFrom)                        url.searchParams.set('date_from', dateFrom);
+            if (dateTo)                          url.searchParams.set('date_to', dateTo);
+            if (sortVal && sortVal !== 'newest') url.searchParams.set('sort', sortVal);
+
+            loadDocumentRequestsFragment(url.toString());
+        });
+
+        resetBtn && resetBtn.addEventListener('click', () => {
+            if (chipGroup) {
+                chipGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                const allChip = chipGroup.querySelector('.filter-chip[data-value=""]');
+                if (allChip) allChip.classList.add('active');
+            }
+
+            if (sortGroup) {
+                sortGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                const defaultSort = sortGroup.querySelector('.filter-chip[data-value="newest"]');
+                if (defaultSort) defaultSort.classList.add('active');
+            }
+
+            const typeSelect = document.getElementById('filterTypeSelect');
+            if (typeSelect) typeSelect.value = '';
+
+            const dfrom = document.getElementById('filterDateFrom');
+            const dto   = document.getElementById('filterDateTo');
+            if (dfrom) dfrom.value = '';
+            if (dto) dto.value = '';
+
+            document.getElementById('hiddenStatus').value   = '';
+            document.getElementById('hiddenType').value     = '';
+            document.getElementById('hiddenDateFrom').value = '';
+            document.getElementById('hiddenDateTo').value   = '';
+            document.getElementById('hiddenSort').value     = 'newest';
+
+            updateFilterButtonState();
+        });
+    }
 
     function detailRow(label, value) {
-        return `
-            <div style="display:flex;gap:.5rem;margin-bottom:.6rem;font-size:.8rem;">
-                <span style="color:#9ca3af;min-width:100px;flex-shrink:0;">${label}</span>
-                <span style="color:#111;font-weight:600;">${value}</span>
-            </div>
-        `;
+        return `<div style="display:flex;gap:.5rem;margin-bottom:.6rem;font-size:.8rem;">
+            <span style="color:#9ca3af;min-width:100px;flex-shrink:0;">${label}</span>
+            <span style="color:#111;font-weight:600;">${value}</span>
+        </div>`;
     }
 
     async function openPanel(id) {
         const panelRefNo = document.getElementById('panelRefNo');
-        const panelBody = document.getElementById('panelBody');
-        const panelFoot = document.getElementById('panelFoot');
+        const panelBody  = document.getElementById('panelBody');
+        const panelFoot  = document.getElementById('panelFoot');
 
         panelRefNo.textContent = 'Loading...';
-        panelBody.innerHTML = `
-            <div style="text-align:center;padding:2rem 0;color:#d1d5db;">
-                <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i>
-            </div>
-        `;
+        panelBody.innerHTML = `<div style="text-align:center;padding:2rem 0;color:#d1d5db;"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>`;
         panelFoot.style.display = 'none';
         panelFoot.innerHTML = '';
 
         try {
             const response = await fetch(`/admin/document-requests/${id}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch.');
-            }
-
+            if (!response.ok) throw new Error('Failed to fetch.');
             const data = await response.json();
 
             panelRefNo.textContent = data.reference_number;
             panelBody.innerHTML = `
-                <div
-                    style="
-                        background:#fef2f2;
-                        border-radius:10px;
-                        padding:.9rem 1rem;
-                        margin-bottom:1rem;
-                        display:flex;
-                        align-items:center;
-                        gap:.75rem;
-                        border:1px solid #fce8e8;
-                    "
-                >
-                    <div
-                        style="
-                            width:32px;
-                            height:32px;
-                            border-radius:50%;
-                            background:linear-gradient(135deg,#8B0000,#6b0000);
-                            color:#fff;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            font-weight:700;
-                            flex-shrink:0;
-                        "
-                    >
+                <div style="background:#fef2f2;border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;border:1px solid #fce8e8;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">
                         ${((data.patient_name || '?')[0] || '?').toUpperCase()}
                     </div>
-
                     <div style="flex:1;min-width:0;">
-                        <div
-                            style="
-                                font-size:.84rem;
-                                font-weight:700;
-                                color:#111;
-                                white-space:nowrap;
-                                overflow:hidden;
-                                text-overflow:ellipsis;
-                            "
-                        >
-                            ${data.patient_name || '—'}
-                        </div>
-                        <div style="font-size:.7rem;color:#9ca3af;">
-                            ${data.patient_id || ''}
-                        </div>
+                        <div style="font-size:.84rem;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${data.patient_name || '—'}</div>
+                        <div style="font-size:.7rem;color:#9ca3af;">${data.patient_id || ''}</div>
                     </div>
-
-                    <span
-                        style="
-                            background:${statusBackground[data.status] || '#f3f4f6'};
-                            color:${statusText[data.status] || '#6b7280'};
-                            padding:.2rem .65rem;
-                            border-radius:999px;
-                            font-size:.68rem;
-                            font-weight:700;
-                            white-space:nowrap;
-                        "
-                    >
+                    <span style="background:${statusBackground[data.status] || '#f3f4f6'};color:${statusText[data.status] || '#6b7280'};padding:.2rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;white-space:nowrap;">
                         ${data.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1) : '—'}
                     </span>
                 </div>
-
                 ${detailRow('Document', formatTitle(data.document_type))}
                 ${detailRow('Purpose', data.purpose || '—')}
                 ${detailRow('Date', data.created_at || '—')}
                 ${detailRow('Copies', data.copies_needed || '1')}
-
                 <div style="margin-top:1rem;">
-                    <div
-                        style="
-                            font-size:.67rem;
-                            font-weight:700;
-                            color:#9ca3af;
-                            text-transform:uppercase;
-                            letter-spacing:.08em;
-                            margin-bottom:.6rem;
-                        "
-                    >
-                        Activity
-                    </div>
-
+                    <div style="font-size:.67rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;">Activity</div>
                     <div style="padding-left:1rem;border-left:2px solid #f0eaea;">
                         ${(data.activities || [{ date: '—', description: 'No activity yet.' }]).map(a => `
                             <div style="position:relative;margin-bottom:.6rem;">
-                                <div
-                                    style="
-                                        position:absolute;
-                                        left:-1.35rem;
-                                        top:.3rem;
-                                        width:6px;
-                                        height:6px;
-                                        border-radius:50%;
-                                        background:#8B0000;
-                                        border:1.5px solid #fef2f2;
-                                    "
-                                ></div>
+                                <div style="position:absolute;left:-1.35rem;top:.3rem;width:6px;height:6px;border-radius:50%;background:#8B0000;border:1.5px solid #fef2f2;"></div>
                                 <div style="font-size:.67rem;color:#9ca3af;">${a.date}</div>
                                 <div style="font-size:.76rem;color:#374151;">${a.description}</div>
                             </div>
@@ -1286,148 +1401,82 @@
             `;
 
             panelFoot.style.display = 'flex';
-
             let actions = '';
 
             if (data.status === 'pending') {
-                actions += `
-                    <form action="/admin/document-requests/${data.id}/approve" method="POST">
-                        <input type="hidden" name="_token" value="${csrfToken}">
-                        <input type="hidden" name="_method" value="PATCH">
-                        <button
-                            type="submit"
-                            class="btn-primary"
-                            style="font-size:.75rem;padding:.4rem .9rem;"
-                        >
-                            <i class="fa-solid fa-check text-xs"></i>
-                            Approve
-                        </button>
-                    </form>
-                `;
+                actions += `<form action="/admin/document-requests/${data.id}/approve" method="POST">
+                    <input type="hidden" name="_token" value="${csrfToken}">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="btn-primary" style="font-size:.75rem;padding:.4rem .9rem;">
+                        <i class="fa-solid fa-check text-xs"></i> Approve
+                    </button>
+                </form>`;
             }
-
             if (data.status === 'approved' || data.status === 'ready') {
-                actions += `
-                    <form action="/admin/document-requests/${data.id}/release" method="POST">
-                        <input type="hidden" name="_token" value="${csrfToken}">
-                        <input type="hidden" name="_method" value="PATCH">
-                        <button
-                            type="submit"
-                            class="btn-secondary"
-                            style="font-size:.75rem;padding:.38rem .9rem;"
-                        >
-                            Release
-                        </button>
-                    </form>
-                `;
+                actions += `<form action="/admin/document-requests/${data.id}/release" method="POST">
+                    <input type="hidden" name="_token" value="${csrfToken}">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="btn-secondary" style="font-size:.75rem;padding:.38rem .9rem;">Release</button>
+                </form>`;
             }
-
             if (data.status === 'pending' || data.status === 'approved') {
-                actions += `
-                    <form
-                        action="/admin/document-requests/${data.id}/reject"
-                        method="POST"
-                        onsubmit="return confirm('Reject this request?')"
-                    >
-                        <input type="hidden" name="_token" value="${csrfToken}">
-                        <input type="hidden" name="_method" value="PATCH">
-                        <button
-                            type="submit"
-                            class="btn-secondary"
-                            style="font-size:.75rem;padding:.38rem .9rem;color:#dc2626;border-color:#fce8e8;"
-                        >
-                            Reject
-                        </button>
-                    </form>
-                `;
+                actions += `<form action="/admin/document-requests/${data.id}/reject" method="POST" onsubmit="return confirm('Reject this request?')">
+                    <input type="hidden" name="_token" value="${csrfToken}">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="btn-secondary" style="font-size:.75rem;padding:.38rem .9rem;color:#dc2626;border-color:#fce8e8;">Reject</button>
+                </form>`;
             }
 
             panelFoot.innerHTML = actions;
         } catch {
-            panelBody.innerHTML = `
-                <p style="color:#dc2626;text-align:center;padding:1.5rem;">
-                    Failed to load details.
-                </p>
-            `;
+            panelBody.innerHTML = `<p style="color:#dc2626;text-align:center;padding:1.5rem;">Failed to load details.</p>`;
         }
     }
 
     function formatTitle(value) {
-        if (!value) {
-            return '—';
-        }
-
-        return value
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, char => char.toUpperCase());
+        if (!value) return '—';
+        return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
     function updateDocumentRequestSearchClear() {
         const searchInput = document.getElementById('documentRequestSearch');
-        const clearBtn = document.getElementById('documentRequestClearBtn');
-
-        if (!searchInput || !clearBtn) {
-            return;
-        }
-
+        const clearBtn    = document.getElementById('documentRequestClearBtn');
+        if (!searchInput || !clearBtn) return;
         clearBtn.classList.toggle('visible', searchInput.value.trim().length > 0);
     }
 
     function filterDocumentRequestRows() {
         const searchInput = document.getElementById('documentRequestSearch');
-        const rows = Array.from(document.querySelectorAll('.document-request-row'));
-        const emptyState = document.getElementById('documentRequestClientEmpty');
-        const pagination = document.querySelector('.tbl-pagination');
-
-        if (!searchInput) {
-            return;
-        }
+        const rows        = Array.from(document.querySelectorAll('.document-request-row'));
+        const emptyState  = document.getElementById('documentRequestClientEmpty');
+        const pagination  = document.querySelector('.tbl-pagination');
+        if (!searchInput) return;
 
         const q = searchInput.value.trim().toLowerCase();
         let visibleCount = 0;
 
         rows.forEach(row => {
-            const haystack = [
-                row.dataset.reference || '',
-                row.dataset.patient || '',
-                row.dataset.student || '',
-                row.dataset.document || '',
-                row.dataset.purpose || '',
-                row.dataset.status || ''
-            ].join(' ');
-
+            const haystack = [row.dataset.reference, row.dataset.patient, row.dataset.student, row.dataset.document, row.dataset.purpose, row.dataset.status].join(' ');
             const match = !q || haystack.includes(q);
             row.style.display = match ? '' : 'none';
-
-            if (match) {
-                visibleCount++;
-            }
+            if (match) visibleCount++;
         });
 
-        if (emptyState) {
-            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
-        }
-
-        if (pagination) {
-            pagination.style.display = q ? 'none' : '';
-        }
+        if (emptyState) emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        if (pagination) pagination.style.display = q ? 'none' : '';
     }
 
     function initDocumentRequestSearch() {
         const searchInput = document.getElementById('documentRequestSearch');
-        const clearBtn = document.getElementById('documentRequestClearBtn');
-
-        if (!searchInput) {
-            return;
-        }
+        const clearBtn    = document.getElementById('documentRequestClearBtn');
+        if (!searchInput) return;
 
         updateDocumentRequestSearchClear();
         filterDocumentRequestRows();
 
         if (!searchInput.dataset.searchBound) {
             searchInput.dataset.searchBound = '1';
-
-            searchInput.addEventListener('input', function () {
+            searchInput.addEventListener('input', () => {
                 updateDocumentRequestSearchClear();
                 filterDocumentRequestRows();
             });
@@ -1435,8 +1484,7 @@
 
         if (clearBtn && !clearBtn.dataset.bound) {
             clearBtn.dataset.bound = '1';
-
-            clearBtn.addEventListener('click', function () {
+            clearBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 updateDocumentRequestSearchClear();
                 filterDocumentRequestRows();
@@ -1445,142 +1493,31 @@
         }
     }
 
-    function initDocumentRequestVoice() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (!SpeechRecognition) {
-            console.warn('Your browser does not support Voice Recognition.');
-            return;
-        }
-
-        const scope = document.getElementById('documentRequestsFragment') || document;
-
-        const inputs = scope.querySelectorAll(
-            'input[type="text"]:not([readonly])[data-voice-search="1"], input[type="email"][data-voice-search="1"], textarea:not([readonly])[data-voice-search="1"]'
-        );
-
-        inputs.forEach(input => {
-            if (input.dataset.voiceReady === '1') {
-                return;
-            }
-
-            input.dataset.voiceReady = '1';
-
-            const isTextarea = input.tagName.toLowerCase() === 'textarea';
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'relative w-full';
-            input.parentNode.insertBefore(wrapper, input);
-            wrapper.appendChild(input);
-
-            input.classList.add('pr-10');
-
-            const statusLabel = document.createElement('span');
-            statusLabel.className = 'hidden absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20';
-            wrapper.appendChild(statusLabel);
-
-            const micBtn = document.createElement('button');
-            micBtn.type = 'button';
-            micBtn.className = isTextarea
-                ? 'absolute right-3 top-3 text-gray-400 hover:text-[#8B0000] transition-colors'
-                : 'absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors';
-            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-            wrapper.appendChild(micBtn);
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
-            micBtn.onclick = (e) => {
-                e.preventDefault();
-
-                try {
-                    recognition.start();
-                    statusLabel.innerText = 'Speaking...';
-                    statusLabel.className = 'absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20 block text-blue-600 animate-pulse';
-                    micBtn.classList.add('text-[#8B0000]');
-                } catch (err) {
-                    console.error('Speech start error:', err);
-                }
-            };
-
-            recognition.onresult = (event) => {
-                input.value = event.results[0][0].transcript;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                statusLabel.classList.add('hidden');
-            };
-
-            recognition.onerror = (event) => {
-                let message = "Didn't catch that. Try again.";
-
-                if (event.error === 'not-allowed') {
-                    message = 'Microphone permission denied.';
-                } else if (event.error === 'audio-capture') {
-                    message = 'No microphone detected.';
-                } else if (event.error === 'no-speech') {
-                    message = 'No speech detected.';
-                } else if (event.error === 'network') {
-                    message = 'Voice recognition network error.';
-                }
-
-                statusLabel.innerText = message;
-                statusLabel.className = 'absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20 block text-red-600';
-
-                setTimeout(() => {
-                    statusLabel.classList.add('hidden');
-                }, 3000);
-            };
-
-            recognition.onend = () => {
-                micBtn.classList.remove('text-[#8B0000]');
-                if (statusLabel.innerText === 'Speaking...') {
-                    statusLabel.classList.add('hidden');
-                }
-            };
-        });
-    }
-
     async function loadDocumentRequestsFragment(url, push = true) {
         const fragment = document.getElementById('documentRequestsFragment');
-
-        if (!fragment) {
-            return;
-        }
+        if (!fragment) return;
 
         fragment.classList.add('is-loading');
 
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to load.');
-            }
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!response.ok) throw new Error('Failed to load.');
 
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const newFragment = doc.querySelector('#documentRequestsFragment');
 
-            if (!newFragment) {
-                window.location.href = url;
-                return;
-            }
+            if (!newFragment) { window.location.href = url; return; }
 
             fragment.innerHTML = newFragment.innerHTML;
-
-            if (push) {
-                window.history.pushState({}, '', url);
-            }
+            if (push) window.history.pushState({}, '', url);
 
             bindDocumentRequestAjax();
             initDocumentRequestSearch();
-            initDocumentRequestVoice();
-        } catch (error) {
+            initFilterModal();
+            updateFilterButtonState();
+        } catch {
             window.location.href = url;
         } finally {
             fragment.classList.remove('is-loading');
@@ -1595,62 +1532,21 @@
             });
         });
 
-        const filterForm = document.querySelector('.js-ajax-filter-form');
-
-        if (filterForm && !filterForm.dataset.bound) {
-            filterForm.dataset.bound = 'true';
-
-            filterForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const url = new URL(filterForm.action, window.location.origin);
-                const formData = new FormData(filterForm);
-
-                url.search = '';
-
-                for (const [key, value] of formData.entries()) {
-                    if (String(value).trim() !== '') {
-                        url.searchParams.set(key, value);
-                    }
-                }
-
-                loadDocumentRequestsFragment(url.toString());
-            });
-        }
-
         document.querySelectorAll('.tbl-pagination a').forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 loadDocumentRequestsFragment(this.href);
             });
         });
-
-        document.querySelectorAll('.js-ajax-filter-form select').forEach(select => {
-            if (!select.dataset.bound) {
-                select.dataset.bound = 'true';
-
-                select.addEventListener('change', function () {
-                    const form = this.closest('.js-ajax-filter-form');
-
-                    if (form) {
-                        form.dispatchEvent(new Event('submit', {
-                            cancelable: true,
-                            bubbles: true
-                        }));
-                    }
-                });
-            }
-        });
     }
 
-    window.addEventListener('popstate', function () {
-        loadDocumentRequestsFragment(window.location.href, false);
-    });
+    window.addEventListener('popstate', () => loadDocumentRequestsFragment(window.location.href, false));
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
         bindDocumentRequestAjax();
         initDocumentRequestSearch();
-        initDocumentRequestVoice();
+        initFilterModal();
+        updateFilterButtonState();
     });
 </script>
 @endsection
