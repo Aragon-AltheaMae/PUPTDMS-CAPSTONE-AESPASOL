@@ -496,6 +496,7 @@
 @php
     $notifications = collect($notifications ?? []);
     $notifCount = $notifications->count();
+    $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 @endphp
 
 <body class="bg-[#F4F4F4] text-[#8B0000] min-h-screen"
@@ -1183,37 +1184,40 @@
                         </div>
 
                         <!-- For Women -->
-                        <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">
-                            <p
-                                class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                <i class="fa-solid fa-venus text-xs"></i> For Women Only <span
-                                    class="flex-1 h-px bg-[#f9e8e8]"></span>
-                            </p>
-                            <div
-                                class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                <span>Question</span><span class="text-center">YES</span><span
-                                    class="text-center">NO</span>
-                            </div>
-                            @foreach ([
-        ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
-        [
-            'name' => 'nursing',
-            'q' => 'Are you
-                nursing?',
-        ],
-        ['name' => 'birth_control', 'q' => 'Are you taking birth control pills?'],
-    ] as $i => $q)
+                        @if ($isFemalePatient)
+                            <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5" id="forWomenSection">
+                                <p
+                                    class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
+                                    <i class="fa-solid fa-venus text-xs"></i> For Women Only <span
+                                        class="flex-1 h-px bg-[#f9e8e8]"></span>
+                                </p>
                                 <div
-                                    class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
-                                    <span>{{ $q['q'] }}</span>
-                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                        class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                        required>
-                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                        class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                    class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
+                                    <span>Question</span><span class="text-center">YES</span><span
+                                        class="text-center">NO</span>
                                 </div>
-                            @endforeach
-                        </div>
+
+                                @foreach ([
+                                    ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
+                                    ['name' => 'nursing', 'q' => 'Are you nursing?'],
+                                    ['name' => 'birth_control', 'q' => 'Are you taking birth control pills?'],
+                                ] as $i => $q)
+                                    <div
+                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
+                                        <span>{{ $q['q'] }}</span>
+                                        <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
+                                            required>
+                                        <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <input type="hidden" name="pregnant" value="NO">
+                            <input type="hidden" name="nursing" value="NO">
+                            <input type="hidden" name="birth_control" value="NO">
+                        @endif
 
                         <!-- Medical Conditions -->
                         <div class="bg-[#fafaf8] rounded-2xl border border-[#e8e2dd] p-5 mb-5">

@@ -1052,29 +1052,48 @@
                                 <div class="card-header-icon"><i class="fa-solid fa-database"></i></div>
                                 <span class="card-title">Data Backup</span>
                             </div>
-                            <span
-                                style="font-size:.65rem;font-weight:700;background:#f0fdf4;color:#16a34a;padding:.25rem .6rem;border-radius:20px;border:1px solid #bbf7d0;">Healthy</span>
+
+                            @if ($autoBackupEnabled)
+                                <span style="font-size:.65rem;font-weight:700;background:#f0fdf4;color:#16a34a;padding:.25rem .6rem;border-radius:20px;border:1px solid #bbf7d0;">
+                                    Active
+                                </span>
+                            @else
+                                <span style="font-size:.65rem;font-weight:700;background:#fef3c7;color:#a16207;padding:.25rem .6rem;border-radius:20px;border:1px solid #fcd34d;">
+                                    Paused
+                                </span>
+                            @endif
                         </div>
+
                         <div style="padding:1rem;">
                             <div class="backup-status">
-                                <div class="backup-check"><i class="fa-solid fa-check"></i></div>
+                                <div class="backup-check">
+                                    <i class="fa-solid {{ $lastBackup ? 'fa-check' : 'fa-clock' }}"></i>
+                                </div>
                                 <div>
                                     <span class="backup-label">Last Backup</span>
-                                    <span class="backup-date">December 25, 2025</span>
-                                    <span class="backup-sub">✓ Completed successfully</span>
+                                    <span class="backup-date">
+                                        {{ $lastBackup ? $lastBackup->created_at->format('F d, Y h:i A') : 'No backup yet' }}
+                                    </span>
+                                    <span class="backup-sub">
+                                        {{ $lastBackup ? '✓ Completed successfully' : 'No completed backup found' }}
+                                    </span>
                                 </div>
                             </div>
+
                             <div class="next-backup">
                                 <i class="fa-regular fa-clock next-icon"></i>
                                 <div>
                                     <div class="next-label">Next Scheduled</div>
-                                    <div class="next-date">March 30, 2026</div>
+                                    <div class="next-date">
+                                        {{ $nextBackupDate ? $nextBackupDate->format('F d, Y h:i A') : 'No schedule set' }}
+                                    </div>
                                 </div>
                             </div>
-                            <button class="run-backup-btn">
+
+                            <a href="{{ route('admin.data_backup') }}" class="run-backup-btn" style="text-decoration:none;">
                                 <i class="fa-solid fa-database"></i>
-                                Run Backup Now
-                            </button>
+                                View Backups ({{ $totalBackups }})
+                            </a>
                         </div>
                     </div>
 

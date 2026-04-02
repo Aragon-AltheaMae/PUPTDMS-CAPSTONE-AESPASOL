@@ -19,6 +19,13 @@ class DataBackupController extends Controller
     public function index(Request $request)
     {
         if (!session('admin_logged_in')) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized.',
+                ], 403);
+            }
+
             return redirect('/admin/login');
         }
 
@@ -71,6 +78,38 @@ class DataBackupController extends Controller
         ];
 
         $totalAllocatedBytes = self::ALLOCATED_BYTES;
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'rows' => $backups->getCollection()->map(function ($backup) {
+                    return [
+                        'id' => $backup->id,
+                        'backup_id' => $backup->backup_id,
+                        'type' => $backup->type ?? 'full',
+                        'status' => $backup->status ?? 'completed',
+                        'size_formatted' => $backup->size_formatted ?? '0 B',
+                        'created_at_formatted' => $backup->created_at
+                            ? $backup->created_at->format('M d, Y h:i A')
+                            : '—',
+                        'download_url' => route('admin.data_backup.download', $backup->id),
+                    ];
+                })->values(),
+                'meta' => [
+                    'current_page' => $backups->currentPage(),
+                    'from' => $backups->firstItem(),
+                    'to' => $backups->lastItem(),
+                    'total' => $backups->total(),
+                    'per_page' => $backups->perPage(),
+                    'last_page' => $backups->lastPage(),
+                ],
+                'stats' => [
+                    'total_backups' => $totalBackups,
+                    'this_month_backups' => $thisMonthBackups,
+                    'last_backup' => $lastBackup?->created_at?->format('M d') ?? '—',
+                ],
+            ]);
+        }
 
         return view('admin.data-backup', compact(
             'backups',
