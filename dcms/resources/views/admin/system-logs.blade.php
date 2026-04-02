@@ -512,6 +512,7 @@
             font-weight: 600;
             color: #333333;
             font-size: .78rem;
+            white-space: nowrap;
         }
 
         .sl-action {
@@ -1363,9 +1364,9 @@
                                 <th style="width:100px;">ID</th>
                                 <th style="width:150px;">Timestamp</th>
                                 <th style="width:150px;">Role</th>
-                                <th style="width:130px;">User</th>
-                                <th style="width:170px;">Action</th>
-                                <th style="width:210px;">Module</th>
+                                <th style="width:180px;">User</th>
+                                <th style="width:150px;">Action</th>
+                                <th style="width:200px;">Module</th>
                                 <th>Description</th>
                             </tr>
                         </thead>
@@ -1396,7 +1397,7 @@
                                         'patient' => 'fa-user',
                                         default => 'fa-circle-user',
                                     };
-                                    $avatarLetter = strtoupper(substr($log->actor_identifier ?? $role, 0, 1));
+                                    $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
                                 @endphp
                                 <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
                                     <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span></td>
@@ -1409,7 +1410,7 @@
                                     <td>
                                         <div class="sl-user">
                                             <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                                            <span class="sl-username">{{ $log->actor_identifier ?? '—' }}</span>
+                                            <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
                                         </div>
                                     </td>
                                     <td><span class="sl-action {{ $actionClass }}"><i
@@ -1751,7 +1752,7 @@
                         'delete') ? 'delete' : 'default';
                 var actionIcon = actionIcons[actionClass] || 'fa-bolt';
                 var roleIcon = roleIcons[role] || 'fa-circle-user';
-                var letter = (log.actor_identifier || role).charAt(0).toUpperCase();
+                var letter = (log.actor_name || role).charAt(0).toUpperCase();
                 var idPadded = '#' + String(log.id).padStart(3, '0');
                 var actionLabel = (log.action || '').replace(/_/g, ' ').replace(/\b\w/g, function(c) {
                     return c.toUpperCase();
@@ -1766,8 +1767,8 @@
                     '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
                 html += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role
                     .charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
-                html += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter +
-                    '</div><span class="sl-username">' + (log.actor_identifier || '—') + '</span></div></td>';
+               html += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter +
+    '</div><span class="sl-username">' + (log.actor_name || 'Unknown User') + '</span></div></td>';
                 html += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon +
                     '"></i>' + actionLabel + '</span></td>';
                 html += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel +
