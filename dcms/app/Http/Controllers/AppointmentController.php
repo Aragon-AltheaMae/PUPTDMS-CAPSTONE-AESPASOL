@@ -224,6 +224,9 @@ class AppointmentController extends Controller
             return redirect()->route('login')->with('error', 'Please login first!');
         }
 
+        $patient = Patient::findOrFail($patientId);
+        $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
+
         // Convert UI "1:00 PM" -> DB TIME "13:00:00"
         try {
             $mysqlTime = $this->toMysqlTime($request->appointment_time);
@@ -311,6 +314,14 @@ class AppointmentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, that time slot was already taken. Please choose another time.');
+        }
+
+        if (! $isFemalePatient) {
+            $request->merge([
+                'pregnant' => 'NO',
+                'nursing' => 'NO',
+                'birth_control' => 'NO',
+            ]);
         }
 
         $signaturePath = $request->file('patient_signature')->store('signatures', 'public');

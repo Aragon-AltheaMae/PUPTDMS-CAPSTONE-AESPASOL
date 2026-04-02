@@ -28,8 +28,7 @@
     }
 
     .backup-run-btn {
-        background: linear-gradient(135deg, var(--crimson, #8B0000) 0%, 
-                    var(--crimson-dark, #6b0000) 100%);
+        background: linear-gradient(135deg, var(--crimson, #8B0000) 0%, var(--crimson-dark, #6b0000) 100%);
         color: #fff;
         font-weight: 800;
         font-size: .8rem;
@@ -48,7 +47,7 @@
     .backup-run-btn:hover {
         transform: translateY(-1px);
     }
-    /* Page Banner */
+
     .page-banner {
         background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
         padding: 1.75rem 2rem 2rem;
@@ -738,6 +737,38 @@
         color: #374151;
     }
 
+    .loading-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .loading-overlay.show {
+        display: flex;
+    }
+
+    .loading-spinner {
+        width: 34px;
+        height: 34px;
+        border: 3px solid #f3d3d3;
+        border-top-color: #8B0000;
+        border-radius: 50%;
+        animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .spin {
+        animation: spin .8s linear infinite;
+        display: inline-block;
+    }
+
     [data-theme="dark"] #toastContainer .toast {
         background: #161b22;
         border-color: #21262d;
@@ -750,15 +781,6 @@
     [data-theme="dark"] .toast-msg,
     [data-theme="dark"] .toast-close {
         color: #9ca3af;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .spin {
-        animation: spin .8s linear infinite;
-        display: inline-block;
     }
 
     [data-theme="dark"] .backup-page {
@@ -889,41 +911,33 @@
 
 <div id="backupModal">
     <div class="backup-modal-inner">
-        <div style="width:52px;height:52px;background:linear-gradient(135deg,#8B0000,#6b0000);
-        border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#8B0000,#6b0000);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
             <i id="modalIcon" class="fa-solid fa-database" style="color:#fff;font-size:1.2rem;"></i>
         </div>
 
-        <div id="modalTitle" style="font-size:.95rem;font-weight:800;
-            color:#1f2937;margin-bottom:.3rem;">
-                Creating Backup...
-            </div>
+        <div id="modalTitle" style="font-size:.95rem;font-weight:800;color:#1f2937;margin-bottom:.3rem;">
+            Creating Backup...
+        </div>
 
         <div id="modalSubtitle" style="font-size:.76rem;color:#9ca3af;margin-bottom:1.25rem;">
             Please wait while the system archives your data.
         </div>
 
         <div style="background:#f3f4f6;border-radius:99px;height:7px;overflow:hidden;margin-bottom:.4rem;">
-            <div id="modalBar" style="height:100%;border-radius:99px;
-                background:linear-gradient(90deg,#8B0000,#c0392b);
-                width:0%;transition:width .3s ease;"></div>
+            <div id="modalBar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#8B0000,#c0392b);width:0%;transition:width .3s ease;"></div>
         </div>
 
-        <div id="modalPct" style="font-size:.7rem;
-            color:#9ca3af;text-align:right;margin-bottom:1.25rem;">0%</div>
+        <div id="modalPct" style="font-size:.7rem;color:#9ca3af;text-align:right;margin-bottom:1.25rem;">0%</div>
+
         <button class="terms-cancel-btn" id="modalClose" onclick="closeModal()" disabled>
             Close
         </button>
     </div>
 </div>
 
-<div id="scheduleModal" style="position:fixed;inset:0;background:rgba(0,0,0,.45);
-    z-index:10000;display:none;align-items:center;justify-content:center;">
-
-    <div style="background:#fff;border-radius:18px;padding:1.5rem;width:460px;
-        max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.2);">
-        <div style="display:flex;align-items:center;
-            justify-content:space-between;margin-bottom:1rem;">
+<div id="scheduleModal" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:18px;padding:1.5rem;width:460px;max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
             <div>
                 <div style="font-size:1rem;font-weight:800;color:#1f2937;">
                     Edit Backup Schedule
@@ -933,9 +947,7 @@
                 </div>
             </div>
 
-            <button type="button" onclick="closeScheduleModal()" 
-                style="border:none;background:none;
-                    font-size:1rem;color:#9ca3af;cursor:pointer;">
+            <button type="button" onclick="closeScheduleModal()" style="border:none;background:none;font-size:1rem;color:#9ca3af;cursor:pointer;">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -943,51 +955,33 @@
         <form id="scheduleForm">
             <div style="display:grid;gap:1rem;">
                 <div>
-                    <label style="display:flex;align-items:center;justify-content:space-between;
-                        font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
-                        <span>
-                            Daily Incremental
-                        </span>
-                        <input type="checkbox" id="daily_enabled" 
-                            {{ $backupSchedule['daily_enabled'] ? 'checked' : '' }}>
+                    <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
+                        <span>Daily Incremental</span>
+                        <input type="checkbox" id="daily_enabled" {{ $backupSchedule['daily_enabled'] ? 'checked' : '' }}>
                     </label>
-                    <input type="time" id="daily_time" value="{{ $backupSchedule['daily_time'] }}" 
-                        style="width:100%;height:40px;
-                        border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
+                    <input type="time" id="daily_time" value="{{ $backupSchedule['daily_time'] }}" style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
                 </div>
 
                 <div>
-                    <label style="display:flex;align-items:center;justify-content:space-between;
-                        font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
-                        <span>
-                            Weekly Full Backup
-                        </span>
-                        <input type="checkbox" id="weekly_enabled" 
-                            {{ $backupSchedule['weekly_enabled'] ? 'checked' : '' }}>
+                    <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
+                        <span>Weekly Full Backup</span>
+                        <input type="checkbox" id="weekly_enabled" {{ $backupSchedule['weekly_enabled'] ? 'checked' : '' }}>
                     </label>
-                    <input type="time" id="weekly_time" value="{{ $backupSchedule['weekly_time'] }}" 
-                        style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
+                    <input type="time" id="weekly_time" value="{{ $backupSchedule['weekly_time'] }}" style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
                 </div>
 
                 <div>
-                    <label style="display:flex;align-items:center;justify-content:space-between;
-                        font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
-                        <span>
-                            Monthly Archive
-                        </span>
-                        <input type="checkbox" id="monthly_enabled" 
-                            {{ $backupSchedule['monthly_enabled'] ? 'checked' : '' }}>
+                    <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;font-weight:700;color:#374151;margin-bottom:.45rem;">
+                        <span>Monthly Archive</span>
+                        <input type="checkbox" id="monthly_enabled" {{ $backupSchedule['monthly_enabled'] ? 'checked' : '' }}>
                     </label>
-                    <input type="time" id="monthly_time" value="{{ $backupSchedule['monthly_time'] }}" 
-                        style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
+                    <input type="time" id="monthly_time" value="{{ $backupSchedule['monthly_time'] }}" style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 .8rem;">
                 </div>
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;">
-                <button type="button" onclick="closeScheduleModal()" 
-                    class="filter-reset-btn">Cancel</button>
-                <button type="submit" class="backup-run-btn" 
-                    style="padding:.72rem 1rem;">Save Changes</button>
+                <button type="button" onclick="closeScheduleModal()" class="filter-reset-btn">Cancel</button>
+                <button type="submit" class="backup-run-btn" style="padding:.72rem 1rem;">Save Changes</button>
             </div>
         </form>
     </div>
@@ -995,35 +989,30 @@
 
 <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-[calc(100vh-82px)]">
     <div class="max-w-[1280px] mx-auto">
-        
+
         <div class="page-banner">
             <div class="page-banner-inner">
+                <div>
+                    <h1 class="page-title">Data Backup</h1>
+                </div>
 
-        <div>
-            <h1 class="page-title">Data Backup</h1>
+                <div class="flex items-center gap-3">
+                    <button id="backupNowBtn" onclick="startBackup()"
+                        class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+                        <i class="fa-solid fa-database"></i>
+                        Backup Now
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="flex items-center gap-3">
-            <button onclick="startBackup()"
-                class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
-                px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
-                <i class="fa-solid fa-database"></i>
-                Backup Now
-            </button>
-        </div>
-
-    </div>
-</div>
 
         <div class="backup-stats" id="backupStats">
             <span class="stats-indicator" id="statsIndicator"></span>
-            
+
             <button id="stat-all"
                 type="button"
-                class="backup-stat clickable {{ !request()->filled('type') && 
-                    !request()->filled('status') && !request()->filled('scope') && 
-                    request('stat') !== 'last' && request('stat') !== 'auto' ? 'active' : '' }}"
-                onclick="animateThenGo(this, '{{ route('admin.data_backup') }}')">
+                class="backup-stat clickable {{ !request()->filled('type') && !request()->filled('status') && !request()->filled('scope') && request('stat') !== 'last' && request('stat') !== 'auto' ? 'active' : '' }}"
+                onclick="applyFilters({ scope: '', stat: '' }, this)">
                 <div class="backup-stat-value red">{{ $totalBackups }}</div>
                 <div class="backup-stat-label">Total Backups</div>
             </button>
@@ -1031,15 +1020,15 @@
             <button id="stat-month"
                 type="button"
                 class="backup-stat clickable {{ request('scope') === 'month' ? 'active' : '' }}"
-                onclick="animateThenGo(this, '{{ route('admin.data_backup', ['scope' => 'month']) }}')">
+                onclick="applyFilters({ scope: 'month', stat: '' }, this)">
                 <div class="backup-stat-value green">{{ $thisMonthBackups ?? 0 }}</div>
                 <div class="backup-stat-label">This Month</div>
             </button>
 
             <button id="stat-last"
-                    type="button"
-                    class="backup-stat clickable {{ request('stat') === 'last' ? 'active' : '' }}"
-                    onclick="setActiveStat(this); scrollToTable()">
+                type="button"
+                class="backup-stat clickable {{ request('stat') === 'last' ? 'active' : '' }}"
+                onclick="setActiveStat(this); scrollToTable()">
                 <div class="backup-stat-value green">
                     {{ isset($lastBackup) && $lastBackup ? $lastBackup->created_at->format('M d') : '—' }}
                 </div>
@@ -1047,16 +1036,20 @@
             </button>
 
             <button id="stat-auto"
-                    type="button"
-                    class="backup-stat clickable {{ request('stat') === 'auto' ? 'active' : '' }}"
-                    onclick="setActiveStat(this); openScheduleModal(true)">
-                <div class="backup-stat-value green">{{ $autoBackupEnabled ? 'Active' : 'Paused' }}</div>
+                type="button"
+                class="backup-stat clickable {{ request('stat') === 'auto' ? 'active' : '' }}"
+                onclick="setActiveStat(this); openScheduleModal(true)">
+                <div class="backup-stat-value green" id="autoScheduleStatValue">{{ $autoBackupEnabled ? 'Active' : 'Paused' }}</div>
                 <div class="backup-stat-label">Auto-Schedule</div>
             </button>
         </div>
 
         <div class="backup-main">
-            <div class="card">
+            <div class="card" id="backupHistoryCard" style="position:relative;">
+                <div class="loading-overlay" id="tableLoading">
+                    <div class="loading-spinner"></div>
+                </div>
+
                 <div class="card-header">
                     <div class="card-header-left">
                         <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -1066,13 +1059,11 @@
                         </div>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.data_backup') }}" 
-                        class="toolbar" id="backupFilterForm">
+                    <form method="GET" action="{{ route('admin.data_backup') }}" class="toolbar" id="backupFilterForm">
                         <select name="type" id="typeFilter">
                             <option value="">All Types</option>
                             <option value="full" {{ request('type') === 'full' ? 'selected' : '' }}>Full</option>
-                            <option value="incremental" 
-                                {{ request('type') === 'incremental' ? 'selected' : '' }}>Incremental</option>
+                            <option value="incremental" {{ request('type') === 'incremental' ? 'selected' : '' }}>Incremental</option>
                         </select>
 
                         <select name="status" id="statusFilter">
@@ -1082,9 +1073,13 @@
                             <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
                         </select>
 
-                        @if(request()->filled('type') || request()->filled('status'))
-                            <a href="{{ route('admin.data_backup') }}" class="filter-reset-btn">Reset</a>
-                        @endif
+                        <a href="{{ route('admin.data_backup') }}"
+                           class="filter-reset-btn"
+                           id="resetFiltersBtn"
+                           style="{{ request()->filled('type') || request()->filled('status') || request()->filled('scope') ? '' : 'display:none;' }}"
+                           onclick="event.preventDefault(); resetAjaxFilters();">
+                           Reset
+                        </a>
                     </form>
                 </div>
 
@@ -1115,8 +1110,7 @@
                                         </span>
                                     </td>
                                     <td style="font-weight:700;">
-                                        {{ isset($backup->size_formatted) ? $backup->size_formatted : 
-                                            $formatBytes($backup->size_bytes ?? 0) }}
+                                        {{ isset($backup->size_formatted) ? $backup->size_formatted : $formatBytes($backup->size_bytes ?? 0) }}
                                     </td>
                                     <td>
                                         <span class="status-pill {{ $backup->status ?? 'completed' }}">
@@ -1125,16 +1119,13 @@
                                     </td>
                                     <td>
                                         <div class="table-actions">
-                                            <a class="act-btn dl" title="Download" 
-                                                href="{{ route('admin.data_backup.download', $backup->id) }}">
+                                            <a class="act-btn dl" title="Download" href="{{ route('admin.data_backup.download', $backup->id) }}">
                                                 <i class="fa-solid fa-download"></i>
                                             </a>
-                                            <button type="button" class="act-btn restore" title="Restore" 
-                                                onclick="restoreBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                            <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
                                                 <i class="fa-solid fa-rotate-left"></i>
                                             </button>
-                                            <button type="button" class="act-btn del" title="Delete" 
-                                                onclick="deleteBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                            <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
@@ -1145,10 +1136,8 @@
                                     <td colspan="6">
                                         <div class="empty-state">
                                             <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
-                                            <p style="font-size:.9rem;font-weight:800;
-                                                color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
-                                            <p style="font-size:.78rem;color:#b0b7c3;margin:0;">
-                                                Create your first backup to start protecting system data</p>
+                                            <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                                            <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -1157,10 +1146,13 @@
                     </table>
                 </div>
 
-                <div class="table-footer">
-                    <span>Showing {{ $backups->firstItem() ?? 0 }}–{{ $backups->lastItem() ?? 0 }} of 
-                        {{ $backups->total() }} backups</span>
-                    <div>{{ $backups->links() }}</div>
+                <div class="table-footer" id="backupTableFooter">
+                    <span id="backupTableSummary">
+                        Showing {{ $backups->firstItem() ?? 0 }}–{{ $backups->lastItem() ?? 0 }} of {{ $backups->total() }} backups
+                    </span>
+                    <div id="backupPagination">
+                        {{ $backups->links() }}
+                    </div>
                 </div>
             </div>
 
@@ -1219,7 +1211,7 @@
                         <div class="schedule-item">
                             <div>
                                 <div class="schedule-title">Daily Incremental</div>
-                                <div class="schedule-time">
+                                <div class="schedule-time" data-time-label="daily">
                                     Every day at {{ \Carbon\Carbon::createFromFormat('H:i', $backupSchedule['daily_time'])->format('g:i A') }}
                                 </div>
                             </div>
@@ -1236,7 +1228,7 @@
                         <div class="schedule-item">
                             <div>
                                 <div class="schedule-title">Weekly Full Backup</div>
-                                <div class="schedule-time">
+                                <div class="schedule-time" data-time-label="weekly">
                                     Every Sunday at {{ \Carbon\Carbon::createFromFormat('H:i', $backupSchedule['weekly_time'])->format('g:i A') }}
                                 </div>
                             </div>
@@ -1253,7 +1245,7 @@
                         <div class="schedule-item">
                             <div>
                                 <div class="schedule-title">Monthly Archive</div>
-                                <div class="schedule-time">
+                                <div class="schedule-time" data-time-label="monthly">
                                     1st of every month at {{ \Carbon\Carbon::createFromFormat('H:i', $backupSchedule['monthly_time'])->format('g:i A') }}
                                 </div>
                             </div>
@@ -1286,6 +1278,254 @@
 
     const restoreUrlTemplate = @json(route('admin.data_backup.restore', ['id' => '__ID__']));
     const deleteUrlTemplate = @json(route('admin.data_backup.delete', ['id' => '__ID__']));
+    const dataBackupUrl = @json(route('admin.data_backup'));
+
+    let currentFilters = {
+        type: @json(request('type', '')),
+        status: @json(request('status', '')),
+        scope: @json(request('scope', '')),
+        stat: @json(request('stat', ''))
+    };
+
+    function formatTimeTo12Hour(time24) {
+        if (!time24) return '';
+        const parts = time24.split(':');
+        const hours = parseInt(parts[0], 10);
+        const minutes = parts[1] || '00';
+        const suffix = hours >= 12 ? 'PM' : 'AM';
+        const hour12 = hours % 12 || 12;
+        return `${hour12}:${minutes} ${suffix}`;
+    }
+
+    function refreshAutoScheduleStat() {
+        const statValue = document.getElementById('autoScheduleStatValue');
+        if (!statValue) return;
+
+        const hasEnabled =
+            !!backupSchedule.daily_enabled ||
+            !!backupSchedule.weekly_enabled ||
+            !!backupSchedule.monthly_enabled;
+
+        scheduleOn = hasEnabled;
+        statValue.textContent = hasEnabled ? 'Active' : 'Paused';
+    }
+
+    function updateScheduleUI() {
+        const items = document.querySelectorAll('#scheduleCard .schedule-item');
+        const types = ['daily', 'weekly', 'monthly'];
+
+        items.forEach((item, index) => {
+            const type = types[index];
+            const enabled = !!backupSchedule[type + '_enabled'];
+
+            const pill = item.querySelector('.schedule-pill');
+            pill.textContent = enabled ? 'Active' : 'Paused';
+            pill.className = 'schedule-pill ' + (enabled ? 'active' : 'paused');
+
+            const toggle = item.querySelector('.schedule-toggle');
+            const thumb = item.querySelector('.schedule-thumb');
+
+            toggle.style.background = enabled ? '#8B0000' : '#d1d5db';
+            thumb.style.left = enabled ? '16px' : '2px';
+        });
+
+        const dailyTimeLabel = document.querySelector('[data-time-label="daily"]');
+        const weeklyTimeLabel = document.querySelector('[data-time-label="weekly"]');
+        const monthlyTimeLabel = document.querySelector('[data-time-label="monthly"]');
+
+        if (dailyTimeLabel) {
+            dailyTimeLabel.textContent = `Every day at ${formatTimeTo12Hour(backupSchedule.daily_time)}`;
+        }
+
+        if (weeklyTimeLabel) {
+            weeklyTimeLabel.textContent = `Every Sunday at ${formatTimeTo12Hour(backupSchedule.weekly_time)}`;
+        }
+
+        if (monthlyTimeLabel) {
+            monthlyTimeLabel.textContent = `1st of every month at ${formatTimeTo12Hour(backupSchedule.monthly_time)}`;
+        }
+
+        refreshAutoScheduleStat();
+    }
+
+    function setLoading(show) {
+        const loading = document.getElementById('tableLoading');
+        if (!loading) return;
+        loading.classList.toggle('show', show);
+    }
+
+    function updateUrlFromFilters() {
+        const url = new URL(window.location.href);
+
+        ['type', 'status', 'scope', 'stat'].forEach(key => {
+            if (currentFilters[key]) {
+                url.searchParams.set(key, currentFilters[key]);
+            } else {
+                url.searchParams.delete(key);
+            }
+        });
+
+        window.history.replaceState({}, '', url);
+    }
+
+    function updateResetButtonVisibility() {
+        const resetBtn = document.getElementById('resetFiltersBtn');
+        if (!resetBtn) return;
+
+        const hasFilters = !!currentFilters.type || !!currentFilters.status || !!currentFilters.scope;
+        resetBtn.style.display = hasFilters ? '' : 'none';
+    }
+
+    function syncFilterInputs() {
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+
+        if (typeFilter) typeFilter.value = currentFilters.type || '';
+        if (statusFilter) statusFilter.value = currentFilters.status || '';
+    }
+
+    function setStatActiveByFilters() {
+        const statAll = document.getElementById('stat-all');
+        const statMonth = document.getElementById('stat-month');
+
+        if (!statAll || !statMonth) return;
+
+        if (currentFilters.scope === 'month') {
+            setActiveStat(statMonth);
+        } else if (!currentFilters.type && !currentFilters.status && !currentFilters.scope && currentFilters.stat !== 'auto' && currentFilters.stat !== 'last') {
+            setActiveStat(statAll);
+        }
+    }
+
+    function renderTableRows(rows) {
+        const tbody = document.getElementById('backupTableBody');
+        if (!tbody) return;
+
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
+                            <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                            <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = rows.map(backup => `
+            <tr id="row-${backup.id}">
+                <td>
+                    <div class="backup-id">${backup.backup_id}</div>
+                </td>
+                <td>${backup.created_at_formatted || '—'}</td>
+                <td>
+                    <span class="type-pill ${backup.type === 'full' ? 'full' : 'incremental'}">
+                        ${(backup.type || 'full').charAt(0).toUpperCase() + (backup.type || 'full').slice(1)}
+                    </span>
+                </td>
+                <td style="font-weight:700;">
+                    ${backup.size_formatted || '0 B'}
+                </td>
+                <td>
+                    <span class="status-pill ${backup.status || 'completed'}">
+                        ${String(backup.status || 'completed').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    </span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <a class="act-btn dl" title="Download" href="${backup.download_url}">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                        <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup(${backup.id}, '${backup.backup_id}')">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                        <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup(${backup.id}, '${backup.backup_id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderTableFooter(meta) {
+        const summary = document.getElementById('backupTableSummary');
+        const pagination = document.getElementById('backupPagination');
+
+        if (summary) {
+            summary.textContent = `Showing ${meta.from ?? 0}–${meta.to ?? 0} of ${meta.total ?? 0} backups`;
+        }
+
+        if (pagination) {
+            pagination.innerHTML = '';
+        }
+    }
+
+    async function fetchBackupTable() {
+        try {
+            setLoading(true);
+
+            const url = new URL(dataBackupUrl, window.location.origin);
+            if (currentFilters.type) url.searchParams.set('type', currentFilters.type);
+            if (currentFilters.status) url.searchParams.set('status', currentFilters.status);
+            if (currentFilters.scope) url.searchParams.set('scope', currentFilters.scope);
+            if (currentFilters.stat) url.searchParams.set('stat', currentFilters.stat);
+
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to load backups.');
+            }
+
+            renderTableRows(result.rows || []);
+            renderTableFooter(result.meta || {});
+            updateUrlFromFilters();
+            updateResetButtonVisibility();
+            syncFilterInputs();
+            setStatActiveByFilters();
+            moveStatsIndicator();
+        } catch (error) {
+            showToast('Load Failed', error.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function applyFilters(newValues = {}, clickedStatEl = null) {
+        currentFilters = {
+            ...currentFilters,
+            ...newValues
+        };
+
+        if (clickedStatEl) {
+            setActiveStat(clickedStatEl);
+        }
+
+        fetchBackupTable();
+    }
+
+    function resetAjaxFilters() {
+        currentFilters = {
+            type: '',
+            status: '',
+            scope: '',
+            stat: ''
+        };
+
+        syncFilterInputs();
+        fetchBackupTable();
+    }
 
     async function startBackup() {
         const modal = document.getElementById('backupModal');
@@ -1345,9 +1585,8 @@
             icon.className = 'fa-solid fa-circle-check';
             btn.disabled = false;
 
-            showToast('Backup Complete', result.message || 
-                'New backup saved successfully.', 'success');
-            setTimeout(() => window.location.reload(), 1000);
+            showToast('Backup Complete', result.message || 'New backup saved successfully.', 'success');
+            await fetchBackupTable();
         } catch (error) {
             clearInterval(fakeProgress);
             title.textContent = 'Backup Failed';
@@ -1396,8 +1635,11 @@
     }
 
     async function toggleSchedule(type) {
+        const originalValue = !!backupSchedule[type + '_enabled'];
+
         try {
-            backupSchedule[type + '_enabled'] = !backupSchedule[type + '_enabled'];
+            backupSchedule[type + '_enabled'] = !originalValue;
+            updateScheduleUI();
 
             const response = await fetch("{{ route('admin.data_backup.update_schedule') }}", {
                 method: 'POST',
@@ -1419,14 +1661,17 @@
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                backupSchedule[type + '_enabled'] = !backupSchedule[type + '_enabled'];
+                backupSchedule[type + '_enabled'] = originalValue;
+                updateScheduleUI();
                 throw new Error(result.message || 'Failed to update schedule.');
             }
 
             scheduleOn = !!result.auto_backup_enabled;
+            refreshAutoScheduleStat();
             showToast('Schedule Updated', result.message, 'success');
-            setTimeout(() => window.location.reload(), 1200);
         } catch (error) {
+            backupSchedule[type + '_enabled'] = originalValue;
+            updateScheduleUI();
             showToast('Schedule Update Failed', error.message, 'error');
         }
     }
@@ -1477,7 +1722,6 @@
             if (row) row.remove();
 
             showToast('Deleted', result.message, 'success');
-            setTimeout(() => window.location.reload(), 700);
         } catch (error) {
             showToast('Delete Failed', error.message, 'error');
         }
@@ -1487,13 +1731,6 @@
         document.querySelectorAll('.backup-stat').forEach(stat => stat.classList.remove('active'));
         el.classList.add('active');
         requestAnimationFrame(moveStatsIndicator);
-    }
-
-    function animateThenGo(el, url) {
-        setActiveStat(el);
-        setTimeout(() => {
-            window.location = url;
-        }, 380);
     }
 
     function moveStatsIndicator() {
@@ -1547,20 +1784,25 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const filterForm = document.getElementById('backupFilterForm');
         const typeFilter = document.getElementById('typeFilter');
         const statusFilter = document.getElementById('statusFilter');
         const scheduleForm = document.getElementById('scheduleForm');
 
         if (typeFilter) {
             typeFilter.addEventListener('change', function () {
-                filterForm.submit();
+                applyFilters({
+                    type: this.value,
+                    stat: ''
+                });
             });
         }
 
         if (statusFilter) {
             statusFilter.addEventListener('change', function () {
-                filterForm.submit();
+                applyFilters({
+                    status: this.value,
+                    stat: ''
+                });
             });
         }
 
@@ -1598,11 +1840,12 @@
                     backupSchedule.weekly_time = document.getElementById('weekly_time').value;
                     backupSchedule.monthly_enabled = document.getElementById('monthly_enabled').checked;
                     backupSchedule.monthly_time = document.getElementById('monthly_time').value;
+
                     scheduleOn = !!result.auto_backup_enabled;
 
                     closeScheduleModal();
+                    updateScheduleUI();
                     showToast('Schedule Updated', result.message, 'success');
-                    setTimeout(() => window.location.reload(), 700);
                 } catch (error) {
                     showToast('Schedule Update Failed', error.message, 'error');
                 }
@@ -1610,6 +1853,8 @@
         }
 
         moveStatsIndicator();
+        updateScheduleUI();
+        updateResetButtonVisibility();
     });
 
     window.addEventListener('resize', moveStatsIndicator);
@@ -1620,8 +1865,7 @@
         t.className = 'toast ' + type;
         t.innerHTML = `
             <div class="toast-icon-wrap">
-                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 
-                    'fa-circle-exclamation'} toast-icon"></i>
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'} toast-icon"></i>
             </div>
             <div class="toast-body">
                 <div class="toast-title">${title}</div>
