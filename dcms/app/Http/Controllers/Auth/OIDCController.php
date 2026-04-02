@@ -311,9 +311,10 @@ class OIDCController extends Controller
             }
 
             session([
-                'role'       => 'patient',
-                'patient_id' => $patient->id,
-                'email'      => $patient->email,
+                'role'         => 'patient',
+                'patient_id'   => $patient->id,
+                'patient_name' => $patient->name,
+                'email'        => $patient->email,
             ]);
 
             session()->save();
@@ -330,6 +331,7 @@ class OIDCController extends Controller
                 'admin_logged_in' => true,
                 'role'            => $roleSlug,
                 'admin_id'        => $user->id,
+                'admin_name'      => $user->name,
                 'admin_email'     => $user->email,
             ]);
 
@@ -343,6 +345,8 @@ class OIDCController extends Controller
         if ($roleSlug === 'dentist') {
             session([
                 'role'          => 'dentist',
+                'dentist_id'    => $user->id,
+                'dentist_name'  => $user->name,
                 'dentist_email' => $user->email,
             ]);
 
