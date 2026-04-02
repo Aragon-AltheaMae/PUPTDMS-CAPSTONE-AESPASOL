@@ -1,5 +1,4 @@
-
-<style>    
+<style>
     :root {
         --crimson: #8B0000;
         --crimson-dark: #6b0000;
@@ -386,5 +385,78 @@
     [data-theme="dark"] .terms-cancel-btn:hover {
         background: #374151;
         color: #e5e7eb;
+    }
+
+    @media (min-width: 768px) {
+        body.role-patient.sidebar-collapsed #sidebar {
+            width: 88px;
+        }
+
+        body.role-patient.sidebar-collapsed #mainContent {
+            margin-left: 88px !important;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .nav-section-label,
+        body.role-patient.sidebar-collapsed #sidebar .menu-text {
+            opacity: 0;
+            transform: translateX(-10px);
+            pointer-events: none;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .nav-link,
+        body.role-patient.sidebar-collapsed #sidebar .logout-btn {
+            justify-content: center;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .nav-link i {
+            width: auto;
+            margin-right: 0;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .logout-btn .logout-icon {
+            margin: 0;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .sidebar-inner {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        body.role-patient.sidebar-collapsed #sidebar .sidebar-bottom {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+
+    #sidebar .nav-section-label,
+    #sidebar .menu-text,
+    #sidebar .logout-btn,
+    #sidebar .nav-link {
+        transition: all 0.25s ease;
+    }
+
+    .sidebar-toggle-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: none;
+        background: #fef2f2;
+        color: #8B0000;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        transition: background .15s ease, color .15s ease;
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #fce8e8;
+    }
+
+    body.role-patient.sidebar-collapsed #sidebar .toggle-row {
+        justify-content: center !important;
     }
 </style>

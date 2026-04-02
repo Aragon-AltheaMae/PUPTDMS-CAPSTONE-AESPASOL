@@ -33,7 +33,7 @@ use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
-
+use App\Http\Controllers\Dentist\DentistDashboardController;
 
 // routes/web.php
 
@@ -658,21 +658,66 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
 
 Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
-    // Dashboard Route
     Route::get('/dashboard', function () {
         $now   = \Carbon\Carbon::now();
         $today = $now->toDateString();
 
         $todayAppointments = \App\Models\Appointment::with('patient')
             ->whereDate('appointment_date', $today)
-            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereIn('status', ['upcoming', 'rescheduled', 'pending', 'confirmed'])
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $appointmentCountsPerDay = \App\Models\Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->selectRaw('appointment_date, COUNT(*) as count')
-            ->groupBy('appointment_date')
-            ->pluck('count', 'appointment_date')
+        $startOfMonth = $now->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $now->copy()->endOfMonth()->toDateString();
+
+        $calendarAppointments = \App\Models\Appointment::with('patient')
+            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+            ->whereIn('status', ['pending', 'confirmed', 'upcoming', 'rescheduled', 'completed'])
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $appointmentCountsPerDay = $calendarAppointments
+            ->groupBy(function ($appointment) {
+                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            })
+            ->map(function ($items) {
+                return $items->count();
+            })
+            ->toArray();
+
+        $calendarAppointmentDetails = $calendarAppointments
+            ->groupBy(function ($appointment) {
+                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            })
+            ->map(function ($items) {
+                return $items->map(function ($appointment) {
+                    $name = $appointment->patient->name ?? 'Unknown Patient';
+
+                    $time = !empty($appointment->appointment_time)
+                        ? \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A')
+                        : '—';
+
+                    $service = $appointment->service_type === 'others'
+                        ? ($appointment->other_services ?? 'Other Service')
+                        : ($appointment->service_type ?? 'General Service');
+
+                    return [
+                        'id' => $appointment->id,
+                        'name' => $name,
+                        'time' => $time,
+                        'service' => ucwords($service),
+                        'status' => $appointment->status ?? 'pending',
+                        'date' => \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
+                        'patientProfileUrl' => $appointment->patient_id
+                        ? route('dentist.dentist.patient.profile', $appointment->patient_id)
+                        : '#',
+                        'rescheduleUrl' => route('dentist.dentist.appointments.reschedule', $appointment->id),
+                        'cancelUrl' => route('dentist.dentist.appointments.cancel', $appointment->id),
+                    ];
+                })->values()->toArray();
+            })
             ->toArray();
 
         $dentalCasesThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
@@ -693,12 +738,12 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
         $totalApptsThisMonth = \App\Models\Appointment::whereYear('appointment_date', $now->year)
             ->whereMonth('appointment_date', $now->month)
-            ->whereIn('status', ['upcoming', 'rescheduled', 'completed', 'cancelled'])
+            ->whereIn('status', ['upcoming', 'rescheduled', 'completed', 'cancelled', 'pending', 'confirmed'])
             ->count();
 
         $totalApptsLastMonth = \App\Models\Appointment::whereYear('appointment_date', $lastMonth->year)
             ->whereMonth('appointment_date', $lastMonth->month)
-            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->whereIn('status', ['pending', 'confirmed', 'upcoming', 'rescheduled', 'completed', 'cancelled'])
             ->count();
 
         $totalApptsDelta = $totalApptsLastMonth > 0
@@ -736,11 +781,14 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
         $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
         $notifications = collect([]);
+        $unavailableDates = [];
 
         return view('dentist.dentist-dashboard', compact(
             'todayAppointments',
             'appointmentCountsPerDay',
+            'calendarAppointmentDetails',
             'philippineHolidays',
+            'unavailableDates',
             'notifications',
             'dentalCasesThisMonth',
             'dentalCasesDelta',

@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dental Clinic</title>
 </head>
-<body>
+
+<body class="role-{{ $role ?? (optional(optional(auth()->user())->role)->slug ?? 'patient') }}">
     <div class="container">
         @yield('content')
     </div>
 </body>
+
 </html>

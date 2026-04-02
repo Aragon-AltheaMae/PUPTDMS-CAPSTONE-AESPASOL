@@ -1,5 +1,88 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    function updateSidebarToggleIcon() {
+        const icon = document.getElementById('sidebarToggleIcon');
+        if (!icon) return;
+
+        if (document.body.classList.contains('sidebar-collapsed')) {
+            icon.classList.remove('fa-xmark');
+            icon.classList.add('fa-bars');
+        } else {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-xmark');
+        }
+    }
+
+    const body = document.body;
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+    const desktopBreakpoint = window.matchMedia('(min-width: 1024px)');
+
+    if (desktopSidebarToggle) {
+        desktopSidebarToggle.addEventListener('click', function (e) {
+            if (!desktopBreakpoint.matches) return;
+            e.preventDefault();
+            toggleDesktopSidebar();
+        });
+    }
+
+    function getRoleFromBody() {
+        if (body.classList.contains('role-dentist')) return 'dentist';
+        if (body.classList.contains('role-patient')) return 'patient';
+        return 'default';
+    }
+
+    function getSidebarStorageKey() {
+        return `sidebar-collapsed-${getRoleFromBody()}`;
+    }
+
+    function applySidebarStateFromStorage() {
+        if (!desktopBreakpoint.matches) return;
+
+        const saved = localStorage.getItem(getSidebarStorageKey());
+        if (saved === 'true') {
+            body.classList.add('sidebar-collapsed');
+        } else {
+            body.classList.remove('sidebar-collapsed');
+        }
+    }
+
+    function toggleDesktopSidebar() {
+        if (!desktopBreakpoint.matches) return;
+
+        body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem(
+            getSidebarStorageKey(),
+            body.classList.contains('sidebar-collapsed') ? 'true' : 'false'
+        );
+
+        updateSidebarToggleIcon();
+    }
+
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function (e) {
+            if (desktopBreakpoint.matches) {
+                e.preventDefault();
+                toggleDesktopSidebar();
+                return;
+            }
+
+            if (body.classList.contains('role-dentist') && typeof openDrawer === 'function') {
+                openDrawer();
+            }
+        });
+    }
+
+    applySidebarStateFromStorage();
+    updateSidebarToggleIcon();
+
+    window.addEventListener('resize', function () {
+        if (desktopBreakpoint.matches) {
+            applySidebarStateFromStorage();
+        } else {
+            body.classList.remove('sidebar-collapsed');
+        }
+    });
     const notifBtn = document.getElementById('notifBtn');
     const notifMenu = document.getElementById('notifMenu');
     const notifDropdown = document.getElementById('notifDropdown');

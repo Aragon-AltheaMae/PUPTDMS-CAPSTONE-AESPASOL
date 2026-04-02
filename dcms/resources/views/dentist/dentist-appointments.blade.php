@@ -2,11 +2,12 @@
 
 @section('title', 'Appointments | PUP Taguig Dental Clinic')
 
+@section('usesAppointmentCalendar', true)
+
 @section('styles')
 <style>
-  /* ── SUMMARY BAR ── */
   .summary-bar {
-    background: linear-gradient(135deg, #7f0000 0%, #a00000 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
     border-bottom: 1px solid rgba(255, 255, 255, .08);
   }
 
@@ -29,7 +30,6 @@
     font-weight: 700;
   }
 
-  /* ── TAB TOGGLE ── */
   .tab-toggle-wrap {
     background: #5a0000;
     border-radius: 9999px;
@@ -79,7 +79,6 @@
     color: rgba(255, 255, 255, .8);
   }
 
-  /* ── APPOINTMENT CARDS ── */
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -139,7 +138,6 @@
     opacity: 1;
   }
 
-  /* ── BADGES & PILLS ── */
   .service-badge {
     display: inline-flex;
     align-items: center;
@@ -232,7 +230,6 @@
     color: #6B5E52;
   }
 
-  /* ── TIMELINE ── */
   .timeline-dot {
     width: 18px;
     height: 18px;
@@ -253,7 +250,6 @@
     flex-shrink: 0;
   }
 
-  /* ── ACTION BUTTONS ── */
   .action-btn {
     display: inline-flex;
     align-items: center;
@@ -320,7 +316,6 @@
     box-shadow: 0 2px 8px rgba(159, 18, 57, .15);
   }
 
-  /* ── MOBILE APPOINTMENT CARD ── */
   .mobile-appt-card {
     background: #fff;
     border: 1px solid #EDE8E3;
@@ -352,7 +347,6 @@
     background: #16a34a;
   }
 
-  /* ── TOAST ── */
   #toastContainer {
     position: fixed;
     bottom: 28px;
@@ -477,144 +471,6 @@
     color: #e5e7eb;
   }
 
-  /* ── CANCEL MODAL ── */
-  .cancel-modal-panel {
-    animation: modalUp .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
-  }
-
-  .reschedule-modal-panel {
-    animation: modalUp .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
-  }
-
-  @keyframes modalUp {
-    from {
-      opacity: 0;
-      transform: translateY(24px) scale(.97);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  .cancel-icon-ring {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .cancel-icon-ring::before,
-  .cancel-icon-ring::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 2px solid rgba(220, 38, 38, .35);
-    animation: ringPulse 2s ease-out infinite;
-  }
-
-  .cancel-icon-ring::after {
-    animation-delay: .7s;
-  }
-
-  @keyframes ringPulse {
-    0% {
-      transform: scale(.85);
-      opacity: .8;
-    }
-
-    100% {
-      transform: scale(1.5);
-      opacity: 0;
-    }
-  }
-
-  .cancel-icon-core {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border: 2px solid #fca5a5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(220, 38, 38, .2);
-    z-index: 1;
-  }
-
-  .reason-chip input[type="radio"] {
-    display: none;
-  }
-
-  .reason-chip label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 9999px;
-    border: 1.5px solid #e5e7eb;
-    font-size: 12px;
-    font-weight: 500;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all .15s;
-    background: white;
-    user-select: none;
-  }
-
-  .reason-chip label:hover {
-    border-color: #fca5a5;
-    color: #9f1239;
-    background: #fff1f2;
-  }
-
-  .reason-chip input[type="radio"]:checked+label {
-    border-color: #dc2626;
-    background: #fef2f2;
-    color: #dc2626;
-    font-weight: 600;
-    box-shadow: 0 2px 6px rgba(220, 38, 38, .15);
-  }
-
-  #cancelReasonChips.invalid .reason-chip label {
-    border-color: #fca5a5;
-    background: #fff5f5;
-  }
-
-  @keyframes errorShake {
-
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-
-    20% {
-      transform: translateX(-5px);
-    }
-
-    40% {
-      transform: translateX(5px);
-    }
-
-    60% {
-      transform: translateX(-3px);
-    }
-
-    80% {
-      transform: translateX(3px);
-    }
-  }
-
-  .chips-error-shake {
-    animation: errorShake .35s ease;
-  }
-
-  /* ── DARK MODE ── */
-
   [data-theme="dark"] .bg-white,
   [data-theme="dark"] .appt-card,
   [data-theme="dark"] .mobile-appt-card {
@@ -632,15 +488,135 @@
     color: #9ca3af;
   }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 767px) {
-
+  @media (min-width: 768px) {
     .desktop-appointments-table {
-      display: none !important;
+      display: block !important;
     }
 
     .mobile-appointments-list {
-      display: block !important;
+      display: none !important;
+    }
+  }
+
+  .view-toggle-container {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid #f9eaea;
+    box-shadow: 0 2px 10px rgba(139, 0, 0, 0.04);
+    position: relative;
+  }
+
+  .view-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 36px;
+    height: 36px;
+    background: #8B0000;
+    border-radius: 10px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.25);
+  }
+
+  .mode-list .view-slider {
+    transform: translateX(0);
+  }
+
+  .mode-grid .view-slider {
+    transform: translateX(40px);
+  }
+
+  .btn-view-mode {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    transition: color 0.3s ease;
+    border: none;
+    background: transparent !important;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+
+  .btn-view-mode:hover:not(.active) {
+    color: #8B0000;
+  }
+
+  .btn-view-mode.active {
+    color: #ffffff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mode-list .desktop-appointments-table {
+    display: block !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px;
+    padding-right: 15px;
+  }
+
+  .mode-list .desktop-appointments-table>.grid,
+  .mode-list .desktop-appointments-table .appt-card {
+    min-width: 950px !important;
+  }
+
+  .mode-list .mobile-appointments-list {
+    display: none !important;
+  }
+
+  .mode-grid .desktop-appointments-table {
+    display: none !important;
+  }
+
+  .mode-grid .mobile-appointments-list {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .mode-grid .mobile-appointments-list {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .mode-grid .mobile-appointments-list {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+
+    .view-toggle-container {
+      display: none !important;
+    }
+
+    .mode-list .desktop-appointments-table,
+    .mode-grid .desktop-appointments-table {
+      display: none !important;
+    }
+
+    .mode-list .mobile-appointments-list,
+    .mode-grid .mobile-appointments-list {
+      display: flex !important;
+      flex-direction: column !important;
+      width: 100% !important;
+    }
+
+    .mobile-appt-card {
+      width: 100% !important;
+      box-sizing: border-box;
     }
 
     .tab-btn-toggle {
@@ -664,16 +640,6 @@
     }
   }
 
-  @media (min-width: 768px) {
-    .desktop-appointments-table {
-      display: block !important;
-    }
-
-    .mobile-appointments-list {
-      display: none !important;
-    }
-  }
-
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -689,6 +655,46 @@
   .fade-in {
     animation: fadeIn .6s ease-out forwards;
   }
+
+  .reschedule-modal-panel {
+    animation: modalUp .3s cubic-bezier(.34, 1.56, .64, 1) forwards;
+  }
+
+  .reschedule-icon-ring {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reschedule-icon-ring::before,
+  .reschedule-icon-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 158, 11, .35);
+    animation: ringPulse 2s ease-out infinite;
+  }
+
+  .reschedule-icon-ring::after {
+    animation-delay: .7s;
+  }
+
+  .reschedule-icon-core {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 2px solid #fcd34d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, .18);
+    z-index: 1;
+  }
 </style>
 @endsection
 
@@ -701,10 +707,12 @@ $today = $today ?? \Carbon\Carbon::today()->toDateString();
 $todayAppts = $upcomingAppointments->filter(fn($a) => ($a->appointment_date ?? null) === $today);
 $todayCount = $todayAppts->count();
 $nextAppt = $upcomingAppointments->sortBy('appointment_date')->first();
-$nextName = $nextAppt ? (optional($nextAppt->patient)->name ?? 'Unknown') : null;
+$nextName = $nextAppt ? optional($nextAppt->patient)->name ?? 'Unknown' : null;
 $nextTime = $nextAppt ? \Carbon\Carbon::parse($nextAppt->appointment_time)->format('g:i A') : null;
 $nextDate = $nextAppt ? \Carbon\Carbon::parse($nextAppt->appointment_date)->format('M j') : null;
-$upcomingGrouped = $upcomingAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'));
+$upcomingGrouped = $upcomingAppointments->groupBy(
+fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'),
+);
 $pastGrouped = $pastAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->appointment_date)->format('F'));
 $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
@@ -713,24 +721,36 @@ $notifCount = $notifications->count();
 @endphp
 
 
-<main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
-    <div class="w-full fade-in">
+<main id="mainContent" class="pt-[90px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
+  <div class="w-full fade-in">
 
-    <div class="summary-bar rounded-2xl px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3 flex-wrap mb-5 mt-2">
-      <i class="fa-solid fa-circle-info text-white/60 text-sm"></i>
-      <span class="text-white/70 text-xs font-medium hidden sm:inline">Today's snapshot:</span>
-      @if($todayCount > 0)
-      <span class="summary-chip summary-chip-highlight"><i class="fa-solid fa-calendar-check text-xs"></i>{{
-        $todayCount }} appt{{ $todayCount > 1 ? 's' : '' }} today</span>
-      @else
-      <span class="summary-chip"><i class="fa-regular fa-calendar text-xs"></i>No appointments today</span>
-      @endif
-      @if($nextAppt)
-      <span class="summary-chip hidden sm:inline-flex"><i class="fa-solid fa-clock text-xs"></i>Next: <strong>{{
-          $nextName }}</strong> — {{ $nextDate }} at {{ $nextTime }}</span>
-      @endif
-      {{-- <span class="summary-chip ml-auto"><i class="fa-solid fa-list text-xs"></i>{{ $upcomingTotal }} upcoming · {{
-        $pastTotal }} past</span> --}}
+    <div
+      class="summary-bar rounded-2xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 flex-wrap mb-5 mt-2 shadow-sm">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-white/80 text-sm"></i>
+        <span class="text-white/90 text-[13px] font-semibold">Today's snapshot:</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 w-full sm:w-auto">
+        @if ($todayCount > 0)
+        <span class="summary-chip summary-chip-highlight w-full sm:w-auto justify-center sm:justify-start">
+          <i class="fa-solid fa-calendar-check text-xs"></i>{{ $todayCount }}
+          appt{{ $todayCount > 1 ? 's' : '' }} today
+        </span>
+        @else
+        <span class="summary-chip w-full sm:w-auto justify-center sm:justify-start">
+          <i class="fa-regular fa-calendar text-xs"></i>No appointments today
+        </span>
+        @endif
+
+        @if ($nextAppt)
+        <span class="summary-chip w-full sm:w-auto justify-center sm:justify-start">
+          <i class="fa-solid fa-clock text-xs text-white/70"></i>
+          <span>Next: <strong>{{ $nextName }}</strong> <span class="opacity-75">—
+              {{ $nextTime }}</span></span>
+        </span>
+        @endif
+      </div>
     </div>
 
     <!-- Page Header & Tabs -->
@@ -748,19 +768,31 @@ $notifCount = $notifications->count();
         </div>
       </div>
 
-      <div class="tab-toggle-wrap self-start md:self-auto flex-shrink-0">
-        <button id="btnUpcoming" class="tab-btn-toggle active">
-          <i class="fa-solid fa-calendar-clock text-xs"></i>
-          Upcoming
-          <span class="tab-count-badge">{{ $upcomingTotal }}</span>
-        </button>
-        <button id="btnPast" class="tab-btn-toggle">
-          <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-          Past
-          <span class="tab-count-badge">{{ $pastTotal }}</span>
-        </button>
-      </div>
+      <div class="flex items-center gap-3 self-start md:self-auto flex-shrink-0">
 
+        <div class="view-toggle-container hidden md:flex">
+          <div class="view-slider"></div>
+
+          <button id="btnListView" onclick="switchView('list')" class="btn-view-mode active" title="List View">
+            <i class="fa-solid fa-list text-sm"></i></button>
+          <button id="btnGridView" onclick="switchView('grid')" class="btn-view-mode" title="Grid View"><i
+              class="fa-solid fa-border-all text-sm"></i></button>
+        </div>
+
+        <div class="tab-toggle-wrap">
+          <button id="btnUpcoming" class="tab-btn-toggle active">
+            <i class="fa-solid fa-calendar-clock text-xs"></i>
+            Upcoming
+            <span class="tab-count-badge">{{ $upcomingTotal }}</span>
+          </button>
+          <button id="btnPast" class="tab-btn-toggle">
+            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+            Past
+            <span class="tab-count-badge">{{ $pastTotal }}</span>
+          </button>
+        </div>
+
+      </div>
     </div>
 
     <!-- ═══ UPCOMING SECTION ═══ -->
@@ -782,10 +814,12 @@ $notifCount = $notifications->count();
             class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#8b0000]/30 to-[#8b0000]/05 rounded-full">
           </div>
 
-          <div class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
-               style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) 310px;">
+          <div
+            class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
+            style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) 310px;">
             <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</div>
-            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</div>
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time
+            </div>
             <div class="text-left">Service</div>
             <div class="text-left">Patient</div>
             <div class="text-left">Program</div>
@@ -794,23 +828,32 @@ $notifCount = $notifications->count();
           </div>
 
           <div class="space-y-2.5">
-            @foreach($items as $i => $appt)
+            @foreach ($items as $i => $appt)
             @php
             $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
             $program = optional($appt->patient)->program ?? '—';
             $dateLabel = \Carbon\Carbon::parse($appt->appointment_date)->format('F j, Y');
             $weekday = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
-            $timeLabel = $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') :
-            '—';
-            $serviceLabel = ($appt->service_type ?? '') === 'Others' ? (($appt->other_services ?? '') ?: 'Others') :
-            ($appt->service_type ?? '—');
+            $timeLabel = $appt->appointment_time
+            ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+            : '—';
+            $serviceLabel =
+            ($appt->service_type ?? '') === 'Others'
+            ? ($appt->other_services ?? '' ?:
+            'Others')
+            : $appt->service_type ?? '—';
             $isToday = ($appt->appointment_date ?? null) === $today;
             $serviceLower = strtolower($serviceLabel);
             $badgeClass = 'service-badge-default';
-            if (str_contains($serviceLower, 'surgery')) $badgeClass = 'service-badge-surgery';
-            elseif (str_contains($serviceLower, 'check')) $badgeClass = 'service-badge-checkup';
-            elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
-            elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+            if (str_contains($serviceLower, 'surgery')) {
+            $badgeClass = 'service-badge-surgery';
+            } elseif (str_contains($serviceLower, 'check')) {
+            $badgeClass = 'service-badge-checkup';
+            } elseif (str_contains($serviceLower, 'whiten')) {
+            $badgeClass = 'service-badge-whitening';
+            } elseif (str_contains($serviceLower, 'extrac')) {
+            $badgeClass = 'service-badge-extraction';
+            }
             @endphp
 
             <div class="appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
@@ -822,28 +865,34 @@ $notifCount = $notifications->count();
                 <div>
                   <p class="text-[13px] font-semibold text-gray-800">{{ $dateLabel }}</p>
                   <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
-                  @if($isToday)<span
-                    class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide bg-green-500 text-white px-2 py-0.5 rounded-md">Today</span>@endif
+                  @if ($isToday)
+                  <span
+                    class="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide bg-green-500 text-white px-2 py-0.5 rounded-md">Today</span>
+                  @endif
                 </div>
 
-                <div><span class="time-chip"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}</span></div>
+                <div><span class="time-chip"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}</span>
+                </div>
 
                 <div class="flex items-center justify-start"><span class="service-badge {{ $badgeClass }}">{{
-                    $serviceLabel }}</span></div>
+                    $serviceLabel }}</span>
+                </div>
 
                 <div class="flex items-center justify-start gap-3">
-                  <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=8B0000&color=ffffff&bold=true' }}" 
-                       alt="{{ $patientName }}" 
-                       class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0">
+                  <img
+                    src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patientName) . '&background=8B0000&color=ffffff&bold=true' }}"
+                    alt="{{ $patientName }}"
+                    class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0">
                   <div class="text-left min-w-0">
-                    <p class="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[140px]">{{ $patientName
-                      }}</p>
-                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID #{{ $appt->patient_id ?? 'N/A' }}</p>
+                    <p class="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[140px]">
+                      {{ $patientName }}</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID
+                      #{{ $appt->patient_id ?? 'N/A' }}</p>
                   </div>
                 </div>
 
                 <div class="text-left">
-                  @if($program === '—')
+                  @if ($program === '—')
                   <span class="text-[12px] text-gray-400">—</span>
                   @else
                   <span
@@ -853,7 +902,7 @@ $notifCount = $notifications->count();
                 </div>
 
                 <div class="text-left">
-                  @if($isToday)
+                  @if ($isToday)
                   <span class="status-pill status-confirmed"><span class="status-dot"></span>Confirmed</span>
                   @else
                   <span class="status-pill status-pending"><span class="status-dot"></span>Upcoming</span>
@@ -861,7 +910,7 @@ $notifCount = $notifications->count();
                 </div>
 
                 <div class="flex items-center justify-end gap-1 flex-nowrap">
-                  <a href="{{ route('dentist.dentist.appointments.patientProfile', $appt->id) }}"
+                  <a href="{{ route('dentist.dentist.patient.profile', $appt->patient_id) }}?from=appointments"
                     class="action-btn action-btn-view">
                     <i class="fa-regular fa-user text-[9px]"></i> View
                   </a>
@@ -870,14 +919,17 @@ $notifCount = $notifications->count();
                     data-datetime="{{ $dateLabel }} | {{ $timeLabel }}" {{ $isToday ? '' : 'disabled' }}>
                     <i class="fa-solid fa-play text-[9px]"></i> Start
                   </button>
-                  <button type="button" class="action-btn action-btn-reschedule" onclick="openRescheduleModal(this)"
-                    data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
-                    data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
+                  <button type="button" class="action-btn action-btn-reschedule" onclick="openRescheduleModal({
+                        id: '{{ $appt->id }}',
+                        name: @js($patientName),
+                        datetime: @js($dateLabel . ' | ' . $timeLabel),
+                        serviceType: @js($appt->service_type),
+                        updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
+                    })" data-id="{{ $appt->id }}" data-name="{{ $patientName }}" data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
                     <i class="fa-solid fa-rotate-right text-[9px]"></i> Reschedule
                   </button>
-                  <button type="button" class="action-btn action-btn-cancel" onclick="openCancelAppointmentModal(this)"
-                    data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
-                    data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
+                  <button type="button" class="action-btn action-btn-cancel"
+                    onclick="cancelAppointmentFromModal('{{ route('dentist.dentist.appointments.cancel', $appt->id) }}', @js($patientName), @js($dateLabel . ' | ' . $timeLabel))">
                     <i class="fa-solid fa-xmark text-[9px]"></i> Cancel
                   </button>
                 </div>
@@ -888,75 +940,104 @@ $notifCount = $notifications->count();
         </div>
 
         <!-- ── MOBILE CARD VIEW ── -->
-        <div class="mobile-appointments-list space-y-3">
-          @foreach($items as $i => $appt)
+        <div class="mobile-appointments-list">
+          @foreach ($items as $i => $appt)
           @php
           $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
           $program = optional($appt->patient)->program ?? '—';
           $dateLabel = \Carbon\Carbon::parse($appt->appointment_date)->format('M j, Y');
           $weekday = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
-          $timeLabel = $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') :
-          '—';
-          $serviceLabel = ($appt->service_type ?? '') === 'Others' ? (($appt->other_services ?? '') ?: 'Others') :
-          ($appt->service_type ?? '—');
+          $timeLabel = $appt->appointment_time
+          ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+          : '—';
+          $serviceLabel =
+          ($appt->service_type ?? '') === 'Others'
+          ? ($appt->other_services ?? '' ?:
+          'Others')
+          : $appt->service_type ?? '—';
           $isToday = ($appt->appointment_date ?? null) === $today;
           $serviceLower = strtolower($serviceLabel);
           $badgeClass = 'service-badge-default';
-          if (str_contains($serviceLower, 'surgery')) $badgeClass = 'service-badge-surgery';
-          elseif (str_contains($serviceLower, 'check')) $badgeClass = 'service-badge-checkup';
-          elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
-          elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+          if (str_contains($serviceLower, 'surgery')) {
+          $badgeClass = 'service-badge-surgery';
+          } elseif (str_contains($serviceLower, 'check')) {
+          $badgeClass = 'service-badge-checkup';
+          } elseif (str_contains($serviceLower, 'whiten')) {
+          $badgeClass = 'service-badge-whitening';
+          } elseif (str_contains($serviceLower, 'extrac')) {
+          $badgeClass = 'service-badge-extraction';
+          }
           @endphp
+
           <div class="mobile-appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
             style="animation-delay:{{ $i * 0.04 }}s">
-            <!-- Card Top Row -->
-            <div class="flex items-start justify-between gap-2 mb-3 pl-2">
-              <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-[13px] font-bold text-gray-800">{{ $patientName }}</p>
-                  @if($isToday)<span
-                    class="text-[9px] font-bold uppercase bg-green-500 text-white px-2 py-0.5 rounded-md">Today</span>@endif
+
+            <div class="flex items-start justify-between gap-2 mb-4 pl-1">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <p class="text-[15px] font-extrabold text-gray-800 truncate">
+                    {{ $patientName }}</p>
+                  @if ($isToday)
+                  <span
+                    class="text-[9px] font-bold uppercase tracking-wide bg-green-500 text-white px-2 py-0.5 rounded-md">Today</span>
+                  @endif
                 </div>
-                <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}, {{ $dateLabel }}</p>
+                <p class="text-[11px] font-medium text-gray-500">{{ $weekday }},
+                  {{ $dateLabel }}</p>
               </div>
-              @if($isToday)
+              @if ($isToday)
               <span class="status-pill status-confirmed flex-shrink-0"><span class="status-dot"></span>Confirmed</span>
               @else
               <span class="status-pill status-pending flex-shrink-0"><span class="status-dot"></span>Upcoming</span>
               @endif
             </div>
-            <!-- Info Row -->
-            <div class="flex flex-wrap items-center gap-2 mb-3 pl-2">
-              <span class="time-chip text-xs"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel }}</span>
-              <span class="service-badge {{ $badgeClass }} text-xs">{{ $serviceLabel }}</span>
-              @if($program !== '—')
-              <span
-                class="inline-block bg-gray-100 text-gray-500 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200">{{
-                $program }}</span>
-              @endif
+
+            <div class="bg-gray-50 rounded-xl p-3 mb-4 grid grid-cols-2 gap-3 border border-gray-100 ml-1">
+              <div>
+                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                  Schedule Time</p>
+                <span class="time-chip text-[11px] bg-white w-full justify-center shadow-sm py-1.5 border-gray-200">
+                  <i class="fa-regular fa-clock text-[#8B0000]"></i> {{ $timeLabel }}
+                </span>
+              </div>
+              <div>
+                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                  Service Type</p>
+                <span
+                  class="service-badge {{ $badgeClass }} text-[11px] w-full justify-center py-1.5 truncate shadow-sm border border-gray-100/50">
+                  {{ $serviceLabel }}
+                </span>
+              </div>
             </div>
-            <!-- Action Buttons Row -->
-            <div class="flex flex-wrap gap-2 pl-2">
-              <a href="{{ route('dentist.dentist.appointments.patientProfile', $appt->id) }}"
-                class="action-btn action-btn-view text-xs">
-                <i class="fa-regular fa-user text-[9px]"></i> View
-              </a>
-              <button type="button" class="action-btn action-btn-start text-xs" onclick="openStartProcedureModal(this)"
-                data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
+
+            <div class="grid grid-cols-2 gap-2 pl-1">
+              <button type="button" class="action-btn action-btn-start !h-auto py-2.5 text-[11px]"
+                onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
                 data-datetime="{{ $dateLabel }} | {{ $timeLabel }}" {{ $isToday ? '' : 'disabled' }}>
-                <i class="fa-solid fa-play text-[9px]"></i> Start
+                <i class="fa-solid fa-play text-[10px]"></i> Start
               </button>
-              <button type="button" class="action-btn action-btn-reschedule text-xs" onclick="openRescheduleModal(this)"
-                data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
-                data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
-                <i class="fa-solid fa-rotate-right text-[9px]"></i> Reschedule
+
+              <a href="{{ route('dentist.dentist.patient.profile', $appt->patient_id) }}?from=appointments"
+                class="action-btn action-btn-view !h-auto py-2.5 text-[11px]">
+                <i class="fa-regular fa-user text-[10px]"></i> View
+              </a>
+
+              <button type="button" class="action-btn action-btn-reschedule !h-auto py-2.5 text-[11px]" onclick="openRescheduleModal({
+                    id: '{{ $appt->id }}',
+                    name: @js($patientName),
+                    datetime: @js($dateLabel . ' | ' . $timeLabel),
+                    serviceType: @js($appt->service_type),
+                    updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
+                })" data-id="{{ $appt->id }}" data-name="{{ $patientName }}" data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
+                <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
               </button>
-              <button type="button" class="action-btn action-btn-cancel text-xs"
-                onclick="openCancelAppointmentModal(this)" data-id="{{ $appt->id }}" data-name="{{ $patientName }}"
-                data-datetime="{{ $dateLabel }} | {{ $timeLabel }}">
-                <i class="fa-solid fa-xmark text-[9px]"></i> Cancel
-              </button>
+
+              <button type="button" class="action-btn action-btn-cancel !h-auto py-2.5 text-[11px]"
+    onclick="cancelAppointmentFromModal('{{ route('dentist.dentist.appointments.cancel', $appt->id) }}', @js($patientName), @js($dateLabel . ' | ' . $timeLabel))">
+    <i class="fa-solid fa-xmark text-[10px]"></i> Cancel
+</button>
             </div>
+
           </div>
           @endforeach
         </div>
@@ -986,32 +1067,43 @@ $notifCount = $notifications->count();
         <div class="desktop-appointments-table relative pl-10">
           <div class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gray-200 rounded-full"></div>
 
-          <div class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
-               style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr);">
+          <div
+            class="grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 py-3.5 px-6 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3"
+            style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr) minmax(0, 1fr);">
             <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date</div>
-            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time</div>
+            <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time
+            </div>
             <div class="text-left">Service</div>
             <div class="text-left">Patient</div>
             <div class="text-left">Program</div>
           </div>
 
           <div class="space-y-2.5">
-            @foreach($items as $i => $appt)
+            @foreach ($items as $i => $appt)
             @php
             $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
             $program = optional($appt->patient)->program ?? '—';
             $dateLabel = \Carbon\Carbon::parse($appt->appointment_date)->format('F j, Y');
             $weekday = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
-            $timeLabel = $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') :
-            '—';
-            $serviceLabel = ($appt->service_type ?? '') === 'Others' ? (($appt->other_services ?? '') ?: 'Others') :
-            ($appt->service_type ?? '—');
+            $timeLabel = $appt->appointment_time
+            ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+            : '—';
+            $serviceLabel =
+            ($appt->service_type ?? '') === 'Others'
+            ? ($appt->other_services ?? '' ?:
+            'Others')
+            : $appt->service_type ?? '—';
             $serviceLower = strtolower($serviceLabel);
             $badgeClass = 'service-badge-default';
-            if (str_contains($serviceLower, 'surgery')) $badgeClass = 'service-badge-surgery';
-            elseif (str_contains($serviceLower, 'check')) $badgeClass = 'service-badge-checkup';
-            elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
-            elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+            if (str_contains($serviceLower, 'surgery')) {
+            $badgeClass = 'service-badge-surgery';
+            } elseif (str_contains($serviceLower, 'check')) {
+            $badgeClass = 'service-badge-checkup';
+            } elseif (str_contains($serviceLower, 'whiten')) {
+            $badgeClass = 'service-badge-whitening';
+            } elseif (str_contains($serviceLower, 'extrac')) {
+            $badgeClass = 'service-badge-extraction';
+            }
             @endphp
 
             <div class="appt-card opacity-70" style="animation-delay:{{ $i * 0.04 }}s">
@@ -1025,24 +1117,28 @@ $notifCount = $notifications->count();
                 </div>
 
                 <div><span class="time-chip text-gray-400"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel
-                    }}</span></div>
+                    }}</span>
+                </div>
 
                 <div class="flex items-center justify-start"><span class="service-badge {{ $badgeClass }} opacity-70">{{
-                    $serviceLabel }}</span></div>
+                    $serviceLabel }}</span>
+                </div>
 
                 <div class="flex items-center justify-start gap-3">
-                  <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=9ca3af&color=ffffff&bold=true' }}" 
-                       alt="{{ $patientName }}" 
-                       class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 opacity-80">
+                  <img
+                    src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patientName) . '&background=9ca3af&color=ffffff&bold=true' }}"
+                    alt="{{ $patientName }}"
+                    class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 opacity-80">
                   <div class="text-left min-w-0">
-                    <p class="text-[13px] font-bold text-gray-500 leading-tight truncate max-w-[140px]">{{ $patientName
-                      }}</p>
-                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID #{{ $appt->patient_id ?? 'N/A' }}</p>
+                    <p class="text-[13px] font-bold text-gray-500 leading-tight truncate max-w-[140px]">
+                      {{ $patientName }}</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">ID
+                      #{{ $appt->patient_id ?? 'N/A' }}</p>
                   </div>
                 </div>
 
                 <div class="text-left">
-                  @if($program === '—')
+                  @if ($program === '—')
                   <span class="text-[12px] text-gray-400">—</span>
                   @else
                   <span
@@ -1057,38 +1153,49 @@ $notifCount = $notifications->count();
           </div>
         </div>
 
-        <!-- Mobile past cards -->
-        <div class="mobile-appointments-list space-y-3">
-          @foreach($items as $i => $appt)
+        <div class="mobile-appointments-list">
+          @foreach ($items as $i => $appt)
           @php
           $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
           $program = optional($appt->patient)->program ?? '—';
           $dateLabel = \Carbon\Carbon::parse($appt->appointment_date)->format('M j, Y');
           $weekday = \Carbon\Carbon::parse($appt->appointment_date)->format('l');
-          $timeLabel = $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') :
-          '—';
-          $serviceLabel = ($appt->service_type ?? '') === 'Others' ? (($appt->other_services ?? '') ?: 'Others') :
-          ($appt->service_type ?? '—');
+          $timeLabel = $appt->appointment_time
+          ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
+          : '—';
+          $serviceLabel =
+          ($appt->service_type ?? '') === 'Others'
+          ? ($appt->other_services ?? '' ?:
+          'Others')
+          : $appt->service_type ?? '—';
           $serviceLower = strtolower($serviceLabel);
           $badgeClass = 'service-badge-default';
-          if (str_contains($serviceLower, 'surgery')) $badgeClass = 'service-badge-surgery';
-          elseif (str_contains($serviceLower, 'check')) $badgeClass = 'service-badge-checkup';
-          elseif (str_contains($serviceLower, 'whiten')) $badgeClass = 'service-badge-whitening';
-          elseif (str_contains($serviceLower, 'extrac')) $badgeClass = 'service-badge-extraction';
+          if (str_contains($serviceLower, 'surgery')) {
+          $badgeClass = 'service-badge-surgery';
+          } elseif (str_contains($serviceLower, 'check')) {
+          $badgeClass = 'service-badge-checkup';
+          } elseif (str_contains($serviceLower, 'whiten')) {
+          $badgeClass = 'service-badge-whitening';
+          } elseif (str_contains($serviceLower, 'extrac')) {
+          $badgeClass = 'service-badge-extraction';
+          }
           @endphp
-          <div class="mobile-appt-card opacity-70 border-gray-200" style="animation-delay:{{ $i * 0.04 }}s">
-            <div class="pl-2">
-              <p class="text-[13px] font-semibold text-gray-500">{{ $patientName }}</p>
-              <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}, {{ $dateLabel }}</p>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span class="time-chip text-xs text-gray-400"><i class="fa-regular fa-clock text-xs"></i>{{ $timeLabel
-                  }}</span>
-                <span class="service-badge {{ $badgeClass }} opacity-70 text-xs">{{ $serviceLabel }}</span>
-                @if($program !== '—')
+
+          <div class="mobile-appt-card opacity-75 border-gray-200" style="animation-delay:{{ $i * 0.04 }}s">
+            <div class="pl-1">
+              <p class="text-[14px] font-extrabold text-gray-500">{{ $patientName }}</p>
+              <p class="text-[11px] font-medium text-gray-400 mt-0.5 mb-3">{{ $weekday }},
+                {{ $dateLabel }}</p>
+
+              <div class="bg-gray-50 rounded-xl p-2.5 grid grid-cols-2 gap-2 border border-gray-100">
                 <span
-                  class="inline-block bg-gray-100 text-gray-400 text-[11px] px-2.5 py-1 rounded-full border border-gray-200">{{
-                  $program }}</span>
-                @endif
+                  class="time-chip text-[11px] text-gray-400 bg-white w-full justify-center shadow-sm py-1.5 border-gray-100">
+                  <i class="fa-regular fa-clock"></i> {{ $timeLabel }}
+                </span>
+                <span
+                  class="service-badge {{ $badgeClass }} opacity-70 text-[11px] w-full justify-center py-1.5 truncate border border-gray-100/50">
+                  {{ $serviceLabel }}
+                </span>
               </div>
             </div>
           </div>
@@ -1112,63 +1219,6 @@ $notifCount = $notifications->count();
 <!-- TOAST CONTAINER -->
 <div id="toastContainer"></div>
 
-<!-- ═══ RESCHEDULE MODAL ═══ -->
-<div id="rescheduleModal"
-  class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center backdrop-blur-sm hidden z-[9999] p-0 sm:p-4"
-  onclick="handleRescheduleBackdropClick(event)">
-  <div
-    class="reschedule-modal-panel bg-white w-full sm:w-[580px] rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl">
-    <div class="relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500"></div>
-      <div class="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10"></div>
-      <div class="relative px-6 sm:px-8 pt-5 pb-5 flex items-center gap-4">
-        <div
-          class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center flex-shrink-0">
-          <i class="fa-solid fa-calendar-day text-white text-lg sm:text-xl"></i>
-        </div>
-        <div class="flex-1">
-          <h2 class="text-white font-bold text-lg sm:text-xl leading-tight">Reschedule Appointment</h2>
-          <p class="text-white/70 text-xs mt-0.5">The patient will be notified of the new schedule.</p>
-        </div>
-        <button onclick="closeRescheduleModal()"
-          class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/80 hover:text-white flex items-center justify-content:center transition text-sm flex-shrink-0 flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    </div>
-    <div class="px-6 sm:px-8 py-5 sm:py-6 bg-gray-50">
-      <div class="bg-white border border-amber-100 rounded-xl p-4 mb-4 shadow-sm">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-2">Current Appointment</p>
-        <div class="flex items-center gap-3">
-          <div
-            class="w-9 h-9 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-            <i class="fa-regular fa-circle-user text-amber-400 text-base"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[13px] font-bold text-gray-800 truncate" id="resPatientName">—</p>
-            <p class="text-[11px] text-gray-400 mt-0.5 truncate" id="resAppointmentDate">—</p>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
-        <i class="fa-solid fa-circle-info text-amber-500 text-sm mt-0.5 flex-shrink-0"></i>
-        <p class="text-[12px] text-amber-700 leading-relaxed">You'll be taken to the scheduling page to pick a new
-          date and time slot.</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <button onclick="closeRescheduleModal()"
-          class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 font-semibold hover:bg-gray-50 transition text-sm shadow-sm">
-          <i class="fa-solid fa-xmark text-xs mr-1.5 text-gray-400"></i>Cancel
-        </button>
-        <button onclick="confirmReschedule()"
-          class="flex-[2] px-4 py-2.5 rounded-xl font-bold text-sm transition bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md active:scale-[.98]">
-          <i class="fa-solid fa-calendar-day text-xs mr-1.5"></i>Proceed to Reschedule
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ START PROCEDURE MODAL ═══ -->
 <div id="startProcedureModal"
   class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center backdrop-blur-sm hidden z-[9999] p-0 sm:p-4">
@@ -1179,7 +1229,8 @@ $notifCount = $notifications->count();
     <div class="px-6 sm:px-10 py-6 sm:py-7 bg-gray-50">
       <p class="text-sm sm:text-base font-bold text-gray-900 mb-1 text-center">You are about to begin this
         appointment's procedure.</p>
-      <p class="text-xs sm:text-sm text-gray-500 mb-5 text-center">This will mark the appointment as in progress.</p>
+      <p class="text-xs sm:text-sm text-gray-500 mb-5 text-center">This will mark the appointment as in progress.
+      </p>
       <div class="bg-white border border-gray-200 rounded-2xl px-6 sm:px-8 py-4 sm:py-5 text-center mb-4 shadow-sm">
         <p class="text-sm text-gray-800">Patient: <span class="font-bold" id="startPatientName">—</span></p>
         <p class="text-sm text-gray-600 mt-1" id="startAppointmentDate">—</p>
@@ -1194,85 +1245,20 @@ $notifCount = $notifications->count();
     </div>
   </div>
 </div>
-
-<!-- ═══ CANCEL MODAL ═══ -->
-<div id="cancelAppointmentModal"
-  class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center backdrop-blur-sm hidden z-[9999] p-0 sm:p-4"
-  onclick="handleCancelBackdropClick(event)">
-  <div class="cancel-modal-panel bg-white w-full sm:w-[620px] rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl">
-    <div class="relative bg-gradient-to-r from-[#7f0000] to-[#b91c1c] px-6 sm:px-8 pt-5 pb-7 sm:pb-8">
-      <button onclick="closeCancelAppointmentModal()"
-        class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition text-sm">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="flex justify-center mb-3">
-        <div class="cancel-icon-ring">
-          <div class="cancel-icon-core"><i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i></div>
-        </div>
-      </div>
-      <h2 class="text-center text-white font-bold text-lg leading-tight">Cancel Appointment</h2>
-      <p class="text-center text-white/60 text-xs mt-1">This action cannot be undone.</p>
-    </div>
-    <div class="px-6 sm:px-8 py-5 sm:py-6 bg-gray-50">
-      <div class="bg-white border border-gray-100 rounded-xl px-4 sm:px-5 py-4 mb-4 shadow-sm">
-        <div class="flex items-center gap-3">
-          <div
-            class="w-9 h-9 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
-            <i class="fa-regular fa-circle-user text-red-400 text-sm"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Patient</p>
-            <p class="text-[14px] font-bold text-gray-800 truncate" id="cancelPatientName">—</p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Scheduled</p>
-            <p class="text-[12px] font-medium text-gray-600" id="cancelAppointmentDate">—</p>
-          </div>
-        </div>
-      </div>
-      <div class="mb-5">
-        <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide mb-2.5">
-          Reason <span class="text-red-400 font-normal normal-case">* required</span>
-        </p>
-        <div class="flex flex-wrap gap-2" id="cancelReasonChips" onchange="clearReasonError()">
-          <div class="reason-chip"><input type="radio" name="cancelReason" id="r1" value="Patient no-show"><label
-              for="r1"><i class="fa-regular fa-circle-xmark text-[11px]"></i> Patient no-show</label></div>
-          <div class="reason-chip"><input type="radio" name="cancelReason" id="r2" value="Doctor unavailable"><label
-              for="r2"><i class="fa-solid fa-user-doctor text-[11px]"></i> Doctor unavailable</label></div>
-          <div class="reason-chip"><input type="radio" name="cancelReason" id="r3" value="Patient request"><label
-              for="r3"><i class="fa-regular fa-hand text-[11px]"></i> Patient request</label></div>
-          <div class="reason-chip"><input type="radio" name="cancelReason" id="r4" value="Emergency"><label for="r4"><i
-                class="fa-solid fa-bolt text-[11px]"></i> Emergency</label></div>
-          <div class="reason-chip"><input type="radio" name="cancelReason" id="r5" value="Rescheduled"><label
-              for="r5"><i class="fa-solid fa-rotate text-[11px]"></i> Rescheduled</label></div>
-        </div>
-        <div id="reasonError" class="hidden mt-2.5 flex items-center gap-1.5 text-red-500 text-[12px] font-semibold">
-          <i class="fa-solid fa-circle-exclamation text-[11px]"></i> Please select a reason before cancelling.
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <button onclick="closeCancelAppointmentModal()"
-          class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 font-semibold hover:bg-gray-50 transition text-sm shadow-sm">
-          <i class="fa-solid fa-arrow-left text-xs mr-1.5"></i>Keep
-        </button>
-        <button id="confirmCancelBtn" onclick="confirmCancelAppointment()"
-          class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#8b0000] to-[#c0392b] text-white font-bold hover:from-[#6f0000] hover:to-[#a93226] transition text-sm shadow-md active:scale-[.98]">
-          <i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
-  document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
 
-  // ── Tabs ──
   document.getElementById('btnUpcoming')?.addEventListener('click', () => setActiveTab('upcoming'));
   document.getElementById('btnPast')?.addEventListener('click', () => setActiveTab('past'));
+
   function setActiveTab(tab) {
     const isUpcoming = tab === 'upcoming';
     document.getElementById('upcomingSection')?.classList.toggle('hidden', !isUpcoming);
@@ -1281,8 +1267,11 @@ $notifCount = $notifications->count();
     document.getElementById('btnPast')?.classList.toggle('active', !isUpcoming);
   }
 
-  // ── Toast ──
-  function showToast({ title = '', message = '', duration = 4000 }) {
+  function showToast({
+    title = '',
+    message = '',
+    duration = 4000
+  }) {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = 'toast-item';
@@ -1297,30 +1286,49 @@ $notifCount = $notifications->count();
     container.appendChild(toast);
     setTimeout(() => dismissToast(toast), duration);
   }
+
   function dismissToast(toast) {
     if (!toast || toast.classList.contains('toast-exit')) return;
     toast.classList.add('toast-exit');
     setTimeout(() => toast.remove(), 350);
   }
 
-  // ── Modals ──
-  var selectedApptId = null;
+  function switchView(mode) {
+    const mainContent = document.getElementById('mainContent');
+    const btnList = document.getElementById('btnListView');
+    const btnGrid = document.getElementById('btnGridView');
 
-  function openRescheduleModal(btn) {
-    selectedApptId = btn.dataset.id;
-    document.getElementById('resPatientName').textContent = btn.dataset.name || '—';
-    document.getElementById('resAppointmentDate').textContent = btn.dataset.datetime || '—';
-    const modal = document.getElementById('rescheduleModal');
-    modal.classList.remove('hidden');
-    const panel = modal.querySelector('.reschedule-modal-panel');
-    panel.style.animation = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.animation = ''; }));
+    if (mode === 'grid') {
+      mainContent.classList.remove('mode-list');
+      mainContent.classList.add('mode-grid');
+      btnList.classList.remove('active');
+      btnGrid.classList.add('active');
+      localStorage.setItem('apptViewMode', 'grid');
+    } else {
+      mainContent.classList.remove('mode-grid');
+      mainContent.classList.add('mode-list');
+      btnGrid.classList.remove('active');
+      btnList.classList.add('active');
+      localStorage.setItem('apptViewMode', 'list');
+    }
   }
-  function closeRescheduleModal() { document.getElementById('rescheduleModal').classList.add('hidden'); selectedApptId = null; }
-  function handleRescheduleBackdropClick(e) { if (e.target === document.getElementById('rescheduleModal')) closeRescheduleModal(); }
-  function confirmReschedule() {
-    var url = "{{ route('dentist.dentist.appointments.reschedule', ['id' => ':id']) }}".replace(':id', selectedApptId);
-    window.location.href = url;
-  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth <= 767) {
+      switchView('grid');
+    } else {
+      const savedMode = localStorage.getItem('apptViewMode') || 'list';
+      switchView(savedMode);
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth <= 767) {
+      switchView('grid');
+    }
+  });
+
+  var selectedApptId = null;
 
   function openStartProcedureModal(btn) {
     selectedApptId = btn.dataset.id;
@@ -1328,71 +1336,14 @@ $notifCount = $notifications->count();
     document.getElementById('startAppointmentDate').textContent = btn.dataset.datetime || '—';
     document.getElementById('startProcedureModal').classList.remove('hidden');
   }
-  function closeStartProcedureModal() { document.getElementById('startProcedureModal').classList.add('hidden'); selectedApptId = null; }
-  function confirmStartProcedure() { window.location.href = `/dentist/appointments/${selectedApptId}/start`; }
 
-  var cancelPatientNameCache = '';
-  function openCancelAppointmentModal(btn) {
-    selectedApptId = btn.dataset.id;
-    cancelPatientNameCache = btn.dataset.name || 'this patient';
-    document.getElementById('cancelPatientName').textContent = btn.dataset.name || '—';
-    document.getElementById('cancelAppointmentDate').textContent = btn.dataset.datetime || '—';
-    document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
-    clearReasonError();
-    const confirmBtn = document.getElementById('confirmCancelBtn');
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
-    const modal = document.getElementById('cancelAppointmentModal');
-    modal.classList.remove('hidden');
-    const panel = modal.querySelector('.cancel-modal-panel');
-    panel.style.animation = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.animation = ''; }));
+  function closeStartProcedureModal() {
+    document.getElementById('startProcedureModal').classList.add('hidden');
+    selectedApptId = null;
   }
-  function closeCancelAppointmentModal() { document.getElementById('cancelAppointmentModal').classList.add('hidden'); selectedApptId = null; }
-  function handleCancelBackdropClick(e) { if (e.target === document.getElementById('cancelAppointmentModal')) closeCancelAppointmentModal(); }
 
-  function clearReasonError() {
-    document.getElementById('cancelReasonChips').classList.remove('invalid', 'chips-error-shake');
-    document.getElementById('reasonError').classList.add('hidden');
-  }
-  document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.addEventListener('change', clearReasonError));
-
-  function confirmCancelAppointment() {
-    var selectedReason = document.querySelector('input[name="cancelReason"]:checked')?.value || null;
-    if (!selectedReason) {
-      var chips = document.getElementById('cancelReasonChips');
-      document.getElementById('reasonError').classList.remove('hidden');
-      chips.classList.add('invalid'); chips.classList.remove('chips-error-shake');
-      void chips.offsetWidth; chips.classList.add('chips-error-shake');
-      return;
-    }
-    var btn = document.getElementById('confirmCancelBtn');
-    btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1.5"></i>Cancelling…';
-    var patientName = cancelPatientNameCache;
-    var apptId = selectedApptId;
-    closeCancelAppointmentModal();
-    fetch(`/dentist/appointments/${apptId}/cancel`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Accept': 'application/json' }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          // Remove all cards with this appt-id (both desktop and mobile)
-          document.querySelectorAll(`[data-appt-id="${apptId}"]`).forEach(card => {
-            card.style.transition = 'all 0.35s cubic-bezier(.4,0,.2,1)';
-            card.style.overflow = 'hidden';
-            requestAnimationFrame(() => {
-              card.style.maxHeight = card.offsetHeight + 'px';
-              requestAnimationFrame(() => { card.style.maxHeight = '0'; card.style.opacity = '0'; card.style.transform = 'scaleY(0.85) translateX(-8px)'; card.style.marginBottom = '0'; });
-            });
-            setTimeout(() => card.remove(), 380);
-          });
-          showToast({ title: 'Appointment Cancelled', message: `${patientName}'s appointment has been successfully cancelled.`, duration: 5000 });
-        } else {
-          showToast({ title: 'Cancel Failed', message: data.message || 'Something went wrong.', duration: 4000 });
-        }
-      })
-      .catch(() => { showToast({ title: 'Network Error', message: 'Could not reach the server.', duration: 4000 }); });
+  function confirmStartProcedure() {
+    window.location.href = `/dentist/appointments/${selectedApptId}/start`;
   }
 </script>
 @endsection
