@@ -1,17 +1,33 @@
 @extends('layouts.dentist')
 
 @section('title', 'Dentist Dashboard | PUP Taguig Dental Clinic')
-
+@section('usesAppointmentCalendar', true)
 @section('styles')
 <style>
-    /* ════════ DASHBOARD SPECIFIC STYLES ════════ */
     @keyframes wave {
-        0% { transform: rotate(0deg) }
-        20% { transform: rotate(14deg) }
-        40% { transform: rotate(-8deg) }
-        60% { transform: rotate(14deg) }
-        80% { transform: rotate(-4deg) }
-        100% { transform: rotate(0deg) }
+        0% {
+            transform: rotate(0deg)
+        }
+
+        20% {
+            transform: rotate(14deg)
+        }
+
+        40% {
+            transform: rotate(-8deg)
+        }
+
+        60% {
+            transform: rotate(14deg)
+        }
+
+        80% {
+            transform: rotate(-4deg)
+        }
+
+        100% {
+            transform: rotate(0deg)
+        }
     }
 
     .wave-hand {
@@ -19,7 +35,6 @@
         animation: wave 2.5s ease-in-out infinite;
     }
 
-    /* GREETING ROW */
     .greeting-row {
         display: flex;
         flex-direction: row;
@@ -41,7 +56,138 @@
         word-break: break-word;
     }
 
-    /* Status pill card (Top Right) */
+    .greeting-banner {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        padding: 22px 24px;
+        background:
+            linear-gradient(135deg,
+                rgba(139, 0, 0, 0.95) 0%,
+                rgba(102, 0, 0, 0.92) 45%,
+                rgba(139, 0, 0, 0.88) 100%);
+        box-shadow: 0 14px 40px rgba(14, 116, 144, 0.18);
+        border: 1px solid rgba(255, 255, 255, .28);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+
+    .greeting-banner::before,
+    .greeting-banner::after {
+        content: '';
+        position: absolute;
+        border-radius: 999px;
+        background: rgba(255, 215, 0, 0.08);
+        filter: blur(2px);
+        pointer-events: none;
+    }
+
+    .greeting-banner::before {
+        width: 280px;
+        height: 280px;
+        top: -170px;
+        left: -60px;
+    }
+
+    .greeting-banner::after {
+        width: 240px;
+        height: 240px;
+        right: -70px;
+        bottom: -170px;
+    }
+
+    .greeting-banner-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .greeting-banner-copy h1 {
+        color: #fff;
+        font-size: clamp(1.45rem, 3.6vw, 2.35rem);
+        line-height: 1.15;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .greeting-banner-copy p {
+        color: rgba(255, 255, 255, .92);
+        font-size: 0.95rem;
+        margin-top: 0.45rem;
+    }
+
+    .greeting-banner-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .greeting-status-meta {
+        text-align: right;
+        color: white;
+    }
+
+    .greeting-status-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: rgba(255, 255, 255, .72);
+        margin-bottom: 4px;
+    }
+
+    .greeting-status-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, .94);
+        white-space: nowrap;
+    }
+
+    .status-btn-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, .28);
+        background: rgba(255, 215, 0, 0.08);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+    }
+
+    .status-icon-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: rgba(255, 255, 255, .14);
+        border: 1px solid rgba(255, 255, 255, .24);
+        flex-shrink: 0;
+    }
+
+    .status-icon-badge i {
+        font-size: 15px;
+    }
+
+    #statusBtn.banner-status-btn {
+        border-radius: 999px !important;
+        padding: 10px 18px !important;
+        min-width: 108px;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+    }
+
     .status-card {
         display: flex;
         align-items: center;
@@ -76,7 +222,6 @@
         white-space: nowrap;
     }
 
-    /* KPI GRID */
     .kpi-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -85,18 +230,23 @@
     }
 
     @media (min-width: 640px) {
-        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @media (min-width: 1024px) {
-        .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    
-    @media (min-width: 1200px) {
-        .kpi-grid { grid-template-columns: repeat(5, 1fr); }
+        .kpi-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
 
-    /* ROW GRIDS */
+    @media (min-width: 1200px) {
+        .kpi-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+
     .row2-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -144,80 +294,194 @@
         }
     }
 
-    /* ════════ MOBILE FIXES (2-COLUMN GRID) ════════ */
+    .day-hover-card {
+        transform: translateX(-50%) translateY(6px);
+    }
+
+    .group:hover .day-hover-card,
+    .day-hover-card:hover {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    .greeting-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 0;
+    }
+
+    .greeting-line {
+        display: block;
+    }
+
+    .greeting-name-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    #greetingText {
+        font-weight: 500;
+        font-size: 1.45rem;
+    }
+
+    .greeting-name-prefix {
+        opacity: .96;
+    }
+
     @media (max-width: 767px) {
-        /* GREETING ROW FIXES */
+
         .greeting-row {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 0.75rem !important;
         }
+
         .status-card {
             width: 100% !important;
             justify-content: space-between !important;
             padding: 8px 8px 8px 16px !important;
         }
-        .status-card-labels { 
-            align-items: flex-start !important; 
+
+        .status-card-labels {
+            align-items: flex-start !important;
         }
 
-        /* FORCED 2-COLUMN KPI GRID PARA SA MOBILE */
         .kpi-grid {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 8px !important; /* Masikip na gap */
+            gap: 8px !important;
         }
 
-        /* Paliitin ang cards */
-        .kpi-grid > div {
+        .kpi-grid>div {
             padding: 12px !important;
             border-radius: 14px !important;
         }
 
-        /* Paliitin ang Icon Box (w-10 h-10) */
-        .kpi-grid > div .w-10.h-10 {
+        .kpi-grid>div .w-10.h-10 {
             width: 28px !important;
             height: 28px !important;
             border-radius: 8px !important;
         }
-        .kpi-grid > div .w-10.h-10 i {
+
+        .kpi-grid>div .w-10.h-10 i {
             font-size: 12px !important;
         }
 
-        /* Paliitin ang pill badges (yung may mga +0%, Today, Live) */
-        .kpi-grid > div .text-\[10px\] {
+        .kpi-grid>div .text-\[10px\] {
             font-size: 8px !important;
             padding: 2px 6px !important;
         }
 
-        /* Paliitin ang malalaking numero */
-        .kpi-grid > div p.text-4xl {
+        .kpi-grid>div p.text-4xl {
             font-size: 1.5rem !important;
             margin-top: 4px !important;
             margin-bottom: 2px !important;
         }
 
-        /* Paliitin ang mga text label sa ilalim */
-        .kpi-grid > div p.text-xs {
+        .kpi-grid>div p.text-xs {
             font-size: 0.55rem !important;
             line-height: 1.2 !important;
             white-space: normal !important;
-            letter-spacing: 0px !important; /* Para magkasya ang text */
+            letter-spacing: 0px !important;
         }
-        
-        .kpi-grid > div p.text-\[10px\] {
+
+        .kpi-grid>div p.text-\[10px\] {
             font-size: 0.5rem !important;
             line-height: 1.2 !important;
         }
 
-        /* Specific adjustments for Live Clock & Status */
-        #kpi-clock-hhmm { font-size: 1.35rem !important; }
-        #kpi-clock-ss { font-size: 0.75rem !important; }
-        #statusKpiLabel { font-size: 1.35rem !important; }
+        #kpi-clock-hhmm {
+            font-size: 1.35rem !important;
+        }
 
-        /* Itago ang background decorators sa mobile */
-        .kpi-grid > div .absolute.w-24.h-24 {
+        #kpi-clock-ss {
+            font-size: 0.75rem !important;
+        }
+
+        #statusKpiLabel {
+            font-size: 1.35rem !important;
+        }
+
+        .kpi-grid>div .absolute.w-24.h-24 {
             display: none !important;
+        }
+
+        .greeting-banner-inner {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .greeting-banner-actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .greeting-status-meta {
+            text-align: left;
+        }
+
+        .greeting-status-text {
+            white-space: normal;
+        }
+
+        .status-btn-wrap {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #statusBtn.banner-status-btn {
+            flex: 1 1 auto;
+        }
+
+        .greeting-banner {
+            padding: 16px 14px;
+            border-radius: 18px;
+        }
+
+        #greetingText {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .greeting-banner-copy h1 {
+            font-size: 1.1rem;
+            line-height: 1.25;
+            font-weight: 800;
+        }
+
+        .greeting-line:first-child {
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+
+        .greeting-name-line {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .greeting-name-prefix {
+            opacity: 0.9;
+        }
+
+        .greeting-banner-copy p {
+            font-size: 0.75rem;
+            margin-top: 6px;
+            opacity: 0.85;
+        }
+
+        .wave-hand {
+            font-size: 0.9em;
         }
     }
 </style>
@@ -243,41 +507,54 @@ $todayAppointments = $todayAppointments ?? collect();
 $medicalSupplies = $medicalSupplies ?? collect();
 $medicineSupplies = $medicineSupplies ?? collect();
 
-$calendarAppointmentCounts = $appointmentCountsPerDay;
-
-if (empty($calendarAppointmentCounts) && $todayAppointments->count() > 0) {
-$calendarAppointmentCounts = [
-\Carbon\Carbon::today()->format('Y-m-d') => $todayAppointments->count(),
-];
-}
+$calendarAppointmentCounts = $appointmentCountsPerDay ?? [];
+$calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
 @endphp
 
 <main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
     <div class="w-full fade-in">
 
         <div class="greeting-row">
-            <div class="min-w-0 flex-1">
-                <h1 class="greeting-title font-extrabold fade-in">
-                    <span class="bg-gradient-to-r from-[#660000] to-[#FFD700] bg-clip-text text-transparent">
-                        Good Morning, <span id="dentistName"></span>
-                        <i class="fa-solid fa-hand text-[#FFD700] wave-hand"></i>
-                    </span>
-                </h1>
-                
-            </div>
+            <div class="greeting-banner w-full">
+                <div class="greeting-banner-inner">
+                    <div class="greeting-banner-copy min-w-0">
+                        <h1 class="greeting-heading">
+                            <span class="greeting-line">
+                                <span id="greetingText"></span>
+                            </span>
+                            <span class="greeting-line greeting-name-line">
+                                <span class="greeting-name-prefix">Dr.</span>
+                                <span id="dentistName"></span>
+                                <i class="fa-solid fa-hand text-yellow-300 wave-hand"></i>
+                            </span>
+                        </h1>
+                        <p>Wishing you a healthy and happy day!</p>
+                    </div>
 
-            <div class="status-card">
-                <div class="status-card-labels">
-                    <span class="status-card-eyebrow">Clinic Status</span>
-                    <span class="status-card-text">The Dentist is currently</span>
+                    <div class="greeting-banner-actions">
+                        <div class="greeting-status-meta">
+                            <div class="greeting-status-eyebrow">
+                                <i class="fa-solid fa-circle-plus"></i>
+                                Clinic Status
+                            </div>
+                            <div class="greeting-status-text">The Dentist is currently</div>
+                        </div>
+
+                        <div class="status-btn-wrap">
+                            <div class="status-icon-badge">
+                                <i class="fa-solid fa-stethoscope"></i>
+                            </div>
+
+                            <button id="statusBtn" onclick="openStatusModal()"
+                                class="banner-status-btn font-bold text-white flex items-center gap-2 transition-colors duration-300"
+                                style="background:#00A96E; font-size:13px; border:none;">
+                                <span id="statusLabel" class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button id="statusBtn" onclick="openStatusModal()"
-                    class="rounded-full px-5 py-2 font-bold shadow text-white flex items-center gap-2 transition-colors duration-300"
-                    style="background:#00A96E; font-size:13px; border:none;">
-                    <span id="statusLabel" class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
-                    </span>
-                </button>
             </div>
         </div>
 
@@ -341,10 +618,12 @@ $calendarAppointmentCounts = [
                 <p class="text-xs font-semibold mt-1 uppercase tracking-widest text-[#8B0000]/50">Today's Patients</p>
                 <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
                     <span class="text-green-500 font-bold">{{ $todayAppointments->where('status', 'confirmed')->count()
-                        }} confirmed</span>
+                        }}
+                        confirmed</span>
                     <span class="text-gray-300">·</span>
                     <span class="text-yellow-500 font-bold">{{ $todayAppointments->where('status', 'pending')->count()
-                        }} pending</span>
+                        }}
+                        pending</span>
                 </p>
                 <div class="absolute -bottom-5 -right-5 w-24 h-24 rounded-full bg-red-50/40"></div>
             </div>
@@ -369,7 +648,8 @@ $calendarAppointmentCounts = [
                         style="font-variant-numeric:tabular-nums;">:00</span>
                     <span id="kpi-clock-ampm" class="text-xs font-bold opacity-60 ml-1 align-super">AM</span>
                 </p>
-                <p class="text-xs font-semibold mt-1 uppercase tracking-widest text-white" style="opacity:.55;">Live Time</p>
+                <p class="text-xs font-semibold mt-1 uppercase tracking-widest text-white" style="opacity:.55;">Live
+                    Time</p>
                 <p class="text-xs mt-0.5 text-white flex items-center gap-1.5" style="opacity:.45;">
                     <i id="kpi-clock-dayicon" class="fa-solid fa-sun text-xs flex-shrink-0" style="color:#fde68a;"></i>
                     <span id="kpi-clock-date"></span>
@@ -409,260 +689,264 @@ $calendarAppointmentCounts = [
                     <div class="animate-pulse space-y-4">
                         <div class="h-6 w-40 bg-gray-200 rounded mx-auto"></div>
                         <div class="grid grid-cols-7 gap-2">
-                            @for ($i = 0; $i < 35; $i++) <div class="h-9 bg-gray-200 rounded-lg"></div>
-                            @endfor
+                            @for ($i = 0; $i < 35; $i++) <div class="h-9 bg-gray-200 rounded-lg">
                         </div>
+                        @endfor
                     </div>
                 </div>
             </div>
-            <div>
-                <div class="card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow h-full">
-                    <div class="card-body flex flex-col">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-base font-bold flex items-center gap-2">
-                                <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
-                            </h2>
-                            <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">
-                                {{ $todayAppointments->count() }}
-                                {{ \Illuminate\Support\Str::plural('patient', $todayAppointments->count()) }}
-                            </span>
-                        </div>
-                        <div class="space-y-2 flex-1 overflow-y-auto pr-1">
-                            @forelse($todayAppointments as $appointment)
-                            @php
-                            $name = $appointment->patient->name ?? 'Unknown Patient';
-                            $time = \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A');
-                            $service =
-                            $appointment->service_type === 'others'
-                            ? $appointment->other_services ?? 'Other Service'
-                            : $appointment->service_type;
-                            $isConfirmed = $appointment->status === 'confirmed';
-                            @endphp
-                            <a href="{{ route('dentist.dentist.appointments') }}"
-                                class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]">
-                                <div
-                                    class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                                    {{ strtoupper(substr($name, 0, 1)) }}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-sm truncate">{{ $name }}</p>
-                                    <p class="text-xs opacity-70 truncate flex items-center gap-1">
-                                        <i class="fa-solid fa-stethoscope text-yellow-300 flex-shrink-0 text-[10px]"></i>
-                                        {{ ucwords($service) }} · {{ $time }}
-                                    </p>
-                                </div>
-                                @if ($isConfirmed)
-                                <span
-                                    class="badge badge-sm bg-green-400 text-white border-none flex-shrink-0 text-[10px]">✓</span>
-                                @else
-                                <span
-                                    class="badge badge-sm bg-yellow-400 text-[#660000] border-none flex-shrink-0 text-[10px]">!</span>
-                                @endif
-                            </a>
-                            @empty
-                            <div class="flex flex-col items-center justify-center py-10 opacity-60">
-                                <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-yellow-300"></i>
-                                <p class="text-sm font-semibold">No appointments today</p>
-                                <p class="text-xs opacity-70 mt-1">Enjoy your free day, Doctor!</p>
-                            </div>
-                            @endforelse
-                        </div>
+        </div>
+        <div>
+            <div class="card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow h-full">
+                <div class="card-body flex flex-col">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-bold flex items-center gap-2">
+                            <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
+                        </h2>
+                        <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">
+                            {{ $todayAppointments->count() }}
+                            {{ \Illuminate\Support\Str::plural('patient', $todayAppointments->count()) }}
+                        </span>
+                    </div>
+                    <div class="space-y-2 flex-1 overflow-y-auto pr-1">
+                        @forelse($todayAppointments as $appointment)
+                        @php
+                        $name = $appointment->patient->name ?? 'Unknown Patient';
+                        $time = \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A');
+                        $service =
+                        $appointment->service_type === 'others'
+                        ? $appointment->other_services ?? 'Other Service'
+                        : $appointment->service_type;
+                        $isConfirmed = $appointment->status === 'confirmed';
+                        @endphp
                         <a href="{{ route('dentist.dentist.appointments') }}"
-                            class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
-                            View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
+                            class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]">
+                            <div
+                                class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                {{ strtoupper(substr($name, 0, 1)) }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-sm truncate">{{ $name }}</p>
+                                <p class="text-xs opacity-70 truncate flex items-center gap-1">
+                                    <i class="fa-solid fa-stethoscope text-yellow-300 flex-shrink-0 text-[10px]"></i>
+                                    {{ ucwords($service) }} · {{ $time }}
+                                </p>
+                            </div>
+                            @if ($isConfirmed)
+                            <span
+                                class="badge badge-sm bg-green-400 text-white border-none flex-shrink-0 text-[10px]">✓</span>
+                            @else
+                            <span
+                                class="badge badge-sm bg-yellow-400 text-[#660000] border-none flex-shrink-0 text-[10px]">!</span>
+                            @endif
                         </a>
+                        @empty
+                        <div class="flex flex-col items-center justify-center py-10 opacity-60">
+                            <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-yellow-300"></i>
+                            <p class="text-sm font-semibold">No appointments today</p>
+                            <p class="text-xs opacity-70 mt-1">Enjoy your free day, Doctor!</p>
+                        </div>
+                        @endforelse
+                    </div>
+                    <a href="{{ route('dentist.dentist.appointments') }}"
+                        class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
+                        View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row3-grid">
+
+        <div class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col shadow-xl">
+
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div>
+                    <h3 class="text-base font-bold text-[#8B0000]">GAD Analytics</h3>
+                    <p class="text-sm text-gray-600">Gender and Development Data</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex —
+                        {{ now()->format('F Y') }}</p>
+                </div>
+
+                <div class="flex items-center justify-end space-x-4 flex-wrap gap-y-1">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#E5B5B5] flex-shrink-0"></span>
+                        <span class="text-xs text-gray-600 leading-none">Female</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#89CFF0] flex-shrink-0"></span>
+                        <span class="text-xs text-gray-600 leading-none">Male</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-grow flex items-center justify-center w-full min-h-[200px]">
+
+                <canvas id="gadChart" style="display: block; width: 100%; height: 100%;"></canvas>
+
+                <div id="empty-state-container" class="flex flex-col items-center justify-center text-gray-500 gap-4"
+                    style="display: none;">
+
+                    <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                        <text x="12" y="16" text-anchor="middle" font-size="6" fill="currentColor"
+                            font-weight="bold">?</text>
+                    </svg>
+
+                    <div class="text-center flex flex-col gap-1 items-center">
+                        <p class="font-semibold text-base text-gray-700 leading-tight">No Treatments Recorded</p>
+                        <p class="text-sm text-gray-400 max-w-xs">There are no completed treatment records for this
+                            month yet.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row3-grid">
-
-            <div class="relative bg-white p-5 rounded-3xl h-[350px] shadow-sm flex flex-col shadow-xl">
-
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <div>
-                        <h3 class="text-base font-bold text-[#8B0000]">GAD Analytics</h3>
-                        <p class="text-sm text-gray-600">Gender and Development Data</p>
-                        <p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex —
-                            {{ now()->format('F Y') }}</p>
-                    </div>
-
-                    <div class="flex items-center justify-end space-x-4 flex-wrap gap-y-1">
-                        <div class="flex items-center justify-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#E5B5B5] flex-shrink-0"></span>
-                            <span class="text-xs text-gray-600 leading-none">Female</span>
-                        </div>
-                        <div class="flex items-center justify-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#89CFF0] flex-shrink-0"></span>
-                            <span class="text-xs text-gray-600 leading-none">Male</span>
-                        </div>
-                    </div>
+        <div class="flex flex-col gap-5">
+            <div
+                class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100">
+                <div
+                    class="absolute -top-6 -right-6 w-24 h-24 bg-red-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500">
                 </div>
 
-                <div class="flex-grow flex items-center justify-center w-full min-h-[200px]">
-
-                    <canvas id="gadChart" style="display: block; width: 100%; height: 100%;"></canvas>
-
-                    <div id="empty-state-container" class="flex flex-col items-center justify-center text-gray-500 gap-4"
-                        style="display: none;">
-
-                        <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
-                            <text x="12" y="16" text-anchor="middle" font-size="6" fill="currentColor"
-                                font-weight="bold">?</text>
-                        </svg>
-
-                        <div class="text-center flex flex-col gap-1 items-center">
-                            <p class="font-semibold text-base text-gray-700 leading-tight">No Treatments Recorded</p>
-                            <p class="text-sm text-gray-400 max-w-xs">There are no completed treatment records for this
-                                month yet.</p>
+                <div class="relative z-10 flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-[#8B0000] border border-red-100 flex-shrink-0">
+                            <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-[#8B0000] text-sm">Medical Supplies</h3>
+                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top
+                                Inventory
+                            </p>
                         </div>
                     </div>
+                    <a href="{{ route('dentist.dentist.inventory') }}"
+                        class="text-[11px] font-bold text-[#8B0000] bg-red-50 hover:bg-[#8B0000] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                        View All <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
+
+                @if ($medicalSupplies->count() > 0)
+                <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style="max-height: 180px;">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
+                            <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                <th class="pb-2 font-bold">Item</th>
+                                <th class="pb-2 text-center font-bold">Stock</th>
+                                <th class="pb-2 text-center font-bold">Used</th>
+                                <th class="pb-2 text-right font-bold">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs text-gray-700">
+                            @foreach ($medicalSupplies as $item)
+                            @php
+                            $balance = $item->qty - $item->used;
+                            $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
+                            $isLow = $pct <= 30; $badgeCls=$isLow
+                                ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+                                : 'bg-green-50 text-green-600 border-green-200' ; @endphp <tr
+                                class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors">
+                                <td class="py-2.5 max-w-[140px] truncate font-semibold text-gray-800">
+                                    {{ $item->name }}
+                                </td>
+                                <td class="py-2.5 text-center font-medium">{{ $item->qty }}</td>
+                                <td class="py-2.5 text-center text-gray-500">{{ $item->used }}</td>
+                                <td class="py-2.5 text-right">
+                                    <span class="px-2 py-1 rounded-md border text-[10px] font-bold {{ $badgeCls }}">
+                                        {{ $balance }}{{ $isLow ? ' ⚠' : '' }}
+                                    </span>
+                                </td>
+                                </tr>
+                                @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <div
+                    class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200">
+                    <i class="fa-solid fa-box-open text-3xl mb-2 text-[#8B0000]/50"></i>
+                    <p class="text-xs font-semibold text-gray-500">No medical supplies yet</p>
+                </div>
+                @endif
             </div>
 
-            <div class="flex flex-col gap-5">
-
+            <div
+                class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100">
                 <div
-                    class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100">
-                    <div
-                        class="absolute -top-6 -right-6 w-24 h-24 bg-red-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500">
-                    </div>
-
-                    <div class="relative z-10 flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-[#8B0000] border border-red-100 flex-shrink-0">
-                                <i class="fa-solid fa-boxes-stacked text-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-[#8B0000] text-sm">Medical Supplies</h3>
-                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory
-                                </p>
-                            </div>
-                        </div>
-                        <a href="{{ route('dentist.dentist.inventory') }}"
-                            class="text-[11px] font-bold text-[#8B0000] bg-red-50 hover:bg-[#8B0000] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
-                            View All <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    </div>
-
-                    @if ($medicalSupplies->count() > 0)
-                    <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style="max-height: 180px;">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
-                                <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                    <th class="pb-2 font-bold">Item</th>
-                                    <th class="pb-2 text-center font-bold">Stock</th>
-                                    <th class="pb-2 text-center font-bold">Used</th>
-                                    <th class="pb-2 text-right font-bold">Balance</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-xs text-gray-700">
-                                @foreach ($medicalSupplies as $item)
-                                @php
-                                $balance = $item->qty - $item->used;
-                                $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
-                                $isLow = $pct <= 30; $badgeCls=$isLow
-                                    ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
-                                    : 'bg-green-50 text-green-600 border-green-200' ; @endphp <tr
-                                    class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors">
-                                    <td class="py-2.5 max-w-[140px] truncate font-semibold text-gray-800">{{ $item->name }}
-                                    </td>
-                                    <td class="py-2.5 text-center font-medium">{{ $item->qty }}</td>
-                                    <td class="py-2.5 text-center text-gray-500">{{ $item->used }}</td>
-                                    <td class="py-2.5 text-right">
-                                        <span class="px-2 py-1 rounded-md border text-[10px] font-bold {{ $badgeCls }}">
-                                            {{ $balance }}{{ $isLow ? ' ⚠' : '' }}
-                                        </span>
-                                    </td>
-                                    </tr>
-                                    @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div
-                        class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200">
-                        <i class="fa-solid fa-box-open text-3xl mb-2 text-[#8B0000]/50"></i>
-                        <p class="text-xs font-semibold text-gray-500">No medical supplies yet</p>
-                    </div>
-                    @endif
+                    class="absolute -bottom-6 -right-6 w-24 h-24 bg-yellow-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500">
                 </div>
 
-                <div
-                    class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100">
-                    <div
-                        class="absolute -bottom-6 -right-6 w-24 h-24 bg-yellow-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500">
-                    </div>
-
-                    <div class="relative z-10 flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-[#8B0000] border border-yellow-100 flex-shrink-0">
-                                <i class="fa-solid fa-pills text-lg text-yellow-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-[#8B0000] text-sm">Medicine Supplies</h3>
-                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory
-                                </p>
-                            </div>
+                <div class="relative z-10 flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-[#8B0000] border border-yellow-100 flex-shrink-0">
+                            <i class="fa-solid fa-pills text-lg text-yellow-600"></i>
                         </div>
-                        <a href="{{ route('dentist.dentist.inventory') }}"
-                            class="text-[11px] font-bold text-yellow-700 bg-yellow-50 hover:bg-yellow-400 hover:text-[#8B0000] px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
-                            View All <i class="fa-solid fa-arrow-right"></i>
-                        </a>
+                        <div>
+                            <h3 class="font-extrabold text-[#8B0000] text-sm">Medicine Supplies</h3>
+                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top
+                                Inventory
+                            </p>
+                        </div>
                     </div>
-
-                    @if ($medicineSupplies->count() > 0)
-                    <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style="max-height: 180px;">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
-                                <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                    <th class="pb-2 font-bold">Medicine</th>
-                                    <th class="pb-2 text-center font-bold">Form</th>
-                                    <th class="pb-2 text-center font-bold">Stock</th>
-                                    <th class="pb-2 text-right font-bold">Balance</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-xs text-gray-700">
-                                @foreach ($medicineSupplies as $item)
-                                @php
-                                $balance = $item->qty - $item->used;
-                                $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
-                                $isLow = $pct <= 30; $badgeCls=$isLow
-                                    ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
-                                    : 'bg-green-50 text-green-600 border-green-200' ; @endphp <tr
-                                    class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors">
-                                    <td class="py-2.5 max-w-[120px] truncate font-semibold text-gray-800">{{ $item->name }}
-                                    </td>
-                                    <td class="py-2.5 text-center text-gray-500">{{ $item->form ?? '—' }}</td>
-                                    <td class="py-2.5 text-center font-medium">{{ $item->qty }}</td>
-                                    <td class="py-2.5 text-right">
-                                        <span class="px-2 py-1 rounded-md border text-[10px] font-bold {{ $badgeCls }}">
-                                            {{ $balance }}{{ $isLow ? ' ⚠' : '' }}
-                                        </span>
-                                    </td>
-                                    </tr>
-                                    @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div
-                        class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200">
-                        <i class="fa-solid fa-prescription-bottle-medical text-3xl mb-2 text-[#8B0000]/50"></i>
-                        <p class="text-xs font-semibold text-gray-500">No medicine items yet</p>
-                    </div>
-                    @endif
+                    <a href="{{ route('dentist.dentist.inventory') }}"
+                        class="text-[11px] font-bold text-yellow-700 bg-yellow-50 hover:bg-yellow-400 hover:text-[#8B0000] px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                        View All <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
 
+                @if ($medicineSupplies->count() > 0)
+                <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style="max-height: 180px;">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
+                            <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                <th class="pb-2 font-bold">Medicine</th>
+                                <th class="pb-2 text-center font-bold">Form</th>
+                                <th class="pb-2 text-center font-bold">Stock</th>
+                                <th class="pb-2 text-right font-bold">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs text-gray-700">
+                            @foreach ($medicineSupplies as $item)
+                            @php
+                            $balance = $item->qty - $item->used;
+                            $pct = $item->qty > 0 ? ($balance / $item->qty) * 100 : 100;
+                            $isLow = $pct <= 30; $badgeCls=$isLow
+                                ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+                                : 'bg-green-50 text-green-600 border-green-200' ; @endphp <tr
+                                class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors">
+                                <td class="py-2.5 max-w-[120px] truncate font-semibold text-gray-800">
+                                    {{ $item->name }}
+                                </td>
+                                <td class="py-2.5 text-center text-gray-500">{{ $item->form ?? '—' }}</td>
+                                <td class="py-2.5 text-center font-medium">{{ $item->qty }}</td>
+                                <td class="py-2.5 text-right">
+                                    <span class="px-2 py-1 rounded-md border text-[10px] font-bold {{ $badgeCls }}">
+                                        {{ $balance }}{{ $isLow ? ' ⚠' : '' }}
+                                    </span>
+                                </td>
+                                </tr>
+                                @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <div
+                    class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200">
+                    <i class="fa-solid fa-prescription-bottle-medical text-3xl mb-2 text-[#8B0000]/50"></i>
+                    <p class="text-xs font-semibold text-gray-500">No medicine items yet</p>
+                </div>
+                @endif
             </div>
+
         </div>
+    </div>
 
     </div>
 </main>
@@ -697,6 +981,37 @@ $calendarAppointmentCounts = [
     </div>
 </div>
 
+<div id="dayAppointmentsModal"
+    class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div id="dayAppointmentsModalBox"
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
+
+        <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 py-4 text-white">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-extrabold">Scheduled Patients</h2>
+                    <p id="dayAppointmentsModalDate" class="text-sm opacity-80 mt-1"></p>
+                </div>
+                <button type="button" onclick="closeDayAppointmentsModal()"
+                    class="text-white/80 hover:text-white text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+        </div>
+
+        <div class="px-6 py-5 max-h-[70vh] overflow-y-auto">
+            <div id="dayAppointmentsModalList" class="space-y-3"></div>
+        </div>
+
+        <div class="px-6 pb-5">
+            <button type="button" onclick="closeDayAppointmentsModal()"
+                class="w-full btn rounded-xl font-semibold border-none bg-gray-100 text-gray-700 hover:bg-gray-200">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 @if (session('activeAppointmentModal'))
 <dialog id="activeAppointmentModal" class="modal">
     <div class="modal-box">
@@ -725,6 +1040,7 @@ $calendarAppointmentCounts = [
         gadFemale: @json($gadFemale),
         gadMale: @json($gadMale),
         apptCounts: @json($calendarAppointmentCounts),
+        apptDetails: @json($calendarAppointmentDetails),
         unavailableDates: @json($unavailableDates),
         holidays: @json($philippineHolidays),
     };
@@ -733,18 +1049,24 @@ $calendarAppointmentCounts = [
     const GAD_FEMALE = dashboardData.gadFemale;
     const GAD_MALE = dashboardData.gadMale;
 
-    /* ── GREETING & CLOCK ── */
     document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("dentistName").textContent = "{{ auth()->user()->name ?? 'Doctor' }}";
+        const nameEl = document.getElementById("dentistName");
+        const greetingEl = document.getElementById("greetingText");
+
+        nameEl.textContent = "{{ auth()->user()->name ?? 'Doctor' }}";
 
         const h = new Date().getHours();
-        const greeting = h < 12 ? 'Good Morning,' : h < 18 ? 'Good Afternoon,' : 'Good Evening,';
-        const greetEl = document.querySelector(
-            '.bg-gradient-to-r.from-\\[\\#660000\\].to-\\[\\#FFD700\\].bg-clip-text');
-        if (greetEl) {
-            const fn = greetEl.childNodes[0];
-            if (fn && fn.nodeType === Node.TEXT_NODE) fn.textContent = greeting + ' ';
+        let greeting = "";
+
+        if (h < 12) {
+            greeting = "Good Morning,";
+        } else if (h < 18) {
+            greeting = "Good Afternoon,";
+        } else {
+            greeting = "Good Evening,";
         }
+
+        greetingEl.textContent = greeting + " ";
     });
 
     (function () {
@@ -783,7 +1105,6 @@ $calendarAppointmentCounts = [
         setInterval(tickClock, 1000);
     })();
 
-    /* ── STATUS MODAL ── */
     let dentistIsIn = true;
 
     function openStatusModal() {
@@ -864,7 +1185,6 @@ $calendarAppointmentCounts = [
         if (e.target === this) closeStatusModal();
     });
 
-    /* ── CHART & CALENDAR ── */
     document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             const ctx = document.getElementById('gadChart');
@@ -969,9 +1289,101 @@ $calendarAppointmentCounts = [
         loadDentistCalendar();
     });
 
+    function escHtml(str = '') {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function escJs(str = '') {
+        return String(str)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'");
+    }
+
+    function buildDayHoverCard(dateStr, appointments) {
+        if (!appointments?.length) return '';
+
+        const encodedAppointments = encodeURIComponent(JSON.stringify(appointments));
+
+        const items = appointments.slice(0, 3).map(appt => {
+            const status = String(appt.status || '').toLowerCase();
+            const canReschedule = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
+            const canCancel = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
+
+            const safeName = escJs(appt.name || 'Unknown Patient');
+            const safeService = escJs(appt.service || 'General Service');
+            const safeSchedule = escJs(`${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'}`);
+            const rawProfileUrl = appt.patientProfileUrl || '#';
+            const profileUrl = `${rawProfileUrl}${rawProfileUrl.includes('?') ? '&' : '?'}from=dashboard`;
+
+            return `
+            <div class="rounded-xl border border-gray-100 p-3 bg-white">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                    <div class="min-w-0">
+                        <p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
+                        <p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
+                    </div>
+                    <a href="${escHtml(profileUrl)}"
+                       class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
+                        View
+                    </a>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <a href="${escHtml(profileUrl)}"
+                       class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#8B0000] text-white text-[10px] font-semibold hover:bg-[#660000] transition">
+                        <i class="fa-regular fa-user text-[10px]"></i> Profile
+                    </a>
+
+                    ${canReschedule ? `
+                                <button type="button"
+                                    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-semibold hover:bg-amber-200 transition">
+                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
+                                </button>
+                            ` : ''}
+
+                    ${canCancel ? `
+                                <button type="button"
+                                    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-100 text-red-700 text-[10px] font-semibold hover:bg-red-200 transition">
+                                    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
+                                </button>
+                            ` : ''}
+                </div>
+            </div>
+        `;
+        }).join('');
+
+        return `
+            <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[340px] -translate-x-1/2 rounded-2xl
+            border border-[#efe6df] bg-white p-3 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto">
+                <div class="absolute -top-3 left-0 right-0 h-3"></div>
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
+                        <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
+                    </div>
+                    <a href="{{ route('dentist.dentist.appointments') }}"
+                        class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
+                        View all
+                    </a>
+                </div>
+                <div class="space-y-2">
+                    ${items}
+                </div>
+            </div>
+            `;
+    }
+
     function loadDentistCalendar() {
         const MAX_PER_DAY = 5;
         const apptCounts = dashboardData.apptCounts;
+        const apptDetails = dashboardData.apptDetails || {};
         const unavailableDates = dashboardData.unavailableDates;
         const allHolidays = dashboardData.holidays;
 
@@ -996,6 +1408,8 @@ $calendarAppointmentCounts = [
             });
             return out;
         }
+
+        const isHoverDevice = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 
         function renderDentistCalendar(year, month) {
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
@@ -1022,6 +1436,10 @@ $calendarAppointmentCounts = [
                 const isFull = count >= MAX_PER_DAY;
                 const isUnavail = unavailableDates.includes(dateStr) || weekend;
                 const hasAppts = count > 0;
+
+                const dayAppointments = apptDetails[dateStr] || [];
+                const canOpenModal = dayAppointments.length > 0;
+                const encodedAppointments = encodeURIComponent(JSON.stringify(dayAppointments));
 
                 let dotHtml = '',
                     badgeHtml = '',
@@ -1087,13 +1505,28 @@ $calendarAppointmentCounts = [
                     `<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">${tooltipTxt}<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>` :
                     '';
 
+                const hoverCardHtml = canOpenModal && isHoverDevice ?
+                    buildDayHoverCard(dateStr, dayAppointments) :
+                    '';
+
+                const clickOpen = canOpenModal && !isHoverDevice ?
+                    `onclick="openDayAppointmentsModal('${dateStr}', decodeURIComponent('${encodedAppointments}'))"` :
+                    '';
+
+                const mobileAvatarHtml = '';
+
                 cells += `
-                    <div class="relative group flex items-center justify-center">
-                        ${tooltipHtml}
-                        <div class="relative w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}">
-                            ${d}${dotHtml}${badgeHtml}
-                        </div>
-                    </div>`;
+                <div class="relative group flex items-center justify-center overflow-visible">
+                    ${tooltipHtml}
+                    ${hoverCardHtml}
+                    <div
+                        class="relative z-10 w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}"
+                        ${clickOpen}
+                    >
+                        ${d}${dotHtml}${badgeHtml}
+                    </div>
+                    ${mobileAvatarHtml}
+                </div>`;
             }
 
             const container = document.getElementById('dentistCalendarContainer');
@@ -1145,5 +1578,149 @@ $calendarAppointmentCounts = [
 
         renderDentistCalendar(currentYear, currentMonth);
     }
+
+    function formatModalDate(dateStr) {
+        const date = new Date(dateStr + 'T00:00:00');
+        return date.toLocaleDateString('en-PH', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    function getStatusBadgeClass(status) {
+        const s = String(status || '').toLowerCase();
+
+        if (s.includes('confirmed') || s.includes('completed')) {
+            return 'bg-green-100 text-green-700';
+        } else if (s.includes('pending')) {
+            return 'bg-yellow-100 text-yellow-700';
+        } else if (s.includes('cancelled')) {
+            return 'bg-red-100 text-red-700';
+        } else if (s.includes('rescheduled')) {
+            return 'bg-blue-100 text-blue-700';
+        }
+
+        return 'bg-gray-100 text-gray-700';
+    }
+
+    function openDayAppointmentsModal(dateStr, appointmentsJson) {
+        const modal = document.getElementById('dayAppointmentsModal');
+        const box = document.getElementById('dayAppointmentsModalBox');
+        const dateEl = document.getElementById('dayAppointmentsModalDate');
+        const listEl = document.getElementById('dayAppointmentsModalList');
+
+        let appointments = [];
+
+        try {
+            appointments = JSON.parse(appointmentsJson);
+        } catch (e) {
+            appointments = [];
+        }
+
+        dateEl.textContent = formatModalDate(dateStr);
+
+        if (!appointments.length) {
+            listEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
+                    <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-[#8B0000]"></i>
+                    <p class="text-sm font-semibold text-gray-700">No appointments for this date</p>
+                </div>
+            `;
+        } else {
+            listEl.innerHTML = appointments.map(appt => {
+                const badgeClass = getStatusBadgeClass(appt.status);
+                const initial = (appt.name || '?').charAt(0).toUpperCase();
+                const profileUrl = appt.patientProfileUrl || '#';
+                const rescheduleUrl = appt.rescheduleUrl || '#';
+                const cancelUrl = appt.cancelUrl || '#';
+                const status = String(appt.status || '').toLowerCase();
+                const canReschedule = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
+                const canCancel = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
+                const safeName = (appt.name || 'Unknown Patient').replace(/'/g, "\'");
+                const safeSchedule = `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'}`.replace(
+                    /'/g, "\'");
+
+                return `
+                    <div class="border border-gray-100 rounded-xl p-3 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-3">
+                            <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+                               class="rounded-full w-10 h-10 border-2 border-[#8B0000]/10 bg-[#8B0000]/10 flex items-center justify-center font-bold text-sm text-[#8B0000] flex-shrink-0">
+                                ${initial}
+                            </a>
+
+                            <div class="flex-1 min-w-0">
+                                <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+                                   class="font-semibold text-sm text-gray-800 truncate hover:text-[#8B0000] transition block">
+                                    ${appt.name || 'Unknown Patient'}
+                                </a>
+                                <p class="text-xs text-gray-500 truncate flex items-center gap-1">
+                                    <i class="fa-solid fa-stethoscope text-[10px]"></i>
+                                    ${appt.service || 'General Service'} · ${appt.time || '—'}
+                                </p>
+                            </div>
+
+                            <span class="px-2 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
+                                ${appt.status || 'Pending'}
+                            </span>
+                        </div>
+
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-[11px] font-semibold hover:bg-[#660000] transition">
+                                <i class="fa-regular fa-user text-[10px]"></i>
+                                View Profile
+                            </a>
+
+                            ${canReschedule ? `
+                    <button type="button"
+                        onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${appt.service || ''}', '${rescheduleUrl}')"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[11px] font-semibold hover:bg-amber-200 transition">
+                        <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                        Reschedule
+                    </button>
+                ` : ''}
+
+                 ${canCancel ? `
+                        <button type="button"
+                        onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-[11px] font-semibold hover:bg-red-200 transition">
+                                                    <i class="fa-solid fa-ban text-[10px]"></i>
+                                                    Cancel
+                                                </button>
+                                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+
+        setTimeout(() => {
+            box.classList.replace('scale-90', 'scale-100');
+        }, 10);
+    }
+
+    function closeDayAppointmentsModal() {
+        const modal = document.getElementById('dayAppointmentsModal');
+        const box = document.getElementById('dayAppointmentsModalBox');
+
+        box.classList.replace('scale-100', 'scale-90');
+
+        setTimeout(() => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }, 150);
+    }
+
+    document.addEventListener('click', function (e) {
+        const modal = document.getElementById('dayAppointmentsModal');
+        if (e.target === modal) {
+            closeDayAppointmentsModal();
+        }
+    });
 </script>
 @endsection

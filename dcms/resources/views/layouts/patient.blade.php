@@ -12,10 +12,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-    
+    <link rel="stylesheet" href="{{ asset('css/greeting.css') }}">
+
     <script>
         tailwind.config = {
             darkMode: ['class', '[data-theme="dark"]'],
@@ -34,24 +36,23 @@
             margin: 0;
         }
     </style>
-    
+
     @include('partials.patient.styles')
     @include('partials.terms-styles')
     @include('partials.global-toast-styles')
     @yield('styles')
-    
+
 </head>
 
-<body class="@yield('body-class', 'bg-[#F4F4F4]')">
-
+<body class="role-patient @yield('body-class', 'bg-[#F4F4F4]')">
+    
     @include('partials.header', [
-    'role' => 'patient',
-    'patient' => $patient ?? null,
-    'notifications' => $notifications ?? [],
-    'showMobileMenu' => false,
-    'showSettings' => false
-])
-
+        'role' => 'patient',
+        'patient' => $patient ?? null,
+        'notifications' => $notifications ?? [],
+        'showMobileMenu' => false,
+        'showSettings' => false,
+    ])
 
     @include('partials.patient.sidebar')
     @include('partials.patient.mobile-nav')
@@ -72,11 +73,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js" defer></script>
 
     @include('partials.global-toast')
-    
+
     {{-- GLOBAL TERMS MODAL --}}
     @include('partials.terms-modal')
     @include('partials.terms-scripts')
-    
+
     @stack('scripts')
     @yield('scripts')
 

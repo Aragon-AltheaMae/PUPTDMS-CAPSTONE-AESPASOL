@@ -18,6 +18,13 @@ class DocumentRequestController extends Controller
             'purpose' => 'required|string|max:150',
         ]);
 
+        if (!session('patient_id')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Patient session not found. Please log in again.',
+            ], 401);
+        }
+
         try {
             DB::transaction(function () use ($request) {
                 $nextId = (DocumentRequest::max('id') ?? 0) + 1;
@@ -27,33 +34,33 @@ class DocumentRequestController extends Controller
                     'reference_number' => 'DOC-' . now()->format('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
                     'document_type' => $request->document_type,
                     'purpose' => $request->purpose,
-                    'priority' => 'normal',
+                    // 'priority' => 'normal',
                     'request_date' => Carbon::now()->toDateString(),
                     'request_time' => Carbon::now()->toTimeString(),
                     'status' => 'pending',
                 ]);
             });
+
+            $patient = Patient::find(session('patient_id'));
+
+            if ($patient) {
+                AuditLogger::log(
+                    'create',
+                    'document_request',
+                    'Patient submitted document request'
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Document request submitted successfully.',
+            ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit request.'
+                'message' => 'Failed to submit request: ' . $e->getMessage(),
             ], 500);
         }
-
-        $patient = Patient::find(session('patient_id'));
-
-        if ($patient) {
-            AuditLogger::log(
-                'create',
-                'document_request',
-                'Patient submitted document request'
-            );
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Document request submitted successfully.'
-        ]);
     }
 
     public function index()
@@ -103,13 +110,13 @@ class DocumentRequestController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('reference_number', 'like', "%{$search}%")
-                ->orWhere('document_type', 'like', "%{$search}%")
-                ->orWhere('purpose', 'like', "%{$search}%")
-                ->orWhereHas('patient', function ($patientQuery) use ($search) {
-                    $patientQuery->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('student_id', 'like', "%{$search}%");
-                });
+                    ->orWhere('document_type', 'like', "%{$search}%")
+                    ->orWhere('purpose', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($patientQuery) use ($search) {
+                        $patientQuery->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_id', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -118,8 +125,10 @@ class DocumentRequestController extends Controller
         }
 
         if ($request->filled('type')) {
-            $query->whereRaw('LOWER(document_type) = ?', 
-            [strtolower($request->type)]);
+            $query->whereRaw(
+                'LOWER(document_type) = ?',
+                [strtolower($request->type)]
+            );
         }
 
         if ($request->filled('purpose')) {
@@ -165,7 +174,7 @@ class DocumentRequestController extends Controller
             ->orderBy('purpose')
             ->pluck('purpose')
             ->values();
-        
+
         $types = DocumentRequest::query()
             ->whereNotNull('document_type')
             ->where('document_type', '!=', '')

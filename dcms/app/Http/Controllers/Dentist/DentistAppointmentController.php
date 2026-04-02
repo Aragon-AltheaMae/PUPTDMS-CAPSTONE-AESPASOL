@@ -74,11 +74,12 @@ class DentistAppointmentController extends Controller
         }
 
         $appointment->load('patient');
+        $patient = $appointment->patient;
 
         $patient = $appointment->patient;
 
         if (!$patient) {
-            return redirect()->route('dentist.appointments')
+            return redirect()->route('dentist.dentist.appointments')
                 ->with('error', 'Patient not found for this appointment.');
         }
 
@@ -109,7 +110,7 @@ class DentistAppointmentController extends Controller
         $notifications = collect([]);
 
 
-        return view('dentist-patientprofile', compact(
+        return view('dentist.dentist-patientprofile', compact(
             'patient',
             'appointment',
             'futureVisits',
@@ -125,7 +126,7 @@ class DentistAppointmentController extends Controller
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!in_array($appointment->status, ['upcoming', 'rescheduled', 'pending', 'confirmed'])) {
+        if (!in_array($appointment->status, ['upcoming', 'rescheduled'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'This appointment cannot be cancelled.',

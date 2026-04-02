@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -43,8 +44,8 @@
 
 </head>
 
-<body class="@yield('body-class', 'bg-[#F4F4F4]')">
-
+<body class="role-dentist @yield('body-class', 'bg-[#F4F4F4]')">
+    
     @include('partials.header', [
         'role' => 'dentist',
         'notifications' => $notifications ?? [],
@@ -56,6 +57,11 @@
     @include('partials.dentist.drawer')
 
     @include('partials.impersonation-banner')
+
+    <div id="toastContainer"></div>
+
+    @include('components.reschedule-modal')
+    @include('components.cancel-modal')
 
     @yield('content')
 
@@ -72,6 +78,43 @@
     {{-- GLOBAL TERMS MODAL --}}
     @include('partials.terms-modal')
     @include('partials.terms-scripts')
+
+    @if (View::hasSection('usesAppointmentCalendar'))
+        @include('components.appointment-calendar-script', [
+            'mode' => 'booking',
+            'calendarContainerId' => 'calendarContainer',
+            'calGridId' => 'calGrid',
+            'calMonthLabelId' => 'calMonthLabel',
+            'calYearLabelId' => 'calYearLabel',
+            'dateInputId' => 'new_appointment_date',
+            'timeInputId' => 'new_appointment_time',
+            'dateBannerId' => 'dateBanner',
+            'slotPlaceholderId' => 'slotPlaceholder',
+            'slotContainerId' => 'slotContainer',
+            'slotGridId' => 'slotGrid',
+            'selectedSlotDisplayId' => 'selectedSlotDisplay',
+            'selectedSlotTextId' => 'selectedSlotText',
+            'selectedTimePillId' => 'selectedTimePill',
+            'selectedTimeTextId' => 'selectedTimeText',
+            'datePillId' => 'datePill',
+            'dateErrorId' => 'dateError',
+            'timeErrorId' => 'timeError',
+            'calendarWrapSelector' => '.cal-wrap',
+            'slotsWrapSelector' => '.slots-wrap',
+            'slotEndpoint' => route('dentist.appointment.slots'),
+            'scheduleRules' => isset($scheduleRules) ? $scheduleRules : \App\Models\ClinicSchedule::active()->get()->values()->toArray(),
+            'blockedDates' => isset($blockedDates) ? $blockedDates : (isset($unavailableDates) ? $unavailableDates : []),
+            'appointmentCountsPerDay' => isset($appointmentCountsPerDay) ? $appointmentCountsPerDay : [],
+            'philippineHolidays' => isset($philippineHolidays) ? $philippineHolidays : [],
+            'disallowToday' => true,
+            'allowToggleOffDate' => true,
+            'useDynamicScheduleRules' => true,
+            'renderStyle' => 'dentist',
+        ])
+    @endif
+
+    @include('components.reschedule-modal-script')
+    @include('components.cancel-modal-script')
 
     @stack('scripts')
     @yield('scripts')
