@@ -401,10 +401,16 @@
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
         if (banner) {
-            const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
-            banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${maxSlots} slots left)</span>`;
-            banner.classList.remove("hidden");
-            banner.style.display = "block";
+            if (calendarConfig.renderStyle === 'dentist') {
+                banner.classList.add("hidden");
+                banner.style.display = "none";
+                banner.innerHTML = "";
+            } else {
+                const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
+                banner.innerHTML = `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${maxSlots} slots left)</span>`;
+                banner.classList.remove("hidden");
+                banner.style.display = "block";
+            }
         }
 
         if (pill) {

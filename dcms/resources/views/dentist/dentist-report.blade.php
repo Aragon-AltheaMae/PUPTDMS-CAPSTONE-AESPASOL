@@ -356,8 +356,8 @@ $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 @endphp
 
-<main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
-  <div class="w-full fade-in">
+<main id="mainContent" class="pt-[90px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
+    <div class="w-full fade-in">
 
     <div class="page-title-row flex items-start md:items-center justify-between mb-8">
       <div>

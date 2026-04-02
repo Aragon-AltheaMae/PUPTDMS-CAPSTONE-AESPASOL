@@ -1,4 +1,54 @@
 <script>
+
+    function dismissToast(toast) {
+        if (!toast || toast.classList.contains('toast-exit')) return;
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 350);
+    }
+
+    function showToast({
+        title = '',
+        message = '',
+        duration = 4000,
+        tone = 'success'
+    }) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const icon = tone === 'danger'
+            ? '<i class="fa-solid fa-ban text-red-400 text-sm"></i>'
+            : '<i class="fa-solid fa-circle-check text-green-400 text-sm"></i>';
+
+        const toast = document.createElement('div');
+        toast.className = `toast-item toast-${tone}`;
+        toast.innerHTML = `
+            <div class="toast-icon-wrap">${icon}</div>
+            <div class="flex-1 min-w-0">
+                <div class="toast-title">${title}</div>
+                ${message ? `<div class="toast-message">${message}</div>` : ''}
+            </div>
+            <button class="toast-close" onclick="dismissToast(this.closest('.toast-item'))">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="toast-progress" style="animation-duration:${duration}ms;"></div>
+        `;
+
+        container.appendChild(toast);
+        setTimeout(() => dismissToast(toast), duration);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const raw = sessionStorage.getItem('dentistToast');
+        if (!raw) return;
+
+        try {
+            const toast = JSON.parse(raw);
+            showToast(toast);
+        } catch (e) {}
+
+        sessionStorage.removeItem('dentistToast');
+    });
+    
     document.documentElement.classList.add('sidebar-preload');
 
     (function () {

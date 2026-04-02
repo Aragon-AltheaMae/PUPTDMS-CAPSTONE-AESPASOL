@@ -14,7 +14,7 @@ class DocumentRequest extends Model
         'reference_number',
         'document_type',
         'purpose',
-        'priority',
+        // 'priority',
         'request_date',
         'request_time',
         'status',

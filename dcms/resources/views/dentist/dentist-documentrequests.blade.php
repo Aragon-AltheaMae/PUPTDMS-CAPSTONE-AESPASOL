@@ -1997,7 +1997,7 @@ $notifCount = $notifications->count();
               </div>
               
               <button type="button" id="searchClearBtn" onclick="clearSearch()"
-                class="text-xs font-bold text-red-600 hover:text-red-800 transition-colors hidden flex-shrink-0 px-1">
+                class="text-xs font-semibold text-red-600 hover:text-red-800 transition-colors hidden flex-shrink-0 px-1">
                 Clear
               </button>
             </div>

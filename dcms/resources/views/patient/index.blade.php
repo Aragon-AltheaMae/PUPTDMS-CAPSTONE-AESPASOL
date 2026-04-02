@@ -314,14 +314,17 @@
 
             {{-- Hero Welcome Section --}}
             <div id="heroWrapper">
-                <div class="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm p-6 sm:p-10 animate-pulse overflow-hidden relative">
+                <div
+                    class="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm p-6 sm:p-10 animate-pulse overflow-hidden relative">
                     <div class="h-8 w-32 bg-gray-200 rounded-full mb-4"></div>
                     <div class="h-10 sm:h-12 w-3/4 sm:w-1/2 bg-gray-200 rounded-lg mb-4"></div>
                     <div class="h-5 sm:h-6 w-full sm:w-2/3 bg-gray-200 rounded-lg mb-8"></div>
                     <div class="h-12 w-48 bg-gray-200 rounded-xl"></div>
-                    
+
                     <div class="absolute right-[-10%] sm:right-4 top-1/2 -translate-y-1/2">
-                        <div class="w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] md:w-[260px] md:h-[260px] bg-gray-100 rounded-full opacity-50"></div>
+                        <div
+                            class="w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] md:w-[260px] md:h-[260px] bg-gray-100 rounded-full opacity-50">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -674,10 +677,66 @@
 
         </div>
     </main>
+
+    <div id="docSuccessModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 md:p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300"
+            id="docSuccessModalContent">
+
+            <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-check text-3xl text-green-500"></i>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Request Sent!</h3>
+            <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+                Your document request has been successfully submitted. We will process it shortly and notify you once it's
+                ready. Have a great day!
+            </p>
+
+            <button onclick="closeDocSuccessModal()"
+                class="w-full bg-[#8B0000] hover:bg-[#6b0000] text-white font-bold py-3.5 px-4 rounded-xl transition-colors shadow-md shadow-red-900/20">
+                Okay, got it!
+            </button>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
     <script>
+        function openDocSuccessModal() {
+            const modal = document.getElementById('docSuccessModal');
+            const content = document.getElementById('docSuccessModalContent');
+
+            modal.classList.remove('hidden');
+
+            void modal.offsetWidth;
+
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeDocSuccessModal() {
+            const modal = document.getElementById('docSuccessModal');
+            const content = document.getElementById('docSuccessModalContent');
+
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        document.getElementById('docSuccessModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDocSuccessModal();
+            }
+        });
+
         const calendarData =
             {{ Illuminate\Support\Js::from([
                 'appointments' => $calendarAppointments ?? [],
@@ -834,7 +893,7 @@
         function renderHero() {
             var wrapper = document.getElementById('heroWrapper');
             if (!wrapper) return;
-            
+
             var greetingText = "Good evening";
             var greetingIcon = "fa-solid fa-moon text-blue-200 text-sm greet-float";
             var h = new Date().getHours();
@@ -846,28 +905,29 @@
                 greetingIcon = 'fa-solid fa-cloud-sun text-yellow-300 text-sm greet-drift';
             }
 
-            wrapper.innerHTML = 
+            wrapper.innerHTML =
                 '<div class="bg-gradient-to-br from-[#8B0000] via-[#7A0000] to-[#5A0000] rounded-[1.5rem] p-6 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden shadow-lg border border-white/10 fade-in">' +
-                    '<div class="absolute inset-0 bg-[url(\'data:image/svg+xml,%3Csvg width=\\\'60\\\' height=\\\'60\\\' viewBox=\\\'0 0 60 60\\\' xmlns=\\\'http://www.w3.org/2000/svg\\\'%3E%3Cg fill=\\\'none\\\' fill-rule=\\\'evenodd\\\'%3E%3Cg fill=\\\'%23ffffff\\\' fill-opacity=\\\'0.03\\\'%3E%3Ccircle cx=\\\'30\\\' cy=\\\'30\\\' r=\\\'20\\\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')]"></div>' +
-                    '<div class="hero-text relative z-10 w-full lg:w-[65%]">' +
-                        '<div class="inline-flex items-center gap-2 bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-4 border border-white/10">' +
-                            '<i class="' + greetingIcon + '"></i>' +
-                            '<p class="text-xs sm:text-sm font-medium text-white/90">' + greetingText + '</p>' +
-                        '</div>' +
-                        '<h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mt-1 mb-2 text-white leading-tight break-words hyphens-auto">' +
-                            'Welcome, <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500">' + PROFILE_DATA.name + '!</span>' +
-                            '<i class="fa-solid fa-hand text-yellow-400 wave-hand inline-block ml-1"></i>' +
-                        '</h1>' +
-                        '<h2 class="text-sm sm:text-base font-medium mt-2 mb-6 text-white/80 max-w-md">Healthy teeth start with one appointment. Let\'s maintain that bright smile.</h2>' +
-                        '<a href="' + ROUTE_BOOK + '" class="inline-block">' +
-                            '<button class="shimmer-btn px-5 sm:px-6 py-3 rounded-xl border border-white/20 text-sm sm:text-base font-bold text-white transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-red-900/50 flex items-center gap-2">' +
-                                '<i class="fa-solid fa-calendar-plus"></i> Book Appointment' +
-                            '</button>' +
-                        '</a>' +
-                    '</div>' +
-                    '<div class="absolute right-[-10%] sm:right-4 top-1/2 -translate-y-1/2 pointer-events-none z-0">' +
-                        '<img src="{{ asset("images/home-tooth.png") }}" alt="Tooth" class="hero-tooth float-slow w-[120px] sm:w-[220px] md:w-[260px] drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] opacity-20 sm:opacity-90" />' +
-                    '</div>' +
+                '<div class="absolute inset-0 bg-[url(\'data:image/svg+xml,%3Csvg width=\\\'60\\\' height=\\\'60\\\' viewBox=\\\'0 0 60 60\\\' xmlns=\\\'http://www.w3.org/2000/svg\\\'%3E%3Cg fill=\\\'none\\\' fill-rule=\\\'evenodd\\\'%3E%3Cg fill=\\\'%23ffffff\\\' fill-opacity=\\\'0.03\\\'%3E%3Ccircle cx=\\\'30\\\' cy=\\\'30\\\' r=\\\'20\\\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')]"></div>' +
+                '<div class="hero-text relative z-10 w-full lg:w-[65%]">' +
+                '<div class="inline-flex items-center gap-2 bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-4 border border-white/10">' +
+                '<i class="' + greetingIcon + '"></i>' +
+                '<p class="text-xs sm:text-sm font-medium text-white/90">' + greetingText + '</p>' +
+                '</div>' +
+                '<h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mt-1 mb-2 text-white leading-tight break-words hyphens-auto">' +
+                'Welcome, <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500">' +
+                PROFILE_DATA.name + '!</span>' +
+                '<i class="fa-solid fa-hand text-yellow-400 wave-hand inline-block ml-1"></i>' +
+                '</h1>' +
+                '<h2 class="text-sm sm:text-base font-medium mt-2 mb-6 text-white/80 max-w-md">Healthy teeth start with one appointment. Let\'s maintain that bright smile.</h2>' +
+                '<a href="' + ROUTE_BOOK + '" class="inline-block">' +
+                '<button class="shimmer-btn px-5 sm:px-6 py-3 rounded-xl border border-white/20 text-sm sm:text-base font-bold text-white transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-red-900/50 flex items-center gap-2">' +
+                '<i class="fa-solid fa-calendar-plus"></i> Book Appointment' +
+                '</button>' +
+                '</a>' +
+                '</div>' +
+                '<div class="absolute right-[-10%] sm:right-4 top-1/2 -translate-y-1/2 pointer-events-none z-0">' +
+                '<img src="{{ asset('images/home-tooth.png') }}" alt="Tooth" class="hero-tooth float-slow w-[120px] sm:w-[220px] md:w-[260px] drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] opacity-20 sm:opacity-90" />' +
+                '</div>' +
                 '</div>';
         }
 
@@ -1204,5 +1264,88 @@
             };
             renderCalendar(curYear, curMonth);
         }
+
+        function showInlineWarning(warningEl, message) {
+            if (!warningEl) return;
+            warningEl.textContent = message;
+            warningEl.classList.remove('hidden');
+
+            setTimeout(() => {
+                warningEl.classList.add('hidden');
+            }, 2500);
+        }
+
+        async function submitDocumentRequestForm(formId, modalId, warningId) {
+            const form = document.getElementById(formId);
+            const modal = document.getElementById(modalId);
+            const warningEl = document.getElementById(warningId);
+
+            if (!form) return;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const documentType = form.querySelector('[name="document_type"]');
+                const purpose = form.querySelector('[name="purpose"]');
+                const submitBtn = form.querySelector('button[type="submit"]');
+
+                if (!documentType?.value || !purpose?.value) {
+                    showInlineWarning(warningEl, 'Please complete all required fields');
+                    return;
+                }
+
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Submitting...';
+
+                try {
+                    const formData = new FormData(form);
+
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        showInlineWarning(warningEl, data.message || 'Failed to submit request.');
+                        return;
+                    }
+
+                    if (modal && typeof modal.close === 'function') {
+                        modal.close();
+                    }
+
+                    form.reset();
+                    openDocSuccessModal();
+                } catch (error) {
+                    showInlineWarning(warningEl, 'Something went wrong. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            submitDocumentRequestForm(
+                'clearanceRequestForm',
+                'dentalClearanceModal',
+                'clearanceWarning'
+            );
+
+            submitDocumentRequestForm(
+                'healthRecordRequestForm',
+                'dentalHealthRecordModal',
+                'healthRecordWarning'
+            );
+        });
     </script>
 @endsection
