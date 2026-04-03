@@ -34,6 +34,16 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
+use App\Services\FlssService;
+
+//api para sa project nila matt
+Route::get('/test/flss/health', function (FlssService $flssService) {
+    return response()->json($flssService->healthCheck());
+});
+
+Route::get('/test/flss/faculty-profiles', function (FlssService $flssService) {
+    return response()->json($flssService->getFacultyProfiles());
+});
 
 // routes/web.php
 
