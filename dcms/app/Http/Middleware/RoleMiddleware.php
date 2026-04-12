@@ -2,38 +2,40 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Patient;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Patient;
 
 class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!session()->has('role')) {
+        if (!Auth::check()) {
             return redirect('/login');
         }
 
-        // If admin is impersonating, use that role for route checks
-        $userRole = session('impersonated_role') ?: session('role');
+        $user = Auth::user();
 
-        if (!in_array($userRole, $roles)) {
+        // If admin is impersonating, use impersonated role first
+        $userRole = session('impersonated_role') ?: optional($user->role)->slug;
+
+        if (!$userRole || !in_array($userRole, $roles, true)) {
             abort(403, 'Unauthorized access.');
         }
 
         // If viewing as patient, make sure patient data exists
         if ($userRole === 'patient') {
-
             $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
             if (!$patientId) {
-                // If this is an impersonation session, don't destroy admin login
                 if (session()->has('impersonator_role')) {
                     return redirect()->route('admin.admin.dashboard')
                         ->with('error', 'No patient selected for impersonation.');
                 }
 
+                Auth::logout();
                 session()->forget(['role', 'patient_id']);
                 return redirect('/login');
             }
@@ -46,6 +48,7 @@ class RoleMiddleware
                         ->with('error', 'Impersonated patient was not found.');
                 }
 
+                Auth::logout();
                 session()->forget(['role', 'patient_id']);
                 return redirect('/login');
             }
