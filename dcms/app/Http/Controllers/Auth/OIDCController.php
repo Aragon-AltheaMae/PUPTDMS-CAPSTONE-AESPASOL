@@ -201,28 +201,46 @@ class OIDCController extends Controller
             })
             ->first();
 
+        $incomingRoles = $profile['roles'] ?? [];
+
+        // 🔥 FIX: ensure roles is always an array
+        if (is_string($incomingRoles)) {
+            $incomingRoles = $incomingRoles ? [$incomingRoles] : [];
+        }
+
+        $roleSlug = null;
+
+        foreach ($incomingRoles as $incomingRole) {
+            $incomingRole = strtolower($incomingRole);
+
+            if (str_contains($incomingRole, 'dentist')) {
+                $roleSlug = 'dentist';
+                break;
+            }
+
+            if (str_contains($incomingRole, 'admin')) {
+                $roleSlug = 'admin';
+            }
+        }
+
+        if (!$roleSlug) {
+            $roleSlug = 'patient';
+        }
+
+        $roleId = Role::where('slug', $roleSlug)->value('id');
+
+        Log::info('ROLE MAPPING DEBUG', [
+            'incoming_roles' => $incomingRoles,
+            'mapped_role'    => $roleSlug,
+            'mapped_role_id' => $roleId,
+        ]);
+
+        if (!$roleId) {
+            return redirect()->route('login')
+                ->with('error', 'No matching local role found for this SSO account.');
+        }
+
         if (!$user) {
-            $roleName = strtolower($profile['roles'][0] ?? '');
-
-            if (str_contains($roleName, 'admin')) {
-                $roleId = Role::where('slug', 'admin')->value('id');
-            } elseif (str_contains($roleName, 'dentist')) {
-                $roleId = Role::where('slug', 'dentist')->value('id');
-            } else {
-                $roleId = Role::where('slug', 'patient')->value('id');
-            }
-
-            Log::info('ROLE MAPPING DEBUG', [
-                'incoming_role'  => $roleName,
-                'mapped_role_id' => $roleId,
-                'all_roles'      => $profile['roles'] ?? [],
-            ]);
-
-            if (!$roleId) {
-                return redirect()->route('login')
-                    ->with('error', 'No matching local role found for this SSO account.');
-            }
-
             $user = User::create([
                 'name'          => $name ?: $email,
                 'email'         => $email,
@@ -240,7 +258,6 @@ class OIDCController extends Controller
                 'role_id' => $user?->role_id,
             ]);
         }
-
         $user = User::where('email', $email)
             ->when($ssoUserId, function ($query) use ($ssoUserId) {
                 $query->orWhere('sso_user_id', $ssoUserId);
@@ -267,6 +284,7 @@ class OIDCController extends Controller
 
         $user->name          = $name ?: $user->name;
         $user->email         = $email;
+        $user->role_id       = $roleId;
         $user->sso_user_id   = $ssoUserId ?: $user->sso_user_id;
         $user->access_token  = $accessToken;
         $user->refresh_token = $refreshToken;
@@ -289,7 +307,9 @@ class OIDCController extends Controller
             )
         );
 
-        Auth::login($user);
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate();
+        session()->save();
 
         $roleSlug = optional($user->role)->slug;
 
