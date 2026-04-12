@@ -78,13 +78,6 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-// Dentist Login
-Route::get('/dentist/login', function () {
-    return view('auth.dentist-login');
-})->name('dentist.login');
-
-// Admin Login
-Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 
 
 /*
@@ -155,39 +148,8 @@ Route::post('/register', function (Request $request) {
 });
 
 // Single Login POST — handles patient, dentist, and admin
+// ── PATIENT ──
 Route::post('/login', function (Request $request) {
-
-    // ── DENTIST ──
-    if ($request->email === 'dentist' && $request->password === 'dentist123') {
-        session([
-            'role' => 'dentist',
-            'dentist_email' => 'dentist'
-        ]);
-
-        AuditLogger::log('login', 'authentication', 'Dentist logged into the system');
-
-        return redirect()->route('dentist.dentist.dashboard')
-            ->with('login_as', 'Dentist')
-            ->with('show_terms_modal', true);
-    }
-
-    // ── ADMIN ──
-    if ($request->email === 'admin' && $request->password === 'admin123') {
-        session([
-            'admin_logged_in' => true,
-            'role' => 'admin',
-            'admin_id' => 1,
-            'admin_email' => 'admin'
-        ]);
-
-        AuditLogger::log('login', 'authentication', 'Admin logged into the system');
-
-        return redirect()->route('admin.admin.dashboard')
-            ->with('login_as', 'Administrator')
-            ->with('show_terms_modal', true);
-    }
-
-    // ── PATIENT ──
     $patient = Patient::where('email', $request->email)->first();
 
     if (!$patient) {
@@ -198,62 +160,35 @@ Route::post('/login', function (Request $request) {
         return back()->with('error', 'Incorrect password. Please try again.');
     }
 
-    session([
-        'role' => 'patient',
-        'patient_id' => $patient->id,
-        'email' => $patient->email
-    ]);
+    $user = User::where('email', $patient->email)->first();
 
-    AuditLogger::log('login', 'authentication', 'Patient logged into the system');
+    if (!$user) {
+        return back()->with('error', 'No linked user account found for this patient.');
+    }
+
+    if (!$user->hasRole('patient')) {
+        return back()->with('error', 'This account is not allowed to log in as patient.');
+    }
+
+    Auth::login($user);
 
     session([
-        'role' => 'patient',
         'patient_id' => $patient->id,
-        'email' => $patient->email
+        'email' => $patient->email,
     ]);
 
     session()->save();
 
-    // dd([
-    //     'message' => 'patient login success',
-    //     'session' => session()->all(),
-    //     'redirecting_to' => route('patient.dashboard'),
-    // ]);
+    AuditLogger::log('login', 'authentication', 'Patient logged into the system');
 
     return redirect()->route('patient.dashboard')
         ->with('login_as', $patient->name)
         ->with('show_terms_modal', true);
 });
 
-// Dentist Login POST (hard-coded for now)
-// Route::post('/dentist/login', function (Request $request) {
-//     if ($request->email === 'dentist' && $request->password === 'dentist123') {
-//         session([
-//             'role' => 'dentist',
-//             'dentist_email' => 'dentist',
-//         ]);
-
-//         AuditLogger::log(
-//             'login',
-//             'authentication',
-//             'Dentist logged into the system'
-//         );
-
-//         return redirect()->route('dentist.dentist.dashboard');
-//     }
-
-//     return back()->with('error', 'Invalid dentist credentials');
-// })->name('dentist.login.submit');
-
-// Admin Login POST
-// Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 
 // Logout (all roles)
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
-
-// Admin Logout
-Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -261,210 +196,212 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-    // ADMIN DASHBOARD
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-        ->name('admin.admin.dashboard');
+        // ADMIN DASHBOARD
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('admin.admin.dashboard');
 
-    // ROLE PERMISSIONS
-    Route::get('/role-permissions', [RolePermissionController::class, 'index'])
-        ->name('admin.role_permissions');
+        // ROLE PERMISSIONS
+        Route::get('/role-permissions', [RolePermissionController::class, 'index'])
+            ->name('admin.role_permissions');
 
-    Route::post('/role-permissions/update', [RolePermissionController::class, 'update'])
-        ->name('admin.role_permissions.update');
+        Route::post('/role-permissions/update', [RolePermissionController::class, 'update'])
+            ->name('admin.role_permissions.update');
 
-    Route::post('/role-permissions/reset', [RolePermissionController::class, 'reset'])
-        ->name('admin.role_permissions.reset');
+        Route::post('/role-permissions/reset', [RolePermissionController::class, 'reset'])
+            ->name('admin.role_permissions.reset');
 
-    Route::post('/role-permissions/store-role', [RolePermissionController::class, 'storeRole'])
-        ->name('admin.role_permissions.store_role');
+        Route::post('/role-permissions/store-role', [RolePermissionController::class, 'storeRole'])
+            ->name('admin.role_permissions.store_role');
 
-    Route::delete('/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
-        ->name('admin.role_permissions.destroy_role');
+        Route::delete('/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
+            ->name('admin.role_permissions.destroy_role');
 
 
-    // SYSTEM LOGS
-    Route::get('/system-logs', [SystemLogController::class, 'index'])
-        ->name('admin.system_logs');
+        // SYSTEM LOGS
+        Route::get('/system-logs', [SystemLogController::class, 'index'])
+            ->name('admin.system_logs');
 
-    Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
-        ->name('admin.system_logs.fetch');
+        Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
+            ->name('admin.system_logs.fetch');
 
-    Route::get('/admin/system-logs/check', [SystemLogController::class, 'checkLatest'])
-        ->name('admin.system_logs.check');
+        Route::get('/admin/system-logs/check', [SystemLogController::class, 'checkLatest'])
+            ->name('admin.system_logs.check');
 
-    Route::get('/admin/system-logs/export', [SystemLogController::class, 'export'])
-        ->name('admin.system_logs.export');
+        Route::get('/admin/system-logs/export', [SystemLogController::class, 'export'])
+            ->name('admin.system_logs.export');
 
-    // PATIENT DIRECTORY
-    Route::get('/patient-directory', [AdminPatientController::class, 'index'])
-        ->name('admin.patient_directory');
+        // PATIENT DIRECTORY
+        Route::get('/patient-directory', [AdminPatientController::class, 'index'])
+            ->name('admin.patient_directory');
 
-    Route::get('/patients', [AdminPatientController::class, 'index'])
-        ->name('admin.admin.patients');
+        Route::get('/patients', [AdminPatientController::class, 'index'])
+            ->name('admin.admin.patients');
 
-    Route::get('/patient/{patient}', [AdminPatientController::class, 'show'])
-        ->name('admin.admin.patient.profile');
+        Route::get('/patient/{patient}', [AdminPatientController::class, 'show'])
+            ->name('admin.admin.patient.profile');
 
-    // APPOINTMENTS
-    Route::get('/appointments', [AdminAppointmentController::class, 'index'])
-        ->name('admin.admin.appointments');
+        // APPOINTMENTS
+        Route::get('/appointments', [AdminAppointmentController::class, 'index'])
+            ->name('admin.admin.appointments');
 
-    Route::get('/appointments/{id}', [AdminAppointmentController::class, 'show'])
-        ->name('admin.admin.appointments.show');
+        Route::get('/appointments/{id}', [AdminAppointmentController::class, 'show'])
+            ->name('admin.admin.appointments.show');
 
-    Route::get('/appointments/{id}/reschedule', [AdminAppointmentController::class, 'reschedule'])
-        ->name('admin.admin.appointments.reschedule');
+        Route::get('/appointments/{id}/reschedule', [AdminAppointmentController::class, 'reschedule'])
+            ->name('admin.admin.appointments.reschedule');
 
-    Route::get('/appointments/{id}/start', [AdminAppointmentController::class, 'start'])
-        ->name('admin.admin.appointments.start');
+        Route::get('/appointments/{id}/start', [AdminAppointmentController::class, 'start'])
+            ->name('admin.admin.appointments.start');
 
-    Route::post('/appointments/{id}/cancel', [AdminAppointmentController::class, 'cancel'])
-        ->name('admin.admin.appointments.cancel');
+        Route::post('/appointments/{id}/cancel', [AdminAppointmentController::class, 'cancel'])
+            ->name('admin.admin.appointments.cancel');
 
-    // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
-    Route::get('/patients/list', function () {
+        // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
+        Route::get('/patients/list', function () {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
 
-        if (!session('admin_logged_in') || !in_array(session('role'), ['super_admin', 'admin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+            if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
 
-        $patients = Patient::select('id', 'name', 'email', 'phone')
-            ->orderBy('name')
-            ->get();
+            $patients = Patient::select('id', 'name', 'email', 'phone')
+                ->orderBy('name')
+                ->get();
 
-        return response()->json($patients);
-    })->name('admin.patients.list');
+            return response()->json($patients);
+        })->name('admin.patients.list');
 
-    // ACADEMIC PERIOD
-    Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
-        ->name('admin.academic_periods');
-    Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
-        ->name('admin.academic_periods.store');
-    Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
-        ->name('admin.academic_periods.update');
-    Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
-        ->name('admin.academic_periods.destroy');
-    Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
-        ->name('admin.academic_periods.set_active');
+        // ACADEMIC PERIOD
+        Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
+            ->name('admin.academic_periods');
+        Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
+            ->name('admin.academic_periods.store');
+        Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
+            ->name('admin.academic_periods.update');
+        Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
+            ->name('admin.academic_periods.destroy');
+        Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
+            ->name('admin.academic_periods.set_active');
 
-    // CLINIC SCHEDULE
-    Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
-        ->name('admin.clinic_schedule');
+        // CLINIC SCHEDULE
+        Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
+            ->name('admin.clinic_schedule');
 
-    Route::post('/clinic-schedule', [ClinicScheduleController::class, 'store'])
-        ->name('admin.clinic_schedule.store');
+        Route::post('/clinic-schedule', [ClinicScheduleController::class, 'store'])
+            ->name('admin.clinic_schedule.store');
 
-    Route::put('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'update'])
-        ->name('admin.clinic_schedule.update');
+        Route::put('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'update'])
+            ->name('admin.clinic_schedule.update');
 
-    Route::delete('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'destroy'])
-        ->name('admin.clinic_schedule.destroy');
+        Route::delete('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'destroy'])
+            ->name('admin.clinic_schedule.destroy');
 
-    Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
-        ->name('admin.clinic_schedule.block');
+        Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
+            ->name('admin.clinic_schedule.block');
 
-    Route::delete('/clinic-schedule/block-date/{blockedDate}', [ClinicScheduleController::class, 'unblockDate'])
-        ->name('admin.clinic_schedule.unblock');
+        Route::delete('/clinic-schedule/block-date/{blockedDate}', [ClinicScheduleController::class, 'unblockDate'])
+            ->name('admin.clinic_schedule.unblock');
 
-    Route::get('/clinic-schedule/unavailable-dates', [ClinicScheduleController::class, 'unavailableDates'])
-        ->name('admin.clinic_schedule.unavailable_dates');
+        Route::get('/clinic-schedule/unavailable-dates', [ClinicScheduleController::class, 'unavailableDates'])
+            ->name('admin.clinic_schedule.unavailable_dates');
 
-    Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
-        ->name('admin.clinic_schedule.slots');
-});
+        Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
+            ->name('admin.clinic_schedule.slots');
+    });
 
 // DOCUMENT REQUEST 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/document-requests', [AdminDocumentRequestController::class, 'index'])
-        ->name('document-requests.index');
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-    Route::get('/document-requests/export', [AdminDocumentRequestController::class, 'export'])
-        ->name('document-requests.export');
+        Route::get('/document-requests', [AdminDocumentRequestController::class, 'index'])
+            ->name('admin.document-requests.index');
 
-    Route::get('/document-requests/print-queue', [AdminDocumentRequestController::class, 'printQueue'])
-        ->name('document-requests.print-queue');
+        Route::get('/document-requests/export', [AdminDocumentRequestController::class, 'export'])
+            ->name('admin.document-requests.export');
 
-    Route::get('/document-requests/{documentRequest}', [AdminDocumentRequestController::class, 'show'])
-        ->name('document-requests.show');
+        Route::get('/document-requests/print-queue', [AdminDocumentRequestController::class, 'printQueue'])
+            ->name('admin.document-requests.print-queue');
 
-    Route::patch('/document-requests/{documentRequest}/approve', [AdminDocumentRequestController::class, 'approve'])
-        ->name('document-requests.approve');
+        Route::get('/document-requests/{documentRequest}', [AdminDocumentRequestController::class, 'show'])
+            ->name('admin.document-requests.show');
 
-    Route::patch('/document-requests/{documentRequest}/release', [AdminDocumentRequestController::class, 'release'])
-        ->name('document-requests.release');
+        Route::patch('/document-requests/{documentRequest}/approve', [AdminDocumentRequestController::class, 'approve'])
+            ->name('admin.document-requests.approve');
 
-    Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
-        ->name('document-requests.reject');
-});
+        Route::patch('/document-requests/{documentRequest}/release', [AdminDocumentRequestController::class, 'release'])
+            ->name('admin.document-requests.release');
+
+        Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
+            ->name('admin.document-requests.reject');
+    });
 
 // DATA BACKUP
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/data-backup', [DataBackupController::class, 'index'])->name('data_backup');
-    Route::post('/data-backup/store', [DataBackupController::class, 'store'])->name('data_backup.store');
-    Route::get('/data-backup/download/{id}', [DataBackupController::class, 'download'])->name('data_backup.download');
-    Route::post('/data-backup/toggle-auto', [DataBackupController::class, 'toggleAuto'])->name('data_backup.toggle_auto');
-    Route::post('/data-backup/restore/{id}', [DataBackupController::class, 'restore'])->name('data_backup.restore');
-    Route::delete('/data-backup/delete/{id}', [DataBackupController::class, 'destroy'])->name('data_backup.delete');
-    Route::post('/data-backup/update-schedule', [DataBackupController::class, 'updateSchedule'])->name('data_backup.update_schedule');
-});
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-// START IMPERSONATION
-// Route::post('/impersonate', function (Request $request) {
-//     if (!session('admin_logged_in') || session('role') !== 'super_admin') {
-//         return response()->json(['message' => 'Unauthorized'], 403);
-//     }
+        Route::get('/data-backup', [DataBackupController::class, 'index'])->name('admin.data_backup');
+        Route::post('/data-backup/store', [DataBackupController::class, 'store'])->name('admin.data_backup.store');
+        Route::get('/data-backup/download/{id}', [DataBackupController::class, 'download'])->name('admin.data_backup.download');
+        Route::post('/data-backup/toggle-auto', [DataBackupController::class, 'toggleAuto'])->name('admin.data_backup.toggle_auto');
+        Route::post('/data-backup/restore/{id}', [DataBackupController::class, 'restore'])->name('admin.data_backup.restore');
+        Route::delete('/data-backup/delete/{id}', [DataBackupController::class, 'destroy'])->name('admin.data_backup.delete');
+        Route::post('/data-backup/update-schedule', [DataBackupController::class, 'updateSchedule'])->name('admin.data_backup.update_schedule');
+    });
 
-//     $patients = Patient::select('id', 'name', 'email', 'phone')
-//         ->orderBy('name')
-//         ->get();
 
-//     return response()->json($patients);
-// })->name('admin.patients.list');
 
 // SYSTEM SETTINGS
-Route::get('/admin/system-settings', [SystemSettingsController::class, 'index'])
-    ->name('admin.system_settings');
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+        Route::get('/system-settings', [SystemSettingsController::class, 'index'])
+            ->name('admin.system_settings');
 
-Route::post('/admin/system-settings', [SystemSettingsController::class, 'update'])
-    ->name('admin.system_settings.update');
+        Route::post('/system-settings', [SystemSettingsController::class, 'update'])
+            ->name('admin.system_settings.update');
+    });
 /*  
 |--------------------------------------------------------------------------
 | ADMIN USER MANAGEMENT ROUTES
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-    Route::get('/user-management', [UserManagementController::class, 'index'])
-        ->name('user_management');
+        Route::get('/user-management', [UserManagementController::class, 'index'])
+            ->name('admin.user_management');
 
-    Route::post('/user-management', [UserManagementController::class, 'store'])
-        ->name('user_management.store');
+        Route::post('/user-management', [UserManagementController::class, 'store'])
+            ->name('admin.user_management.store');
 
-    Route::put('/user-management/{user}', [UserManagementController::class, 'update'])
-        ->name('user_management.update');
+        Route::put('/user-management/{user}', [UserManagementController::class, 'update'])
+            ->name('admin.user_management.update');
 
-    Route::put('/user-management/{user}/reset-password', [UserManagementController::class, 'resetPassword'])
-        ->name('user_management.reset_password');
+        Route::post('/user-management/{user}/reset-password', [UserManagementController::class, 'resetPassword'])
+            ->name('admin.user_management.reset_password');
 
-    Route::patch('/user-management/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
-        ->name('user_management.toggle_status');
+        Route::post('/user-management/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
+            ->name('admin.user_management.toggle_status');
+    });
 
-    Route::put('/user-management/patient/{patient}', [UserManagementController::class, 'updatePatient'])
-        ->name('user_management.patient.update');
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-    Route::put('/user-management/patient/{patient}/reset-password', [UserManagementController::class, 'resetPatientPassword'])
-        ->name('user_management.patient.reset_password');
-});
-
-Route::prefix('admin')->group(function () {
-    Route::get('/service-types', [ServiceTypeController::class, 'index'])->name('admin.service-types');
-    Route::post('/service-types', [ServiceTypeController::class, 'store'])->name('admin.service-types.store');
-    Route::delete('/service-types/{id}', [ServiceTypeController::class, 'destroy'])->name('admin.service-types.destroy');
-});
-
+        Route::get('/service-types', [ServiceTypeController::class, 'index'])->name('service-types');
+        Route::post('/service-types', [ServiceTypeController::class, 'store'])->name('service-types.store');
+        Route::delete('/service-types/{id}', [ServiceTypeController::class, 'destroy'])->name('service-types.destroy');
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -474,7 +411,10 @@ Route::prefix('admin')->group(function () {
 
 Route::post('/impersonate', function (Request $request) {
 
-    if (!session('admin_logged_in') || !in_array(session('role'), ['super_admin', 'admin'])) {
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
@@ -486,10 +426,9 @@ Route::post('/impersonate', function (Request $request) {
 
     if (!session()->has('impersonator_role')) {
         session([
-            'impersonator_role' => session('role'),
-            'impersonator_admin_logged_in' => session('admin_logged_in'),
-            'impersonator_admin_id' => session('admin_id'),
-            'impersonator_admin_email' => session('admin_email'),
+            'impersonator_role' => optional(Auth::user()->role)->slug,
+            'impersonator_admin_id' => Auth::id(),
+            'impersonator_admin_email' => Auth::user()->email,
         ]);
     }
 
@@ -550,6 +489,13 @@ Route::post('/impersonate', function (Request $request) {
 
 Route::post('/stop-impersonation', function () {
 
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
     if (session()->has('impersonator_role')) {
         AuditLogger::log(
             'impersonation_stopped',
@@ -562,19 +508,12 @@ Route::post('/stop-impersonation', function () {
         'impersonated_role',
         'impersonated_patient_id',
         'impersonator_role',
-        'impersonator_admin_logged_in',
         'impersonator_admin_id',
         'impersonator_admin_email',
     ]);
 
-    session([
-        'role' => 'admin',
-        'admin_logged_in' => true,
-    ]);
-
     return redirect()->route('admin.admin.dashboard');
 })->name('admin.stop_impersonation');
-
 
 
 /*
@@ -629,8 +568,12 @@ Route::middleware(['role:patient'])->group(function () {
 
 Route::prefix('patient')->middleware(['role:patient'])->group(function () {
     Route::get('/dashboard', function () {
-        $patientId = session('impersonated_patient_id') ?: session('patient_id');
-        $patient = Patient::find($patientId);
+
+        if (session()->has('impersonated_patient_id')) {
+            $patient = Patient::find(session('impersonated_patient_id'));
+        } else {
+            $patient = Auth::user()->patient;
+        }
 
         return view('patient.index', compact('patient'));
     })->middleware('permission:access_patient_dashboard')->name('patient.dashboard');
@@ -721,8 +664,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
                         'status' => $appointment->status ?? 'pending',
                         'date' => \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
                         'patientProfileUrl' => $appointment->patient_id
-                        ? route('dentist.dentist.patient.profile', $appointment->patient_id)
-                        : '#',
+                            ? route('dentist.dentist.patient.profile', $appointment->patient_id)
+                            : '#',
                         'rescheduleUrl' => route('dentist.dentist.appointments.reschedule', $appointment->id),
                         'cancelUrl' => route('dentist.dentist.appointments.cancel', $appointment->id),
                     ];
