@@ -13,7 +13,7 @@ class AdminAppointmentController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        $appointments = Appointment::with(['patient', 'dentist'])
+        $appointments = Appointment::with(['patient'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
@@ -71,14 +71,14 @@ class AdminAppointmentController extends Controller
 
     public function show($id)
     {
-        $appointment = Appointment::with(['patient', 'dentist'])->findOrFail($id);
+        $appointment = Appointment::with(['patient'])->findOrFail($id);
 
         return view('admin.admin-appointment-show', compact('appointment'));
     }
 
     public function reschedule($id)
     {
-        $appointment = Appointment::with(['patient', 'dentist'])->findOrFail($id);
+        $appointment = Appointment::with(['patient'])->findOrFail($id);
 
         return view('admin.admin-appointment-reschedule', compact('appointment'));
     }

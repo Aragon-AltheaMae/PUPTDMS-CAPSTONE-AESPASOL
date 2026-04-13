@@ -48,12 +48,6 @@
         letter-spacing: -.02em;
     }
 
-    .page-subtitle {
-        font-size: .8rem;
-        color: rgba(255, 255, 255, .7);
-        margin-top: .35rem;
-    }
-
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
@@ -189,7 +183,7 @@
     .stat-card.pending .stat-trend { background: #fef3c7; color: #92400e; }
     .stat-card.rejected .stat-trend { background: #fee2e2; color: #991b1b; }
 
-    /* ── Toolbar ── */
+    /* Toolbar */
     .toolbar {
         display: flex;
         align-items: center;
@@ -198,7 +192,6 @@
         flex-wrap: wrap;
     }
 
-    /* ── Search ── */
     .search-wrap {
         display: flex;
         align-items: center;
@@ -260,7 +253,6 @@
     .search-clear-btn:hover { background: rgba(139,0,0,.47); color: #fff; }
     .search-clear-btn.visible { display: flex; }
 
-    /* ── Filter Button ── */
     .filter-btn {
         height: 38px;
         padding: 0 14px;
@@ -303,7 +295,46 @@
         display: block;
     }
 
-    /* ── Filter Modal ── */
+    .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        background: #FAFAF9;
+        border: 1.5px solid #E0DDD8;
+        border-radius: 12px;
+        padding: 3px;
+        gap: 3px;
+        height: 38px;
+    }
+
+    .view-toggle-btn {
+        width: 32px;
+        height: 30px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        border-radius: 9px;
+        font-size: .82rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all .15s ease;
+        flex-shrink: 0;
+    }
+
+    .view-toggle-btn:hover {
+        background: #f3f4f6;
+        color: #8B0000;
+    }
+
+    .view-toggle-btn.active {
+        background: #8B0000;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+    }
+
+    /* Filter Modal */
     .filter-modal-backdrop {
         position: fixed;
         inset: 0;
@@ -556,7 +587,6 @@
 
     .filter-apply-btn:hover { background: #6b0000; }
 
-    /* Dark theme support */
     [data-theme="dark"] .filter-modal {
         background: #161b22 !important;
         border-color: #21262d !important;
@@ -586,7 +616,6 @@
         color: #f3f4f6;
     }
 
-    /* ── Buttons ── */
     .btn-primary,
     .btn-secondary {
         display: inline-flex;
@@ -618,7 +647,14 @@
 
     .btn-secondary:hover { background: #f9fafb; }
 
-    /* ── Table ── */
+    .request-view {
+        width: 100%;
+    }
+
+    .request-view[hidden] {
+        display: none !important;
+    }
+
     .table-responsive-fix {
         width: 100%;
         overflow-x: hidden;
@@ -632,17 +668,65 @@
 
     .tbl th,
     .tbl td {
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+        padding: .9rem 1rem;
+        vertical-align: middle;
     }
 
-    .cell-patient-name,
-    .cell-purpose,
-    .cell-document { white-space: normal; }
+    .tbl th:nth-child(1),
+    .tbl td:nth-child(1),
+    .tbl th:nth-child(2),
+    .tbl td:nth-child(2),
+    .tbl th:nth-child(3),
+    .tbl td:nth-child(3),
+    .tbl th:nth-child(5),
+    .tbl td:nth-child(5),
+    .tbl th:nth-child(6),
+    .tbl td:nth-child(6),
+    .tbl th:nth-child(7),
+    .tbl td:nth-child(7) {
+        white-space: nowrap;
+    }
 
-    .cell-purpose,
-    .cell-patient-name { max-width: 180px; word-wrap: break-word; overflow-wrap: break-word; }
+    .tbl th:nth-child(4),
+    .tbl td:nth-child(4) {
+        white-space: normal;
+    }
+
+    .tbl td:nth-child(4) {
+        line-height: 1.2;
+    }
+
+    .tbl th:nth-child(1),
+    .tbl td:nth-child(1) { width: 16%; }
+    .tbl th:nth-child(2),
+    .tbl td:nth-child(2) { width: 18%; }
+    .tbl th:nth-child(3),
+    .tbl td:nth-child(3) { width: 17%; }
+    .tbl th:nth-child(4),
+    .tbl td:nth-child(4) { width: 14%; }
+    .tbl th:nth-child(5),
+    .tbl td:nth-child(5) { width: 13%; }
+    .tbl th:nth-child(6),
+    .tbl td:nth-child(6) { width: 12%; }
+    .tbl th:nth-child(7),
+    .tbl td:nth-child(7) { width: 10%; }
+
+    .cell-document,
+    .cell-patient-name {
+        white-space: nowrap;
+    }
+
+    .cell-patient-name {
+        font-size: .8rem;
+        font-weight: 600;
+    }
+
+    .cell-purpose {
+        font-size: .78rem;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.2;
+    }
 
     .tbl-wrap {
         background: #fff;
@@ -679,9 +763,9 @@
         white-space: nowrap;
         background: #fef2f2;
         color: #8B0000;
-        padding: .15rem .55rem;
+        padding: .15rem .5rem;
         border-radius: 5px;
-        font-size: .68rem;
+        font-size: .64rem;
         font-weight: 700;
         text-decoration: none;
         transition: .15s ease;
@@ -689,10 +773,150 @@
 
     .document-badge:hover { background: #8B0000; color: #fff; }
 
+    .requests-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .request-card {
+        background: #fff;
+        border: 1px solid #f0eaea;
+        border-radius: 16px;
+        padding: 1rem;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+        display: flex;
+        flex-direction: column;
+        gap: .85rem;
+        min-width: 0;
+    }
+
+    .request-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+        border-color: #ead6d6;
+    }
+
+    .request-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+    }
+
+    .request-card-ref {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: .72rem;
+        font-weight: 800;
+        color: #8B0000;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .request-card-patient {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+        min-width: 0;
+    }
+
+    .request-card-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#8B0000,#6b0000);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .82rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .request-card-patient-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .request-card-name {
+        font-size: .84rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-card-id {
+        font-size: .68rem;
+        color: #9ca3af;
+        margin-top: .15rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-card-meta {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .65rem;
+    }
+
+    .request-card-field {
+        min-width: 0;
+    }
+
+    .request-card-label {
+        font-size: .64rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: .28rem;
+    }
+
+    .request-card-value {
+        font-size: .8rem;
+        color: #374151;
+        line-height: 1.35;
+        min-width: 0;
+    }
+
+    .request-card-purpose {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+    }
+
+    .request-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        margin-top: .15rem;
+        flex-wrap: wrap;
+    }
+
+    .request-card-actions {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        flex-wrap: wrap;
+    }
+
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
         color: #9ca3af;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .empty-state i {
@@ -735,7 +959,6 @@
     .act-btn.del { background: transparent; color: #dc2626; }
     .act-btn.del:hover { background: #fef2f2; }
 
-    /* ── Side Panel ── */
     .panel-card {
         background: #fff;
         border: 1px solid #f0eaea;
@@ -771,7 +994,6 @@
         transition: opacity .15s ease;
     }
 
-    /* ── Responsive ── */
     @media (max-width: 1280px) {
         .stats-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -779,29 +1001,75 @@
     @media (max-width: 1024px) {
         .content-grid { grid-template-columns: 1fr !important; }
         .panel-card { position: static; }
+        .requests-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 900px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 900px) {
         .document-requests-page {
             margin-left: 0;
             padding: calc(var(--header-h, 70px) + 12px) 1rem 2rem;
         }
 
-        .search-wrap { max-width: 100%; width: 100%; height: 42px; }
+        .search-wrap {
+            max-width: 100%;
+            width: 100%;
+            height: 42px;
+        }
+
         .toolbar { gap: .5rem; }
-        .filter-btn { height: 42px; flex: 1; justify-content: center; }
-        .page-banner { border-radius: 14px; padding: 1.1rem 1.1rem 1.4rem; }
+
+        .filter-btn {
+            height: 42px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .page-banner {
+            border-radius: 14px;
+            padding: 1.1rem 1.1rem 1.4rem;
+        }
+
         .page-title { font-size: 1.45rem; }
         .page-banner-inner { flex-direction: column; gap: .6rem; }
         .filter-date-row { grid-template-columns: 1fr; }
+
+        .view-toggle {
+            height: 42px;
+            width: auto;
+        }
+
+        .view-toggle-btn {
+            width: 36px;
+            height: 34px;
+        }
+
+        .requests-grid {
+            grid-template-columns: 1fr;
+            padding: .85rem;
+            gap: .85rem;
+        }
     }
 
     @media (max-width: 480px) {
         .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 767px) {
+        #documentRequestListView {
+            display: none !important;
+        }
+
+        #documentRequestGridView {
+            display: block !important;
+        }
+
+        #documentRequestViewToggle {
+            display: none !important;
+        }
     }
 </style>
 @endsection
@@ -901,7 +1169,7 @@
                         <input
                             type="text"
                             id="documentRequestSearch"
-                            placeholder="Patient name or request ID..."
+                            placeholder="Search name/ID..."
                             value=""
                             autocomplete="off"
                         >
@@ -919,6 +1187,15 @@
                         Filter
                         <span class="filter-dot {{ $activeFilterCount > 0 ? 'visible' : '' }}"></span>
                     </button>
+
+                    <div class="view-toggle" id="documentRequestViewToggle">
+                        <button type="button" class="view-toggle-btn active" data-view="list" id="listViewBtn" title="List view" aria-label="List view">
+                            <i class="fa-solid fa-table-list"></i>
+                        </button>
+                        <button type="button" class="view-toggle-btn" data-view="grid" id="gridViewBtn" title="Grid view" aria-label="Grid view">
+                            <i class="fa-solid fa-grip"></i>
+                        </button>
+                    </div>
 
                     <form
                         method="GET"
@@ -1058,113 +1335,239 @@
                                 <p class="text-sm">Try adjusting your filters.</p>
                             </div>
                         @else
-                            <div class="table-responsive-fix">
-                                <table class="tbl">
-                                    <thead>
-                                        <tr>
-                                            <th>Ref No.</th>
-                                            <th>Patient</th>
-                                            <th>Document</th>
-                                            <th>Purpose</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($requests as $req)
-                                            @php
-                                                $sBg = [
-                                                    'pending'  => '#fef3c7',
-                                                    'approved' => '#d1fae5',
-                                                    'ready'    => '#dbeafe',
-                                                    'released' => '#ede9fe',
-                                                    'rejected' => '#fef2f2',
-                                                ];
-                                                $sTx = [
-                                                    'pending'  => '#92400e',
-                                                    'approved' => '#065f46',
-                                                    'ready'    => '#1e40af',
-                                                    'released' => '#5b21b6',
-                                                    'rejected' => '#8B0000',
-                                                ];
-                                                $patientName      = $req->patient->full_name ?? 'Unknown Patient';
-                                                $patientStudentId = $req->patient->student_id ?? 'No ID';
-                                                $patientInitial   = strtoupper(substr($patientName, 0, 1));
-                                            @endphp
-                                            <tr
-                                                class="document-request-row"
-                                                data-reference="{{ strtolower($req->reference_number) }}"
-                                                data-patient="{{ strtolower($patientName) }}"
-                                                data-student="{{ strtolower($patientStudentId) }}"
-                                                data-document="{{ strtolower(str_replace('_', ' ', $req->document_type)) }}"
-                                                data-purpose="{{ strtolower($req->purpose ?? '') }}"
-                                                data-status="{{ strtolower($req->status) }}"
-                                            >
-                                                <td>
-                                                    <span class="font-mono text-xs font-bold text-[#8B0000]">
-                                                        {{ $req->reference_number }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="flex items-center gap-2">
-                                                        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">
-                                                            {{ $patientInitial }}
-                                                        </div>
-                                                        <div>
-                                                            <div class="font-semibold text-gray-800 text-xs leading-tight cell-patient-name">{{ $patientName }}</div>
-                                                            <div class="text-[10px] text-gray-400 whitespace-nowrap">{{ $patientStudentId }}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="cell-document">
-                                                    <a href="{{ route('admin.document-requests.index', array_merge(request()->only(['status', 'sort', 'date_from', 'date_to']), ['type' => $req->document_type])) }}"
-                                                       class="document-badge js-ajax-nav">
-                                                        {{ ucwords(str_replace('_', ' ', $req->document_type)) }}
-                                                    </a>
-                                                </td>
-                                                <td class="text-xs text-gray-500 cell-purpose">{{ $req->purpose ?: '—' }}</td>
-                                                <td class="text-xs text-gray-400 whitespace-nowrap">{{ $req->created_at->format('M d, Y') }}</td>
-                                                <td>
-                                                    <span style="background:{{ $sBg[$req->status] ?? '#f3f4f6' }};color:{{ $sTx[$req->status] ?? '#6b7280' }};padding:.2rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;display:inline-block;">
-                                                        {{ ucfirst($req->status) }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="flex items-center gap-1">
-                                                        <button type="button" class="act-btn view" onclick="openPanel({{ $req->id }})" title="View">
-                                                            <i class="fa-solid fa-eye"></i>
-                                                        </button>
-                                                        @if($req->status === 'pending')
-                                                            <form action="{{ route('admin.document-requests.approve', $req) }}" method="POST" style="display:inline;">
-                                                                @csrf @method('PATCH')
-                                                                <button type="submit" class="act-btn tog-on" title="Approve">
-                                                                    <i class="fa-solid fa-check"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                        @if(in_array($req->status, ['approved', 'ready']))
-                                                            <form action="{{ route('admin.document-requests.release', $req) }}" method="POST" style="display:inline;">
-                                                                @csrf @method('PATCH')
-                                                                <button type="submit" class="act-btn" style="background:#dbeafe;color:#1e40af;" title="Release">
-                                                                    <i class="fa-solid fa-paper-plane"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                        @if(in_array($req->status, ['pending', 'approved']))
-                                                            <form action="{{ route('admin.document-requests.reject', $req) }}" method="POST" style="display:inline;" onsubmit="return confirm('Reject this request?')">
-                                                                @csrf @method('PATCH')
-                                                                <button type="submit" class="act-btn del" title="Reject">
-                                                                    <i class="fa-solid fa-xmark"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    </div>
-                                                </td>
+                            <div class="request-view" id="documentRequestListView">
+                                <div class="table-responsive-fix">
+                                    <table class="tbl">
+                                        <thead>
+                                            <tr>
+                                                <th>Ref No.</th>
+                                                <th>Patient</th>
+                                                <th>Document</th>
+                                                <th>Purpose</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($requests as $req)
+                                                @php
+                                                    $sBg = [
+                                                        'pending'  => '#fef3c7',
+                                                        'approved' => '#d1fae5',
+                                                        'ready'    => '#dbeafe',
+                                                        'released' => '#ede9fe',
+                                                        'rejected' => '#fef2f2',
+                                                    ];
+                                                    $sTx = [
+                                                        'pending'  => '#92400e',
+                                                        'approved' => '#065f46',
+                                                        'ready'    => '#1e40af',
+                                                        'released' => '#5b21b6',
+                                                        'rejected' => '#8B0000',
+                                                    ];
+                                                    $patientName      = $req->patient->name ?? 'Unknown Patient';
+                                                    $patientStudentId = $req->patient->id ?? 'No ID';
+                                                    $patientInitial   = strtoupper(substr($patientName, 0, 1));
+                                                @endphp
+                                                <tr
+                                                    class="document-request-row"
+                                                    data-reference="{{ strtolower($req->reference_number) }}"
+                                                    data-patient="{{ strtolower($patientName) }}"
+                                                    data-student="{{ strtolower($patientStudentId) }}"
+                                                    data-document="{{ strtolower(str_replace('_', ' ', $req->document_type)) }}"
+                                                    data-purpose="{{ strtolower($req->purpose ?? '') }}"
+                                                    data-status="{{ strtolower($req->status) }}"
+                                                >
+                                                    <td>
+                                                        <span class="font-mono text-xs font-bold text-[#8B0000]">
+                                                            {{ $req->reference_number }}
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="flex items-center gap-2">
+                                                            <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;">
+                                                                {{ $patientInitial }}
+                                                            </div>
+                                                            <div>
+                                                                <div class="font-semibold text-gray-800 cell-patient-name">
+                                                                    {{ $patientName }}
+                                                                </div>
+                                                                <div class="text-[10px] text-gray-400 whitespace-nowrap">
+                                                                    {{ $patientStudentId }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="cell-document">
+                                                        <a href="{{ route('admin.document-requests.index', array_merge(request()->only(['status', 'sort', 'date_from', 'date_to']), ['type' => $req->document_type])) }}"
+                                                           class="document-badge js-ajax-nav">
+                                                            {{ ucwords(str_replace('_', ' ', $req->document_type)) }}
+                                                        </a>
+                                                    </td>
+
+                                                    <td class="text-xs text-gray-500 cell-purpose">{{ $req->purpose ?: '—' }}</td>
+
+                                                    <td class="text-xs text-gray-400 whitespace-nowrap" style="overflow: visible; text-overflow: unset;">
+                                                        {{ $req->created_at->format('M d, Y') }}
+                                                    </td>
+
+                                                    <td>
+                                                        <span style="background:{{ $sBg[$req->status] ?? '#f3f4f6' }};color:{{ $sTx[$req->status] ?? '#6b7280' }};padding:.2rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;display:inline-block;">
+                                                            {{ ucfirst($req->status) }}
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="flex items-center gap-1">
+                                                            <button type="button" class="act-btn view" onclick="openPanel({{ $req->id }})" title="View">
+                                                                <i class="fa-solid fa-eye"></i>
+                                                            </button>
+                                                            @if($req->status === 'pending')
+                                                                <form action="{{ route('admin.document-requests.approve', $req) }}" method="POST" style="display:inline;">
+                                                                    @csrf @method('PATCH')
+                                                                    <button type="submit" class="act-btn tog-on" title="Approve">
+                                                                        <i class="fa-solid fa-check"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                            @if(in_array($req->status, ['approved', 'ready']))
+                                                                <form action="{{ route('admin.document-requests.release', $req) }}" method="POST" style="display:inline;">
+                                                                    @csrf @method('PATCH')
+                                                                    <button type="submit" class="act-btn" style="background:#dbeafe;color:#1e40af;" title="Release">
+                                                                        <i class="fa-solid fa-paper-plane"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                            @if(in_array($req->status, ['pending', 'approved']))
+                                                                <form action="{{ route('admin.document-requests.reject', $req) }}" method="POST" style="display:inline;" onsubmit="return confirm('Reject this request?')">
+                                                                    @csrf @method('PATCH')
+                                                                    <button type="submit" class="act-btn del" title="Reject">
+                                                                        <i class="fa-solid fa-xmark"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="request-view" id="documentRequestGridView" hidden>
+                                <div class="requests-grid">
+                                    @foreach($requests as $req)
+                                        @php
+                                            $sBg = [
+                                                'pending'  => '#fef3c7',
+                                                'approved' => '#d1fae5',
+                                                'ready'    => '#dbeafe',
+                                                'released' => '#ede9fe',
+                                                'rejected' => '#fef2f2',
+                                            ];
+                                            $sTx = [
+                                                'pending'  => '#92400e',
+                                                'approved' => '#065f46',
+                                                'ready'    => '#1e40af',
+                                                'released' => '#5b21b6',
+                                                'rejected' => '#8B0000',
+                                            ];
+                                            $patientName      = $req->patient->name ?? 'Unknown Patient';
+                                            $patientStudentId = $req->patient->id ?? 'No ID';
+                                            $patientInitial   = strtoupper(substr($patientName, 0, 1));
+                                        @endphp
+
+                                        <div
+                                            class="request-card document-request-row"
+                                            data-reference="{{ strtolower($req->reference_number) }}"
+                                            data-patient="{{ strtolower($patientName) }}"
+                                            data-student="{{ strtolower($patientStudentId) }}"
+                                            data-document="{{ strtolower(str_replace('_', ' ', $req->document_type)) }}"
+                                            data-purpose="{{ strtolower($req->purpose ?? '') }}"
+                                            data-status="{{ strtolower($req->status) }}"
+                                        >
+                                            <div class="request-card-top">
+                                                <div class="request-card-ref">{{ $req->reference_number }}</div>
+                                                <span style="background:{{ $sBg[$req->status] ?? '#f3f4f6' }};color:{{ $sTx[$req->status] ?? '#6b7280' }};padding:.2rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;display:inline-block;white-space:nowrap;">
+                                                    {{ ucfirst($req->status) }}
+                                                </span>
+                                            </div>
+
+                                            <div class="request-card-patient">
+                                                <div class="request-card-avatar">{{ $patientInitial }}</div>
+                                                <div class="request-card-patient-info">
+                                                    <div class="request-card-name">{{ $patientName }}</div>
+                                                    <div class="request-card-id">{{ $patientStudentId }}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="request-card-meta">
+                                                <div class="request-card-field">
+                                                    <div class="request-card-label">Document</div>
+                                                    <div class="request-card-value">
+                                                        <a href="{{ route('admin.document-requests.index', array_merge(request()->only(['status', 'sort', 'date_from', 'date_to']), ['type' => $req->document_type])) }}"
+                                                           class="document-badge js-ajax-nav">
+                                                            {{ ucwords(str_replace('_', ' ', $req->document_type)) }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="request-card-field">
+                                                    <div class="request-card-label">Purpose</div>
+                                                    <div class="request-card-value request-card-purpose">
+                                                        {{ $req->purpose ?: '—' }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="request-card-field">
+                                                    <div class="request-card-label">Date</div>
+                                                    <div class="request-card-value">
+                                                        {{ $req->created_at->format('M d, Y') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="request-card-footer">
+                                                <button type="button" class="act-btn view" onclick="openPanel({{ $req->id }})" title="View">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+
+                                                <div class="request-card-actions">
+                                                    @if($req->status === 'pending')
+                                                        <form action="{{ route('admin.document-requests.approve', $req) }}" method="POST" style="display:inline;">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit" class="act-btn tog-on" title="Approve">
+                                                                <i class="fa-solid fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                    @if(in_array($req->status, ['approved', 'ready']))
+                                                        <form action="{{ route('admin.document-requests.release', $req) }}" method="POST" style="display:inline;">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit" class="act-btn" style="background:#dbeafe;color:#1e40af;" title="Release">
+                                                                <i class="fa-solid fa-paper-plane"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                    @if(in_array($req->status, ['pending', 'approved']))
+                                                        <form action="{{ route('admin.document-requests.reject', $req) }}" method="POST" style="display:inline;" onsubmit="return confirm('Reject this request?')">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit" class="act-btn del" title="Reject">
+                                                                <i class="fa-solid fa-xmark"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
 
                             <div id="documentRequestClientEmpty" class="empty-state" style="display:none;">
@@ -1175,7 +1578,8 @@
 
                             @if(!empty($requests) && $requests->hasPages())
                                 <div class="tbl-pagination">
-                                    <span>Showing {{ $requests->firstItem() }}–{{ $requests->lastItem() }} of {{ $requests->total() }} requests</span>
+                                    <span>Showing {{ $requests->firstItem() }}–{{ $requests->lastItem() }} of 
+                                        {{ $requests->total() }} requests</span>
                                     <div>{{ $requests->withQueryString()->links() }}</div>
                                 </div>
                             @endif
@@ -1195,7 +1599,8 @@
 
                         <div style="padding:1.25rem;" id="panelBody">
                             <div style="text-align:center;padding:2.5rem 0 2rem;color:#d1d5db;">
-                                <div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;">
+                                <div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;display:flex;
+                                    align-items:center;justify-content:center;margin:0 auto .9rem;">
                                     <i class="fa-solid fa-file-circle-check" style="font-size:1.4rem;color:#f9c1c1;"></i>
                                 </div>
                                 <p style="font-size:.78rem;font-weight:600;color:#cbd5e1;margin-bottom:.25rem;">No request selected</p>
@@ -1247,22 +1652,41 @@
 
         if (!backdrop || !openBtn) return;
 
-        openBtn.addEventListener('click', () => {
-            backdrop.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        });
+        if (!openBtn.dataset.bound) {
+            openBtn.dataset.bound = '1';
+            openBtn.addEventListener('click', () => {
+                backdrop.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+        }
 
         function closeModal() {
             backdrop.classList.remove('show');
             document.body.style.overflow = '';
         }
 
-        closeBtn && closeBtn.addEventListener('click', closeModal);
-        backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        if (closeBtn && !closeBtn.dataset.bound) {
+            closeBtn.dataset.bound = '1';
+            closeBtn.addEventListener('click', closeModal);
+        }
+
+        if (!backdrop.dataset.bound) {
+            backdrop.dataset.bound = '1';
+            backdrop.addEventListener('click', e => {
+                if (e.target === backdrop) closeModal();
+            });
+        }
+
+        if (!document.body.dataset.documentRequestEscapeBound) {
+            document.body.dataset.documentRequestEscapeBound = '1';
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closeModal();
+            });
+        }
 
         const chipGroup = document.getElementById('filterStatusChips');
-        if (chipGroup) {
+        if (chipGroup && !chipGroup.dataset.bound) {
+            chipGroup.dataset.bound = '1';
             chipGroup.addEventListener('click', e => {
                 const chip = e.target.closest('.filter-chip');
                 if (!chip) return;
@@ -1272,7 +1696,8 @@
         }
 
         const sortGroup = document.getElementById('filterSortChips');
-        if (sortGroup) {
+        if (sortGroup && !sortGroup.dataset.bound) {
+            sortGroup.dataset.bound = '1';
             sortGroup.addEventListener('click', e => {
                 const chip = e.target.closest('.filter-chip');
                 if (!chip) return;
@@ -1281,67 +1706,73 @@
             });
         }
 
-        applyBtn && applyBtn.addEventListener('click', () => {
-            const activeChip     = chipGroup ? chipGroup.querySelector('.filter-chip.active') : null;
-            const activeSortChip = sortGroup ? sortGroup.querySelector('.filter-chip.active') : null;
+        if (applyBtn && !applyBtn.dataset.bound) {
+            applyBtn.dataset.bound = '1';
+            applyBtn.addEventListener('click', () => {
+                const activeChip     = chipGroup ? chipGroup.querySelector('.filter-chip.active') : null;
+                const activeSortChip = sortGroup ? sortGroup.querySelector('.filter-chip.active') : null;
 
-            const statusVal = activeChip ? activeChip.dataset.value : '';
-            const sortVal   = activeSortChip ? activeSortChip.dataset.value : 'newest';
-            const typeVal   = document.getElementById('filterTypeSelect')?.value || '';
-            const dateFrom  = document.getElementById('filterDateFrom')?.value || '';
-            const dateTo    = document.getElementById('filterDateTo')?.value || '';
+                const statusVal = activeChip ? activeChip.dataset.value : '';
+                const sortVal   = activeSortChip ? activeSortChip.dataset.value : 'newest';
+                const typeVal   = document.getElementById('filterTypeSelect')?.value || '';
+                const dateFrom  = document.getElementById('filterDateFrom')?.value || '';
+                const dateTo    = document.getElementById('filterDateTo')?.value || '';
 
-            document.getElementById('hiddenStatus').value   = statusVal;
-            document.getElementById('hiddenType').value     = typeVal;
-            document.getElementById('hiddenDateFrom').value = dateFrom;
-            document.getElementById('hiddenDateTo').value   = dateTo;
-            document.getElementById('hiddenSort').value     = sortVal;
+                document.getElementById('hiddenStatus').value   = statusVal;
+                document.getElementById('hiddenType').value     = typeVal;
+                document.getElementById('hiddenDateFrom').value = dateFrom;
+                document.getElementById('hiddenDateTo').value   = dateTo;
+                document.getElementById('hiddenSort').value     = sortVal;
 
-            updateFilterButtonState();
-            closeModal();
+                updateFilterButtonState();
+                closeModal();
 
-            const form = document.getElementById('documentRequestsFilterForm');
-            const url  = new URL(form.action, window.location.origin);
-            url.search = '';
+                const form = document.getElementById('documentRequestsFilterForm');
+                const url  = new URL(form.action, window.location.origin);
+                url.search = '';
 
-            if (statusVal)                       url.searchParams.set('status', statusVal);
-            if (typeVal)                         url.searchParams.set('type', typeVal);
-            if (dateFrom)                        url.searchParams.set('date_from', dateFrom);
-            if (dateTo)                          url.searchParams.set('date_to', dateTo);
-            if (sortVal && sortVal !== 'newest') url.searchParams.set('sort', sortVal);
+                if (statusVal)                        url.searchParams.set('status', statusVal);
+                if (typeVal)                          url.searchParams.set('type', typeVal);
+                if (dateFrom)                         url.searchParams.set('date_from', dateFrom);
+                if (dateTo)                           url.searchParams.set('date_to', dateTo);
+                if (sortVal && sortVal !== 'newest') url.searchParams.set('sort', sortVal);
 
-            loadDocumentRequestsFragment(url.toString());
-        });
+                loadDocumentRequestsFragment(url.toString());
+            });
+        }
 
-        resetBtn && resetBtn.addEventListener('click', () => {
-            if (chipGroup) {
-                chipGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                const allChip = chipGroup.querySelector('.filter-chip[data-value=""]');
-                if (allChip) allChip.classList.add('active');
-            }
+        if (resetBtn && !resetBtn.dataset.bound) {
+            resetBtn.dataset.bound = '1';
+            resetBtn.addEventListener('click', () => {
+                if (chipGroup) {
+                    chipGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    const allChip = chipGroup.querySelector('.filter-chip[data-value=""]');
+                    if (allChip) allChip.classList.add('active');
+                }
 
-            if (sortGroup) {
-                sortGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                const defaultSort = sortGroup.querySelector('.filter-chip[data-value="newest"]');
-                if (defaultSort) defaultSort.classList.add('active');
-            }
+                if (sortGroup) {
+                    sortGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    const defaultSort = sortGroup.querySelector('.filter-chip[data-value="newest"]');
+                    if (defaultSort) defaultSort.classList.add('active');
+                }
 
-            const typeSelect = document.getElementById('filterTypeSelect');
-            if (typeSelect) typeSelect.value = '';
+                const typeSelect = document.getElementById('filterTypeSelect');
+                if (typeSelect) typeSelect.value = '';
 
-            const dfrom = document.getElementById('filterDateFrom');
-            const dto   = document.getElementById('filterDateTo');
-            if (dfrom) dfrom.value = '';
-            if (dto) dto.value = '';
+                const dfrom = document.getElementById('filterDateFrom');
+                const dto   = document.getElementById('filterDateTo');
+                if (dfrom) dfrom.value = '';
+                if (dto) dto.value = '';
 
-            document.getElementById('hiddenStatus').value   = '';
-            document.getElementById('hiddenType').value     = '';
-            document.getElementById('hiddenDateFrom').value = '';
-            document.getElementById('hiddenDateTo').value   = '';
-            document.getElementById('hiddenSort').value     = 'newest';
+                document.getElementById('hiddenStatus').value   = '';
+                document.getElementById('hiddenType').value     = '';
+                document.getElementById('hiddenDateFrom').value = '';
+                document.getElementById('hiddenDateTo').value   = '';
+                document.getElementById('hiddenSort').value     = 'newest';
 
-            updateFilterButtonState();
-        });
+                updateFilterButtonState();
+            });
+        }
     }
 
     function detailRow(label, value) {
@@ -1357,7 +1788,8 @@
         const panelFoot  = document.getElementById('panelFoot');
 
         panelRefNo.textContent = 'Loading...';
-        panelBody.innerHTML = `<div style="text-align:center;padding:2rem 0;color:#d1d5db;"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>`;
+        panelBody.innerHTML = `<div style="text-align:center;padding:2rem 0;color:#d1d5db;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>`;
         panelFoot.style.display = 'none';
         panelFoot.innerHTML = '';
 
@@ -1370,8 +1802,10 @@
 
             panelRefNo.textContent = data.reference_number;
             panelBody.innerHTML = `
-                <div style="background:#fef2f2;border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;border:1px solid #fce8e8;">
-                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">
+                <div style="background:#fef2f2;border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;display:flex;
+                    align-items:center;gap:.75rem;border:1px solid #fce8e8;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#6b0000);
+                        color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">
                         ${((data.patient_name || '?')[0] || '?').toUpperCase()}
                     </div>
                     <div style="flex:1;min-width:0;">
@@ -1387,11 +1821,13 @@
                 ${detailRow('Date', data.created_at || '—')}
                 ${detailRow('Copies', data.copies_needed || '1')}
                 <div style="margin-top:1rem;">
-                    <div style="font-size:.67rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;">Activity</div>
+                    <div style="font-size:.67rem;font-weight:700;color:#9ca3af;text-transform:uppercase;
+                        letter-spacing:.08em;margin-bottom:.6rem;">Activity</div>
                     <div style="padding-left:1rem;border-left:2px solid #f0eaea;">
                         ${(data.activities || [{ date: '—', description: 'No activity yet.' }]).map(a => `
                             <div style="position:relative;margin-bottom:.6rem;">
-                                <div style="position:absolute;left:-1.35rem;top:.3rem;width:6px;height:6px;border-radius:50%;background:#8B0000;border:1.5px solid #fef2f2;"></div>
+                                <div style="position:absolute;left:-1.35rem;top:.3rem;width:6px;
+                                    height:6px;border-radius:50%;background:#8B0000;border:1.5px solid #fef2f2;"></div>
                                 <div style="font-size:.67rem;color:#9ca3af;">${a.date}</div>
                                 <div style="font-size:.76rem;color:#374151;">${a.description}</div>
                             </div>
@@ -1423,7 +1859,8 @@
                 actions += `<form action="/admin/document-requests/${data.id}/reject" method="POST" onsubmit="return confirm('Reject this request?')">
                     <input type="hidden" name="_token" value="${csrfToken}">
                     <input type="hidden" name="_method" value="PATCH">
-                    <button type="submit" class="btn-secondary" style="font-size:.75rem;padding:.38rem .9rem;color:#dc2626;border-color:#fce8e8;">Reject</button>
+                    <button type="submit" class="btn-secondary" style="font-size:.75rem;
+                        padding:.38rem .9rem;color:#dc2626;border-color:#fce8e8;">Reject</button>
                 </form>`;
             }
 
@@ -1436,6 +1873,54 @@
     function formatTitle(value) {
         if (!value) return '—';
         return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function getPreferredDocumentRequestView() {
+        if (window.innerWidth <= 767) return 'grid';
+        return localStorage.getItem('documentRequestView') || 'list';
+    }
+
+    function applyDocumentRequestView(view, save = true) {
+        const listView = document.getElementById('documentRequestListView');
+        const gridView = document.getElementById('documentRequestGridView');
+        const listBtn  = document.getElementById('listViewBtn');
+        const gridBtn  = document.getElementById('gridViewBtn');
+
+        if (!listView || !gridView) return;
+
+        const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+        if (finalView === 'grid') {
+            listView.hidden = true;
+            gridView.hidden = false;
+        } else {
+            listView.hidden = false;
+            gridView.hidden = true;
+        }
+
+        if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+        if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+        if (save && window.innerWidth > 767) {
+            localStorage.setItem('documentRequestView', finalView);
+        }
+    }
+
+    function initDocumentRequestViewToggle() {
+        const listBtn = document.getElementById('listViewBtn');
+        const gridBtn = document.getElementById('gridViewBtn');
+
+        applyDocumentRequestView(getPreferredDocumentRequestView(), false);
+
+        if (listBtn && !listBtn.dataset.bound) {
+            listBtn.dataset.bound = '1';
+            listBtn.addEventListener('click', () => applyDocumentRequestView('list', true));
+        }
+
+        if (gridBtn && !gridBtn.dataset.bound) {
+            gridBtn.dataset.bound = '1';
+            gridBtn.addEventListener('click', () => applyDocumentRequestView('grid', true));
+        }
     }
 
     function updateDocumentRequestSearchClear() {
@@ -1454,15 +1939,31 @@
 
         const q = searchInput.value.trim().toLowerCase();
         let visibleCount = 0;
+        const seenKeys = new Set();
 
         rows.forEach(row => {
-            const haystack = [row.dataset.reference, row.dataset.patient, row.dataset.student, row.dataset.document, row.dataset.purpose, row.dataset.status].join(' ');
+            const haystack = [
+                row.dataset.reference,
+                row.dataset.patient,
+                row.dataset.student,
+                row.dataset.document,
+                row.dataset.purpose,
+                row.dataset.status
+            ].join(' ');
+
             const match = !q || haystack.includes(q);
             row.style.display = match ? '' : 'none';
-            if (match) visibleCount++;
+
+            if (match) {
+                const key = row.dataset.reference || Math.random().toString();
+                if (!seenKeys.has(key)) {
+                    seenKeys.add(key);
+                    visibleCount++;
+                }
+            }
         });
 
-        if (emptyState) emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        if (emptyState) emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
         if (pagination) pagination.style.display = q ? 'none' : '';
     }
 
@@ -1516,6 +2017,7 @@
             bindDocumentRequestAjax();
             initDocumentRequestSearch();
             initFilterModal();
+            initDocumentRequestViewToggle();
             updateFilterButtonState();
         } catch {
             window.location.href = url;
@@ -1526,6 +2028,9 @@
 
     function bindDocumentRequestAjax() {
         document.querySelectorAll('.js-ajax-nav').forEach(link => {
+            if (link.dataset.bound === '1') return;
+            link.dataset.bound = '1';
+
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 loadDocumentRequestsFragment(this.href);
@@ -1533,6 +2038,9 @@
         });
 
         document.querySelectorAll('.tbl-pagination a').forEach(link => {
+            if (link.dataset.bound === '1') return;
+            link.dataset.bound = '1';
+
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 loadDocumentRequestsFragment(this.href);
@@ -1546,7 +2054,12 @@
         bindDocumentRequestAjax();
         initDocumentRequestSearch();
         initFilterModal();
+        initDocumentRequestViewToggle();
         updateFilterButtonState();
+
+        window.addEventListener('resize', () => {
+            applyDocumentRequestView(getPreferredDocumentRequestView(), false);
+        });
     });
 </script>
 @endsection

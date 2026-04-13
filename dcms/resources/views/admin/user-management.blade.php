@@ -84,6 +84,117 @@
             font-size: .75rem;
         }
 
+        .um-view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+            height: 42px;
+        }
+
+        .um-view-toggle-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 9px;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            flex-shrink: 0;
+        }
+
+        .um-view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: #8B0000;
+        }
+
+        .um-view-toggle-btn.active {
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+        }
+
+        .um-view[hidden] {
+            display: none !important;
+        }
+
+        .um-grid-wrap {
+            padding: 1rem;
+        }
+
+        .um-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .um-grid-card {
+            background: #fff;
+            border: 1px solid #f0eaea;
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+            transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            min-width: 0;
+        }
+
+        .um-grid-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+            border-color: #ead6d6;
+        }
+
+        .um-grid-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        .um-grid-number {
+            font-size: .72rem;
+            font-weight: 800;
+            color: #8B0000;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .um-grid-meta {
+            display: grid;
+            gap: .65rem;
+        }
+
+        .um-grid-field {
+            min-width: 0;
+        }
+
+        .um-grid-label {
+            font-size: .64rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .28rem;
+        }
+
+        .um-grid-value {
+            font-size: .8rem;
+            color: #374151;
+            line-height: 1.35;
+            min-width: 0;
+            word-break: break-word;
+        }
+
         @media (max-width: 767px) {
             .page-banner {
                 border-radius: 14px;
@@ -307,6 +418,26 @@
 
             .action-btn {
                 padding: 5px 6px;
+            }
+
+            #umListView {
+                display: none !important;
+            }
+
+            #umGridView {
+                display: block !important;
+            }
+
+            #umViewToggle {
+                display: none !important;
+            }
+
+            .um-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .um-grid-wrap {
+                padding: .85rem;
             }
         }
 
@@ -636,18 +767,37 @@
         <div style="max-width:1280px; margin:0 auto;">
 
             <div class="page-banner">
-                <div class="page-banner-inner">
+                    <div class="page-banner-inner">
                     <div>
                         <h1 class="page-title">User Management</h1>
                     </div>
 
-                    <button
-                        onclick="openModal('addModal')"
-                        class="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
-                        px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
-                        <i class="fa-solid fa-user-plus"></i>
-                        Add New User
-                    </button>
+                    <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                        <button
+                            onclick="openModal('addModal')"
+                            class="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
+                            px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Add New User
+                        </button>
+
+                        <div class="um-view-toggle" id="umViewToggle">
+                            <button type="button"
+                                class="um-view-toggle-btn active"
+                                id="umListViewBtn"
+                                title="List view"
+                                aria-label="List view">
+                                <i class="fa-solid fa-table-list"></i>
+                            </button>
+                            <button type="button"
+                                class="um-view-toggle-btn"
+                                id="umGridViewBtn"
+                                title="Grid view"
+                                aria-label="Grid view">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -769,132 +919,233 @@
                     </form>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
-                                <th class="py-3 px-3 sm:px-5 text-left w-12 hidden sm:table-cell">#</th>
-                                <th class="py-3 px-4 text-left">User</th>
-                                <th class="py-3 px-4 text-left">Role</th>
-                                <th class="py-3 px-4 text-center">Status</th>
-                                <th class="py-3 px-4 text-left hidden lg:table-cell">Registered</th>
-                                <th class="py-3 px-5 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="umTableBody">
-                            @forelse($users as $user)
-                                <tr class="user-table-row border-b border-gray-50 last:border-0"
-                                    data-name="{{ strtolower($user->name) }}"
-                                    data-email="{{ strtolower($user->email) }}"
-                                    data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
-                                    <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
-                                        <span
-                                            class="text-xs text-gray-400 font-medium">{{ $users->firstItem() + $loop->index }}</span>
-                                    </td>
+                <div class="um-view" id="umListView">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-100">
+                                <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
+                                    <th class="py-3 px-3 sm:px-5 text-left w-12 hidden sm:table-cell">#</th>
+                                    <th class="py-3 px-4 text-left">User</th>
+                                    <th class="py-3 px-4 text-left">Role</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                    <th class="py-3 px-4 text-left hidden lg:table-cell">Registered</th>
+                                    <th class="py-3 px-5 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="umTableBody">
+                                @forelse($users as $user)
+                                    <tr class="user-table-row border-b border-gray-50 last:border-0"
+                                        data-name="{{ strtolower($user->name) }}"
+                                        data-email="{{ strtolower($user->email) }}"
+                                        data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
+                                        <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
+                                            <span
+                                                class="text-xs text-gray-400 font-medium">{{ $users->firstItem() + $loop->index }}</span>
+                                        </td>
 
-                                    <td class="py-3.5 px-3 sm:px-4">
-                                        <div class="flex items-center gap-2 sm:gap-3">
+                                        <td class="py-3.5 px-3 sm:px-4">
+                                            <div class="flex items-center gap-2 sm:gap-3">
+                                                <div
+                                                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                                        {{ $user->name }}
+                                                    </div>
+                                                    <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
+                                                        {{ $user->email }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="py-3.5 px-4">
+                                            @php $roleSlug = optional($user->role)->slug; @endphp
+                                            <span class="badge-role"
+                                                style="background:
+                {{ $roleSlug === 'patient' ? '#dbeafe' : ($roleSlug === 'dentist' ? '#d1fae5' : '#fee2e2') }};
+                color:
+                {{ $roleSlug === 'patient' ? '#1d4ed8' : ($roleSlug === 'dentist' ? '#065f46' : '#8B0000') }};">
+                                                {{ optional($user->role)->name ?? 'No Role' }}
+                                            </span>
+                                        </td>
+
+                                        <td class="py-3.5 px-4 text-center">
+                                            <span
+                                                class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                                {{ ucfirst($user->status) }}
+                                            </span>
+                                        </td>
+
+                                        <td class="py-3.5 px-4 hidden lg:table-cell">
+                                            <span
+                                                class="text-xs text-gray-400">{{ $user->created_at->format('M d, Y') }}</span>
+                                        </td>
+
+                                        <td class="py-3.5 px-2 sm:px-5">
+                                            <div class="flex items-center justify-center gap-1">
+                                                <button type="button"
+                                                    onclick="openEditModal(
+                                                    'users',
+                                                    {{ $user->id }},
+                                                    @js($user->name),
+                                                    @js($user->email),
+                                                    @js($user->role_id),
+                                                    @js($user->status)
+                                                  )"
+                                                    class="action-btn btn-edit" title="Edit account">
+                                                    <i class="fa-solid fa-pen text-[11px]"></i>
+                                                </button>
+
+                                                <button type="button"
+                                                    onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
+                                                    class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
+                                                    title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                                    <i
+                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                                </button>
+
+                                                <button type="button"
+                                                    onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
+                                                    class="action-btn btn-reset" title="Reset password">
+                                                    <i class="fa-solid fa-key text-[11px]"></i>
+                                                </button>
+
+                                                <button type="button"
+                                                    onclick="openViewModal(
+                                                    @js($user->name),
+                                                    @js($user->email),
+                                                    @js(optional($user->role)->name ?? 'No Role'),
+                                                    @js(ucfirst($user->status)),
+                                                    'Users',
+                                                    @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
+                                                  )"
+                                                    class="action-btn" style="background:#f3f4f6;color:#374151;"
+                                                    title="View details">
+                                                    <i class="fa-solid fa-eye text-[11px]"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr id="dbEmptyRow">
+                                        <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
                                             <div
-                                                class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
+                                                <i class="fa-solid fa-magnifying-glass"
+                                                    style="font-size:1.6rem;color:#d1d5db;"></i>
                                             </div>
-                                            <div>
-                                                <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                                    {{ $user->name }}
-                                                </div>
-                                                <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
-                                                    {{ $user->email }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td class="py-3.5 px-4">
-                                        @php $roleSlug = optional($user->role)->slug; @endphp
-                                        <span class="badge-role"
-                                            style="background:
-        {{ $roleSlug === 'patient' ? '#dbeafe' : ($roleSlug === 'dentist' ? '#d1fae5' : '#fee2e2') }};
-        color:
-        {{ $roleSlug === 'patient' ? '#1d4ed8' : ($roleSlug === 'dentist' ? '#065f46' : '#8B0000') }};">
-                                            {{ optional($user->role)->name ?? 'No Role' }}
-                                        </span>
-                                    </td>
-
-                                    <td class="py-3.5 px-4 text-center">
-                                        <span
-                                            class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
-                                            {{ ucfirst($user->status) }}
-                                        </span>
-                                    </td>
-
-                                    <td class="py-3.5 px-4 hidden lg:table-cell">
-                                        <span
-                                            class="text-xs text-gray-400">{{ $user->created_at->format('M d, Y') }}</span>
-                                    </td>
-
-                                    <td class="py-3.5 px-2 sm:px-5">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <button type="button"
-                                                onclick="openEditModal(
-                                            'users',
-                                            {{ $user->id }},
-                                            @js($user->name),
-                                            @js($user->email),
-                                            @js($user->role_id),
-                                            @js($user->status)
-                                          )"
-                                                class="action-btn btn-edit" title="Edit account">
-                                                <i class="fa-solid fa-pen text-[11px]"></i>
-                                            </button>
-
-                                            <button type="button"
-                                                onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
-                                                class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                                title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                                <i
-                                                    class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
-                                            </button>
-
-                                            <button type="button"
-                                                onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                                class="action-btn btn-reset" title="Reset password">
-                                                <i class="fa-solid fa-key text-[11px]"></i>
-                                            </button>
-
-                                            <button type="button"
-                                                onclick="openViewModal(
-                                            @js($user->name),
-                                            @js($user->email),
-                                            @js(optional($user->role)->name ?? 'No Role'),
-                                            @js(ucfirst($user->status)),
-                                            'Users',
-                                            @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                          )"
-                                                class="action-btn" style="background:#f3f4f6;color:#374151;"
-                                                title="View details">
-                                                <i class="fa-solid fa-eye text-[11px]"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr id="dbEmptyRow">
-                                    <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
-                                        <div
-                                            style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
-                                            <i class="fa-solid fa-magnifying-glass"
-                                                style="font-size:1.6rem;color:#d1d5db;"></i>
-                                        </div>
-                                        <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users
-                                            found</p>
-                                        <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                            <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users
+                                                found</p>
+                                            <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <div class="um-view" id="umGridView" hidden>
+                    <div class="um-grid-wrap">
+                        <div class="um-grid" id="umGridBody">
+                            @forelse($users as $user)
+                                @php
+                                    $roleSlug = optional($user->role)->slug;
+                                    $roleName = optional($user->role)->name ?? 'No Role';
+                                    $roleBg = $roleSlug === 'patient' ? '#dbeafe' : ($roleSlug === 'dentist' ? '#d1fae5' : '#fee2e2');
+                                    $roleColor = $roleSlug === 'patient' ? '#1d4ed8' : ($roleSlug === 'dentist' ? '#065f46' : '#8B0000');
+                                @endphp
+
+                                <div class="um-grid-card">
+                                    <div class="um-grid-top">
+                                        <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}</div>
+                                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                            {{ ucfirst($user->status) }}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                                {{ $user->name }}
+                                            </div>
+                                            <div class="text-[11px] text-gray-400 mt-0.5">
+                                                {{ $user->email }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="um-grid-meta">
+                                        <div class="um-grid-field">
+                                            <div class="um-grid-label">Role</div>
+                                            <div class="um-grid-value">
+                                                <span class="badge-role" style="background:{{ $roleBg }};color:{{ $roleColor }};">
+                                                    {{ $roleName }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="um-grid-field">
+                                            <div class="um-grid-label">Registered</div>
+                                            <div class="um-grid-value">{{ $user->created_at->format('M d, Y') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-end gap-1 flex-wrap">
+                                        <button type="button"
+                                            onclick="openEditModal(
+                                                'users',
+                                                {{ $user->id }},
+                                                @js($user->name),
+                                                @js($user->email),
+                                                @js($user->role_id),
+                                                @js($user->status)
+                                            )"
+                                            class="action-btn btn-edit" title="Edit account">
+                                            <i class="fa-solid fa-pen text-[11px]"></i>
+                                        </button>
+
+                                        <button type="button"
+                                            onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
+                                            class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
+                                            title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                            <i class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                        </button>
+
+                                        <button type="button"
+                                            onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
+                                            class="action-btn btn-reset" title="Reset password">
+                                            <i class="fa-solid fa-key text-[11px]"></i>
+                                        </button>
+
+                                        <button type="button"
+                                            onclick="openViewModal(
+                                                @js($user->name),
+                                                @js($user->email),
+                                                @js($roleName),
+                                                @js(ucfirst($user->status)),
+                                                'Users',
+                                                @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
+                                            )"
+                                            class="action-btn" style="background:#f3f4f6;color:#374151;"
+                                            title="View details">
+                                            <i class="fa-solid fa-eye text-[11px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @empty
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
                 <div
                     class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p class="text-xs text-gray-500 um-pagebar-info">
@@ -1296,12 +1547,15 @@
 
 @section('scripts')
     <script>
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        const currentDateEl = document.getElementById('currentDate');
+            if (currentDateEl) {
+                currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
 
         var umState = {
             search: '{{ $search ?? '' }}',
@@ -1313,6 +1567,58 @@
 
         var umSearchTimer = null;
         var umController = null;
+
+        function getPreferredUmView() {
+            if (window.innerWidth <= 767) return 'grid';
+            return localStorage.getItem('userManagementView') || 'list';
+        }
+
+        function applyUmView(view, save = true) {
+            var listView = document.getElementById('umListView');
+            var gridView = document.getElementById('umGridView');
+            var listBtn = document.getElementById('umListViewBtn');
+            var gridBtn = document.getElementById('umGridViewBtn');
+
+            if (!listView || !gridView) return;
+
+            var finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+            if (finalView === 'grid') {
+                listView.hidden = true;
+                gridView.hidden = false;
+            } else {
+                listView.hidden = false;
+                gridView.hidden = true;
+            }
+
+            if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+            if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+            if (save && window.innerWidth > 767) {
+                localStorage.setItem('userManagementView', finalView);
+            }
+        }
+
+        function initUmViewToggle() {
+            var listBtn = document.getElementById('umListViewBtn');
+            var gridBtn = document.getElementById('umGridViewBtn');
+
+            applyUmView(getPreferredUmView(), false);
+
+            if (listBtn && !listBtn.dataset.bound) {
+                listBtn.dataset.bound = '1';
+                listBtn.addEventListener('click', function() {
+                    applyUmView('list', true);
+                });
+            }
+
+            if (gridBtn && !gridBtn.dataset.bound) {
+                gridBtn.dataset.bound = '1';
+                gridBtn.addEventListener('click', function() {
+                    applyUmView('grid', true);
+                });
+            }
+        }
 
         function closeAllModals() {
             document.querySelectorAll('.modal-overlay').forEach(function(modal) {
@@ -1565,7 +1871,9 @@
             }
 
             var tbody = document.getElementById('umTableBody');
-            if (!tbody) return;
+            var gridBody = document.getElementById('umGridBody');
+
+            if (!tbody || !gridBody) return;
 
             if (!users || users.length === 0) {
                 var searchVal = umState.search || '';
@@ -1579,6 +1887,17 @@
                     '<button onclick="clearSearch()" style="margin-top:.75rem;display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:99px;border:1.5px dashed #d1d5db;background:none;font-size:.78rem;color:#9ca3af;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor=\'#8B0000\';this.style.color=\'#8B0000\';" onmouseout="this.style.borderColor=\'#d1d5db\';this.style.color=\'#9ca3af\';"><i class=\"fa-solid fa-xmark\" style=\"font-size:.7rem;\"></i> Clear search</button>' :
                     '';
 
+                var emptyHtml = `
+                    <div style="padding:3.5rem 1rem;text-align:center;grid-column:1 / -1;">
+                        <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
+                            <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:#d1d5db;"></i>
+                        </div>
+                        <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">${emptyTitle}</p>
+                        <p style="font-size:.78rem;color:#9ca3af;margin:0;">${emptySub}</p>
+                        ${clearBtn}
+                    </div>
+                `;
+
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
@@ -1591,11 +1910,14 @@
                         </td>
                     </tr>
                 `;
+
+                gridBody.innerHTML = emptyHtml;
                 return;
             }
 
             var startNumber = ((umState.page - 1) * umState.perPage) + 1;
-            var html = '';
+            var tableHtml = '';
+            var gridHtml = '';
 
             users.forEach(function(user, index) {
                 var rowNumber = startNumber + index;
@@ -1616,8 +1938,10 @@
 
                 var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
                 var initial = (user.name || 'U').charAt(0).toUpperCase();
+                var statusLabel = (user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1);
+                var createdFull = (user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : '');
 
-                html += `
+                tableHtml += `
                 <tr class="user-table-row border-b border-gray-50 last:border-0">
                     <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
                         <span class="text-xs text-gray-400 font-medium">${rowNumber}</span>
@@ -1648,7 +1972,7 @@
 
                     <td class="py-3.5 px-4 text-center">
                         <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
-                            ${(user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1)}
+                            ${statusLabel}
                         </span>
                     </td>
 
@@ -1689,9 +2013,9 @@
                                     ${jsAttr(user.name)},
                                     ${jsAttr(user.email)},
                                     ${jsAttr(roleLabel)},
-                                    ${jsAttr((user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1))},
+                                    ${jsAttr(statusLabel)},
                                     'Users',
-                                    ${jsAttr((user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : ''))}
+                                    ${jsAttr(createdFull)}
                                 )"
                                 class="action-btn" style="background:#f3f4f6;color:#374151;"
                                 title="View details">
@@ -1701,9 +2025,91 @@
                     </td>
                 </tr>
             `;
+
+                gridHtml += `
+                <div class="um-grid-card">
+                    <div class="um-grid-top">
+                        <div class="um-grid-number">#${rowNumber}</div>
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
+                            ${statusLabel}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                            ${initial}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-semibold text-gray-800 text-sm leading-tight">${user.name}</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">${user.email}</div>
+                        </div>
+                    </div>
+
+                    <div class="um-grid-meta">
+                        <div class="um-grid-field">
+                            <div class="um-grid-label">Role</div>
+                            <div class="um-grid-value">
+                                <span class="badge-role" style="background:${roleBg};color:${roleColor};">
+                                    ${roleLabel}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="um-grid-field">
+                            <div class="um-grid-label">Registered</div>
+                            <div class="um-grid-value">${registeredDay}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-1 flex-wrap">
+                        <button type="button"
+                            onclick="openEditModal(
+                                'users',
+                                ${user.id},
+                                ${jsAttr(user.name)},
+                                ${jsAttr(user.email)},
+                                ${jsAttr(user.role_id)},
+                                ${jsAttr(user.status)}
+                            )"
+                            class="action-btn btn-edit" title="Edit account">
+                            <i class="fa-solid fa-pen text-[11px]"></i>
+                        </button>
+
+                        <button type="button"
+                            onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
+                            class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
+                            title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
+                            <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
+                        </button>
+
+                        <button type="button"
+                            onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
+                            class="action-btn btn-reset" title="Reset password">
+                            <i class="fa-solid fa-key text-[11px]"></i>
+                        </button>
+
+                        <button type="button"
+                            onclick="openViewModal(
+                                ${jsAttr(user.name)},
+                                ${jsAttr(user.email)},
+                                ${jsAttr(roleLabel)},
+                                ${jsAttr(statusLabel)},
+                                'Users',
+                                ${jsAttr(createdFull)}
+                            )"
+                            class="action-btn" style="background:#f3f4f6;color:#374151;"
+                            title="View details">
+                            <i class="fa-solid fa-eye text-[11px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
             });
 
-            tbody.innerHTML = html;
+            tbody.innerHTML = tableHtml;
+            gridBody.innerHTML = gridHtml;
+            applyUmView(getPreferredUmView(), false);
         }
 
         function umGoPage(page) {
@@ -1874,7 +2280,7 @@
         }
 
         function setRoleFilter(el, role) {
-            document.querySelectorAll('[data-role]').forEach(function(b) {
+            document.querySelectorAll('#umFilterForm [data-role]').forEach(function(b) {
                 b.classList.remove('active');
             });
             el.classList.add('active');
@@ -1886,6 +2292,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             applyTheme(localStorage.getItem('theme') || 'light');
+            initUmViewToggle();
             document.querySelectorAll('.theme-option').forEach(function(o) {
                 o.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -2089,6 +2496,10 @@
                         });
                 });
             }
+        });
+
+        window.addEventListener('resize', function() {
+            applyUmView(getPreferredUmView(), false);
         });
     </script>
 @endsection

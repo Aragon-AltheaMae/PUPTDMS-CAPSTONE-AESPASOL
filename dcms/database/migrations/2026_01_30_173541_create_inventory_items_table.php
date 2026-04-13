@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->date('date_received');
             $table->string('stock_no')->unique();
             $table->string('name');
-            $table->enum('unit', ['Box', 'Pack', 'Bottle', 'Piece']);
+            $table->string('unit');
             $table->unsignedInteger('qty');
             $table->unsignedInteger('used')->default(0);
             $table->timestamps();

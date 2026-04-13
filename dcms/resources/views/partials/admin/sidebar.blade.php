@@ -64,9 +64,9 @@
                 <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-pen"></i>
                     Document
                     Templates</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i
-                        class="fa-solid fa-boxes-stacked"></i>
-                    Inventory</a>
+                <a href="{{ route('admin.inventory') }}"
+                    class="nav-link {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-boxes-stacked"></i>Inventory</a>
             </div>
         </div>
 

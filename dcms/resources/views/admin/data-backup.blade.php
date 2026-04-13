@@ -81,6 +81,122 @@
         color: #fff;
     }
 
+    .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        background: #FAFAF9;
+        border: 1.5px solid #E0DDD8;
+        border-radius: 12px;
+        padding: 3px;
+        gap: 3px;
+        height: 38px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 5;
+    }
+
+    .view-toggle-btn {
+        width: 32px;
+        height: 30px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        border-radius: 9px;
+        font-size: .82rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all .15s ease;
+        flex-shrink: 0;
+    }
+
+    .view-toggle-btn:hover {
+        background: #f3f4f6;
+        color: #8B0000;
+    }
+
+    .view-toggle-btn.active {
+        background: #8B0000;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+    }
+
+    .backup-history-view[hidden] {
+        display: none !important;
+    }
+
+    .backup-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .backup-grid-card {
+        background: #fff;
+        border: 1px solid #ececef;
+        border-radius: 16px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .9rem;
+        min-width: 0;
+        transition: all .15s ease;
+    }
+
+    .backup-grid-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0,0,0,.06);
+        border-color: #e2d6d6;
+    }
+
+    .backup-grid-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+    }
+
+    .backup-grid-id {
+        font-family: monospace;
+        font-size: .78rem;
+        font-weight: 800;
+        color: #8B0000;
+        line-height: 1.3;
+        word-break: break-word;
+    }
+
+    .backup-grid-meta {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .7rem;
+    }
+
+    .backup-grid-label {
+        font-size: .64rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: .25rem;
+    }
+
+    .backup-grid-value {
+        font-size: .8rem;
+        color: #374151;
+        line-height: 1.35;
+    }
+
+    .backup-grid-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
     .backup-stats {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -654,7 +770,7 @@
         border-left: 4px solid #8B0000 !important;
         border-radius: 14px !important;
         box-shadow: 0 16px 36px rgba(0,0,0,.12) !important;
-        padding: .9rem 1rem !important;
+        padding: .9rem 2.2rem .9rem 1rem !important;
         width: min(380px, calc(100vw - 32px)) !important;
         min-width: unset !important;
         max-width: 380px !important;
@@ -723,14 +839,17 @@
     }
 
     .toast-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
         border: none;
         background: transparent;
         color: #9ca3af;
         cursor: pointer;
         padding: 0;
-        margin-left: .25rem;
+        margin-left: 0;
         font-size: .85rem;
-        flex-shrink: 0;
+        line-height: 1;
     }
 
     .toast-close:hover {
@@ -867,6 +986,24 @@
         .backup-stats {
             grid-template-columns: 1fr 1fr;
         }
+
+        #backupHistoryListView {
+            display: none !important;
+        }
+
+        #backupHistoryGridView {
+            display: block !important;
+        }
+
+        #backupHistoryViewToggle {
+            display: none !important;
+        }
+
+        .backup-grid {
+            grid-template-columns: 1fr;
+            padding: .85rem;
+            gap: .85rem;
+        }
     }
 
     @media (max-width: 520px) {
@@ -996,12 +1133,21 @@
                     <h1 class="page-title">Data Backup</h1>
                 </div>
 
-                <div class="flex items-center gap-3">
+                 <div class="flex items-center gap-3 flex-wrap">
                     <button id="backupNowBtn" onclick="startBackup()"
                         class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
                         <i class="fa-solid fa-database"></i>
                         Backup Now
                     </button>
+
+                    <div class="view-toggle" id="backupHistoryViewToggle">
+                        <button type="button" class="view-toggle-btn active" id="backupListViewBtn" title="List view" aria-label="List view">
+                            <i class="fa-solid fa-table-list"></i>
+                        </button>
+                        <button type="button" class="view-toggle-btn" id="backupGridViewBtn" title="Grid view" aria-label="Grid view">
+                            <i class="fa-solid fa-grip"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1083,67 +1229,129 @@
                     </form>
                 </div>
 
-                <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Backup ID</th>
-                                <th>Date & Time</th>
-                                <th>Type</th>
-                                <th>Size</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="backupTableBody">
-                            @forelse($backups as $backup)
-                                <tr id="row-{{ $backup->id }}">
-                                    <td>
-                                        <div class="backup-id">{{ $backup->backup_id }}</div>
-                                    </td>
-                                    <td>
-                                        {{ $backup->created_at ? $backup->created_at->format('M d, Y h:i A') : '—' }}
-                                    </td>
-                                    <td>
-                                        <span class="type-pill {{ $backup->type === 'full' ? 'full' : 'incremental' }}">
-                                            {{ ucfirst($backup->type ?? 'full') }}
-                                        </span>
-                                    </td>
-                                    <td style="font-weight:700;">
-                                        {{ isset($backup->size_formatted) ? $backup->size_formatted : $formatBytes($backup->size_bytes ?? 0) }}
-                                    </td>
-                                    <td>
-                                        <span class="status-pill {{ $backup->status ?? 'completed' }}">
-                                            {{ ucfirst(str_replace('_', ' ', $backup->status ?? 'completed')) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <a class="act-btn dl" title="Download" href="{{ route('admin.data_backup.download', $backup->id) }}">
-                                                <i class="fa-solid fa-download"></i>
-                                            </a>
-                                            <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
-                                                <i class="fa-solid fa-rotate-left"></i>
-                                            </button>
-                                            <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
+                 <div id="backupHistoryListView" class="backup-history-view">
+                    <div style="overflow-x:auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
-                                            <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
-                                            <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
-                                        </div>
-                                    </td>
+                                    <th>Backup ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="backupTableBody">
+                                @forelse($backups as $backup)
+                                    <tr id="row-{{ $backup->id }}">
+                                        <td>
+                                            <div class="backup-id">{{ $backup->backup_id }}</div>
+                                        </td>
+                                        <td>
+                                            {{ $backup->created_at ? $backup->created_at->format('M d, Y h:i A') : '—' }}
+                                        </td>
+                                        <td>
+                                            <span class="type-pill {{ $backup->type === 'full' ? 'full' : 'incremental' }}">
+                                                {{ ucfirst($backup->type ?? 'full') }}
+                                            </span>
+                                        </td>
+                                        <td style="font-weight:700;">
+                                            {{ isset($backup->size_formatted) ? $backup->size_formatted : $formatBytes($backup->size_bytes ?? 0) }}
+                                        </td>
+                                        <td>
+                                            <span class="status-pill {{ $backup->status ?? 'completed' }}">
+                                                {{ ucfirst(str_replace('_', ' ', $backup->status ?? 'completed')) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="table-actions">
+                                                <a class="act-btn dl" title="Download" href="{{ route('admin.data_backup.download', $backup->id) }}">
+                                                    <i class="fa-solid fa-download"></i>
+                                                </a>
+                                                <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                </button>
+                                                <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
+                                                <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                                                <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="backupHistoryGridView" class="backup-history-view" hidden>
+                    <div class="backup-grid" id="backupGridBody">
+                        @forelse($backups as $backup)
+                            <div class="backup-grid-card" id="grid-row-{{ $backup->id }}">
+                                <div class="backup-grid-top">
+                                    <div class="backup-grid-id">{{ $backup->backup_id }}</div>
+                                    <span class="status-pill {{ $backup->status ?? 'completed' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $backup->status ?? 'completed')) }}
+                                    </span>
+                                </div>
+
+                                <div class="backup-grid-meta">
+                                    <div>
+                                        <div class="backup-grid-label">Date & Time</div>
+                                        <div class="backup-grid-value">
+                                            {{ $backup->created_at ? $backup->created_at->format('M d, Y h:i A') : '—' }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="backup-grid-label">Type</div>
+                                        <div class="backup-grid-value">
+                                            <span class="type-pill {{ $backup->type === 'full' ? 'full' : 'incremental' }}">
+                                                {{ ucfirst($backup->type ?? 'full') }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="backup-grid-label">Size</div>
+                                        <div class="backup-grid-value" style="font-weight:700;">
+                                            {{ isset($backup->size_formatted) ? $backup->size_formatted : $formatBytes($backup->size_bytes ?? 0) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="backup-grid-footer">
+                                    <div class="table-actions">
+                                        <a class="act-btn dl" title="Download" href="{{ route('admin.data_backup.download', $backup->id) }}">
+                                            <i class="fa-solid fa-download"></i>
+                                        </a>
+                                        <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                        </button>
+                                        <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup({{ $backup->id }}, '{{ $backup->backup_id }}')">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="empty-state" style="grid-column: 1 / -1;">
+                                <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
+                                <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                                <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
 
                 <div class="table-footer" id="backupTableFooter">
@@ -1154,6 +1362,7 @@
                         {{ $backups->links() }}
                     </div>
                 </div>
+
             </div>
 
             <div class="side-stack">
@@ -1399,57 +1608,124 @@
 
     function renderTableRows(rows) {
         const tbody = document.getElementById('backupTableBody');
-        if (!tbody) return;
+        const gridBody = document.getElementById('backupGridBody');
+
+        if (!tbody && !gridBody) return;
 
         if (!rows || rows.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6">
-                        <div class="empty-state">
-                            <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
-                            <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
-                            <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
+                                <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                                <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            if (gridBody) {
+                gridBody.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-icon"><i class="fa-solid fa-database"></i></div>
+                        <p style="font-size:.9rem;font-weight:800;color:#6b7280;margin:0 0 .25rem;">No backups found.</p>
+                        <p style="font-size:.78rem;color:#b0b7c3;margin:0;">Create your first backup to start protecting system data</p>
+                    </div>
+                `;
+            }
+
             return;
         }
 
-        tbody.innerHTML = rows.map(backup => `
-            <tr id="row-${backup.id}">
-                <td>
-                    <div class="backup-id">${backup.backup_id}</div>
-                </td>
-                <td>${backup.created_at_formatted || '—'}</td>
-                <td>
-                    <span class="type-pill ${backup.type === 'full' ? 'full' : 'incremental'}">
-                        ${(backup.type || 'full').charAt(0).toUpperCase() + (backup.type || 'full').slice(1)}
-                    </span>
-                </td>
-                <td style="font-weight:700;">
-                    ${backup.size_formatted || '0 B'}
-                </td>
-                <td>
-                    <span class="status-pill ${backup.status || 'completed'}">
-                        ${String(backup.status || 'completed').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                    </span>
-                </td>
-                <td>
-                    <div class="table-actions">
-                        <a class="act-btn dl" title="Download" href="${backup.download_url}">
-                            <i class="fa-solid fa-download"></i>
-                        </a>
-                        <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup(${backup.id}, '${backup.backup_id}')">
-                            <i class="fa-solid fa-rotate-left"></i>
-                        </button>
-                        <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup(${backup.id}, '${backup.backup_id}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+        if (tbody) {
+            tbody.innerHTML = rows.map(backup => `
+                <tr id="row-${backup.id}">
+                    <td>
+                        <div class="backup-id">${backup.backup_id}</div>
+                    </td>
+                    <td>${backup.created_at_formatted || '—'}</td>
+                    <td>
+                        <span class="type-pill ${backup.type === 'full' ? 'full' : 'incremental'}">
+                            ${(backup.type || 'full').charAt(0).toUpperCase() + (backup.type || 'full').slice(1)}
+                        </span>
+                    </td>
+                    <td style="font-weight:700;">
+                        ${backup.size_formatted || '0 B'}
+                    </td>
+                    <td>
+                        <span class="status-pill ${backup.status || 'completed'}">
+                            ${String(backup.status || 'completed').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="act-btn dl" title="Download" href="${backup.download_url}">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                            <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup(${backup.id}, '${backup.backup_id}')">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                            <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup(${backup.id}, '${backup.backup_id}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        if (gridBody) {
+            gridBody.innerHTML = rows.map(backup => `
+                <div class="backup-grid-card" id="grid-row-${backup.id}">
+                    <div class="backup-grid-top">
+                        <div class="backup-grid-id">${backup.backup_id}</div>
+                        <span class="status-pill ${backup.status || 'completed'}">
+                            ${String(backup.status || 'completed').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </span>
                     </div>
-                </td>
-            </tr>
-        `).join('');
+
+                    <div class="backup-grid-meta">
+                        <div>
+                            <div class="backup-grid-label">Date & Time</div>
+                            <div class="backup-grid-value">${backup.created_at_formatted || '—'}</div>
+                        </div>
+
+                        <div>
+                            <div class="backup-grid-label">Type</div>
+                            <div class="backup-grid-value">
+                                <span class="type-pill ${backup.type === 'full' ? 'full' : 'incremental'}">
+                                    ${(backup.type || 'full').charAt(0).toUpperCase() + (backup.type || 'full').slice(1)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="backup-grid-label">Size</div>
+                            <div class="backup-grid-value" style="font-weight:700;">
+                                ${backup.size_formatted || '0 B'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="backup-grid-footer">
+                        <div class="table-actions">
+                            <a class="act-btn dl" title="Download" href="${backup.download_url}">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                            <button type="button" class="act-btn restore" title="Restore" onclick="restoreBackup(${backup.id}, '${backup.backup_id}')">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                            <button type="button" class="act-btn del" title="Delete" onclick="deleteBackup(${backup.id}, '${backup.backup_id}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
     }
 
     function renderTableFooter(meta) {
@@ -1851,6 +2127,62 @@
                 }
             });
         }
+
+        function getPreferredBackupHistoryView() {
+            if (window.innerWidth <= 767) return 'grid';
+            return localStorage.getItem('backupHistoryView') || 'list';
+        }
+
+        function applyBackupHistoryView(view, save = true) {
+            const listView = document.getElementById('backupHistoryListView');
+            const gridView = document.getElementById('backupHistoryGridView');
+            const listBtn = document.getElementById('backupListViewBtn');
+            const gridBtn = document.getElementById('backupGridViewBtn');
+
+            if (!listView || !gridView) return;
+
+            const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+            if (finalView === 'grid') {
+                listView.hidden = true;
+                gridView.hidden = false;
+            } else {
+                listView.hidden = false;
+                gridView.hidden = true;
+            }
+
+            if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+            if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+            if (save && window.innerWidth > 767) {
+                localStorage.setItem('backupHistoryView', finalView);
+            }
+        }
+
+        const backupListViewBtn = document.getElementById('backupListViewBtn');
+        const backupGridViewBtn = document.getElementById('backupGridViewBtn');
+
+        if (backupListViewBtn) {
+            backupListViewBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                applyBackupHistoryView('list', true);
+            });
+        }
+
+        if (backupGridViewBtn) {
+            backupGridViewBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                applyBackupHistoryView('grid', true);
+            });
+        }
+
+        applyBackupHistoryView(getPreferredBackupHistoryView(), false);
+
+        window.addEventListener('resize', function () {
+            applyBackupHistoryView(getPreferredBackupHistoryView(), false);
+        });
 
         moveStatsIndicator();
         updateScheduleUI();

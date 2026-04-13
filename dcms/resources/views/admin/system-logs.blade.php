@@ -105,8 +105,7 @@
             line-height: 1.1;
             letter-spacing: -.02em;
         }
-        
-        /* ── Stat grid ── */
+ 
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -205,7 +204,6 @@
             gap: .35rem;
         }
 
-        /* ── Card ── */
         .card {
             background: #fff;
             border-radius: 16px;
@@ -263,7 +261,6 @@
             color: #1a202c;
         }
 
-        /* ── Data table ── */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -415,6 +412,114 @@
             background: #10b981;
             border-radius: 50%;
             animation: sl-pulse 2s infinite;
+        }
+
+        .sl-view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+            height: 38px;
+        }
+
+        .sl-view-toggle-btn {
+            width: 32px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 9px;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            flex-shrink: 0;
+        }
+
+        .sl-view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: #8B0000;
+        }
+
+        .sl-view-toggle-btn.active {
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+        }
+
+        .sl-view[hidden] {
+            display: none !important;
+        }
+
+        .sl-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .sl-grid-card {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+            transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            min-width: 0;
+        }
+
+        .sl-grid-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+            border-color: #ead6d6;
+        }
+
+        .sl-grid-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        .sl-grid-id {
+            font-size: .72rem;
+            font-weight: 800;
+            color: #8B0000;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .sl-grid-meta {
+            display: grid;
+            gap: .65rem;
+        }
+
+        .sl-grid-field {
+            min-width: 0;
+        }
+
+        .sl-grid-label {
+            font-size: .64rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .28rem;
+        }
+
+        .sl-grid-value {
+            font-size: .8rem;
+            color: #374151;
+            line-height: 1.35;
+            min-width: 0;
+            word-break: break-word;
         }
 
         /* ── Log cell styles ── */
@@ -593,7 +698,6 @@
             font-weight: 600;
         }
 
-        /* ── Pagebar ── */
         .sl-pagebar {
             padding: .85rem 1.4rem;
             border-top: 1px solid #f3f4f6;
@@ -619,7 +723,6 @@
             animation: slNewRowSlideIn .8s ease;
         }
 
-        /* ── Filter panel ── */
         .sl-filter-wrap {
             position: relative;
             display: inline-flex;
@@ -780,9 +883,7 @@
             display: none;
         }
 
-        /* ══════════════════════════════════════════
-               DARK MODE
-            ══════════════════════════════════════════ */
+
         [data-theme="dark"] .stat-card,
         [data-theme="dark"] .card {
             background: #161b22 !important;
@@ -1103,6 +1204,24 @@
                 padding: .6rem .5rem;
                 font-size: .72rem;
             }
+
+            #slListView {
+                display: none !important;
+            }
+
+            #slGridView {
+                display: block !important;
+            }
+
+            #slViewToggle {
+                display: none !important;
+            }
+
+            .sl-grid {
+                grid-template-columns: 1fr;
+                padding: .85rem;
+                gap: .85rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1164,8 +1283,28 @@
                     <div>
                         <h1 class="page-title">System Logs</h1>
                     </div>
+
                     <div class="flex items-center gap-3 flex-shrink-0">
-                        <span class="sl-live"><span class="sl-live-dot"></span> Live Monitoring</span>
+                        <span class="sl-live">
+                            <span class="sl-live-dot"></span> Live Monitoring
+                        </span>
+
+                        <div class="sl-view-toggle" id="slViewToggle">
+                            <button type="button"
+                                class="sl-view-toggle-btn active"
+                                id="slListViewBtn"
+                                title="List view"
+                                aria-label="List view">
+                                <i class="fa-solid fa-table-list"></i>
+                            </button>
+                            <button type="button"
+                                class="sl-view-toggle-btn"
+                                id="slGridViewBtn"
+                                title="Grid view"
+                                aria-label="Grid view">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1356,76 +1495,162 @@
                     <div class="sl-pagination-wrap"></div>
                 </div>
 
-                {{-- Table --}}
-                <div style="overflow-x:auto;">
-                    <table class="data-table" id="slTable">
-                        <thead>
-                            <tr>
-                                <th style="width:100px;">ID</th>
-                                <th style="width:150px;">Timestamp</th>
-                                <th style="width:150px;">Role</th>
-                                <th style="width:180px;">User</th>
-                                <th style="width:150px;">Action</th>
-                                <th style="width:200px;">Module</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody id="slTableBody">
-                            @forelse($logs as $log)
-                                @php
-                                    $role = strtolower($log->actor_role ?? 'other');
-                                    $action = strtolower($log->action ?? '');
-                                    $actionClass = match (true) {
-                                        str_contains($action, 'login') => 'login',
-                                        str_contains($action, 'logout') => 'logout',
-                                        str_contains($action, 'create') => 'create',
-                                        str_contains($action, 'update') => 'update',
-                                        str_contains($action, 'delete') => 'delete',
-                                        default => 'default',
-                                    };
-                                    $actionIcon = match ($actionClass) {
-                                        'login' => 'fa-right-to-bracket',
-                                        'logout' => 'fa-right-from-bracket',
-                                        'create' => 'fa-plus',
-                                        'update' => 'fa-pen',
-                                        'delete' => 'fa-trash',
-                                        default => 'fa-bolt',
-                                    };
-                                    $roleIcon = match ($role) {
-                                        'admin' => 'fa-user-tie',
-                                        'dentist' => 'fa-user-doctor',
-                                        'patient' => 'fa-user',
-                                        default => 'fa-circle-user',
-                                    };
-                                    $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
-                                @endphp
-                                <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                                    <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span></td>
-                                    <td>
-                                        <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
-                                        <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
-                                    </td>
-                                    <td><span class="sl-role {{ $role }}"><i
-                                                class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}</span></td>
-                                    <td>
-                                        <div class="sl-user">
-                                            <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                                            <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="sl-action {{ $actionClass }}"><i
-                                                class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}</span>
-                                    </td>
-                                    <td><span class="sl-module"><i
-                                                class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}</span>
-                                    </td>
-                                    <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span>
-                                    </td>
+               {{-- List View --}}
+                <div class="sl-view" id="slListView">
+                    <div style="overflow-x:auto;">
+                        <table class="data-table" id="slTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:100px;">ID</th>
+                                    <th style="width:150px;">Timestamp</th>
+                                    <th style="width:150px;">Role</th>
+                                    <th style="width:180px;">User</th>
+                                    <th style="width:150px;">Action</th>
+                                    <th style="width:200px;">Module</th>
+                                    <th>Description</th>
                                 </tr>
-                            @empty
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="slTableBody">
+                                @forelse($logs as $log)
+                                    @php
+                                        $role = strtolower($log->actor_role ?? 'other');
+                                        $action = strtolower($log->action ?? '');
+                                        $actionClass = match (true) {
+                                            str_contains($action, 'login') => 'login',
+                                            str_contains($action, 'logout') => 'logout',
+                                            str_contains($action, 'create') => 'create',
+                                            str_contains($action, 'update') => 'update',
+                                            str_contains($action, 'delete') => 'delete',
+                                            default => 'default',
+                                        };
+                                        $actionIcon = match ($actionClass) {
+                                            'login' => 'fa-right-to-bracket',
+                                            'logout' => 'fa-right-from-bracket',
+                                            'create' => 'fa-plus',
+                                            'update' => 'fa-pen',
+                                            'delete' => 'fa-trash',
+                                            default => 'fa-bolt',
+                                        };
+                                        $roleIcon = match ($role) {
+                                            'admin' => 'fa-user-tie',
+                                            'dentist' => 'fa-user-doctor',
+                                            'patient' => 'fa-user',
+                                            default => 'fa-circle-user',
+                                        };
+                                        $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                                    @endphp
+                                    <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                                        <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                        <td>
+                                            <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
+                                            <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
+                                        </td>
+                                        <td><span class="sl-role {{ $role }}"><i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}</span></td>
+                                        <td>
+                                            <div class="sl-user">
+                                                <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
+                                                <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="sl-action {{ $actionClass }}">
+                                                <i class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="sl-module">
+                                                <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
+                                            </span>
+                                        </td>
+                                        <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span></td>
+                                    </tr>
+                                @empty
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="sl-view" id="slGridView" hidden>
+                    <div class="sl-grid" id="slGridBody">
+                        @forelse($logs as $log)
+                            @php
+                                $role = strtolower($log->actor_role ?? 'other');
+                                $action = strtolower($log->action ?? '');
+                                $actionClass = match (true) {
+                                    str_contains($action, 'login') => 'login',
+                                    str_contains($action, 'logout') => 'logout',
+                                    str_contains($action, 'create') => 'create',
+                                    str_contains($action, 'update') => 'update',
+                                    str_contains($action, 'delete') => 'delete',
+                                    default => 'default',
+                                };
+                                $actionIcon = match ($actionClass) {
+                                    'login' => 'fa-right-to-bracket',
+                                    'logout' => 'fa-right-from-bracket',
+                                    'create' => 'fa-plus',
+                                    'update' => 'fa-pen',
+                                    'delete' => 'fa-trash',
+                                    default => 'fa-bolt',
+                                };
+                                $roleIcon = match ($role) {
+                                    'admin' => 'fa-user-tie',
+                                    'dentist' => 'fa-user-doctor',
+                                    'patient' => 'fa-user',
+                                    default => 'fa-circle-user',
+                                };
+                                $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                            @endphp
+
+                            <div class="sl-grid-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                                <div class="sl-grid-top">
+                                    <div class="sl-grid-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</div>
+                                    <span class="sl-action {{ $actionClass }}">
+                                        <i class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                    </span>
+                                </div>
+
+                                <div class="sl-user">
+                                    <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
+                                    <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
+                                </div>
+
+                                <div class="sl-grid-meta">
+                                    <div class="sl-grid-field">
+                                        <div class="sl-grid-label">Timestamp</div>
+                                        <div class="sl-grid-value">
+                                            {{ $log->created_at->format('M j, Y') }}<br>
+                                            {{ $log->created_at->format('h:i:s A') }}
+                                        </div>
+                                    </div>
+
+                                    <div class="sl-grid-field">
+                                        <div class="sl-grid-label">Role</div>
+                                        <div class="sl-grid-value">
+                                            <span class="sl-role {{ $role }}">
+                                                <i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="sl-grid-field">
+                                        <div class="sl-grid-label">Module</div>
+                                        <div class="sl-grid-value">
+                                            <span class="sl-module">
+                                                <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="sl-grid-field">
+                                        <div class="sl-grid-label">Description</div>
+                                        <div class="sl-grid-value">{{ $log->description ?? 'No description provided.' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                        @endforelse
+                    </div>
                 </div>
 
                 <div id="emptyState" style="display:none;"></div>
@@ -1454,6 +1679,7 @@
 
             syncSlFilterInputs();
             updateSlClearFilterButton();
+            initSlViewToggle();
 
             document.getElementById('slFilterPanel')?.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1552,6 +1778,58 @@
         var slOverallTotal = {{ $totalCount }};
         var slSearchTimer = null;
         var slController = null;
+
+        function getPreferredSlView() {
+            if (window.innerWidth <= 767) return 'grid';
+            return localStorage.getItem('systemLogsView') || 'list';
+        }
+
+        function applySlView(view, save = true) {
+            var listView = document.getElementById('slListView');
+            var gridView = document.getElementById('slGridView');
+            var listBtn = document.getElementById('slListViewBtn');
+            var gridBtn = document.getElementById('slGridViewBtn');
+
+            if (!listView || !gridView) return;
+
+            var finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+            if (finalView === 'grid') {
+                listView.hidden = true;
+                gridView.hidden = false;
+            } else {
+                listView.hidden = false;
+                gridView.hidden = true;
+            }
+
+            if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+            if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+            if (save && window.innerWidth > 767) {
+                localStorage.setItem('systemLogsView', finalView);
+            }
+        }
+
+        function initSlViewToggle() {
+            var listBtn = document.getElementById('slListViewBtn');
+            var gridBtn = document.getElementById('slGridViewBtn');
+
+            applySlView(getPreferredSlView(), false);
+
+            if (listBtn && !listBtn.dataset.bound) {
+                listBtn.dataset.bound = '1';
+                listBtn.addEventListener('click', function() {
+                    applySlView('list', true);
+                });
+            }
+
+            if (gridBtn && !gridBtn.dataset.bound) {
+                gridBtn.dataset.bound = '1';
+                gridBtn.addEventListener('click', function() {
+                    applySlView('grid', true);
+                });
+            }
+        }
 
         function toggleSearchClear(input) {
             document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0);
@@ -1725,11 +2003,16 @@
         }
 
         function slRenderRows(logs) {
+            var tableBody = document.getElementById('slTableBody');
+            var gridBody = document.getElementById('slGridBody');
+
             if (!logs || logs.length === 0) {
-                document.getElementById('slTableBody').innerHTML = '';
+                if (tableBody) tableBody.innerHTML = '';
+                if (gridBody) gridBody.innerHTML = '';
                 showEmptyState(slState.search);
                 return;
             }
+
             var actionIcons = {
                 login: 'fa-right-to-bracket',
                 logout: 'fa-right-from-bracket',
@@ -1738,18 +2021,26 @@
                 delete: 'fa-trash',
                 default: 'fa-bolt'
             };
+
             var roleIcons = {
                 admin: 'fa-user-tie',
                 dentist: 'fa-user-doctor',
                 patient: 'fa-user'
             };
-            var html = '';
+
+            var tableHtml = '';
+            var gridHtml = '';
+
             logs.forEach(function(log) {
                 var role = (log.actor_role || 'other').toLowerCase();
                 var action = (log.action || '').toLowerCase();
-                var actionClass = action.includes('login') ? 'login' : action.includes('logout') ? 'logout' : action
-                    .includes('create') ? 'create' : action.includes('update') ? 'update' : action.includes(
-                        'delete') ? 'delete' : 'default';
+                var actionClass = action.includes('login') ? 'login'
+                    : action.includes('logout') ? 'logout'
+                    : action.includes('create') ? 'create'
+                    : action.includes('update') ? 'update'
+                    : action.includes('delete') ? 'delete'
+                    : 'default';
+
                 var actionIcon = actionIcons[actionClass] || 'fa-bolt';
                 var roleIcon = roleIcons[role] || 'fa-circle-user';
                 var letter = (log.actor_name || role).charAt(0).toUpperCase();
@@ -1760,26 +2051,41 @@
                 var moduleLabel = (log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function(c) {
                     return c.toUpperCase();
                 });
+                var actorName = log.actor_name || 'Unknown User';
+                var description = log.description || 'No description provided.';
 
-                html += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
-                html += '<td><span class="sl-id">' + idPadded + '</span></td>';
-                html += '<td><span class="sl-date-day">' + log.created_at_day +
-                    '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
-                html += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role
-                    .charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
-               html += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter +
-    '</div><span class="sl-username">' + (log.actor_name || 'Unknown User') + '</span></div></td>';
-                html += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon +
-                    '"></i>' + actionLabel + '</span></td>';
-                html += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel +
-                    '</span></td>';
-                html += '<td><span class="sl-desc" title="' + (log.description || '') + '">' + (log.description ||
-                    'No description provided.') + '</span></td>';
-                html += '</tr>';
+                tableHtml += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
+                tableHtml += '<td><span class="sl-id">' + idPadded + '</span></td>';
+                tableHtml += '<td><span class="sl-date-day">' + log.created_at_day + '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
+                tableHtml += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
+                tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter + '</div><span class="sl-username">' + actorName + '</span></div></td>';
+                tableHtml += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon + '"></i>' + actionLabel + '</span></td>';
+                tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel + '</span></td>';
+                tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description + '</span></td>';
+                tableHtml += '</tr>';
+
+                gridHtml += '<div class="sl-grid-card">';
+                gridHtml += '<div class="sl-grid-top">';
+                gridHtml += '<div class="sl-grid-id">' + idPadded + '</div>';
+                gridHtml += '<span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon + '"></i>' + actionLabel + '</span>';
+                gridHtml += '</div>';
+
+                gridHtml += '<div class="sl-user"><div class="sl-avatar ' + role + '">' + letter + '</div><span class="sl-username">' + actorName + '</span></div>';
+
+                gridHtml += '<div class="sl-grid-meta">';
+                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Timestamp</div><div class="sl-grid-value">' + log.created_at_day + '<br>' + log.created_at_time + '</div></div>';
+                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Role</div><div class="sl-grid-value"><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role.slice(1) + '</span></div></div>';
+                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Module</div><div class="sl-grid-value"><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel + '</span></div></div>';
+                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Description</div><div class="sl-grid-value">' + description + '</div></div>';
+                gridHtml += '</div>';
+                gridHtml += '</div>';
             });
-            document.getElementById('slTableBody').innerHTML = html;
+
+            if (tableBody) tableBody.innerHTML = tableHtml;
+            if (gridBody) gridBody.innerHTML = gridHtml;
+
             document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('slTable').style.display = '';
+            applySlView(getPreferredSlView(), false);
         }
 
         function slRenderPagebar(p) {
@@ -1862,7 +2168,11 @@
             var emptyState = document.getElementById('emptyState');
             var table = document.getElementById('slTable');
             if (!emptyState) return;
-            if (table) table.style.display = 'none';
+            if (table) table.style.display = '';
+            var listView = document.getElementById('slListView');
+            var gridView = document.getElementById('slGridView');
+            if (listView) listView.hidden = true;
+            if (gridView) gridView.hidden = true;
             emptyState.style.display = 'block';
 
             var icon, title, sub, extra = '';
@@ -1902,6 +2212,10 @@
                 '" style="font-size:1.6rem;color:#d1d5db;"></i></div><p style="font-size:.9rem;font-weight:700;color:#6b7280;margin:0;">' +
                 title + '</p><p style="font-size:.78rem;color:#b0b7c3;margin:0;max-width:280px;">' + sub + '</p>' + extra +
                 '</div>';
+
+                window.addEventListener('resize', function() {
+                applySlView(getPreferredSlView(), false);
+            });
         }
     </script>
 @endsection
