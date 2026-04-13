@@ -92,6 +92,11 @@
                         class="fa-solid fa-sliders"></i> System Settings</a>
             </div>
         </div>
+        <a href="{{ route('admin.assign-cms-access') }}"
+            class="nav-link {{ request()->routeIs('admin.assign-cms-access') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-shield nav-icon"></i>
+            Assign CMS Access
+        </a>
 
     </div>
 </aside>
