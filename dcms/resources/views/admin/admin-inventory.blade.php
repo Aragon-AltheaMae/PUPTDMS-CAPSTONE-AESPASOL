@@ -500,6 +500,30 @@
             white-space: nowrap;
         }
 
+        @keyframes stockAlertPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.0);
+                opacity: 1;
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(192, 57, 43, 0.10);
+                opacity: .88;
+            }
+        }
+
+        .bal-chip.alert-blink {
+            animation: stockAlertPulse 1.2s ease-in-out infinite;
+        }
+
+        .out-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 11px;
+            line-height: 1;
+        }
+
         .bal-chip::before {
             content: '';
             width: 6px;
@@ -1760,9 +1784,14 @@
 
             data.forEach(function(item) {
                 const balance = Number(item.qty) - Number(item.used);
-                const balClass = balance <= 0 ? 'critical' : balance <= 5 ? 'low' : 'ok';
-                const balLabel = balance <= 0 ? 'Out of stock' : balance <= 5 ? 'Low stock' : 'In stock';
+
+                const isOutOfStock = balance <= 0;
+                const balClass = balance <= 5 ? 'critical' : 'ok';
+                const balLabel = isOutOfStock ? 'Out of stock' : balance <= 5 ? 'Low stock' : 'In stock';
                 const catClass = item.category === 'Medicine' ? 'medicine' : 'supplies';
+
+                const balExtraClass = isOutOfStock ? ' alert-blink' : '';
+                const balIcon = isOutOfStock ? '<span class="out-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>' : '';
 
                 tbody.innerHTML +=
                     '<tr>' +
@@ -1772,7 +1801,9 @@
                     '<td style="color:#9A9490;">' + (item.unit || '') + '</td>' +
                     '<td style="font-weight:700;">' + (item.qty || 0) + '</td>' +
                     '<td style="color:#9A9490;">' + (item.used || 0) + '</td>' +
-                    '<td><span class="bal-chip ' + balClass + '">' + balance + ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span></span></td>' +
+                    '<td><span class="bal-chip ' + balClass + balExtraClass + '">' + balance +
+                        ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span>' +
+                        balIcon + '</span></td>' +
                     '<td><div style="display:flex;justify-content:center;gap:6px;"><button class="act-btn edit" title="Edit" onclick="openEdit(' + item.id + ')"><i class="fa fa-pen"></i></button><button class="act-btn delete" title="Delete" onclick="deleteItem(' + item.id + ')"><i class="fa fa-trash"></i></button></div></td>' +
                     '</tr>';
 
@@ -1785,7 +1816,7 @@
                         '<div style="margin-top:6px;"><span class="stock-no">' + (item.stock_no || '') + '</span></div>' +
                         '<span class="supply-cat ' + catClass + '" style="margin-top:8px;">' + (item.category || '') + '</span>' +
                         '</div>' +
-                        '<span class="bal-chip ' + balClass + '">' + balance + '</span>' +
+                        '<span class="bal-chip ' + balClass + balExtraClass + '">' + balance + balIcon + '</span>' +
                         '</div>' +
 
                         '<div class="inventory-card-meta">' +

@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\AcademicPeriod;
 use App\Models\Backup;
 use App\Models\SystemSetting;
+use App\Models\Inventory;
 use Carbon\Carbon;
 use App\Models\AuditLog;
 use App\Helpers\AuditLogger;
@@ -39,6 +40,21 @@ class AdminDashboardController extends Controller
             ->whereMonth('request_date', $now->month)
             ->where('status', 'approved')
             ->count();
+
+        $inventoryItems = Inventory::get();
+
+            $inventoryTotal = $inventoryItems->count();
+            $inventoryMedicine = $inventoryItems->where('category', 'Medicine')->count();
+            $inventorySupplies = $inventoryItems->where('category', 'Supplies')->count();
+            $inventoryLowStock = $inventoryItems->filter(fn($item) => $item->balance > 0 && $item->balance <= 5)->count();
+            $inventoryOutOfStock = $inventoryItems->filter(fn($item) => $item->balance <= 0)->count();
+            $inventoryInStock = $inventoryItems->filter(fn($item) => $item->balance > 5)->count();
+
+            $inventoryCriticalItems = $inventoryItems
+                ->filter(fn($item) => $item->balance <= 5)
+                ->sortBy('balance')
+                ->take(5)
+                ->values();
         
         $lastBackup = Backup::where('status', 'completed')
             ->latest('created_at')
@@ -160,7 +176,14 @@ class AdminDashboardController extends Controller
             'lastBackup',
             'totalBackups',
             'autoBackupEnabled',
-            'nextBackupDate'
+            'nextBackupDate',
+            'inventoryTotal',
+            'inventoryMedicine',
+            'inventorySupplies',
+            'inventoryLowStock',
+            'inventoryOutOfStock',
+            'inventoryInStock',
+            'inventoryCriticalItems'
         ));
     }
 }
