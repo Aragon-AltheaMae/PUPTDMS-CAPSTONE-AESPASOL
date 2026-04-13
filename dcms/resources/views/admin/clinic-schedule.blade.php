@@ -352,98 +352,6 @@
             padding: 1.5rem;
         }
 
-        .form-label {
-            font-size: .72rem;
-            font-weight: 700;
-            color: #5c5550;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            margin-bottom: .4rem;
-            display: block;
-        }
-
-        .form-ctrl {
-            width: 100%;
-            border: 1.5px solid #e8e2dd;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: .82rem;
-            color: #1a1410;
-            background: #fff;
-            outline: none;
-            transition: border-color .15s, box-shadow .15s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .form-ctrl:focus {
-            border-color: #8B0000;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
-        }
-
-        .form-sel {
-            appearance: none;
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 16px;
-            padding-right: 32px;
-        }
-
-        .break-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 8px;
-            border: 1.5px solid #e8e2dd;
-            font-size: .72rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .15s;
-            background: #fafaf8;
-            color: #5c5550;
-            user-select: none;
-        }
-
-        .break-chip:hover {
-            border-color: #8B0000;
-            color: #8B0000;
-            background: #fef2f2;
-        }
-
-        .break-chip.selected {
-            background: #f59e0b;
-            color: #fff;
-            border-color: #f59e0b;
-        }
-
-        .day-toggle {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 2px solid #e8e2dd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .7rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .15s;
-            color: #9ca3af;
-            background: #fff;
-            user-select: none;
-        }
-
-        .day-toggle:hover {
-            border-color: #8B0000;
-            color: #8B0000;
-        }
-
-        .day-toggle.active {
-            background: #8B0000;
-            border-color: #8B0000;
-            color: #fff;
-        }
-
         [data-theme="dark"] .sched-table tbody tr {
             border-color: #21262d;
         }
@@ -531,8 +439,124 @@
             letter-spacing: -.02em;
         }
 
-        @media (max-width: 767px) {
+        .view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+            height: 32px;
+            flex-shrink: 0;
+        }
 
+        .view-toggle-btn {
+            width: 30px;
+            height: 24px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 8px;
+            font-size: .78rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            flex-shrink: 0;
+        }
+
+        .view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: #8B0000;
+        }
+
+        .view-toggle-btn.active {
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+        }
+
+        .schedule-rules-view[hidden] {
+            display: none !important;
+        }
+
+        .schedule-rules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .schedule-rule-card {
+            background: #fff;
+            border: 1px solid #f1e7e4;
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+            min-width: 0;
+            transition: all .15s ease;
+        }
+
+        .schedule-rule-card:hover {
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .05);
+            border-color: #ead4d4;
+        }
+
+        .schedule-rule-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        .schedule-rule-card-title {
+            font-size: .88rem;
+            font-weight: 800;
+            color: #1f2937;
+            line-height: 1.3;
+        }
+
+        .schedule-rule-card-meta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: .7rem;
+        }
+
+        .schedule-rule-card-label {
+            font-size: .64rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .25rem;
+        }
+
+        .schedule-rule-card-value {
+            font-size: .78rem;
+            color: #374151;
+            line-height: 1.35;
+        }
+
+        .schedule-rule-card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: .4rem;
+            margin-top: .2rem;
+        }
+
+         @media (max-width: 1024px) {
+            .schedule-rules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767px) {
             #toastContainer {
                 left: .75rem !important;
                 right: .75rem !important;
@@ -572,6 +596,18 @@
                 padding-bottom: 1rem !important;
             }
 
+            #scheduleRulesViewToggle {
+                display: none !important;
+            }
+
+            #scheduleRulesGridView {
+                display: none !important;
+            }
+
+            #scheduleRulesListView {
+                display: block !important;
+            }
+
             .stat-card {
                 padding: .9rem;
             }
@@ -581,7 +617,6 @@
                 line-height: 1.1;
             }
 
-            /* top action buttons */
             .mb-6 .flex.items-center.gap-3,
             .mb-6 .flex.flex-col.sm\:flex-row.sm\:items-center.sm\:justify-between.gap-3>div:last-child {
                 width: 100%;
@@ -595,7 +630,6 @@
                 justify-content: center;
             }
 
-            /* week view */
             .week-grid {
                 min-width: 640px;
             }
@@ -623,13 +657,11 @@
                 font-size: .62rem !important;
             }
 
-            /* legend */
             .p-4 .flex.flex-wrap.gap-3.mt-3.justify-end {
                 justify-content: flex-start !important;
                 gap: .5rem .75rem !important;
             }
 
-            /* schedule table to cards */
             .sched-table thead {
                 display: none;
             }
@@ -694,12 +726,10 @@
                 color: #9ca3af;
             }
 
-            /* right column cards tighter */
             .space-y-6>.bg-white {
                 border-radius: 14px;
             }
 
-            /* modals */
             .modal-backdrop {
                 align-items: flex-end;
             }
@@ -844,20 +874,34 @@
             text-transform: uppercase;
             letter-spacing: .07em;
             margin-bottom: .45rem;
+            display: block;
         }
 
         .form-ctrl {
+            width: 100%;
             min-height: 44px;
             border: 1.5px solid #eadfd9;
             border-radius: 12px;
             padding: 10px 13px;
             background: #fff;
             font-size: .84rem;
+            color: #1a1410;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            font-family: 'Inter', sans-serif;
         }
 
         .form-ctrl:focus {
             border-color: #8B0000;
             box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+        }
+
+        .form-sel {
+            appearance: none;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 32px;
         }
 
         .form-help {
@@ -880,6 +924,16 @@
             background: #fffdfc;
             font-size: .78rem;
             font-weight: 800;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
+            cursor: pointer;
+            transition: all .15s ease;
+            user-select: none;
+            overflow: hidden;
         }
 
         .day-toggle.active {
@@ -896,13 +950,22 @@
         }
 
         .break-chip {
+            display: flex;
+            align-items: center;
             justify-content: center;
+            gap: 6px;
             min-height: 46px;
             border-radius: 14px;
             font-size: .76rem;
             font-weight: 700;
             text-align: center;
             padding: .7rem .8rem;
+            border: 1.5px solid #e8e2dd;
+            background: #fafaf8;
+            color: #5c5550;
+            cursor: pointer;
+            transition: all .15s ease;
+            user-select: none;
         }
 
         .break-chip.selected {
@@ -1248,6 +1311,11 @@
                 height: 40px;
                 border-radius: 12px;
                 font-size: .74rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                padding: 0;
             }
 
             .break-chip-group {
@@ -1256,9 +1324,13 @@
             }
 
             .break-chip {
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 min-height: 42px;
                 padding: .6rem .75rem;
                 font-size: .74rem;
+                width: 100%;
             }
 
             .slot-stepper {
@@ -1291,25 +1363,25 @@
                 justify-content: center;
             }
 
-        .blocked-remove-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #b8b8b8;
-            background: #fff;
-            border: 1px solid #f1e5e5;
-            transition: all .15s ease;
-        }
+            .blocked-remove-btn {
+                width: 30px;
+                height: 30px;
+                border-radius: 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #b8b8b8;
+                background: #fff;
+                border: 1px solid #f1e5e5;
+                transition: all .15s ease;
+            }
 
-        .blocked-remove-btn:hover {
-            color: #dc2626;
-            background: #fef2f2;
-            border-color: #fecaca;
+            .blocked-remove-btn:hover {
+                color: #dc2626;
+                background: #fef2f2;
+                border-color: #fecaca;
+            }
         }
-    }
     </style>
 @endsection
 
@@ -1409,7 +1481,7 @@
                         <h1 class="page-title">Clinic Schedule</h1>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-wrap page-actions">
                         <button onclick="openRuleModal()"
                             class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000]
                              px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
@@ -1421,6 +1493,15 @@
                             px-4 py-2.5 rounded-xl font-semibold text-sm shadow transition-all">
                             <i class="fa-solid fa-ban"></i> Block Date
                         </button>
+
+                        <div class="view-toggle" id="scheduleRulesViewToggle">
+                            <button type="button" class="view-toggle-btn active" id="scheduleRulesListViewBtn" title="List view">
+                                <i class="fa-solid fa-table-list"></i>
+                            </button>
+                            <button type="button" class="view-toggle-btn" id="scheduleRulesGridViewBtn" title="Grid view">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1526,7 +1607,7 @@
                     </div>
 
                     {{-- Schedule rules table --}}
-                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                                        <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                         <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
                             <div class="weekly-toolbar flex items-center gap-2">
                                 <i class="fa-solid fa-list-check text-[#8B0000]"></i>
@@ -1534,99 +1615,183 @@
                             </div>
                             <span class="text-xs text-gray-400 font-medium">{{ $schedules->count() }} rules</span>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="sched-table">
-                                <thead>
-                                    <tr>
-                                        <th>Day(s)</th>
-                                        <th>Opens</th>
-                                        <th>Closes</th>
-                                        <th>Lunch Break</th>
-                                        <th>Max Slots</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($schedules as $rule)
-                                        <tr>
-                                            <td data-label="Day(s)" class="font-semibold text-gray-800">
-                                                {{ $rule->days_label }}</td>
-                                            <td data-label="Opens">
-                                                {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
-                                            </td>
-                                            <td data-label="Closes">
-                                                {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—' }}
-                                            </td>
-                                            <td data-label="Lunch Break" class="text-xs text-gray-500">
-                                                @if ($rule->break_time && $rule->break_time !== 'none')
-                                                    @php [$bs,$be]=explode('-',$rule->break_time); @endphp
-                                                    {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
-                                                    {{ date('g:i A', strtotime(trim($be) . ':00')) }}
-                                                @else
-                                                    —
-                                                @endif
-                                            </td>
-                                            <td data-label="Max Slots">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
-                                                    @if ($rule->status !== 'closed')
-                                                        <div class="cap-bar w-16">
-                                                            <div class="cap-fill"
-                                                                style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%">
-                                                            </div>
+
+                        @if($schedules->count())
+                            <div id="scheduleRulesListView" class="schedule-rules-view">
+                                <div class="overflow-x-auto">
+                                    <table class="sched-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Day(s)</th>
+                                                <th>Opens</th>
+                                                <th>Closes</th>
+                                                <th>Lunch Break</th>
+                                                <th>Max Slots</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($schedules as $rule)
+                                                <tr>
+                                                    <td data-label="Day(s)" class="font-semibold text-gray-800">{{ $rule->days_label }}</td>
+                                                    <td data-label="Opens">
+                                                        {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
+                                                    </td>
+                                                    <td data-label="Closes">
+                                                        {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—' }}
+                                                    </td>
+                                                    <td data-label="Lunch Break" class="text-xs text-gray-500">
+                                                        @if ($rule->break_time && $rule->break_time !== 'none')
+                                                            @php [$bs,$be]=explode('-', $rule->break_time); @endphp
+                                                            {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
+                                                            {{ date('g:i A', strtotime(trim($be) . ':00')) }}
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </td>
+                                                    <td data-label="Max Slots">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
+                                                            @if ($rule->status !== 'closed')
+                                                                <div class="cap-bar w-16">
+                                                                    <div class="cap-fill" style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%"></div>
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    @endif
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        @if ($rule->status === 'open')
+                                                            <span class="badge-open">Open</span>
+                                                        @elseif($rule->status === 'limited')
+                                                            <span class="badge-limited">Limited</span>
+                                                        @else
+                                                            <span class="badge-closed">Closed</span>
+                                                        @endif
+                                                    </td>
+                                                    <td data-label="Actions">
+                                                        <div class="flex items-center gap-1.5">
+                                                            <button
+                                                                onclick='openRuleModal("edit",{{ $rule->id }},{{ json_encode($rule) }})'
+                                                                class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-100 text-xs"
+                                                                title="Edit">
+                                                                <i class="fa-solid fa-pen"></i>
+                                                            </button>
+
+                                                            <form action="{{ route('admin.clinic_schedule.destroy', $rule) }}"
+                                                                method="POST" onsubmit="return confirm('Delete this rule?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit"
+                                                                    class="w-7 h-7 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-100 text-xs"
+                                                                    title="Delete">
+                                                                    <i class="fa-solid fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="scheduleRulesGridView" class="schedule-rules-view" hidden>
+                                <div class="schedule-rules-grid">
+                                    @foreach($schedules as $rule)
+                                        <div class="schedule-rule-card">
+                                            <div class="schedule-rule-card-top">
+                                                <div>
+                                                    <div class="schedule-rule-card-title">{{ $rule->days_label }}</div>
+                                                    <div class="mt-2">
+                                                        @if ($rule->status === 'open')
+                                                            <span class="badge-open">Open</span>
+                                                        @elseif($rule->status === 'limited')
+                                                            <span class="badge-limited">Limited</span>
+                                                        @else
+                                                            <span class="badge-closed">Closed</span>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td data-label="Status">
-                                                @if ($rule->status === 'open')
-                                                    <span class="badge-open">Open</span>
-                                                @elseif($rule->status === 'limited')
-                                                    <span class="badge-limited">Limited</span>
-                                                @else
-                                                    <span class="badge-closed">Closed</span>
-                                                @endif
-                                            </td>
-                                            <td data-label="Actions">
-                                                <div class="flex items-center gap-1.5">
-                                                    <button
-                                                        onclick='openRuleModal("edit",{{ $rule->id }},{{ json_encode($rule) }})'
-                                                        class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-100 text-xs"
-                                                        title="Edit">
-                                                        <i class="fa-solid fa-pen"></i>
+                                            </div>
+
+                                            <div class="schedule-rule-card-meta">
+                                                <div>
+                                                    <div class="schedule-rule-card-label">Opens</div>
+                                                    <div class="schedule-rule-card-value">
+                                                        {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="schedule-rule-card-label">Closes</div>
+                                                    <div class="schedule-rule-card-value">
+                                                        {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—' }}
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="schedule-rule-card-label">Lunch Break</div>
+                                                    <div class="schedule-rule-card-value">
+                                                        @if ($rule->break_time && $rule->break_time !== 'none')
+                                                            @php [$bs,$be]=explode('-', $rule->break_time); @endphp
+                                                            {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
+                                                            {{ date('g:i A', strtotime(trim($be) . ':00')) }}
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="schedule-rule-card-label">Max Slots</div>
+                                                    <div class="schedule-rule-card-value flex items-center gap-2">
+                                                        <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
+                                                        @if ($rule->status !== 'closed')
+                                                            <div class="cap-bar w-16">
+                                                                <div class="cap-fill" style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%"></div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="schedule-rule-card-actions">
+                                                <button
+                                                    onclick='openRuleModal("edit",{{ $rule->id }},{{ json_encode($rule) }})'
+                                                    class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 
+                                                        flex items-center justify-center text-blue-600 hover:bg-blue-100 text-xs"
+                                                    title="Edit">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+
+                                                <form action="{{ route('admin.clinic_schedule.destroy', $rule) }}"
+                                                    method="POST" onsubmit="return confirm('Delete this rule?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="w-8 h-8 rounded-lg bg-red-50 border border-red-200 
+                                                            flex items-center justify-center text-red-600 hover:bg-red-100 text-xs"
+                                                        title="Delete">
+                                                        <i class="fa-solid fa-trash"></i>
                                                     </button>
-
-                                                    <form action="{{ route('admin.clinic_schedule.destroy', $rule) }}"
-                                                        method="POST" onsubmit="return confirm('Delete this rule?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                            class="w-7 h-7 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-100 text-xs"
-                                                            title="Delete">
-                                                            <i class="fa-solid fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center py-10">
-                                                <i
-                                                    class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
-                                                <p class="text-gray-400 text-sm">No rules yet. <button
-                                                        onclick="openRuleModal()"
-                                                        class="text-[#8B0000] font-semibold hover:underline">Add
-                                                        one.</button></p>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-10">
+                                <i class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
+                                <p class="text-gray-400 text-sm">
+                                    No rules yet.
+                                    <button onclick="openRuleModal()" class="text-[#8B0000] font-semibold hover:underline">Add one.</button>
+                                </p>
+                            </div>
+                        @endif
                     </div>
-
                 </div>
 
                 {{-- RIGHT: Clinic Hours | Blocked Dates | Holidays --}}
@@ -1672,54 +1837,66 @@
 
                     {{-- Blocked Dates --}}
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-ban text-[#8B0000]"></i>
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between gap-3 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-ban text-[#8B0000]"></i>
                                 <h2 class="font-bold text-gray-800 text-sm">Blocked Dates</h2>
                             </div>
-                            <button onclick="openBlockModal()"
-                                class="text-xs text-[#8B0000] font-semibold hover:underline flex items-center gap-1"><i
-                                    class="fa-solid fa-plus text-[9px]"></i> Add</button>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="openBlockModal()"
+                                    class="text-xs text-[#8B0000] font-semibold hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-plus text-[9px]"></i> Add
+                                </button>
+                            </div>
                         </div>
+
                         <div class="p-4">
-                            @forelse($blockedDates as $blocked)
-                                @php
-                                    $bd = \Carbon\Carbon::parse($blocked->date);
-                                    $badgeCls = match ($blocked->reason) {
-                                        'Holiday' => 'badge-holiday',
-                                        'Dentist Unavailable' => 'badge-limited',
-                                        default => 'badge-closed',
-                                    };
-                                @endphp
-                                <div
-                                    class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
-                                    <div
-                                        class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
-                                        {{ $bd->day }}</div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="blocked-title text-xs font-bold text-gray-800 truncate">
-                                            {{ $bd->format('D, M j, Y') }}
-                                        </p>
-                                        <span
-                                            class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
-                                        @if ($blocked->note)
-                                            <p class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
-                                                {{ $blocked->note }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                    <form action="{{ route('admin.clinic_schedule.unblock', $blocked) }}" method="POST">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="blocked-remove-btn" title="Remove">
-                                            <i class="fa-solid fa-xmark text-xs"></i>
-                                        </button>
-                                    </form>
+                            @if($blockedDates->count())
+                                <div id="blockedDatesListView" class="blocked-dates-view">
+                                    @foreach($blockedDates as $blocked)
+                                        @php
+                                            $bd = \Carbon\Carbon::parse($blocked->date);
+                                            $badgeCls = match ($blocked->reason) {
+                                                'Holiday' => 'badge-holiday',
+                                                'Dentist Unavailable' => 'badge-limited',
+                                                default => 'badge-closed',
+                                            };
+                                        @endphp
+
+                                        <div class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                                            <div class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
+                                                {{ $bd->day }}
+                                            </div>
+
+                                            <div class="flex-1 min-w-0">
+                                                <p class="blocked-title text-xs font-bold text-gray-800 truncate">
+                                                    {{ $bd->format('D, M j, Y') }}
+                                                </p>
+                                                <span class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
+                                                @if ($blocked->note)
+                                                    <p class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
+                                                        {{ $blocked->note }}
+                                                    </p>
+                                                @endif
+                                            </div>
+
+                                            <form action="{{ route('admin.clinic_schedule.unblock', $blocked) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="blocked-remove-btn" title="Remove">
+                                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @empty
-                                <div class="text-center py-6"><i
-                                        class="fa-solid fa-check-circle text-3xl text-green-400 mb-2 block"></i>
-                                    <p class="text-xs text-gray-400">No blocked dates</p>
+                            @else
+                                <div class="flex flex-col items-center justify-center py-10 text-center">
+                                    <i class="fa-solid fa-check-circle text-4xl text-green-400 mb-3"></i>
+                                    <p class="text-sm text-gray-400">No blocked dates</p>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
                     </div>
 
@@ -2313,7 +2490,8 @@
             today.setHours(0, 0, 0, 0);
 
             document.getElementById('weekRangeLabel').textContent =
-                `${SHORT_MONTHS[days[0].getMonth()]} ${days[0].getDate()} – ${SHORT_MONTHS[days[6].getMonth()]} ${days[6].getDate()}, ${days[6].getFullYear()}`;
+                `${SHORT_MONTHS[days[0].getMonth()]} ${days[0].getDate()} – ${SHORT_MONTHS[days[6].getMonth()]} 
+                    ${days[6].getDate()}, ${days[6].getFullYear()}`;
 
             // Header row
             let html = `<div class="wk-hdr empty"></div>`;
@@ -2593,6 +2771,62 @@
                 'blockReasonError', 'blockReason'));
             document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError',
                 'blockNote'));
+            
+        function getPreferredScheduleRulesView() {
+            if (window.innerWidth <= 767) return 'list';
+            return localStorage.getItem('scheduleRulesView') || 'list';
+        }
+
+        function applyScheduleRulesView(view, save = true) {
+            const listView = document.getElementById('scheduleRulesListView');
+            const gridView = document.getElementById('scheduleRulesGridView');
+            const listBtn = document.getElementById('scheduleRulesListViewBtn');
+            const gridBtn = document.getElementById('scheduleRulesGridViewBtn');
+
+            if (!listView || !gridView) return;
+
+                const finalView = window.innerWidth <= 767 ? 'list' : view;
+
+                if (finalView === 'grid') {
+                    listView.setAttribute('hidden', 'hidden');
+                    gridView.removeAttribute('hidden');
+                } else {
+                    gridView.setAttribute('hidden', 'hidden');
+                    listView.removeAttribute('hidden');
+                }
+
+                if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+                if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+                if (save && window.innerWidth > 767) {
+                    localStorage.setItem('scheduleRulesView', finalView);
+                }
+            }
+
+            const scheduleRulesListViewBtn = document.getElementById('scheduleRulesListViewBtn');
+            const scheduleRulesGridViewBtn = document.getElementById('scheduleRulesGridViewBtn');
+
+            if (scheduleRulesListViewBtn) {
+                scheduleRulesListViewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyScheduleRulesView('list', true);
+                });
+            }
+
+            if (scheduleRulesGridViewBtn) {
+                scheduleRulesGridViewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyScheduleRulesView('grid', true);
+                });
+            }
+
+            applyScheduleRulesView(getPreferredScheduleRulesView(), false);
+
+            window.addEventListener('resize', function () {
+                applyScheduleRulesView(getPreferredScheduleRulesView(), false);
+            });
         });
     </script>
 @endsection

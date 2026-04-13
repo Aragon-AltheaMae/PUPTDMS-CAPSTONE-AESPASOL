@@ -45,6 +45,63 @@
     color: #fff;
   }
 
+  .settings-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: #FAFAF9;
+    border: 1.5px solid #E0DDD8;
+    border-radius: 12px;
+    padding: 3px;
+    gap: 3px;
+    height: 42px;
+  }
+
+  .settings-view-toggle-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    border-radius: 9px;
+    font-size: .82rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+    flex-shrink: 0;
+  }
+
+  .settings-view-toggle-btn:hover {
+    background: #f3f4f6;
+    color: #8B0000;
+  }
+
+  .settings-view-toggle-btn.active {
+    background: #8B0000;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+  }
+
+  .settings-view[hidden] {
+    display: none !important;
+  }
+
+  .settings-grid-view {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .settings-grid-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #f0eaea;
+    box-shadow: 0 2px 12px rgba(139, 0, 0, .04);
+    overflow: hidden;
+  }
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
   }
@@ -173,322 +230,338 @@
     padding: 2px 4px;
   }
 
-    .stat-mini {
-      transition: transform .2s ease, box-shadow .2s ease;
+  .stat-mini {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+
+  .stat-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .1);
+  }
+
+  .settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: .78rem;
+    font-weight: 500;
+    color: #4a5568;
+    text-decoration: none;
+    margin-bottom: 2px;
+  }
+
+  .settings-nav-item:hover {
+    background: var(--crimson-light);
+    color: var(--crimson);
+  }
+
+  .settings-nav-item.active {
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(139, 0, 0, .25);
+    font-weight: 600;
+  }
+
+  .settings-nav-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .settings-nav-item .badge {
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: .58rem;
+    font-weight: 700;
+    margin-left: auto;
+  }
+
+  .settings-nav-item.active .badge {
+    background: rgba(255, 255, 255, .25);
+    color: #fff;
+  }
+
+  .settings-nav-item:not(.active) .badge {
+    background: #f0f0f0;
+    color: #888;
+  }
+
+  .settings-section {
+    display: none;
+  }
+
+  .settings-section.active {
+    display: block;
+  }
+
+  .form-label {
+    font-size: .72rem;
+    font-weight: 700;
+    color: #5c5550;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: .4rem;
+    display: block;
+  }
+
+  .form-ctrl {
+    width: 100%;
+    border: 1.5px solid #e8e2dd;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: .82rem;
+    color: #1a1410;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .form-ctrl:focus {
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
+  }
+
+  .form-ctrl:disabled {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  .setting-note {
+    font-size: .68rem;
+    color: #9ca3af;
+    margin-top: 6px;
+  }
+
+  .form-sel {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 32px;
+  }
+
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f8f4f4;
+  }
+
+  .setting-row:last-child {
+    border-bottom: none;
+  }
+
+  .setting-row-info {
+    flex: 1;
+    min-width: 0;
+    padding-right: 1rem;
+  }
+
+  .setting-row-label {
+    font-size: .82rem;
+    font-weight: 700;
+    color: #1a1410;
+  }
+
+  .setting-row-desc {
+    font-size: .72rem;
+    color: #9ca3af;
+    margin-top: 2px;
+  }
+
+  .toggle-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .toggle-wrap input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-slider {
+    width: 42px;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    transition: background .2s;
+    position: relative;
+    display: block;
+  }
+
+  .toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+  }
+
+  .toggle-wrap input:checked + .toggle-slider {
+    background: #8B0000;
+  }
+
+  .toggle-wrap input:checked + .toggle-slider::after {
+    transform: translateX(18px);
+  }
+
+  .permission-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: .68rem;
+    font-weight: 600;
+    background: #fef2f2;
+    color: var(--crimson);
+    border: 1px solid #fce8e8;
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+  }
+
+  .permission-chip:hover,
+  .permission-chip.active {
+    background: var(--crimson);
+    color: #fff;
+    border-color: var(--crimson);
+  }
+
+  .section-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #f0eaea;
+    box-shadow: 0 2px 12px rgba(139, 0, 0, .04);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-card-hdr {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f8f4f4;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-card-hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-card-body {
+    padding: 20px;
+  }
+
+  .badge-online {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+  }
+
+  .badge-offline {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] .section-card {
+    background: #161b22;
+    border-color: #21262d;
+  }
+
+  [data-theme="dark"] .section-card-hdr {
+    background: #0d1117;
+    border-color: #21262d;
+  }
+
+  [data-theme="dark"] .setting-row {
+    border-color: #21262d;
+  }
+
+  [data-theme="dark"] .setting-row-label {
+    color: #e5e7eb;
+  }
+
+  [data-theme="dark"] .form-ctrl {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #e6edf3;
+  }
+
+  [data-theme="dark"] .settings-nav-item {
+    color: #d1d5db;
+  }
+
+  [data-theme="dark"] .settings-nav-item:hover {
+    background: rgba(139, 0, 0, .2);
+    color: #fff;
+  }
+
+  [data-theme="dark"] #toastContainer .toast {
+    background: #161b22 !important;
+  }
+
+  [data-theme="dark"] #toastContainer .toast-title {
+    color: #e5e7eb !important;
+  }
+
+  [data-theme="dark"] #toastContainer .toast-msg {
+    color: #9ca3af !important;
+  }
+
+  @media (max-width: 767px) {
+    .settings-page {
+      margin-left: 0;
+      padding: 82px 1rem 2rem;
     }
 
-    .stat-mini:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, .1);
+    #settingsListView {
+      display: none !important;
     }
 
-    .settings-nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all .15s;
-      font-size: .78rem;
-      font-weight: 500;
-      color: #4a5568;
-      text-decoration: none;
-      margin-bottom: 2px;
+    #settingsGridView {
+      display: block !important;
     }
 
-    .settings-nav-item:hover {
-      background: var(--crimson-light);
-      color: var(--crimson);
+    #settingsViewToggle {
+      display: none !important;
     }
 
-    .settings-nav-item.active {
-      background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
-      color: #fff;
-      box-shadow: 0 3px 10px rgba(139, 0, 0, .25);
-      font-weight: 600;
+    .settings-grid-view {
+      grid-template-columns: 1fr;
     }
-
-    .settings-nav-item i {
-      width: 16px;
-      text-align: center;
-      font-size: 12px;
-      flex-shrink: 0;
-    }
-
-    .settings-nav-item .badge {
-      padding: 1px 6px;
-      border-radius: 999px;
-      font-size: .58rem;
-      font-weight: 700;
-      margin-left: auto;
-    }
-
-    .settings-nav-item.active .badge {
-      background: rgba(255, 255, 255, .25);
-      color: #fff;
-    }
-
-    .settings-nav-item:not(.active) .badge {
-      background: #f0f0f0;
-      color: #888;
-    }
-
-    .settings-section {
-      display: none;
-    }
-
-    .settings-section.active {
-      display: block;
-    }
-
-    .form-label {
-      font-size: .72rem;
-      font-weight: 700;
-      color: #5c5550;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: .4rem;
-      display: block;
-    }
-
-    .form-ctrl {
-      width: 100%;
-      border: 1.5px solid #e8e2dd;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: .82rem;
-      color: #1a1410;
-      background: #fff;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .form-ctrl:focus {
-      border-color: #8B0000;
-      box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
-    }
-
-    .form-ctrl:disabled {
-      background: #f3f4f6;
-      color: #6b7280;
-      cursor: not-allowed;
-      opacity: 1;
-    }
-
-    .setting-note {
-      font-size: .68rem;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    .form-sel {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 16px;
-      padding-right: 32px;
-    }
-
-    .setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #f8f4f4;
-    }
-
-    .setting-row:last-child {
-      border-bottom: none;
-    }
-
-    .setting-row-info {
-      flex: 1;
-      min-width: 0;
-      padding-right: 1rem;
-    }
-
-    .setting-row-label {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #1a1410;
-    }
-
-    .setting-row-desc {
-      font-size: .72rem;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
-    .toggle-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .toggle-wrap input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
-
-    .toggle-slider {
-      width: 42px;
-      height: 24px;
-      background: #e5e7eb;
-      border-radius: 999px;
-      transition: background .2s;
-      position: relative;
-      display: block;
-    }
-
-    .toggle-slider::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
-    }
-
-    .toggle-wrap input:checked + .toggle-slider {
-      background: #8B0000;
-    }
-
-    .toggle-wrap input:checked + .toggle-slider::after {
-      transform: translateX(18px);
-    }
-
-    .permission-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: .68rem;
-      font-weight: 600;
-      background: #fef2f2;
-      color: var(--crimson);
-      border: 1px solid #fce8e8;
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-
-    .permission-chip:hover,
-    .permission-chip.active {
-      background: var(--crimson);
-      color: #fff;
-      border-color: var(--crimson);
-    }
-
-    .section-card {
-      background: #fff;
-      border-radius: 16px;
-      border: 1px solid #f0eaea;
-      box-shadow: 0 2px 12px rgba(139, 0, 0, .04);
-      overflow: hidden;
-      margin-bottom: 1.25rem;
-    }
-
-    .section-card-hdr {
-      padding: 14px 20px;
-      border-bottom: 1px solid #f8f4f4;
-      background: #fafafa;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .section-card-hdr-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-card-body {
-      padding: 20px;
-    }
-
-    .badge-online {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: .68rem;
-      font-weight: 700;
-    }
-
-    .badge-offline {
-      background: #f1f5f9;
-      color: #64748b;
-      border: 1px solid #e2e8f0;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: .68rem;
-      font-weight: 700;
-    }
-
-    [data-theme="dark"] .section-card {
-      background: #161b22;
-      border-color: #21262d;
-    }
-
-    [data-theme="dark"] .section-card-hdr {
-      background: #0d1117;
-      border-color: #21262d;
-    }
-
-    [data-theme="dark"] .setting-row {
-      border-color: #21262d;
-    }
-
-    [data-theme="dark"] .setting-row-label {
-      color: #e5e7eb;
-    }
-
-    [data-theme="dark"] .form-ctrl {
-      background: #0d1117;
-      border-color: #30363d;
-      color: #e6edf3;
-    }
-
-    [data-theme="dark"] .settings-nav-item {
-      color: #d1d5db;
-    }
-
-    [data-theme="dark"] .settings-nav-item:hover {
-      background: rgba(139, 0, 0, .2);
-      color: #fff;
-    }
-
-    [data-theme="dark"] #toastContainer .toast {
-      background: #161b22 !important;
-    }
-
-    [data-theme="dark"] #toastContainer .toast-title {
-      color: #e5e7eb !important;
-    }
-
-    [data-theme="dark"] #toastContainer .toast-msg {
-      color: #9ca3af !important;
-    }
-
-    @media (max-width: 767px) {
-      .settings-page {
-        margin-left: 0;
-        padding: 82px 1rem 2rem;
-      }
-    }
+  }
 </style>
 @endsection
 
@@ -505,7 +578,7 @@
           <h1 class="page-title">System Settings</h1>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
           <button type="button"
             onclick="document.getElementById('settingsForm').submit();"
             class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000]
@@ -513,8 +586,24 @@
             <i class="fa-solid fa-floppy-disk"></i>
             Save Changes
           </button>
-        </div>
 
+          <div class="settings-view-toggle" id="settingsViewToggle">
+            <button type="button"
+              class="settings-view-toggle-btn active"
+              id="settingsListViewBtn"
+              title="List view"
+              aria-label="List view">
+              <i class="fa-solid fa-table-list"></i>
+            </button>
+            <button type="button"
+              class="settings-view-toggle-btn"
+              id="settingsGridViewBtn"
+              title="Grid view"
+              aria-label="Grid view">
+              <i class="fa-solid fa-grip"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -546,7 +635,8 @@
     <form id="settingsForm" action="{{ route('admin.system_settings.update') }}" method="POST">
       @csrf
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div class="settings-view" id="settingsListView">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
         <div class="settings-sidebar-col lg:col-span-1">
           <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden sticky top-[82px]">
@@ -623,6 +713,7 @@
                     <div class="setting-row-desc">Temporarily disable patient-facing booking portal</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="maintenance_mode" value="0">
                     <input type="checkbox" name="maintenance_mode" value="1" {{ old('maintenance_mode', $settings['maintenance_mode']->value ?? '0') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -634,6 +725,7 @@
                     <div class="setting-row-desc">Enable detailed error logging for developers</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="debug_mode" value="0">
                     <input type="checkbox" name="debug_mode" value="1" {{ old('debug_mode', $settings['debug_mode']->value ?? '0') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -709,6 +801,7 @@
                     <div class="setting-row-desc">Notify admin when a patient books an appointment</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="notif_new_appointment" value="0">
                     <input type="checkbox" name="notif_new_appointment" value="1" {{ old('notif_new_appointment', $settings['notif_new_appointment']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -720,6 +813,7 @@
                     <div class="setting-row-desc">Notify when a patient cancels or no-shows</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="notif_cancellation" value="0">
                     <input type="checkbox" name="notif_cancellation" value="1" {{ old('notif_cancellation', $settings['notif_cancellation']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -731,6 +825,7 @@
                     <div class="setting-row-desc">Alert when a patient requests a dental certificate</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="notif_document_request" value="0">
                     <input type="checkbox" name="notif_document_request" value="1" {{ old('notif_document_request', $settings['notif_document_request']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -745,6 +840,7 @@
                       <div class="setting-row-desc">Send an email/SMS to patient 24 hours before their slot</div>
                     </div>
                     <label class="toggle-wrap">
+                      <input type="hidden" name="notif_reminder_24h" value="0">
                       <input type="checkbox" name="notif_reminder_24h" value="1" {{ old('notif_reminder_24h', $settings['notif_reminder_24h']->value ?? '1') === '1' ? 'checked' : '' }}>
                       <span class="toggle-slider"></span>
                     </label>
@@ -756,6 +852,7 @@
                       <div class="setting-row-desc">Send confirmation email immediately after booking</div>
                     </div>
                     <label class="toggle-wrap">
+                      <input type="hidden" name="notif_confirmation" value="0">
                       <input type="checkbox" name="notif_confirmation" value="1" {{ old('notif_confirmation', $settings['notif_confirmation']->value ?? '1') === '1' ? 'checked' : '' }}>
                       <span class="toggle-slider"></span>
                     </label>
@@ -767,6 +864,7 @@
                       <div class="setting-row-desc">Remind patients of recommended follow-up schedule</div>
                     </div>
                     <label class="toggle-wrap">
+                      <input type="hidden" name="notif_followup" value="0">
                       <input type="checkbox" name="notif_followup" value="1" {{ old('notif_followup', $settings['notif_followup']->value ?? '0') === '1' ? 'checked' : '' }}>
                       <span class="toggle-slider"></span>
                     </label>
@@ -878,6 +976,7 @@
                     <div class="setting-row-desc">Automatically backup database on the schedule above</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="auto_backup_enabled" value="0">
                     <input type="checkbox" name="auto_backup_enabled" value="1" {{ old('auto_backup_enabled', $settings['auto_backup_enabled']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -889,6 +988,7 @@
                     <div class="setting-row-desc">Include uploaded documents and images in the backup</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="backup_include_files" value="0">
                     <input type="checkbox" name="backup_include_files" value="1" {{ old('backup_include_files', $settings['backup_include_files']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -900,6 +1000,7 @@
                     <div class="setting-row-desc">Use AES-256 encryption on all backup files</div>
                   </div>
                   <label class="toggle-wrap">
+                    <input type="hidden" name="backup_encrypt" value="0">
                     <input type="checkbox" name="backup_encrypt" value="1" {{ old('backup_encrypt', $settings['backup_encrypt']->value ?? '1') === '1' ? 'checked' : '' }}>
                     <span class="toggle-slider"></span>
                   </label>
@@ -949,7 +1050,44 @@
 
         </div>
       </div>
-    </form>
+    </div>
+  </form>
+    <div class="settings-view" id="settingsGridView" hidden>
+      <div class="settings-grid-view">
+
+        <div class="settings-grid-card">
+          <div class="section-card-hdr">
+            <div class="section-card-hdr-left">
+              <i class="fa-solid fa-sliders text-[#8B0000]"></i>
+              <h2 class="font-bold text-gray-800 text-sm">Settings Menu</h2>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <div class="grid grid-cols-1 gap-2">
+              <a href="#" class="settings-nav-item active" onclick="switchTab('general', this); syncSettingsGridTabs('general'); return false;"><i class="fa-solid fa-sliders"></i> General</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('clinic', this); syncSettingsGridTabs('clinic'); return false;"><i class="fa-solid fa-hospital"></i> Clinic Info</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('notifications', this); syncSettingsGridTabs('notifications'); return false;"><i class="fa-solid fa-bell"></i> Notifications</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('security', this); syncSettingsGridTabs('security'); return false;"><i class="fa-solid fa-shield-halved"></i> Security</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('email', this); syncSettingsGridTabs('email'); return false;"><i class="fa-solid fa-envelope"></i> Email / SMTP</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('backup', this); syncSettingsGridTabs('backup'); return false;"><i class="fa-solid fa-database"></i> Backup & Data</a>
+              <a href="#" class="settings-nav-item" onclick="switchTab('integrations', this); syncSettingsGridTabs('integrations'); return false;"><i class="fa-solid fa-plug"></i> Integrations</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-grid-card">
+          <div class="section-card-hdr">
+            <div class="section-card-hdr-left">
+              <i class="fa-solid fa-layer-group text-[#8B0000]"></i>
+              <h2 class="font-bold text-gray-800 text-sm">Active Section</h2>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <div id="settingsGridSectionContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 @endsection
@@ -1006,7 +1144,11 @@
       section.classList.remove('active');
     });
 
-    document.querySelectorAll('.settings-nav-item').forEach(item => {
+    document.querySelectorAll('#settingsListView .settings-nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    document.querySelectorAll('#settingsGridView .settings-nav-item').forEach(item => {
       item.classList.remove('active');
     });
 
@@ -1018,10 +1160,99 @@
     if (el) {
       el.classList.add('active');
     }
+
+    document.querySelectorAll('#settingsGridView .settings-nav-item').forEach(item => {
+      const onclickAttr = item.getAttribute('onclick') || '';
+      if (onclickAttr.includes("'" + tabId + "'")) {
+        item.classList.add('active');
+      }
+    });
+
+    renderSettingsGridActiveSection();
   }
 
   function resetSettingsNotice() {
     showToast('Notice', 'Reset to defaults is not connected yet.', 'error');
   }
+  
+  function getPreferredSettingsView() {
+    if (window.innerWidth <= 767) return 'grid';
+    return localStorage.getItem('systemSettingsView') || 'list';
+  }
+
+  function applySettingsView(view, save = true) {
+    const listView = document.getElementById('settingsListView');
+    const gridView = document.getElementById('settingsGridView');
+    const listBtn = document.getElementById('settingsListViewBtn');
+    const gridBtn = document.getElementById('settingsGridViewBtn');
+
+    if (!listView || !gridView) return;
+
+    const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+    if (finalView === 'grid') {
+      listView.hidden = true;
+      gridView.hidden = false;
+      renderSettingsGridActiveSection();
+    } else {
+      listView.hidden = false;
+      gridView.hidden = true;
+    }
+
+    if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+    if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+    if (save && window.innerWidth > 767) {
+      localStorage.setItem('systemSettingsView', finalView);
+    }
+  }
+
+  function initSettingsViewToggle() {
+    const listBtn = document.getElementById('settingsListViewBtn');
+    const gridBtn = document.getElementById('settingsGridViewBtn');
+
+    applySettingsView(getPreferredSettingsView(), false);
+
+    if (listBtn && !listBtn.dataset.bound) {
+      listBtn.dataset.bound = '1';
+      listBtn.addEventListener('click', () => applySettingsView('list', true));
+    }
+
+    if (gridBtn && !gridBtn.dataset.bound) {
+      gridBtn.dataset.bound = '1';
+      gridBtn.addEventListener('click', () => applySettingsView('grid', true));
+    }
+  }
+
+  function getActiveSettingsTabId() {
+    const activeSection = document.querySelector('.settings-section.active');
+    if (!activeSection) return 'general';
+    return activeSection.id.replace('tab-', '');
+  }
+
+  function renderSettingsGridActiveSection() {
+    const activeId = getActiveSettingsTabId();
+    const source = document.getElementById('tab-' + activeId);
+    const target = document.getElementById('settingsGridSectionContent');
+
+    if (!source || !target) return;
+
+    target.innerHTML = source.innerHTML;
+  }
+
+  function syncSettingsGridTabs(tabId) {
+    setTimeout(() => {
+      renderSettingsGridActiveSection();
+    }, 0);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initSettingsViewToggle();
+    renderSettingsGridActiveSection();
+
+    window.addEventListener('resize', function () {
+      applySettingsView(getPreferredSettingsView(), false);
+    });
+  });
 </script>
 @endsection
