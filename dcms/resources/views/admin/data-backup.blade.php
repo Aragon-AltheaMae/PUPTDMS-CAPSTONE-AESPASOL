@@ -987,6 +987,53 @@
             grid-template-columns: 1fr 1fr;
         }
 
+        .card-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: .85rem;
+            padding: .95rem 1rem;
+        }
+
+        .card-header-left {
+            gap: .65rem;
+        }
+
+        .card-icon {
+            width: 26px;
+            height: 26px;
+            font-size: 10px;
+            margin-top: 1px;
+        }
+
+        .card-title {
+            font-size: .9rem;
+            line-height: 1.15;
+        }
+
+        .card-subtitle {
+            font-size: .68rem;
+            margin-top: .12rem;
+            line-height: 1.2;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .6rem;
+            width: 100%;
+        }
+
+        .toolbar select,
+        .filter-reset-btn {
+            width: 100%;
+            min-width: 0;
+            height: 40px;
+        }
+
+        .filter-reset-btn {
+            grid-column: 1 / -1;
+        }
+
         #backupHistoryListView {
             display: none !important;
         }
@@ -1008,7 +1055,37 @@
 
     @media (max-width: 520px) {
         .backup-stats {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0;
+            border-radius: 16px;
+        }
+
+        .backup-stat {
+            min-height: 74px;
+            padding: .85rem .8rem .75rem;
+        }
+
+        .backup-stat:nth-child(2) {
+            border-right: none;
+        }
+
+        .backup-stat:nth-child(1),
+        .backup-stat:nth-child(2) {
+            border-bottom: 1px solid #ececef;
+        }
+
+        .backup-stat-value {
+            font-size: 1.05rem;
+            margin-bottom: .32rem;
+        }
+
+        .backup-stat-label {
+            font-size: .62rem;
+            line-height: 1.2;
+        }
+
+        #statsIndicator {
+            display: none;
         }
 
         .usage-grid {

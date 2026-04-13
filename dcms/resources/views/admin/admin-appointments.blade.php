@@ -321,6 +321,20 @@
         margin-left: 2px;
     }
 
+    .appointment-banner-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .55rem;
+        flex-wrap: wrap;
+        margin-left: auto;
+        align-self: center;
+    }
+
+    .appointment-banner-title-wrap {
+        min-width: 0;
+    }
+
     .view-toggle-btn {
         width: 32px;
         height: 30px;
@@ -828,29 +842,67 @@
 
     @media (max-width: 767px) {
         .page-banner {
-            padding: 1.1rem 1.1rem 1.4rem !important;
-        }
-
-        .page-title {
-            font-size: 1.45rem !important;
+            padding: 1rem 1rem 1.2rem !important;
         }
 
         .page-banner-inner {
+            display: flex;
             flex-direction: column;
-            gap: .6rem;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: .85rem;
         }
 
-        .summary-bar {
-            padding: .85rem 1rem;
+        .appointment-banner-title-wrap {
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 1.28rem !important;
+            line-height: 1.15;
+            text-align: left;
+            margin: 0;
+        }
+
+        .appointment-banner-actions {
+            width: 100%;
+            margin-left: 0;
+            justify-content: flex-start;
+            align-items: center;
+            gap: .55rem;
+            flex-wrap: nowrap;
+        }
+
+        .tab-toggle-wrap {
+            width: fit-content;
+            max-width: 100%;
+            padding: 4px;
+            gap: 3px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn-toggle {
+            padding: 7px 12px;
+            font-size: 11.5px;
+            gap: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab-count-badge {
+            min-width: 18px;
+            height: 18px;
+            font-size: 10px;
+            padding: 0 5px;
         }
 
         .view-toggle {
             display: none !important;
         }
 
-        .tab-btn-toggle {
-            padding: 7px 14px;
-            font-size: 12px;
+        .summary-bar {
+            padding: .85rem 1rem;
         }
 
         .desktop-appointments-table {
@@ -909,11 +961,11 @@
 
         <div class="page-banner mt-2">
             <div class="page-banner-inner">
-                <div>
+                <div class="appointment-banner-title-wrap">
                     <h1 class="page-title">Appointment Management</h1>
                 </div>
 
-                <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto ml-auto">
+                <div class="appointment-banner-actions">
 
                     <div class="tab-toggle-wrap">
                         <button id="btnUpcoming" class="tab-btn-toggle active">
