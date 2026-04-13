@@ -740,6 +740,59 @@
         [data-theme="dark"] .bg-gray-100 {
             background-color: #21262d !important;
         }
+
+        .um-search-mobile {
+            width: 260px;
+        }
+
+        .um-role-tabs {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            background: #F5F2EE;
+            border: 1px solid #E8E4DE;
+            border-radius: 10px;
+            padding: 3px;
+            gap: 2px;
+            width: auto;
+            max-width: 100%;
+        }
+
+        @media (max-width: 767px) {
+            .um-search-mobile {
+                width: 100%;
+            }
+
+            #umFilterForm {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .search-wrap,
+            #statusFilter {
+                width: 100%;
+            }
+
+            .um-role-tabs {
+                align-self: center;
+                margin: 0 auto;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                scrollbar-width: none;
+            }
+
+            .um-role-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .um-role-tabs .tab-btn {
+                flex: 0 0 auto;
+                padding: 6px 12px;
+            }
+        }
     </style>
 @endsection
 
@@ -878,7 +931,7 @@
                     <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
                         class="flex items-center gap-2.5 flex-wrap">
                         {{-- Search --}}
-                        <div class="search-wrap" style="width:260px;">
+                        <div class="search-wrap um-search-mobile">
                             <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
                             <input id="umSearch" name="search" placeholder="Search name or email…"
                                 value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
@@ -891,14 +944,13 @@
                         </div>
 
                         {{-- Role filter --}}
-                        <div
-                            style="display:flex;background:#F5F2EE;border:1px solid #E8E4DE;border-radius:10px;padding:3px;gap:2px;">
+                        <div class="um-role-tabs">
                             <button type="button" onclick="setRoleFilter(this,'all')"
                                 class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
                                 data-role="">All</button>
-                            <button type="button" onclick="setRoleFilter(this,'super_admin')"
-                                class="tab-btn {{ ($roleFilter ?? '') === 'super_admin' ? 'active' : '' }}"
-                                data-role="super_admin">Admin</button>
+                            <button type="button" onclick="setRoleFilter(this,'admin')"
+                                class="tab-btn {{ ($roleFilter ?? '') === 'admin' ? 'active' : '' }}"
+                                data-role="admin">Admin</button>
                             <button type="button" onclick="setRoleFilter(this,'dentist')"
                                 class="tab-btn {{ ($roleFilter ?? '') === 'dentist' ? 'active' : '' }}"
                                 data-role="dentist">Dentist</button>
