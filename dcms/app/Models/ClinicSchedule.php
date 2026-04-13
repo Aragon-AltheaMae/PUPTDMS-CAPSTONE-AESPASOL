@@ -37,6 +37,26 @@ class ClinicSchedule extends Model
              . date('g:i A', strtotime($this->close_time));
     }
 
+    public function getDaysLabelAttribute(): string
+    {
+        $map = [
+            'Mon' => 'M',
+            'Tue' => 'T',
+            'Wed' => 'W',
+            'Thu' => 'TH',
+            'Fri' => 'F',
+            'Sat' => 'SAT',
+            'Sun' => 'SUN',
+        ];
+
+        $order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        return collect($this->days ?? [])
+            ->sortBy(fn($day) => array_search($day, $order))
+            ->map(fn($day) => $map[$day] ?? $day)
+            ->implode(', ');
+    }
+
     /**
      * Returns available time-slot strings for a specific ISO date.
      * Each element: ['time' => '9:00 AM', 'available' => true]

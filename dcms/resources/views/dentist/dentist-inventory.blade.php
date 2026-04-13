@@ -1822,8 +1822,19 @@
 
                     <div class="form-group-custom">
                         <div class="form-label-custom">Unit <span style="color:#C0392B">*</span></div>
-                        <input id="addUnit" class="form-input-custom" placeholder="Box / Bottle / Pack" maxlength="30"
-                            oninput="validateAddField('addUnit')">
+                        <input id="addUnit" list="unitOptions" class="form-input-custom" placeholder="Type or select unit"
+                            maxlength="50" oninput="validateAddField('addUnit')">
+
+                        <datalist id="unitOptions">
+                            <option value="Box">
+                            <option value="Pack">
+                            <option value="Bottle">
+                            <option value="Piece">
+                            <option value="Set">
+                            <option value="Tube">
+                            <option value="Vial">
+                            <option value="Roll">
+                        </datalist>
                         <div class="field-error" id="err-addUnit"></div>
                     </div>
 
@@ -1898,8 +1909,19 @@
                 </div>
                 <div class="form-group-custom">
                     <div class="form-label-custom">Unit</div>
-                    <input id="editUnit" class="form-input-custom" placeholder="Box / Bottle / Pack">
-                </div>
+                        <input id="editUnit" list="unitOptionsEdit" class="form-input-custom" placeholder="Type or select unit">
+
+                        <datalist id="unitOptionsEdit">
+                            <option value="Box">
+                            <option value="Pack">
+                            <option value="Bottle">
+                            <option value="Piece">
+                            <option value="Set">
+                            <option value="Tube">
+                            <option value="Vial">
+                            <option value="Roll">
+                        </datalist>
+                    </div>
                 <div class="form-group-custom full">
                     <div class="form-label-custom">Supply / Medicine Name</div>
                     <input id="editName" class="form-input-custom">
