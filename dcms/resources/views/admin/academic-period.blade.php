@@ -38,7 +38,6 @@
     gap: 1rem;
   }
 
-  /* Page Banner */
   .page-banner {
     background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
     padding: 1.75rem 2rem 2rem;
@@ -86,6 +85,44 @@
     font-size: .75rem;
     color: rgba(255,255,255,.8);
     margin-bottom: .3rem;
+  }
+
+  .academic-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: #FAFAF9;
+    border: 1.5px solid #E0DDD8;
+    border-radius: 14px;
+    padding: 4px;
+    gap: 4px;
+    height: 42px;
+  }
+
+  .academic-view-btn {
+    width: 38px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    border-radius: 10px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+    flex-shrink: 0;
+  }
+
+  .academic-view-btn:hover {
+    background: #f3f4f6;
+    color: #8B0000;
+  }
+
+  .academic-view-btn.active {
+    background: #8B0000;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
   }
 
   @media (min-width:1024px) {
@@ -555,6 +592,92 @@
     padding: 3rem 1rem;
   }
 
+  .academic-grid-view {
+    display: none;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .academic-card {
+    background: #fff;
+    border: 1px solid #f1e8e8;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+  }
+
+  .academic-card.is-active {
+    border-color: #f3c9c9;
+    box-shadow: 0 4px 16px rgba(139, 0, 0, .08);
+  }
+
+  .academic-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .academic-card-year {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  .academic-card-year-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+  }
+
+  .academic-card-meta {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .academic-card-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .academic-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9ca3af;
+    min-width: 70px;
+  }
+
+  .academic-card-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    text-align: right;
+    line-height: 1.35;
+  }
+
+  .academic-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .academic-card-actions .act,
+  .academic-card-actions form {
+    flex: 1;
+  }
+
+  .academic-card-actions form .act {
+    width: 100%;
+  }
+
   @media (max-width: 1023px) {
     .ap-toolbar {
       align-items: stretch;
@@ -604,6 +727,19 @@
     .filter-btn,
     .reset-btn {
       justify-content: center;
+    }
+
+    #academicViewToggle {
+      display: none !important;
+    }
+
+    #academicListView {
+      display: none !important;
+    }
+
+    #academicGridView {
+      display: grid !important;
+      grid-template-columns: 1fr;
     }
 
     .ap-table {
@@ -705,19 +841,17 @@ $activePeriodPayload = $activePeriod
 
     <div class="page-banner">
       <div class="page-banner-inner">
-    
         <div>
           <h1 class="page-title">Academic Periods</h1>
         </div>
 
         <button onclick="openModal('addModal')" type="button"
-          class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
-          px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
+          class="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all">
           <i class="fa-solid fa-plus"></i>
           Add Period
         </button>
+      </div>
     </div>
-  </div>
 
     <div class="active-banner mb-6" id="activeBannerWrap">
       <div class="active-banner-inner">
@@ -728,9 +862,7 @@ $activePeriodPayload = $activePeriod
               <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current Semester</p>
             </div>
             <p class="text-xl font-bold text-gray-800" id="bannerSem">
-              {{ $activePeriod?->semester ??
-              'No Active
-              Period' }}
+              {{ $activePeriod?->semester ?? 'No Active Period' }}
             </p>
           </div>
           <div>
@@ -824,10 +956,19 @@ $activePeriodPayload = $activePeriod
               <button type="button" class="reset-btn" onclick="resetAcademicFilters()">
                 Reset
               </button>
+
+              <div class="academic-view-toggle" id="academicViewToggle">
+                <button type="button" class="academic-view-btn active" id="academicListBtn" title="List view" aria-label="List view">
+                  <i class="fa-solid fa-table-list"></i>
+                </button>
+                <button type="button" class="academic-view-btn" id="academicGridBtn" title="Grid view" aria-label="Grid view">
+                  <i class="fa-solid fa-grip"></i>
+                </button>
+              </div>
             </form>
           </div>
 
-          <div class="ap-table-wrap scrollbar-thin">
+          <div id="academicListView" class="ap-table-wrap scrollbar-thin">
             <table class="ap-table text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
@@ -840,7 +981,7 @@ $activePeriodPayload = $activePeriod
                   <th class="py-3 px-4 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="academicTableBody">
                 @forelse($academicPeriods as $index => $period)
                 @php
                 $statusClass = match ($period->status) {
@@ -869,9 +1010,10 @@ $activePeriodPayload = $activePeriod
                 @endphp
 
                 <tr
-                  class="tbl-row {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
+                  class="tbl-row academic-item {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
                   data-semester="{{ $period->semester }}"
-                  data-status="{{ $period->status }}">
+                  data-status="{{ $period->status }}"
+                  data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
                   <td class="py-3 px-4 text-sm">{{ $academicPeriods->firstItem() + $index }}</td>
 
                   <td class="py-3 px-4 col-year">
@@ -951,6 +1093,114 @@ $activePeriodPayload = $activePeriod
                 @endforelse
               </tbody>
             </table>
+          </div>
+
+          <div id="academicGridView" class="academic-grid-view">
+            @forelse($academicPeriods as $index => $period)
+            @php
+              $statusClass = match ($period->status) {
+                'Active' => 's-active',
+                'Upcoming' => 's-upcoming',
+                'Ended' => 's-ended',
+                default => 's-inactive',
+              };
+
+              $semStyle = match ($period->semester) {
+                '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
+                '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
+                'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
+                default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+              };
+
+              $periodPayload = [
+                'id' => $period->id,
+                'academic_year' => $period->academic_year,
+                'semester' => $period->semester,
+                'start_date' => optional($period->start_date)->format('Y-m-d'),
+                'end_date' => optional($period->end_date)->format('Y-m-d'),
+                'description' => $period->description,
+                'is_active' => (bool) $period->is_active,
+              ];
+
+              $label = $period->academic_year . ' — ' . str_replace(['1st','2nd'], ['First','Second'], $period->semester);
+            @endphp
+
+            <div
+              class="academic-card academic-item {{ $period->is_active ? 'is-active' : '' }}"
+              data-semester="{{ $period->semester }}"
+              data-status="{{ $period->status }}"
+              data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
+
+              <div class="academic-card-top">
+                <div class="academic-card-year">
+                  @if ($period->is_active)
+                  <span class="dot-pulse" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
+                  @else
+                  <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e5e7eb;"></span>
+                  @endif
+                  <div class="academic-card-year-text">{{ $period->academic_year }}</div>
+                </div>
+
+                <span class="status-badge {{ $statusClass }}"
+                  style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;">
+                  {{ $period->status }}
+                </span>
+              </div>
+
+              <div class="academic-card-meta">
+                <div class="academic-card-row">
+                  <div class="academic-card-label">Semester</div>
+                  <div class="academic-card-value">
+                    <span class="sem-pill" style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
+                      <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}" style="font-size:9px;"></i>
+                      {{ str_replace(['1st','2nd'], ['First','Second'], $period->semester) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="academic-card-row">
+                  <div class="academic-card-label">Start</div>
+                  <div class="academic-card-value">{{ optional($period->start_date)->format('M d, Y') }}</div>
+                </div>
+
+                <div class="academic-card-row">
+                  <div class="academic-card-label">End</div>
+                  <div class="academic-card-value">{{ optional($period->end_date)->format('M d, Y') }}</div>
+                </div>
+              </div>
+
+              <div class="academic-card-actions">
+                <button type="button" class="act act-edit" title="Edit"
+                  onclick='openEditModal(@json($periodPayload))'>
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+
+                @if (!$period->is_active)
+                <form method="POST" action="{{ route('admin.academic_periods.set_active', $period) }}">
+                  @csrf
+                  @method('PATCH')
+                  <button type="submit" class="act act-star" title="Set as active">
+                    <i class="fa-solid fa-circle-check" style="font-size:10px;"></i>
+                  </button>
+                </form>
+                @else
+                <span class="act act-pinned"><i class="fa-solid fa-star" style="font-size:10px;"></i></span>
+                @endif
+
+                <button type="button" class="act act-del" title="Delete"
+                  onclick='openDeleteModal(@json(route("admin.academic_periods.destroy", $period)), @json($label))'>
+                  <i class="fa-solid fa-trash" style="font-size:10px;"></i>
+                </button>
+              </div>
+            </div>
+            @empty
+            <div id="serverEmptyStateGrid" class="text-center text-gray-400 ap-empty">
+              <div class="flex flex-col items-center justify-center text-center">
+                <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
+                <p class="text-sm font-medium">No academic periods found.</p>
+              </div>
+            </div>
+            @endforelse
           </div>
 
           <div class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -1601,19 +1851,31 @@ $activePeriodPayload = $activePeriod
     if (searchInput) searchInput.value = '';
     if (clearBtn) clearBtn.classList.remove('visible');
 
-    const rows = document.querySelectorAll('tbody tr.tbl-row');
-    rows.forEach(row => row.style.display = '');
+    const items = document.querySelectorAll('.academic-item');
+    items.forEach(item => item.style.display = '');
 
     const jsEmpty = document.getElementById('jsEmptyState');
     if (jsEmpty) jsEmpty.style.display = 'none';
 
+    const jsEmptyGrid = document.getElementById('jsEmptyStateGrid');
+    if (jsEmptyGrid) jsEmptyGrid.style.display = 'none';
+
     const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
     if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
 
+    const jsFilterEmptyGrid = document.getElementById('jsFilterEmptyStateGrid');
+    if (jsFilterEmptyGrid) jsFilterEmptyGrid.style.display = 'none';
+
     const serverEmpty = document.getElementById('serverEmptyState');
     if (serverEmpty) {
-      const hasRows = rows.length > 0;
+      const hasRows = document.querySelectorAll('#academicTableBody tr.tbl-row').length > 0;
       serverEmpty.style.display = hasRows ? 'none' : '';
+    }
+
+    const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
+    if (serverEmptyGrid) {
+      const hasCards = document.querySelectorAll('#academicGridView .academic-card').length > 0;
+      serverEmptyGrid.style.display = hasCards ? 'none' : '';
     }
 
     if (searchInput) searchInput.focus();
@@ -1624,25 +1886,85 @@ $activePeriodPayload = $activePeriod
     const clearBtn = document.getElementById('clearSearch');
     const semesterFilter = document.getElementById('semesterFilter');
     const statusFilter = document.getElementById('statusFilter');
-    const rows = document.querySelectorAll('tbody tr.tbl-row');
+    const items = document.querySelectorAll('.academic-item');
 
     if (searchInput) searchInput.value = '';
     if (semesterFilter) semesterFilter.value = '';
     if (statusFilter) statusFilter.value = '';
     if (clearBtn) clearBtn.classList.remove('visible');
 
-    rows.forEach(row => row.style.display = '');
+    items.forEach(item => item.style.display = '');
 
     const jsEmpty = document.getElementById('jsEmptyState');
     if (jsEmpty) jsEmpty.style.display = 'none';
 
+    const jsEmptyGrid = document.getElementById('jsEmptyStateGrid');
+    if (jsEmptyGrid) jsEmptyGrid.style.display = 'none';
+
     const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
     if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
 
+    const jsFilterEmptyGrid = document.getElementById('jsFilterEmptyStateGrid');
+    if (jsFilterEmptyGrid) jsFilterEmptyGrid.style.display = 'none';
+
     const serverEmpty = document.getElementById('serverEmptyState');
     if (serverEmpty) {
-      const hasRows = rows.length > 0;
+      const hasRows = document.querySelectorAll('#academicTableBody tr.tbl-row').length > 0;
       serverEmpty.style.display = hasRows ? 'none' : '';
+    }
+
+    const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
+    if (serverEmptyGrid) {
+      const hasCards = document.querySelectorAll('#academicGridView .academic-card').length > 0;
+      serverEmptyGrid.style.display = hasCards ? 'none' : '';
+    }
+  }
+
+  function getPreferredAcademicView() {
+    if (window.innerWidth <= 767) return 'grid';
+    return localStorage.getItem('academicView') || 'list';
+  }
+
+  function applyAcademicView(view, save = true) {
+    const listView = document.getElementById('academicListView');
+    const gridView = document.getElementById('academicGridView');
+    const listBtn = document.getElementById('academicListBtn');
+    const gridBtn = document.getElementById('academicGridBtn');
+
+    if (!listView || !gridView) return;
+
+    const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+    if (finalView === 'grid') {
+      listView.style.display = 'none';
+      gridView.style.display = 'grid';
+    } else {
+      listView.style.display = 'block';
+      gridView.style.display = 'none';
+    }
+
+    if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+    if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+    if (save && window.innerWidth > 767) {
+      localStorage.setItem('academicView', finalView);
+    }
+  }
+
+  function initAcademicViewToggle() {
+    const listBtn = document.getElementById('academicListBtn');
+    const gridBtn = document.getElementById('academicGridBtn');
+
+    applyAcademicView(getPreferredAcademicView(), false);
+
+    if (listBtn && !listBtn.dataset.bound) {
+      listBtn.dataset.bound = '1';
+      listBtn.addEventListener('click', () => applyAcademicView('list', true));
+    }
+
+    if (gridBtn && !gridBtn.dataset.bound) {
+      gridBtn.dataset.bound = '1';
+      gridBtn.addEventListener('click', () => applyAcademicView('grid', true));
     }
   }
 
@@ -1655,23 +1977,22 @@ $activePeriodPayload = $activePeriod
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
-    const tbody = document.querySelector('tbody');
-    const allRows = () => tbody.querySelectorAll('tr.tbl-row');
-    let searchTimer = null;
-
     const semesterFilter = document.getElementById('semesterFilter');
     const statusFilter = document.getElementById('statusFilter');
+    let searchTimer = null;
 
-    function getEmptyRow() {
-      return document.getElementById('jsEmptyState');
-    }
+    const tableBody = document.getElementById('academicTableBody');
+    const gridView = document.getElementById('academicGridView');
 
-    function showEmptyState(query) {
-      let el = getEmptyRow();
-      if (!el) {
-        el = document.createElement('tr');
-        el.id = 'jsEmptyState';
-        el.innerHTML = `
+    const allTableRows = () => tableBody ? tableBody.querySelectorAll('tr.tbl-row') : [];
+    const allGridCards = () => gridView ? gridView.querySelectorAll('.academic-card') : [];
+
+    function showSearchEmptyState(query) {
+      let rowEmpty = document.getElementById('jsEmptyState');
+      if (!rowEmpty && tableBody) {
+        rowEmpty = document.createElement('tr');
+        rowEmpty.id = 'jsEmptyState';
+        rowEmpty.innerHTML = `
           <td colspan="7" class="text-center py-12 text-gray-400">
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;gap:.5rem;">
               <div style="width:60px;height:60px;border-radius:16px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
@@ -1694,144 +2015,193 @@ $activePeriodPayload = $activePeriod
               </button>
             </div>
           </td>`;
-        tbody.appendChild(el);
+        tableBody.appendChild(rowEmpty);
       }
 
-      document.getElementById('jsEmptyQuery').textContent = query;
-      el.style.display = '';
+      let gridEmpty = document.getElementById('jsEmptyStateGrid');
+      if (!gridEmpty && gridView) {
+        gridEmpty = document.createElement('div');
+        gridEmpty.id = 'jsEmptyStateGrid';
+        gridEmpty.className = 'text-center py-12 text-gray-400';
+        gridEmpty.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;gap:.5rem;">
+            <div style="width:60px;height:60px;border-radius:16px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+              <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:#d1d5db;"></i>
+            </div>
+            <p class="font-semibold text-sm text-gray-500 mb-1">
+              No results for "<span id="jsEmptyQueryGrid"></span>"
+            </p>
+            <p class="text-xs text-gray-400">
+              Try a different academic year or semester name.
+            </p>
+            <button
+              type="button"
+              onclick="clearAcademicSearch()"
+              style="margin-top:.75rem;padding:.5rem 1.1rem;border-radius:10px;border:1.5px dashed #d1d5db;background:none;font-size:.8rem;color:#9ca3af;cursor:pointer;"
+              onmouseover="this.style.borderColor='#8B0000';this.style.color='#8B0000';"
+              onmouseout="this.style.borderColor='#d1d5db';this.style.color='#9ca3af';">
+              <i class="fa-solid fa-xmark" style="margin-right:.4rem;font-size:.7rem;"></i>
+              Clear search
+            </button>
+          </div>`;
+        gridView.appendChild(gridEmpty);
+      }
+
+      const q1 = document.getElementById('jsEmptyQuery');
+      const q2 = document.getElementById('jsEmptyQueryGrid');
+      if (q1) q1.textContent = query;
+      if (q2) q2.textContent = query;
+
+      if (rowEmpty) rowEmpty.style.display = '';
+      if (gridEmpty) gridEmpty.style.display = '';
 
       const serverEmpty = document.getElementById('serverEmptyState');
       if (serverEmpty) serverEmpty.style.display = 'none';
+
+      const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
+      if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
     }
 
-    function hideEmptyState() {
-      const el = getEmptyRow();
-      if (el) el.style.display = 'none';
+    function hideSearchEmptyState() {
+      const rowEmpty = document.getElementById('jsEmptyState');
+      const gridEmpty = document.getElementById('jsEmptyStateGrid');
+      if (rowEmpty) rowEmpty.style.display = 'none';
+      if (gridEmpty) gridEmpty.style.display = 'none';
+    }
+
+    function showFilterEmptyState() {
+      let rowEmpty = document.getElementById('jsFilterEmptyState');
+      if (!rowEmpty && tableBody) {
+        rowEmpty = document.createElement('tr');
+        rowEmpty.id = 'jsFilterEmptyState';
+        rowEmpty.innerHTML = `
+          <td colspan="7" class="text-center text-gray-400 ap-empty">
+            <div class="flex flex-col items-center justify-center text-center">
+              <i class="fa-solid fa-filter text-3xl mb-3 opacity-30 block"></i>
+              <p class="text-sm font-medium">No academic periods match the selected filters.</p>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(rowEmpty);
+      }
+
+      let gridEmpty = document.getElementById('jsFilterEmptyStateGrid');
+      if (!gridEmpty && gridView) {
+        gridEmpty = document.createElement('div');
+        gridEmpty.id = 'jsFilterEmptyStateGrid';
+        gridEmpty.className = 'text-center text-gray-400 ap-empty';
+        gridEmpty.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center">
+            <i class="fa-solid fa-filter text-3xl mb-3 opacity-30 block"></i>
+            <p class="text-sm font-medium">No academic periods match the selected filters.</p>
+          </div>
+        `;
+        gridView.appendChild(gridEmpty);
+      }
+
+      if (rowEmpty) rowEmpty.style.display = '';
+      if (gridEmpty) gridEmpty.style.display = '';
+
+      hideSearchEmptyState();
 
       const serverEmpty = document.getElementById('serverEmptyState');
-      if (serverEmpty) {
-        const rows = document.querySelectorAll('tbody tr.tbl-row');
-        const hasRows = rows.length > 0;
-        serverEmpty.style.display = hasRows ? 'none' : '';
-      }
+      if (serverEmpty) serverEmpty.style.display = 'none';
+
+      const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
+      if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
     }
 
-    function applyDropdownFilters() {
+    function hideFilterEmptyState() {
+      const rowEmpty = document.getElementById('jsFilterEmptyState');
+      const gridEmpty = document.getElementById('jsFilterEmptyStateGrid');
+      if (rowEmpty) rowEmpty.style.display = 'none';
+      if (gridEmpty) gridEmpty.style.display = 'none';
+    }
+
+    function filterItems() {
       const semesterValue = semesterFilter?.value || '';
       const statusValue = statusFilter?.value || '';
-      const rows = allRows();
-      const searchValue = searchInput.value.trim().toLowerCase();
+      const searchValue = (searchInput?.value || '').trim().toLowerCase();
+
+      const rows = allTableRows();
+      const cards = allGridCards();
 
       let visibleCount = 0;
 
       rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
         const rowSemester = row.dataset.semester || '';
         const rowStatus = row.dataset.status || '';
+        const rowSearch = row.dataset.search || '';
 
         const semesterMatch = !semesterValue || rowSemester === semesterValue;
         const statusMatch = !statusValue || rowStatus === statusValue;
-        const searchMatch = !searchValue || text.includes(searchValue);
+        const searchMatch = !searchValue || rowSearch.includes(searchValue);
 
-        if (semesterMatch && statusMatch && searchMatch) {
-          row.style.display = '';
-          visibleCount++;
-        } else {
-          row.style.display = 'none';
-        }
+        const show = semesterMatch && statusMatch && searchMatch;
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
       });
+
+      cards.forEach(card => {
+        const rowSemester = card.dataset.semester || '';
+        const rowStatus = card.dataset.status || '';
+        const rowSearch = card.dataset.search || '';
+
+        const semesterMatch = !semesterValue || rowSemester === semesterValue;
+        const statusMatch = !statusValue || rowStatus === statusValue;
+        const searchMatch = !searchValue || rowSearch.includes(searchValue);
+
+        const show = semesterMatch && statusMatch && searchMatch;
+        card.style.display = show ? '' : 'none';
+      });
+
+      if (visibleCount === 0) {
+        if (searchValue) {
+          hideFilterEmptyState();
+          showSearchEmptyState(searchInput.value.trim());
+        } else {
+          hideSearchEmptyState();
+          showFilterEmptyState();
+        }
+      } else {
+        hideSearchEmptyState();
+        hideFilterEmptyState();
+      }
 
       const serverEmpty = document.getElementById('serverEmptyState');
-      let jsEmpty = document.getElementById('jsFilterEmptyState');
+      if (serverEmpty) serverEmpty.style.display = 'none';
 
-      if (visibleCount === 0) {
-        if (!jsEmpty) {
-          jsEmpty = document.createElement('tr');
-          jsEmpty.id = 'jsFilterEmptyState';
-          jsEmpty.innerHTML = `
-            <td colspan="7" class="text-center text-gray-400 ap-empty">
-              <div class="flex flex-col items-center justify-center text-center">
-                <i class="fa-solid fa-filter text-3xl mb-3 opacity-30 block"></i>
-                <p class="text-sm font-medium">No academic periods match the selected filters.</p>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(jsEmpty);
-        }
-        jsEmpty.style.display = '';
-        hideEmptyState();
-        if (serverEmpty) serverEmpty.style.display = 'none';
-      } else {
-        if (jsEmpty) jsEmpty.style.display = 'none';
-        if (serverEmpty) serverEmpty.style.display = 'none';
+      const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
+      if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('visible', searchValue !== '');
       }
     }
 
-    function doSearch(query) {
-      const q = query.trim().toLowerCase();
-      const rows = allRows();
-
-      clearBtn.classList.toggle('visible', q !== '');
-
-      if (q === '') {
-        applyDropdownFilters();
-        hideEmptyState();
-        return;
-      }
-
-      let visibleCount = 0;
-      const semesterValue = semesterFilter?.value || '';
-      const statusValue = statusFilter?.value || '';
-
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        const rowSemester = row.dataset.semester || '';
-        const rowStatus = row.dataset.status || '';
-
-        const searchMatch = text.includes(q);
-        const semesterMatch = !semesterValue || rowSemester === semesterValue;
-        const statusMatch = !statusValue || rowStatus === statusValue;
-
-        if (searchMatch && semesterMatch && statusMatch) {
-          row.style.display = '';
-          visibleCount++;
-        } else {
-          row.style.display = 'none';
-        }
-      });
-
-      const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
-      if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
-
-      if (visibleCount === 0) {
-        showEmptyState(query.trim());
-      } else {
-        hideEmptyState();
-      }
-    }
-
-    clearBtn.addEventListener('click', () => {
+    clearBtn?.addEventListener('click', () => {
       clearAcademicSearch();
-      applyDropdownFilters();
+      filterItems();
     });
 
-    searchInput.addEventListener('input', () => {
+    searchInput?.addEventListener('input', () => {
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => doSearch(searchInput.value), 250);
+      searchTimer = setTimeout(() => filterItems(), 250);
     });
 
-    searchInput.addEventListener('keydown', e => {
+    searchInput?.addEventListener('keydown', e => {
       if (e.key === 'Enter') e.preventDefault();
     });
 
-    semesterFilter?.addEventListener('change', applyDropdownFilters);
-    statusFilter?.addEventListener('change', applyDropdownFilters);
+    semesterFilter?.addEventListener('change', filterItems);
+    statusFilter?.addEventListener('change', filterItems);
 
-    if (searchInput.value) {
-      doSearch(searchInput.value);
-    } else {
-      applyDropdownFilters();
-    }
+    filterItems();
+    initAcademicViewToggle();
+
+    window.addEventListener('resize', () => {
+    applyAcademicView(getPreferredAcademicView(), false);
+    });
   });
 </script>
 @endsection

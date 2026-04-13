@@ -4,9 +4,6 @@
 
 @section('styles')
     <style>
-        /* ══════════════════════════════════════
-               TOAST NOTIFICATION STYLES (OVERRIDES DAISYUI)
-            ══════════════════════════════════════ */
         #toastContainer {
             position: fixed !important;
             top: 20px !important;
@@ -169,11 +166,12 @@
             background: rgba(34, 197, 94, .1) !important;
         }
 
-        /* ══════════════════════════════════════
-               SHARED DASHBOARD STYLES & HEADER
-            ══════════════════════════════════════ */
         * {
             box-sizing: border-box;
+        }
+
+        .role-permission-shell {
+            padding: 1.5rem 1.75rem 2rem;
         }
 
         ::-webkit-scrollbar {
@@ -245,990 +243,1143 @@
         color: rgba(255,255,255,.7);
         margin-top: .3rem;
     }
+    
+    .page-banner-actions {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        background: #FAFAF9;
+        border: 1.5px solid #E0DDD8;
+        border-radius: 12px;
+        padding: 3px;
+        gap: 3px;
+        height: 38px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 5;
+    }
+
+    .view-toggle-btn {
+        width: 32px;
+        height: 30px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        border-radius: 9px;
+        font-size: .82rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all .15s ease;
+        flex-shrink: 0;
+    }
+
+    .view-toggle-btn:hover {
+        background: #f3f4f6;
+        color: #8B0000;
+    }
+
+    .view-toggle-btn.active {
+        background: #8B0000;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+    }
+
+    .role-list-container.role-list-view {
+        display: block;
+    }
+
+    .role-list-container.role-grid-view {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .role-list-container.role-grid-view .role-card {
+        margin-bottom: 0;
+        height: 100%;
+    }
+
+
+    .btn-new-role {
+        background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: .8rem 1.25rem;
+        font-weight: 700;
+        font-size: .85rem;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(139, 0, 0, 0.25);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-new-role:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(139, 0, 0, 0.35);
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .role-list-header {
+        font-size: .65rem;
+        color: #6b7280;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        font-weight: 800;
+    }
+
+    .role-card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, .06);
+        border-radius: 14px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+        margin-bottom: 10px;
+        position: relative;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .02);
+    }
+
+    .role-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .role-card:hover {
+        transform: translateX(3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
+    }
+
+    .role-card.active {
+        border-color: var(--crimson);
+        box-shadow: 0 4px 20px rgba(139, 0, 0, 0.1);
+    }
+
+    .role-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 12px;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .role-card.active .role-avatar {
+        background: linear-gradient(135deg, var(--crimson), #c0392b);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(139, 0, 0, 0.25);
+    }
+
+    .badge-pill {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: .65rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .progress-bar {
+        height: 4px;
+        background: #f3f4f6;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 4px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.4s ease;
+        background: #d1d5db;
+    }
+
+    .role-card.active .progress-fill {
+        background: linear-gradient(90deg, var(--crimson), #e11d48);
+    }
+
+    .btn-delete-role {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all .15s;
+        z-index: 10;
+    }
+
+    .role-card:hover .btn-delete-role {
+        opacity: 1;
+    }
+
+    .btn-delete-role:hover {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .accent-card {
+        background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
+        border-radius: 14px;
+        padding: 18px 20px;
+        color: #fff;
+        margin-top: 16px;
+        box-shadow: 0 10px 25px rgba(139, 0, 0, .15);
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, .05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .03);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafafa;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .st-input-wrap {
+        position: relative;
+    }
+
+    .st-input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    .st-input {
+        width: 100%;
+        padding: 10px 14px 10px 34px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: .8rem;
+        font-family: 'Inter', sans-serif;
+        outline: none;
+        transition: all .2s;
+    }
+
+    .st-input:focus {
+        border-color: var(--crimson);
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+    }
+
+    .btn-collapse,
+    .btn-reset {
+        padding: 9px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        font-size: .75rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: #4b5563;
+        transition: all .15s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-collapse:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .btn-reset:hover {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: var(--crimson);
+    }
+
+    .protected-banner {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    /* Permission Groups */
+    .group-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .perm-group-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: #fafafa;
+        cursor: pointer;
+        transition: background 0.15s;
+        user-select: none;
+    }
+
+    .perm-group-header:hover {
+        background: #f3f4f6;
+    }
+
+    .perm-group-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-right: 12px;
+    }
+
+    .dot-row {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+    }
+
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        transition: background 0.2s;
+    }
+
+    .all-toggle-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 4px 10px;
+        cursor: pointer;
+    }
+
+    /* Custom Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        display: inline-block;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
+    .toggle-track {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: #e5e7eb;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+    .toggle-track::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+        transition: all 0.2s;
+    }
+
+    .toggle-switch input:checked+.toggle-track {
+        background: var(--crimson);
+    }
+
+    .toggle-switch input:checked+.toggle-track::after {
+        transform: translateX(18px);
+    }
+
+    .toggle-switch.disabled .toggle-track {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    .perm-group-body {
+        border-top: 1px solid #f3f4f6;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.2s ease;
+        max-height: 9999px;
+        opacity: 1;
+    }
+
+    .perm-group-body.collapsed {
+        max-height: 0;
+        opacity: 0;
+        border-top: none;
+    }
+
+    .chevron {
+        transition: transform 0.2s;
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+    .chevron.collapsed {
+        transform: rotate(180deg);
+    }
+
+    .perm-row {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px 12px 60px;
+        border-bottom: 1px solid #f9fafb;
+        transition: background 0.15s;
+    }
+
+    .perm-row:last-child {
+        border-bottom: none;
+    }
+
+    .perm-row:hover {
+        background: #fdfcfb;
+    }
+
+    .status-granted {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 20px;
+        text-transform: uppercase;
+    }
+
+    .status-denied {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background: #f3f4f6;
+        color: #9ca3af;
+        text-transform: uppercase;
+    }
+
+    /* View As Toolbar Button */
+    .btn-view-as {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: #f0f9ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-weight: 600;
+        font-size: .75rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        position: relative;
+        white-space: nowrap;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-view-as.show {
+        display: flex;
+    }
+
+    .btn-view-as:hover {
+        background: #e0f2fe;
+        border-color: #93c5fd;
+    }
+
+    .btn-view-as.fsb-view-as {
+        background: rgba(59, 130, 246, 0.15);
+        color: #93c5fd;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 30px;
+        padding: 8px 16px;
+    }
+
+    .btn-view-as.fsb-view-as:hover {
+        background: rgba(59, 130, 246, 0.25);
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .va-count-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 800;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ══════════════════════════════════════
+            FLOATING SAVE BAR (UNSAVED CHANGES)
+        ══════════════════════════════════════ */
+    .floating-save-bar {
+        position: fixed;
+        bottom: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111827;
+        border-radius: 50px;
+        padding: 10px 10px 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+        opacity: 0;
+        pointer-events: none;
+        width: max-content;
+        max-width: 90vw;
+    }
+
+    .floating-save-bar.show {
+        bottom: 32px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .fsb-text {
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .fsb-title {
+        font-size: .85rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .fsb-sub {
+        font-size: .7rem;
+        color: #9ca3af;
+    }
+
+    .fsb-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-discard {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: .8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-discard:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-save-float {
+        background: #fff;
+        color: #111827;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: .8rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-save-float:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    /* ══════════════════════════════════════
+            MODALS (MODERN PILL STYLE)
+        ══════════════════════════════════════ */
+    .modern-modal {
+        border: none;
+        padding: 32px 24px 24px;
+        border-radius: 20px;
+        width: min(90vw, 400px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        text-align: center;
+        overflow: visible;
+    }
+
+    .modern-modal::backdrop {
+        background: rgba(17, 24, 39, 0.6);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 26px;
+        border: 6px solid #fff;
+    }
+
+    .modal-icon.danger {
+        background: #fef2f2;
+        color: #ef4444;
+        box-shadow: 0 0 0 1px #fee2e2;
+    }
+
+    .modal-icon.warning {
+        background: #fffbeb;
+        color: #f59e0b;
+        box-shadow: 0 0 0 1px #fef3c7;
+    }
+
+    .modal-icon.primary {
+        background: #eff6ff;
+        color: #3b82f6;
+        box-shadow: 0 0 0 1px #dbeafe;
+    }
+
+    .modal-icon.success {
+        background: #f0fdf4;
+        color: #22c55e;
+        box-shadow: 0 0 0 1px #bbf7d0;
+    }
+
+    .modal-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 0 8px;
+    }
+
+    .modal-body {
+        font-size: .85rem;
+        color: #6b7280;
+        line-height: 1.6;
+        margin: 0 0 24px;
+    }
+
+    .modal-highlight {
+        display: inline-block;
+        font-size: .9rem;
+        font-weight: 700;
+        color: #111827;
+        background: #f3f4f6;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin: 8px 0;
+        word-break: break-all;
+    }
+
+    .modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .modal-btn-cancel {
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        color: #374151;
+        font-weight: 600;
+        font-size: .85rem;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+    .modal-btn-cancel:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .modal-btn-confirm {
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: .85rem;
+        cursor: pointer;
+        transition: all .15s;
+        width: 100%;
+    }
+
+    .modal-btn-confirm.danger {
+        background: #ef4444;
+    }
+
+    .modal-btn-confirm.danger:hover {
+        background: #dc2626;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    }
+
+    .modal-btn-confirm.warning {
+        background: #f59e0b;
+    }
+
+    .modal-btn-confirm.warning:hover {
+        background: #d97706;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    }
+
+    .modal-btn-confirm.primary {
+        background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+    }
+
+    .modal-btn-confirm.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(139, 0, 0, 0.3);
+    }
+
+    .modal-form-group {
+        text-align: left;
+        margin-bottom: 16px;
+    }
+
+    .modal-label {
+        display: block;
+        font-size: .7rem;
+        font-weight: 700;
+        color: #4b5563;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    /* View As Panel (Specific Modal) */
+    #vaOverlay,
+    #patientPickerOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 300;
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .25s;
+    }
+
+    #vaOverlay.open,
+    #patientPickerOverlay.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .va-panel {
+        background: #fff;
+        border-radius: 20px;
+        width: 640px;
+        max-width: 94vw;
+        max-height: 85vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transform: scale(.95);
+        transition: transform .3s;
+    }
+
+    #vaOverlay.open .va-panel,
+    #patientPickerOverlay.open .va-panel {
+        transform: scale(1);
+    }
+
+    .va-head {
+        padding: 20px 24px;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fafafa;
+    }
+
+    .va-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 24px;
+    }
+
+    .va-foot {
+        padding: 16px 24px;
+        border-top: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: flex-end;
+        background: #fafafa;
+    }
+
+    .va-role-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all .2s;
+        margin-bottom: 10px;
+    }
+
+    .va-role-row:hover {
+        border-color: #93c5fd;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, .1);
+        transform: translateY(-1px);
+    }
+
+    .va-go-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-weight: 700;
+        font-size: .75rem;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .va-go-btn:hover {
+        background: #dbeafe;
+    }
+
+    /* Redirect Overlay */
+    .redirect-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .3s;
+    }
+
+    .redirect-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .redirect-spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid rgba(255, 255, 255, .2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Dark Mode Overrides */
+    [data-theme="dark"] .card {
+        background: #161b22;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .card-header,
+    [data-theme="dark"] .perm-group-header,
+    [data-theme="dark"] .va-head,
+    [data-theme="dark"] .va-foot {
+        background: #0d1117;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .st-input {
+        background: #0d1117;
+        border-color: #21262d;
+        color: #f3f4f6;
+    }
+
+    [data-theme="dark"] .role-card,
+    [data-theme="dark"] .group-card,
+    [data-theme="dark"] .va-role-row {
+        background: #161b22;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .role-card:hover {
+        background: #1c2128;
+    }
+
+    [data-theme="dark"] .perm-row {
+        border-color: #1c2128;
+    }
+
+    [data-theme="dark"] .perm-row:hover {
+        background: #1c2128;
+    }
+
+    [data-theme="dark"] .modern-modal,
+    [data-theme="dark"] .va-panel {
+        background: #1f2937;
+    }
+
+    [data-theme="dark"] .page-title,
+    [data-theme="dark"] .modal-title,
+    [data-theme="dark"] .role-name-label {
+        color: #f9fafb;
+    }
+
+    [data-theme="dark"] .page-subtitle,
+    [data-theme="dark"] .modal-body,
+    [data-theme="dark"] .role-list-header {
+        color: #9ca3af;
+    }
+
+    [data-theme="dark"] .modal-btn-cancel,
+    [data-theme="dark"] .btn-collapse,
+    [data-theme="dark"] .btn-reset {
+        background: #374151;
+        border-color: #4b5563;
+        color: #d1d5db;
+    }
+
+    [data-theme="dark"] .modal-highlight {
+        background: #374151;
+        color: #f3f4f6;
+    }
+
+    [data-theme="dark"] .floating-save-bar {
+        background: #1f2937;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        border: 1px solid #374151;
+    }
+
+    [data-theme="dark"] .btn-save-float {
+        background: #fff;
+        color: #111827;
+    }
+
+    [data-theme="dark"] .fsb-sub {
+        color: #9ca3af;
+    }
+
+    [data-theme="dark"] .btn-view-as.fsb-view-as {
+        background: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 767px) {
+        #mainContent {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .role-permission-shell {
+            padding: 1rem 1rem 1.5rem;
+        }
+
+        .page-banner {
+            padding: 1rem 1rem 1.2rem;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+        }
+
+        .page-banner-inner {
+            flex-direction: column;
+            align-items: stretch;
+            gap: .75rem;
+        }
+
+        .page-banner-title {
+            font-size: 1.45rem;
+            line-height: 1.1;
+        }
+
+        .page-banner-actions {
+            width: 100%;
+        }
 
         .btn-new-role {
-            background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: .8rem 1.25rem;
-            font-weight: 700;
-            font-size: .85rem;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(139, 0, 0, 0.25);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-new-role:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 0, 0, 0.35);
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-
-        /* ══════════════════════════════════════
-               LEFT COLUMN: ROLE CARDS
-            ══════════════════════════════════════ */
-        .role-list-header {
-            font-size: .65rem;
-            color: #6b7280;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            font-weight: 800;
-        }
-
-        .role-card {
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, .06);
-            border-radius: 14px;
-            padding: 14px 16px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
-            margin-bottom: 10px;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .02);
-        }
-
-        .role-card:last-child {
-            margin-bottom: 0;
-        }
-
-        .role-card:hover {
-            transform: translateX(3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
-        }
-
-        .role-card.active {
-            border-color: var(--crimson);
-            box-shadow: 0 4px 20px rgba(139, 0, 0, 0.1);
-        }
-
-        .role-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
+            width: 100%;
             justify-content: center;
-            font-weight: 800;
-            font-size: 12px;
-            flex-shrink: 0;
-            transition: all 0.2s;
-            background: #f3f4f6;
-            color: #6b7280;
         }
 
-        .role-card.active .role-avatar {
-            background: linear-gradient(135deg, var(--crimson), #c0392b);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(139, 0, 0, 0.25);
+        #rolePermissionViewToggle {
+            display: none !important;
         }
 
-        .badge-pill {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: .65rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: #f3f4f6;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 4px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.4s ease;
-            background: #d1d5db;
-        }
-
-        .role-card.active .progress-fill {
-            background: linear-gradient(90deg, var(--crimson), #e11d48);
-        }
-
-        .btn-delete-role {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 26px;
-            height: 26px;
-            border-radius: 7px;
-            border: none;
-            background: transparent;
-            color: #9ca3af;
-            font-size: 11px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all .15s;
-            z-index: 10;
-        }
-
-        .role-card:hover .btn-delete-role {
-            opacity: 1;
-        }
-
-        .btn-delete-role:hover {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
-
-        .accent-card {
-            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 100%);
-            border-radius: 14px;
-            padding: 18px 20px;
-            color: #fff;
-            margin-top: 16px;
-            box-shadow: 0 10px 25px rgba(139, 0, 0, .15);
-        }
-
-        /* ══════════════════════════════════════
-               RIGHT COLUMN: EDITOR CARD
-            ══════════════════════════════════════ */
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, .05);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .03);
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fafafa;
-            flex-wrap: wrap;
+        #roleListContainer {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
 
-        .st-input-wrap {
-            position: relative;
+        #roleListContainer .role-card {
+            margin-bottom: 0;
+            padding: 12px;
         }
 
-        .st-input-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 12px;
-            pointer-events: none;
+        #roleListContainer .role-avatar {
+            width: 34px;
+            height: 34px;
+            font-size: 11px;
+            border-radius: 9px;
         }
 
-        .st-input {
+        #roleListContainer .role-name-label {
+            font-size: 12px !important;
+        }
+
+        #roleListContainer .badge-pill {
+            font-size: .58rem;
+            padding: 2px 8px;
+        }
+
+        #roleListContainer .progress-bar {
+            height: 3px;
+        }
+
+        #roleListContainer .count-label,
+        #roleListContainer .pct-label {
+            font-size: 9px !important;
+        }
+
+        .main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .card-header > div:last-child {
             width: 100%;
-            padding: 10px 14px 10px 34px;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: .8rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: all .2s;
-        }
-
-        .st-input:focus {
-            border-color: var(--crimson);
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
 
         .btn-collapse,
-        .btn-reset {
-            padding: 9px 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            background: #fff;
-            font-size: .75rem;
-            font-weight: 600;
-            cursor: pointer;
-            color: #4b5563;
-            transition: all .15s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-collapse:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
-
-        .btn-reset:hover {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            color: var(--crimson);
-        }
-
-        .protected-banner {
-            background: linear-gradient(135deg, #fffbeb, #fef3c7);
-            border: 1px solid #fde68a;
-            border-radius: 12px;
-            padding: 12px 18px;
+        .btn-reset,
+        .btn-view-as {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
         }
 
-        /* Permission Groups */
-        .group-card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 10px;
+        .role-card {
+            padding: 13px 14px;
+        }
+
+        .accent-card {
+            margin-top: 12px;
+            padding: 16px 16px;
         }
 
         .perm-group-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            background: #fafafa;
-            cursor: pointer;
-            transition: background 0.15s;
-            user-select: none;
-        }
-
-        .perm-group-header:hover {
-            background: #f3f4f6;
-        }
-
-        .perm-group-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-            margin-right: 12px;
-        }
-
-        .dot-row {
-            display: flex;
-            gap: 3px;
-            align-items: center;
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            transition: background 0.2s;
-        }
-
-        .all-toggle-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 4px 10px;
-            cursor: pointer;
-        }
-
-        /* Custom Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            width: 42px;
-            height: 24px;
-            display: inline-block;
-            flex-shrink: 0;
-            margin: 0;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
-
-        .toggle-track {
-            position: absolute;
-            cursor: pointer;
-            inset: 0;
-            background: #e5e7eb;
-            border-radius: 12px;
-            transition: all 0.2s;
-        }
-
-        .toggle-track::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
-            transition: all 0.2s;
-        }
-
-        .toggle-switch input:checked+.toggle-track {
-            background: var(--crimson);
-        }
-
-        .toggle-switch input:checked+.toggle-track::after {
-            transform: translateX(18px);
-        }
-
-        .toggle-switch.disabled .toggle-track {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .perm-group-body {
-            border-top: 1px solid #f3f4f6;
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.2s ease;
-            max-height: 9999px;
-            opacity: 1;
-        }
-
-        .perm-group-body.collapsed {
-            max-height: 0;
-            opacity: 0;
-            border-top: none;
-        }
-
-        .chevron {
-            transition: transform 0.2s;
-            color: #9ca3af;
-            font-size: 11px;
-        }
-
-        .chevron.collapsed {
-            transform: rotate(180deg);
+            padding: 10px 12px;
         }
 
         .perm-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px 12px 60px;
-            border-bottom: 1px solid #f9fafb;
-            transition: background 0.15s;
+            padding: 10px 12px 10px 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
+    }
 
-        .perm-row:last-child {
-            border-bottom: none;
+    @media (max-width: 480px) {
+        #roleListContainer {
+            grid-template-columns: 1fr;
         }
-
-        .perm-row:hover {
-            background: #fdfcfb;
-        }
-
-        .status-granted {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 20px;
-            text-transform: uppercase;
-        }
-
-        .status-denied {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 20px;
-            background: #f3f4f6;
-            color: #9ca3af;
-            text-transform: uppercase;
-        }
-
-        /* View As Toolbar Button */
-        .btn-view-as {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            background: #f0f9ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-weight: 600;
-            font-size: .75rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            white-space: nowrap;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-view-as.show {
-            display: flex;
-        }
-
-        .btn-view-as:hover {
-            background: #e0f2fe;
-            border-color: #93c5fd;
-        }
-
-        .btn-view-as.fsb-view-as {
-            background: rgba(59, 130, 246, 0.15);
-            color: #93c5fd;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 30px;
-            padding: 8px 16px;
-        }
-
-        .btn-view-as.fsb-view-as:hover {
-            background: rgba(59, 130, 246, 0.25);
-            border-color: rgba(59, 130, 246, 0.5);
-        }
-
-        .va-count-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 800;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ══════════════════════════════════════
-               FLOATING SAVE BAR (UNSAVED CHANGES)
-            ══════════════════════════════════════ */
-        .floating-save-bar {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #111827;
-            border-radius: 50px;
-            padding: 10px 10px 10px 24px;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
-            opacity: 0;
-            pointer-events: none;
-            width: max-content;
-            max-width: 90vw;
-        }
-
-        .floating-save-bar.show {
-            bottom: 32px;
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .fsb-text {
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .fsb-title {
-            font-size: .85rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .fsb-sub {
-            font-size: .7rem;
-            color: #9ca3af;
-        }
-
-        .fsb-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-discard {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: .8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-discard:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-save-float {
-            background: #fff;
-            color: #111827;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: .8rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-save-float:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-        }
-
-        /* ══════════════════════════════════════
-               MODALS (MODERN PILL STYLE)
-            ══════════════════════════════════════ */
-        .modern-modal {
-            border: none;
-            padding: 32px 24px 24px;
-            border-radius: 20px;
-            width: min(90vw, 400px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            background: #ffffff;
-            text-align: center;
-            overflow: visible;
-        }
-
-        .modern-modal::backdrop {
-            background: rgba(17, 24, 39, 0.6);
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 26px;
-            border: 6px solid #fff;
-        }
-
-        .modal-icon.danger {
-            background: #fef2f2;
-            color: #ef4444;
-            box-shadow: 0 0 0 1px #fee2e2;
-        }
-
-        .modal-icon.warning {
-            background: #fffbeb;
-            color: #f59e0b;
-            box-shadow: 0 0 0 1px #fef3c7;
-        }
-
-        .modal-icon.primary {
-            background: #eff6ff;
-            color: #3b82f6;
-            box-shadow: 0 0 0 1px #dbeafe;
-        }
-
-        .modal-icon.success {
-            background: #f0fdf4;
-            color: #22c55e;
-            box-shadow: 0 0 0 1px #bbf7d0;
-        }
-
-        .modal-title {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #111827;
-            margin: 0 0 8px;
-        }
-
-        .modal-body {
-            font-size: .85rem;
-            color: #6b7280;
-            line-height: 1.6;
-            margin: 0 0 24px;
-        }
-
-        .modal-highlight {
-            display: inline-block;
-            font-size: .9rem;
-            font-weight: 700;
-            color: #111827;
-            background: #f3f4f6;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin: 8px 0;
-            word-break: break-all;
-        }
-
-        .modal-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .modal-btn-cancel {
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
-            background: #ffffff;
-            color: #374151;
-            font-weight: 600;
-            font-size: .85rem;
-            cursor: pointer;
-            transition: all .15s;
-        }
-
-        .modal-btn-cancel:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
-
-        .modal-btn-confirm {
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            color: #ffffff !important;
-            font-weight: 600;
-            font-size: .85rem;
-            cursor: pointer;
-            transition: all .15s;
-            width: 100%;
-        }
-
-        .modal-btn-confirm.danger {
-            background: #ef4444;
-        }
-
-        .modal-btn-confirm.danger:hover {
-            background: #dc2626;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
-        }
-
-        .modal-btn-confirm.warning {
-            background: #f59e0b;
-        }
-
-        .modal-btn-confirm.warning:hover {
-            background: #d97706;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-        }
-
-        .modal-btn-confirm.primary {
-            background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
-        }
-
-        .modal-btn-confirm.primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(139, 0, 0, 0.3);
-        }
-
-        .modal-form-group {
-            text-align: left;
-            margin-bottom: 16px;
-        }
-
-        .modal-label {
-            display: block;
-            font-size: .7rem;
-            font-weight: 700;
-            color: #4b5563;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-        }
-
-        /* View As Panel (Specific Modal) */
-        #vaOverlay,
-        #patientPickerOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 24, 39, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-            backdrop-filter: blur(4px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .25s;
-        }
-
-        #vaOverlay.open,
-        #patientPickerOverlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .va-panel {
-            background: #fff;
-            border-radius: 20px;
-            width: 640px;
-            max-width: 94vw;
-            max-height: 85vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(.95);
-            transition: transform .3s;
-        }
-
-        #vaOverlay.open .va-panel,
-        #patientPickerOverlay.open .va-panel {
-            transform: scale(1);
-        }
-
-        .va-head {
-            padding: 20px 24px;
-            border-bottom: 1px solid #f3f4f6;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #fafafa;
-        }
-
-        .va-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 24px;
-        }
-
-        .va-foot {
-            padding: 16px 24px;
-            border-top: 1px solid #f3f4f6;
-            display: flex;
-            justify-content: flex-end;
-            background: #fafafa;
-        }
-
-        .va-role-row {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 14px 16px;
-            cursor: pointer;
-            transition: all .2s;
-            margin-bottom: 10px;
-        }
-
-        .va-role-row:hover {
-            border-color: #93c5fd;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, .1);
-            transform: translateY(-1px);
-        }
-
-        .va-go-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-weight: 700;
-            font-size: .75rem;
-            cursor: pointer;
-            transition: all .2s;
-        }
-
-        .va-go-btn:hover {
-            background: #dbeafe;
-        }
-
-        /* Redirect Overlay */
-        .redirect-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .3s;
-        }
-
-        .redirect-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .redirect-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(255, 255, 255, .2);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin .7s linear infinite;
-            margin-bottom: 16px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Dark Mode Overrides */
-        [data-theme="dark"] .card {
-            background: #161b22;
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .card-header,
-        [data-theme="dark"] .perm-group-header,
-        [data-theme="dark"] .va-head,
-        [data-theme="dark"] .va-foot {
-            background: #0d1117;
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .st-input {
-            background: #0d1117;
-            border-color: #21262d;
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .role-card,
-        [data-theme="dark"] .group-card,
-        [data-theme="dark"] .va-role-row {
-            background: #161b22;
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .role-card:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .perm-row {
-            border-color: #1c2128;
-        }
-
-        [data-theme="dark"] .perm-row:hover {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .modern-modal,
-        [data-theme="dark"] .va-panel {
-            background: #1f2937;
-        }
-
-        [data-theme="dark"] .page-title,
-        [data-theme="dark"] .modal-title,
-        [data-theme="dark"] .role-name-label {
-            color: #f9fafb;
-        }
-
-        [data-theme="dark"] .page-subtitle,
-        [data-theme="dark"] .modal-body,
-        [data-theme="dark"] .role-list-header {
-            color: #9ca3af;
-        }
-
-        [data-theme="dark"] .modal-btn-cancel,
-        [data-theme="dark"] .btn-collapse,
-        [data-theme="dark"] .btn-reset {
-            background: #374151;
-            border-color: #4b5563;
-            color: #d1d5db;
-        }
-
-        [data-theme="dark"] .modal-highlight {
-            background: #374151;
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .floating-save-bar {
-            background: #1f2937;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            border: 1px solid #374151;
-        }
-
-        [data-theme="dark"] .btn-save-float {
-            background: #fff;
-            color: #111827;
-        }
-
-        [data-theme="dark"] .fsb-sub {
-            color: #9ca3af;
-        }
-
-        [data-theme="dark"] .btn-view-as.fsb-view-as {
-            background: rgba(59, 130, 246, 0.1);
-            color: #60a5fa;
-            border-color: rgba(59, 130, 246, 0.2);
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .page-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-new-role {
-                justify-content: center;
-            }
-
-            .role-list-container {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .role-card {
-                margin-bottom: 0;
-            }
-
-            .card-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-collapse,
-            .btn-reset {
-                flex: 1;
-                text-align: center;
-                justify-content: center;
-                display: flex;
-            }
-        }
+    }
     </style>
 @endsection
 
@@ -1239,17 +1390,29 @@
 
 @section('content')
     <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
-        <div style="max-width: 1300px; margin: 0 auto; padding: 1.5rem 1.75rem 2rem;">
+        <div class="role-permission-shell" style="max-width: 1300px; margin: 0 auto;">
 
             <div class="page-banner">
                 <div class="page-banner-inner">
                     <h1 class="page-banner-title">Roles & Permissions</h1>
-                <button type="button" class="btn-new-role" onclick="openNewRoleModal()"
-                style="background:white; color:#8B0000;">
-                    <i class="fa-solid fa-plus"></i> New Role
-                </button>
+
+                    <div class="page-banner-actions">
+                        <button type="button" class="btn-new-role" onclick="openNewRoleModal()"
+                            style="background:white; color:#8B0000;">
+                            <i class="fa-solid fa-plus"></i> New Role
+                        </button>
+
+                        <div class="view-toggle" id="rolePermissionViewToggle" onclick="event.stopPropagation()">
+                            <button type="button" class="view-toggle-btn active" id="roleListViewBtn" title="List view" aria-label="List view">
+                                <i class="fa-solid fa-table-list"></i>
+                            </button>
+                            <button type="button" class="view-toggle-btn" id="roleGridViewBtn" title="Grid view" aria-label="Grid view">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
             <div class="main-grid">
 
@@ -1288,7 +1451,7 @@
 
                     <div class="role-list-header">Active Roles ({{ $roles->count() }})</div>
 
-                    <div class="role-list-container">
+                    <div class="role-list-container role-list-view" id="roleListContainer">
                         @foreach ($roles as $i => $role)
                             @php
                                 $c = getRoleBadge($role->name, $role->slug);
@@ -1837,6 +2000,56 @@
             updateViewAsBtn();
         }
 
+        function getPreferredRolePermissionView() {
+            if (window.innerWidth <= 767) return 'grid';
+            return localStorage.getItem('rolePermissionView') || 'list';
+        }
+
+        function applyRolePermissionView(view, save = true) {
+            const container = document.getElementById('roleListContainer');
+            const listBtn = document.getElementById('roleListViewBtn');
+            const gridBtn = document.getElementById('roleGridViewBtn');
+
+            if (!container) return;
+
+            const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+            container.classList.remove('role-list-view', 'role-grid-view');
+            container.classList.add(finalView === 'grid' ? 'role-grid-view' : 'role-list-view');
+
+            if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+            if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+            if (save && window.innerWidth > 767) {
+                localStorage.setItem('rolePermissionView', finalView);
+            }
+        }
+
+        function initRolePermissionViewToggle() {
+            const listBtn = document.getElementById('roleListViewBtn');
+            const gridBtn = document.getElementById('roleGridViewBtn');
+
+            applyRolePermissionView(getPreferredRolePermissionView(), false);
+
+            if (listBtn && !listBtn.dataset.bound) {
+                listBtn.dataset.bound = '1';
+                listBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyRolePermissionView('list', true);
+                });
+            }
+
+            if (gridBtn && !gridBtn.dataset.bound) {
+                gridBtn.dataset.bound = '1';
+                gridBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyRolePermissionView('grid', true);
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const firstCard = document.querySelector('.role-card');
             const protectedBanner = document.getElementById('protectedBanner');
@@ -1845,6 +2058,11 @@
             }
 
             initRoleForms();
+            initRolePermissionViewToggle();
+
+            window.addEventListener('resize', () => {
+                applyRolePermissionView(getPreferredRolePermissionView(), false);
+            });
 
             @if (session('success'))
                 if (typeof showToast === 'function') {
@@ -2296,11 +2514,13 @@
                         .then(html => {
                             const doc = new DOMParser().parseFromString(html, 'text/html');
                             const newGrid = doc.querySelector('.main-grid');
+
                             if (newGrid) {
                                 document.querySelector('.main-grid').innerHTML = newGrid.innerHTML;
                                 initRoleForms();
+                                initRolePermissionViewToggle();
+                                applyRolePermissionView(getPreferredRolePermissionView(), false);
 
-                                // Automatically click/highlight the newly created role
                                 const newRoleCard = document.querySelector(
                                     `.role-card[data-slug="${slug}"]`) || document.querySelector(
                                     '.role-card');
@@ -2378,9 +2598,12 @@
                         .then(html => {
                             const doc = new DOMParser().parseFromString(html, 'text/html');
                             const newGrid = doc.querySelector('.main-grid');
+
                             if (newGrid) {
                                 document.querySelector('.main-grid').innerHTML = newGrid.innerHTML;
                                 initRoleForms();
+                                initRolePermissionViewToggle();
+                                applyRolePermissionView(getPreferredRolePermissionView(), false);
                                 const firstRole = document.querySelector('.role-card');
                                 if (firstRole) selectRole(firstRole);
                             }
@@ -2451,8 +2674,9 @@
                                 if (firstRole) selectRole(firstRole);
 
                                 initRoleForms();
+                                initRolePermissionViewToggle();
+                                applyRolePermissionView(getPreferredRolePermissionView(), false);
                             }
-
                             confirmBtn.disabled = false;
                             confirmBtn.innerHTML = 'Yes, Reset';
                         });

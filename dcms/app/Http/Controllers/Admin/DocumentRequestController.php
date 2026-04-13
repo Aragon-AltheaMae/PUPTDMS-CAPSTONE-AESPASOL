@@ -30,8 +30,8 @@ class DocumentRequestController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('reference_number', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($patientQuery) use ($search) {
-                        $patientQuery->where('full_name', 'like', "%{$search}%")
-                            ->orWhere('student_id', 'like', "%{$search}%");
+                        $patientQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('id', 'like', "%{$search}%");
                     });
             });
         }
@@ -95,8 +95,8 @@ class DocumentRequestController extends Controller
         return response()->json([
             'id' => $documentRequest->id,
             'reference_number' => $documentRequest->reference_number,
-            'patient_name' => $documentRequest->patient->full_name ?? 'Unknown Patient',
-            'patient_id' => $documentRequest->patient->student_id ?? 'No ID',
+            'patient_name' => $documentRequest->patient->name ?? 'Unknown Patient',
+            'patient_id' => $documentRequest->patient->id ?? 'No ID',
             'document_type' => $documentRequest->document_type,
             'purpose' => $documentRequest->purpose,
             'priority' => $documentRequest->priority,
@@ -189,8 +189,8 @@ class DocumentRequestController extends Controller
                 foreach ($requests as $request) {
                     fputcsv($handle, [
                         $request->reference_number,
-                        $request->patient->full_name ?? '',
-                        $request->patient->student_id ?? '',
+                        $request->patient->name ?? '',
+                        $request->patient->id ?? '',
                         $request->document_type,
                         $request->purpose,
                         $request->priority,

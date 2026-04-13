@@ -208,6 +208,8 @@
             flex-wrap: wrap;
             flex: 1 1 auto;
             justify-content: flex-end;
+            position: relative;
+            z-index: 30;
         }
 
         .card-header-icon {
@@ -847,6 +849,140 @@
             border-color: #21262d;
         }
 
+        .view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+            height: 38px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 40;
+            pointer-events: auto;
+        }
+
+        .view-toggle-btn {
+            width: 32px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 9px;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 41;
+            pointer-events: auto;
+        }
+
+        .view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: #8B0000;
+        }
+
+        .view-toggle-btn.active {
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+        }
+
+        .patient-view {
+            width: 100%;
+        }
+
+        .patient-view[hidden] {
+            display: none !important;
+        }
+
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .patient-grid-card {
+            position: relative;
+            background: #fff;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color .2s, box-shadow .2s, transform .2s;
+            animation: cardIn .4s ease both;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            min-width: 0;
+        }
+
+        .patient-grid-card:hover {
+            border-color: #D1D5DB;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .09);
+            transform: translateY(-2px);
+        }
+
+        .patient-grid-card-body {
+            padding: 1rem 1rem 1rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: .9rem;
+            min-width: 0;
+        }
+
+        .patient-grid-top {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            min-width: 0;
+        }
+
+        .patient-grid-main {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .patient-grid-name {
+            font-weight: 700;
+            font-size: .95rem;
+            color: #111827;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .patient-grid-id {
+            display: inline-block;
+            margin-top: .4rem;
+            padding: .25rem .55rem;
+            border-radius: 999px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: .68rem;
+            font-weight: 700;
+        }
+
+        .patient-grid-meta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: .75rem;
+            min-width: 0;
+        }
+
+        .patient-grid-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
         @media (max-width: 1279px) {
             .stat-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -936,6 +1072,18 @@
             .detail-box {
                 width: 100%;
             }
+
+            #patientListView {
+                display: none !important;
+            }
+
+            #patientGridView {
+                display: block !important;
+            }
+
+            #patientViewToggle {
+                display: none !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1014,6 +1162,14 @@
                             <span>Filter</span>
                             <span id="filterDot" class="filter-dot"></span>
                         </button>
+                            <div class="view-toggle" id="patientViewToggle">
+                            <button type="button" class="view-toggle-btn active" data-view="list" id="patientListViewBtn" title="List view" aria-label="List view">
+                                <i class="fa-solid fa-table-list"></i>
+                            </button>
+                            <button type="button" class="view-toggle-btn" data-view="grid" id="patientGridViewBtn" title="Grid view" aria-label="Grid view">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1068,86 +1224,170 @@
                 </div>
 
                 <div id="patientListWrap" class="patient-list-wrap">
-                    @forelse($allAppointments as $appt)
-                        @php
-                            $status = strtolower($appt->status ?? '');
-                            $isCancelled = $status === 'cancelled';
-                            $isCompleted = $status === 'completed';
-                            $isRescheduled = $status === 'rescheduled';
-                            $isToday = $appt->appointment_date === $today && !$isCancelled && !$isCompleted;
-                            $isUpcoming = $appt->appointment_date > $today && in_array($status, ['upcoming', 'rescheduled', 'pending', 'confirmed'], true);
+                    @if($allAppointments->count())
+                        <div class="patient-view" id="patientListView">
+                            @foreach($allAppointments as $appt)
+                                @php
+                                    $status = strtolower($appt->status ?? '');
+                                    $isCancelled = $status === 'cancelled';
+                                    $isCompleted = $status === 'completed';
+                                    $isRescheduled = $status === 'rescheduled';
+                                    $isToday = $appt->appointment_date === $today && !$isCancelled && !$isCompleted;
+                                    $isUpcoming = $appt->appointment_date > $today && in_array($status, ['upcoming', 'rescheduled', 'pending', 'confirmed'], true);
 
-                            $tabClass = $isCancelled ? 'cancelled' : ($isCompleted ? 'completed' : ($isRescheduled ? 'rescheduled' : ($isToday ? 'today' : ($isUpcoming ? 'upcoming' : 'all'))));
+                                    $tabClass = $isCancelled ? 'cancelled' : ($isCompleted ? 'completed' : ($isRescheduled ? 'rescheduled' : ($isToday ? 'today' : ($isUpcoming ? 'upcoming' : 'all'))));
 
-                            $patientName = $appt->patient->name ?? 'Unknown Patient';
-                            $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
-                            $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
-                            $serviceLabel = ($appt->service_type === 'Others') ? ($appt->other_services ?: 'Others') : $appt->service_type;
+                                    $patientName = $appt->patient->name ?? 'Unknown Patient';
+                                    $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
+                                    $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
+                                    $serviceLabel = ($appt->service_type === 'Others') ? ($appt->other_services ?: 'Others') : $appt->service_type;
 
-                            $accentClass = $isCancelled ? 'accent-cancelled' : ($isCompleted ? 'accent-completed' : ($isRescheduled ? 'accent-rescheduled' : ($isToday ? 'accent-today' : ($isUpcoming ? 'accent-upcoming' : 'accent-default'))));
-                            $iconBg = $isCancelled ? 'background:#FEE2E2;color:#DC2626;' : ($isCompleted ? 'background:#F0FDF4;color:#16A34A;' : ($isRescheduled ? 'background:#FEFCE8;color:#A16207;' : ($isToday ? 'background:#EFF6FF;color:#2563EB;' : ($isUpcoming ? 'background:#FFF7ED;color:#EA580C;' : 'background:#F3F4F6;color:#6B7280;'))));
-                            $pillClass = $isCancelled ? 'pill-cancelled' : ($isCompleted ? 'pill-completed' : ($isRescheduled ? 'pill-rescheduled' : ($isToday ? 'pill-today' : ($isUpcoming ? 'pill-upcoming' : 'pill-default'))));
-                            $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? 'Upcoming · '.ucfirst($status) : ucfirst($status ?: 'Pending')))));
-                        @endphp
+                                    $accentClass = $isCancelled ? 'accent-cancelled' : ($isCompleted ? 'accent-completed' : ($isRescheduled ? 'accent-rescheduled' : ($isToday ? 'accent-today' : ($isUpcoming ? 'accent-upcoming' : 'accent-default'))));
+                                    $iconBg = $isCancelled ? 'background:#FEE2E2;color:#DC2626;' : ($isCompleted ? 'background:#F0FDF4;color:#16A34A;' : ($isRescheduled ? 'background:#FEFCE8;color:#A16207;' : ($isToday ? 'background:#EFF6FF;color:#2563EB;' : ($isUpcoming ? 'background:#FFF7ED;color:#EA580C;' : 'background:#F3F4F6;color:#6B7280;'))));
+                                    $pillClass = $isCancelled ? 'pill-cancelled' : ($isCompleted ? 'pill-completed' : ($isRescheduled ? 'pill-rescheduled' : ($isToday ? 'pill-today' : ($isUpcoming ? 'pill-upcoming' : 'pill-default'))));
+                                    $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? ($status === 'upcoming' ? 'Upcoming' : 'Upcoming · '.ucfirst($status)) : ucfirst($status ?: 'Pending')))));
+                                @endphp
 
-                        <a href="{{ route('admin.admin.patient.profile', ['patient' => $appt->patient_id]) }}"
-                            class="patient-card patient-item"
-                            data-tab="{{ $tabClass }}"
-                            data-name="{{ strtolower($patientName) }}"
-                            data-service="{{ strtolower($serviceLabel) }}"
-                            data-course="{{ strtolower($appt->patient->course ?? '') }}"
-                            data-year="{{ strtolower($appt->patient->year_level ?? '') }}"
-                            data-section="{{ strtolower($appt->patient->section ?? '') }}"
-                            data-department="{{ strtolower($appt->patient->department ?? '') }}"
-                            data-date="{{ $appt->appointment_date }}">
+                                <a href="{{ route('admin.admin.patient.profile', ['patient' => $appt->patient_id]) }}"
+                                    class="patient-card patient-item"
+                                    data-tab="{{ $tabClass }}"
+                                    data-name="{{ strtolower($patientName) }}"
+                                    data-service="{{ strtolower($serviceLabel) }}"
+                                    data-course="{{ strtolower($appt->patient->course ?? '') }}"
+                                    data-year="{{ strtolower($appt->patient->year_level ?? '') }}"
+                                    data-section="{{ strtolower($appt->patient->section ?? '') }}"
+                                    data-department="{{ strtolower($appt->patient->department ?? '') }}"
+                                    data-date="{{ $appt->appointment_date }}"
+                                    data-record-key="appt-{{ $appt->id }}"
+                                    data-view-type="list">
 
-                            <div class="accent-bar {{ $accentClass }}"></div>
+                                    <div class="accent-bar {{ $accentClass }}"></div>
 
-                            <div class="patient-card-body">
-                                <img
-                                    src="{{ $appt->patient->profile_image ? asset('storage/'.$appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
-                                    alt="{{ $patientName }}"
-                                    class="patient-avatar">
+                                    <div class="patient-card-body">
+                                        <img
+                                            src="{{ $appt->patient->profile_image ? asset('storage/'.$appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+                                            alt="{{ $patientName }}"
+                                            class="patient-avatar">
 
-                                <div class="patient-main">
-                                    <div class="patient-name">{{ $patientName }}</div>
-                                    <span class="patient-id">ID #{{ $appt->patient_id }}</span>
-                                </div>
+                                        <div class="patient-main">
+                                            <div class="patient-name">{{ $patientName }}</div>
+                                            <span class="patient-id">ID #{{ $appt->patient_id }}</span>
+                                        </div>
 
-                                <div class="divider-y"></div>
+                                        <div class="divider-y"></div>
 
-                                <div class="detail-box" style="width: 210px; flex-shrink:0;">
-                                    <div class="detail-icon" style="background:#EFF6FF;color:#2563EB;">
-                                        <i class="fa-regular fa-calendar"></i>
+                                        <div class="detail-box" style="width: 210px; flex-shrink:0;">
+                                            <div class="detail-icon" style="background:#EFF6FF;color:#2563EB;">
+                                                <i class="fa-regular fa-calendar"></i>
+                                            </div>
+                                            <div>
+                                                <div class="detail-label">Date & Time</div>
+                                                <div class="detail-value">{{ $dateLabel }}</div>
+                                                <div class="detail-sub">{{ $timeLabel }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="divider-y"></div>
+
+                                        <div class="detail-box" style="flex:1; min-width:220px;">
+                                            <div class="detail-icon" style="{{ $iconBg }}">
+                                                <i class="fa-solid fa-tooth"></i>
+                                            </div>
+                                            <div>
+                                                <div class="detail-label">Service</div>
+                                                <div class="detail-value">{{ $serviceLabel }}</div>
+                                                <span class="status-pill {{ $pillClass }}">
+                                                    <span class="pill-dot"></span>{{ $pillText }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="card-arrow-btn">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div class="detail-label">Date & Time</div>
-                                        <div class="detail-value">{{ $dateLabel }}</div>
-                                        <div class="detail-sub">{{ $timeLabel }}</div>
-                                    </div>
-                                </div>
+                                </a>
+                            @endforeach
+                        </div>
 
-                                <div class="divider-y"></div>
+                        <div class="patient-view" id="patientGridView" hidden>
+                            <div class="patient-grid">
+                                @foreach($allAppointments as $appt)
+                                    @php
+                                        $status = strtolower($appt->status ?? '');
+                                        $isCancelled = $status === 'cancelled';
+                                        $isCompleted = $status === 'completed';
+                                        $isRescheduled = $status === 'rescheduled';
+                                        $isToday = $appt->appointment_date === $today && !$isCancelled && !$isCompleted;
+                                        $isUpcoming = $appt->appointment_date > $today && in_array($status, ['upcoming', 'rescheduled', 'pending', 'confirmed'], true);
 
-                                <div class="detail-box" style="flex:1; min-width:220px;">
-                                    <div class="detail-icon" style="{{ $iconBg }}">
-                                        <i class="fa-solid fa-tooth"></i>
-                                    </div>
-                                    <div>
-                                        <div class="detail-label">Service</div>
-                                        <div class="detail-value">{{ $serviceLabel }}</div>
-                                        <span class="status-pill {{ $pillClass }}">
-                                            <span class="pill-dot"></span>{{ $pillText }}
-                                        </span>
-                                    </div>
-                                </div>
+                                        $tabClass = $isCancelled ? 'cancelled' : ($isCompleted ? 'completed' : ($isRescheduled ? 'rescheduled' : ($isToday ? 'today' : ($isUpcoming ? 'upcoming' : 'all'))));
 
-                                <div class="card-arrow-btn">
-                                    <i class="fa-solid fa-arrow-right"></i>
-                                </div>
+                                        $patientName = $appt->patient->name ?? 'Unknown Patient';
+                                        $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
+                                        $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
+                                        $serviceLabel = ($appt->service_type === 'Others') ? ($appt->other_services ?: 'Others') : $appt->service_type;
+
+                                        $accentClass = $isCancelled ? 'accent-cancelled' : ($isCompleted ? 'accent-completed' : ($isRescheduled ? 'accent-rescheduled' : ($isToday ? 'accent-today' : ($isUpcoming ? 'accent-upcoming' : 'accent-default'))));
+                                        $pillClass = $isCancelled ? 'pill-cancelled' : ($isCompleted ? 'pill-completed' : ($isRescheduled ? 'pill-rescheduled' : ($isToday ? 'pill-today' : ($isUpcoming ? 'pill-upcoming' : 'pill-default'))));
+                                        $pillText = $isCancelled ? 'Cancelled' : ($isCompleted ? 'Completed' : ($isRescheduled ? 'Rescheduled' : ($isToday ? 'Appointment Today' : ($isUpcoming ? ($status === 'upcoming' ? 'Upcoming' : 'Upcoming · '.ucfirst($status)) : ucfirst($status ?: 'Pending')))));
+                                    @endphp
+
+                                    <a href="{{ route('admin.admin.patient.profile', ['patient' => $appt->patient_id]) }}"
+                                        class="patient-grid-card patient-item"
+                                        data-tab="{{ $tabClass }}"
+                                        data-name="{{ strtolower($patientName) }}"
+                                        data-service="{{ strtolower($serviceLabel) }}"
+                                        data-course="{{ strtolower($appt->patient->course ?? '') }}"
+                                        data-year="{{ strtolower($appt->patient->year_level ?? '') }}"
+                                        data-section="{{ strtolower($appt->patient->section ?? '') }}"
+                                        data-department="{{ strtolower($appt->patient->department ?? '') }}"
+                                        data-date="{{ $appt->appointment_date }}"
+                                        data-record-key="appt-{{ $appt->id }}"
+                                        data-view-type="grid">
+
+                                        <div class="accent-bar {{ $accentClass }}"></div>
+
+                                        <div class="patient-grid-card-body">
+                                            <div class="patient-grid-top">
+                                                <img
+                                                    src="{{ $appt->patient->profile_image ? asset('storage/'.$appt->patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=660000&color=FFFFFF&rounded=true&size=128' }}"
+                                                    alt="{{ $patientName }}"
+                                                    class="patient-avatar">
+
+                                                <div class="patient-grid-main">
+                                                    <div class="patient-grid-name">{{ $patientName }}</div>
+                                                    <span class="patient-grid-id">ID #{{ $appt->patient_id }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="patient-grid-meta">
+                                                <div>
+                                                    <div class="detail-label">Date & Time</div>
+                                                    <div class="detail-value">{{ $dateLabel }}</div>
+                                                    <div class="detail-sub">{{ $timeLabel }}</div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="detail-label">Service</div>
+                                                    <div class="detail-value">{{ $serviceLabel }}</div>
+                                                    <span class="status-pill {{ $pillClass }}">
+                                                        <span class="pill-dot"></span>{{ $pillText }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="patient-grid-actions">
+                                                <div class="card-arrow-btn">
+                                                    <i class="fa-solid fa-arrow-right"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
-                        </a>
-                    @empty
+                        </div>
+                    @else
                         <div id="serverEmptyState" class="empty-state visible">
                             <div class="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
                                 <i class="fa-solid fa-users text-3xl text-gray-300"></i>
@@ -1155,7 +1395,7 @@
                             <p class="text-gray-500 font-semibold text-base">No appointments found</p>
                             <p class="text-gray-400 text-sm mt-1">There are no patient records to display yet.</p>
                         </div>
-                    @endforelse
+                    @endif
 
                     <div id="clientEmptyState" class="empty-state">
                         <div class="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
@@ -1283,7 +1523,10 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const cards = Array.from(document.querySelectorAll('.patient-item'));
+            const allCards = Array.from(document.querySelectorAll('.patient-item'));
+            const listCards = allCards.filter(card => card.dataset.viewType === 'list');
+            const gridCards = allCards.filter(card => card.dataset.viewType === 'grid');
+
             const searchInput = document.getElementById('searchInput');
             const searchClearBtn = document.getElementById('searchClearBtn');
             const tabButtons = Array.from(document.querySelectorAll('.tab-btn[data-filter]'));
@@ -1299,7 +1542,14 @@
             const clearFiltersBtn = document.getElementById('clearFiltersBtn');
             const filterDot = document.getElementById('filterDot');
 
+            const patientListView = document.getElementById('patientListView');
+            const patientGridView = document.getElementById('patientGridView');
+            const patientListViewBtn = document.getElementById('patientListViewBtn');
+            const patientGridViewBtn = document.getElementById('patientGridViewBtn');
+
             let activeTab = 'today';
+            let currentView = getPreferredPatientView();
+
             let filters = {
                 search: '',
                 sort: '',
@@ -1311,8 +1561,35 @@
                 department: ''
             };
 
+            function getPreferredPatientView() {
+                if (window.innerWidth <= 767) return 'grid';
+                return localStorage.getItem('patientView') || 'list';
+            }
+
+             function applyPatientView(view, save = true) {
+                if (!patientListView || !patientGridView) return;
+
+                const finalView = window.innerWidth <= 767 ? 'grid' : view;
+                currentView = finalView;
+
+                if (finalView === 'grid') {
+                    patientListView.setAttribute('hidden', 'hidden');
+                    patientGridView.removeAttribute('hidden');
+                } else {
+                    patientGridView.setAttribute('hidden', 'hidden');
+                    patientListView.removeAttribute('hidden');
+                }
+
+                if (patientListViewBtn) patientListViewBtn.classList.toggle('active', finalView === 'list');
+                if (patientGridViewBtn) patientGridViewBtn.classList.toggle('active', finalView === 'grid');
+
+                if (save && window.innerWidth > 767) {
+                    localStorage.setItem('patientView', finalView);
+                }
+            }
+
             function updateSearchClear() {
-                if (!searchClearBtn) return;
+                if (!searchClearBtn || !searchInput) return;
                 searchClearBtn.classList.toggle('visible', searchInput.value.trim().length > 0);
             }
 
@@ -1322,84 +1599,83 @@
             }
 
             function updateFilterDot() {
-                if (!filterDot) return;
+                if (!filterDot || !openFilterBtn) return;
                 filterDot.classList.toggle('visible', hasActiveFilters());
                 openFilterBtn.classList.toggle('active', hasActiveFilters());
             }
 
-            function applyCardFilters() {
-                let visible = 0;
-                let filteredCards = [...cards];
-
-                filteredCards.forEach(card => {
-                    card.style.display = '';
-                });
-
-                if (activeTab !== 'all') {
-                    filteredCards = filteredCards.filter(card => card.dataset.tab === activeTab);
-                }
+            function cardMatchesFilters(card) {
+                if (activeTab !== 'all' && card.dataset.tab !== activeTab) return false;
 
                 if (filters.search) {
                     const q = filters.search.toLowerCase();
-                    filteredCards = filteredCards.filter(card => {
-                        return (
-                            (card.dataset.name || '').includes(q) ||
-                            (card.dataset.service || '').includes(q) ||
-                            (card.textContent || '').toLowerCase().includes(q)
-                        );
-                    });
+                    const matchesSearch =
+                        (card.dataset.name || '').includes(q) ||
+                        (card.dataset.service || '').includes(q) ||
+                        (card.textContent || '').toLowerCase().includes(q);
+
+                    if (!matchesSearch) return false;
                 }
 
-                if (filters.course) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.course || '') === filters.course);
-                }
+                if (filters.course && (card.dataset.course || '') !== filters.course) return false;
+                if (filters.year && (card.dataset.year || '') !== filters.year) return false;
+                if (filters.section && (card.dataset.section || '') !== filters.section) return false;
+                if (filters.department && (card.dataset.department || '') !== filters.department) return false;
+                if (filters.fromDate && (card.dataset.date || '') < filters.fromDate) return false;
+                if (filters.toDate && (card.dataset.date || '') > filters.toDate) return false;
 
-                if (filters.year) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.year || '') === filters.year);
-                }
+                return true;
+            }
 
-                if (filters.section) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.section || '') === filters.section);
-                }
-
-                if (filters.department) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.department || '') === filters.department);
-                }
-
-                if (filters.fromDate) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.date || '') >= filters.fromDate);
-                }
-
-                if (filters.toDate) {
-                    filteredCards = filteredCards.filter(card => (card.dataset.date || '') <= filters.toDate);
-                }
-
+            function applySorting(cards) {
                 if (filters.sort === 'az') {
-                    filteredCards.sort((a, b) => (a.dataset.name || '').localeCompare(b.dataset.name || ''));
+                    cards.sort((a, b) => (a.dataset.name || '').localeCompare(b.dataset.name || ''));
                 } else if (filters.sort === 'za') {
-                    filteredCards.sort((a, b) => (b.dataset.name || '').localeCompare(a.dataset.name || ''));
+                    cards.sort((a, b) => (b.dataset.name || '').localeCompare(a.dataset.name || ''));
                 }
+                return cards;
+            }
 
-                const wrap = document.getElementById('patientListWrap');
+            function applyCardFilters() {
+                const listWrap = patientListView;
+                const gridWrap = patientGridView ? patientGridView.querySelector('.patient-grid') : null;
 
-                cards.forEach(card => {
+                allCards.forEach(card => {
                     card.style.display = 'none';
                 });
 
-                filteredCards.forEach(card => {
-                    card.style.display = '';
-                    wrap.insertBefore(card, clientEmptyState);
-                    visible++;
-                });
+                let filteredListCards = listCards.filter(cardMatchesFilters);
+                let filteredGridCards = gridCards.filter(cardMatchesFilters);
+
+                filteredListCards = applySorting(filteredListCards);
+                filteredGridCards = applySorting(filteredGridCards);
+
+                if (listWrap) {
+                    filteredListCards.forEach(card => {
+                        card.style.display = '';
+                        listWrap.appendChild(card);
+                    });
+                }
+
+                if (gridWrap) {
+                    filteredGridCards.forEach(card => {
+                        card.style.display = '';
+                        gridWrap.appendChild(card);
+                    });
+                }
+
+                const visible = filteredListCards.length;
 
                 if (visibleCount) visibleCount.textContent = visible;
-                if (totalCount) totalCount.textContent = cards.length;
+                if (totalCount) totalCount.textContent = listCards.length;
 
                 if (serverEmptyState) {
                     serverEmptyState.classList.remove('visible');
                 }
 
-                clientEmptyState.classList.toggle('visible', visible === 0 && cards.length > 0);
+                if (clientEmptyState) {
+                    clientEmptyState.classList.toggle('visible', visible === 0 && listCards.length > 0);
+                }
 
                 updateFilterDot();
             }
@@ -1412,6 +1688,22 @@
                     applyCardFilters();
                 });
             });
+
+            if (patientListViewBtn) {
+                patientListViewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyPatientView('list', true);
+                });
+            }
+
+            if (patientGridViewBtn) {
+                patientGridViewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyPatientView('grid', true);
+                });
+            }
 
             if (searchInput) {
                 searchInput.addEventListener('input', function () {
@@ -1474,6 +1766,7 @@
 
                     const fromDate = document.getElementById('fromDate');
                     const toDate = document.getElementById('toDate');
+
                     if (fromDate) fromDate.value = '';
                     if (toDate) toDate.value = '';
 
@@ -1489,6 +1782,12 @@
                 });
             }
 
+            window.addEventListener('resize', function () {
+                applyPatientView(getPreferredPatientView(), false);
+            });
+
+            applyPatientView(currentView, false);
+            updateSearchClear();
             applyCardFilters();
         });
     </script>

@@ -34,6 +34,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
+use App\Http\Controllers\Admin\AdminInventoryController;
 use App\Services\FlssService;
 
 //api para sa project nila matt
@@ -312,6 +313,22 @@ Route::prefix('admin')
 
         Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
             ->name('admin.clinic_schedule.slots');
+        
+        // INVENTORY
+        Route::get('/inventory', [AdminInventoryController::class, 'index'])
+            ->name('admin.inventory');
+
+        Route::get('/inventory/data', [AdminInventoryController::class, 'fetch'])
+            ->name('admin.inventory.data');
+
+        Route::post('/inventory', [AdminInventoryController::class, 'store'])
+            ->name('admin.inventory.store');
+
+        Route::put('/inventory/{inventory}', [AdminInventoryController::class, 'update'])
+            ->name('admin.inventory.update');
+
+        Route::delete('/inventory/{inventory}', [AdminInventoryController::class, 'destroy'])
+            ->name('admin.inventory.destroy');
     });
 
 // DOCUMENT REQUEST 
@@ -354,8 +371,6 @@ Route::prefix('admin')
         Route::delete('/data-backup/delete/{id}', [DataBackupController::class, 'destroy'])->name('admin.data_backup.delete');
         Route::post('/data-backup/update-schedule', [DataBackupController::class, 'updateSchedule'])->name('admin.data_backup.update_schedule');
     });
-
-
 
 // SYSTEM SETTINGS
 Route::prefix('admin')

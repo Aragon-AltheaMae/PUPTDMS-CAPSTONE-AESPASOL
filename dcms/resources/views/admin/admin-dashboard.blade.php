@@ -377,6 +377,156 @@
             gap: .5rem;
         }
 
+        .card-header-actions {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            flex-wrap: wrap;
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #FAFAF9;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+            height: 38px;
+        }
+
+        .view-toggle-btn {
+            width: 32px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 9px;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s ease;
+            flex-shrink: 0;
+        }
+
+        .view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: var(--crimson);
+        }
+
+        .view-toggle-btn.active {
+            background: var(--crimson);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
+        }
+
+        .logs-view[hidden] {
+            display: none !important;
+        }
+
+        .logs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .log-card {
+            background: #fff;
+            border: 1px solid #f0eaea;
+            border-radius: 16px;
+            padding: 1rem;
+            transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+            min-width: 0;
+        }
+
+        .log-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+            border-color: #ead6d6;
+        }
+
+        .log-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        .log-card-id {
+            font-size: .72rem;
+            font-weight: 800;
+            color: var(--crimson);
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .log-card-date {
+            font-size: .68rem;
+            color: #9ca3af;
+            white-space: nowrap;
+        }
+
+        .log-card-desc {
+            font-size: .8rem;
+            color: #374151;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .log-card-user {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            min-width: 0;
+        }
+
+        .log-card-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .log-card-user-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .log-card-user-name {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-card-user-role {
+            font-size: .68rem;
+            color: #9ca3af;
+            margin-top: .15rem;
+            text-transform: capitalize;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         /* ════════════════════════════════
            LOG MINI-STATS
         ════════════════════════════════ */
@@ -697,6 +847,27 @@
             .bottom-grid {
                 grid-template-columns: 1fr;
             }
+
+            #dashboardLogsViewToggle {
+                display: none !important;
+            }
+
+            #dashboardLogsListView {
+                display: none !important;
+            }
+
+            #dashboardLogsGridView {
+                display: block !important;
+            }
+
+            .logs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
         }
 
         @media (max-width: 480px) {
@@ -752,7 +923,6 @@
 
     <main id="mainContent" style="padding-top: var(--header-h); min-height: 100vh;">
 
-        <!-- Page banner -->
         <div class="page-banner">
             <div class="page-banner-inner">
                 <div>
@@ -797,10 +967,8 @@
             </div>
         </div>
 
-        <!-- Content (overlaps banner) -->
         <div class="content-lift">
 
-            <!-- STAT CARDS -->
             <div class="stat-grid">
                 <div class="stat-card">
                     <div class="stat-card-accent" style="background: linear-gradient(90deg, var(--crimson), #c0392b);">
@@ -854,22 +1022,33 @@
                 </div>
             </div>
 
-            <!-- MAIN GRID -->
             <div class="main-grid">
 
-                <!-- LEFT COLUMN -->
                 <div style="display:flex;flex-direction:column;gap:1.25rem;">
 
-                    <!-- System Logs Card -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-header-left">
                                 <div class="card-header-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="card-title">System Logs Overview</span>
                             </div>
-                            <a href="{{ route('admin.system_logs') }}" class="card-link">
-                                View All <i class="fa-solid fa-arrow-right" style="font-size:.65rem;"></i>
-                            </a>
+
+                            <div class="card-header-actions">
+                                <div class="view-toggle" id="dashboardLogsViewToggle">
+                                    <button type="button" class="view-toggle-btn active" data-view="list"
+                                        id="dashboardLogsListBtn" title="List view" aria-label="List view">
+                                        <i class="fa-solid fa-table-list"></i>
+                                    </button>
+                                    <button type="button" class="view-toggle-btn" data-view="grid"
+                                        id="dashboardLogsGridBtn" title="Grid view" aria-label="Grid view">
+                                        <i class="fa-solid fa-grip"></i>
+                                    </button>
+                                </div>
+
+                                <a href="{{ route('admin.system_logs') }}" class="card-link">
+                                    View All <i class="fa-solid fa-arrow-right" style="font-size:.65rem;"></i>
+                                </a>
+                            </div>
                         </div>
 
                         <div class="log-stats-row">
@@ -895,63 +1074,99 @@
                             </div>
                         </div>
 
-                        <div style="overflow-x:auto;">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:60px;">ID</th>
-                                        <th style="width:160px;">Date & Time</th>
-                                        <th>Description</th>
-                                        <th style="width:120px;">User</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($recentLogs ?? [] as $log)
+                        @if (($recentLogs ?? collect())->isEmpty())
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
+                                <p style="font-size:.82rem;font-weight:700;color:#6b7280;margin-bottom:.25rem;">
+                                    No logs yet
+                                </p>
+                                <p style="font-size:.72rem;color:#b0b7c3;">System activity will appear here</p>
+                            </div>
+                        @else
+                            <div class="logs-view" id="dashboardLogsListView">
+                                <div style="overflow-x:auto;">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:60px;">ID</th>
+                                                <th style="width:160px;">Date & Time</th>
+                                                <th>Description</th>
+                                                <th style="width:120px;">User</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($recentLogs ?? [] as $log)
+                                                @php
+                                                    $logId = data_get($log, 'id', '—');
+                                                    $logDate = data_get($log, 'created_at');
+                                                    $logDesc = data_get($log, 'description', 'No description provided.');
+                                                    $logActor = data_get($log, 'actor_identifier', '—');
+                                                    $logRole = data_get($log, 'actor_role', '');
+                                                @endphp
+                                                <tr>
+                                                    <td style="color:#9ca3af;font-size:.72rem;">#{{ $logId }}</td>
+                                                    <td>
+                                                        <div style="font-size:.74rem;font-weight:600;color:#374151;">
+                                                            {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('M j, Y') : '—' }}
+                                                        </div>
+                                                        <div style="font-size:.68rem;color:#9ca3af;">
+                                                            {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('h:i:s A') : '—' }}
+                                                        </div>
+                                                    </td>
+                                                    <td style="font-size:.76rem;">{{ $logDesc }}</td>
+                                                    <td>
+                                                        <span
+                                                            style="font-size:.72rem;font-weight:600;color:#4a5568;">{{ $logActor }}</span>
+                                                        <div
+                                                            style="font-size:.65rem;color:#9ca3af;text-transform:capitalize;">
+                                                            {{ $logRole }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="logs-view" id="dashboardLogsGridView" hidden>
+                                <div class="logs-grid">
+                                    @foreach ($recentLogs ?? [] as $log)
                                         @php
                                             $logId = data_get($log, 'id', '—');
                                             $logDate = data_get($log, 'created_at');
                                             $logDesc = data_get($log, 'description', 'No description provided.');
                                             $logActor = data_get($log, 'actor_identifier', '—');
                                             $logRole = data_get($log, 'actor_role', '');
+                                            $logInitial = strtoupper(substr(trim($logActor), 0, 1));
                                         @endphp
-                                        <tr>
-                                            <td style="color:#9ca3af;font-size:.72rem;">#{{ $logId }}</td>
-                                            <td>
-                                                <div style="font-size:.74rem;font-weight:600;color:#374151;">
-                                                    {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('M j, Y') : '—' }}
+
+                                        <div class="log-card">
+                                            <div class="log-card-top">
+                                                <div class="log-card-id">#{{ $logId }}</div>
+                                                <div class="log-card-date">
+                                                    {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('M d, Y h:i A') : '—' }}
                                                 </div>
-                                                <div style="font-size:.68rem;color:#9ca3af;">
-                                                    {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('h:i:s A') : '—' }}
+                                            </div>
+
+                                            <div class="log-card-desc">
+                                                {{ $logDesc }}
+                                            </div>
+
+                                            <div class="log-card-user">
+                                                <div class="log-card-avatar">{{ $logInitial ?: '—' }}</div>
+                                                <div class="log-card-user-info">
+                                                    <div class="log-card-user-name">{{ $logActor }}</div>
+                                                    <div class="log-card-user-role">{{ $logRole ?: 'No role' }}</div>
                                                 </div>
-                                            </td>
-                                            <td style="font-size:.76rem;">{{ $logDesc }}</td>
-                                            <td>
-                                                <span
-                                                    style="font-size:.72rem;font-weight:600;color:#4a5568;">{{ $logActor }}</span>
-                                                <div style="font-size:.65rem;color:#9ca3af;text-transform:capitalize;">
-                                                    {{ $logRole }}</div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4">
-                                                <div class="empty-state">
-                                                    <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
-                                                    <p
-                                                        style="font-size:.82rem;font-weight:700;color:#6b7280;margin-bottom:.25rem;">
-                                                        No logs yet</p>
-                                                    <p style="font-size:.72rem;color:#b0b7c3;">System activity will appear
-                                                        here</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Bottom row: GAD + Inventory -->
                     <div class="bottom-grid">
                         <div class="card">
                             <div class="card-header">
@@ -964,7 +1179,8 @@
                             </div>
                             <div style="padding:1.25rem;">
                                 <div
-                                    style="height:140px;border-radius:10px;border:2px dashed #e5e7eb;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fafafa,#fff);">
+                                    style="height:140px;border-radius:10px;border:2px dashed #e5e7eb;display:flex;
+                                    align-items:center;justify-content:center;background:linear-gradient(135deg,#fafafa,#fff);">
                                     <div style="text-align:center;">
                                         <i class="fa-solid fa-chart-area"
                                             style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
@@ -985,7 +1201,8 @@
                             </div>
                             <div style="padding:1.25rem;">
                                 <div
-                                    style="height:140px;border-radius:10px;border:2px dashed #e5e7eb;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fafafa,#fff);">
+                                    style="height:140px;border-radius:10px;border:2px dashed #e5e7eb;display:flex;
+                                    align-items:center;justify-content:center;background:linear-gradient(135deg,#fafafa,#fff);">
                                     <div style="text-align:center;">
                                         <i class="fa-solid fa-box"
                                             style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
@@ -998,10 +1215,8 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN -->
                 <div style="display:flex;flex-direction:column;gap:1.25rem;">
 
-                    <!-- Quick Actions -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-header-left">
@@ -1045,7 +1260,6 @@
                         </div>
                     </div>
 
-                    <!-- Data Backup -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-header-left">
@@ -1054,11 +1268,15 @@
                             </div>
 
                             @if ($autoBackupEnabled)
-                                <span style="font-size:.65rem;font-weight:700;background:#f0fdf4;color:#16a34a;padding:.25rem .6rem;border-radius:20px;border:1px solid #bbf7d0;">
+                                <span
+                                    style="font-size:.65rem;font-weight:700;background:#f0fdf4;color:#16a34a;
+                                        padding:.25rem .6rem;border-radius:20px;border:1px solid #bbf7d0;">
                                     Active
                                 </span>
                             @else
-                                <span style="font-size:.65rem;font-weight:700;background:#fef3c7;color:#a16207;padding:.25rem .6rem;border-radius:20px;border:1px solid #fcd34d;">
+                                <span
+                                    style="font-size:.65rem;font-weight:700;background:#fef3c7;color:#a16207;
+                                        padding:.25rem .6rem;border-radius:20px;border:1px solid #fcd34d;">
                                     Paused
                                 </span>
                             @endif
@@ -1090,7 +1308,8 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('admin.data_backup') }}" class="run-backup-btn" style="text-decoration:none;">
+                            <a href="{{ route('admin.data_backup') }}" class="run-backup-btn"
+                                style="text-decoration:none;">
                                 <i class="fa-solid fa-database"></i>
                                 View Backups ({{ $totalBackups }})
                             </a>
@@ -1098,9 +1317,8 @@
                     </div>
 
                 </div>
-            </div><!-- /main-grid -->
-
-        </div><!-- /content-lift -->
+            </div>
+        </div>
     </main>
 
 @endsection
@@ -1126,4 +1344,62 @@
             });
         </script>
     @endif
+
+    <script>
+        function getPreferredDashboardLogsView() {
+            if (window.innerWidth <= 767) return 'grid';
+            return localStorage.getItem('dashboardLogsView') || 'list';
+        }
+
+        function applyDashboardLogsView(view, save = true) {
+            const listView = document.getElementById('dashboardLogsListView');
+            const gridView = document.getElementById('dashboardLogsGridView');
+            const listBtn = document.getElementById('dashboardLogsListBtn');
+            const gridBtn = document.getElementById('dashboardLogsGridBtn');
+
+            if (!listView || !gridView) return;
+
+            const finalView = window.innerWidth <= 767 ? 'grid' : view;
+
+            if (finalView === 'grid') {
+                listView.hidden = true;
+                gridView.hidden = false;
+            } else {
+                listView.hidden = false;
+                gridView.hidden = true;
+            }
+
+            if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
+            if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
+
+            if (save && window.innerWidth > 767) {
+                localStorage.setItem('dashboardLogsView', finalView);
+            }
+        }
+
+        function initDashboardLogsViewToggle() {
+            const listBtn = document.getElementById('dashboardLogsListBtn');
+            const gridBtn = document.getElementById('dashboardLogsGridBtn');
+
+            applyDashboardLogsView(getPreferredDashboardLogsView(), false);
+
+            if (listBtn && !listBtn.dataset.bound) {
+                listBtn.dataset.bound = '1';
+                listBtn.addEventListener('click', () => applyDashboardLogsView('list', true));
+            }
+
+            if (gridBtn && !gridBtn.dataset.bound) {
+                gridBtn.dataset.bound = '1';
+                gridBtn.addEventListener('click', () => applyDashboardLogsView('grid', true));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboardLogsViewToggle();
+
+            window.addEventListener('resize', function() {
+                applyDashboardLogsView(getPreferredDashboardLogsView(), false);
+            });
+        });
+    </script>
 @endsection
