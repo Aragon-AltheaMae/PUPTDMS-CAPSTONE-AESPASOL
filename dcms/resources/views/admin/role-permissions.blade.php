@@ -581,12 +581,6 @@
         margin-right: 12px;
     }
 
-    .dot-row {
-        display: flex;
-        gap: 3px;
-        align-items: center;
-    }
-
     .dot {
         width: 6px;
         height: 6px;
@@ -1337,22 +1331,35 @@
         .card-header {
             flex-direction: column;
             align-items: stretch;
+            gap: 10px;
+        }
+
+        .card-header > div:first-child {
+            width: 100%;
+            min-width: 0;
         }
 
         .card-header > div:last-child {
             width: 100%;
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
+            align-items: stretch;
+        }
+
+        #globalViewAsBtn {
+            grid-column: 1 / -1;
         }
 
         .btn-collapse,
         .btn-reset,
         .btn-view-as {
             width: 100%;
+            min-height: 42px;
             text-align: center;
             justify-content: center;
             display: flex;
+            align-items: center;
         }
 
         .role-card {
@@ -1365,9 +1372,86 @@
         }
 
         .perm-group-header {
-            padding: 10px 12px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 32px 1fr;
+            align-items: start;
+            column-gap: 10px;
+            row-gap: 10px;
         }
 
+        .perm-group-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 0;
+            grid-column: 1;
+            grid-row: 1 / span 2;
+        }
+
+        .perm-group-header > div:nth-child(2) {
+            grid-column: 2;
+            grid-row: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .perm-group-header > div:nth-child(2) > div:first-child {
+            font-size: 12px !important;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .perm-group-header > div:nth-child(2) > .group-count {
+            font-size: 10px !important;
+            line-height: 1.2;
+            margin-top: 0;
+        }
+
+        .perm-group-header > div:last-child {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .dot-row {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            max-width: none;
+            flex: 1 1 auto;
+        }
+
+        .all-toggle-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 999px;
+            padding: 3px 8px;
+            min-height: 30px;
+            flex-shrink: 0;
+        }
+
+        .all-toggle-wrap span {
+            font-size: 9px !important;
+            line-height: 1;
+        }
+
+        .chevron {
+            margin-left: 0;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
         .perm-row {
             padding: 10px 12px 10px 12px;
             flex-wrap: wrap;
@@ -1378,6 +1462,29 @@
     @media (max-width: 480px) {
         #roleListContainer {
             grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .perm-group-header {
+            grid-template-columns: 32px 1fr;
+        }
+
+        .perm-group-header > div:nth-child(2) {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .perm-group-header > div:last-child {
+            grid-column: 2;
+            grid-row: 2;
+            justify-content: space-between;
+            width: 100%;
+            padding-left: 0;
+        }
+
+        .dot-row {
+            overflow: visible;
         }
     }
     </style>
