@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
 use App\Services\FlssService;
+use App\Http\Controllers\Admin\ExternalAdminController;
 
 //api para sa project nila matt
 Route::get('/test/flss/health', function (FlssService $flssService) {
@@ -201,11 +202,38 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-        // ADMIN DASHBOARD
+        /*
+        |--------------------------------------------------------------------------
+        | CMS ACCESS (External Admin Integration)
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/assign-cms-access', [ExternalAdminController::class, 'index'])
+            ->name('admin.assign-cms-access');
+
+        Route::post('/assign-cms-access', [ExternalAdminController::class, 'store'])
+            ->name('admin.assign-cms-access.store');
+
+        Route::get('/external-admins/search', [ExternalAdminController::class, 'search'])
+            ->name('admin.external_admins.search');
+
+        Route::get('/external-admins/{adminId}', [ExternalAdminController::class, 'show'])
+            ->name('admin.external_admins.show');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN DASHBOARD
+        |--------------------------------------------------------------------------
+        */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.admin.dashboard');
 
-        // ROLE PERMISSIONS
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROLE & PERMISSIONS
+        |--------------------------------------------------------------------------
+        */
         Route::get('/role-permissions', [RolePermissionController::class, 'index'])
             ->name('admin.role_permissions');
 
@@ -222,20 +250,29 @@ Route::prefix('admin')
             ->name('admin.role_permissions.destroy_role');
 
 
-        // SYSTEM LOGS
+        /*
+        |--------------------------------------------------------------------------
+        | SYSTEM LOGS
+        |--------------------------------------------------------------------------
+        */
         Route::get('/system-logs', [SystemLogController::class, 'index'])
             ->name('admin.system_logs');
 
-        Route::get('/admin/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
+        Route::get('/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
             ->name('admin.system_logs.fetch');
 
-        Route::get('/admin/system-logs/check', [SystemLogController::class, 'checkLatest'])
+        Route::get('/system-logs/check', [SystemLogController::class, 'checkLatest'])
             ->name('admin.system_logs.check');
 
-        Route::get('/admin/system-logs/export', [SystemLogController::class, 'export'])
+        Route::get('/system-logs/export', [SystemLogController::class, 'export'])
             ->name('admin.system_logs.export');
 
-        // PATIENT DIRECTORY
+
+        /*
+        |--------------------------------------------------------------------------
+        | PATIENT DIRECTORY
+        |--------------------------------------------------------------------------
+        */
         Route::get('/patient-directory', [AdminPatientController::class, 'index'])
             ->name('admin.patient_directory');
 
@@ -245,7 +282,12 @@ Route::prefix('admin')
         Route::get('/patient/{patient}', [AdminPatientController::class, 'show'])
             ->name('admin.admin.patient.profile');
 
-        // APPOINTMENTS
+
+        /*
+        |--------------------------------------------------------------------------
+        | APPOINTMENTS
+        |--------------------------------------------------------------------------
+        */
         Route::get('/appointments', [AdminAppointmentController::class, 'index'])
             ->name('admin.admin.appointments');
 
@@ -261,15 +303,18 @@ Route::prefix('admin')
         Route::post('/appointments/{id}/cancel', [AdminAppointmentController::class, 'cancel'])
             ->name('admin.admin.appointments.cancel');
 
-        // GET ALL PATIENTS (FOR IMPERSONATION PICKER)
+
+        /*
+        |--------------------------------------------------------------------------
+        | PATIENT LIST (FOR IMPERSONATION)
+        |--------------------------------------------------------------------------
+        */
         Route::get('/patients/list', function () {
-            /** @var \App\Models\User $user */
             $user = Auth::user();
 
-            if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
+            if (!$user || !in_array(optional($user->role)->slug, ['super_admin', 'admin'])) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
-
             $patients = Patient::select('id', 'name', 'email', 'phone')
                 ->orderBy('name')
                 ->get();
@@ -277,19 +322,33 @@ Route::prefix('admin')
             return response()->json($patients);
         })->name('admin.patients.list');
 
-        // ACADEMIC PERIOD
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACADEMIC PERIODS
+        |--------------------------------------------------------------------------
+        */
         Route::get('/academic-periods', [AcademicPeriodController::class, 'index'])
             ->name('admin.academic_periods');
+
         Route::post('/academic-periods', [AcademicPeriodController::class, 'store'])
             ->name('admin.academic_periods.store');
+
         Route::put('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'update'])
             ->name('admin.academic_periods.update');
+
         Route::delete('/academic-periods/{academicPeriod}', [AcademicPeriodController::class, 'destroy'])
             ->name('admin.academic_periods.destroy');
+
         Route::patch('/academic-periods/{academicPeriod}/set-active', [AcademicPeriodController::class, 'setActive'])
             ->name('admin.academic_periods.set_active');
 
-        // CLINIC SCHEDULE
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLINIC SCHEDULE
+        |--------------------------------------------------------------------------
+        */
         Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
             ->name('admin.clinic_schedule');
 

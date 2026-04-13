@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
+use App\Models\ExternalAdminAccess;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
@@ -203,7 +204,6 @@ class OIDCController extends Controller
 
         $incomingRoles = $profile['roles'] ?? [];
 
-        // 🔥 FIX: ensure roles is always an array
         if (is_string($incomingRoles)) {
             $incomingRoles = $incomingRoles ? [$incomingRoles] : [];
         }
@@ -227,12 +227,30 @@ class OIDCController extends Controller
             $roleSlug = 'patient';
         }
 
+        $assignedAccess = ExternalAdminAccess::where('email', $email)
+            ->orWhere('external_admin_id', (string) $ssoUserId)
+            ->first();
+
+        if ($assignedAccess) {
+            if (($assignedAccess->cms_status ?? 'inactive') !== 'active') {
+                return redirect()->route('login')
+                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+            }
+
+            if (!empty($assignedAccess->cms_role)) {
+                $roleSlug = $assignedAccess->cms_role;
+            }
+        }
+
         $roleId = Role::where('slug', $roleSlug)->value('id');
 
         Log::info('ROLE MAPPING DEBUG', [
             'incoming_roles' => $incomingRoles,
             'mapped_role'    => $roleSlug,
             'mapped_role_id' => $roleId,
+            'assigned_access_id' => $assignedAccess?->id,
+            'assigned_cms_role' => $assignedAccess?->cms_role,
+            'assigned_cms_status' => $assignedAccess?->cms_status,
         ]);
 
         if (!$roleId) {
@@ -258,6 +276,7 @@ class OIDCController extends Controller
                 'role_id' => $user?->role_id,
             ]);
         }
+
         $user = User::where('email', $email)
             ->when($ssoUserId, function ($query) use ($ssoUserId) {
                 $query->orWhere('sso_user_id', $ssoUserId);
@@ -289,6 +308,7 @@ class OIDCController extends Controller
         $user->access_token  = $accessToken;
         $user->refresh_token = $refreshToken;
         $user->last_login_at = now();
+        $user->status        = 'active';
         $user->save();
 
         $jwt = JWTAuth::fromUser($user);
@@ -355,6 +375,8 @@ class OIDCController extends Controller
                 'admin_email'     => $user->email,
             ]);
 
+            session()->save();
+
             AuditLogger::log('login', 'authentication', 'Admin logged in via OIDC');
 
             return redirect()->route('admin.admin.dashboard')
@@ -369,6 +391,8 @@ class OIDCController extends Controller
                 'dentist_name'  => $user->name,
                 'dentist_email' => $user->email,
             ]);
+
+            session()->save();
 
             AuditLogger::log('login', 'authentication', 'Dentist logged in via OIDC');
 
