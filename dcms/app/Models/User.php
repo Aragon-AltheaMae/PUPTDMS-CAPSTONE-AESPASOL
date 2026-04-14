@@ -13,6 +13,11 @@ class User extends Authenticatable implements JWTSubject
 
     protected $fillable = [
         'name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix_name',
+        'code',
         'email',
         'password',
         'role_id',
@@ -34,19 +39,36 @@ class User extends Authenticatable implements JWTSubject
         'last_login_at' => 'datetime',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function hasRole(string $slug): bool
-    {
-        return optional($this->role)->slug === $slug;
-    }
-
     public function patient()
     {
         return $this->hasOne(Patient::class);
+    }
+
+    public function faculty()
+    {
+        return $this->hasOne(Faculty::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Role & Permission Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function hasRole(string $slug): bool
+    {
+        return optional($this->role)->slug === $slug;
     }
 
     public function hasAnyRole(array $slugs): bool
@@ -63,6 +85,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->role->permissions()->where('slug', $permissionSlug)->exists();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT
+    |--------------------------------------------------------------------------
+    */
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -71,5 +99,22 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors
+    |--------------------------------------------------------------------------
+    */
+
+    // 🔥 Full name (automatic)
+    public function getFullNameAttribute()
+    {
+        return trim(
+            $this->first_name . ' ' .
+            ($this->middle_name ?? '') . ' ' .
+            $this->last_name . ' ' .
+            ($this->suffix_name ?? '')
+        );
     }
 }
