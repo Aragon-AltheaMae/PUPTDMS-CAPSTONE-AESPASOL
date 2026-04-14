@@ -47,10 +47,12 @@ Route::get('/faculty-integration', function () {
     return view('admin.faculty-integration');
 })->name('admin.faculty.integration');
 
-Route::post('/faculty-integration/store', [FacultyController::class, 'store'])
-    ->name('admin.faculty.store');
-    
-// routes/web.php
+Route::get('/test/flss/faculty-profiles', function (FlssService $flssService) {
+    return response()->json($flssService->getFacultyProfiles());
+});use App\Http\Controllers\Admin\DocumentTemplateController;
+
+
+// routes/web.php---
 
 Route::get('/debug-session', function () {
     return response()->json(session()->all());
@@ -416,8 +418,35 @@ Route::prefix('admin')
         Route::patch('/document-requests/{documentRequest}/release', [AdminDocumentRequestController::class, 'release'])
             ->name('admin.document-requests.release');
 
-        Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
-            ->name('admin.document-requests.reject');
+    Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
+        ->name('document-requests.reject');
+});
+
+    // DOCUMENT TEMPLATES (SIMPLIFIED)
+    Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+
+        // LIST PAGE
+        Route::get('/document-template', [DocumentTemplateController::class, 'index'])
+            ->name('document-template');
+
+        // PREVIEW (AJAX)
+        Route::get('/document-template/{id}', [DocumentTemplateController::class, 'show'])
+            ->name('document-template.show');
+
+        // ARCHIVE
+        Route::patch('/document-template/{id}/archive', [DocumentTemplateController::class, 'archive'])
+            ->name('document-template.archive');
+
+        // ACTIVATE
+        Route::patch('/document-template/{id}/activate', [DocumentTemplateController::class, 'activate'])
+            ->name('document-template.activate');
+
+        // SET DEFAULT
+        Route::patch('/document-template/{id}/default', [DocumentTemplateController::class, 'setDefault'])
+            ->name('document-template.default');
     });
 
 // DATA BACKUP
