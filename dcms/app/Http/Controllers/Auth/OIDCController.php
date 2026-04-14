@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\ExternalAdminAccess;
+use App\Models\Faculty;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
@@ -180,15 +181,26 @@ class OIDCController extends Controller
 
         $profile = $profileResponse->json();
 
-        $ssoUserId = $profile['id'] ?? $profile['sub'] ?? null;
-        $email     = $profile['email'] ?? null;
-        $name      = $profile['name'] ?? trim(($profile['first_name'] ?? '') . ' ' . ($profile['last_name'] ?? ''));
+        $ssoUserId  = $profile['id'] ?? $profile['sub'] ?? null;
+        $email      = $profile['email'] ?? null;
+        $firstName  = trim((string) ($profile['first_name'] ?? ''));
+        $middleName = trim((string) ($profile['middle_name'] ?? ''));
+        $lastName   = trim((string) ($profile['last_name'] ?? ''));
+        $suffixName = trim((string) ($profile['name_suffix'] ?? ''));
+
+        $nameParts = array_filter([$firstName, $middleName, $lastName, $suffixName], fn ($value) => $value !== '');
+        $fullName  = trim(implode(' ', $nameParts));
+        $name      = $profile['name'] ?? ($fullName !== '' ? $fullName : $email);
 
         Log::info('OIDC PROFILE DEBUG', [
-            'profile'    => $profile,
-            'ssoUserId'  => $ssoUserId,
-            'email'      => $email,
-            'name'       => $name,
+            'profile'      => $profile,
+            'ssoUserId'    => $ssoUserId,
+            'email'        => $email,
+            'name'         => $name,
+            'first_name'   => $firstName,
+            'middle_name'  => $middleName,
+            'last_name'    => $lastName,
+            'suffix_name'  => $suffixName,
         ]);
 
         if (!$email) {
@@ -211,7 +223,7 @@ class OIDCController extends Controller
         $roleSlug = null;
 
         foreach ($incomingRoles as $incomingRole) {
-            $incomingRole = strtolower($incomingRole);
+            $incomingRole = strtolower((string) $incomingRole);
 
             if (str_contains($incomingRole, 'dentist')) {
                 $roleSlug = 'dentist';
@@ -231,6 +243,16 @@ class OIDCController extends Controller
             ->orWhere('external_admin_id', (string) $ssoUserId)
             ->first();
 
+        $facultyAccess = Faculty::with(['user.role'])
+            ->whereHas('user', function ($query) use ($email, $ssoUserId) {
+                $query->where('email', $email);
+
+                if ($ssoUserId) {
+                    $query->orWhere('sso_user_id', $ssoUserId);
+                }
+            })
+            ->first();
+
         if ($assignedAccess) {
             if (($assignedAccess->cms_status ?? 'inactive') !== 'active') {
                 return redirect()->route('login')
@@ -240,17 +262,30 @@ class OIDCController extends Controller
             if (!empty($assignedAccess->cms_role)) {
                 $roleSlug = $assignedAccess->cms_role;
             }
+        } elseif ($facultyAccess && $facultyAccess->user) {
+            if (($facultyAccess->user->status ?? 'inactive') !== 'active') {
+                return redirect()->route('login')
+                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+            }
+
+            if (!empty($facultyAccess->user->role?->slug)) {
+                $roleSlug = $facultyAccess->user->role->slug;
+            }
         }
 
         $roleId = Role::where('slug', $roleSlug)->value('id');
 
         Log::info('ROLE MAPPING DEBUG', [
-            'incoming_roles' => $incomingRoles,
-            'mapped_role'    => $roleSlug,
-            'mapped_role_id' => $roleId,
-            'assigned_access_id' => $assignedAccess?->id,
-            'assigned_cms_role' => $assignedAccess?->cms_role,
-            'assigned_cms_status' => $assignedAccess?->cms_status,
+            'incoming_roles'        => $incomingRoles,
+            'mapped_role'           => $roleSlug,
+            'mapped_role_id'        => $roleId,
+            'assigned_access_id'    => $assignedAccess?->id,
+            'assigned_cms_role'     => $assignedAccess?->cms_role,
+            'assigned_cms_status'   => $assignedAccess?->cms_status,
+            'faculty_access_id'     => $facultyAccess?->id,
+            'faculty_user_id'       => $facultyAccess?->user?->id,
+            'faculty_user_role'     => $facultyAccess?->user?->role?->slug,
+            'faculty_user_status'   => $facultyAccess?->user?->status,
         ]);
 
         if (!$roleId) {
@@ -261,6 +296,10 @@ class OIDCController extends Controller
         if (!$user) {
             $user = User::create([
                 'name'          => $name ?: $email,
+                'first_name'    => $firstName !== '' ? $firstName : null,
+                'middle_name'   => $middleName !== '' ? $middleName : null,
+                'last_name'     => $lastName !== '' ? $lastName : null,
+                'suffix_name'   => $suffixName !== '' ? $suffixName : null,
                 'email'         => $email,
                 'role_id'       => $roleId,
                 'status'        => 'active',
@@ -301,7 +340,11 @@ class OIDCController extends Controller
             ]);
         }
 
-        $user->name          = $name ?: $user->name;
+        $user->name          = $name ?: $user->name ?: $email;
+        $user->first_name    = $firstName !== '' ? $firstName : $user->first_name;
+        $user->middle_name   = $middleName !== '' ? $middleName : $user->middle_name;
+        $user->last_name     = $lastName !== '' ? $lastName : $user->last_name;
+        $user->suffix_name   = $suffixName !== '' ? $suffixName : $user->suffix_name;
         $user->email         = $email;
         $user->role_id       = $roleId;
         $user->sso_user_id   = $ssoUserId ?: $user->sso_user_id;
@@ -341,7 +384,7 @@ class OIDCController extends Controller
             if (!$patient) {
                 $patient = Patient::create([
                     'user_id'   => $user->id,
-                    'name'      => $user->name,
+                    'name'      => $user->name ?: $name ?: $email,
                     'email'     => $user->email,
                     'phone'     => '',
                     'birthdate' => now()->subYears(18)->toDateString(),
@@ -371,7 +414,7 @@ class OIDCController extends Controller
                 'admin_logged_in' => true,
                 'role'            => $roleSlug,
                 'admin_id'        => $user->id,
-                'admin_name'      => $user->name,
+                'admin_name'      => $user->name ?: $name ?: $email,
                 'admin_email'     => $user->email,
             ]);
 
@@ -380,7 +423,7 @@ class OIDCController extends Controller
             AuditLogger::log('login', 'authentication', 'Admin logged in via OIDC');
 
             return redirect()->route('admin.admin.dashboard')
-                ->with('login_as', $user->name)
+                ->with('login_as', $user->name ?: $name ?: $email)
                 ->with('show_terms_modal', true);
         }
 
@@ -388,7 +431,7 @@ class OIDCController extends Controller
             session([
                 'role'          => 'dentist',
                 'dentist_id'    => $user->id,
-                'dentist_name'  => $user->name,
+                'dentist_name'  => $user->name ?: $name ?: $email,
                 'dentist_email' => $user->email,
             ]);
 
@@ -397,7 +440,7 @@ class OIDCController extends Controller
             AuditLogger::log('login', 'authentication', 'Dentist logged in via OIDC');
 
             return redirect()->route('dentist.dentist.dashboard')
-                ->with('login_as', $user->name)
+                ->with('login_as', $user->name ?: $name ?: $email)
                 ->with('show_terms_modal', true);
         }
 
