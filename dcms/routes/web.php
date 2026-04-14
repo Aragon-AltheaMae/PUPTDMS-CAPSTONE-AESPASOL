@@ -35,18 +35,21 @@ use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
-use App\Services\FlssService;
 use App\Http\Controllers\Admin\ExternalAdminController;
+use App\Http\Controllers\FacultyController;
 
-//api para sa project nila matt
-Route::get('/test/flss/health', function (FlssService $flssService) {
-    return response()->json($flssService->healthCheck());
-});
 
-Route::get('/test/flss/faculty-profiles', function (FlssService $flssService) {
-    return response()->json($flssService->getFacultyProfiles());
-});
 
+//kela matt
+Route::get('/faculties', [FacultyController::class, 'getFacultyList']);
+
+Route::get('/faculty-integration', function () {
+    return view('admin.faculty-integration');
+})->name('admin.faculty.integration');
+
+Route::post('/faculty-integration/store', [FacultyController::class, 'store'])
+    ->name('admin.faculty.store');
+    
 // routes/web.php
 
 Route::get('/debug-session', function () {
