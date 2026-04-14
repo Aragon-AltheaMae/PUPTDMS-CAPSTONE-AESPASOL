@@ -35,6 +35,12 @@
 
 <body class="role-patient @yield('body-class', 'bg-[#F4F4F4]')">
 
+    <script>
+        if (localStorage.getItem('sidebar-collapsed-patient') === 'true') {
+            document.body.classList.add('sidebar-collapsed');
+        }
+    </script>
+
     @include('partials.header', [
         'role' => 'patient',
         'patient' => $patient ?? null,
@@ -71,7 +77,7 @@
     @yield('scripts')
 
     <script src="{{ asset('js/header.js') }}"></script>
-    
+
     <script>
         function openQuickAction(type) {
             if (type === 'record') {

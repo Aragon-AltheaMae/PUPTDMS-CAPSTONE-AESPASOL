@@ -717,7 +717,7 @@
             slotGrid.style.display = calendarConfig.renderStyle === 'dentist' ? "flex" : "grid";
             slotGrid.className = calendarConfig.renderStyle === 'dentist' ?
                 slotGrid.className :
-                "grid grid-cols-1 sm:grid-cols-2 gap-3 animate-pulse";
+                "slot-grid-ui";
 
             slotGrid.innerHTML = Array.from({
                 length: 8
@@ -952,7 +952,7 @@
 
         if (slotGrid) {
             slotGrid.innerHTML = "";
-            slotGrid.style.display = calendarConfig.renderStyle === 'dentist' ? "flex" : "block";
+            slotGrid.style.display = calendarConfig.renderStyle === 'dentist' ? "flex" : "grid";
         }
 
         if (display) display.classList.add("hidden");
@@ -1052,7 +1052,7 @@
                     if (calendarConfig.renderStyle === 'dentist') {
                         chip.classList.add("selected");
                     } else {
-                        chip.classList.add("bg-[#8B0000]", "text-white", "border-[#8B0000]",
+                        chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]",
                             "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
                         chip.classList.remove("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
                     }

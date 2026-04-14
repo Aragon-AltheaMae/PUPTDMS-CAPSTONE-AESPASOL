@@ -1154,11 +1154,6 @@
             var pData = PROFILE_DATA;
             console.log('PROFILE AVATAR:', pData.avatar);
 
-            var alertBadge = pData.hasAlert ?
-                '<div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/30 flex items-center gap-1.5 text-white text-[10px] font-bold tracking-wide uppercase shadow-sm">' +
-                '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Medical Alert</div>' :
-                '';
-
             var emergencyRelation = pData.emergencyRelation ?
                 '<span class="ml-1 text-gray-400">(' + escapeHtml(pData.emergencyRelation) + ')</span>' :
                 '';
@@ -1180,9 +1175,7 @@
             document.getElementById("profileSkeletonContainer").innerHTML =
                 '<div class="overflow-hidden fade-up">' +
 
-                '<div class="h-24 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative">' +
-                alertBadge +
-                '</div>' +
+                '<div class="h-24 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative"></div>' +
 
                 '<div class="px-5 pb-5 relative flex flex-col items-center mt-[-40px]">' +
                 '<div class="relative mb-3">' +

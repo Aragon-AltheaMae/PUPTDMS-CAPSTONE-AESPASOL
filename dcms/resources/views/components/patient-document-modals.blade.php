@@ -238,8 +238,8 @@
 </dialog>
 
 <div id="docSuccessModal"
-    class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 md:p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300"
+    class="fixed inset-0 z-[20000] flex items-center justify-center bg-gray-900/70 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none hidden">
+    <div class="relative z-[20001] bg-white w-full max-w-sm rounded-3xl p-6 md:p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300"
         id="docSuccessModalContent">
 
         <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
@@ -274,9 +274,20 @@
         const modal = document.getElementById('docSuccessModal');
         const content = document.getElementById('docSuccessModalContent');
 
+        const sidebar = document.getElementById('sidebar');
+        const mobileBottomNav = document.getElementById('mobileBottomNav');
+        const mobFabMenu = document.getElementById('mobFabMenu');
+
+        sidebar?.classList.add('pointer-events-none');
+        mobileBottomNav?.classList.add('pointer-events-none');
+        mobFabMenu?.classList.add('pointer-events-none');
+
         if (!modal || !content) return;
 
+        document.body.classList.add('overflow-hidden');
+
         modal.classList.remove('hidden');
+        modal.classList.remove('pointer-events-none');
         void modal.offsetWidth;
         modal.classList.remove('opacity-0');
         content.classList.remove('scale-95');
@@ -287,11 +298,21 @@
         const modal = document.getElementById('docSuccessModal');
         const content = document.getElementById('docSuccessModalContent');
 
+        const sidebar = document.getElementById('sidebar');
+        const mobileBottomNav = document.getElementById('mobileBottomNav');
+        const mobFabMenu = document.getElementById('mobFabMenu');
+
+        sidebar?.classList.remove('pointer-events-none');
+        mobileBottomNav?.classList.remove('pointer-events-none');
+        mobFabMenu?.classList.remove('pointer-events-none');
+
         if (!modal || !content) return;
 
         modal.classList.add('opacity-0');
         content.classList.remove('scale-100');
         content.classList.add('scale-95');
+        modal.classList.add('pointer-events-none');
+        document.body.classList.remove('overflow-hidden');
 
         setTimeout(() => {
             modal.classList.add('hidden');
