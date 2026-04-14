@@ -7,7 +7,6 @@
         if (!container) return;
 
         var t = document.createElement('div');
-        // Renamed to custom-toast to avoid DaisyUI hijacking it
         t.className = 'custom-toast ' + type;
 
         var icon = type === 'error' ?
@@ -30,7 +29,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Global Listeners for Laravel Sessions
         @if (session('success'))
             showToast('Success', '{!! addslashes(session('success')) !!}', 'success');
         @endif

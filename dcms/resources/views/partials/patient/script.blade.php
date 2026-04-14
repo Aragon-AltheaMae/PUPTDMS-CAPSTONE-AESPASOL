@@ -1,38 +1,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        const notifBtn = document.getElementById('notifBtn');
-        const notifMenu = document.getElementById('notifMenu');
-
-        const userBtn = document.getElementById('userBtn');
-        const userMenu = document.getElementById('userMenu');
-
-        if (notifBtn && notifMenu) {
-            notifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                notifMenu.classList.toggle('open');
-                if (userMenu) userMenu.classList.remove('open');
-            });
-        }
-
-        if (userBtn && userMenu) {
-            userBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                userMenu.classList.toggle('open');
-                if (notifMenu) notifMenu.classList.remove('open');
-            });
-        }
-
-        document.addEventListener('click', function(e) {
-            if (notifMenu && !notifMenu.contains(e.target) && !notifBtn.contains(e.target)) {
-                notifMenu.classList.remove('open');
-            }
-
-            if (userMenu && !userMenu.contains(e.target) && !userBtn.contains(e.target)) {
-                userMenu.classList.remove('open');
-            }
-        });
-
         const html = document.documentElement;
         const themeToggleContainer = document.getElementById("themeToggle");
 
@@ -72,6 +40,12 @@
         if (mobFab && mobFabMenu) {
             mobFab.addEventListener('click', function(e) {
                 e.stopPropagation();
+                
+                const notifMenu = document.getElementById('notifMenu');
+                const userMenu = document.getElementById('userMenu');
+                if (notifMenu) notifMenu.classList.remove('show');
+                if (userMenu) userMenu.classList.remove('show');
+
                 mobFabMenu.classList.toggle('open');
                 mobFab.classList.toggle('open');
             });
@@ -82,49 +56,27 @@
         }
 
         document.addEventListener('click', function(e) {
-            if (mobFabMenu && mobFabMenu.classList.contains('open')) {
+            if (!mobFabMenu || !mobFab) return;
+
+            const clickedInsideMenu = mobFabMenu.contains(e.target);
+            const clickedFab = mobFab.contains(e.target);
+
+            if (!clickedInsideMenu && !clickedFab && mobFabMenu.classList.contains('open')) {
                 mobFabMenu.classList.remove('open');
-                if (mobFab) mobFab.classList.remove('open');
+                mobFab.classList.remove('open');
             }
         });
-
-        const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
-        const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
-        const body = document.body;
-
-        function applySidebarState() {
-            const isCollapsed = body.classList.contains('sidebar-collapsed');
-
-            if (sidebarToggleIcon) {
-                sidebarToggleIcon.classList.remove('fa-bars', 'fa-xmark');
-                sidebarToggleIcon.classList.add(isCollapsed ? 'fa-bars' : 'fa-xmark');
-            }
-
-            localStorage.setItem('patientSidebarCollapsed', isCollapsed ? '1' : '0');
-        }
-
-        if (localStorage.getItem('patientSidebarCollapsed') === '1') {
-            body.classList.add('sidebar-collapsed');
-        }
-
-        applySidebarState();
-
-        if (desktopSidebarToggle) {
-            desktopSidebarToggle.addEventListener('click', function() {
-                body.classList.toggle('sidebar-collapsed');
-                applySidebarState();
-            });
-        }
-
-        function closeMobFabMenu() {
-            if (mobFabMenu) mobFabMenu.classList.remove('open');
-            if (mobFab) mobFab.classList.remove('open');
-        }
 
         document.querySelectorAll('[data-quick-action]').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+
+                if (mobFabMenu && mobFabMenu.classList.contains('open')) {
+                    mobFabMenu.classList.remove('open');
+                    mobFab.classList.remove('open');
+                }
+
                 openQuickAction(btn.getAttribute('data-quick-action'));
             });
         });
