@@ -776,18 +776,9 @@
 @endphp
 
 @section('content')
-    <!-- ══════════════ MAIN CONTENT ══════════════ -->
-    <main id="mainContent" class="pt-[100px] px-4 sm:px-6 py-6 fade-up min-h-screen">
-        <div class="mx-auto">
+<main id="mainContent" class="pt-[90px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
+  <div class="w-full fade-in">
 
-            <!-- Breadcrumb -->
-            <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400">
-                <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
-                <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                <span class="text-[#8B0000] font-semibold">About Us</span>
-            </div>
-
-            <!-- ── HERO BANNER ── -->
             <div class="about-hero reveal">
                 <!-- Decorative rings -->
                 <div class="about-hero-ring" style="width:300px;height:300px;top:-100px;right:-100px;"></div>

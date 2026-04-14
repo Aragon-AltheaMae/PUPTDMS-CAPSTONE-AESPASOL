@@ -1,346 +1,307 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>PUP Taguig Dental Clinic | Reports</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+@extends('layouts.dentist')
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+@section('title', '3D Procedure Odontogram | PUP Taguig Dental Clinic')
 
-  <!-- daisyUI -->
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
+@section('styles')
+<style>
+  /* ── HIDE SIDEBAR & FULL WIDTH OVERRIDES ── */
+  #sidebar, .sidebar { display: none !important; }
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  #mainContent, main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-top: 1.5rem !important;
+    background-color: #F8FAFC; 
+  }
 
-  <!-- Highcharts -->
-  <script src="https://code.highcharts.com/highcharts.js"></script>
+  .glass-panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primaryDark: "#7a0000",
-            primaryMain: "#8b0000",
-            gold: "#FFD700"
-          }
-        }
-      }
-    }
-  </script>
+  /* 3D Canvas Container */
+  #canvas-container {
+    width: 100%;
+    height: 600px; 
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: grab;
+    position: relative;
+  }
+  #canvas-container:active {
+    cursor: grabbing;
+  }
+</style>
+@endsection
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-  </style>
-</head>
+@section('content')
+@php
+  use Carbon\Carbon;
+  // Gumawa ako ng fallback kung sakaling walang pangalan
+  $patientName = $patient->name ?? 'Unknown Patient';
+  $today = Carbon::now()->format('F d, Y');
+  $currentTime = Carbon::now()->format('H:i');
+@endphp
 
-<body class="bg-gray-100">
-
-
-<!-- ================= TOP HEADER ================= -->
-<header class="bg-gradient-to-r from-[#660000] to-[#8B0000] text-white px-8 py-4 flex justify-between items-center">
-  <div class="flex items-center gap-3 font-bold">
-    <!-- University Logo -->
-    <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUP Logo" class="w-10 h-10 object-contain">
-    <span>PUP TAGUIG DENTAL CLINIC</span>
-  </div>
-
-  <div class="flex items-center gap-8">
-      @php
-  // Pass $notifications from controller, or leave it empty for now
-  // Expected format: [['title'=>'...', 'message'=>'...', 'time'=>'...', 'url'=>'...'], ...]
-  $notifications = collect($notifications ?? []);
-  $notifCount = $notifications->count();
-  @endphp
-
-  <div class="dropdown dropdown-end">
-    <label tabindex="0" class="btn btn-ghost btn-circle indicator text-[#F4F4F4]">
-      @if($notifCount > 0)
-        <span class="indicator-item badge badge-secondary text-s text-[#F4F4F4] bg-[#660000] border-none">
-          {{ $notifCount }}
-        </span>
-      @endif
-
-      <i class="fa-regular fa-bell text-lg cursor-pointer"></i>
-      </label>
-
-      <div tabindex="0" class="dropdown-content z-[50] mt-3 w-80 rounded-2xl bg-white shadow-xl border border-gray-100">
-        <div class="p-4 border-b flex items-center justify-between">
-          <span class="font-bold text-[#8B0000]">Notifications</span>
-
-          {{-- Optional "View all" (only if you have this route) --}}
-          {{-- <a href="{{ route('notifications.index') }}" class="text-xs text-[#8B0000] hover:underline">View all</a> --}}
-        </div>
-
-        <div class="max-h-80 overflow-y-auto">
-          @forelse($notifications as $n)
-            <a href="{{ $n['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-gray-50">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ $n['title'] ?? 'Notification' }}
-              </div>
-              @if(!empty($n['message']))
-                <div class="text-xs text-[#ADADAD] mt-0.5">
-                  {{ $n['message'] }}
-                </div>
-              @endif
-              @if(!empty($n['time']))
-                <div class="text-[11px] text-gray-400 mt-1">
-                  {{ $n['time'] }}
-                </div>
-              @endif
-            </a>
-          @empty
-            <div class="px-4 py-10 text-center justify-items-center">
-              <img src="{{ asset('images/no-notifications.png') }}" alt="No Notification">
-              <div class="text-sm font-semibold text-gray-800">No notifications</div>
-              <div class="text-xs text-gray-500 mt-1">You’re all caught up.</div>
-            </div>
-          @endforelse
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10">
-      <div class="text-sm">
-        <p class="font-semibold">Dr. Nelson Angeles</p>
-        <p class="text-xs opacity-80">Dentist</p>
-      </div>
-
-      <form action="{{ route('logout') }}" method="POST" class="inline">
-        @csrf
-        <button type="submit" class="cursor-pointer text-[#F4F4F4] hover:text-[#660000]">
-            <i class="fa-solid fa-right-from-bracket text-lg"></i>
-        </button>
-      </form>
-
-    </div>
-  </div>
-</header>
-
-<!-- ================= NAV HEADER ================= -->
-<header class="bg-primaryMain text-white px-8 py-3">
-  <nav class="flex justify-around text-sm">
-    <a href="{{ route('dentist.dashboard') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-chart-line text-lg"></i>
-      <span>Dashboard</span>
-    </a>
-
-    <a href="{{ route('dentist.patients') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-users text-lg"></i>
-      <span>Patients</span>
-    </a>
-
-    <a href="{{ route('dentist.appointments') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-calendar-check text-lg"></i>
-      <span>Appointments</span>
-    </a>
+<div class="px-4 md:px-8 pb-10 max-w-[1600px] mx-auto fade-in">
+  
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
     
-    <a href="{{ route('dentist.inventory') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-box text-lg"></i>
-      <span>Inventory</span>
+    <a href="{{ route('dentist.dentist.patient.profile', $patient->id ?? 1) }}" 
+       class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-xl font-bold transition shadow-sm flex-shrink-0">
+      <i class="fa-solid fa-xmark"></i> Cancel Procedure
     </a>
 
-    <a href="{{ route('dentist.report') }}" class="flex flex-col items-center">
-      <i class="fa-solid fa-file text-lg"></i>
-      <span class="font-bold">Reports</span>
-    </a>
-
-  </nav>
-</header>
-
-<body class="bg-gray-100">
-
-<!-- ================= MAIN ================= -->
-<main class="max-w-6xl mx-auto mt-10 px-6">
-
-  <!-- ================= PATIENT HEADER ================= -->
-  <div class="bg-gradient-to-r from-[#8B0000] to-[#5e0000]
-              rounded-2xl text-white px-10 py-6 shadow-lg mb-10">
-
-    <div class="flex items-center gap-6">
-      <img src="https://i.pravatar.cc/120"
-           class="w-24 h-24 rounded-full border-4 border-[#7a0000] object-cover">
-
-      <div class="flex-1">
-        <p class="text-2xl font-bold">Capilitan, Beyonce</p>
-        <p class="text-sm font-semibold mt-1">2023-00099-TG-0</p>
-        <p class="text-sm font-semibold">BSIT 3-1</p>
+    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto flex-1 justify-end">
+      
+      <div class="glass-panel px-6 py-4 min-w-[200px] flex flex-col justify-center">
+        <h2 class="text-2xl font-extrabold text-[#8B0000] leading-none mb-1">3D Tooth Chart</h2>
+        <p class="text-sm font-medium text-gray-500 italic">Interactive WebGL Examination</p>
       </div>
 
-      <div class="text-sm space-y-1">
-        <p><span class="font-semibold">Age:</span> 18</p>
-        <p><span class="font-semibold">Sex:</span> Female</p>
+      <div class="glass-panel px-6 py-4 flex-1 md:min-w-[350px] flex flex-col justify-between">
+        <div class="w-full text-right mb-2">
+            <h2 class="font-bold text-gray-900 text-lg md:text-xl leading-tight break-words">
+                {{ $patientName }}
+            </h2>
+        </div>
+        <div class="flex justify-between items-end w-full mt-auto">
+          <span class="text-xs font-bold uppercase tracking-widest text-red-600 pr-4">Patient</span>
+          <div class="text-right flex-shrink-0">
+            <p class="text-xs font-bold text-[#8B0000] leading-none mb-1">{{ $currentTime }}</p>
+            <p class="text-[10px] font-semibold text-gray-500 leading-none">{{ $today }}</p>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
-  <!-- ================= ODONTOGRAM RECORDS ================= -->
-  <div class="space-y-6">
-
-    <!-- ================= DONE RECORD ================= -->
-    <div class="bg-white rounded-xl shadow border border-gray-200 p-6">
-
-      <div class="flex justify-between items-start">
-        <!-- LEFT INFO -->
-        <div class="flex items-center gap-6">
-
-          <!-- DATE -->
-          <div class="text-center w-14">
-            <p class="text-xs text-gray-400">MAY</p>
-            <p class="text-2xl font-bold text-[#8B0000]">03</p>
-          </div>
-
-          <!-- CONDITION -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Condition</p>
-            <p class="font-semibold">Caries</p>
-          </div>
-
-          <!-- TOOTH NUMBER -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Tooth #</p>
-            <p class="font-semibold">14</p>
-          </div>
-
-          <!-- TREATMENT -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Treatment</p>
-            <p class="font-semibold">Tooth Filling</p>
-          </div>
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+    
+    <div class="xl:col-span-8 glass-panel p-4 flex flex-col items-center">
+      <div class="w-full flex justify-between items-center mb-2 px-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="fa-solid fa-arrows-rotate"></i> Drag to rotate • Scroll to zoom</p>
+        <div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shadow-inner">
+            <i class="fa-solid fa-tooth text-[#8B0000]"></i>
+            <p id="toothHoverLabel" class="text-sm font-extrabold text-[#8B0000]">Select a tooth</p>
         </div>
-
-        <!-- STATUS -->
-        <span class="flex items-center gap-1 text-green-600 font-semibold text-sm">
-          <i class="fa-solid fa-circle-check"></i> Done
-        </span>
       </div>
-
-      <!-- NOTES -->
-      <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm flex items-center gap-2">
-        <i class="fa-solid fa-tooth text-[#8B0000]"></i>
-        Advanced Decay
+      
+      <div id="canvas-container" class="bg-[#F1F5F9] border border-gray-200 shadow-inner rounded-xl">
+          <div id="loadingOverlay" class="absolute inset-0 bg-white flex flex-col gap-3 items-center justify-center z-10 rounded-xl transition-opacity duration-500">
+              <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#8B0000]"></i>
+              <p class="text-sm font-semibold text-gray-600">Generating 3D Model...</p>
+          </div>
       </div>
     </div>
 
-    <!-- ================= PENDING RECORD ================= -->
-    <div class="bg-white rounded-xl shadow border border-gray-200 p-6">
+    <div class="xl:col-span-4 glass-panel p-6 flex flex-col h-full">
+      
+      <div class="flex-1 space-y-6">
+        
+        <div>
+           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Selected Tooth</label>
+           <input type="text" id="selectedToothInput" class="w-full bg-red-50/50 border border-red-100 text-[#8B0000] font-bold rounded-xl px-4 py-3 focus:outline-none" placeholder="Click a tooth on the 3D model" readonly>
+        </div>
 
-      <div class="flex justify-between items-start">
-        <div class="flex items-center gap-6">
-
-          <!-- DATE -->
-          <div class="text-center w-14">
-            <p class="text-xs text-gray-400">APR</p>
-            <p class="text-2xl font-bold text-[#8B0000]">12</p>
-          </div>
-
-          <!-- CONDITION -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Condition</p>
-            <p class="font-semibold">Caries</p>
-          </div>
-
-          <!-- TOOTH NUMBER -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Tooth #</p>
-            <p class="font-semibold">14</p>
-          </div>
-
-          <!-- TREATMENT -->
-          <div>
-            <p class="text-xs text-gray-400 uppercase">Treatment</p>
-            <p class="font-semibold">Tooth Filling</p>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Treatment</label>
+          <div class="flex flex-wrap gap-2">
+            @foreach(['Filling', 'Extraction', 'Cleaning', 'Root Canal', 'Crown', 'Whitening', 'Sealant', 'Braces'] as $tag)
+              <button class="px-3 py-1.5 border border-yellow-300 text-yellow-800 bg-yellow-50 hover:bg-yellow-100 rounded-lg text-xs font-bold transition">
+                {{ $tag }}
+              </button>
+            @endforeach
           </div>
         </div>
 
-        <!-- STATUS -->
-        <span class="flex items-center gap-1 text-yellow-500 font-semibold text-sm">
-          <i class="fa-solid fa-hourglass-half"></i> Pending
-        </span>
-      </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Oral Examination Notes</label>
+          <textarea rows="3" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition" placeholder="Add examination notes here..."></textarea>
+        </div>
 
-      <!-- REASON -->
-      <div class="mt-4 space-y-2 text-sm">
-        <p class="text-gray-600">
-          <span class="font-semibold text-[#8B0000]">Reason:</span>
-          Not enough time
-        </p>
-
-        <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-2">
-          <i class="fa-solid fa-tooth text-[#8B0000]"></i>
-          Decay in pulp
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Diagnosis</label>
+          <textarea rows="3" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition" placeholder="Add diagnosis here..."></textarea>
         </div>
       </div>
+
+      <div class="pt-6 mt-4 border-t border-gray-100 space-y-3">
+        <button class="w-full flex justify-center items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white font-bold py-3.5 rounded-xl transition shadow-md">
+          <i class="fa-solid fa-check"></i> Finish Procedure
+        </button>
+      </div>
+
     </div>
 
   </div>
+</div>
+@endsection
 
-    <div class="h-20"></div>
-</main>
+@section('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer sm:footer-horizontal bg-[#660000] text-[#F4F4F4] p-10">
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    const container = document.getElementById('canvas-container');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
-  <!-- ASIDE: CLINIC INFO -->
-  <aside class="space-y-4">
-    <div class="flex items-center gap-3">
+    // 1. SETUP SCENE & CAMERA
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#F1F5F9');
 
-      <div class="w-12">
-        <img src="{{ asset('images/PUP.png') }}" alt="PUP Logo" class="w-12 h-auto">
-      </div>
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+    camera.position.set(0, 10, 14);
 
-      <div class="w-12">
-        <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="PUPT DMS Logo" class="w-full h-auto" />
-      </div>
+    // 2. SETUP RENDERER
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
 
-      <div>
-        <p class="font-bold text-lg">PUP TAGUIG DENTAL CLINIC</p>
-        <p class="text-sm whitespace-nowrap">
-          Polytechnic University of the Philippines – Taguig Campus
-        </p>
-      </div>
-    </div>
+    // 3. ADD CONTROLS
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.07;
+    controls.minDistance = 5;
+    controls.maxDistance = 30;
+    controls.maxPolarAngle = Math.PI / 1.8;
 
-    <div class="flex items-start gap-3 text-sm">
-      <img src="{{ asset('images/footer-location.png') }}" class="w-4 h-5 mt-0.5" />
-      <p>Gen. Santos Ave., Upper Bicutan, Taguig City</p>
-    </div>
+    // 4. LIGHTING
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
 
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-email.png') }}" class="w-5 h-4" />
-      <p>pupdental@pup.edu.ph</p>
-    </div>
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    keyLight.position.set(10, 15, 10);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
+    scene.add(keyLight);
 
-    <div class="flex items-center gap-3 text-sm">
-      <img src="{{ asset('images/footer-phone.png') }}" class="w-4 h-4" />
-      <p>(02) 123-4567</p>
-    </div>
-  </aside>
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    backLight.position.set(-10, 5, -10);
+    scene.add(backLight);
 
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Navigation</h6>
-    <a class="link link-hover text-[#F4F4F4]">Home</a>
-    <a class="link link-hover text-[#F4F4F4]">Appointment</a>
-    <a class="link link-hover text-[#F4F4F4]">Record</a>
-    <a class="link link-hover text-[#F4F4F4]">About Us</a>
-  </nav>
+    // 5. CREATE 3D TEETH
+    const teethMeshes = [];
+    const toothGeometry = new THREE.CylinderGeometry(0.38, 0.22, 1.0, 32, 1);
+    
+    const enamelMaterialProps = {
+        color: 0xFFFFF0,
+        metalness: 0.1,
+        roughness: 0.25,
+        emissive: 0x111111,
+        envMapIntensity: 1.0
+    };
+    
+    const adultUpperTeethNums = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+    const adultLowerTeethNums = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
 
-  <nav>
-    <h6 class="footer-title text-[#F4F4F4]">Services</h6>
-    <a class="link link-hover text-[#F4F4F4]">Oral Check-up</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Cleaning</a>
-    <a class="link link-hover text-[#F4F4F4]">Tooth Extraction</a>
-    <a class="link link-hover text-[#F4F4F4]">Dental Consultation</a>
-  </nav>
+    function createArch(teethArray, yPosition) {
+        const group = new THREE.Group();
 
-</footer>
+        teethArray.forEach((toothNum, i) => {
+            const material = new THREE.MeshStandardMaterial(enamelMaterialProps);
+            const mesh = new THREE.Mesh(toothGeometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
 
-</body>
-</html>
+            let angle = Math.PI - (i / (teethArray.length - 1)) * Math.PI;
+            
+            let x = Math.cos(angle) * 4.0;
+            let z = Math.sin(angle) * 3.5;
+
+            mesh.position.set(x, yPosition, z);
+            mesh.lookAt(0, yPosition, 0);
+
+            mesh.userData = { tooth: toothNum, originalColor: 0xFFFFF0 };
+            
+            group.add(mesh);
+            teethMeshes.push(mesh);
+        });
+        scene.add(group);
+    }
+
+    createArch(adultUpperTeethNums, 0.6);
+    createArch(adultLowerTeethNums, -0.6);
+
+    // Gums
+    const gumGeometry = new THREE.TorusGeometry(3.9, 0.5, 12, 50, Math.PI);
+    const gumMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xF5B7B1,
+        roughness: 0.8,
+        metalness: 0.0 
+    }); 
+    
+    const upperGums = new THREE.Mesh(gumGeometry, gumMaterial);
+    upperGums.rotation.x = Math.PI / 2;
+    upperGums.position.set(0, 1.1, 0);
+    upperGums.receiveShadow = true;
+    scene.add(upperGums);
+
+    const lowerGums = new THREE.Mesh(gumGeometry, gumMaterial);
+    lowerGums.rotation.x = Math.PI / 2;
+    lowerGums.position.set(0, -1.1, 0);
+    lowerGums.receiveShadow = true;
+    scene.add(lowerGums);
+
+    // 6. RAYCASTER
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    container.addEventListener('pointerdown', (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        const intersects = raycaster.intersectObjects(teethMeshes);
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+
+            teethMeshes.forEach(m => m.material.color.setHex(m.userData.originalColor));
+            
+            clickedObject.material.color.setHex(0x8B0000); 
+            
+            const selectedNum = clickedObject.userData.tooth;
+            document.getElementById('selectedToothInput').value = `Tooth #${selectedNum}`;
+            document.getElementById('toothHoverLabel').innerText = `Selected: #${selectedNum}`;
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        const newWidth = container.clientWidth;
+        const newHeight = container.clientHeight;
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
+    });
+
+    // 7. ANIMATION LOOP
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update(); 
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    setTimeout(() => {
+        loadingOverlay.style.opacity = '0';
+        setTimeout(() => loadingOverlay.style.display = 'none', 500);
+    }, 1000);
+
+  });
+</script>
+@endsection
