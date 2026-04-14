@@ -38,7 +38,7 @@
         <div class="nav-section-label">Maintenance</div>
         <div class="nav-group">
             <div
-                class="group-trigger {{ request()->routeIs('admin.user_management*', 'admin.role_permissions', 'admin.academic_periods*', 'admin.clinic_schedule*') ? 'active-group' : '' }}">
+                class="group-trigger {{ request()->routeIs('admin.user_management*', 'admin.role_permissions', 'admin.academic_periods*', 'admin.clinic_schedule*', 'admin.document-template*') ? 'active-group' : '' }}">
                 <div class="group-icon-wrap"><i class="fa-solid fa-screwdriver-wrench"></i></div>
                 <div class="group-text">
                     <span class="group-label">Configuration</span>
@@ -61,7 +61,9 @@
                 <a href="{{ route('admin.service-types') }}"
                     class="nav-link {{ request()->routeIs('admin.service-types*') ? 'active' : '' }}"><i
                         class="fa-solid fa-list-check"></i> Service Types</a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file-pen"></i>
+                <a href="{{ route('admin.document-template') }}"
+                    class="nav-link {{ request()->routeIs('admin.document-template*') ? 'active' : '' }}"><i
+                        class="fa-solid fa-file-pen"></i>
                     Document
                     Templates</a>
                 <a href="{{ route('admin.inventory') }}"

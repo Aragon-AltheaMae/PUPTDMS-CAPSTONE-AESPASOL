@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             ServiceTypeSeeder::class,
             AcademicPeriodSeeder::class,
             ClinicScheduleSeeder::class,
+            DocumentTemplateFieldSeeder::class,
+            DefaultDocumentTemplateSeeder::class,
         ]);
     }
 }
