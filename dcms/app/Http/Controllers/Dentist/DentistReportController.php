@@ -25,7 +25,6 @@ class DentistReportController extends Controller
         $today     = $now->toDateString();
         $lastMonth = $now->copy()->subMonth();
 
-        // ── KPI 1: Patients This Month 
         $patientsThisMonth = Appointment::whereYear('appointment_date', $thisYear)
             ->whereMonth('appointment_date', $thisMonth)
             ->distinct('patient_id')->count('patient_id');
@@ -38,7 +37,6 @@ class DentistReportController extends Controller
             ? round((($patientsThisMonth - $patientsLastMonth) / $patientsLastMonth) * 100)
             : null;
 
-        // ── KPI 2: Appointments Today 
         $appointmentsToday = Appointment::whereDate('appointment_date', $today)
             ->whereIn('status', ['pending', 'confirmed'])->count();
 
@@ -48,7 +46,6 @@ class DentistReportController extends Controller
 
         $appointmentsDelta = $appointmentsToday - $appointmentsYesterday;
 
-        // ── KPI 3: Dental Cases This Month 
         $casesThisMonth = Appointment::whereYear('appointment_date', $thisYear)
             ->whereMonth('appointment_date', $thisMonth)
             ->where('status', 'completed')->count();
@@ -61,24 +58,52 @@ class DentistReportController extends Controller
             ? round((($casesThisMonth - $casesLastMonth) / $casesLastMonth) * 100)
             : null;
 
-        // ── KPI 4: Low Stock Items 
         $lowStockItems = DB::table('inventory_items')
             ->whereRaw('(qty - used) <= (qty * 0.30)')->count();
 
-        // ── GAD Chart (current month) 
         [$gadLabels, $gadFemale, $gadMale] = $this->buildGadData($thisYear, $thisMonth);
 
-        // ── Weekly Dental Cases (current month) 
         [$weekLabels, $weeklyDatasets] = $this->buildWeeklyData($thisYear, $thisMonth);
 
-        // ── Inventory Pie Charts 
+        $totalAppointmentsThisMonth = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->count();
+
+        $cancelledAppointments = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->where('status', 'cancelled')
+            ->count();
+
+        $cancellationRate = $totalAppointmentsThisMonth > 0
+            ? round(($cancelledAppointments / $totalAppointmentsThisMonth) * 100)
+            : 0;
+
+        $daysElapsedThisMonth = max(1, min($now->day, $now->daysInMonth));
+        $avgPatientsPerDay = round($patientsThisMonth / $daysElapsedThisMonth, 1);
+
+        $patientVisitCounts = Appointment::select('patient_id', DB::raw('COUNT(*) as total_visits'))
+            ->whereNotNull('patient_id')
+            ->groupBy('patient_id')
+            ->get();
+
+        $returningPatients = $patientVisitCounts->where('total_visits', '>', 1)->count();
+        $newPatients = $patientVisitCounts->where('total_visits', 1)->count();
+
+        $topServices = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->whereNotNull('service_type')
+            ->select('service_type as name', DB::raw('COUNT(*) as total'))
+            ->groupBy('service_type')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
         $inventoryItems = DB::table('inventory_items')
             ->select('category', 'name', 'qty', 'used')->orderBy('name')->get();
 
         $medicineItems = $inventoryItems->where('category', 'Medicine')->values();
         $suppliesItems = $inventoryItems->where('category', 'Supplies')->values();
 
-        // ── Low Stock Panel 
         $lowStockRows     = DB::table('inventory_items')
             ->whereRaw('(qty - used) <= (qty * 0.30)')
             ->orderByRaw('(qty - used) ASC')->get();
@@ -86,7 +111,6 @@ class DentistReportController extends Controller
         $lowStockMedicine = $lowStockRows->where('category', 'Medicine')->values();
         $lowStockSupplies = $lowStockRows->where('category', 'Supplies')->values();
 
-        // ── Period selector labels
         $periodOptions = [];
         for ($i = 0; $i < 3; $i++) {
             $periodOptions[] = $now->copy()->subMonths($i)->format('M Y');
@@ -118,11 +142,17 @@ class DentistReportController extends Controller
             'lowStockMedicine',
             'lowStockSupplies',
             'periodOptions',
+            'totalAppointmentsThisMonth',
+            'cancelledAppointments',
+            'cancellationRate',
+            'avgPatientsPerDay',
+            'returningPatients',
+            'newPatients',
+            'topServices',
             'notifications'
         ));
     }
 
-    // ── AJAX: GAD chart for selected period 
     public function gadData(Request $request)
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -131,7 +161,6 @@ class DentistReportController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Expect "Mar 2026" or "March 2026"
         $parsed = Carbon::createFromFormat('M Y', $request->input('period'))
             ?? Carbon::createFromFormat('F Y', $request->input('period'));
 
@@ -153,7 +182,6 @@ class DentistReportController extends Controller
         ]);
     }
 
-    // ── AJAX: Weekly dental cases for selected period 
     public function weeklyData(Request $request)
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -180,7 +208,6 @@ class DentistReportController extends Controller
         ]);
     }
 
-    // ── Shared: Build GAD data for any year/month 
     private function buildGadData(int $year, int $month): array
     {
         $gadRaw = DB::table('daily_treatment_records')
@@ -203,7 +230,6 @@ class DentistReportController extends Controller
         return [$gadLabels, $gadFemale, $gadMale];
     }
 
-    // ── Shared: Build weekly dental cases for any year/month
     private function buildWeeklyData(int $year, int $month): array
     {
         $topServices = Appointment::whereYear('appointment_date', $year)

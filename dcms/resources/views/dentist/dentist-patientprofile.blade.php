@@ -773,7 +773,7 @@ function initStatusThemes() {
   function confirmStart() {
     closeStartModal();
     setTimeout(() => {
-      window.location.href = "{{ route('dentist.viewOdontogram') }}";
+      window.location.href = "{{ route('dentist.odontogram', ['patient' => $patient->id ?? 0]) }}";
     }, 250);
   }
 
