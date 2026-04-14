@@ -115,8 +115,19 @@
                 class="drawer-link {{ request()->routeIs('admin.system_settings*') ? 'active' : '' }}">
                 <i class="fa-solid fa-sliders"></i> System Settings
             </a>
+
+            <a href="{{ route('admin.assign-cms-access') }}"
+                class="drawer-link {{ request()->routeIs('admin.assign-cms-access') ? 'active' : '' }}">
+                <i class="fa-solid fa-user-shield"></i> Assign CMS Access
+            </a>
+
+            <a href="{{ route('admin.faculty.integration') }}"
+                class="drawer-link {{ request()->routeIs('admin.faculty.integration') ? 'active' : '' }}">
+                <i class="fa-solid fa-user-plus"></i> Faculty Integration
+            </a>
         </div>
     </div>
+    
     <div class="drawer-bottom">
         <div class="theme-toggle-container" id="drawerThemeToggle" style="margin-bottom:10px;">
             <button type="button" class="theme-option active" data-theme="light"><i

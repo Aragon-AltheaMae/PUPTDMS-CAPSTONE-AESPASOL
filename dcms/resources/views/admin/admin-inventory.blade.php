@@ -1509,7 +1509,21 @@
             stock: ''
         };
 
+        function applyDashboardStockFilterFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const stockFilter = (params.get('stock_filter') || '').toLowerCase();
+
+            if (stockFilter === 'in-stock') {
+                filters.stock = 'in-stock';
+            } else if (stockFilter === 'low-stock') {
+                filters.stock = 'low-stock';
+            } else if (stockFilter === 'out-stock') {
+                filters.stock = 'out-stock';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            applyDashboardStockFilterFromQuery();
             bindEvents();
             applyInventoryView(getPreferredInventoryView(), false);
             updateSearchClear();
@@ -1731,7 +1745,17 @@
                 data = data.filter(item => item.date_received && new Date(item.date_received) <= to);
             }
 
-            if (filters.stock === 'low-high') {
+            if (filters.stock === 'in-stock') {
+                data = data.filter(item => (Number(item.qty) - Number(item.used)) > 5);
+            } else if (filters.stock === 'low-stock') {
+                data = data.filter(item => {
+                    const bal = Number(item.qty) - Number(item.used);
+                    return bal >= 1 && bal <= 5;
+                });
+                
+            } else if (filters.stock === 'out-stock') {
+                data = data.filter(item => (Number(item.qty) - Number(item.used)) <= 0);
+            } else if (filters.stock === 'low-high') {
                 data.sort((a, b) => (Number(a.qty) - Number(a.used)) - (Number(b.qty) - Number(b.used)));
             } else if (filters.stock === 'high-low') {
                 data.sort((a, b) => (Number(b.qty) - Number(b.used)) - (Number(a.qty) - Number(a.used)));
