@@ -98,5 +98,13 @@
             Assign CMS Access
         </a>
 
+        <a href="{{ route('admin.faculty.integration') }}"
+            class="nav-link {{ request()->routeIs('admin.faculty.integration') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-plus"></i>
+            Faculty Integration
+        </a>
+    </div>
+    </a>
+
     </div>
 </aside>
