@@ -90,21 +90,19 @@
                 <a href="{{ route('admin.system_settings') }}"
                     class="nav-link {{ request()->routeIs('admin.system_settings*') ? 'active' : '' }}"><i
                         class="fa-solid fa-sliders"></i> System Settings</a>
-            </div>
+
+                <a href="{{ route('admin.assign-cms-access') }}"
+                    class="nav-link {{ request()->routeIs('admin.assign-cms-access') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-shield nav-icon"></i>
+                    Assign CMS Access
+                </a>
+
+                <a href="{{ route('admin.faculty.integration') }}"
+                    class="nav-link {{ request()->routeIs('admin.faculty.integration') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Faculty Integration
+                </a>
+            </div>     
         </div>
-        <a href="{{ route('admin.assign-cms-access') }}"
-            class="nav-link {{ request()->routeIs('admin.assign-cms-access') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-shield nav-icon"></i>
-            Assign CMS Access
-        </a>
-
-        <a href="{{ route('admin.faculty.integration') }}"
-            class="nav-link {{ request()->routeIs('admin.faculty.integration') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-plus"></i>
-            Faculty Integration
-        </a>
-    </div>
-    </a>
-
     </div>
 </aside>
