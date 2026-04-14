@@ -776,15 +776,12 @@
 }
 
 :root {
-    --sidebar-w: 260px;
-    --sidebar-collapsed-w: 88px;
     --sidebar-anim: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar,
 #sidebar,
 .aside-sidebar {
-    width: var(--sidebar-w);
     transition:
         width var(--sidebar-anim),
         transform var(--sidebar-anim),
@@ -851,12 +848,6 @@ body.sidebar-collapsed .aside-sidebar .nav-link i {
 }
 
 @media (min-width: 1024px) {
-
-    body:not(.sidebar-collapsed) .main-content,
-    body:not(.sidebar-collapsed) #mainContent,
-    body:not(.sidebar-collapsed) .layout-content {
-        margin-left: var(--sidebar-w);
-    }
 
     body.sidebar-collapsed .main-content,
     body.sidebar-collapsed #mainContent,
