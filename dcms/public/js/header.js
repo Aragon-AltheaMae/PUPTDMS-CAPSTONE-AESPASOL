@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const body = document.body;
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
-    const desktopBreakpoint = window.matchMedia('(min-width: 1024px)');
+    const desktopBreakpoint = window.matchMedia('(min-width: 1200px)');
 
     if (desktopSidebarToggle) {
         desktopSidebarToggle.addEventListener('click', function (e) {

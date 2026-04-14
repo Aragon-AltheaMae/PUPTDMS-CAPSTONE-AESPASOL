@@ -6,11 +6,20 @@
         width: min(94vw, 480px);
         box-shadow: 0 24px 60px rgba(0, 0, 0, .2);
         overflow: hidden;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    #termsModal[open] {
+        display: flex;
+        flex-direction: column;
     }
 
     #termsModal::backdrop {
-        background: rgba(0, 0, 0, .55);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.25);
+        backdrop-filter: none;
     }
 
     .terms-header {

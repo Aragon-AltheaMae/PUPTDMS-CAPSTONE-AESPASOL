@@ -78,6 +78,88 @@
             font-family: 'Inter', sans-serif;
         }
 
+        @keyframes confirmBackdropFade {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes confirmModalPop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.86);
+            }
+            60% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.03);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes confirmIconPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.55) rotate(-10deg);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.08) rotate(4deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes confirmContentRise {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #confirmModal::backdrop {
+            animation: confirmBackdropFade 0.25s ease-out;
+        }
+
+        #confirmModal[open] {
+            animation: confirmModalPop 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-origin: center;
+        }
+
+        #confirmModal .confirm-modal-icon {
+            animation: confirmIconPop 0.5s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        #confirmModal .confirm-modal-title,
+        #confirmModal .confirm-modal-message,
+        #confirmModal .confirm-modal-button {
+            opacity: 0;
+            animation: confirmContentRise 0.4s ease-out forwards;
+        }
+
+        #confirmModal .confirm-modal-title {
+            animation-delay: 0.14s;
+        }
+
+        #confirmModal .confirm-modal-message {
+            animation-delay: 0.22s;
+        }
+
+        #confirmModal .confirm-modal-button {
+            animation-delay: 0.3s;
+        }
+
         .step-content {
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -466,13 +548,86 @@
         }
 
         .mini-tab {
-            bottom: 5rem;
+            position: fixed;
+            left: 50%;
+            bottom: 2rem;
+            transform: translate(-50%, 20px);
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+
+            min-height: 68px;
+            max-width: min(calc(100vw - 2rem), 560px);
+            width: auto;
+
+            padding: 0.95rem 1.35rem;
+            border-radius: 24px;
+
+            background: #1a1410;
+            color: #fff;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 999;
         }
 
-        @media (max-width: 640px) {
-            .sm-grid-1col {
-                grid-template-columns: 1fr !important;
-            }
+        .mini-tab.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .mini-tab i {
+            flex: 0 0 20px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            line-height: 1;
+            margin: 0;
+        }
+
+        #miniTabText {
+            display: block;
+            flex: 0 1 auto;
+            margin: 0;
+            line-height: 1.35;
+            white-space: nowrap;
+        }
+
+        .field-help-text {
+            margin-top: 0.45rem;
+            font-size: 0.75rem;
+            line-height: 1.35;
+            min-height: 1rem;
+        }
+
+        .field-help-text.error {
+            color: #dc2626;
+        }
+
+        .field-help-text.success {
+            color: #15803d;
+        }
+
+        .input-invalid {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08) !important;
+        }
+
+        .input-valid {
+            border-color: #15803d !important;
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.08) !important;
         }
 
         input[type="text"],
@@ -513,9 +668,9 @@
             font-family: 'Inter', sans-serif;
             overflow: visible;
             padding: 0;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
         .flatpickr-months {
@@ -671,8 +826,8 @@
             transition: opacity 0.18s ease, transform 0.18s ease;
             z-index: 999;
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
         .flatpickr-day.flatpickr-future-disabled::before {
@@ -850,8 +1005,9 @@
         #slotGrid.slot-grid-ui {
             display: grid !important;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-rows: repeat(4, 60px);
             grid-auto-rows: 60px;
-            grid-auto-flow: row;
+            grid-auto-flow: column;
             gap: 0.85rem !important;
             margin-top: 0.8rem;
             align-items: stretch;
@@ -882,11 +1038,31 @@
                 opacity 0.22s ease;
         }
 
-        #slotGrid .slot-chip:hover:not(:disabled):not(.disabled) {
+        #slotGrid .slot-chip:hover:not(:disabled):not(.disabled):not(.selected):not(.bg-\[\#8B0000\]) {
             transform: translateY(-2px);
             border-color: #d5b2a9 !important;
             box-shadow: 0 16px 30px rgba(139, 0, 0, 0.10);
             background: linear-gradient(180deg, #fffafa 0%, #fff3f2 100%) !important;
+        }
+
+        #slotGrid .slot-chip.bg-\[\#8B0000\]:hover,
+        #slotGrid .slot-chip.selected:hover,
+        #slotGrid .slot-chip[aria-pressed="true"]:hover {
+            background: linear-gradient(135deg, #8B0000, #660000) !important;
+            border-color: #8B0000 !important;
+            color: #fff !important;
+            box-shadow: 0 14px 30px rgba(139, 0, 0, 0.24) !important;
+        }
+
+        #slotGrid .slot-chip.bg-\[\#8B0000\]:hover i,
+        #slotGrid .slot-chip.selected:hover i,
+        #slotGrid .slot-chip[aria-pressed="true"]:hover i {
+            color: #fff !important;
+        }
+
+        #slotGrid .slot-chip.selected:hover {
+            background: linear-gradient(135deg, #8B0000, #660000) !important;
+            color: #fff !important;
         }
 
         #slotGrid .slot-chip.selected,
@@ -951,11 +1127,12 @@
             color: #fff !important;
         }
 
-        #slotGrid .slot-chip:hover {
-            transform: translateY(-2px) scale(1.01);
-            border-color: #cfaaaa !important;
-            box-shadow: 0 14px 28px rgba(139, 0, 0, 0.10);
-            background: linear-gradient(180deg, #fffafa 0%, #fff4f4 100%) !important;
+        #slotGrid .slot-chip,
+        #slotGrid .slot-chip:hover,
+        #slotGrid .slot-chip.selected,
+        #slotGrid .slot-chip:active {
+            transform: none !important;
+            animation: none !important;
         }
 
         #slotGrid .slot-chip.selected,
@@ -1036,7 +1213,63 @@
             pointer-events: none;
         }
 
+        @media (max-width: 640px) {
+            .sm-grid-1col {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
         @media only screen and (max-width: 600px) {
+
+            .mini-tab {
+                left: 50%;
+                right: auto;
+                bottom: 0.75rem;
+                max-width: calc(100vw - 1rem);
+                width: calc(100vw - 1rem);
+                padding: 0.8rem 0.95rem;
+                border-radius: 16px;
+                font-size: 0.78rem;
+                line-height: 1.35;
+                box-shadow: 0 16px 30px rgba(0, 0, 0, 0.24);
+            }
+
+            #miniTabText {
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            .field-help-text {
+                font-size: 0.72rem;
+                margin-top: 0.4rem;
+            }
+
+            .service-step-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.85rem !important;
+            }
+
+            .service-option-title {
+                font-size: 0.95rem;
+                line-height: 1.2;
+            }
+
+            .service-option-desc {
+                font-size: 0.74rem;
+                line-height: 1.4;
+            }
+
+            .service-option-badge {
+                font-size: 0.55rem;
+                padding: 0.22rem 0.42rem;
+            }
+
+            .service-option-icon img,
+            .service-option-icon i {
+                width: 16px;
+                height: 16px;
+                font-size: 0.9rem;
+            }
 
             .service-option-card {
                 min-height: 84px;
@@ -1049,13 +1282,14 @@
             }
 
             .service-option-icon {
-                width: 40px;
-                height: 40px;
+                width: 38px;
+                height: 38px;
+                border-radius: 12px;
             }
 
             .service-option-arrow {
-                width: 30px;
-                height: 30px;
+                width: 28px;
+                height: 28px;
             }
 
             .cal-time-layout {
@@ -1084,8 +1318,10 @@
             }
 
             #slotGrid.slot-grid-ui {
-                grid-template-columns: 1fr !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                grid-template-rows: repeat(4, 56px);
                 grid-auto-rows: 56px;
+                grid-auto-flow: column;
                 gap: 0.75rem !important;
             }
 
@@ -1117,17 +1353,49 @@
             }
         }
 
-        @media only screen and (min-width: 600px) {
+        @media only screen and (min-width: 600px) and (max-width: 767px) {
             .cal-time-layout {
                 grid-template-columns: 1fr !important;
             }
 
             .service-step-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.9rem;
+            }
+
+            .service-option-card {
+                min-height: 92px;
+                padding: 0.8rem 0.85rem;
+                border-radius: 18px;
+            }
+
+            .service-option-title {
+                font-size: 0.9rem;
+            }
+
+            .service-option-desc {
+                font-size: 0.75rem;
+            }
+
+            .service-option-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .service-option-arrow {
+                width: 30px;
+                height: 30px;
             }
         }
 
         @media only screen and (min-width: 768px) {
+
+            .mini-tab {
+                width: max-content;
+                max-width: none;
+                white-space: nowrap;
+                padding: 0.95rem 1.5rem;
+            }
 
             .service-option-card {
                 min-height: 88px;
@@ -1164,7 +1432,9 @@
 
             #slotGrid.slot-grid-ui {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-rows: repeat(4, 58px);
                 grid-auto-rows: 58px;
+                grid-auto-flow: column;
             }
 
             #slotPlaceholder {
@@ -1179,7 +1449,9 @@
             }
 
             #slotGrid.slot-grid-ui {
+                grid-template-rows: repeat(4, 60px);
                 grid-auto-rows: 60px;
+                grid-auto-flow: column;
             }
 
             #slotPlaceholder {
@@ -1850,9 +2122,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             class="text-center">NO</span>
                                     </div>
 
-                                    @foreach ([['name' => 'pregnant', 'q' => 'Are you pregnant?'], ['name' => 'nursing',
-                                    'q' => 'Are you nursing?'], ['name' => 'birth_control', 'q' => 'Are you taking birth
-                                    control pills?']] as $i => $q)
+                                    @foreach ([
+                                    ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
+                                    ['name' => 'nursing', 'q' => 'Are you nursing?'],
+                                    [
+                                    'name' => 'birth_control',
+                                    'q' => 'Are you taking birth
+                                    control pills?',
+                                    ],
+                                    ] as $i => $q)
                                     <div
                                         class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
                                         <span class="question-text">{{ $q['q'] }}</span>
@@ -1966,9 +2244,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 Contact Number
                                             </label>
                                             <input type="tel" id="emergency_number" name="emergency_number"
-                                                maxlength="11"
+                                                inputmode="numeric" autocomplete="tel" maxlength="13"
                                                 class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                placeholder="09XXXXXXXXX" required>
+                                                placeholder="09xx xxx xxxx" required>
+                                            <p id="emergency_number_feedback" class="field-help-text text-[#9e9690]">
+                                                Format: 09xx xxx xxxx
+                                            </p>
                                         </div>
 
                                         <div>
@@ -1986,7 +2267,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     <option value="Spouse">Spouse</option>
                                                     <option value="Others">Others</option>
                                                 </select>
-                                                <div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+                                                <div
+                                                    class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
                                                     <i class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
                                                 </div>
                                             </div>
@@ -1997,7 +2279,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 Patient's Signature <span class="required-star">*</span>
                                             </label>
 
-                                            <div class="file-upload-zone border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer min-h-[180px]">
+                                            <div
+                                                class="file-upload-zone border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer min-h-[180px]">
                                                 <i class="fa-regular fa-image text-gray-400 text-3xl mb-2"></i>
 
                                                 <p class="text-xs text-[#5c5550] mb-1">
@@ -2007,7 +2290,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     JPG, PNG, up to 25 MB
                                                 </p>
 
-                                                <label class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
+                                                <label
+                                                    class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
                                                     <i class="fa-solid fa-upload"></i> Browse
                                                     <input type="file" name="patient_signature" id="patient_signature"
                                                         class="hidden" accept=".jpg,.jpeg,.png" required>
@@ -2116,26 +2400,28 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         </div>
     </div>
 
-    <div id="miniTab"
-        class="mini-tab fixed left-1/2 -translate-x-1/2 bg-[#1a1410] text-white px-5 py-2.5 rounded-full text-sm font-semibold z-[200] shadow-xl flex items-center gap-2 whitespace-nowrap opacity-0 pointer-events-none"
-        style="transition: opacity 0.25s;">
-        <i class="fa-solid fa-circle-exclamation text-red-400"></i>
+    <div id="miniTab" class="mini-tab">
+        <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
         <span id="miniTabText">Please complete all required fields.</span>
     </div>
-
 
     <dialog id="confirmModal"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
         <div class="bg-[#8B0000] px-8 py-10 text-center">
-            <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+            <div class="confirm-modal-icon w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
                 <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
             </div>
-            <h2 class="text-2xl font-extrabold text-white mb-4">Appointment Confirmed!</h2>
-            <p id="confirmMessage" class="text-white/85 text-sm leading-7 mb-6"></p>
+
+            <h2 class="confirm-modal-title text-2xl font-extrabold text-white mb-4">
+                Appointment Confirmed!
+            </h2>
+
+            <p id="confirmMessage" class="confirm-modal-message text-white/85 text-sm leading-7 mb-6"></p>
+
             <button type="button" id="okBtn"
-                class="bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Back
-                to
-                Home</button>
+                class="confirm-modal-button bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
+                Back to Home
+            </button>
         </div>
     </dialog>
 
@@ -2284,11 +2570,14 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             miniTabText.textContent = msg || "Please complete all required fields.";
             miniTab.style.opacity = "1";
             miniTab.style.pointerEvents = "auto";
+            miniTab.classList.add("show");
+
             clearTimeout(window.__mtTimer);
             window.__mtTimer = setTimeout(() => {
                 miniTab.style.opacity = "0";
                 miniTab.style.pointerEvents = "none";
-            }, 3000);
+                miniTab.classList.remove("show");
+            }, 3200);
         }
 
         function showInputError(input) {
@@ -2456,9 +2745,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             const phone = stepEl.querySelector("#emergency_number");
             if (phone) {
-                const v = phone.value.trim();
-                if (!/^\d{1,11}$/.test(v)) {
-                    showMiniTab("Emergency Contact must be 1–11 digits only!");
+                const digits = phone.value.replace(/\D/g, "");
+                if (!/^09\d{9}$/.test(digits)) {
+                    showMiniTab("Please enter a valid contact number.");
+                    phone.classList.add("input-invalid");
+                    setPhoneFeedback("Enter a valid mobile number in the format 09xx xxx xxxx.", "error");
                     scrollToInvalidTarget(phone);
                     return false;
                 }
@@ -2559,11 +2850,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             let sigHTML = `<span class="text-[#9e9690] italic">Not uploaded</span>`;
             if (sigFile && sigFile.size > 0) {
                 const url = URL.createObjectURL(sigFile);
-                sigHTML = `<img src="${url}" alt="Signature" class="max-w-[220px] max-h-[130px] rounded-lg border border-[#e8e2dd]">`;
+                sigHTML = `
+        <div class="space-y-2">
+            <p><b class="text-[#5c5550] font-semibold">File:</b> ${sigFile.name}</p>
+            <p class="text-emerald-700 font-semibold">
+                <i class="fa-solid fa-circle-check mr-1"></i> Signature uploaded
+            </p>
+            <img src="${url}" alt="Signature" class="max-w-[220px] max-h-[130px] rounded-lg border border-[#e8e2dd]">
+        </div>
+    `;
             }
 
             const row = (label, val) =>
-                `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val || '<span class="text-[#9e9690]">N/A</span>'}</p>`;
+                `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val && String(val).trim() !== "" ? val : '<span class="text-[#9e9690]">N/A</span>'}</p>`;
+
+            const optionalRow = (label, val) => {
+                if (!val || String(val).trim() === "" || val === "N/A") return "";
+                return `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val}</p>`;
+            };
 
             const summaryCard = (title, icon, body) => `
                 <div class="border border-[#e8e2dd] rounded-xl overflow-hidden bg-white">
@@ -2599,139 +2903,148 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             `;
 
             const diseases = getAll("diseases[]");
-            const diseaseText = diseases.length
-                ? diseases.map(code => diseaseLabelByCode?.[code] ?? code).join(", ")
-                : "None";
+            const diseaseText = diseases.length ?
+                diseases.map(code => diseaseLabelByCode?.[code] ?? code).join(", ") :
+                "None";
 
+            const patientName = @json($patient -> name ?? 'N/A');
+            const patientGender = @json($patient -> gender ?? 'N/A');
             const dentalHistoryBody = `
-                ${subSection("Basic Info", `
-                    ${row("Last Dental Visit", get("last_dental_visit"))}
-                    ${row("Previous Dentist", get("previous_dentist"))}
-                `)}
+    ${subSection("Basic Info", `
+            ${row("Last Dental Visit", get("last_dental_visit"))}
+            ${row("Previous Dentist", get("previous_dentist"))}
+        `)}
 
-                ${subSection("Dental Symptoms", `
-                    ${row("Bleeding Gums", get("bleeding_gums"))}
-                    ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                    ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                    ${row("Tooth Pain", get("tooth_pain"))}
-                    ${row("Sores/Lumps", get("sores"))}
-                    ${row("Jaw Injuries", get("injuries"))}
-                `)}
+    ${subSection("Dental Symptoms", `
+            ${row("Bleeding Gums", get("bleeding_gums"))}
+            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+            ${row("Tooth Pain", get("tooth_pain"))}
+            ${row("Sores/Lumps", get("sores"))}
+            ${row("Jaw Injuries", get("injuries"))}
+        `)}
 
-                ${subSection("Jaw & Bite Symptoms", `
-                    ${row("Clicking", get("clicking"))}
-                    ${row("Joint Pain", get("joint_pain"))}
-                    ${row("Difficulty Moving", get("difficulty_moving"))}
-                    ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                    ${row("Frequent Headaches", get("jaw_headaches"))}
-                    ${row("Grinding/Clenching", get("clench_grind"))}
-                    ${row("Lips/Cheek Biting", get("biting"))}
-                    ${row("Teeth Loosening", get("teeth_loosening"))}
-                    ${row("Food Caught Between Teeth", get("food_teeth"))}
-                    ${row("Medicine Reaction", get("med_reaction"))}
-                `)}
+    ${subSection("Jaw & Bite Symptoms", `
+            ${row("Clicking", get("clicking"))}
+            ${row("Joint Pain", get("joint_pain"))}
+            ${row("Difficulty Moving", get("difficulty_moving"))}
+            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+            ${row("Frequent Headaches", get("jaw_headaches"))}
+            ${row("Grinding/Clenching", get("clench_grind"))}
+            ${row("Lips/Cheek Biting", get("biting"))}
+            ${row("Teeth Loosening", get("teeth_loosening"))}
+            ${row("Food Caught Between Teeth", get("food_teeth"))}
+            ${row("Medicine Reaction", get("med_reaction"))}
+        `)}
 
-                ${subSection("Dental Procedures", `
-                    ${row("Periodontal Treatment", get("periodontal"))}
-                    ${row("Difficult Extraction", get("difficult_extraction"))}
-                    ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+    ${subSection("Dental Procedures", `
+            ${row("Periodontal Treatment", get("periodontal"))}
+            ${row("Difficult Extraction", get("difficult_extraction"))}
+            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                    ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                    ${row("Dentures", get("dentures"))}
-                    ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+            ${row("Dentures", get("dentures"))}
+            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                    ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                    ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                `)}
+            ${row("Orthodontic Treatment", get("ortho_treatment"))}
+            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+        `)}
 
-                ${fullWidthSection("Additional Concerns", `
-                    ${get("additional_concerns") !== "N/A"
+    ${fullWidthSection("Additional Concerns", `
+            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                     ? get("additional_concerns")
                     : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                `)}
-            `;
+        `)}
+`;
 
             const medicalHistoryBody = `
-                ${subSection("General Health", `
-                    ${row("Good Health", get("good_health"))}
-                    ${get("good_health") === "NO" ? row("Good Health Details", get("good_health_details")) : ""}
+    ${subSection("General Health", `
+        ${row("Good Health", get("good_health"))}
+        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                    ${row("Had Medical Examination", get("had_medical_exam"))}
-                    ${get("had_medical_exam") === "YES" ? row("Medical Examination Date", get("medical_exam_date")) : ""}
+        ${row("Had Medical Exam", get("had_medical_exam"))}
+        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                    ${row("Under Treatment", get("under_treatment"))}
-                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+        ${row("Under Treatment", get("under_treatment"))}
+        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                    ${row("Hospitalized", get("hospitalized"))}
-                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                `)}
+        ${row("Hospitalized", get("hospitalized"))}
+        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+    `)}
 
-                ${subSection("Allergies", `
-                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                    ${row("Allergy (Food)", get("allergy_food"))}
-                    ${row("Allergy (Others)", get("allergy_others"))}
-                `)}
+    ${subSection("Allergies", `
+        ${row("Allergy (Medicine)", get("allergy_medicine"))}
+        ${row("Allergy (Food)", get("allergy_food"))}
+        ${optionalRow("Allergy (Others)", get("allergy_others"))}
+    `)}
 
-                ${subSection("Medications", `
-                    ${row("Medication", get("medication"))}
-                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                `)}
+    ${subSection("Medications", `
+        ${row("Medication", get("medication"))}
+        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+    `)}
 
-                ${isFemalePatient ? subSection("For Women Only", `
-                    ${row("Pregnant", get("pregnant"))}
-                    ${row("Nursing", get("nursing"))}
-                    ${row("Birth Control Pills", get("birth_control"))}
-                `) : ""}
+    ${isFemalePatient ? subSection("For Women Only", `
+        ${row("Pregnant", get("pregnant"))}
+        ${row("Nursing", get("nursing"))}
+        ${row("Birth Control Pills", get("birth_control"))}
+    `) : ""}
 
-                ${fullWidthSection("Medical Conditions", `
-                    <b class="text-[#5c5550] font-semibold">Selected Conditions:</b> ${diseaseText}
-                `)}
+    ${fullWidthSection("Medical Conditions", `
+        <b class="text-[#5c5550] font-semibold">Selected Conditions:</b> ${diseaseText}
+    `)}
 
-                ${subSection("Tobacco Use", `
-                    ${row("Tobacco Use", get("tobacco_use"))}
-                    ${get("tobacco_use") === "YES" ? row("Tobacco Per Day", get("tobacco_per_day")) : ""}
-                    ${get("tobacco_use") === "YES" ? row("Tobacco Per Week", get("tobacco_per_week")) : ""}
-                `)}
+    ${subSection("Tobacco Use", `
+        ${row("Tobacco Use", get("tobacco_use"))}
+        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+    `)}
 
-                ${subSection("Do You Suffer From", `
-                    ${row("Headaches", get("headaches"))}
-                    ${row("Earaches", get("earaches"))}
-                    ${row("Neck Aches", get("neck_aches"))}
-                `)}
-            `;
+    ${subSection("Do You Suffer From", `
+        ${row("Headaches", get("headaches"))}
+        ${row("Earaches", get("earaches"))}
+        ${row("Neck Aches", get("neck_aches"))}
+    `)}
+`;
 
             document.getElementById("summaryBox").innerHTML = `
-                <div class="grid grid-cols-2 gap-4 sm-grid-1col">
-                    ${summaryCard("Appointment Details", "fa-calendar-check", `
-                        <div class="grid grid-cols-1 gap-y-1">
-                            ${row("Date", get("appointment_date"))}
-                            ${row("Time", get("appointment_time"))}
-                        </div>
-                    `)}
+    ${summaryCard("Patient Information", "fa-user", `
+        <div class="grid grid-cols-1 gap-y-1">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+        </div>
+    `)}
 
-                    ${summaryCard("Service", "fa-tooth", `
-                        <div class="grid grid-cols-1 gap-y-1">
-                            ${row("Type", get("service_type"))}
-                        </div>
-                    `)}
-                </div>
+    <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+        ${summaryCard("Appointment Details", "fa-calendar-check", `
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Date", get("appointment_date"))}
+                ${row("Time", get("appointment_time"))}
+            </div>
+        `)}
 
-                ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
+        ${summaryCard("Service", "fa-tooth", `
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Type", get("service_type"))}
+            </div>
+        `)}
+    </div>
 
-                ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
+    ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
 
-                <div class="grid grid-cols-2 gap-4 sm-grid-1col">
-                    ${summaryCard("Emergency Contact", "fa-phone", `
-                        <div class="grid grid-cols-1 gap-y-1">
-                            ${row("Name", get("emergency_person"))}
-                            ${row("Number", get("emergency_number"))}
-                            ${row("Relation", emergencyRelation)}
-                        </div>
-                    `)}
+    ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
 
-                    ${summaryCard("Signature", "fa-signature", sigHTML)}
-                </div>
-            `;
+    <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+        ${summaryCard("Emergency Contact", "fa-phone", `
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Name", get("emergency_person"))}
+                ${row("Number", get("emergency_number"))}
+                ${row("Relation", emergencyRelation)}
+            </div>
+        `)}
+
+        ${summaryCard("Signature", "fa-signature", sigHTML)}
+    </div>
+`;
 
             document.querySelectorAll(".sm-grid-1col").forEach(el => {
                 if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
@@ -2745,6 +3058,22 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
         const finalConfirm = document.getElementById('finalConfirm');
 
+        function replayConfirmModalAnimation() {
+            if (!confirmModal) return;
+
+            confirmModal.classList.remove("confirm-modal-animate");
+            void confirmModal.offsetWidth;
+            confirmModal.classList.add("confirm-modal-animate");
+
+            confirmModal.querySelectorAll(
+                ".confirm-modal-icon, .confirm-modal-title, .confirm-modal-message, .confirm-modal-button"
+            ).forEach(el => {
+                el.style.animation = "none";
+                void el.offsetWidth;
+                el.style.animation = "";
+            });
+        }
+
         if (finalSubmitBtn) {
             finalSubmitBtn.addEventListener("click", () => {
                 if (!finalConfirm || !finalConfirm.checked) {
@@ -2757,13 +3086,17 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                 if (confirmMessage) {
                     confirmMessage.innerHTML = `
-Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
-<b>${date}</b> at <b>${time}</b>.<br>
-Please arrive on time and bring your school or office ID.
-<br>
-`;
+        Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
+        <b>${date}</b> at <b>${time}</b>.<br>
+        Please arrive on time and bring your school or office ID.
+        <br>
+        `;
                 }
+
                 confirmModal?.showModal();
+                requestAnimationFrame(() => {
+                    replayConfirmModalAnimation();
+                });
             });
         }
 
@@ -3043,7 +3376,10 @@ Please arrive on time and bring your school or office ID.
             const objectUrl = URL.createObjectURL(file);
 
             img.onload = function () {
-                const { width, height } = img;
+                const {
+                    width,
+                    height
+                } = img;
 
                 if (width < 120 || height < 60) {
                     showMiniTab("Signature image is too small. Please upload a clearer signature.");
@@ -3079,23 +3415,88 @@ Please arrive on time and bring your school or office ID.
             img.src = objectUrl;
         });
         const emergencyNumber = document.getElementById("emergency_number");
-        emergencyNumber?.addEventListener(
-            "input", e => {
-                if (/[^0-9]/.test(e.target.value)) {
-                    showMiniTab("Contact number must contain digits only.");
-                    showInputError(emergencyNumber);
-                }
-                let v = e.target.value.replace(/\D/g, "");
-                if (v.startsWith("9")) v = "0" + v;
-                v = v.slice(0, 11);
-                emergencyNumber.value = v;
-                if (/^09\d{9}$/.test(v)) {
-                    emergencyNumber.classList.remove("border-red-500");
-                    emergencyNumber.classList.add("border-green-600");
-                } else emergencyNumber.classList.remove("border-green-600");
-            });
+        const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
+
+        function formatPhoneDisplay(rawDigits) {
+            const digits = rawDigits.slice(0, 11);
+            let out = "";
+
+            if (digits.length > 0) out += digits.slice(0, 4);
+            if (digits.length > 4) out += " " + digits.slice(4, 7);
+            if (digits.length > 7) out += " " + digits.slice(7, 11);
+
+            return out;
+        }
+
+        function setPhoneFeedback(message, type = "") {
+            if (!emergencyNumberFeedback) return;
+            emergencyNumberFeedback.textContent = message;
+            emergencyNumberFeedback.classList.remove("error", "success", "text-[#9e9690]");
+            if (type === "error") emergencyNumberFeedback.classList.add("error");
+            else if (type === "success") emergencyNumberFeedback.classList.add("success");
+            else emergencyNumberFeedback.classList.add("text-[#9e9690]");
+        }
+
+        function validateEmergencyNumber(showNeutral = false) {
+            if (!emergencyNumber) return false;
+
+            const digits = emergencyNumber.value.replace(/\D/g, "");
+
+            emergencyNumber.classList.remove("input-invalid", "input-valid", "border-red-500", "border-green-600");
+
+            if (!digits.length) {
+                if (showNeutral) setPhoneFeedback("Format: 09xx xxx xxxx");
+                else setPhoneFeedback("");
+                return false;
+            }
+
+            if (!digits.startsWith("09")) {
+                emergencyNumber.classList.add("input-invalid");
+                setPhoneFeedback("Contact number must start with 09.", "error");
+                return false;
+            }
+
+            if (digits.length < 11) {
+                emergencyNumber.classList.add("input-invalid");
+                setPhoneFeedback("Contact number must be 11 digits.", "error");
+                return false;
+            }
+
+            if (digits.length === 11) {
+                emergencyNumber.classList.add("input-valid");
+                setPhoneFeedback("Valid contact number.", "success");
+                return true;
+            }
+
+            emergencyNumber.classList.add("input-invalid");
+            setPhoneFeedback("Contact number must be 11 digits only.", "error");
+            return false;
+        }
+
+        emergencyNumber?.addEventListener("input", (e) => {
+            const hadNonDigit = /[^\d\s]/.test(e.target.value);
+
+            let digits = e.target.value.replace(/\D/g, "");
+
+            if (digits.startsWith("9")) digits = "0" + digits;
+            if (digits.length > 11) digits = digits.slice(0, 11);
+
+            emergencyNumber.value = formatPhoneDisplay(digits);
+
+            if (hadNonDigit) {
+                showMiniTab("Contact number must contain digits only.");
+            }
+
+            validateEmergencyNumber(true);
+            markFormDirty();
+        });
+
+        emergencyNumber?.addEventListener("focus", () => {
+            validateEmergencyNumber(true);
+        });
+
         emergencyNumber?.addEventListener("blur", () => {
-            if (!emergencyNumber.value) emergencyNumber.classList.remove("border-red-500", "border-green-600");
+            validateEmergencyNumber(true);
         });
 
         let formIsDirty = false;

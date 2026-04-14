@@ -67,44 +67,118 @@
             color: white;
         }
 
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
         .service-card {
             position: relative;
             overflow: hidden;
-            transition: transform 0.45s ease, box-shadow 0.45s ease;
-        }
-
-        .service-card::before {
-            content: "";
-            position: absolute;
-            inset: -12px;
-            background: linear-gradient(135deg, #8B0000, #660000);
-            opacity: 0;
             border-radius: 1.25rem;
-            transition: opacity 0.45s ease;
-            z-index: 0;
-        }
-
-        .service-card:hover::before {
-            opacity: 1;
+            border: 1px solid #f3d6d6;
+            background: linear-gradient(135deg, #fff7f7 0%, #fff 100%);
+            padding: 1rem 1rem 0.95rem;
+            min-height: 150px;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            box-shadow: 0 10px 24px rgba(139, 0, 0, 0.06);
         }
 
         .service-card:hover {
-            transform: scale(1.06);
-            z-index: 20;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+            transform: translateY(-2px);
+            border-color: #e8b4b4;
+            box-shadow: 0 14px 30px rgba(139, 0, 0, 0.12);
         }
 
-        .service-card>* {
-            position: relative;
-            z-index: 1;
+        .service-card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #8B0000, #660000);
+            box-shadow: 0 10px 20px rgba(139, 0, 0, 0.18);
+            margin-bottom: 0.85rem;
         }
 
-        .service-card img {
-            transition: transform 0.45s ease;
+        .service-card-icon img {
+            width: 1.65rem;
+            height: 1.65rem;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.96;
         }
 
-        .service-card:hover img {
-            transform: translateX(-6px) scale(1.08);
+        .service-card-title {
+            font-size: 1.15rem;
+            line-height: 1.2;
+            font-weight: 800;
+            color: #7a0000;
+            margin-bottom: 0.35rem;
+        }
+
+        .service-card-desc {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #6b7280;
+            max-width: 100%;
+        }
+
+        .service-card-tag {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 0.85rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 999px;
+            background: #fff1f1;
+            color: #8B0000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid #f3d6d6;
+        }
+
+        @media (max-width: 767px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .service-card {
+                min-height: unset;
+                padding: 0.9rem;
+                border-radius: 1rem;
+            }
+
+            .service-card-icon {
+                width: 2.65rem;
+                height: 2.65rem;
+                border-radius: 0.85rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .service-card-icon img {
+                width: 1.45rem;
+                height: 1.45rem;
+            }
+
+            .service-card-title {
+                font-size: 1rem;
+            }
+
+            .service-card-desc {
+                font-size: 0.8rem;
+                line-height: 1.45;
+            }
+
+            .service-card-tag {
+                margin-top: 0.7rem;
+                font-size: 0.65rem;
+                padding: 0.3rem 0.58rem;
+            }
         }
 
         dialog#appt_detail_modal::backdrop {
@@ -125,7 +199,10 @@
             as $appt
         ) {
             $calendarAppointments[\Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d')] =
-                $appt->service_type . ' • ' . $appt->appointment_time;
+                'My Appointment: ' .
+                $appt->service_type .
+                ' • ' .
+                \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A');
         }
     @endphp
 
@@ -297,7 +374,7 @@
                                         ? \Carbon\Carbon::parse($appt->appointment_date)->format('F d, Y')
                                         : '—',
                                     'time' => $appt->appointment_time
-                                        ? \Carbon\Carbon::parse($appt->appointment_time)->format('H:i:s')
+                                        ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
                                         : '—',
                                     'status' => $rawStatus,
                                     'duration' => $appt->duration ?? '—',
@@ -369,40 +446,60 @@
             </section>
 
             <section class="mt-2 mb-8 fade-up">
-                <h2
-                    class="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent mb-5 sm:mb-6">
-                    Services Offered
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden bg-[#8B0000]">
-                    <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b md:border-r border-[#F4F4F4]/20">
-                        <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Oral Check-Up</h3>
-                        <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs text-white/80">Routine oral examination •
-                            Dental consultation</p>
-                        <img src="{{ asset('images/oral-checkup.png') }}"
-                            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Oral Checkup" />
+                <div class="flex items-end justify-between gap-3 mb-4 sm:mb-5">
+                    <div>
+                        <h2 class="text-[1.6rem] sm:text-[2rem] font-extrabold text-[#8B0000] leading-tight">
+                            Services Offered
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Available dental care services at the clinic.
+                        </p>
                     </div>
-                    <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b border-[#F4F4F4]/20">
-                        <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Cleaning</h3>
-                        <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs text-white/80">Oral hygiene treatment •
-                            Removing surface buildup</p>
-                        <img src="{{ asset('images/dental-cleaning.png') }}"
-                            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Cleaning" />
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-card-icon">
+                            <img src="{{ asset('images/oral-checkup.png') }}" alt="Oral Checkup">
+                        </div>
+                        <h3 class="service-card-title">Oral Check-Up</h3>
+                        <p class="service-card-desc">
+                            Routine oral examination and dental consultation for general assessment.
+                        </p>
+                        <span class="service-card-tag">Consultation</span>
                     </div>
-                    <div
-                        class="service-card relative p-6 sm:p-10 text-[#F4F4F4] border-b md:border-b-0 md:border-r border-[#F4F4F4]/20">
-                        <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Restoration</h3>
-                        <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs text-white/80">Repairs damaged teeth •
-                            Fillings • Crowns</p>
-                        <img src="{{ asset('images/restoration-prosthesis.png') }}"
-                            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28"
-                            alt="Restoration & Prosthesis" />
+
+                    <div class="service-card">
+                        <div class="service-card-icon">
+                            <img src="{{ asset('images/dental-cleaning.png') }}" alt="Dental Cleaning">
+                        </div>
+                        <h3 class="service-card-title">Dental Cleaning</h3>
+                        <p class="service-card-desc">
+                            Oral hygiene treatment focused on removing plaque and surface buildup.
+                        </p>
+                        <span class="service-card-tag">Preventive Care</span>
                     </div>
-                    <div class="service-card relative p-6 sm:p-10 text-[#F4F4F4]">
-                        <h3 class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Dental Surgery</h3>
-                        <p class="text-xs sm:text-sm max-w-[55%] sm:max-w-xs text-white/80">Treating dental issues
-                            surgically • Extraction</p>
-                        <img src="{{ asset('images/dental-surgery.png') }}"
-                            class="absolute right-4 sm:right-6 inset-y-0 my-auto w-16 sm:w-28" alt="Dental Surgery" />
+
+                    <div class="service-card">
+                        <div class="service-card-icon">
+                            <img src="{{ asset('images/restoration-prosthesis.png') }}" alt="Dental Restoration">
+                        </div>
+                        <h3 class="service-card-title">Dental Restoration</h3>
+                        <p class="service-card-desc">
+                            Restorative procedures for damaged teeth including fillings and crowns.
+                        </p>
+                        <span class="service-card-tag">Restoration</span>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-card-icon">
+                            <img src="{{ asset('images/dental-surgery.png') }}" alt="Dental Surgery">
+                        </div>
+                        <h3 class="service-card-title">Dental Surgery</h3>
+                        <p class="service-card-desc">
+                            Surgical dental treatment such as tooth extraction and related procedures.
+                        </p>
+                        <span class="service-card-tag">Surgical Care</span>
                     </div>
                 </div>
             </section>
