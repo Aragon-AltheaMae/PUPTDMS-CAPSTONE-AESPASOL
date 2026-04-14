@@ -37,6 +37,7 @@ use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
 use App\Http\Controllers\Admin\ExternalAdminController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\Admin\DocumentTemplateController;
 
 
 
@@ -47,10 +48,8 @@ Route::get('/faculty-integration', function () {
     return view('admin.faculty-integration');
 })->name('admin.faculty.integration');
 
-Route::get('/test/flss/faculty-profiles', function (FlssService $flssService) {
-    return response()->json($flssService->getFacultyProfiles());
-});use App\Http\Controllers\Admin\DocumentTemplateController;
-
+Route::post('/faculty-integration/store', [FacultyController::class, 'store'])
+    ->name('admin.faculty.store');
 
 // routes/web.php---
 
