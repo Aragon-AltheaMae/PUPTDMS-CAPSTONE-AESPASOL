@@ -618,10 +618,10 @@
         }
 
         .inventory-chart-card-body {
-            padding: .85rem .95rem .95rem;
+            padding: 1rem;
             background:
-                radial-gradient(circle at top left, rgba(34, 197, 94, .10), transparent 35%),
-                radial-gradient(circle at top right, rgba(239, 68, 68, .08), transparent 38%),
+                radial-gradient(circle at top left, rgba(34, 197, 94, .08), transparent 35%),
+                radial-gradient(circle at top right, rgba(239, 68, 68, .06), transparent 38%),
                 linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%);
         }
 
@@ -638,47 +638,106 @@
 
         .inventory-top-layout {
             display: grid;
-            grid-template-columns: 92px 1fr;
-            gap: .85rem;
+            grid-template-columns: 118px 1fr;
+            gap: 1rem;
             align-items: center;
-            margin-bottom: .75rem;
+            margin-bottom: .9rem;
         }
 
         .inventory-donut-wrap {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 92px;
-            padding: 0;
+            height: 118px;
         }
 
         .inventory-donut-box {
-            width: 92px;
-            height: 92px;
-            max-width: 92px;
-            max-height: 92px;
+            width: 108px;
+            height: 108px;
             position: relative;
             margin: 0 auto;
             border-radius: 50%;
-            background: radial-gradient(circle, #ffffff 58%, #f8fafc 100%);
+            background:
+                radial-gradient(circle at center, #ffffff 56%, #f8fafc 100%);
             box-shadow:
-                0 8px 22px rgba(17, 24, 39, .08),
-                0 0 0 6px rgba(255, 255, 255, .75);
+                0 10px 24px rgba(17, 24, 39, .09),
+                0 0 0 6px rgba(255, 255, 255, .80);
             transition: transform .18s ease, box-shadow .18s ease;
+            overflow: visible;
         }
 
-        .inventory-donut-box:hover {
-            transform: scale(1.05);
-            box-shadow:
-                0 12px 28px rgba(17, 24, 39, .12),
-                0 0 0 6px rgba(255, 255, 255, .82);
+        .inventory-donut-center {
+            position: absolute;
+            inset: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .inventory-donut-center span {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #111827;
+            letter-spacing: -.03em;
+        }
+
+        .inventory-donut-center small {
+            margin-top: 4px;
+            font-size: .58rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .inventory-donut-box::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 220deg,
+                rgba(34, 197, 94, .95) 0deg,
+                rgba(16, 185, 129, .92) 105deg,
+                rgba(245, 158, 11, .92) 210deg,
+                rgba(239, 68, 68, .95) 300deg,
+                rgba(34, 197, 94, .95) 360deg
+            );
+            z-index: 0;
+            filter: saturate(1.05);
+            opacity: .95;
+        }
+
+        .inventory-donut-box::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 62%, #f8fafc 100%);
+            z-index: 1;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
         }
 
         #inventoryDonutChart {
-            width: 92px !important;
-            height: 92px !important;
-            max-width: 92px !important;
-            max-height: 92px !important;
+            position: relative;
+            z-index: 2;
+        }
+
+        .inventory-donut-box:hover {
+            transform: scale(1.04);
+        }
+
+        #inventoryDonutChart {
+            width: 108px !important;
+            height: 108px !important;
+            max-width: 108px !important;
+            max-height: 108px !important;
             display: block;
             margin: 0 auto;
         }
@@ -686,42 +745,155 @@
         .inventory-legend {
             display: grid;
             grid-template-columns: 1fr;
-            gap: .42rem;
-            margin-top: 0;
+            gap: .62rem;
         }
 
         .inventory-legend-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: .55rem;
-            padding: .48rem .65rem;
-            border: 1px solid #eef0f3;
-            border-radius: 12px;
+            gap: .75rem;
+            padding: .72rem .9rem;
+            border: 1px solid #efe8e8;
+            border-radius: 16px;
             background: linear-gradient(135deg, #ffffff, #fafafa);
             box-shadow: 0 2px 8px rgba(0, 0, 0, .03);
-            transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .inventory-legend-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(139, 0, 0, .04), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity .18s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .inventory-legend-item::before,
+        .inventory-legend-item .legend-bubble,
+        .inventory-legend-item .legend-bubble-sm {
+            content: '';
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .inventory-legend-item::before {
+            width: 68px;
+            height: 68px;
+            top: -24px;
+            right: -14px;
+            opacity: .10;
+            animation: inventoryBubbleFloat 6.5s ease-in-out infinite;
+        }
+
+        .inventory-legend-item .legend-bubble {
+            width: 36px;
+            height: 36px;
+            bottom: -12px;
+            left: 12px;
+            opacity: .08;
+            animation: inventoryBubbleFloat 7.5s ease-in-out infinite reverse;
+        }
+
+        .inventory-legend-item .legend-bubble-sm {
+            width: 18px;
+            height: 18px;
+            top: 10px;
+            right: 34px;
+            opacity: .10;
+            animation: inventoryBubbleDrift 5.8s ease-in-out infinite;
+        }
+
+        .inventory-legend-item[data-stock-filter="in-stock"]::before,
+        .inventory-legend-item[data-stock-filter="in-stock"] .legend-bubble,
+        .inventory-legend-item[data-stock-filter="in-stock"] .legend-bubble-sm {
+            background: #22c55e;
+        }
+
+        .inventory-legend-item[data-stock-filter="low-stock"]::before,
+        .inventory-legend-item[data-stock-filter="low-stock"] .legend-bubble,
+        .inventory-legend-item[data-stock-filter="low-stock"] .legend-bubble-sm {
+            background: #f59e0b;
+        }
+
+        .inventory-legend-item[data-stock-filter="out-stock"]::before,
+        .inventory-legend-item[data-stock-filter="out-stock"] .legend-bubble,
+        .inventory-legend-item[data-stock-filter="out-stock"] .legend-bubble-sm {
+            background: #ef4444;
+        }
+
+        @keyframes inventoryBubbleFloat {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            50% {
+                transform: translateY(-6px) translateX(-4px) scale(1.06);
+            }
+        }
+
+        @keyframes inventoryBubbleDrift {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(4px) translateX(-6px);
+            }
         }
 
         .inventory-legend-item:hover {
-            transform: translateY(-2px) scale(1.015);
-            box-shadow: 0 10px 22px rgba(0, 0, 0, .07);
-            border-color: #e5e7eb;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, .08);
+            border-color: #e7dede;
+        }
+
+        .inventory-legend-item:hover::after,
+        .inventory-legend-item.active::after {
+            opacity: 1;
+        }
+
+        .inventory-legend-item.active {
+            border-color: #e5caca;
+            box-shadow: 0 12px 24px rgba(139, 0, 0, .10);
+        }
+
+        .inventory-legend-item.pulse-pop {
+            animation: inventoryPulsePop .28s ease;
+        }
+
+        @keyframes inventoryPulsePop {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1.015);
+            }
         }
 
         .inventory-legend-left {
             display: flex;
             align-items: center;
-            gap: .55rem;
+            gap: .65rem;
             min-width: 0;
         }
 
         .inventory-legend-dot {
-            width: 9px;
-            height: 9px;
+            width: 10px;
+            height: 10px;
             border-radius: 999px;
             flex-shrink: 0;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, .9);
+            box-shadow: 0 0 0 4px rgba(255,255,255,.9);
         }
 
         .inventory-legend-dot.in-stock {
@@ -737,78 +909,77 @@
         }
 
         .inventory-legend-label {
-            font-size: .68rem;
+            font-size: .82rem;
             font-weight: 800;
             color: #374151;
             line-height: 1.1;
         }
 
         .inventory-legend-sub {
-            font-size: .6rem;
+            font-size: .68rem;
             color: #9ca3af;
-            margin-top: 1px;
+            margin-top: 2px;
             line-height: 1.1;
         }
 
         .inventory-legend-value {
-            font-size: .84rem;
+            font-size: 1.2rem;
             font-weight: 900;
             color: #111827;
             flex-shrink: 0;
+            line-height: 1;
         }
 
         .inventory-mini-stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: .5rem;
-            margin-top: .65rem;
+            gap: .62rem;
+            margin-top: .8rem;
         }
 
         .inventory-mini-pill {
             border: 1px solid #edf0f3;
-            border-radius: 12px;
-            padding: .55rem .45rem;
-            background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+            border-radius: 14px;
+            padding: .72rem .45rem;
             text-align: center;
             box-shadow: 0 3px 10px rgba(0, 0, 0, .03);
             transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
         }
 
         .inventory-mini-pill:hover {
-            transform: translateY(-2px) scale(1.03);
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 0 10px 20px rgba(0, 0, 0, .07);
-            border-color: #e5e7eb;
         }
 
-        .inventory-mini-pill:nth-child(1) {
-            background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+        .inventory-mini-pill.total {
+            background: linear-gradient(135deg, #f7f1eb 0%, #ffffff 100%);
         }
 
-        .inventory-mini-pill:nth-child(2) {
-            background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+        .inventory-mini-pill.medicine {
+            background: linear-gradient(135deg, #eef8f5 0%, #ffffff 100%);
         }
 
-        .inventory-mini-pill:nth-child(3) {
-            background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+        .inventory-mini-pill.supplies {
+            background: linear-gradient(135deg, #f2f6fb 0%, #ffffff 100%);
         }
 
         .inventory-mini-pill-label {
-            font-size: .55rem;
+            font-size: .62rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .05em;
+            letter-spacing: .06em;
             color: #9ca3af;
-            margin-bottom: .15rem;
+            margin-bottom: .18rem;
             line-height: 1.1;
         }
 
         .inventory-mini-pill-value {
-            font-size: .9rem;
+            font-size: 1.1rem;
             font-weight: 900;
             line-height: 1;
             color: #111827;
         }
-        
+
         [data-theme="dark"] .inventory-chart-card-body {
             background:
                 radial-gradient(circle at top left, rgba(34, 197, 94, .10), transparent 35%),
@@ -821,6 +992,18 @@
             box-shadow:
                 0 8px 22px rgba(0, 0, 0, .25),
                 0 0 0 6px rgba(22, 27, 34, .9);
+        }
+
+        [data-theme="dark"] .inventory-donut-box::after {
+            background: radial-gradient(circle, #1f2937 62%, #111827 100%);
+        }
+
+        [data-theme="dark"] .inventory-donut-center span {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .inventory-donut-center small {
+            color: #9ca3af;
         }
 
         [data-theme="dark"] .inventory-legend-item,
@@ -843,55 +1026,47 @@
         @media (max-width: 767px) {
             .inventory-top-layout {
                 grid-template-columns: 1fr;
-                gap: .7rem;
+                gap: .8rem;
             }
 
             .inventory-donut-wrap {
-                height: 88px;
+                height: 104px;
             }
 
             .inventory-donut-box {
-                width: 88px;
-                height: 88px;
-                max-width: 88px;
-                max-height: 88px;
+                width: 96px;
+                height: 96px;
             }
 
             #inventoryDonutChart {
-                width: 88px !important;
-                height: 88px !important;
-                max-width: 88px !important;
-                max-height: 88px !important;
+                width: 96px !important;
+                height: 96px !important;
+                max-width: 96px !important;
+                max-height: 96px !important;
             }
 
-            .inventory-mini-stats-row {
-                grid-template-columns: repeat(3, 1fr);
+            .inventory-legend-item {
+                padding: .68rem .8rem;
             }
 
-            .inventory-overview-card {
-                position: relative;
-                overflow: hidden;
-                transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            .inventory-legend-label {
+                font-size: .76rem;
             }
 
-            .inventory-overview-card::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                pointer-events: none;
-                background: linear-gradient(135deg, rgba(34, 197, 94, .05), rgba(245, 158, 11, .04), rgba(239, 68, 68, .05));
-                opacity: 0;
-                transition: opacity .18s ease;
+            .inventory-legend-sub {
+                font-size: .62rem;
             }
 
-            .inventory-overview-card:hover {
-                transform: translateY(-4px) scale(1.01);
-                box-shadow: 0 14px 30px rgba(0, 0, 0, .09);
-                border-color: #ececec;
+            .inventory-legend-value {
+                font-size: 1.05rem;
             }
 
-            .inventory-overview-card:hover::before {
-                opacity: 1;
+            .inventory-mini-pill-label {
+                font-size: .56rem;
+            }
+
+            .inventory-mini-pill-value {
+                font-size: .95rem;
             }
         }
 
@@ -1482,49 +1657,58 @@
 
                             <div class="inventory-chart-card-body">
 
-                                @if(($inventoryTotal ?? 0) <= 0)
-                                    <div class="inventory-empty">
-                                        <div>
-                                            <i class="fa-solid fa-box-open"
-                                                style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
-                                            <span style="font-size:.72rem;color:#b0b7c3;font-weight:600;">
-                                                No inventory records yet
-                                            </span>
-                                        </div>
-                                    </div>
+                            <div id="inventoryOverviewEmpty" class="inventory-empty" style="display:none;">
+                                <div>
+                                    <i id="inventoryOverviewEmptyIcon" class="fa-solid fa-box-open"
+                                        style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
+                                    <span id="inventoryOverviewEmptyText" style="font-size:.72rem;color:#b0b7c3;font-weight:600;">
+                                        No inventory records yet
+                                    </span>
+                                </div>
+                            </div>
 
-                               @else
+                                <div id="inventoryOverviewContent" style="display:none;">
                                     <div class="inventory-top-layout">
                                         <div class="inventory-donut-wrap">
                                             <div class="inventory-donut-box">
+                                                <div class="inventory-donut-center">
+                                                    <span id="inventoryDonutTotal">0</span>
+                                                    <small>Items</small>
+                                                </div>
                                                 <canvas id="inventoryDonutChart"></canvas>
                                             </div>
                                         </div>
 
                                         <div class="inventory-legend">
-                                            <div class="inventory-legend-item">
+                                            <div class="inventory-legend-item" data-stock-filter="in-stock">
+                                                <span class="legend-bubble"></span>
+                                                <span class="legend-bubble-sm"></span>
                                                 <div class="inventory-legend-left">
                                                     <span class="inventory-legend-dot in-stock"></span>
                                                     <div>
                                                         <div class="inventory-legend-label">In Stock</div>
-                                                        <div class="inventory-legend-sub">Sufficient quantity available</div>
+                                                        <div class="inventory-legend-sub">Sufficient supply</div>
                                                     </div>
                                                 </div>
-                                                <div class="inventory-legend-value">{{ $inventoryInStock }}</div>
+                                                <div class="inventory-legend-value" id="inventoryInStockValue">0</div>
                                             </div>
 
-                                            <div class="inventory-legend-item">
+                                            <div class="inventory-legend-item" data-stock-filter="low-stock">
+                                                <span class="legend-bubble"></span>
+                                                <span class="legend-bubble-sm"></span>
                                                 <div class="inventory-legend-left">
                                                     <span class="inventory-legend-dot low-stock"></span>
                                                     <div>
                                                         <div class="inventory-legend-label">Low Stock</div>
-                                                        <div class="inventory-legend-sub">Running low on stock</div>
+                                                        <div class="inventory-legend-sub">Replenishment required</div>
                                                     </div>
                                                 </div>
-                                                <div class="inventory-legend-value">{{ $inventoryLowStock }}</div>
+                                                <div class="inventory-legend-value" id="inventoryLowStockValue">0</div>
                                             </div>
 
-                                            <div class="inventory-legend-item">
+                                            <div class="inventory-legend-item" data-stock-filter="out-stock">
+                                                <span class="legend-bubble"></span>
+                                                <span class="legend-bubble-sm"></span>
                                                 <div class="inventory-legend-left">
                                                     <span class="inventory-legend-dot out-stock"></span>
                                                     <div>
@@ -1532,28 +1716,28 @@
                                                         <div class="inventory-legend-sub">Currently unavailable</div>
                                                     </div>
                                                 </div>
-                                                <div class="inventory-legend-value">{{ $inventoryOutOfStock }}</div>
+                                                <div class="inventory-legend-value" id="inventoryOutStockValue">0</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="inventory-mini-stats-row">
-                                        <div class="inventory-mini-pill">
+                                        <div class="inventory-mini-pill total">
                                             <div class="inventory-mini-pill-label">Total</div>
-                                            <div class="inventory-mini-pill-value">{{ $inventoryTotal }}</div>
+                                            <div class="inventory-mini-pill-value" id="inventoryTotalValue">0</div>
                                         </div>
 
-                                        <div class="inventory-mini-pill">
+                                        <div class="inventory-mini-pill medicine">
                                             <div class="inventory-mini-pill-label">Medicine</div>
-                                            <div class="inventory-mini-pill-value">{{ $inventoryMedicine }}</div>
+                                            <div class="inventory-mini-pill-value" id="inventoryMedicineValue">0</div>
                                         </div>
 
-                                        <div class="inventory-mini-pill">
+                                        <div class="inventory-mini-pill supplies">
                                             <div class="inventory-mini-pill-label">Supplies</div>
-                                            <div class="inventory-mini-pill-value">{{ $inventorySupplies }}</div>
+                                            <div class="inventory-mini-pill-value" id="inventorySuppliesValue">0</div>
                                         </div>
                                     </div>
-                                @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1750,41 +1934,169 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    let adminInventoryOverviewChart = null;
 
+    function animateInventoryLegendCard(card) {
+        if (!card) return;
+        card.classList.remove('pulse-pop');
+        void card.offsetWidth;
+        card.classList.add('pulse-pop');
+    }
+
+    function setInventoryOverviewEmptyState(message, isError = false) {
+        const emptyEl = document.getElementById('inventoryOverviewEmpty');
+        const contentEl = document.getElementById('inventoryOverviewContent');
+        const textEl = document.getElementById('inventoryOverviewEmptyText');
+        const iconEl = document.getElementById('inventoryOverviewEmptyIcon');
+
+        if (!emptyEl || !contentEl) return;
+
+        emptyEl.style.display = 'flex';
+        contentEl.style.display = 'none';
+
+        if (textEl) {
+            textEl.textContent = message || 'No inventory records yet';
+        }
+
+        if (iconEl) {
+            iconEl.className = isError
+                ? 'fa-solid fa-triangle-exclamation'
+                : 'fa-solid fa-box-open';
+            iconEl.style.color = isError ? '#f59e0b' : '#e5e7eb';
+        }
+    }
+
+    function showInventoryOverviewContent() {
+        const emptyEl = document.getElementById('inventoryOverviewEmpty');
+        const contentEl = document.getElementById('inventoryOverviewContent');
+
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (contentEl) contentEl.style.display = 'block';
+    }
+
+    function bindInventoryLegendClicks() {
+        document.querySelectorAll('.inventory-legend-item').forEach(card => {
+            if (card.dataset.bound === '1') return;
+
+            card.dataset.bound = '1';
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.inventory-legend-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                animateInventoryLegendCard(this);
+
+                const filter = this.dataset.stockFilter || '';
+                const target = "{{ route('admin.inventory') }}";
+                const url = filter ? `${target}?stock_filter=${filter}` : target;
+
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 120);
+            });
+        });
+    }
+
+    async function loadAdminDashboardInventoryOverview() {
         const ctx = document.getElementById('inventoryDonutChart');
         if (!ctx) return;
 
-        const data = [
-            {{ $inventoryInStock ?? 0 }},
-            {{ $inventoryLowStock ?? 0 }},
-            {{ $inventoryOutOfStock ?? 0 }}
-        ];
-
-        if (data.reduce((a,b)=>a+b,0) === 0) return;
-
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['In Stock', 'Low Stock', 'Out'],
-                datasets: [{
-                    data: data,
-                    backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
-                    hoverBackgroundColor: ['#16a34a', '#d97706', '#dc2626'],
-                    borderColor: '#ffffff',
-                    borderWidth: 2.5,
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                    legend: { display: false }
+        try {
+            const res = await fetch("{{ route('admin.inventory.data') }}", {
+                method: 'GET',
+                cache: 'no-store',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
+            });
+
+            const contentType = res.headers.get('content-type') || '';
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
             }
-        });
+
+            if (!contentType.includes('application/json')) {
+                throw new Error('Inventory endpoint did not return JSON');
+            }
+
+            const items = await res.json();
+
+            if (!Array.isArray(items)) {
+                throw new Error('Inventory response is not an array');
+            }
+
+            const total = items.length;
+            const medicine = items.filter(item => item.category === 'Medicine').length;
+            const supplies = items.filter(item => item.category === 'Supplies').length;
+            const inStock = items.filter(item => Number(item.qty) - Number(item.used) > 5).length;
+            const lowStock = items.filter(item => {
+                const bal = Number(item.qty) - Number(item.used);
+                return bal >= 1 && bal <= 5;
+            }).length;
+            const outStock = items.filter(item => Number(item.qty) - Number(item.used) <= 0).length;
+
+            if (total <= 0) {
+                setInventoryOverviewEmptyState('No inventory records yet', false);
+                return;
+            }
+
+            showInventoryOverviewContent();
+
+            document.getElementById('inventoryInStockValue').textContent = inStock;
+            document.getElementById('inventoryLowStockValue').textContent = lowStock;
+            document.getElementById('inventoryOutStockValue').textContent = outStock;
+            document.getElementById('inventoryTotalValue').textContent = total;
+                const donutTotalEl = document.getElementById('inventoryDonutTotal');
+                if (donutTotalEl) donutTotalEl.textContent = total;
+            document.getElementById('inventoryMedicineValue').textContent = medicine;
+            document.getElementById('inventorySuppliesValue').textContent = supplies;
+
+            if (adminInventoryOverviewChart) {
+                adminInventoryOverviewChart.destroy();
+            }
+
+            adminInventoryOverviewChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+                    datasets: [{
+                        data: [inStock, lowStock, outStock],
+                        backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                        hoverBackgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            bindInventoryLegendClicks();
+
+            console.log('Dashboard inventory overview loaded:', {
+                total, medicine, supplies, inStock, lowStock, outStock
+            });
+
+        } catch (error) {
+            console.error('Dashboard inventory overview error:', error);
+            setInventoryOverviewEmptyState('Failed to load inventory overview', true);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadAdminDashboardInventoryOverview();
+    });
+
+    window.addEventListener('focus', function () {
+        loadAdminDashboardInventoryOverview();
     });
 </script>
 @endsection
