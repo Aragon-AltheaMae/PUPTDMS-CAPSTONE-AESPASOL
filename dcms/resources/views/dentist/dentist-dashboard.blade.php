@@ -1,40 +1,8 @@
 @extends('layouts.dentist')
 
 @section('title', 'Dentist Dashboard | PUP Taguig Dental Clinic')
-@section('usesAppointmentCalendar', true)
 @section('styles')
 <style>
-    @keyframes wave {
-        0% {
-            transform: rotate(0deg)
-        }
-
-        20% {
-            transform: rotate(14deg)
-        }
-
-        40% {
-            transform: rotate(-8deg)
-        }
-
-        60% {
-            transform: rotate(14deg)
-        }
-
-        80% {
-            transform: rotate(-4deg)
-        }
-
-        100% {
-            transform: rotate(0deg)
-        }
-    }
-
-    .wave-hand {
-        transform-origin: 70% 70%;
-        animation: wave 2.5s ease-in-out infinite;
-    }
-
     .greeting-row {
         display: flex;
         flex-direction: row;
@@ -227,6 +195,61 @@
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 2rem;
+    }
+
+    .day-smart-tooltip {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    }
+
+    .group:hover .day-smart-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .day-smart-tooltip.tooltip-center {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(4px);
+    }
+
+    .group:hover .day-smart-tooltip.tooltip-center {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .day-smart-tooltip.tooltip-left {
+        left: auto;
+        right: 0;
+        transform: translateX(0) translateY(4px);
+    }
+
+    .group:hover .day-smart-tooltip.tooltip-left {
+        transform: translateX(0) translateY(0);
+    }
+
+    .day-smart-tooltip.tooltip-right {
+        left: 0;
+        right: auto;
+        transform: translateX(0) translateY(4px);
+    }
+
+    .group:hover .day-smart-tooltip.tooltip-right {
+        transform: translateX(0) translateY(0);
+    }
+
+    .day-smart-tooltip.tooltip-center>div {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .day-smart-tooltip.tooltip-left>div {
+        right: 14px;
+    }
+
+    .day-smart-tooltip.tooltip-right>div {
+        left: 14px;
     }
 
     @media (min-width: 640px) {
@@ -1033,6 +1056,22 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
 @endif
 @endsection
 
+@include('components.appointment-calendar-script', [
+    'mode' => 'dentist',
+    'renderStyle' => 'dentist',
+    'calendarContainerId' => 'dentistCalendarContainer',
+    'dateInputId' => null,
+    'timeInputId' => null,
+    'slotEndpoint' => route('book.appointment.slots'),
+    'blockedDates' => $unavailableDates ?? [],
+    'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+    'philippineHolidays' => $philippineHolidays ?? [],
+    'personalAppointments' => [],
+    'useDynamicScheduleRules' => false,
+    'disallowToday' => false,
+    'allowToggleOffDate' => false,
+])
+
 @section('scripts')
 <script>
     const dashboardData = {
@@ -1187,24 +1226,32 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
 
     document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
-            const ctx = document.getElementById('gadChart');
-            if (!ctx) return;
-            const hasData = [...GAD_FEMALE, ...GAD_MALE].some(v => v > 0);
-            const emptyState = document.getElementById('empty-state-container');
+        const ctx = document.getElementById('gadChart');
+        if (!ctx) return;
 
-            if (!hasData) {
-                ctx.style.display = 'none';
-                if (emptyState) emptyState.style.display = 'flex';
-                return;
-            }
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not loaded');
+            return;
+        }
 
-            ctx.style.display = 'block';
-            if (emptyState) emptyState.style.display = 'none';
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: GAD_LABELS,
-                    datasets: [{
+        const hasData = [...GAD_FEMALE, ...GAD_MALE].some(v => v > 0);
+        const emptyState = document.getElementById('empty-state-container');
+
+        if (!hasData) {
+            ctx.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'flex';
+            return;
+        }
+
+        ctx.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: GAD_LABELS,
+                datasets: [
+                    {
                         label: 'Female',
                         data: GAD_FEMALE,
                         backgroundColor: 'rgba(255,192,203,0.85)',
@@ -1219,74 +1266,20 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                         borderColor: '#7EC8E3',
                         borderWidth: 1,
                         borderRadius: 6
-                    },
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} cases`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                },
-                                color: '#555'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Patient Category',
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                },
-                                color: '#888'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                borderDash: [4, 4],
-                                color: '#f0f0f0'
-                            },
-                            ticks: {
-                                precision: 0,
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                },
-                                color: '#555'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Number of Cases',
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                },
-                                color: '#888'
-                            }
-                        }
                     }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
                 }
-            });
-        }, 150);
+            }
+        });
+    }, 150);
 
-        loadDentistCalendar();
+    loadDentistCalendar();
     });
 
     function escHtml(str = '') {
@@ -1304,12 +1297,40 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
             .replace(/'/g, "\\'");
     }
 
+
+    function getSmartTooltipClass(dayNumber, firstDow, totalDays) {
+        const col = (firstDow + dayNumber - 1) % 7;
+
+        if (col >= 5) return 'tooltip-left';
+        if (col <= 1) return 'tooltip-right';
+        return 'tooltip-center';
+    }
+
     function buildDayHoverCard(dateStr, appointments) {
-        if (!appointments?.length) return '';
+        const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
-        const encodedAppointments = encodeURIComponent(JSON.stringify(appointments));
+        if (!safeAppointments.length) {
+            return `
+        <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[320px] -translate-x-1/2 rounded-2xl border border-[#efe6df] bg-white p-4 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto">
+            <div class="absolute -top-3 left-0 right-0 h-3"></div>
+            <div class="flex items-center justify-between mb-2">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
+                    <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
+                </div>
+            </div>
+            <div class="rounded-xl border border-dashed border-gray-200 bg-[#fafafa] px-4 py-6 text-center">
+                <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-[#fff5f5] flex items-center justify-center text-[#8B0000]">
+                    <i class="fa-regular fa-calendar-xmark"></i>
+                </div>
+                <p class="text-sm font-semibold text-gray-700">No scheduled patients</p>
+                <p class="text-[12px] text-gray-500 mt-1">This date has no booked appointments.</p>
+            </div>
+        </div>
+        `;
+        }
 
-        const items = appointments.slice(0, 3).map(appt => {
+        const items = safeAppointments.slice(0, 3).map(appt => {
             const status = String(appt.status || '').toLowerCase();
             const canReschedule = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
             const canCancel = ['pending', 'confirmed', 'upcoming', 'rescheduled'].includes(status);
@@ -1321,66 +1342,97 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
             const profileUrl = `${rawProfileUrl}${rawProfileUrl.includes('?') ? '&' : '?'}from=dashboard`;
 
             return `
-            <div class="rounded-xl border border-gray-100 p-3 bg-white">
-                <div class="flex items-center justify-between gap-3 mb-2">
-                    <div class="min-w-0">
-                        <p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
-                        <p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
-                    </div>
-                    <a href="${escHtml(profileUrl)}"
-                       class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
-                        View
-                    </a>
+        <div class="rounded-xl border border-gray-100 p-3 bg-white">
+            <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
+                    <p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
                 </div>
-
-                <div class="flex flex-wrap gap-2">
-                    <a href="${escHtml(profileUrl)}"
-                       class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#8B0000] text-white text-[10px] font-semibold hover:bg-[#660000] transition">
-                        <i class="fa-regular fa-user text-[10px]"></i> Profile
-                    </a>
-
-                    ${canReschedule ? `
-                                <button type="button"
-                                    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
-                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-semibold hover:bg-amber-200 transition">
-                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
-                                </button>
-                            ` : ''}
-
-                    ${canCancel ? `
-                                <button type="button"
-                                    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
-                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-100 text-red-700 text-[10px] font-semibold hover:bg-red-200 transition">
-                                    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
-                                </button>
-                            ` : ''}
-                </div>
+                <a href="${escHtml(profileUrl)}"
+                class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
+                    View
+                </a>
             </div>
+
+            <div class="flex flex-wrap gap-2">
+                <a href="${escHtml(profileUrl)}"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#8B0000] text-white text-[10px] font-semibold hover:bg-[#660000] transition">
+                    <i class="fa-regular fa-user text-[10px]"></i> Profile
+                </a>
+
+                ${canReschedule ? `
+                        <button type="button"
+                            onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-semibold hover:bg-amber-200 transition">
+                            <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
+                        </button>
+                    ` : ''}
+
+                ${canCancel ? `
+                        <button type="button"
+                            onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-100 text-red-700 text-[10px] font-semibold hover:bg-red-200 transition">
+                            <i class="fa-solid fa-ban text-[10px]"></i> Cancel
+                        </button>
+                    ` : ''}
+            </div>
+        </div>
         `;
         }).join('');
 
         return `
-            <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[340px] -translate-x-1/2 rounded-2xl
-            border border-[#efe6df] bg-white p-3 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto">
-                <div class="absolute -top-3 left-0 right-0 h-3"></div>
-                <div class="flex items-center justify-between mb-2">
-                    <div>
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
-                        <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
-                    </div>
-                    <a href="{{ route('dentist.dentist.appointments') }}"
-                        class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
-                        View all
-                    </a>
+        <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[340px] -translate-x-1/2 rounded-2xl border border-[#efe6df] bg-white p-3 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto">
+            <div class="absolute -top-3 left-0 right-0 h-3"></div>
+            <div class="flex items-center justify-between mb-2">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
+                    <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
                 </div>
-                <div class="space-y-2">
-                    ${items}
-                </div>
+                <a href="{{ route('dentist.dentist.appointments') }}"
+                class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
+                    View all
+                </a>
             </div>
-            `;
+            <div class="space-y-2">
+                ${items}
+            </div>
+        </div>
+        `;
     }
 
     function loadDentistCalendar() {
+
+        if (typeof renderUnifiedCalendarLegend !== 'function') {
+            function renderUnifiedCalendarLegend(mode) {
+                if (mode !== 'dentist') return '';
+
+                return `
+                    <div class="mt-5 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-center gap-2">
+                        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B0000]/10 text-[#8B0000] text-[11px] font-semibold">
+                            <i class="fa-solid fa-calendar-day text-[10px]"></i>
+                            Today
+                        </div>
+                        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+                            <i class="fa-solid fa-user-check text-[10px]"></i>
+                            Has Patients
+                        </div>
+                        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-[11px] font-semibold">
+                            <i class="fa-solid fa-ban text-[10px]"></i>
+                            Fully Booked
+                        </div>
+                        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-[11px] font-semibold">
+                            <i class="fa-solid fa-star text-[10px]"></i>
+                            Holiday
+                        </div>
+                        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold">
+                            <i class="fa-solid fa-circle-minus text-[10px]"></i>
+                            Unavailable
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         const MAX_PER_DAY = 5;
         const apptCounts = dashboardData.apptCounts;
         const apptDetails = dashboardData.apptDetails || {};
@@ -1441,38 +1493,53 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                 const canOpenModal = dayAppointments.length > 0;
                 const encodedAppointments = encodeURIComponent(JSON.stringify(dayAppointments));
 
-                let dotHtml = '',
-                    badgeHtml = '',
-                    tooltipTxt = '';
+                let badgeHtml = '',
+                    tooltipTxt = '',
+                    tooltipTone = 'dark';
 
                 if (holiday) {
-                    dotHtml =
-                        `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>`;
-                    tooltipTxt = `<i class="fa-solid fa-star mr-1 text-blue-300"></i>${holiday}`;
+                    badgeHtml =
+                        `<span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-yellow-400 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+                                <i class="fa-solid fa-star text-[8px]"></i>
+                            </span>`;
+                    tooltipTxt = `<i class="fa-solid fa-star mr-1 text-white"></i>${holiday}`;
+                    tooltipTone = 'yellow';
                 }
 
                 if (hasAppts && !isUnavail) {
                     if (isFull) {
-                        dotHtml =
-                            `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>`;
                         tooltipTxt =
-                            `<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked — ${count} patients`;
+                            `<i class="fa-solid fa-circle-xmark mr-1 text-red-300"></i>Fully booked — ${count} patient${count > 1 ? 's' : ''}`;
+                        tooltipTone = 'red';
                     } else {
-                        dotHtml =
-                            `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-[#8B0000]'}"></span>`;
                         tooltipTxt =
-                            `<i class="fa-solid fa-user-clock mr-1 text-yellow-300"></i>${count} patient${count > 1 ? 's' : ''} scheduled`;
+                            `<i class="fa-solid fa-user-clock mr-1 text-emerald-300"></i>${count} patient${count > 1 ? 's' : ''} scheduled`;
+                        tooltipTone = 'green';
                     }
-                    const pillColor = isFull ? 'bg-red-500 text-white' : (isToday ? 'bg-white text-[#8B0000]' :
-                        'bg-[#8B0000] text-white');
+
+                    const pillColor = isFull
+                    ? 'bg-red-600 text-white'
+                    : (isToday ? 'bg-white text-[#8B0000]' : 'bg-emerald-600 text-white');
+
                     badgeHtml =
-                        `<span class="absolute -top-1.5 -right-1.5 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ${pillColor} shadow">${count}</span>`;
+                        `<span class="absolute -top-1.5 -right-1.5 text-[9px] font-bold min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center ${pillColor} shadow">${count}</span>`;
                 }
 
-                if (isUnavail && !holiday && !hasAppts) {
-                    tooltipTxt = weekend ?
-                        `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed` :
-                        `<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available`;
+                if (isToday && !hasAppts && !holiday) {
+                    tooltipTxt = `<i class="fa-solid fa-calendar-day mr-1 text-white/90"></i>Today`;
+                    tooltipTone = 'today';
+                } else if (isUnavail && !holiday && !hasAppts) {
+                    badgeHtml =
+                        `<span class="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-gray-500 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+                            <i class="fa-solid fa-minus text-[8px]"></i>
+                        </span>`;
+                    tooltipTxt = weekend
+                        ? `<i class="fa-solid fa-ban mr-1 text-gray-300"></i>Clinic closed`
+                        : `<i class="fa-solid fa-ban mr-1 text-gray-300"></i>Not available`;
+                    tooltipTone = 'gray';
+                } else if (!hasAppts && !holiday && !isToday && !isUnavail) {
+                    tooltipTxt = `<i class="fa-regular fa-calendar mr-1 text-gray-300"></i>No scheduled patients`;
+                    tooltipTone = 'gray';
                 }
 
                 let bgClass = '',
@@ -1485,15 +1552,15 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                     textClass = 'text-white font-extrabold';
                     ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
                 } else if (holiday) {
-                    bgClass = 'bg-blue-50 hover:bg-blue-100';
-                    textClass = 'text-blue-700 font-semibold';
+                    bgClass = 'bg-yellow-50 hover:bg-yellow-100';
+                    textClass = 'text-yellow-700 font-semibold';
                 } else if (isFull) {
                     bgClass = 'bg-red-50 hover:bg-red-100';
                     textClass = 'text-red-600 font-semibold';
                     cursor = 'cursor-pointer';
                 } else if (hasAppts) {
-                    bgClass = 'bg-[#FFF5F5] hover:bg-[#FFE8E8]';
-                    textClass = 'text-[#8B0000] font-semibold';
+                    bgClass = 'bg-emerald-50 hover:bg-emerald-100';
+                    textClass = 'text-emerald-700 font-semibold';
                     cursor = 'cursor-pointer';
                 } else if (isUnavail) {
                     textClass = 'text-gray-300';
@@ -1501,11 +1568,44 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                     bgClass = 'hover:bg-gray-100';
                 }
 
-                const tooltipHtml = tooltipTxt ?
-                    `<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">${tooltipTxt}<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>` :
-                    '';
+                const tooltipClass = getSmartTooltipClass(d, firstDow, totalDays);
+                const tooltipPalette = {
+                    dark: {
+                        bg: 'bg-[#1a1a1a]',
+                        arrow: 'border-t-[#1a1a1a]',
+                    },
+                    gray: {
+                        bg: 'bg-gray-700',
+                        arrow: 'border-t-gray-700',
+                    },
+                    red: {
+                        bg: 'bg-red-600',
+                        arrow: 'border-t-red-600',
+                    },
+                    green: {
+                        bg: 'bg-emerald-600',
+                        arrow: 'border-t-emerald-600',
+                    },
+                    yellow: {
+                        bg: 'bg-yellow-500',
+                        arrow: 'border-t-yellow-500',
+                    },
+                    today: {
+                        bg: 'bg-[#8B0000]',
+                        arrow: 'border-t-[#8B0000]',
+                    }
+                };
 
-                const hoverCardHtml = canOpenModal && isHoverDevice ?
+                const palette = tooltipPalette[tooltipTone] || tooltipPalette.dark;
+                const showHoverCard = isHoverDevice && !holiday && !isUnavail;
+
+                const tooltipHtml = (!showHoverCard && tooltipTxt) ? `
+                        <div class="day-smart-tooltip ${tooltipClass} ${palette.arrow} absolute bottom-full mb-3 z-50 ${palette.bg} text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl">
+                            ${tooltipTxt}
+                        </div>
+                    ` : '';
+
+                const hoverCardHtml = showHoverCard ?
                     buildDayHoverCard(dateStr, dayAppointments) :
                     '';
 
@@ -1516,50 +1616,44 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                 const mobileAvatarHtml = '';
 
                 cells += `
-                <div class="relative group flex items-center justify-center overflow-visible">
-                    ${tooltipHtml}
-                    ${hoverCardHtml}
-                    <div
+                        <div class="relative group flex items-center justify-center overflow-visible">
+                        ${tooltipHtml}
+                        ${hoverCardHtml}
+                        <div
                         class="relative z-10 w-9 h-9 flex items-center justify-center text-sm rounded-full transition-all duration-150 ${bgClass} ${textClass} ${ringClass} ${cursor}"
                         ${clickOpen}
-                    >
-                        ${d}${dotHtml}${badgeHtml}
-                    </div>
-                    ${mobileAvatarHtml}
-                </div>`;
+                        >
+                        ${d}${badgeHtml}
+                        </div>
+                        ${mobileAvatarHtml}
+                        </div>`;
             }
 
             const container = document.getElementById('dentistCalendarContainer');
             if (container) {
                 container.innerHTML = `
-                    <div class="h-full flex flex-col select-none">
-                        <div class="flex items-center justify-center gap-2 mb-3">
-                            <i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
-                            <h2 class="text-lg font-extrabold text-[#333]">Clinic Appointment Schedule</h2>
-                        </div>
-                        <hr class="border-t border-gray-200 mb-2">
-                        <div class="flex items-center justify-between my-4">
-                            <button onclick="changeDentistMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
-                                <i class="fa-solid fa-chevron-left text-xs"></i>
-                            </button>
-                            <div class="text-center">
-                                <p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
-                                <p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
-                            </div>
-                            <button onclick="changeDentistMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2 mb-2">${headerHtml}</div>
-                        <div class="grid grid-cols-7 gap-2" style="row-gap:1.2rem;">${cells}</div>
-                        <div class="mt-5 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
-                            <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-[#8B0000] flex-shrink-0"></span><span class="text-[11px] text-[#555]">Today</span></div>
-                            <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-[#FFF5F5] border border-[#8B0000] flex-shrink-0"></span><span class="text-[11px] text-[#555]">Has Patients</span></div>
-                            <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-red-50 border border-red-400 flex-shrink-0"></span><span class="text-[11px] text-[#555]">Fully Booked</span></div>
-                            <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-blue-50 border border-blue-400 flex-shrink-0"></span><span class="text-[11px] text-[#555]">Holiday</span></div>
-                            <div class="flex items-center gap-1.5"><span class="text-gray-300 text-base font-bold leading-none">–</span><span class="text-[11px] text-[#555]">Unavailable</span></div>
-                        </div>
-                    </div>`;
+<div class="h-full flex flex-col select-none">
+<div class="flex items-center justify-center gap-2 mb-3">
+<i class="fa-regular fa-calendar-check text-[#8B0000] text-xl"></i>
+<h2 class="text-lg font-extrabold text-[#333]">Clinic Appointment Schedule</h2>
+</div>
+<hr class="border-t border-gray-200 mb-2">
+<div class="flex items-center justify-between my-4">
+<button onclick="changeDentistMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+<i class="fa-solid fa-chevron-left text-xs"></i>
+</button>
+<div class="text-center">
+<p class="text-lg font-extrabold text-[#8B0000]">${monthNames[month]}</p>
+<p class="text-xs text-[#9CA3AF] font-semibold tracking-widest">${year}</p>
+</div>
+<button onclick="changeDentistMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F0] text-[#8B0000] transition-colors">
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</button>
+</div>
+<div class="grid grid-cols-7 gap-2 mb-2">${headerHtml}</div>
+<div class="grid grid-cols-7 gap-2" style="row-gap:1.2rem;">${cells}</div>
+${typeof renderUnifiedCalendarLegend === 'function' ? renderUnifiedCalendarLegend('dentist') : ''}
+</div>`;
             }
         }
 
@@ -1623,11 +1717,11 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
 
         if (!appointments.length) {
             listEl.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
-                    <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-[#8B0000]"></i>
-                    <p class="text-sm font-semibold text-gray-700">No appointments for this date</p>
-                </div>
-            `;
+<div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
+<i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-[#8B0000]"></i>
+<p class="text-sm font-semibold text-gray-700">No appointments for this date</p>
+</div>
+`;
         } else {
             listEl.innerHTML = appointments.map(appt => {
                 const badgeClass = getStatusBadgeClass(appt.status);
@@ -1643,56 +1737,56 @@ $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
                     /'/g, "\'");
 
                 return `
-                    <div class="border border-gray-100 rounded-xl p-3 hover:bg-gray-50 transition">
-                        <div class="flex items-center gap-3">
-                            <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
-                               class="rounded-full w-10 h-10 border-2 border-[#8B0000]/10 bg-[#8B0000]/10 flex items-center justify-center font-bold text-sm text-[#8B0000] flex-shrink-0">
-                                ${initial}
-                            </a>
+<div class="border border-gray-100 rounded-xl p-3 hover:bg-gray-50 transition">
+<div class="flex items-center gap-3">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+class="rounded-full w-10 h-10 border-2 border-[#8B0000]/10 bg-[#8B0000]/10 flex items-center justify-center font-bold text-sm text-[#8B0000] flex-shrink-0">
+${initial}
+</a>
 
-                            <div class="flex-1 min-w-0">
-                                <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
-                                   class="font-semibold text-sm text-gray-800 truncate hover:text-[#8B0000] transition block">
-                                    ${appt.name || 'Unknown Patient'}
-                                </a>
-                                <p class="text-xs text-gray-500 truncate flex items-center gap-1">
-                                    <i class="fa-solid fa-stethoscope text-[10px]"></i>
-                                    ${appt.service || 'General Service'} · ${appt.time || '—'}
-                                </p>
-                            </div>
+<div class="flex-1 min-w-0">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+class="font-semibold text-sm text-gray-800 truncate hover:text-[#8B0000] transition block">
+${appt.name || 'Unknown Patient'}
+</a>
+<p class="text-xs text-gray-500 truncate flex items-center gap-1">
+<i class="fa-solid fa-stethoscope text-[10px]"></i>
+${appt.service || 'General Service'} · ${appt.time || '—'}
+</p>
+</div>
 
-                            <span class="px-2 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
-                                ${appt.status || 'Pending'}
-                            </span>
-                        </div>
+<span class="px-2 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
+${appt.status || 'Pending'}
+</span>
+</div>
 
-                        <div class="mt-3 flex flex-wrap items-center gap-2">
-                            <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-[11px] font-semibold hover:bg-[#660000] transition">
-                                <i class="fa-regular fa-user text-[10px]"></i>
-                                View Profile
-                            </a>
+<div class="mt-3 flex flex-wrap items-center gap-2">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard" onclick="closeDayAppointmentsModal()"
+class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-[11px] font-semibold hover:bg-[#660000] transition">
+<i class="fa-regular fa-user text-[10px]"></i>
+View Profile
+</a>
 
-                            ${canReschedule ? `
-                    <button type="button"
-                        onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${appt.service || ''}', '${rescheduleUrl}')"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[11px] font-semibold hover:bg-amber-200 transition">
-                        <i class="fa-solid fa-rotate-right text-[10px]"></i>
-                        Reschedule
-                    </button>
-                ` : ''}
+${canReschedule ? `
+        <button type="button"
+        onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${appt.service || ''}', '${rescheduleUrl}')"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[11px] font-semibold hover:bg-amber-200 transition">
+        <i class="fa-solid fa-rotate-right text-[10px]"></i>
+        Reschedule
+        </button>
+        ` : ''}
 
-                 ${canCancel ? `
-                        <button type="button"
-                        onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
-                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-[11px] font-semibold hover:bg-red-200 transition">
-                                                    <i class="fa-solid fa-ban text-[10px]"></i>
-                                                    Cancel
-                                                </button>
-                                            ` : ''}
-                        </div>
-                    </div>
-                `;
+${canCancel ? `
+        <button type="button"
+        onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-[11px] font-semibold hover:bg-red-200 transition">
+        <i class="fa-solid fa-ban text-[10px]"></i>
+        Cancel
+        </button>
+        ` : ''}
+</div>
+</div>
+`;
             }).join('');
         }
 

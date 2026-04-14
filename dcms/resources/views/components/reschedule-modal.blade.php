@@ -100,21 +100,7 @@
                         <hr class="border-[#f0ebe6] mb-3">
 
                         <div id="calGrid" class="grid grid-cols-7 gap-2"></div>
-
-                        <div class="legend mt-4 text-xs flex gap-3 flex-wrap">
-                            <div class="flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-red-500"></span> Full
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-blue-400"></span> Holiday
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-gray-400"></span> Unavailable
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-gray-500"></span> Today not available
-                            </div>
-                        </div>
+                        <div id="dentistCalendarLegend"></div>
                     </div>
 
                     <div class="slots-wrap">

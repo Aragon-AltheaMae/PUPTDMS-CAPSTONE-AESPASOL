@@ -1,5 +1,4 @@
 <script>
-
     function dismissToast(toast) {
         if (!toast || toast.classList.contains('toast-exit')) return;
         toast.classList.add('toast-exit');
@@ -15,9 +14,9 @@
         const container = document.getElementById('toastContainer');
         if (!container) return;
 
-        const icon = tone === 'danger'
-            ? '<i class="fa-solid fa-ban text-red-400 text-sm"></i>'
-            : '<i class="fa-solid fa-circle-check text-green-400 text-sm"></i>';
+        const icon = tone === 'danger' ?
+            '<i class="fa-solid fa-ban text-red-400 text-sm"></i>' :
+            '<i class="fa-solid fa-circle-check text-green-400 text-sm"></i>';
 
         const toast = document.createElement('div');
         toast.className = `toast-item toast-${tone}`;
@@ -48,10 +47,10 @@
 
         sessionStorage.removeItem('dentistToast');
     });
-    
+
     document.documentElement.classList.add('sidebar-preload');
 
-    (function () {
+    (function() {
         try {
             if (window.innerWidth > 767) {
                 const savedSidebarState = localStorage.getItem('dentistSidebarCollapsed');
@@ -62,7 +61,6 @@
         } catch (e) {}
     })();
 
-    /* ── MOBILE DRAWER ── */
     function openDrawer() {
         document.getElementById('mobileDrawer').classList.add('open');
         document.getElementById('mobileDrawerOverlay').classList.add('open');
@@ -75,7 +73,6 @@
         document.body.style.overflow = '';
     }
 
-    /* ── DROPDOWNS (Notif & User) ── */
     document.getElementById('notifBtn')?.addEventListener('click', e => {
         e.stopPropagation();
         document.getElementById('notifMenu').classList.toggle('open');
@@ -93,7 +90,6 @@
         document.getElementById('userMenu')?.classList.remove('open');
     });
 
-    /* ── SIDEBAR TOGGLE ── */
     function applySidebarState(isCollapsed) {
         const sidebar = document.getElementById('sidebar');
         const icon = document.getElementById('sidebarIcon');
@@ -105,8 +101,8 @@
 
         if (isCollapsed) {
             sidebar.classList.add('collapsed');
-            sidebar.style.width = '64px';
-            mainContent.style.marginLeft = '64px';
+            sidebar.style.width = '56px';
+            mainContent.style.marginLeft = '56px';
             icon.className = 'fa-solid fa-bars';
         } else {
             sidebar.classList.remove('collapsed');
@@ -127,7 +123,6 @@
         localStorage.setItem('dentistSidebarCollapsed', nextState ? '1' : '0');
     }
 
-    /* ── THEME TOGGLE ── */
     function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);

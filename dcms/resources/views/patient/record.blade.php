@@ -1,6 +1,6 @@
 @extends('layouts.patient')
 
-@section('title', 'PUP Taguig Dental Clinic | Appointment')
+@section('title', 'Dental Records | PUP Taguig Dental Clinic')
 
 @section('styles')
 
@@ -15,10 +15,6 @@
             color: var(--text-1);
             overflow-x: hidden;
         }
-
-        /* ════════════════════════════
-               PAGE REDESIGN STYLES
-            ════════════════════════════ */
 
         .records-hero {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #b5282a 100%);
@@ -613,6 +609,137 @@
         .modal-close-main:hover {
             background: #DDD9D5;
         }
+
+        .records-page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+            padding-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .records-page-copy {
+            min-width: 0;
+        }
+
+        .records-page-title {
+            font-size: clamp(1.7rem, 3vw, 2.4rem);
+            line-height: 1.1;
+            font-weight: 800;
+            margin: 0;
+
+            background: linear-gradient(135deg, #660000, #8B0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .records-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .records-breadcrumb a {
+            color: #94a3b8;
+            transition: color .18s ease;
+        }
+
+        .records-breadcrumb a:hover {
+            color: var(--crimson);
+        }
+
+        .records-breadcrumb i {
+            font-size: 9px;
+            color: #c4bdb7;
+        }
+
+        .records-breadcrumb-current {
+            color: var(--crimson);
+            font-weight: 700;
+        }
+
+        .records-hero {
+            margin-bottom: -22px;
+            padding: 24px 24px 42px;
+            border-radius: 22px;
+        }
+
+        .records-body {
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .records-section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-top: 4px;
+        }
+
+        .records-section-title span {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: #9E9690;
+            white-space: nowrap;
+        }
+
+        .records-section-title div {
+            flex: 1;
+            height: 1px;
+            background: #EDE8E4;
+        }
+
+        .rec-card {
+            border-radius: 16px;
+            padding: 15px 16px;
+            margin-bottom: 12px;
+        }
+
+        .rec-service {
+            font-size: 15px;
+        }
+
+        .rec-meta-chip {
+            padding: 4px 9px;
+            font-size: 11px;
+        }
+
+        .rec-btn {
+            min-width: 104px;
+            justify-content: center;
+        }
+
+        @media (max-width: 640px) {
+            .records-page-header {
+                margin-bottom: 14px;
+            }
+
+            .records-page-title {
+                font-size: 1.75rem;
+            }
+
+            .records-hero {
+                padding: 20px 18px 36px;
+                border-radius: 18px;
+                margin-bottom: -18px;
+            }
+
+            .records-body {
+                padding: 14px;
+                border-radius: 18px;
+            }
+        }
     </style>
 @endsection
 
@@ -623,15 +750,13 @@
 
 @section('content')
 
-    <!-- ══════ MAIN ══════ -->
-    <main id="mainContent" class="pt-[100px] px-4 sm:px-6 py-6 fade-up min-h-screen">
-        <div class="mx-auto">
+    <main id="mainContent" class="pt-[90px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
+        <div class="w-full fade-in">
 
-            <!-- Breadcrumb -->
-            <div class="text-xs mb-5 font-medium flex items-center gap-1.5 text-gray-400 pt-4">
-                <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
-                <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                <span class="text-[#8B0000] font-semibold">Dental Records</span>
+            <div class="records-page-header">
+                <div class="records-page-copy">
+                    <h1 class="records-page-title">Dental Records</h1>
+                </div>
             </div>
 
             @if (isset($upcomingAppointment) && $upcomingAppointment)
@@ -652,10 +777,10 @@
                         </div>
                         <span
                             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0
-                  {{ $isRescheduled ? 'bg-yellow-400/20 text-yellow-100' : 'bg-emerald-500/20 text-emerald-100' }}">
+{{ $isRescheduled ? 'bg-yellow-400/20 text-yellow-100' : 'bg-emerald-500/20 text-emerald-100' }}">
                             <span
                                 class="w-1.5 h-1.5 rounded-full flex-shrink-0
-                      {{ $isRescheduled ? 'bg-yellow-300' : 'bg-emerald-400' }}"></span>
+{{ $isRescheduled ? 'bg-yellow-300' : 'bg-emerald-400' }}"></span>
                             {{ ucfirst($upcomingAppointment->status) }}
                         </span>
                     </div>
@@ -691,111 +816,100 @@
                     : null;
             @endphp
 
-            <!-- Hero Banner -->
-            <div class="records-hero">
-                <div class="hero-eyebrow">Patient Portal</div>
-                <h1 class="hero-title">Dental Records</h1>
-                <p class="hero-sub">A complete history of your dental visits and treatments.</p>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <i class="fa-solid fa-list"></i>
-                        {{ $totalRecords }} {{ $totalRecords === 1 ? 'visit' : 'visits' }}
-                    </div>
-                    @if ($latestDate)
+                <div class="records-hero">
+                    <div class="hero-eyebrow">Patient Portal</div>
+                    <h2 class="hero-title">Dental Records Overview</h2>
+                    <p class="hero-sub">A complete history of your dental visits and treatments.</p>
+                    <div class="hero-stats">
                         <div class="hero-stat">
-                            <i class="fa-regular fa-calendar"></i>
-                            Latest: {{ $latestDate }}
+                            <i class="fa-solid fa-list"></i>
+                            {{ $totalRecords }} {{ $totalRecords === 1 ? 'visit' : 'visits' }}
+                        </div>
+                        @if ($latestDate)
+                            <div class="hero-stat">
+                                <i class="fa-regular fa-calendar"></i>
+                                Latest: {{ $latestDate }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="records-body">
+
+                    @if ($totalRecords)
+                        <div class="records-section-title">
+                            <span>Visit History</span>
+                            <div></div>
+                        </div>
+
+                        <div class="space-y-0">
+                            @foreach ($records as $i => $record)
+                                @php
+                                    $apptDate = \Carbon\Carbon::parse($record->appointment_date);
+                                    $apptTime = \Carbon\Carbon::parse($record->appointment_time);
+                                    $fmtDate = $apptDate->format('d M Y');
+                                    $fmtTime = $apptTime->format('g:i A');
+                                    $fmtRange =
+                                        $apptTime->format('g:i A') .
+                                        ' – ' .
+                                        $apptTime->copy()->addHour()->format('g:i A');
+                                @endphp
+                                <div class="rec-row" style="animation-delay:{{ $i * 0.06 }}s;">
+
+                                    <div class="rec-tl">
+                                        <div class="rec-dot"></div>
+                                        <div class="rec-line"></div>
+                                    </div>
+
+                                    <div class="rec-card">
+                                        <div class="rec-card-left">
+                                            <div class="rec-service">{{ $record->service_type }}</div>
+                                            <div class="rec-meta">
+                                                <span class="rec-meta-chip">
+                                                    <i class="fa-regular fa-calendar"></i>{{ $fmtDate }}
+                                                </span>
+                                                <span class="rec-meta-chip">
+                                                    <i class="fa-regular fa-clock"></i>{{ $fmtTime }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="rec-btn" onclick="openRecordModal(this)"
+                                            data-service="{{ $record->service_type }}"
+                                            data-date="{{ $apptDate->format('F d, Y') }}" data-time="{{ $fmtRange }}"
+                                            data-status="{{ strtolower($record->status ?? 'completed') }}"
+                                            data-remarks="{{ $record->remarks ?? '' }}"
+                                            data-oral="{{ $record->oral_examination ?? '' }}"
+                                            data-diagnosis="{{ $record->diagnosis ?? '' }}"
+                                            data-prescription="{{ $record->prescription ?? '' }}">
+                                            <i class="fa-regular fa-eye"></i> Details
+                                        </button>
+                                    </div>
+
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon-wrap">
+                                <i class="fa-solid fa-tooth"></i>
+                            </div>
+                            <p class="empty-title">No records yet</p>
+                            <p class="empty-sub">Completed appointment records will appear here after your first dental
+                                visit.</p>
+                            <a href="{{ route('patient.book.appointment') }}"
+                                class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#8B0000] text-white text-sm font-semibold hover:bg-[#660000] transition-colors shadow-md">
+                                <i class="fa-solid fa-calendar-plus text-xs"></i> Book Appointment
+                            </a>
                         </div>
                     @endif
+
                 </div>
-            </div>
-
-            <!-- Records Body Card -->
-            <div class="records-body">
-
-                @if ($totalRecords)
-
-                    {{-- Section label --}}
-                    <div class="flex items-center gap-3 mb-5 pt-2">
-                        <span
-                            style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9E9690;">Visit
-                            History</span>
-                        <div style="flex:1;height:1px;background:#EDE8E4;"></div>
-                    </div>
-
-                    {{-- Timeline --}}
-                    <div class="space-y-0">
-                        @foreach ($records as $i => $record)
-                            @php
-                                $apptDate = \Carbon\Carbon::parse($record->appointment_date);
-                                $apptTime = \Carbon\Carbon::parse($record->appointment_time);
-                                $fmtDate = $apptDate->format('d M Y');
-                                $fmtTime = $apptTime->format('g:i A');
-                                $fmtRange =
-                                    $apptTime->format('g:i A') . ' – ' . $apptTime->copy()->addHour()->format('g:i A');
-                            @endphp
-                            <div class="rec-row" style="animation-delay:{{ $i * 0.06 }}s;">
-
-                                {{-- Timeline dot + line --}}
-                                <div class="rec-tl">
-                                    <div class="rec-dot"></div>
-                                    <div class="rec-line"></div>
-                                </div>
-
-                                {{-- Card --}}
-                                <div class="rec-card">
-                                    <div class="rec-card-left">
-                                        <div class="rec-service">{{ $record->service_type }}</div>
-                                        <div class="rec-meta">
-                                            <span class="rec-meta-chip">
-                                                <i class="fa-regular fa-calendar"></i>{{ $fmtDate }}
-                                            </span>
-                                            <span class="rec-meta-chip">
-                                                <i class="fa-regular fa-clock"></i>{{ $fmtTime }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="rec-btn" onclick="openRecordModal(this)"
-                                        data-service="{{ $record->service_type }}"
-                                        data-date="{{ $apptDate->format('F d, Y') }}" data-time="{{ $fmtRange }}"
-                                        data-status="completed" data-duration="{{ $record->duration ?? '—' }}"
-                                        data-remarks="{{ $record->remarks ?? '' }}"
-                                        data-oral="{{ $record->oral_examination ?? '' }}"
-                                        data-diagnosis="{{ $record->diagnosis ?? '' }}"
-                                        data-prescription="{{ $record->prescription ?? '' }}">
-                                        <i class="fa-regular fa-eye"></i> Details
-                                    </button>
-                                </div>
-
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <div class="empty-icon-wrap">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
-                        <p class="empty-title">No records yet</p>
-                        <p class="empty-sub">Completed appointment records will appear here after your first dental
-                            visit.</p>
-                        <a href="{{ route('patient.book.appointment') }}"
-                            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#8B0000] text-white text-sm font-semibold hover:bg-[#660000] transition-colors shadow-md">
-                            <i class="fa-solid fa-calendar-plus text-xs"></i> Book Appointment
-                        </a>
-                    </div>
-
-                @endif
-
-            </div>
-
         </div>
     </main>
 
-    <!-- ══════ RECORD MODAL ══════ -->
     <dialog id="record_modal">
         <div class="modal-inner">
 
-            <!-- Header -->
             <div class="modal-head">
                 <div class="drag-pill"></div>
                 <div class="modal-head-top">
@@ -815,10 +929,8 @@
                 </div>
             </div>
 
-            <!-- Body -->
             <div class="modal-body">
 
-                <!-- Status + Duration chips -->
                 <div class="chip-row">
                     <div class="chip-box">
                         <div class="chip-lbl"><i class="fa-solid fa-circle-check"
@@ -833,7 +945,6 @@
                     </div>
                 </div>
 
-                <!-- Treatment -->
                 <div class="msec">
                     <div class="msec-head"><span class="msec-lbl">Treatment</span>
                         <div class="msec-rule"></div>
@@ -844,7 +955,6 @@
                     </div>
                 </div>
 
-                <!-- Oral Examination -->
                 <div class="msec">
                     <div class="msec-head"><span class="msec-lbl">Oral Examination</span>
                         <div class="msec-rule"></div>
@@ -855,7 +965,6 @@
                     </div>
                 </div>
 
-                <!-- Diagnosis -->
                 <div class="msec">
                     <div class="msec-head"><span class="msec-lbl">Diagnosis</span>
                         <div class="msec-rule"></div>
@@ -866,7 +975,6 @@
                     </div>
                 </div>
 
-                <!-- Prescription -->
                 <div class="msec">
                     <div class="msec-head"><span class="msec-lbl">Prescription</span>
                         <div class="msec-rule"></div>
@@ -879,7 +987,6 @@
 
             </div>
 
-            <!-- Footer -->
             <div class="modal-footer">
                 <button type="button" class="modal-close-main" id="modalCloseFooter">Close</button>
             </div>
@@ -890,7 +997,6 @@
 
 @section('scripts')
     <script>
-        /* ── RECORD MODAL ── */
         var recModal = document.getElementById('record_modal');
 
         function openRecordModal(btn) {
@@ -923,7 +1029,6 @@
             recModal.close();
         }
 
-        /* ── DOM READY ── */
         document.addEventListener('DOMContentLoaded', function() {
 
             document.getElementById('modalCloseBtn').addEventListener('click', closeRecModal);
@@ -933,53 +1038,6 @@
                 var r = recModal.getBoundingClientRect();
                 if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)
                     closeRecModal();
-            });
-
-            /* Mobile FAB */
-            var mf = document.getElementById('mobFab'),
-                mm = document.getElementById('mobFabMenu');
-            if (mf && mm) {
-                mf.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    var o = mm.classList.contains('open');
-                    mm.classList.toggle('open', !o);
-                    mf.classList.toggle('open', !o);
-                });
-                mm.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-
-            /* Notifications */
-            var nb = document.getElementById("notifBtn"),
-                nm = document.getElementById("notifMenu");
-            if (nb && nm) {
-                nb.addEventListener("click", function(e) {
-                    e.stopPropagation();
-                    nm.classList.toggle("open");
-                });
-                nm.addEventListener("click", function(e) {
-                    e.stopPropagation();
-                });
-                document.addEventListener("keydown", function(e) {
-                    if (e.key === "Escape") nm.classList.remove("open");
-                });
-            }
-
-            /* Outside clicks */
-            document.addEventListener('click', function(e) {
-                if (mm) {
-                    mm.classList.remove('open');
-                    if (mf) mf.classList.remove('open');
-                }
-                if (nm) nm.classList.remove('open');
-                var panel = document.getElementById('mobileProfileAccordion');
-                var toggle = document.getElementById('mobileProfileToggle');
-                var chev = document.getElementById('mobileProfileChevron');
-                if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
-                    panel.classList.remove('open');
-                    if (chev) chev.style.transform = 'rotate(0deg)';
-                }
             });
         });
     </script>

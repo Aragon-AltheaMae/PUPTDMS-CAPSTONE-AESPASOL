@@ -7,24 +7,14 @@
     <title>@yield('title', 'Dentist Portal | PUP Taguig Dental Clinic')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-    <script>
-        tailwind.config = {
-            daisyui: {
-                themes: false
-            }
-        }
-    </script>
 
     <style>
         body {
@@ -45,7 +35,7 @@
 </head>
 
 <body class="role-dentist @yield('body-class', 'bg-[#F4F4F4]')">
-    
+
     @include('partials.header', [
         'role' => 'dentist',
         'notifications' => $notifications ?? [],
@@ -102,8 +92,14 @@
             'calendarWrapSelector' => '.cal-wrap',
             'slotsWrapSelector' => '.slots-wrap',
             'slotEndpoint' => route('dentist.appointment.slots'),
-            'scheduleRules' => isset($scheduleRules) ? $scheduleRules : \App\Models\ClinicSchedule::active()->get()->values()->toArray(),
-            'blockedDates' => isset($blockedDates) ? $blockedDates : (isset($unavailableDates) ? $unavailableDates : []),
+            'scheduleRules' => isset($scheduleRules)
+                ? $scheduleRules
+                : \App\Models\ClinicSchedule::active()->get()->values()->toArray(),
+            'blockedDates' => isset($blockedDates)
+                ? $blockedDates
+                : (isset($unavailableDates)
+                    ? $unavailableDates
+                    : []),
             'appointmentCountsPerDay' => isset($appointmentCountsPerDay) ? $appointmentCountsPerDay : [],
             'philippineHolidays' => isset($philippineHolidays) ? $philippineHolidays : [],
             'disallowToday' => true,
