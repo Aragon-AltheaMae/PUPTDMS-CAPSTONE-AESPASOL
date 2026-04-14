@@ -29,11 +29,11 @@ class HomepageController extends Controller
             "Patient viewed homepage"
         );
         $appointments = Appointment::where('patient_id', $patient->id)
+            ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // Upcoming appointment (nearest from today onwards)
         $today = now()->toDateString();
 
         $upcomingAppointment = Appointment::where('patient_id', $patient->id)
@@ -43,24 +43,22 @@ class HomepageController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->first();
 
-        // Count appointments per day for the calendar
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
-        // Unavailable dates
         $unavailableDates = [];
 
         $philippineHolidays = PhilippineHolidays::range(0, 4);
 
         $records = Appointment::where('patient_id', $patient->id)
+            ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        // Notifications
         $notifications = [];
 
         return view('patient.index', compact(

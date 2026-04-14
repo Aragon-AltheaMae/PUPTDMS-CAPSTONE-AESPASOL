@@ -4,7 +4,6 @@
 
 @section('styles')
     <style>
-        /* ── ANIMATIONS ── */
         @keyframes fadeUp {
             0% {
                 opacity: 0;
@@ -45,7 +44,6 @@
             }
         }
 
-        /* ── DESKTOP LAYOUT ── */
         #mainContent {
             margin-left: 220px;
             transition: margin-left .3s ease;
@@ -55,11 +53,9 @@
             #mainContent {
                 margin-left: 0 !important;
                 padding-bottom: 110px;
-                /* Accounts for floating nav */
             }
         }
 
-        /* ── APPOINTMENT TABS ── */
         .appt-tab.appt-active {
             background: #8B0000;
             color: white;
@@ -71,7 +67,6 @@
             color: white;
         }
 
-        /* ── SERVICES SECTION ── */
         .service-card {
             position: relative;
             overflow: hidden;
@@ -112,7 +107,6 @@
             transform: translateX(-6px) scale(1.08);
         }
 
-        /* ── MODAL ── */
         dialog#appt_detail_modal::backdrop {
             background: rgba(16, 16, 16, .45);
         }
@@ -123,23 +117,21 @@
 
     @php
         $calendarAppointments = [];
-        foreach ($appointments ?? collect() as $appt) {
+        foreach (
+            collect($appointments ?? [])->filter(function ($appt) {
+                $status = strtolower($appt->status ?? '');
+                return !in_array($status, ['completed', 'cancelled']);
+            })
+            as $appt
+        ) {
             $calendarAppointments[\Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d')] =
                 $appt->service_type . ' • ' . $appt->appointment_time;
         }
     @endphp
 
-    <main id="mainContent" class="pt-[90px] px-4 sm:px-6 md:px-8 py-6 fade-up min-h-screen">
-        {{-- Max-W container cleanly centers the layout on desktop --}}
-        <div class="max-w-5xl mx-auto w-full">
+    <main id="mainContent" class="pt-[90px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
+        <div class="w-full fade-in">
 
-            <div class="text-xs mb-6 font-medium flex items-center gap-1.5 text-gray-400">
-                <a href="{{ route('homepage') }}" class="hover:text-[#8B0000] transition-colors">Home</a>
-                <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                <span class="text-[#8B0000] font-bold">Appointment</span>
-            </div>
-
-            {{-- Calendar Widget --}}
             <section class="fade-up mb-10 sm:mb-14">
                 <div id="calendarSkeletonContainer"
                     class="bg-white dark:bg-[#000D1A] border border-gray-100 dark:border-[#1a2a3a] shadow-sm rounded-2xl p-4 sm:p-6 w-full min-h-[420px]">
@@ -154,7 +146,6 @@
                 </div>
             </section>
 
-            {{-- Appointments Section --}}
             <section class="fade-up mb-12 sm:mb-16">
 
                 <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
@@ -227,7 +218,6 @@
                                 $showDot = in_array($rawStatus, ['upcoming', 'scheduled']);
                             @endphp
 
-                            {{-- Refactored Flexbox Card - fully responsive without rigid CSS grid --}}
                             <div class="bg-white dark:bg-[#0a1628] border border-gray-100 dark:border-[#1a2a3a] rounded-[1.25rem] shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col sm:flex-row mb-4 animate-[apptSlideUp_0.35s_ease_backwards]"
                                 style="animation-delay: {{ $index * 0.08 }}s">
 
@@ -378,7 +368,6 @@
 
             </section>
 
-            {{-- Services Section --}}
             <section class="mt-2 mb-8 fade-up">
                 <h2
                     class="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#8B0000] to-[#FFD700] bg-clip-text text-transparent mb-5 sm:mb-6">
@@ -418,7 +407,6 @@
                 </div>
             </section>
 
-            {{-- Appt Details Modal --}}
             <dialog id="appt_detail_modal" class="modal">
                 <div class="modal-box p-0 w-full max-w-md rounded-2xl bg-[#F4F4F4] overflow-hidden dark:bg-[#000D1A]">
                     <div class="bg-gradient-to-r from-[#7A0000] to-[#8B0000] px-5 sm:px-6 py-5 text-white">
@@ -471,7 +459,6 @@
                 <form method="dialog" class="modal-backdrop"><button>close</button></form>
             </dialog>
 
-            {{-- Active Appointment Prevent Booking Modal --}}
             <dialog id="activeAppointmentModal" class="modal">
                 <div
                     class="modal-box p-8 rounded-[1.5rem] bg-white dark:bg-[#000D1A] text-center shadow-2xl w-[min(92vw,400px)]">
@@ -498,15 +485,26 @@
 
         </div>
     </main>
+
+    @include('components.appointment-calendar-script', [
+        'mode' => 'patient-appointment',
+        'renderStyle' => 'patient',
+        'calendarContainerId' => 'calendarSkeletonContainer',
+        'dateInputId' => null,
+        'timeInputId' => null,
+        'slotEndpoint' => route('book.appointment.slots'),
+        'blockedDates' => $unavailableDates ?? [],
+        'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+        'philippineHolidays' => $philippineHolidays ?? [],
+        'personalAppointments' => $calendarAppointments ?? [],
+        'useDynamicScheduleRules' => false,
+        'disallowToday' => false,
+        'allowToggleOffDate' => false,
+    ])
 @endsection
 
 @section('scripts')
     <script>
-        const calendarAppointments = @json($calendarAppointments);
-        const calendarCounts = @json($appointmentCountsPerDay ?? []);
-        const calendarUnavailableDates = @json($unavailableDates ?? []);
-        const calendarHolidays = @json($philippineHolidays ?? []);
-
         /* ── TAB TOGGLE ── */
         function apptShowFuture() {
             document.getElementById('apptFuturePanel').style.display = '';
@@ -578,188 +576,6 @@
                     }
                 }
             @endif
-
-            /* ── CALENDAR ── */
-            function loadCalendar() {
-                var MAX_PER_DAY = 5;
-                var myAppointments = calendarAppointments || {};
-                var apptCounts = calendarCounts || {};
-                var unavailableDates = calendarUnavailableDates || [];
-                var allHolidays = calendarHolidays || {};
-
-                var today = new Date();
-                var currentYear = today.getFullYear();
-                var currentMonth = today.getMonth();
-
-                function pad(n) {
-                    return String(n).padStart(2, '0');
-                }
-
-                function isWeekend(y, m, d) {
-                    var dow = new Date(y, m, d).getDay();
-                    return dow === 0 || dow === 6;
-                }
-
-                function getHolidaysForMonth(y, m) {
-                    var f = {};
-                    Object.keys(allHolidays).forEach(function(ds) {
-                        var p = ds.split('-').map(Number);
-                        if (p[0] === y && p[1] === m + 1) f[ds] = allHolidays[ds];
-                    });
-                    return f;
-                }
-
-                function formatTime(raw) {
-                    if (!raw) return '—';
-                    raw = String(raw).trim();
-                    if (/[AaPp][Mm]$/.test(raw)) return raw;
-                    var m = raw.match(/^(\d{1,2}):(\d{2})/);
-                    if (!m) return raw;
-                    var h = parseInt(m[1], 10),
-                        mn = m[2],
-                        ampm = h >= 12 ? 'PM' : 'AM',
-                        hr = h % 12 || 12;
-                    return hr + ':' + mn + ' ' + ampm;
-                }
-
-                function renderCalendar(year, month) {
-                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August",
-                        "September", "October", "November", "December"
-                    ];
-                    var dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                    var firstDow = new Date(year, month, 1).getDay();
-                    var totalDays = new Date(year, month + 1, 0).getDate();
-                    var holidays = getHolidaysForMonth(year, month);
-                    var cells = '';
-
-                    for (var i = 0; i < firstDow; i++) cells += '<div></div>';
-
-                    for (var d = 1; d <= totalDays; d++) {
-                        var dateStr = year + '-' + pad(month + 1) + '-' + pad(d);
-                        var isToday = d === today.getDate() && month === today.getMonth() && year === today
-                            .getFullYear();
-                        var weekend = isWeekend(year, month, d);
-                        var holiday = holidays[dateStr] || null;
-                        var myAppt = myAppointments[dateStr] || null;
-                        var count = apptCounts[dateStr] || 0;
-                        var isFull = count >= MAX_PER_DAY;
-                        var isUnavail = unavailableDates.indexOf(dateStr) !== -1 || weekend;
-
-                        var bgClass = '';
-                        var textClass = 'text-[#333333] dark:text-gray-200';
-                        var ringClass = '';
-                        var dotHtml = '';
-                        var tooltipTxt = '';
-
-                        if (isToday) {
-                            bgClass = 'bg-[#8B0000]';
-                            textClass = 'text-white font-extrabold';
-                            ringClass = 'ring-2 ring-[#8B0000]/30 ring-offset-1';
-                        } else if (holiday) {
-                            bgClass = 'bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/40';
-                            textClass = 'text-blue-700 dark:text-blue-400 font-semibold';
-                        } else if (isUnavail) {
-                            textClass = 'text-gray-300 dark:text-gray-600';
-                        } else {
-                            bgClass = 'hover:bg-gray-50 dark:hover:bg-gray-800';
-                        }
-
-                        if (myAppt) {
-                            dotHtml +=
-                                '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ' +
-                                (isToday ? 'bg-white' : 'bg-[#008440]') + '"></span>';
-                            var apptParts = myAppt.split(' • ');
-                            var apptService = apptParts[0] || '';
-                            var apptTime = apptParts[1] ? formatTime(apptParts[1]) : '';
-                            tooltipTxt = '<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>' +
-                                apptService + (apptTime ? ' • ' + apptTime : '');
-                        }
-
-                        if (isFull && !myAppt && !isUnavail && !holiday) {
-                            dotHtml +=
-                                '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-red-500"></span>';
-                            tooltipTxt =
-                                '<i class="fa-solid fa-circle-xmark mr-1 text-red-400"></i>Fully booked (' + count +
-                                ')';
-                        }
-
-                        if (holiday && !myAppt) {
-                            dotHtml =
-                                '<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>';
-                            tooltipTxt = '<i class="fa-solid fa-star mr-1 text-blue-300"></i>' + holiday;
-                        }
-
-                        if (isUnavail && !holiday && !myAppt) {
-                            tooltipTxt = weekend ?
-                                '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Clinic closed' :
-                                '<i class="fa-solid fa-ban mr-1 text-gray-400"></i>Not available';
-                        }
-
-                        var tooltipHtml = tooltipTxt ?
-                            '<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 bg-[#1a1a1a] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">' +
-                            tooltipTxt +
-                            '<div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]"></div></div>' :
-                            '';
-
-                        cells += '<div class="relative group flex items-center justify-center py-1">' +
-                            tooltipHtml +
-                            '<div class="relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-xs sm:text-sm font-semibold rounded-full transition-all duration-150 ' +
-                            bgClass + ' ' + textClass + ' ' + ringClass + ' cursor-default">' +
-                            d + dotHtml +
-                            '</div></div>';
-                    }
-
-                    var headerHtml = dayLabels.map(function(l, i) {
-                        return '<div class="text-center text-[9px] sm:text-[10px] font-bold ' + (i === 0 ||
-                                i === 6 ? 'text-[#8B0000]/40 dark:text-[#ff6b6b]/60' :
-                                'text-gray-400 dark:text-gray-500') + ' uppercase tracking-widest py-2">' +
-                            l + '</div>';
-                    }).join('');
-
-                    var container = document.getElementById("calendarSkeletonContainer");
-                    if (container) {
-                        container.innerHTML =
-                            '<div class="h-full flex flex-col select-none">' +
-                            '<div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-[#1a2a3a]">' +
-                            '<h2 class="text-lg sm:text-xl font-extrabold text-[#333333] dark:text-gray-200 flex items-center gap-2"><i class="fa-regular fa-calendar-days text-[#8B0000] dark:text-[#ff6b6b]"></i> Clinic Schedule</h2>' +
-                            '<div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-full p-1">' +
-                            '<button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-gray-600 dark:text-gray-300 transition-all duration-150"><i class="fa-solid fa-chevron-left text-xs"></i></button>' +
-                            '<div class="text-center w-24"><p class="text-sm font-bold text-[#8B0000] dark:text-[#ff6b6b] leading-tight">' +
-                            monthNames[month] +
-                            '</p><p class="text-[10px] text-gray-400 font-bold tracking-widest leading-none">' +
-                            year + '</p></div>' +
-                            '<button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-gray-600 dark:text-gray-300 transition-all duration-150"><i class="fa-solid fa-chevron-right text-xs"></i></button>' +
-                            '</div></div>' +
-                            '<div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2">' + headerHtml + '</div>' +
-                            '<div class="grid grid-cols-7 gap-1 sm:gap-2 flex-1 content-start">' + cells +
-                            '</div>' +
-                            '<div class="flex flex-wrap items-center justify-center gap-3 mt-4 pt-5 border-t border-gray-100 dark:border-[#1a2a3a]">' +
-                            '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-bold"><span class="w-2.5 h-2.5 rounded-full bg-[#008440] inline-block"></span>My Appt</div>' +
-                            '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-bold"><span class="w-2.5 h-2.5 rounded-full bg-[#8B0000] inline-block"></span>Today</div>' +
-                            '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-bold"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>Full</div>' +
-                            '<div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-bold"><span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block"></span>Holiday</div>' +
-                            '</div></div>';
-                    }
-                }
-
-                window.changeMonth = function(dir) {
-                    currentMonth += dir;
-                    if (currentMonth > 11) {
-                        currentMonth = 0;
-                        currentYear++;
-                    }
-                    if (currentMonth < 0) {
-                        currentMonth = 11;
-                        currentYear--;
-                    }
-                    renderCalendar(currentYear, currentMonth);
-                };
-
-                renderCalendar(currentYear, currentMonth);
-            }
-
-            // Initialize calendar
-            loadCalendar();
         });
     </script>
 @endsection
