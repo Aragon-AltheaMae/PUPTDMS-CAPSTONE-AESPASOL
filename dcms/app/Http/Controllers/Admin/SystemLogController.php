@@ -155,9 +155,10 @@ class SystemLogController extends Controller
         return response()->json([
             'logs' => $logs->map(function ($log) {
                 return [
-                    'id'               => $log->id,
-                    'actor_role'       => strtolower($log->actor_role ?? 'other'),
-                    'actor_identifier' => $log->actor_identifier ?? '—',
+                    'id'                 => $log->id,
+                    'actor_role'         => strtolower($log->actor_role ?? 'other'),
+                    'actor_identifier'   => $log->actor_identifier ?? '—',
+                    'actor_display_name' => $log->actor_identifier ?: 'Unknown User',
                     'action'           => strtolower($log->action ?? ''),
                     'module'           => $log->module ?? '',
                     'description'      => $log->description ?? 'No description provided.',

@@ -2051,7 +2051,7 @@
                 var moduleLabel = (log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function(c) {
                     return c.toUpperCase();
                 });
-                var actorName = log.actor_name || 'Unknown User';
+                var actorName = log.actor_display_name ?? log.actor_identifier ?? 'Unknown User';
                 var description = log.description || 'No description provided.';
 
                 tableHtml += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
