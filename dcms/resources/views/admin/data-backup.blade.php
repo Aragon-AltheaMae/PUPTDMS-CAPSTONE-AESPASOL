@@ -1236,7 +1236,7 @@
                 type="button"
                 class="backup-stat clickable {{ !request()->filled('type') && !request()->filled('status') && !request()->filled('scope') && request('stat') !== 'last' && request('stat') !== 'auto' ? 'active' : '' }}"
                 onclick="applyFilters({ scope: '', stat: '' }, this)">
-                <div class="backup-stat-value red">{{ $totalBackups }}</div>
+                <div class="backup-stat-value red" id="totalBackupsStat">{{ $totalBackups }}</div>
                 <div class="backup-stat-label">Total Backups</div>
             </button>
 
@@ -1244,7 +1244,7 @@
                 type="button"
                 class="backup-stat clickable {{ request('scope') === 'month' ? 'active' : '' }}"
                 onclick="applyFilters({ scope: 'month', stat: '' }, this)">
-                <div class="backup-stat-value green">{{ $thisMonthBackups ?? 0 }}</div>
+                <div class="backup-stat-value green" id="thisMonthBackupsStat">{{ $thisMonthBackups ?? 0 }}</div>
                 <div class="backup-stat-label">This Month</div>
             </button>
 
@@ -1252,7 +1252,7 @@
                 type="button"
                 class="backup-stat clickable {{ request('stat') === 'last' ? 'active' : '' }}"
                 onclick="setActiveStat(this); scrollToTable()">
-                <div class="backup-stat-value green">
+                <div class="backup-stat-value green" id="lastBackupStat">
                     {{ isset($lastBackup) && $lastBackup ? $lastBackup->created_at->format('M d') : '—' }}
                 </div>
                 <div class="backup-stat-label">Last Backup</div>
@@ -1449,34 +1449,34 @@
                             <div class="card-icon"><i class="fa-solid fa-database"></i></div>
                             <div>
                                 <div class="card-title">Storage Usage</div>
-                                <div class="card-subtitle">{{ $formatBytes($totalAllocatedBytes) }} total allocated</div>
+                                <div class="card-subtitle" id="totalAllocatedStat">{{ $formatBytes($totalAllocatedBytes) }} total allocated</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="mini-card-body">
                         <div class="usage-row">
-                            <span>{{ $formatBytes($storageUsedBytes) }} used</span>
-                            <span class="percent">{{ $storagePercent }}%</span>
+                            <span id="storageUsedStat">{{ $formatBytes($storageUsedBytes) }} used</span>
+                            <span class="percent" id="storagePercentStat">{{ $storagePercent }}%</span>
                         </div>
 
                         <div class="usage-bar">
-                            <div class="usage-fill" style="width: {{ min($storagePercent, 100) }}%;"></div>
+                            <div class="usage-fill" id="storageUsageBar" style="width: {{ min($storagePercent, 100) }}%;"></div>
                         </div>
 
                         <div class="usage-grid">
                             <div class="usage-box full">
                                 <div class="usage-box-label">Full Backups</div>
-                                <div class="usage-box-value">{{ $formatBytes($fullBackupsBytes) }}</div>
+                                <div class="usage-box-value" id="fullBackupsBytesStat">{{ $formatBytes($fullBackupsBytes) }}</div>
                             </div>
 
                             <div class="usage-box incremental">
                                 <div class="usage-box-label">Incremental</div>
-                                <div class="usage-box-value">{{ $formatBytes($incrementalBackupsBytes) }}</div>
+                                <div class="usage-box-value" id="incrementalBackupsBytesStat">{{ $formatBytes($incrementalBackupsBytes) }}</div>
                             </div>
                         </div>
 
-                        <div style="margin-top:.9rem;font-size:.75rem;color:#9aa3b2;font-weight:700;">
+                        <div id="freeSpaceStat" style="margin-top:.9rem;font-size:.75rem;color:#9aa3b2;font-weight:700;">
                             Free Space: {{ $formatBytes($storageFreeBytes) }}
                         </div>
                     </div>
@@ -1818,6 +1818,60 @@
         }
     }
 
+    function updateBackupStats(stats = {}) {
+        const totalBackupsStat = document.getElementById('totalBackupsStat');
+        const thisMonthBackupsStat = document.getElementById('thisMonthBackupsStat');
+        const lastBackupStat = document.getElementById('lastBackupStat');
+
+        const totalAllocatedStat = document.getElementById('totalAllocatedStat');
+        const storageUsedStat = document.getElementById('storageUsedStat');
+        const storagePercentStat = document.getElementById('storagePercentStat');
+        const storageUsageBar = document.getElementById('storageUsageBar');
+        const fullBackupsBytesStat = document.getElementById('fullBackupsBytesStat');
+        const incrementalBackupsBytesStat = document.getElementById('incrementalBackupsBytesStat');
+        const freeSpaceStat = document.getElementById('freeSpaceStat');
+
+        if (totalBackupsStat && stats.total_backups !== undefined) {
+            totalBackupsStat.textContent = stats.total_backups;
+        }
+
+        if (thisMonthBackupsStat && stats.this_month_backups !== undefined) {
+            thisMonthBackupsStat.textContent = stats.this_month_backups;
+        }
+
+        if (lastBackupStat && stats.last_backup_label !== undefined) {
+            lastBackupStat.textContent = stats.last_backup_label || '—';
+        }
+
+        if (totalAllocatedStat && stats.total_allocated_formatted !== undefined) {
+            totalAllocatedStat.textContent = `${stats.total_allocated_formatted} total allocated`;
+        }
+
+        if (storageUsedStat && stats.storage_used_formatted !== undefined) {
+            storageUsedStat.textContent = `${stats.storage_used_formatted} used`;
+        }
+
+        if (storagePercentStat && stats.storage_percent !== undefined) {
+            storagePercentStat.textContent = `${stats.storage_percent}%`;
+        }
+
+        if (storageUsageBar && stats.storage_percent !== undefined) {
+            storageUsageBar.style.width = `${Math.min(stats.storage_percent, 100)}%`;
+        }
+
+        if (fullBackupsBytesStat && stats.full_backups_formatted !== undefined) {
+            fullBackupsBytesStat.textContent = stats.full_backups_formatted;
+        }
+
+        if (incrementalBackupsBytesStat && stats.incremental_backups_formatted !== undefined) {
+            incrementalBackupsBytesStat.textContent = stats.incremental_backups_formatted;
+        }
+
+        if (freeSpaceStat && stats.free_space_formatted !== undefined) {
+            freeSpaceStat.textContent = `Free Space: ${stats.free_space_formatted}`;
+        }
+    }
+
     async function fetchBackupTable() {
         try {
             setLoading(true);
@@ -1843,6 +1897,7 @@
 
             renderTableRows(result.rows || []);
             renderTableFooter(result.meta || {});
+            updateBackupStats(result.stats || {});
             updateUrlFromFilters();
             updateResetButtonVisibility();
             syncFilterInputs();
