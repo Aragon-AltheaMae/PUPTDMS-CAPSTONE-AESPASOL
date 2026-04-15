@@ -51,8 +51,9 @@
                 <i class="fa-solid fa-file-circle-check"></i> Document Request
             </a>
 
-            <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file"></i>
-                Reports
+            <a href="{{ route('admin.reports') }}"
+                class="drawer-link {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
+                <i class="fa-solid fa-file"></i> Reports
             </a>
         </div>
 
