@@ -26,75 +26,55 @@
             background: #bbb;
         }
 
-        [data-theme="dark"] .card,
-        [data-theme="dark"] .stat-card {
-            background: #161b22 !important;
-            border-color: #21262d !important;
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        [data-theme="dark"] .card-header,
-        [data-theme="dark"] .log-stats-row {
-            background: #0d1117 !important;
-            border-color: #21262d !important;
+        @keyframes inventoryBubbleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-6px) translateX(-4px) scale(1.06);
+            }
         }
 
-        [data-theme="dark"] .stat-value {
-            color: #f3f4f6;
+        @keyframes inventoryBubbleDrift {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            50% {
+                transform: translateY(4px) translateX(-6px);
+            }
         }
 
-        [data-theme="dark"] .card-title {
-            color: #f3f4f6;
-        }
+        @keyframes inventoryPulsePop {
+            0% {
+                transform: scale(1);
+            }
 
-        [data-theme="dark"] .data-table thead th {
-            background: #0d1117;
-            color: #6b7280;
-            border-color: #21262d;
-        }
+            50% {
+                transform: scale(1.05);
+            }
 
-        [data-theme="dark"] .data-table tbody td {
-            color: #d1d5db;
-            border-color: #1c2128;
+            100% {
+                transform: scale(1.015);
+            }
         }
-
-        [data-theme="dark"] .data-table tbody tr:hover td {
-            background: #1c2128;
-        }
-
-        [data-theme="dark"] .next-backup,
-        [data-theme="dark"] .qa-btn {
-            background: #1c2128;
-            border-color: #21262d;
-        }
-
-        [data-theme="dark"] .qa-title {
-            color: #fca5a5;
-        }
-
-        [data-theme="dark"] .qa-sub {
-            color: #6b7280;
-        }
-
-        [data-theme="dark"] .qa-btn:hover {
-            background: rgba(139, 0, 0, .15);
-            border-color: #5b2020;
-        }
-
-        [data-theme="dark"] .next-date {
-            color: #e5e7eb;
-        }
-
-        [data-theme="dark"] .empty-icon {
-            background: #21262d;
-        }
-
-        [data-theme="dark"] .period-pill {
-            background: rgba(255, 255, 255, .08);
-        }
-
-        /* ════════════════════════════════
-           PAGE BANNER
-        ════════════════════════════════ */
 
         .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
@@ -218,9 +198,6 @@
             transform: translateY(-1px);
         }
 
-        /* ════════════════════════════════
-           CONTENT LIFT
-        ════════════════════════════════ */
         .content-lift {
             margin-top: -2rem;
             padding: 0 1.75rem 2rem;
@@ -228,9 +205,6 @@
             z-index: 2;
         }
 
-        /* ════════════════════════════════
-           STAT CARDS
-        ════════════════════════════════ */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -312,9 +286,6 @@
             gap: .35rem;
         }
 
-        /* ════════════════════════════════
-           MAIN GRID & CARDS
-        ════════════════════════════════ */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 320px;
@@ -527,9 +498,6 @@
             text-overflow: ellipsis;
         }
 
-        /* ════════════════════════════════
-           LOG MINI-STATS
-        ════════════════════════════════ */
         .log-stats-row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -564,9 +532,6 @@
             margin-top: 4px;
         }
 
-        /* ════════════════════════════════
-           TABLE
-        ════════════════════════════════ */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -587,7 +552,6 @@
 
         .data-table tbody td {
             padding: .8rem 1rem;
-            color: #4a5568;
             border-bottom: 1px solid #f9fafb;
         }
 
@@ -634,6 +598,13 @@
             justify-content: center;
             background: linear-gradient(135deg, #fafafa, #fff);
             text-align: center;
+        }
+
+        .inventory-empty>div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .inventory-top-layout {
@@ -701,14 +672,12 @@
             position: absolute;
             inset: -6px;
             border-radius: 50%;
-            background: conic-gradient(
-                from 220deg,
-                rgba(34, 197, 94, .95) 0deg,
-                rgba(16, 185, 129, .92) 105deg,
-                rgba(245, 158, 11, .92) 210deg,
-                rgba(239, 68, 68, .95) 300deg,
-                rgba(34, 197, 94, .95) 360deg
-            );
+            background: conic-gradient(from 220deg,
+                    rgba(34, 197, 94, .95) 0deg,
+                    rgba(16, 185, 129, .92) 105deg,
+                    rgba(245, 158, 11, .92) 210deg,
+                    rgba(239, 68, 68, .95) 300deg,
+                    rgba(34, 197, 94, .95) 360deg);
             z-index: 0;
             filter: saturate(1.05);
             opacity: .95;
@@ -721,7 +690,7 @@
             border-radius: 50%;
             background: radial-gradient(circle, #ffffff 62%, #f8fafc 100%);
             z-index: 1;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9);
         }
 
         #inventoryDonutChart {
@@ -769,7 +738,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(139, 0, 0, .04), rgba(255,255,255,0));
+            background: linear-gradient(135deg, rgba(139, 0, 0, .04), rgba(255, 255, 255, 0));
             opacity: 0;
             transition: opacity .18s ease;
             pointer-events: none;
@@ -831,24 +800,6 @@
             background: #ef4444;
         }
 
-        @keyframes inventoryBubbleFloat {
-            0%, 100% {
-                transform: translateY(0) translateX(0) scale(1);
-            }
-            50% {
-                transform: translateY(-6px) translateX(-4px) scale(1.06);
-            }
-        }
-
-        @keyframes inventoryBubbleDrift {
-            0%, 100% {
-                transform: translateY(0) translateX(0);
-            }
-            50% {
-                transform: translateY(4px) translateX(-6px);
-            }
-        }
-
         .inventory-legend-item:hover {
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 12px 24px rgba(0, 0, 0, .08);
@@ -869,18 +820,6 @@
             animation: inventoryPulsePop .28s ease;
         }
 
-        @keyframes inventoryPulsePop {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1.015);
-            }
-        }
-
         .inventory-legend-left {
             display: flex;
             align-items: center;
@@ -893,7 +832,7 @@
             height: 10px;
             border-radius: 999px;
             flex-shrink: 0;
-            box-shadow: 0 0 0 4px rgba(255,255,255,.9);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, .9);
         }
 
         .inventory-legend-dot.in-stock {
@@ -1070,9 +1009,6 @@
             }
         }
 
-        /* ════════════════════════════════
-           BOTTOM GRID
-        ════════════════════════════════ */
         .bottom-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1080,9 +1016,6 @@
             margin-top: 1.25rem;
         }
 
-        /* ════════════════════════════════
-           QUICK ACTIONS
-        ════════════════════════════════ */
         .qa-btn {
             display: flex;
             align-items: center;
@@ -1156,9 +1089,6 @@
             color: var(--crimson);
         }
 
-        /* ════════════════════════════════
-           BACKUP CARD
-        ════════════════════════════════ */
         .backup-status {
             display: flex;
             align-items: center;
@@ -1263,9 +1193,267 @@
             transform: translateY(-1px);
         }
 
-        /* ════════════════════════════════
-           RESPONSIVE
-        ════════════════════════════════ */
+        .stat-card {
+            animation: fadeSlideUp .4s ease both;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: .05s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: .1s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: .15s;
+        }
+
+        .card {
+            animation: fadeSlideUp .4s ease .2s both;
+        }
+
+        .gad-placeholder {
+            height: 220px;
+            border-radius: 14px;
+            border: 1px dashed #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #fafafa, #fff);
+        }
+
+        .gad-placeholder>div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gad-placeholder-icon {
+            font-size: 2rem;
+            color: #e5e7eb;
+            display: block;
+            margin-bottom: .5rem;
+        }
+
+        .gad-placeholder-text {
+            font-size: .72rem;
+            color: #b0b7c3;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .page-banner {
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        [data-theme="dark"] .page-subtitle {
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        [data-theme="dark"] .period-pill {
+            background: rgba(17, 24, 39, 0.42);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="dark"] .period-label {
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        [data-theme="dark"] .period-divider {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-theme="dark"] .manage-btn {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-theme="dark"] .manage-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: #9ca3af;
+        }
+
+        [data-theme="dark"] .stat-footer {
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .log-card {
+            background: #161b22;
+            border-color: #21262d;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+        }
+
+        [data-theme="dark"] .log-card:hover {
+            border-color: #2d3748;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+        }
+
+        [data-theme="dark"] .log-card-desc,
+        [data-theme="dark"] .log-card-user-name {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .log-card-date,
+        [data-theme="dark"] .log-card-user-role,
+        [data-theme="dark"] .log-stat-label {
+            color: #9ca3af;
+        }
+
+        [data-theme="dark"] .log-card-avatar {
+            background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+        }
+
+        [data-theme="dark"] .log-stat {
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        [data-theme="dark"] .view-toggle {
+            background: #111827;
+            border-color: #2a3441;
+        }
+
+        [data-theme="dark"] .view-toggle-btn {
+            color: #9ca3af;
+        }
+
+        [data-theme="dark"] .view-toggle-btn:hover {
+            background: #1f2937;
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .view-toggle-btn.active {
+            background: var(--crimson);
+            color: #fff;
+        }
+
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .stat-card {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .card-header,
+        [data-theme="dark"] .log-stats-row {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .stat-value {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .card-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .data-table thead th {
+            background: #0d1117;
+            color: #6b7280;
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .data-table tbody td {
+            color: #d1d5db;
+            border-color: #1c2128;
+        }
+
+        [data-theme="dark"] .data-table tbody tr:hover td {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .next-backup,
+        [data-theme="dark"] .qa-btn {
+            background: #1c2128;
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .log-card-id {
+            color: #cdcdcd;
+        }
+
+        [data-theme="dark"] .qa-title {
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] .qa-sub {
+            color: #adb1b8;
+        }
+
+        [data-theme="dark"] .qa-btn:hover {
+            background: rgba(139, 0, 0, .15);
+            border-color: #5b2020;
+        }
+
+        [data-theme="dark"] .next-date {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .empty-icon {
+            background: #21262d;
+        }
+
+        [data-theme="dark"] .period-pill {
+            background: rgba(255, 255, 255, .08);
+        }
+
+        [data-theme="dark"] .gad-placeholder {
+            background: linear-gradient(135deg, #161b22, #111827);
+            border-color: #2a3441;
+        }
+
+        [data-theme="dark"] .gad-placeholder-icon {
+            color: #374151;
+        }
+
+        [data-theme="dark"] .gad-placeholder-text {
+            color: #9ca3af;
+        }
+
+
+        [data-theme="dark"] .backup-status {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.10), rgba(22, 163, 74, 0.06));
+            border-color: rgba(34, 197, 94, 0.18);
+        }
+
+        [data-theme="dark"] .backup-check {
+            background: #111827;
+            border-color: rgba(34, 197, 94, 0.24);
+            color: #4ade80;
+        }
+
+        [data-theme="dark"] .backup-label {
+            color: #86efac;
+        }
+
+        [data-theme="dark"] .backup-date {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .backup-sub,
+        [data-theme="dark"] .next-label,
+        [data-theme="dark"] .next-icon {
+            color: #9ca3af;
+        }
+
+
+        [data-theme="dark"] .empty-state p {
+            color: #9ca3af !important;
+        }
+
+        [data-theme="dark"] .inventory-empty {
+            background: linear-gradient(135deg, #161b22, #111827);
+            border-color: #2a3441;
+        }
+
+        [data-theme="dark"] #inventoryOverviewEmptyText {
+            color: #9ca3af !important;
+        }
+
         @media (max-width: 1024px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -1331,41 +1519,6 @@
             .stat-grid .stat-card:last-child {
                 grid-column: span 1;
             }
-        }
-
-        /* ════════════════════════════════
-           ANIMATIONS
-        ════════════════════════════════ */
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card {
-            animation: fadeSlideUp .4s ease both;
-        }
-
-        .stat-card:nth-child(1) {
-            animation-delay: .05s;
-        }
-
-        .stat-card:nth-child(2) {
-            animation-delay: .1s;
-        }
-
-        .stat-card:nth-child(3) {
-            animation-delay: .15s;
-        }
-
-        .card {
-            animation: fadeSlideUp .4s ease .2s both;
         }
     </style>
 @endsection
@@ -1552,14 +1705,18 @@
                                                 @php
                                                     $logId = data_get($log, 'id', '—');
                                                     $logDate = data_get($log, 'created_at');
-                                                    $logDesc = data_get($log, 'description', 'No description provided.');
+                                                    $logDesc = data_get(
+                                                        $log,
+                                                        'description',
+                                                        'No description provided.',
+                                                    );
                                                     $logActor = data_get($log, 'actor_identifier', '—');
                                                     $logRole = data_get($log, 'actor_role', '');
                                                 @endphp
                                                 <tr>
                                                     <td style="color:#9ca3af;font-size:.72rem;">#{{ $logId }}</td>
                                                     <td>
-                                                        <div style="font-size:.74rem;font-weight:600;color:#374151;">
+                                                        <div style="font-size:.74rem;font-weight:600;">
                                                             {{ $logDate ? \Carbon\Carbon::parse($logDate)->format('M j, Y') : '—' }}
                                                         </div>
                                                         <div style="font-size:.68rem;color:#9ca3af;">
@@ -1569,7 +1726,7 @@
                                                     <td style="font-size:.76rem;">{{ $logDesc }}</td>
                                                     <td>
                                                         <span
-                                                            style="font-size:.72rem;font-weight:600;color:#4a5568;">{{ $logActor }}</span>
+                                                            style="font-size:.72rem;font-weight:600;">{{ $logActor }}</span>
                                                         <div
                                                             style="font-size:.65rem;color:#9ca3af;text-transform:capitalize;">
                                                             {{ $logRole }}
@@ -1631,14 +1788,10 @@
                                         style="font-size:.65rem;"></i></a>
                             </div>
                             <div style="padding:1.25rem;">
-                                <div
-                                    style="height:140px;border-radius:10px;border:2px dashed #e5e7eb;display:flex;
-                                    align-items:center;justify-content:center;background:linear-gradient(135deg,#fafafa,#fff);">
+                                <div class="gad-placeholder">
                                     <div style="text-align:center;">
-                                        <i class="fa-solid fa-chart-area"
-                                            style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
-                                        <span style="font-size:.72rem;color:#b0b7c3;font-weight:600;">Chart coming
-                                            soon</span>
+                                        <i class="fa-solid fa-chart-area gad-placeholder-icon"></i>
+                                        <span class="gad-placeholder-text">Chart coming soon</span>
                                     </div>
                                 </div>
                             </div>
@@ -1657,15 +1810,16 @@
 
                             <div class="inventory-chart-card-body">
 
-                            <div id="inventoryOverviewEmpty" class="inventory-empty" style="display:none;">
-                                <div>
-                                    <i id="inventoryOverviewEmptyIcon" class="fa-solid fa-box-open"
-                                        style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
-                                    <span id="inventoryOverviewEmptyText" style="font-size:.72rem;color:#b0b7c3;font-weight:600;">
-                                        No inventory records yet
-                                    </span>
+                                <div id="inventoryOverviewEmpty" class="inventory-empty" style="display:none;">
+                                    <div>
+                                        <i id="inventoryOverviewEmptyIcon" class="fa-solid fa-box-open"
+                                            style="font-size:2rem;color:#e5e7eb;display:block;margin-bottom:.5rem;"></i>
+                                        <span id="inventoryOverviewEmptyText"
+                                            style="font-size:.72rem;color:#b0b7c3;font-weight:600;">
+                                            No inventory records yet
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
 
                                 <div id="inventoryOverviewContent" style="display:none;">
                                     <div class="inventory-top-layout">
@@ -1934,169 +2088,177 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-    let adminInventoryOverviewChart = null;
+        let adminInventoryOverviewChart = null;
 
-    function animateInventoryLegendCard(card) {
-        if (!card) return;
-        card.classList.remove('pulse-pop');
-        void card.offsetWidth;
-        card.classList.add('pulse-pop');
-    }
-
-    function setInventoryOverviewEmptyState(message, isError = false) {
-        const emptyEl = document.getElementById('inventoryOverviewEmpty');
-        const contentEl = document.getElementById('inventoryOverviewContent');
-        const textEl = document.getElementById('inventoryOverviewEmptyText');
-        const iconEl = document.getElementById('inventoryOverviewEmptyIcon');
-
-        if (!emptyEl || !contentEl) return;
-
-        emptyEl.style.display = 'flex';
-        contentEl.style.display = 'none';
-
-        if (textEl) {
-            textEl.textContent = message || 'No inventory records yet';
+        function animateInventoryLegendCard(card) {
+            if (!card) return;
+            card.classList.remove('pulse-pop');
+            void card.offsetWidth;
+            card.classList.add('pulse-pop');
         }
 
-        if (iconEl) {
-            iconEl.className = isError
-                ? 'fa-solid fa-triangle-exclamation'
-                : 'fa-solid fa-box-open';
-            iconEl.style.color = isError ? '#f59e0b' : '#e5e7eb';
+        function setInventoryOverviewEmptyState(message, isError = false) {
+            const emptyEl = document.getElementById('inventoryOverviewEmpty');
+            const contentEl = document.getElementById('inventoryOverviewContent');
+            const textEl = document.getElementById('inventoryOverviewEmptyText');
+            const iconEl = document.getElementById('inventoryOverviewEmptyIcon');
+
+            if (!emptyEl || !contentEl) return;
+
+            emptyEl.style.display = 'flex';
+            contentEl.style.display = 'none';
+
+            if (textEl) {
+                textEl.textContent = message || 'No inventory records yet';
+            }
+
+            if (iconEl) {
+                iconEl.className = isError ?
+                    'fa-solid fa-triangle-exclamation' :
+                    'fa-solid fa-box-open';
+                iconEl.style.color = isError ? '#f59e0b' : '#e5e7eb';
+            }
         }
-    }
 
-    function showInventoryOverviewContent() {
-        const emptyEl = document.getElementById('inventoryOverviewEmpty');
-        const contentEl = document.getElementById('inventoryOverviewContent');
+        function showInventoryOverviewContent() {
+            const emptyEl = document.getElementById('inventoryOverviewEmpty');
+            const contentEl = document.getElementById('inventoryOverviewContent');
 
-        if (emptyEl) emptyEl.style.display = 'none';
-        if (contentEl) contentEl.style.display = 'block';
-    }
+            if (emptyEl) emptyEl.style.display = 'none';
+            if (contentEl) contentEl.style.display = 'block';
+        }
 
-    function bindInventoryLegendClicks() {
-        document.querySelectorAll('.inventory-legend-item').forEach(card => {
-            if (card.dataset.bound === '1') return;
+        function bindInventoryLegendClicks() {
+            document.querySelectorAll('.inventory-legend-item').forEach(card => {
+                if (card.dataset.bound === '1') return;
 
-            card.dataset.bound = '1';
-            card.addEventListener('click', function () {
-                document.querySelectorAll('.inventory-legend-item').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-                animateInventoryLegendCard(this);
+                card.dataset.bound = '1';
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.inventory-legend-item').forEach(el => el.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+                    animateInventoryLegendCard(this);
 
-                const filter = this.dataset.stockFilter || '';
-                const target = "{{ route('admin.inventory') }}";
-                const url = filter ? `${target}?stock_filter=${filter}` : target;
+                    const filter = this.dataset.stockFilter || '';
+                    const target = "{{ route('admin.inventory') }}";
+                    const url = filter ? `${target}?stock_filter=${filter}` : target;
 
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 120);
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 120);
+                });
             });
-        });
-    }
+        }
 
-    async function loadAdminDashboardInventoryOverview() {
-        const ctx = document.getElementById('inventoryDonutChart');
-        if (!ctx) return;
+        async function loadAdminDashboardInventoryOverview() {
+            const ctx = document.getElementById('inventoryDonutChart');
+            if (!ctx) return;
 
-        try {
-            const res = await fetch("{{ route('admin.inventory.data') }}", {
-                method: 'GET',
-                cache: 'no-store',
-                credentials: 'same-origin',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+            try {
+                const res = await fetch("{{ route('admin.inventory.data') }}", {
+                    method: 'GET',
+                    cache: 'no-store',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const contentType = res.headers.get('content-type') || '';
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
                 }
-            });
 
-            const contentType = res.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    throw new Error('Inventory endpoint did not return JSON');
+                }
 
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
+                const items = await res.json();
 
-            if (!contentType.includes('application/json')) {
-                throw new Error('Inventory endpoint did not return JSON');
-            }
+                if (!Array.isArray(items)) {
+                    throw new Error('Inventory response is not an array');
+                }
 
-            const items = await res.json();
+                const total = items.length;
+                const medicine = items.filter(item => item.category === 'Medicine').length;
+                const supplies = items.filter(item => item.category === 'Supplies').length;
+                const inStock = items.filter(item => Number(item.qty) - Number(item.used) > 5).length;
+                const lowStock = items.filter(item => {
+                    const bal = Number(item.qty) - Number(item.used);
+                    return bal >= 1 && bal <= 5;
+                }).length;
+                const outStock = items.filter(item => Number(item.qty) - Number(item.used) <= 0).length;
 
-            if (!Array.isArray(items)) {
-                throw new Error('Inventory response is not an array');
-            }
+                if (total <= 0) {
+                    setInventoryOverviewEmptyState('No inventory records yet', false);
+                    return;
+                }
 
-            const total = items.length;
-            const medicine = items.filter(item => item.category === 'Medicine').length;
-            const supplies = items.filter(item => item.category === 'Supplies').length;
-            const inStock = items.filter(item => Number(item.qty) - Number(item.used) > 5).length;
-            const lowStock = items.filter(item => {
-                const bal = Number(item.qty) - Number(item.used);
-                return bal >= 1 && bal <= 5;
-            }).length;
-            const outStock = items.filter(item => Number(item.qty) - Number(item.used) <= 0).length;
+                showInventoryOverviewContent();
 
-            if (total <= 0) {
-                setInventoryOverviewEmptyState('No inventory records yet', false);
-                return;
-            }
-
-            showInventoryOverviewContent();
-
-            document.getElementById('inventoryInStockValue').textContent = inStock;
-            document.getElementById('inventoryLowStockValue').textContent = lowStock;
-            document.getElementById('inventoryOutStockValue').textContent = outStock;
-            document.getElementById('inventoryTotalValue').textContent = total;
+                document.getElementById('inventoryInStockValue').textContent = inStock;
+                document.getElementById('inventoryLowStockValue').textContent = lowStock;
+                document.getElementById('inventoryOutStockValue').textContent = outStock;
+                document.getElementById('inventoryTotalValue').textContent = total;
                 const donutTotalEl = document.getElementById('inventoryDonutTotal');
                 if (donutTotalEl) donutTotalEl.textContent = total;
-            document.getElementById('inventoryMedicineValue').textContent = medicine;
-            document.getElementById('inventorySuppliesValue').textContent = supplies;
+                document.getElementById('inventoryMedicineValue').textContent = medicine;
+                document.getElementById('inventorySuppliesValue').textContent = supplies;
 
-            if (adminInventoryOverviewChart) {
-                adminInventoryOverviewChart.destroy();
-            }
-
-            adminInventoryOverviewChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['In Stock', 'Low Stock', 'Out of Stock'],
-                    datasets: [{
-                        data: [inStock, lowStock, outStock],
-                        backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
-                        hoverBackgroundColor: ['#16a34a', '#d97706', '#dc2626'],
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false }
-                    }
+                if (adminInventoryOverviewChart) {
+                    adminInventoryOverviewChart.destroy();
                 }
-            });
 
-            bindInventoryLegendClicks();
+                adminInventoryOverviewChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+                        datasets: [{
+                            data: [inStock, lowStock, outStock],
+                            backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                            hoverBackgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                            hoverOffset: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
 
-            console.log('Dashboard inventory overview loaded:', {
-                total, medicine, supplies, inStock, lowStock, outStock
-            });
+                bindInventoryLegendClicks();
 
-        } catch (error) {
-            console.error('Dashboard inventory overview error:', error);
-            setInventoryOverviewEmptyState('Failed to load inventory overview', true);
+                console.log('Dashboard inventory overview loaded:', {
+                    total,
+                    medicine,
+                    supplies,
+                    inStock,
+                    lowStock,
+                    outStock
+                });
+
+            } catch (error) {
+                console.error('Dashboard inventory overview error:', error);
+                setInventoryOverviewEmptyState('Failed to load inventory overview', true);
+            }
         }
-    }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        loadAdminDashboardInventoryOverview();
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminDashboardInventoryOverview();
+        });
 
-    window.addEventListener('focus', function () {
-        loadAdminDashboardInventoryOverview();
-    });
-</script>
+        window.addEventListener('focus', function() {
+            loadAdminDashboardInventoryOverview();
+        });
+    </script>
 @endsection

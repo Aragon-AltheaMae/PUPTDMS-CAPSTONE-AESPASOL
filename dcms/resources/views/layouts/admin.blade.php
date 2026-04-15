@@ -33,7 +33,7 @@
 
 </head>
 
-<body class="@yield('body-class', 'bg-[#F4F4F4]')">
+<body class="role-admin @yield('body-class', 'bg-[#F4F4F4]')">
 
     @include('partials.header', [
         'role' => 'admin',
