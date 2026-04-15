@@ -9,16 +9,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patients', function (Blueprint $table) {
-            // $table->string('faculty_code')->nullable()->after('gender');
-
-            $table->string('student_no')->nullable()->after('faculty_code');
+            $table->string('phone')->nullable()->change();
+            $table->date('birthdate')->nullable()->change();
+            $table->string('gender')->nullable()->change();
         });
     }
 
     public function down(): void
     {
         Schema::table('patients', function (Blueprint $table) {
-            $table->dropColumn(['faculty_code', 'student_no']);
+            $table->string('phone')->nullable(false)->change();
+            $table->date('birthdate')->nullable(false)->change();
+            $table->string('gender')->nullable(false)->change();
         });
     }
 };
