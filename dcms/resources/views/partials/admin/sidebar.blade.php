@@ -29,8 +29,10 @@
                     class="nav-link {{ request()->routeIs('admin.document-requests*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file-circle-check"></i> Document Request
                 </a>
-                <a href="{{ route('admin.admin.dashboard') }}" class="nav-link"><i class="fa-solid fa-file"></i>
-                    Reports</a>
+                <a href="{{ route('admin.reports') }}"
+                    class="nav-link {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file"></i> Reports
+                </a>
             </div>
         </div>
 

@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\ExternalAdminController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\Admin\DocumentTemplateController;
@@ -231,7 +232,14 @@ Route::prefix('admin')
         */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.admin.dashboard');
-
+        
+        /*
+        |--------------------------------------------------------------------------
+        | REPORTS & ANALYTICS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/reports', [AdminReportController::class, 'index'])
+            ->name('admin.reports');
 
         /*
         |--------------------------------------------------------------------------
