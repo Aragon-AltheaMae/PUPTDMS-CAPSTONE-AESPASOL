@@ -296,6 +296,26 @@
             transition: all .2s;
         }
 
+        .st-input-wrap,
+        .st-textarea-wrap {
+            width: 100%;
+            position: relative;
+        }
+
+        .st-input,
+        .st-textarea {
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .st-textarea {
+            min-height: 110px;
+            resize: none;
+            padding: 10px 14px 26px 14px;
+            line-height: 1.45;
+        }
+
         .st-input.with-icon {
             padding-left: 34px;
         }
@@ -932,11 +952,17 @@
 
                                 <div class="st-form-group">
                                     <label class="st-label">Description (Optional)</label>
-                                    <div style="position: relative;">
-                                        <textarea id="serviceDescInput" name="description" placeholder="Brief details about the service..." class="st-input"
-                                            style="height:100px; resize:none; padding-bottom: 24px;" maxlength="100">{{ old('description') }}</textarea>
+
+                                    <div class="st-input-wrap st-textarea-wrap">
+                                        <textarea id="serviceDescInput"
+                                            name="description"
+                                            placeholder="Brief details about the service..."
+                                            class="st-input st-textarea"
+                                            maxlength="100">{{ old('description') }}</textarea>
+
                                         <div id="serviceDescCount" class="st-char-count">0 / 100</div>
                                     </div>
+
                                     @error('description')
                                         <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>
                                             {{ $message }}</div>

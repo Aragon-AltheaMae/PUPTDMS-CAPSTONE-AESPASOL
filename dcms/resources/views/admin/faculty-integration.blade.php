@@ -384,7 +384,7 @@
             text-transform: uppercase;
             letter-spacing: .08em;
             color: #8B0000;
-            margin-bottom: .45rem;
+            margin-bottom: .3rem;
         }
 
         .required-mark {
@@ -396,16 +396,16 @@
         .access-select {
             width: 100%;
             border: 1.5px solid #e0ddd8;
-            border-radius: 14px;
-            padding: .85rem .95rem;
-            font-size: .92rem;
-            line-height: 1.35;
+            border-radius: 10px; /* mas nipis */
+            padding: .6rem .85rem; /* from .85 → .6 */
+            font-size: .9rem;
+            line-height: 1.3;
             background: #fff;
             color: #374151;
             outline: none;
             transition: all .15s ease;
             box-sizing: border-box;
-            height: 58px;
+            height: 46px; /* from 58 → 46 */
         }
 
         .access-input:focus,
