@@ -17,6 +17,7 @@ class SystemLogController extends Controller
 
         $perPage = in_array($request->input('per_page'), [10, 20, 50, 100])
             ? (int) $request->input('per_page') : 20;
+
         $role    = $request->input('role', 'all');
         $search  = $request->input('search');
 
@@ -42,19 +43,22 @@ class SystemLogController extends Controller
 
         $query = AuditLog::query();
 
+        // Role filter
         if ($role === 'login') {
             $query->where('action', 'like', '%login%');
         } elseif (in_array($role, ['admin', 'dentist', 'patient'])) {
             $query->where('actor_role', $role);
         }
 
+        // Search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('actor_identifier', 'like', "%{$search}%")
-                    ->orWhere('action', 'like', "%{$search}%")
-                    ->orWhere('module', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('actor_role', 'like', "%{$search}%");
+                  ->orWhere('actor_name', 'like', "%{$search}%") // ✅ FIX
+                  ->orWhere('action', 'like', "%{$search}%")
+                  ->orWhere('module', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('actor_role', 'like', "%{$search}%");
             });
         }
 
@@ -78,20 +82,25 @@ class SystemLogController extends Controller
 
         $logs = $query->paginate($perPage)->withQueryString();
 
+        // Counts
         $totalCount   = AuditLog::count();
         $adminCount   = AuditLog::where('actor_role', 'admin')->count();
         $dentistCount = AuditLog::where('actor_role', 'dentist')->count();
         $patientCount = AuditLog::where('actor_role', 'patient')->count();
         $loginCount   = AuditLog::where('action', 'like', '%login%')->count();
 
-        // ── AJAX response ──────────────────────────────────
+        // ✅ AJAX RESPONSE FIXED
         if ($request->ajax()) {
             return response()->json([
                 'logs' => $logs->map(function ($log) {
                     return [
                         'id'               => $log->id,
                         'actor_role'       => strtolower($log->actor_role ?? 'other'),
+
+                        // ✅ FIX: unified naming
                         'actor_identifier' => $log->actor_identifier ?? '—',
+                        'actor_name'       => $log->actor_name ?? $log->actor_identifier ?? 'Unknown User',
+
                         'action'           => $log->action ?? '',
                         'module'           => $log->module ?? '',
                         'description'      => $log->description ?? 'No description provided.',
@@ -99,14 +108,16 @@ class SystemLogController extends Controller
                         'created_at_time'  => optional($log->created_at)->format('h:i:s A'),
                     ];
                 }),
+
                 'pagination' => [
                     'total'        => $logs->total(),
                     'from'         => $logs->firstItem() ?? 0,
-                    'to'           => $logs->lastItem()  ?? 0,
+                    'to'           => $logs->lastItem() ?? 0,
                     'current_page' => $logs->currentPage(),
                     'last_page'    => $logs->lastPage(),
                     'per_page'     => $logs->perPage(),
                 ],
+
                 'counts' => [
                     'total'   => $totalCount,
                     'admin'   => $adminCount,
@@ -114,6 +125,7 @@ class SystemLogController extends Controller
                     'patient' => $patientCount,
                     'login'   => $loginCount,
                 ],
+
                 'filters' => [
                     'role'        => $role,
                     'search'      => $search,
@@ -155,10 +167,13 @@ class SystemLogController extends Controller
         return response()->json([
             'logs' => $logs->map(function ($log) {
                 return [
-                    'id'                 => $log->id,
-                    'actor_role'         => strtolower($log->actor_role ?? 'other'),
-                    'actor_identifier'   => $log->actor_identifier ?? '—',
-                    'actor_display_name' => $log->actor_identifier ?: 'Unknown User',
+                    'id'               => $log->id,
+                    'actor_role'       => strtolower($log->actor_role ?? 'other'),
+
+                    // ✅ SAME FIX HERE
+                    'actor_identifier' => $log->actor_identifier ?? '—',
+                    'actor_name'       => $log->actor_name ?? $log->actor_identifier ?? 'Unknown User',
+
                     'action'           => strtolower($log->action ?? ''),
                     'module'           => $log->module ?? '',
                     'description'      => $log->description ?? 'No description provided.',
