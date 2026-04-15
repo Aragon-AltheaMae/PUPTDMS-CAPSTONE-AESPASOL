@@ -4,135 +4,273 @@
 
 @section('styles')
     <style>
-        .access-page {
-            padding-top: var(--header-h, 0);
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .faculty-page {
             min-height: 100vh;
             background: #f5f6fa;
-            width: 100%;
-            overflow-x: hidden;
-            box-sizing: border-box;
-            padding-left: 280px;
         }
 
-        .access-shell {
-            padding: 2rem;
-            width: 100%;
-            box-sizing: border-box;
+        .faculty-shell {
+            max-width: 1280px;
+            margin: 0 auto;
         }
 
-        .access-card {
-            width: 100%;
-            max-width: none;
-            margin: 0;
-            background: #fff;
-            border-radius: 24px;
-            border: 1px solid rgba(0, 0, 0, .05);
-            box-shadow: 0 14px 42px rgba(0, 0, 0, .10);
-            overflow: visible;
-            box-sizing: border-box;
+        .page-banner {
+            background: linear-gradient(135deg, var(--crimson-dark, #660000) 0%, var(--crimson, #8B0000) 60%, #c0392b 100%);
+            padding: 1.5rem 2rem 1.6rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
+            margin-bottom: 1.5rem;
+            border-radius: 1rem;
         }
 
-        .access-card-header {
-            background: linear-gradient(135deg, #8b0000 0%, #a40000 100%);
-            color: #fff;
-            border-radius: 24px 24px 0 0;
-            padding: 1.25rem 1.5rem;
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-banner-inner {
+            position: relative;
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .access-header-left {
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff !important;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            margin-top: .35rem;
+            color: rgba(255, 255, 255, .82);
+            font-size: .92rem;
+            max-width: 720px;
+        }
+
+        .faculty-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(300px, .8fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .05);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+            overflow: hidden;
+            animation: fadeSlideUp .4s ease both;
+        }
+
+        .card-header {
+            position: relative;
+            padding: 1.05rem 1.25rem;
+            border-bottom: 1px solid #f1f3f5;
             display: flex;
             align-items: center;
-            gap: .85rem;
+            justify-content: space-between;
+            background:
+                radial-gradient(circle at 12% 28%, rgba(139, 0, 0, 0.08) 0, rgba(139, 0, 0, 0.08) 26px, transparent 27px),
+                radial-gradient(circle at 22% 78%, rgba(192, 57, 43, 0.06) 0, rgba(192, 57, 43, 0.06) 18px, transparent 19px),
+                radial-gradient(circle at 78% 24%, rgba(139, 0, 0, 0.05) 0, rgba(139, 0, 0, 0.05) 22px, transparent 23px),
+                radial-gradient(circle at 92% 70%, rgba(192, 57, 43, 0.07) 0, rgba(192, 57, 43, 0.07) 24px, transparent 25px),
+                linear-gradient(180deg, #fcfcfd 0%, #f8f9fb 100%);
+            gap: .75rem;
+            flex-wrap: wrap;
+            overflow: hidden;
         }
 
-        .access-header-icon {
+        .card-header::before,
+        .card-header::after {
+            content: '';
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .card-header::before {
+            width: 120px;
+            height: 120px;
+            top: -55px;
+            right: -30px;
+            background: radial-gradient(circle, rgba(139, 0, 0, 0.08) 0%, rgba(139, 0, 0, 0.03) 48%, transparent 72%);
+        }
+
+        .card-header::after {
+            width: 90px;
+            height: 90px;
+            bottom: -42px;
+            left: 210px;
+            background: radial-gradient(circle, rgba(192, 57, 43, 0.08) 0%, rgba(192, 57, 43, 0.03) 50%, transparent 72%);
+        }
+
+        .card-header-left,
+        .entry-badge {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .card-header-icon {
             width: 42px;
             height: 42px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, .14);
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fff6f6 0%, #fdeaea 100%);
+            color: #8B0000;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 16px;
+            flex-shrink: 0;
+            border: 1px solid rgba(139, 0, 0, 0.08);
+            box-shadow: 0 6px 16px rgba(139, 0, 0, 0.06);
         }
 
-        .access-title {
-            margin: 0;
-            font-size: 1.6rem;
+        .card-title {
+            font-size: 1rem;
             font-weight: 800;
-            line-height: 1.1;
+            color: #1a202c;
+            margin: 0;
         }
 
-        .access-subtitle {
-            margin: .2rem 0 0;
-            font-size: .84rem;
-            color: rgba(255, 255, 255, .78);
+        .card-subtitle {
+            font-size: .78rem;
+            color: #757575;
+            margin-top: 2px;
         }
 
-        .access-card-body {
-            padding: 1.5rem;
+        .card-body {
+            padding: 1.25rem;
         }
 
-        .access-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem 1.15rem;
-        }
-
-        .access-grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem 1.15rem;
-        }
-
-        .field-group {
-            min-width: 0;
-        }
-
-        .field-group.full {
-            grid-column: 1 / -1;
-        }
-
-        .field-label {
-            display: block;
+        .status-alert {
+            margin: 0 1.25rem 1rem;
+            padding: .9rem 1rem;
+            border-radius: 12px;
             font-size: .92rem;
-            font-weight: 700;
-            color: #7a4b4b;
-            margin-bottom: .45rem;
+            font-weight: 600;
         }
 
-        .required-mark {
-            color: #dc2626;
-            margin-left: 2px;
+        .status-alert.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
         }
 
-        .access-input,
-        .access-select {
-            width: 100%;
-            border: 1px solid #e7d7d7;
+        .status-alert.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .section-block {
+            border: 1px solid #f1ece8;
+            border-radius: 16px;
+            padding: 1rem;
+            background: linear-gradient(180deg, #fff 0%, #fcfbfb 100%);
+        }
+
+        .section-block + .section-block {
+            margin-top: 1rem;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #660000 0%, #8B0000 60%, #c0392b 100%);
+            padding: .9rem 1rem;
             border-radius: 14px;
-            padding: .95rem 1rem;
-            font-size: 1rem;
-            line-height: 1.3;
-            background: #fff;
-            color: #374151;
-            outline: none;
-            transition: all .15s ease;
-            box-sizing: border-box;
+            box-shadow: 0 4px 16px rgba(139, 0, 0, .16);
         }
 
-        .access-input:focus,
-        .access-select:focus {
-            border-color: #b91c1c;
-            box-shadow: 0 0 0 4px rgba(185, 28, 28, .08);
+        .section-head-left {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
         }
 
-        .access-input[readonly] {
-            background: #fafafa;
-            color: #4b5563;
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .14);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: .94rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+        }
+
+        .section-note {
+            font-size: .8rem;
+            color: rgba(255, 255, 255, .82);
+            margin-top: .15rem;
+        }
+
+        .entry-badge {
+            background: rgba(255, 244, 244, 0.92);
+            color: #8B0000;
+            font-size: .7rem;
+            font-weight: 800;
+            padding: .38rem .82rem;
+            border-radius: 999px;
+            border: 1px solid rgba(139, 0, 0, 0.14);
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.05);
+            backdrop-filter: blur(4px);
+        }
+
+        .faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .faculty-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            align-items: start;
         }
 
         .search-combo {
@@ -141,30 +279,33 @@
 
         .search-input-wrap {
             display: grid;
-            grid-template-columns: 1fr 54px;
-            gap: .6rem;
+            grid-template-columns: 1fr 46px;
+            gap: .65rem;
         }
 
         .dropdown-toggle-btn {
-            border: 1px solid #e7d7d7;
-            border-radius: 14px;
-            background: #fff;
+            border: 1.5px solid #E0DDD8;
+            border-radius: 12px;
+            background: #FAFAF9;
             color: #7b7b86;
-            font-size: 1rem;
+            font-size: .95rem;
             cursor: pointer;
             transition: all .15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .dropdown-toggle-btn:hover {
-            background: #fdf2f2;
+            background: #fef2f2;
             border-color: #d8b4b4;
             color: #8b0000;
         }
 
         .dropdown-toggle-btn:focus {
             outline: none;
-            border-color: #b91c1c;
-            box-shadow: 0 0 0 4px rgba(185, 28, 28, .08);
+            border-color: #8B0000;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
         }
 
         .search-results {
@@ -174,7 +315,7 @@
             top: calc(100% + 8px);
             background: #fff;
             border: 1px solid #eadede;
-            border-radius: 18px;
+            border-radius: 16px;
             box-shadow: 0 18px 40px rgba(0, 0, 0, .12);
             max-height: 290px;
             overflow-y: auto;
@@ -196,7 +337,7 @@
             border: 0;
             background: #fff;
             text-align: left;
-            padding: 1rem 1.1rem;
+            padding: .95rem 1rem;
             cursor: pointer;
             border-bottom: 1px solid #f3eded;
             transition: background .15s ease;
@@ -211,109 +352,353 @@
         }
 
         .search-name {
-            font-size: 1rem;
+            font-size: .94rem;
             font-weight: 800;
             color: #111827;
-            margin-bottom: .2rem;
+            margin-bottom: .15rem;
         }
 
         .search-email {
-            font-size: .88rem;
+            font-size: .84rem;
             color: #6b7280;
         }
 
         .search-empty {
             padding: .95rem 1rem;
-            font-size: .92rem;
+            font-size: .9rem;
             color: #7c7c89;
+        }
+
+        .field-group {
+            min-width: 0;
+        }
+
+        .field-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .field-label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #8B0000;
+            margin-bottom: .45rem;
+        }
+
+        .required-mark {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
+        .access-input,
+        .access-select {
+            width: 100%;
+            border: 1.5px solid #e0ddd8;
+            border-radius: 14px;
+            padding: .85rem .95rem;
+            font-size: .92rem;
+            line-height: 1.35;
+            background: #fff;
+            color: #374151;
+            outline: none;
+            transition: all .15s ease;
+            box-sizing: border-box;
+            height: 58px;
+        }
+
+        .access-input:focus,
+        .access-select:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+        }
+
+        .access-input[readonly] {
+            background: #fff;
+            cursor: default;
+            border-color: #bdbdbd;
+        }
+
+        .access-select {
+            padding-right: 3.2rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%236b7280' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 18px 18px;
+            cursor: pointer;
+        }
+
+        .access-select:invalid {
+            color: #6b7280; 
+        }
+
+        .access-select:not(:invalid) {
+            color: #111827;
+        }
+
+        .access-select option {
+            color: #111827; 
+        }
+
+        .access-select option[value=""] {
+            color: #6b7280;
         }
 
         .field-help {
             margin-top: .45rem;
-            font-size: .82rem;
+            font-size: .79rem;
             color: #7c7c89;
+            line-height: 1.4;
         }
 
-        .section-note {
-            margin: .3rem 0 1.15rem;
-            font-size: .84rem;
-            color: #7c7c89;
+        .sidebar-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-card {
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid #f0eaea;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .03);
+        }
+
+        .preview-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -30px;
+            width: 110px;
+            height: 110px;
+            border-radius: 999px;
+            background: rgba(139, 0, 0, .05);
+        }
+
+        .preview-card::after {
+            content: '';
+            position: absolute;
+            bottom: -35px;
+            left: -20px;
+            width: 90px;
+            height: 90px;
+            border-radius: 999px;
+            background: rgba(192, 57, 43, .04);
+        }
+
+        .preview-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .preview-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #8B0000, #c0392b);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            box-shadow: 0 8px 20px rgba(139, 0, 0, .18);
+            margin-bottom: .9rem;
+        }
+
+        .preview-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: .2rem;
+        }
+
+        .preview-email {
+            font-size: .86rem;
+            color: #6b7280;
+            word-break: break-word;
+            margin-bottom: 1rem;
+        }
+
+        .preview-meta {
+            display: grid;
+            gap: .75rem;
+        }
+
+        .preview-meta-item {
+            padding: .78rem .85rem;
+            border: 1px solid #f1ece8;
+            border-radius: 12px;
+            background: #fcfcfc;
+        }
+
+        .preview-meta-label {
+            font-size: .66rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #9ca3af;
+            margin-bottom: .28rem;
+        }
+
+        .preview-meta-value {
+            font-size: .88rem;
+            color: #374151;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .tip-list {
+            display: grid;
+            gap: .7rem;
+            margin-top: .8rem;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: .7rem;
+            font-size: .86rem;
+            color: #4b5563;
+            line-height: 1.45;
+        }
+
+        .tip-item i {
+            width: 18px;
+            margin-top: 2px;
+            color: #8B0000;
+            flex-shrink: 0;
         }
 
         .access-card-footer {
-            padding: 1.15rem 1.5rem 1.4rem;
+            padding: 1rem 1.25rem 1.2rem;
             border-top: 1px solid #f1f1f4;
             display: flex;
             justify-content: flex-end;
             gap: .8rem;
+            background: #fff;
         }
 
         .btn-cancel,
         .btn-save {
             border: none;
-            border-radius: 14px;
-            padding: .95rem 1.3rem;
-            font-size: .98rem;
+            border-radius: 12px;
+            height: 42px;
+            padding: 0 1.2rem;
+            font-size: .9rem;
             font-weight: 800;
             display: inline-flex;
             align-items: center;
-            gap: .6rem;
+            gap: .55rem;
             cursor: pointer;
             transition: all .15s ease;
-            text-decoration: none;
         }
 
         .btn-cancel {
-            background: #f3f4f6;
+            background: #FAFAF9;
             color: #4b5563;
-            border: 1px solid #e5e7eb;
+            border: 1.5px solid #E0DDD8;
         }
 
         .btn-cancel:hover {
-            background: #e5e7eb;
+            background: #f3f4f6;
         }
 
         .btn-save {
-            background: linear-gradient(135deg, #8b0000 0%, #a40000 100%);
+            background: #8B0000;
             color: #fff;
-            box-shadow: 0 10px 24px rgba(139, 0, 0, .22);
+            box-shadow: 0 8px 20px rgba(139, 0, 0, .18);
         }
 
         .btn-save:hover {
+            background: #760000;
             transform: translateY(-1px);
-            box-shadow: 0 12px 28px rgba(139, 0, 0, .28);
         }
 
-        .alert-success {
-            margin: 1rem 1.5rem 0;
-            padding: .9rem 1rem;
-            border-radius: 12px;
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .section-block,
+        [data-theme="dark"] .info-card,
+        [data-theme="dark"] .preview-meta-item {
+            background: #161b22 !important;
+            border-color: #21262d !important;
         }
 
-        .alert-error {
-            margin: 1rem 1.5rem 0;
-            padding: .9rem 1rem;
-            border-radius: 12px;
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+        [data-theme="dark"] .card-header,
+        [data-theme="dark"] .access-card-footer {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
         }
 
-        @media (max-width: 900px) {
-            .access-page {
-                padding-left: 0;
+        [data-theme="dark"] .card-title,
+        [data-theme="dark"] .section-title,
+        [data-theme="dark"] .preview-name,
+        [data-theme="dark"] .preview-meta-value {
+            color: #f3f4f6 !important;
+        }
+
+        [data-theme="dark"] .card-subtitle,
+        [data-theme="dark"] .field-help,
+        [data-theme="dark"] .section-note,
+        [data-theme="dark"] .preview-email,
+        [data-theme="dark"] .tip-item {
+            color: #9ca3af !important;
+        }
+
+        [data-theme="dark"] .access-input,
+        [data-theme="dark"] .access-select,
+        [data-theme="dark"] .dropdown-toggle-btn {
+            background: #0d1117;
+            border-color: #21262d;
+            color: #f3f4f6;
+        }
+
+        @media (max-width: 1100px) {
+            .faculty-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .page-banner {
+                padding: 1.05rem 1.1rem 1.15rem !important;
+                margin-bottom: 1rem;
             }
 
-            .access-shell {
+            .page-title {
+                font-size: 1.45rem !important;
+            }
+
+            .page-subtitle {
+                font-size: .84rem;
+            }
+
+            .card-header,
+            .section-head {
+                align-items: flex-start;
+            }
+
+            .card-body {
                 padding: 1rem;
             }
 
-            .access-grid,
-            .access-grid-3 {
+            .faculty-grid,
+            .faculty-grid-3 {
                 grid-template-columns: 1fr;
+            }
+
+            .access-input,
+            .access-select {
+                height: 54px;
             }
 
             .access-card-footer {
@@ -325,218 +710,320 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .search-input-wrap {
+                grid-template-columns: 1fr 42px;
+            }
         }
     </style>
 @endsection
 
 @section('content')
-    <main class="access-page">
-        <div class="access-shell">
-            <div class="access-card">
-                <div class="access-card-header">
-                    <div class="access-header-left">
-                        <div class="access-header-icon">
-                            <i class="fa-solid fa-user-graduate"></i>
+    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen faculty-page">
+        <div class="faculty-shell">
+            <div class="page-banner">
+                <div class="page-banner-inner">
+                    <div>
+                        <h1 class="page-title">Faculty Integration</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faculty-layout">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <h2 class="card-title">Faculty Integration Form</h2>
+                            </div>
                         </div>
-                        <div>
-                            <h2 class="access-title">Faculty Integration</h2>
-                            <p class="access-subtitle">
-                                Select a faculty member from the external system and review the synced information below.
-                            </p>
+                        <span class="entry-badge">Faculty Setup</span>
+                    </div>
+
+                    @if (session('success'))
+                        <div class="status-alert success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="status-alert error">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="status-alert error">
+                            <ul style="margin: 0; padding-left: 1.2rem;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form id="facultyIntegrationForm" method="POST" action="{{ route('admin.faculty.store') }}">
+                        @csrf
+
+                        <div class="card-body">
+                            <div class="section-block">
+                                <div class="section-head">
+                                    <div class="section-head-left">
+                                        <div class="section-icon">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="section-title">Faculty Selection</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faculty-grid">
+                                    <div class="field-group full search-combo">
+                                        <label for="faculty_search" class="field-label">
+                                            Select Faculty<span class="required-mark">*</span>
+                                        </label>
+
+                                        <div class="search-input-wrap">
+                                            <input type="text" id="faculty_search" class="access-input"
+                                                placeholder="Search faculty by name, email, or faculty code" autocomplete="off">
+
+                                            <button type="button" id="toggleFacultyDropdown" class="dropdown-toggle-btn"
+                                                aria-label="Show faculty list">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+
+                                        <div id="facultyResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="faculty_json" name="faculty_json">
+
+                            <div class="section-block">
+                                <div class="section-head">
+                                    <div class="section-head-left">
+                                        <div class="section-icon">
+                                            <i class="fa-solid fa-id-card"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="section-title">Synced Faculty Information</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faculty-grid">
+                                    <div class="field-group">
+                                        <label for="faculty_id" class="field-label">External Faculty ID</label>
+                                        <input type="text" id="faculty_id" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="faculty_code" class="field-label">Faculty Code</label>
+                                        <input type="text" id="faculty_code" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="first_name" class="field-label">First Name</label>
+                                        <input type="text" id="first_name" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="middle_name" class="field-label">Middle Name</label>
+                                        <input type="text" id="middle_name" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="last_name" class="field-label">Last Name</label>
+                                        <input type="text" id="last_name" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="suffix_name" class="field-label">Suffix Name</label>
+                                        <input type="text" id="suffix_name" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="faculty_type" class="field-label">Faculty Type</label>
+                                        <input type="text" id="faculty_type" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="department" class="field-label">Department</label>
+                                        <input type="text" id="department" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group full">
+                                        <label for="email" class="field-label">Email</label>
+                                        <input type="email" id="email" class="access-input" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="faculty-grid-3" style="margin-top: 1rem;">
+                                    <div class="field-group">
+                                        <label for="birthday" class="field-label">Birthday</label>
+                                        <input type="text" id="birthday" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="gender" class="field-label">Gender</label>
+                                        <input type="text" id="gender" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="zipcode" class="field-label">Zipcode</label>
+                                        <input type="text" id="zipcode" class="access-input" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="faculty-grid-3" style="margin-top: 1rem;">
+                                    <div class="field-group">
+                                        <label for="house_num" class="field-label">House / Unit No.</label>
+                                        <input type="text" id="house_num" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="street" class="field-label">Street</label>
+                                        <input type="text" id="street" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="barangay" class="field-label">Barangay</label>
+                                        <input type="text" id="barangay" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="city" class="field-label">City</label>
+                                        <input type="text" id="city" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="province" class="field-label">Province</label>
+                                        <input type="text" id="province" class="access-input" readonly>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="country" class="field-label">Country</label>
+                                        <input type="text" id="country" class="access-input" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-block">
+                                <div class="section-head">
+                                    <div class="section-head-left">
+                                        <div class="section-icon">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="section-title">Access Configuration</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faculty-grid">
+                                    <div class="field-group">
+                                        <label for="cms_role" class="field-label">
+                                            CMS Role<span class="required-mark">*</span>
+                                        </label>
+                                        <select name="cms_role" id="cms_role" class="access-select" required>
+                                            <option value="" disabled selected hidden>Select CMS Role</option>
+                                            <option value="patient">Patient</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="dentist">Dentist</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="account_status" class="field-label">
+                                            Account Status<span class="required-mark">*</span>
+                                        </label>
+                                        <select name="account_status" id="account_status" class="access-select" required>
+                                            <option value="" disabled selected hidden>Select Status</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="access-card-footer">
+                            <button type="button" class="btn-cancel" id="cancelFacultyBtn">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Cancel
+                            </button>
+
+                            <button type="submit" class="btn-save">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                Save Faculty
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="sidebar-stack">
+                    <div class="info-card preview-card">
+                        <div class="preview-inner">
+                            <div class="preview-avatar">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+
+                            <div class="preview-name" id="preview_name">No faculty selected</div>
+                            <div class="preview-email" id="preview_email">Select a faculty record to preview the synced information.</div>
+
+                            <div class="preview-meta">
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Faculty Code</div>
+                                    <div class="preview-meta-value" id="preview_code">—</div>
+                                </div>
+
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Department</div>
+                                    <div class="preview-meta-value" id="preview_department">—</div>
+                                </div>
+
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Faculty Type</div>
+                                    <div class="preview-meta-value" id="preview_type">—</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-head" style="margin-bottom: .3rem;">
+                            <div class="section-head-left">
+                                <div class="section-icon">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title">Quick Notes</h3>
+                                    <div class="section-note">Small guidance for cleaner admin workflow.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-list">
+                            <div class="tip-item">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Select from the dropdown or filtered search results to keep faculty information accurately synced.</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span>Review the faculty type, department, and email before assigning the CMS role.</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fa-solid fa-shield"></i>
+                                <span>Use <strong>Inactive</strong> status when the record should remain stored but account access must be disabled.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                @if (session('success'))
-                    <div class="alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert-error">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert-error">
-                        <ul style="margin: 0; padding-left: 1.2rem;">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('admin.faculty.store') }}">
-                    @csrf
-
-                    <div class="access-card-body">
-                        <div class="section-note">
-                            Use the search box or open the dropdown list to choose a faculty member.
-                        </div>
-
-                        <div class="access-grid">
-                            <div class="field-group full search-combo">
-                                <label for="faculty_search" class="field-label">
-                                    Select Faculty<span class="required-mark">*</span>
-                                </label>
-
-                                <div class="search-input-wrap">
-                                    <input type="text" id="faculty_search" class="access-input"
-                                        placeholder="Search faculty by name or email" autocomplete="off">
-
-                                    <button type="button" id="toggleFacultyDropdown" class="dropdown-toggle-btn"
-                                        aria-label="Show faculty list">
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                    </button>
-                                </div>
-
-                                <div id="facultyResults" class="search-results"></div>
-
-                                <div class="field-help">
-                                    Click the dropdown button to view available faculty, or type to filter the list.
-                                </div>
-                            </div>
-                        </div>
-
-                        <input type="hidden" id="faculty_json" name="faculty_json">
-
-                        <div class="access-grid" style="margin-top: 1rem;">
-                            <div class="field-group">
-                                <label for="faculty_id" class="field-label">External Faculty ID</label>
-                                <input type="text" id="faculty_id" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="faculty_code" class="field-label">Faculty Code</label>
-                                <input type="text" id="faculty_code" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="first_name" class="field-label">First Name</label>
-                                <input type="text" id="first_name" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="middle_name" class="field-label">Middle Name</label>
-                                <input type="text" id="middle_name" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="last_name" class="field-label">Last Name</label>
-                                <input type="text" id="last_name" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="suffix_name" class="field-label">Suffix Name</label>
-                                <input type="text" id="suffix_name" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="faculty_type" class="field-label">Faculty Type</label>
-                                <input type="text" id="faculty_type" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="department" class="field-label">Department</label>
-                                <input type="text" id="department" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group full">
-                                <label for="email" class="field-label">Email</label>
-                                <input type="email" id="email" class="access-input" readonly>
-                            </div>
-                        </div>
-
-                        <div class="access-grid-3" style="margin-top: 1rem;">
-                            <div class="field-group">
-                                <label for="birthday" class="field-label">Birthday</label>
-                                <input type="text" id="birthday" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="gender" class="field-label">Gender</label>
-                                <input type="text" id="gender" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="zipcode" class="field-label">Zipcode</label>
-                                <input type="text" id="zipcode" class="access-input" readonly>
-                            </div>
-                        </div>
-
-                        <div class="access-grid-3" style="margin-top: 1rem;">
-                            <div class="field-group">
-                                <label for="house_num" class="field-label">House / Unit No.</label>
-                                <input type="text" id="house_num" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="street" class="field-label">Street</label>
-                                <input type="text" id="street" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="barangay" class="field-label">Barangay</label>
-                                <input type="text" id="barangay" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="city" class="field-label">City</label>
-                                <input type="text" id="city" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="province" class="field-label">Province</label>
-                                <input type="text" id="province" class="access-input" readonly>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="country" class="field-label">Country</label>
-                                <input type="text" id="country" class="access-input" readonly>
-                            </div>
-                        </div>
-
-                        <div class="access-grid" style="margin-top: 1rem;">
-                            <div class="field-group">
-                                <label for="cms_role" class="field-label">
-                                    CMS Role<span class="required-mark">*</span>
-                                </label>
-                                <select name="cms_role" id="cms_role" class="access-select" required>
-                                    <option value="">Select CMS Role</option>
-                                    <option value="patient">Patient</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="dentist">Dentist</option>
-                                </select>
-                            </div>
-
-                            <div class="field-group">
-                                <label for="account_status" class="field-label">
-                                    Account Status<span class="required-mark">*</span>
-                                </label>
-                                <select name="account_status" id="account_status" class="access-select" required>
-                                    <option value="">Select Status</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="access-card-footer">
-                        <button type="button" class="btn-cancel" onclick="window.history.back();">
-                            <i class="fa-solid fa-xmark"></i>
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="btn-save">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            Save Faculty
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </main>
@@ -569,8 +1056,16 @@
             const country = document.getElementById('country');
             const zipcode = document.getElementById('zipcode');
 
+            const previewName = document.getElementById('preview_name');
+            const previewEmail = document.getElementById('preview_email');
+            const previewCode = document.getElementById('preview_code');
+            const previewDepartment = document.getElementById('preview_department');
+            const previewType = document.getElementById('preview_type');
+            const cancelFacultyBtn = document.getElementById('cancelFacultyBtn');
+
             let faculties = [];
             let dropdownOpen = false;
+            let isDropdownMode = false;
 
             function showResults() {
                 resultsBox.style.display = 'block';
@@ -579,7 +1074,17 @@
 
             function hideResults() {
                 resultsBox.style.display = 'none';
+                resultsBox.innerHTML = '';
                 dropdownOpen = false;
+                isDropdownMode = false;
+            }
+
+            function resetPreview() {
+                previewName.textContent = 'No faculty selected';
+                previewEmail.textContent = 'Select a faculty record to preview the synced information.';
+                previewCode.textContent = '—';
+                previewDepartment.textContent = '—';
+                previewType.textContent = '—';
             }
 
             function clearFields() {
@@ -602,6 +1107,15 @@
                 province.value = '';
                 country.value = '';
                 zipcode.value = '';
+                resetPreview();
+            }
+
+            function resetFacultyForm() {
+                searchInput.value = '';
+                clearFields();
+                document.getElementById('cms_role').value = '';
+                document.getElementById('account_status').value = '';
+                hideResults();
             }
 
             function fillFaculty(faculty) {
@@ -630,6 +1144,12 @@
                 country.value = address.country ?? '';
                 zipcode.value = address.zipcode ?? '';
 
+                previewName.textContent = `${faculty.first_name ?? ''} ${faculty.last_name ?? ''}`.trim() || 'Selected faculty';
+                previewEmail.textContent = faculty.email ?? 'No email available';
+                previewCode.textContent = faculty.faculty_code ?? '—';
+                previewDepartment.textContent = faculty.department ?? '—';
+                previewType.textContent = faculty.faculty_type ?? '—';
+
                 hideResults();
             }
 
@@ -651,11 +1171,12 @@
                     item.type = 'button';
                     item.className = 'search-item';
 
-                    const fullName = `${faculty.first_name ?? ''} ${faculty.last_name ?? ''}`.trim();
+                    const fullName =
+                        `${faculty.first_name ?? ''} ${faculty.middle_name ?? ''} ${faculty.last_name ?? ''}`.replace(/\s+/g, ' ').trim();
 
                     item.innerHTML = `
                         <div class="search-name">${fullName || 'Unnamed Faculty'}</div>
-                        <div class="search-email">${faculty.email ?? ''}</div>
+                        <div class="search-email">${faculty.email ?? faculty.faculty_code ?? ''}</div>
                     `;
 
                     item.addEventListener('click', function(event) {
@@ -673,14 +1194,16 @@
                 const q = query.trim().toLowerCase();
 
                 if (q === '') {
-                    return faculties;
+                    return [];
                 }
 
                 return faculties.filter(faculty => {
-                    const fullName = `${faculty.first_name ?? ''} ${faculty.last_name ?? ''}`.toLowerCase();
+                    const fullName =
+                        `${faculty.first_name ?? ''} ${faculty.middle_name ?? ''} ${faculty.last_name ?? ''}`.toLowerCase();
                     const mail = (faculty.email ?? '').toLowerCase();
                     const code = (faculty.faculty_code ?? '').toLowerCase();
-                    return fullName.includes(q) || mail.includes(q) || code.includes(q);
+                    const dept = (faculty.department ?? '').toLowerCase();
+                    return fullName.includes(q) || mail.includes(q) || code.includes(q) || dept.includes(q);
                 });
             }
 
@@ -705,11 +1228,21 @@
                 });
 
             searchInput.addEventListener('input', function() {
-                const query = this.value;
+                const query = this.value.trim();
+
+                clearFields();
+                isDropdownMode = false;
+
+                if (query.length === 0) {
+                    hideResults();
+                    return;
+                }
+
                 const filtered = filterFaculties(query);
 
-                if (query.trim() === '' && facultyJson.value !== '') {
-                    clearFields();
+                if (filtered.length === 0) {
+                    renderNoResults('No results found.');
+                    return;
                 }
 
                 renderResults(filtered);
@@ -719,18 +1252,19 @@
                 event.preventDefault();
                 event.stopPropagation();
 
-                if (dropdownOpen) {
+                if (dropdownOpen && isDropdownMode) {
                     hideResults();
                     return;
                 }
 
-                renderResults(filterFaculties(searchInput.value));
-            });
+                isDropdownMode = true;
 
-            searchInput.addEventListener('focus', function() {
-                if (faculties.length > 0) {
-                    renderResults(filterFaculties(searchInput.value));
+                if (!faculties.length) {
+                    renderNoResults('No faculty records available.');
+                    return;
                 }
+
+                renderResults(faculties);
             });
 
             searchInput.addEventListener('keydown', function(event) {
@@ -749,6 +1283,14 @@
                     hideResults();
                 }
             });
+
+            if (cancelFacultyBtn) {
+                cancelFacultyBtn.addEventListener('click', function() {
+                    resetFacultyForm();
+                });
+            }
+
+            resetPreview();
         });
     </script>
 @endsection

@@ -140,35 +140,50 @@ class ExternalAdminController extends Controller
             /** @var Collection<int, array<string, mixed>> $records */
             $records = collect($payload['data'] ?? []);
 
-            $mapped = $records->map(
-                /**
-                 * @param array<string, mixed> $item
-                 * @return array<string, mixed>
-                 */
-                function (array $item): array {
-                    $fname = trim((string) ($item['first_name'] ?? ''));
-                    $lname = trim((string) ($item['last_name'] ?? ''));
-                    $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
+            $searchTerm = strtolower(trim((string) ($validated['search'] ?? '')));
 
-                    return [
-                        'admin_id' => $item['admin_id'] ?? null,
-                        'fname' => $fname,
-                        'lname' => $lname,
-                        'full_name' => $fullName,
-                        'email' => $item['email'] ?? '',
-                        'office' => $item['office'] ?? '',
-                        'address' => $item['address'] ?? '',
-                        'age' => $item['age'] ?? null,
-                        'gender' => $item['gender'] ?? '',
-                        'birthday' => $item['birthday'] ?? null,
-                        'civil_status' => $item['civil_status'] ?? '',
-                        'access_level' => $item['access_level'] ?? '',
-                        'contact_number' => $item['emergency_contact_no'] ?? '',
-                        'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
-                        'last_updated' => $item['last_updated'] ?? null,
-                    ];
-                }
-            )->values();
+            $mapped = $records
+                ->map(
+                    /**
+                     * @param array<string, mixed> $item
+                     * @return array<string, mixed>
+                     */
+                    function (array $item): array {
+                        $fname = trim((string) ($item['first_name'] ?? ''));
+                        $lname = trim((string) ($item['last_name'] ?? ''));
+                        $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
+
+                        return [
+                            'admin_id' => $item['admin_id'] ?? null,
+                            'fname' => $fname,
+                            'lname' => $lname,
+                            'full_name' => $fullName,
+                            'email' => $item['email'] ?? '',
+                            'office' => $item['office'] ?? '',
+                            'address' => $item['address'] ?? '',
+                            'age' => $item['age'] ?? null,
+                            'gender' => $item['gender'] ?? '',
+                            'birthday' => $item['birthday'] ?? null,
+                            'civil_status' => $item['civil_status'] ?? '',
+                            'access_level' => $item['access_level'] ?? '',
+                            'contact_number' => $item['emergency_contact_no'] ?? '',
+                            'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
+                            'last_updated' => $item['last_updated'] ?? null,
+                        ];
+                    }
+                )
+                ->filter(function (array $user) use ($searchTerm): bool {
+                    if ($searchTerm === '') {
+                        return true;
+                    }
+
+                    return str_contains(strtolower((string) $user['full_name']), $searchTerm)
+                        || str_contains(strtolower((string) $user['fname']), $searchTerm)
+                        || str_contains(strtolower((string) $user['lname']), $searchTerm)
+                        || str_contains(strtolower((string) $user['email']), $searchTerm)
+                        || str_contains(strtolower((string) $user['office']), $searchTerm);
+                })
+                ->values();
 
             return response()->json([
                 'success' => true,
