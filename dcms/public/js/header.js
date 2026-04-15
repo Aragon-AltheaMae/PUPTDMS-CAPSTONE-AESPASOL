@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     function updateSidebarToggleIcon() {
         const icon = document.getElementById('sidebarToggleIcon');
         if (!icon) return;
@@ -29,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getRoleFromBody() {
         if (body.classList.contains('role-dentist')) return 'dentist';
         if (body.classList.contains('role-patient')) return 'patient';
+        if (body.classList.contains('role-admin')) return 'admin';
         return 'default';
     }
 
@@ -38,13 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function applySidebarStateFromStorage() {
         if (!desktopBreakpoint.matches) return;
-
         const saved = localStorage.getItem(getSidebarStorageKey());
-        if (saved === 'true') {
-            body.classList.add('sidebar-collapsed');
-        } else {
-            body.classList.remove('sidebar-collapsed');
-        }
+        body.classList.toggle('sidebar-collapsed', saved === 'true');
     }
 
     function toggleDesktopSidebar() {
@@ -83,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             body.classList.remove('sidebar-collapsed');
         }
     });
+
     const notifBtn = document.getElementById('notifBtn');
     const notifMenu = document.getElementById('notifMenu');
     const notifDropdown = document.getElementById('notifDropdown');
@@ -91,36 +87,81 @@ document.addEventListener('DOMContentLoaded', function () {
     const userMenu = document.getElementById('userMenu');
     const userDropdown = document.getElementById('userDropdown');
 
-    function closeMenus(except = null) {
-        if (notifMenu && except !== 'notif') notifMenu.classList.remove('show');
-        if (userMenu && except !== 'user') userMenu.classList.remove('show');
+    function setButtonState(button, isActive) {
+        if (!button) return;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+    }
+
+    function openMenu(menu, button) {
+        if (!menu) return;
+        menu.classList.add('show');
+        setButtonState(button, true);
+    }
+
+    function closeMenu(menu, button) {
+        if (!menu) return;
+        menu.classList.remove('show');
+        setButtonState(button, false);
+    }
+
+    function closeAllMenus(except = null) {
+        if (except !== 'notif') closeMenu(notifMenu, notifBtn);
+        if (except !== 'user') closeMenu(userMenu, userBtn);
+    }
+
+    function toggleMenu(type) {
+        if (type === 'notif' && notifMenu) {
+            const willOpen = !notifMenu.classList.contains('show');
+            closeAllMenus('notif');
+            if (willOpen) {
+                openMenu(notifMenu, notifBtn);
+            } else {
+                closeMenu(notifMenu, notifBtn);
+            }
+        }
+
+        if (type === 'user' && userMenu) {
+            const willOpen = !userMenu.classList.contains('show');
+            closeAllMenus('user');
+            if (willOpen) {
+                openMenu(userMenu, userBtn);
+            } else {
+                closeMenu(userMenu, userBtn);
+            }
+        }
     }
 
     if (notifBtn && notifMenu) {
+        notifBtn.setAttribute('aria-expanded', 'false');
         notifBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            const isOpen = notifMenu.classList.contains('show');
-            closeMenus();
-            if (!isOpen) notifMenu.classList.add('show');
+            toggleMenu('notif');
         });
     }
 
     if (userBtn && userMenu) {
+        userBtn.setAttribute('aria-expanded', 'false');
         userBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            const isOpen = userMenu.classList.contains('show');
-            closeMenus();
-            if (!isOpen) userMenu.classList.add('show');
+            toggleMenu('user');
         });
     }
 
     document.addEventListener('click', function (e) {
-        if (notifDropdown && !notifDropdown.contains(e.target)) {
-            notifMenu?.classList.remove('show');
-        }
+        const clickedNotif = notifDropdown && notifDropdown.contains(e.target);
+        const clickedUser = userDropdown && userDropdown.contains(e.target);
 
-        if (userDropdown && !userDropdown.contains(e.target)) {
-            userMenu?.classList.remove('show');
+        if (!clickedNotif && !clickedUser) {
+            closeAllMenus();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeAllMenus();
         }
     });
 

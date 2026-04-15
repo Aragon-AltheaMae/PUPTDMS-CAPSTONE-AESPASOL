@@ -43,18 +43,16 @@ class SystemLogController extends Controller
 
         $query = AuditLog::query();
 
-        // Role filter
         if ($role === 'login') {
             $query->where('action', 'like', '%login%');
         } elseif (in_array($role, ['admin', 'dentist', 'patient'])) {
             $query->where('actor_role', $role);
         }
 
-        // Search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('actor_identifier', 'like', "%{$search}%")
-                  ->orWhere('actor_name', 'like', "%{$search}%") // ✅ FIX
+                  ->orWhere('actor_name', 'like', "%{$search}%")
                   ->orWhere('action', 'like', "%{$search}%")
                   ->orWhere('module', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
@@ -82,14 +80,12 @@ class SystemLogController extends Controller
 
         $logs = $query->paginate($perPage)->withQueryString();
 
-        // Counts
         $totalCount   = AuditLog::count();
         $adminCount   = AuditLog::where('actor_role', 'admin')->count();
         $dentistCount = AuditLog::where('actor_role', 'dentist')->count();
         $patientCount = AuditLog::where('actor_role', 'patient')->count();
         $loginCount   = AuditLog::where('action', 'like', '%login%')->count();
 
-        // ✅ AJAX RESPONSE FIXED
         if ($request->ajax()) {
             return response()->json([
                 'logs' => $logs->map(function ($log) {
@@ -97,7 +93,6 @@ class SystemLogController extends Controller
                         'id'               => $log->id,
                         'actor_role'       => strtolower($log->actor_role ?? 'other'),
 
-                        // ✅ FIX: unified naming
                         'actor_identifier' => $log->actor_identifier ?? '—',
                         'actor_name'       => $log->actor_name ?? $log->actor_identifier ?? 'Unknown User',
 
@@ -170,7 +165,6 @@ class SystemLogController extends Controller
                     'id'               => $log->id,
                     'actor_role'       => strtolower($log->actor_role ?? 'other'),
 
-                    // ✅ SAME FIX HERE
                     'actor_identifier' => $log->actor_identifier ?? '—',
                     'actor_name'       => $log->actor_name ?? $log->actor_identifier ?? 'Unknown User',
 

@@ -23,46 +23,76 @@
 
             const isTextarea = input.tagName.toLowerCase() === 'textarea';
             const parent = input.parentNode;
+            const isInsideSearchWrap = parent && parent.classList && parent.classList.contains(
+                'search-wrap');
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'voice-input-wrap';
+            let wrapper = null;
+            let statusLabel = null;
+            let micBtn = null;
 
-            if (input.classList.contains('voice-full')) {
-                wrapper.classList.add('is-full');
-            } else if (input.classList.contains('voice-small')) {
-                wrapper.classList.add('is-small');
+            if (isInsideSearchWrap) {
+                parent.classList.add('voice-search-wrap');
+                input.dataset.voiceReady = 'true';
+
+                if (!input.classList.contains('voice-search-input')) {
+                    input.classList.add('voice-search-input');
+                }
+
+                statusLabel = document.createElement('span');
+                statusLabel.className =
+                    'hidden absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20';
+                parent.appendChild(statusLabel);
+
+                micBtn = document.createElement('button');
+                micBtn.type = 'button';
+                micBtn.setAttribute('aria-label', 'Toggle voice input');
+                micBtn.className =
+                    'voice-mic-btn voice-search-mic absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors z-10';
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                parent.appendChild(micBtn);
             } else {
-                wrapper.classList.add('is-medium');
+                wrapper = document.createElement('div');
+                wrapper.className = 'voice-input-wrap';
+
+                if (input.classList.contains('voice-full')) {
+                    wrapper.classList.add('is-full');
+                } else if (input.classList.contains('voice-small')) {
+                    wrapper.classList.add('is-small');
+                } else {
+                    wrapper.classList.add('is-medium');
+                }
+
+                const computedDisplay = window.getComputedStyle(input).display;
+                if (computedDisplay === 'inline' || computedDisplay === 'inline-block') {
+                    wrapper.style.display = 'inline-block';
+                } else {
+                    wrapper.style.display = 'block';
+                    wrapper.style.width = '100%';
+                }
+
+                parent.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                if (input.tagName.toLowerCase() !== 'select') {
+                    input.classList.add('pr-12');
+                }
+
+                input.dataset.voiceReady = 'true';
+
+                statusLabel = document.createElement('span');
+                statusLabel.className =
+                    'hidden absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20';
+                wrapper.appendChild(statusLabel);
+
+                micBtn = document.createElement('button');
+                micBtn.type = 'button';
+                micBtn.setAttribute('aria-label', 'Toggle voice input');
+                micBtn.className = isTextarea ?
+                    'voice-mic-btn absolute right-3 top-3 text-gray-400 hover:text-[#8B0000] transition-colors z-10' :
+                    'voice-mic-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors z-10';
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                wrapper.appendChild(micBtn);
             }
-
-            const computedDisplay = window.getComputedStyle(input).display;
-            if (computedDisplay === 'inline' || computedDisplay === 'inline-block') {
-                wrapper.style.display = 'inline-block';
-            } else {
-                wrapper.style.display = 'block';
-            }
-
-            parent.insertBefore(wrapper, input);
-            wrapper.appendChild(input);
-            if (input.tagName.toLowerCase() !== 'select') {
-                input.classList.add('pr-12');
-            }
-
-            input.dataset.voiceReady = 'true';
-
-            const statusLabel = document.createElement('span');
-            statusLabel.className =
-                'hidden absolute right-0 -top-6 text-xs font-semibold px-2 py-0.5 rounded pointer-events-none z-20';
-            wrapper.appendChild(statusLabel);
-
-            const micBtn = document.createElement('button');
-            micBtn.type = 'button';
-            micBtn.setAttribute('aria-label', 'Toggle voice input');
-            micBtn.className = isTextarea ?
-                'voice-mic-btn absolute right-3 top-3 text-gray-400 hover:text-[#8B0000] transition-colors z-10' :
-                'voice-mic-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B0000] transition-colors z-10';
-            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-            wrapper.appendChild(micBtn);
 
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
@@ -96,6 +126,7 @@
 
             micBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
 
                 const isSameActive = activeRecognition === recognition;
 
