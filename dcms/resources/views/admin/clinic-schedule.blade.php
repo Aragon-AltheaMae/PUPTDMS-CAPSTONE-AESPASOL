@@ -4,7 +4,6 @@
 
 @section('styles')
     <style>
-        /* TOAST */
         #toastContainer {
             position: fixed !important;
             top: 20px !important;
@@ -1227,36 +1226,167 @@
                 justify-content: center;
             }
 
+            .p-4 .flex.flex-wrap.gap-3.mt-3.justify-end {
+                justify-content: flex-start !important;
+                gap: .5rem .75rem !important;
+            }
+
             .week-grid {
-                min-width: 640px;
+                min-width: 720px;
             }
 
-            .weekly-toolbar {
-                flex-wrap: wrap;
-                gap: .5rem;
-                justify-content: flex-start;
-            }
-
-            .weekly-toolbar #weekRangeLabel {
-                order: -1;
-                width: 100%;
-                text-align: left;
-                padding: 0;
+            #prevWeek,
+            #nextWeek {
+                width: 2.1rem !important;
+                height: 2.1rem !important;
+                flex-shrink: 0;
+                border-radius: 10px !important;
             }
 
             #weekRangeLabel {
                 min-width: 0 !important;
-                font-size: .7rem !important;
+                max-width: none !important;
+                font-size: .72rem !important;
+                line-height: 1.15 !important;
+                white-space: normal !important;
+                text-align: center !important;
+                padding: 0 .25rem !important;
+                color: #374151 !important;
+                font-weight: 700 !important;
             }
 
             #todayBtn {
-                padding: .35rem .55rem !important;
+                padding: .34rem .58rem !important;
                 font-size: .62rem !important;
+                border-radius: 999px !important;
+                white-space: nowrap;
+                flex-shrink: 0;
+                min-width: 52px;
             }
 
-            .p-4 .flex.flex-wrap.gap-3.mt-3.justify-end {
-                justify-content: flex-start !important;
-                gap: .5rem .75rem !important;
+            .bg-white.rounded-xl.shadow.border.border-gray-100.overflow-hidden > .px-4.py-4.border-b.bg-gray-50.flex.flex-col.gap-3.sm\:flex-row.sm\:items-center.sm\:justify-between {
+                gap: .55rem !important;
+                padding: .8rem .85rem !important;
+            }
+
+            .bg-white.rounded-xl.shadow.border.border-gray-100.overflow-hidden > .px-4.py-4.border-b.bg-gray-50.flex.flex-col.gap-3.sm\:flex-row.sm\:items-center.sm\:justify-between > div:first-child {
+                width: 100%;
+            }
+
+            .bg-white.rounded-xl.shadow.border.border-gray-100.overflow-hidden > .px-4.py-4.border-b.bg-gray-50.flex.flex-col.gap-3.sm\:flex-row.sm\:items-center.sm\:justify-between > div:first-child h2 {
+                font-size: .9rem !important;
+                line-height: 1.2 !important;
+            }
+
+            .bg-white.rounded-xl.shadow.border.border-gray-100.overflow-hidden > .px-4.py-4.border-b.bg-gray-50.flex.flex-col.gap-3.sm\:flex-row.sm\:items-center.sm\:justify-between > div:last-child {
+                display: grid !important;
+                grid-template-columns: 34px minmax(0, 1fr) 34px;
+                grid-template-areas:
+                    "prev range next"
+                    "today today today";
+                align-items: center;
+                gap: .45rem .5rem !important;
+                width: 100%;
+            }
+
+            #prevWeek {
+                grid-area: prev;
+            }
+
+            #weekRangeLabel {
+                grid-area: range;
+            }
+
+            #nextWeek {
+                grid-area: next;
+            }
+
+            #todayBtn {
+                grid-area: today;
+                width: fit-content;
+                justify-self: center;
+            }
+
+            .sched-table tbody tr {
+                margin: .75rem 0;
+                padding: .9rem;
+                border: 1px solid #ece5e1;
+                border-radius: 16px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, .05);
+                background: #fff;
+            }
+
+            .sched-table tbody td[data-label="Opens"],
+            .sched-table tbody td[data-label="Closes"] {
+                margin-top: .3rem;
+            }
+
+            .sched-table tbody td[data-label="Day(s)"],
+            .sched-table tbody td[data-label="Lunch Break"] {
+                margin-bottom: .3rem;
+            }
+
+            .sched-table tbody td:last-child {
+                padding-top: .75rem;
+            }
+
+            .sched-table tbody td[data-label="Actions"] {
+                padding-top: .65rem;
+            }
+
+            .sched-table tbody td[data-label="Actions"] .flex {
+                gap: .6rem;
+            }
+
+            .sched-table tbody td[data-label="Actions"] .w-7.h-7 {
+                width: 2.4rem !important;
+                height: 2.4rem !important;
+            }
+
+            .cap-bar.w-16 {
+                width: 4.25rem !important;
+            }
+
+            .badge-open,
+            .badge-closed,
+            .badge-limited {
+                font-size: .68rem;
+                padding: 3px 10px;
+            }
+
+            .sched-table tbody td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: .58rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: #9ca3af;
+                margin-bottom: .18rem;
+            }
+
+            .sched-table tbody td[data-label="Max Slots"] .flex {
+                align-items: center;
+                flex-wrap: wrap;
+                gap: .45rem;
+            }
+
+            .sched-table tbody td[data-label="Day(s)"] {
+                font-size: .9rem;
+                font-weight: 800;
+                color: #1f2937;
+            }
+
+            .sched-table tbody td[data-label="Status"] {
+                padding-top: .5rem;
+            }
+
+            .sched-table tbody td[data-label="Actions"] form {
+                margin: 0;
+            }
+
+            .sched-table tbody td[data-label="Actions"] button {
+                box-shadow: 0 2px 6px rgba(0,0,0,.05);
             }
 
             .sched-table thead {
@@ -1264,63 +1394,62 @@
             }
 
             .sched-table,
-            .sched-table tbody,
-            .sched-table tr,
+            .sched-table tbody {
+                display: block;
+                width: 100%;
+            }
+
+            .sched-table tr {
+                display: flex;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
             .sched-table td {
                 display: block;
                 width: 100%;
             }
 
-            .sched-table tbody tr {
-                margin: .5rem 0;
-                padding: .75rem .8rem;
-                border: 1px solid #f1ece8;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
-                background: #fff;
+            .sched-table tbody td[data-label="Day(s)"],
+            .sched-table tbody td[data-label="Lunch Break"],
+            .sched-table tbody td[data-label="Opens"],
+            .sched-table tbody td[data-label="Closes"] {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
             }
 
-            .sched-table tbody td {
-                padding: .24rem 0;
-                font-size: .76rem;
+            .sched-table tbody td[data-label="Day(s)"],
+            .sched-table tbody td[data-label="Lunch Break"],
+            .sched-table tbody td[data-label="Opens"],
+            .sched-table tbody td[data-label="Closes"] {
+                width: 50%;
             }
 
-            .sched-table tbody td:last-child {
-                padding-top: .6rem;
+            .sched-table tbody td[data-label="Day(s)"] {
+                order: 1;
+            }
+            .sched-table tbody td[data-label="Lunch Break"] {
+                order: 2;
+            }
+            .sched-table tbody td[data-label="Opens"] {
+                order: 3;
+            }
+            .sched-table tbody td[data-label="Closes"] {
+                order: 4;
             }
 
+            .sched-table tbody td[data-label="Max Slots"] {
+                order: 5;
+                width: 100%;
+            }
+            .sched-table tbody td[data-label="Status"] {
+                order: 6;
+                width: 100%;
+            }
             .sched-table tbody td[data-label="Actions"] {
-                padding-top: .45rem;
-            }
-
-            .sched-table tbody td[data-label="Actions"] .flex {
-                gap: .45rem;
-            }
-
-            .sched-table tbody td[data-label="Actions"] .w-7.h-7 {
-                width: 2.25rem !important;
-                height: 2.25rem !important;
-            }
-
-            .cap-bar.w-16 {
-                width: 3rem !important;
-            }
-
-            .badge-open,
-            .badge-closed,
-            .badge-limited {
-                font-size: .62rem;
-                padding: 2px 8px;
-            }
-
-            .sched-table tbody td::before {
-                content: attr(data-label);
-                display: block;
-                font-size: .1rem;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: .05em;
-                color: #9ca3af;
+                order: 7;
+                width: 100%;
             }
 
             .space-y-6>.bg-white {
@@ -1755,12 +1884,14 @@
 
                     {{-- Weekly view --}}
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-calendar-week text-[#8B0000]"></i>
-                                <h2 class="font-bold text-gray-800 text-sm">Weekly Appointment View</h2>
+                        
+                        <div class="px-4 py-4 border-b bg-gray-50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-calendar-week text-[#8B0000] mt-0.5"></i>
+                                <h2 class="font-bold text-gray-800 text-sm leading-5">Weekly Appointment View</h2>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-between gap-2 sm:justify-end">
+
                                 <button id="prevWeek"
                                     class="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#8B0000] hover:text-[#8B0000] transition-all text-xs"><i
                                         class="fa-solid fa-chevron-left"></i></button>
@@ -1773,6 +1904,7 @@
                                     class="text-[10px] font-bold text-[#8B0000] bg-red-50 border border-red-200 px-2.5 py-1 rounded-lg hover:bg-red-100 transition-colors">Today</button>
                             </div>
                         </div>
+                        
                         <div class="p-4 overflow-x-auto">
                             <div id="weekGrid" class="week-grid" style="min-width:480px;"></div>
                             <div class="flex flex-wrap gap-3 mt-3 justify-end">
@@ -1804,7 +1936,7 @@
 
                         @if ($schedules->count())
                             <div id="scheduleRulesListView" class="schedule-rules-view">
-                                <div class="overflow-x-auto">
+                                <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
                                     <table class="sched-table">
                                         <thead>
                                             <tr>
