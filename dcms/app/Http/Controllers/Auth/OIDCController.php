@@ -9,6 +9,7 @@ use App\Models\Faculty;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\FacultyApiService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,13 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OIDCController extends Controller
 {
+    protected FacultyApiService $facultyApiService;
+
+    public function __construct(FacultyApiService $facultyApiService)
+    {
+        $this->facultyApiService = $facultyApiService;
+    }
+
     public function redirect(Request $request)
     {
         $loginUrl     = config('services.idp.login_url');
@@ -188,7 +196,7 @@ class OIDCController extends Controller
         $lastName   = trim((string) ($profile['last_name'] ?? ''));
         $suffixName = trim((string) ($profile['name_suffix'] ?? ''));
 
-        $nameParts = array_filter([$firstName, $middleName, $lastName, $suffixName], fn ($value) => $value !== '');
+        $nameParts = array_filter([$firstName, $middleName, $lastName, $suffixName], fn($value) => $value !== '');
         $fullName  = trim(implode(' ', $nameParts));
         $name      = $profile['name'] ?? ($fullName !== '' ? $fullName : $email);
 
@@ -381,15 +389,98 @@ class OIDCController extends Controller
                 ->orWhere('email', $user->email)
                 ->first();
 
-            if (!$patient) {
+            $birthdate = null;
+            $gender = null;
+            $phone = '';
+            $facultyCode = null;
+            $studentNo = null;
+
+            // 🔥 1. CHECK ADMIN FIRST
+            if ($assignedAccess) {
+                try {
+                    $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
+                    $apiKey = (string) env('OCMS_EXTERNAL_API_KEY');
+
+                    /** @var \Illuminate\Http\Client\Response $response */
+                    $response = Http::timeout(15)
+                        ->acceptJson()
+                        ->withHeaders([
+                            'X-External-Api-Key' => $apiKey,
+                        ])
+                        ->get($baseUrl . '/external/admins/' . urlencode((string) $assignedAccess->external_admin_id));
+
+                    if ($response->successful()) {
+
+                        /** @var array<string, mixed> $payload */
+                        $payload = $response->json();
+
+                        /** @var array<string, mixed> $admin */
+                        $admin = is_array($payload['data'] ?? null) ? $payload['data'] : [];
+
+                        $birthdate = $admin['birthday'] ?? null;
+                        $gender = $admin['gender'] ?? null;
+                        $phone = $admin['emergency_contact_no'] ?? '';
+                    } else {
+                        $gender = $assignedAccess->gender ?? null;
+                        $phone = $assignedAccess->contact_number ?? '';
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Admin API fetch failed', [
+                        'email' => $email,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // 🔥 2. IF NOT ADMIN, CHECK FACULTY
+            elseif (true) {
+                $faculties = $this->facultyApiService->getFaculties();
+
+                $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
+                    $facultyEmail = strtolower((string) ($faculty['email'] ?? ''));
+                    $userEmail = strtolower((string) $email);
+
+                    $facultyId = (string) ($faculty['faculty_id'] ?? '');
+                    $currentSsoUserId = (string) ($ssoUserId ?? '');
+
+                    return ($facultyEmail !== '' && $facultyEmail === $userEmail)
+                        || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
+                });
+
+                if ($matchedFaculty) {
+                    $birthdate = $matchedFaculty['profile']['birthday'] ?? null;
+                    $gender = $matchedFaculty['profile']['gender'] ?? null;
+                    $phone = $matchedFaculty['contact_number'] ?? '';
+                    $facultyCode = $matchedFaculty['faculty_code'] ?? null;
+                }
+            }
+
+            if ($patient) {
+                $patient->user_id = $patient->user_id ?: $user->id;
+                $patient->name = $user->name ?: $name ?: $email;
+                $patient->email = $user->email;
+                $patient->phone = $phone;
+                $patient->birthdate = $birthdate;
+                $patient->gender = $gender;
+                $patient->faculty_code = $facultyCode;
+                $patient->student_no = $studentNo;
+
+                if (empty($patient->password)) {
+                    $patient->password = Hash::make(Str::random(16));
+                }
+
+                $patient->save();
+            } else {
                 $patient = Patient::create([
                     'user_id'   => $user->id,
                     'name'      => $user->name ?: $name ?: $email,
                     'email'     => $user->email,
-                    'phone'     => '',
-                    'birthdate' => now()->subYears(18)->toDateString(),
-                    'gender'    => 'Male',
+                    'phone'     => $phone,
+                    'birthdate' => $birthdate,
+                    'gender'    => $gender,
                     'password'  => Hash::make(Str::random(16)),
+                    'faculty_code' => $facultyCode,
+                    'student_no' => $studentNo,
                 ]);
             }
 

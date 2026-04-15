@@ -976,9 +976,10 @@
 
         var PROFILE_DATA = {
             name: "{{ ucwords(strtolower($patient->name ?? 'Guest')) }}",
-            course: "{{ $patient->course ?? 'BSIT' }}",
-            yearLevel: "{{ $patient->year_level ?? '' }}",
-            studentId: "{{ $patient->student_id ?? ($patient->patient_id ?? 'Student No.') }}",
+            course: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
+            yearLevel: "",
+            facultyCode: "{{ $patient->faculty_code ?? '' }}",
+            studentNo: "{{ $patient->student_no ?? '' }}",
             age: "{{ $patient->age ?? (\Carbon\Carbon::parse($patient->birthdate ?? now())->age ?? 'N/A') }}",
             birthdate: "{{ isset($patient->birthdate) ? \Carbon\Carbon::parse($patient->birthdate)->format('M d, Y') : 'N/A' }}",
             gender: "{{ $patient->gender ?? 'N/A' }}",
@@ -1192,10 +1193,21 @@
                 (pData.yearLevel ? ' ' + escapeHtml(pData.yearLevel) : '') +
                 '</p>' +
 
-                '<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">' +
-                '<i class="fa-regular fa-id-badge text-[10px]"></i> ' +
-                escapeHtml(pData.studentId) +
-                '</div>' +
+                (
+                    pData.facultyCode && pData.facultyCode !== 'null' ?
+                    '<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">' +
+                    '<i class="fa-regular fa-id-badge text-[10px]"></i> ' +
+                    escapeHtml('Faculty Code: ' + pData.facultyCode) +
+                    '</div>' :
+                    (
+                        pData.studentNo && pData.studentNo !== 'null' ?
+                        '<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">' +
+                        '<i class="fa-regular fa-id-badge text-[10px]"></i> ' +
+                        escapeHtml('Student No: ' + pData.studentNo) +
+                        '</div>' :
+                        ''
+                    )
+                ) +
                 '</div>' +
 
                 '<div class="border-t border-gray-100"></div>' +

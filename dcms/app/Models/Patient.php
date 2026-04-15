@@ -16,6 +16,8 @@ class Patient extends Model
         'phone',
         'birthdate',
         'gender',
+        'faculty_code',
+        'student_no',
         'password',
     ];
 

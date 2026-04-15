@@ -99,33 +99,21 @@ class ExternalAdminController extends Controller
         ]);
 
         try {
-            $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
-            $url = $baseUrl . '/external/admins';
-
-            /** @var array<string, string> $query */
-            $query = array_filter([
+            /** @var Response $response */
+            $response = $this->makeApiRequest('/external/admins', array_filter([
                 'search' => $validated['search'] ?? null,
                 'admin_id' => $validated['admin_id'] ?? null,
                 'email' => $validated['email'] ?? null,
                 'email_address' => $validated['email_address'] ?? null,
                 'access_level' => $validated['access_level'] ?? null,
                 'role' => $validated['role'] ?? null,
-            ], static fn ($value): bool => !is_null($value) && $value !== '');
-
-            /** @var Response $response */
-            $response = Http::timeout(15)
-                ->acceptJson()
-                ->withHeaders([
-                    'X-External-Api-Key' => (string) env('OCMS_EXTERNAL_API_KEY'),
-                ])
-                ->get($url, $query);
+            ], static fn ($value): bool => !is_null($value) && $value !== ''));
 
             if ($response->failed()) {
                 Log::error('OCMS external admin search failed', [
-                    'url' => $url,
-                    'query' => $query,
                     'status' => $response->status(),
                     'body' => $response->body(),
+                    'query' => $validated,
                 ]);
 
                 return response()->json([
@@ -138,40 +126,14 @@ class ExternalAdminController extends Controller
             $payload = $response->json();
 
             /** @var Collection<int, array<string, mixed>> $records */
-            $records = collect($payload['data'] ?? []);
+            $records = collect(
+                is_array($payload['data'] ?? null) ? $payload['data'] : []
+            );
 
             $searchTerm = strtolower(trim((string) ($validated['search'] ?? '')));
 
             $mapped = $records
-                ->map(
-                    /**
-                     * @param array<string, mixed> $item
-                     * @return array<string, mixed>
-                     */
-                    function (array $item): array {
-                        $fname = trim((string) ($item['first_name'] ?? ''));
-                        $lname = trim((string) ($item['last_name'] ?? ''));
-                        $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
-
-                        return [
-                            'admin_id' => $item['admin_id'] ?? null,
-                            'fname' => $fname,
-                            'lname' => $lname,
-                            'full_name' => $fullName,
-                            'email' => $item['email'] ?? '',
-                            'office' => $item['office'] ?? '',
-                            'address' => $item['address'] ?? '',
-                            'age' => $item['age'] ?? null,
-                            'gender' => $item['gender'] ?? '',
-                            'birthday' => $item['birthday'] ?? null,
-                            'civil_status' => $item['civil_status'] ?? '',
-                            'access_level' => $item['access_level'] ?? '',
-                            'contact_number' => $item['emergency_contact_no'] ?? '',
-                            'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
-                            'last_updated' => $item['last_updated'] ?? null,
-                        ];
-                    }
-                )
+                ->map(fn (array $item): array => $this->mapAdminRecord($item))
                 ->filter(function (array $user) use ($searchTerm): bool {
                     if ($searchTerm === '') {
                         return true;
@@ -209,21 +171,12 @@ class ExternalAdminController extends Controller
     public function show($adminId): JsonResponse
     {
         try {
-            $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
-            $url = $baseUrl . '/external/admins/' . urlencode((string) $adminId);
-
             /** @var Response $response */
-            $response = Http::timeout(15)
-                ->acceptJson()
-                ->withHeaders([
-                    'X-External-Api-Key' => (string) env('OCMS_EXTERNAL_API_KEY'),
-                ])
-                ->get($url);
+            $response = $this->makeApiRequest('/external/admins/' . urlencode((string) $adminId));
 
             if ($response->failed()) {
                 Log::error('OCMS external admin fetch failed', [
                     'admin_id' => $adminId,
-                    'url' => $url,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
@@ -234,32 +187,15 @@ class ExternalAdminController extends Controller
                 ], $response->status());
             }
 
-            /** @var array<string, mixed> $item */
-            $item = $response->json('data', []);
+            /** @var array<string, mixed> $payload */
+            $payload = $response->json();
 
-            $fname = trim((string) ($item['first_name'] ?? ''));
-            $lname = trim((string) ($item['last_name'] ?? ''));
-            $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
+            /** @var array<string, mixed> $item */
+            $item = is_array($payload['data'] ?? null) ? $payload['data'] : [];
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'admin_id' => $item['admin_id'] ?? null,
-                    'fname' => $fname,
-                    'lname' => $lname,
-                    'full_name' => $fullName,
-                    'email' => $item['email'] ?? '',
-                    'office' => $item['office'] ?? '',
-                    'address' => $item['address'] ?? '',
-                    'age' => $item['age'] ?? null,
-                    'gender' => $item['gender'] ?? '',
-                    'birthday' => $item['birthday'] ?? null,
-                    'civil_status' => $item['civil_status'] ?? '',
-                    'access_level' => $item['access_level'] ?? '',
-                    'contact_number' => $item['emergency_contact_no'] ?? '',
-                    'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
-                    'last_updated' => $item['last_updated'] ?? null,
-                ],
+                'data' => $this->mapAdminRecord($item),
             ]);
         } catch (\Throwable $e) {
             Log::error('OCMS external admin fetch exception', [
@@ -272,5 +208,56 @@ class ExternalAdminController extends Controller
                 'message' => 'Unable to connect to OCMS external admin system.',
             ], 500);
         }
+    }
+
+    /**
+     * Create HTTP request to external OCMS admin API.
+     */
+    private function makeApiRequest(string $path, array $query = []): Response
+    {
+        $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
+        $apiKey = (string) env('OCMS_EXTERNAL_API_KEY');
+        $url = $baseUrl . $path;
+
+        /** @var Response $response */
+        $response = Http::timeout(15)
+            ->acceptJson()
+            ->withHeaders([
+                'X-External-Api-Key' => $apiKey,
+            ])
+            ->get($url, $query);
+
+        return $response;
+    }
+
+    /**
+     * Normalize external admin payload.
+     *
+     * @param array<string, mixed> $item
+     * @return array<string, mixed>
+     */
+    private function mapAdminRecord(array $item): array
+    {
+        $fname = trim((string) ($item['first_name'] ?? ''));
+        $lname = trim((string) ($item['last_name'] ?? ''));
+        $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
+
+        return [
+            'admin_id' => $item['admin_id'] ?? null,
+            'fname' => $fname,
+            'lname' => $lname,
+            'full_name' => $fullName,
+            'email' => $item['email'] ?? '',
+            'office' => $item['office'] ?? '',
+            'address' => $item['address'] ?? '',
+            'age' => $item['age'] ?? null,
+            'gender' => $item['gender'] ?? '',
+            'birthday' => $item['birthday'] ?? null,
+            'civil_status' => $item['civil_status'] ?? '',
+            'access_level' => $item['access_level'] ?? '',
+            'contact_number' => $item['emergency_contact_no'] ?? '',
+            'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
+            'last_updated' => $item['last_updated'] ?? null,
+        ];
     }
 }
