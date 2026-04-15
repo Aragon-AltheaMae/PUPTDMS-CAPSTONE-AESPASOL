@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\AuditLogger;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Helpers\PhilippineHolidays;
+use App\Notifications\AppointmentCancelledNotification;
+use App\Notifications\AppointmentRescheduledNotification;
 
 class DentistAppointmentController extends Controller
 {
@@ -171,7 +174,7 @@ class DentistAppointmentController extends Controller
 
     public function cancel(Request $request, $id)
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with('patient.user')->findOrFail($id);
 
         if (!in_array($appointment->status, ['upcoming', 'rescheduled'])) {
             return response()->json([
@@ -181,6 +184,22 @@ class DentistAppointmentController extends Controller
         }
 
         $appointment->update(['status' => 'cancelled']);
+
+        $patientUser = optional($appointment->patient)->user;
+
+        if (!$patientUser && !empty(optional($appointment->patient)->email)) {
+            $patientUser = User::where('email', $appointment->patient->email)->first();
+        }
+
+        if ($patientUser) {
+            $patientUser->notify(
+                new AppointmentCancelledNotification(
+                    $appointment,
+                    'Dentist',
+                    $request->input('reason')
+                )
+            );
+        }
 
         AuditLogger::log(
             'update',
@@ -304,6 +323,17 @@ class DentistAppointmentController extends Controller
             'service_type' => $request->service_type,
             'status' => 'rescheduled',
         ]);
+
+        $appointment->load('patient.user');
+        $patientUser = optional($appointment->patient)->user;
+
+        if (!$patientUser && !empty(optional($appointment->patient)->email)) {
+            $patientUser = User::where('email', $appointment->patient->email)->first();
+        }
+
+        if ($patientUser) {
+            $patientUser->notify(new AppointmentRescheduledNotification($appointment, 'Dentist'));
+        }
 
         AuditLogger::log(
             'update',
