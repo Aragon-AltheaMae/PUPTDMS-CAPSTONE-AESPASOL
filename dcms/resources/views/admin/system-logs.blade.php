@@ -72,7 +72,6 @@
             }
         }
 
-        /* Page Banner */
         .page-banner {
             background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
             padding: 1.75rem 2rem 2rem;
@@ -105,7 +104,7 @@
             line-height: 1.1;
             letter-spacing: -.02em;
         }
- 
+
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -294,7 +293,6 @@
             border-bottom: none;
         }
 
-        /* ── Search ── */
         .search-wrap {
             display: flex;
             align-items: center;
@@ -333,33 +331,6 @@
             color: #B0ABA6;
         }
 
-        .search-clear-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: #E0DDD8;
-            color: #7A7370;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            padding: 0;
-        }
-
-        .search-clear-btn:hover {
-            background: #8b000076;
-            color: #fff;
-        }
-
-        .search-clear-btn.visible {
-            display: flex;
-        }
-
-        /* ── Tab group ── */
         .tab-group {
             display: flex;
             background: #F5F2EE;
@@ -391,7 +362,6 @@
             box-shadow: 0 2px 8px rgba(139, 0, 0, .3);
         }
 
-        /* ── Live badge ── */
         .sl-live {
             display: inline-flex;
             align-items: center;
@@ -522,7 +492,6 @@
             word-break: break-word;
         }
 
-        /* ── Log cell styles ── */
         .sl-id {
             font-size: .7rem;
             font-weight: 500;
@@ -723,8 +692,48 @@
             animation: slNewRowSlideIn .8s ease;
         }
 
-        .sl-filter-wrap {
-            position: relative;
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .card {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .card-header {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
+        }
+
+        [data-theme="dark"] .card-title,
+        [data-theme="dark"] .stat-value {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .data-table thead th {
+            background: #0d1117;
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .data-table tbody td {
+            color: #d1d5db;
+            border-color: #1c2128;
+        }
+
+        [data-theme="dark"] .data-table tbody tr:hover td {
+            background: #1c2128;
+        }
+
+        [data-theme="dark"] .sl-clear-filter-btn {
+            background: #2a1215;
+            border-color: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] #slTable tbody tr {
+            background: #161b22;
+            border-color: #21262d;
+        }
+
+        .sl-filter-actions-wrap {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -732,6 +741,7 @@
         }
 
         .sl-filter-btn {
+            position: relative;
             height: 38px;
             padding: 0 14px;
             border-radius: 12px;
@@ -755,41 +765,164 @@
             background: #fef2f2;
         }
 
-        .sl-filter-panel {
+        .sl-filter-badge {
             position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            width: 320px;
-            background: #fff;
-            border: 1px solid #ececec;
-            border-radius: 16px;
-            box-shadow: 0 14px 40px rgba(0, 0, 0, .12);
-            padding: 14px;
-            z-index: 60;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: #8B0000;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            pointer-events: none;
         }
 
-        .sl-filter-panel.hidden {
+        .sl-filter-badge.hidden {
+            display: none !important;
+        }
+
+        .sl-clear-filter-btn {
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1.5px dashed #fca5a5;
+            background: #fff7f7;
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .sl-clear-filter-btn:hover {
+            background: #fef2f2;
+            border-color: #dc2626;
+            color: #8B0000;
+        }
+
+        .sl-clear-filter-btn.hidden {
+            display: none !important;
+        }
+
+        .sl-filter-overlay {
             display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 190;
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(2px);
+        }
+
+        .sl-filter-overlay.open {
+            display: block;
+        }
+
+        .sl-filter-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            top: auto;
+            right: auto;
+            width: 100%;
+            height: 85vh;
+            max-width: none;
+            background: #fff;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
+        }
+
+        .sl-filter-panel.open {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 768px) {
+            .sl-filter-panel {
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: auto;
+                width: 360px;
+                height: 100vh;
+                border-radius: 24px 0 0 24px;
+                transform: translateX(100%);
+            }
+
+            .sl-filter-panel.open {
+                transform: translateX(0);
+            }
         }
 
         .sl-filter-head {
+            padding: 18px 24px;
+            border-bottom: 1px solid #EDE9E4;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 13px;
-            font-weight: 800;
-            color: #333333;
+        }
+
+        .sl-filter-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #8B0000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .sl-filter-close {
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: #f3f4f6;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
+            border: 1.5px solid #E8E4DE;
+            background: none;
             cursor: pointer;
-            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9A9490;
+            font-size: 14px;
+            transition: all .2s;
+        }
+
+        .sl-filter-close:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+            background: #FFF8F8;
+        }
+
+        .sl-filter-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .sl-filter-section {
+            margin-bottom: 22px;
+        }
+
+        .sl-filter-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #9A9490;
+            margin-bottom: 10px;
         }
 
         .sl-filter-grid {
@@ -827,97 +960,133 @@
             box-shadow: 0 0 0 3px rgba(139, 0, 0, .08);
         }
 
-        .sl-filter-actions {
+        .sl-filter-date-row {
             display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-top: 14px;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sl-filter-date-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sl-filter-date-label {
+            font-size: 11px;
+            color: #9A9490;
+            font-weight: 600;
+        }
+
+        .sl-filter-footer {
+            padding: 14px 24px;
+            border-top: 1px solid #EDE9E4;
+            display: flex;
+            gap: 10px;
         }
 
         .sl-filter-reset,
         .sl-filter-apply {
-            height: 36px;
-            padding: 0 14px;
+            height: 40px;
             border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .sl-filter-reset {
-            border: 1px solid #e5e7eb;
-            background: #fff;
-            color: #6b7280;
-        }
-
-        .sl-filter-apply {
-            border: none;
-            background: #8B0000;
-            color: #fff;
-        }
-
-        .sl-clear-filter-btn {
-            height: 38px;
-            padding: 0 14px;
-            border-radius: 12px;
-            border: 1.5px dashed #fca5a5;
-            background: #fff7f7;
-            color: #b91c1c;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all .2s;
         }
 
-        .sl-clear-filter-btn:hover {
-            background: #fef2f2;
-            border-color: #dc2626;
+        .sl-filter-reset {
+            flex: 1;
+            border: 1.5px solid #E0DDD8;
+            background: #fff;
             color: #8B0000;
         }
 
-        .sl-clear-filter-btn.hidden {
-            display: none;
+        .sl-filter-reset:hover {
+            background: #FFF8F8;
         }
 
-
-        [data-theme="dark"] .stat-card,
-        [data-theme="dark"] .card {
-            background: #161b22 !important;
-            border-color: #21262d !important;
+        .sl-filter-apply {
+            flex: 2;
+            border: none;
+            background: #8B0000;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(139, 0, 0, .3);
         }
 
-        [data-theme="dark"] .card-header {
-            background: #0d1117 !important;
-            border-color: #21262d !important;
+        .sl-filter-apply:hover {
+            background: #660000;
         }
 
-        [data-theme="dark"] .card-title,
-        [data-theme="dark"] .stat-value {
-            color: #f3f4f6;
+        .sl-active-filters-section {
+            margin-bottom: 22px;
         }
 
-        [data-theme="dark"] .data-table thead th {
-            background: #0d1117;
-            border-color: #21262d;
+        .sl-active-filters-section.hidden {
+            display: none !important;
         }
 
-        [data-theme="dark"] .data-table tbody td {
-            color: #d1d5db;
-            border-color: #1c2128;
+        .sl-active-filters-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
-        [data-theme="dark"] .data-table tbody tr:hover td {
-            background: #1c2128;
+        .sl-active-filters-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
         }
 
-        [data-theme="dark"] .sl-clear-filter-btn {
-            background: #2a1215;
-            border-color: #7f1d1d;
-            color: #fca5a5;
+        .sl-active-filters-clear-all {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #8B0000;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sl-active-filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .sl-filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #E5E7EB;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #4B5563;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s;
+        }
+
+        .sl-filter-chip:hover {
+            border-color: #D1D5DB;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .sl-filter-chip-remove {
+            color: #333333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin-left: 2px;
+        }
+
+        .sl-filter-chip-remove:hover {
+            color: #EF4444;
         }
 
         [data-theme="dark"] .sl-filter-panel {
@@ -926,11 +1095,17 @@
         }
 
         [data-theme="dark"] .sl-filter-head {
+            border-color: #21262d;
+        }
+
+        [data-theme="dark"] .sl-filter-title,
+        [data-theme="dark"] .sl-active-filters-title {
             color: #f3f4f6;
         }
 
         [data-theme="dark"] .sl-filter-close {
             background: #0d1117;
+            border-color: #21262d;
             color: #757575;
         }
 
@@ -944,17 +1119,43 @@
         [data-theme="dark"] .sl-filter-reset {
             background: #0d1117;
             border-color: #21262d;
-            color: #757575;
+            color: #d1d5db;
         }
 
-        [data-theme="dark"] #slTable tbody tr {
-            background: #161b22;
+        [data-theme="dark"] .sl-active-filters-container {
             border-color: #21262d;
+        }
+
+        [data-theme="dark"] .sl-filter-chip {
+            background: #0d1117;
+            border-color: #21262d;
+            color: #d1d5db;
         }
 
         @media (max-width: 767px) {
 
-            /* Banner */
+            .search-wrap.voice-search-wrap {
+                padding-right: 44px;
+            }
+
+            .search-wrap.voice-search-wrap .voice-search-mic {
+                right: 12px;
+            }
+
+            .sl-filter-actions-wrap {
+                width: 100%;
+                display: flex;
+                gap: 8px;
+            }
+
+            .sl-filter-btn,
+            .sl-clear-filter-btn {
+                flex: 1;
+                height: 42px;
+                justify-content: center;
+                min-width: 0;
+            }
+
             .page-banner {
                 border-radius: 14px !important;
                 padding: 1.1rem 1.1rem 1.4rem !important;
@@ -969,7 +1170,6 @@
                 gap: .6rem;
             }
 
-            /* Stat grid → 2 columns */
             .stat-grid {
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: .75rem;
@@ -983,7 +1183,6 @@
                 display: none;
             }
 
-            /* ── Card header: stack vertically ── */
             .card-header {
                 flex-direction: column;
                 align-items: stretch !important;
@@ -1003,7 +1202,6 @@
                 justify-content: flex-start;
             }
 
-            /* Search → full width */
             .search-wrap {
                 width: 100% !important;
                 min-width: 0;
@@ -1015,42 +1213,6 @@
                 font-size: 14px;
             }
 
-            /* Filter row → two equal buttons side by side */
-            .sl-filter-wrap {
-                width: 100%;
-                display: flex;
-                gap: 8px;
-            }
-
-            .sl-filter-btn {
-                flex: 1;
-                height: 42px;
-                justify-content: center;
-            }
-
-            .sl-clear-filter-btn {
-                flex: 1;
-                height: 42px;
-                justify-content: center;
-                min-width: 0;
-            }
-
-            /* Filter panel → full width, positioned better on mobile */
-            .sl-filter-panel {
-                position: absolute;
-                top: calc(100% + 8px);
-                left: 0;
-                right: auto;
-                bottom: auto;
-                width: 100%;
-                min-width: 0;
-                border-radius: 16px;
-                max-height: none;
-                overflow-y: visible;
-                z-index: 9999;
-            }
-
-            /* Tab strip → scrollable */
             .flex.gap-1.px-5.py-2\\.5 {
                 padding-left: .75rem !important;
                 padding-right: .75rem !important;
@@ -1061,7 +1223,6 @@
                 font-size: 11px;
             }
 
-            /* Pagebar → wrap naturally */
             .sl-pagebar {
                 flex-direction: column;
                 align-items: flex-start;
@@ -1078,7 +1239,6 @@
                 width: max-content;
             }
 
-            /* ── Table → card-per-row layout ── */
             #slTable thead {
                 display: none;
             }
@@ -1101,14 +1261,12 @@
                 background: #fafbff;
             }
 
-            /* Hide all cells by default, then reveal selectively */
             #slTable tbody td {
                 display: none;
                 border: none !important;
                 padding: 0 !important;
             }
 
-            /* Col 1 → ID  (row 1, col 1) */
             #slTable tbody td:nth-child(1) {
                 display: flex;
                 align-items: center;
@@ -1116,7 +1274,6 @@
                 grid-row: 1;
             }
 
-            /* Col 2 → Timestamp  (row 1, col 2 – right-aligned) */
             #slTable tbody td:nth-child(2) {
                 display: flex;
                 align-items: flex-start;
@@ -1125,7 +1282,6 @@
                 grid-row: 1;
             }
 
-            /* Col 3 → Role  (row 2, col 1–2) */
             #slTable tbody td:nth-child(3) {
                 display: flex;
                 align-items: center;
@@ -1133,7 +1289,6 @@
                 grid-row: 2;
             }
 
-            /* Col 4 → User  (row 3, col 1) */
             #slTable tbody td:nth-child(4) {
                 display: flex;
                 align-items: center;
@@ -1141,7 +1296,6 @@
                 grid-row: 3;
             }
 
-            /* Col 5 → Action  (row 3, col 2 – right-aligned) */
             #slTable tbody td:nth-child(5) {
                 display: flex;
                 align-items: center;
@@ -1150,12 +1304,10 @@
                 grid-row: 3;
             }
 
-            /* Col 6 → Module: hide on mobile (saves space) */
             #slTable tbody td:nth-child(6) {
                 display: none;
             }
 
-            /* Col 7 → Description  (row 4, full width, with top divider) */
             #slTable tbody td:nth-child(7) {
                 display: block;
                 grid-column: 1 / -1;
@@ -1185,7 +1337,6 @@
                 border-color: #21262d !important;
             }
 
-            /* Per-page + info row */
             .flex.items-center.gap-3.flex-wrap {
                 gap: .4rem;
             }
@@ -1194,7 +1345,6 @@
                 white-space: nowrap;
             }
 
-            /* Table columns not needed */
             .data-table thead th {
                 padding: .5rem;
                 font-size: .6rem;
@@ -1222,6 +1372,82 @@
                 padding: .85rem;
                 gap: .85rem;
             }
+
+            .card-header-right>.flex.items-center.gap-2 {
+                width: 100%;
+                align-items: center;
+            }
+
+            .card-header-right>.flex.items-center.gap-2 .search-wrap {
+                flex: 1;
+                width: 100% !important;
+            }
+
+            .card-header-right>.flex.items-center.gap-2 #searchClearBtn {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            .sl-filter-actions-wrap {
+                width: 100%;
+            }
+        }
+
+        .search-wrap.voice-search-wrap {
+            position: relative;
+            padding-right: 42px;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-input {
+            padding-right: 0 !important;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B0000;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic i {
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic:hover,
+        .search-wrap.voice-search-wrap .voice-search-mic.text-\[\#8B0000\] {
+            color: #660000;
+        }
+
+        .voice-input-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .voice-input-wrap>input,
+        .voice-input-wrap>textarea {
+            width: 100%;
+        }
+
+        .voice-input-wrap .voice-mic-btn {
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
         }
 
         @media (max-width: 480px) {
@@ -1290,17 +1516,11 @@
                         </span>
 
                         <div class="sl-view-toggle" id="slViewToggle">
-                            <button type="button"
-                                class="sl-view-toggle-btn active"
-                                id="slListViewBtn"
-                                title="List view"
+                            <button type="button" class="sl-view-toggle-btn active" id="slListViewBtn" title="List view"
                                 aria-label="List view">
                                 <i class="fa-solid fa-table-list"></i>
                             </button>
-                            <button type="button"
-                                class="sl-view-toggle-btn"
-                                id="slGridViewBtn"
-                                title="Grid view"
+                            <button type="button" class="sl-view-toggle-btn" id="slGridViewBtn" title="Grid view"
                                 aria-label="Grid view">
                                 <i class="fa-solid fa-grip"></i>
                             </button>
@@ -1345,7 +1565,8 @@
                     </div>
                     <div class="stat-label">Dentist Actions</div>
                     <div class="stat-value" id="statDentist" style="color:#3b82f6;">{{ $dentistCount }}</div>
-                    <div class="stat-footer"><i class="fa-solid fa-stethoscope" style="font-size:.65rem;color:#3b82f6;"></i>
+                    <div class="stat-footer"><i class="fa-solid fa-stethoscope"
+                            style="font-size:.65rem;color:#3b82f6;"></i>
                         Dentist activity</div>
                 </div>
                 <div class="stat-card">
@@ -1375,26 +1596,27 @@
                         </span>
                     </div>
 
-                    {{-- Right: search + filter --}}
                     <div class="card-header-right">
-                        {{-- Search --}}
-                        <div class="search-wrap" style="width:200px;">
-                            <i class="fa fa-search"></i>
-                            <input id="slSearch" name="search" placeholder="Search logs…" value="{{ $search ?? '' }}"
-                                onkeydown="if(event.key==='Enter'){event.preventDefault();slState.search=this.value;slState.page=1;slFetch();}">
+                        <div class="flex items-center gap-2">
+                            <div class="search-wrap" style="width:200px;">
+                                <i class="fa fa-search"></i>
+                                <input id="slSearch" name="search" placeholder="Search logs…"
+                                    value="{{ $search ?? '' }}"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();slState.search=this.value;slState.page=1;slFetch();}">
+                            </div>
+
                             <button type="button" id="searchClearBtn"
-                                class="search-clear-btn {{ $search ?? '' ? 'visible' : '' }}" onclick="clearSearch()"
-                                title="Clear">
-                                <i class="fa-solid fa-xmark"></i>
+                                class="hidden text-xs font-semibold text-red-600 hover:text-red-800 transition-colors flex-shrink-0"
+                                onclick="clearSearch()">
+                                Clear
                             </button>
                         </div>
 
-                        {{-- Filter wrap --}}
-                        <div class="sl-filter-wrap">
-                            <button type="button" id="slFilterBtn" class="sl-filter-btn"
-                                onclick="toggleSlFilterPanel(event)">
+                        <div class="sl-filter-actions-wrap">
+                            <button type="button" id="slFilterBtn" class="sl-filter-btn" onclick="openSlFilterPanel()">
                                 <i class="fa-solid fa-sliders"></i>
                                 <span>Filter</span>
+                                <span id="slFilterBadge" class="sl-filter-badge hidden"></span>
                             </button>
 
                             <button type="button" id="slClearFilterBtn" class="sl-clear-filter-btn hidden"
@@ -1402,54 +1624,6 @@
                                 <i class="fa-solid fa-filter-circle-xmark"></i>
                                 <span>Clear</span>
                             </button>
-
-                            <div id="slFilterPanel" class="sl-filter-panel hidden">
-                                <div class="sl-filter-head">
-                                    <span>Filter logs</span>
-                                    <button type="button" class="sl-filter-close" onclick="closeSlFilterPanel()">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                                <div class="sl-filter-grid">
-                                    <div class="sl-filter-group">
-                                        <label>Sort order</label>
-                                        <select id="slSortOrder" class="sl-filter-select">
-                                            <option value="desc">Newest first</option>
-                                            <option value="asc">Oldest first</option>
-                                        </select>
-                                    </div>
-                                    <div class="sl-filter-group">
-                                        <label>From date</label>
-                                        <input type="date" id="slDateFrom" class="sl-filter-input">
-                                    </div>
-                                    <div class="sl-filter-group">
-                                        <label>To date</label>
-                                        <input type="date" id="slDateTo" class="sl-filter-input">
-                                    </div>
-                                    <div class="sl-filter-group">
-                                        <label>Action type</label>
-                                        <select id="slActionType" class="sl-filter-select">
-                                            <option value="">All actions</option>
-                                            <option value="login">Login</option>
-                                            <option value="logout">Logout</option>
-                                            <option value="create">Create</option>
-                                            <option value="update">Update</option>
-                                            <option value="delete">Delete</option>
-                                        </select>
-                                    </div>
-                                    <div class="sl-filter-group">
-                                        <label>Module</label>
-                                        <input type="text" id="slModuleFilter" class="sl-filter-input"
-                                            placeholder="e.g. appointments">
-                                    </div>
-                                </div>
-                                <div class="sl-filter-actions">
-                                    <button type="button" class="sl-filter-reset"
-                                        onclick="resetSlFilters()">Reset</button>
-                                    <button type="button" class="sl-filter-apply" onclick="applySlFilters()">Apply
-                                        filters</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1495,7 +1669,7 @@
                     <div class="sl-pagination-wrap"></div>
                 </div>
 
-               {{-- List View --}}
+                {{-- List View --}}
                 <div class="sl-view" id="slListView">
                     <div style="overflow-x:auto;">
                         <table class="data-table" id="slTable">
@@ -1540,12 +1714,15 @@
                                         $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
                                     @endphp
                                     <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                                        <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                        <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                        </td>
                                         <td>
                                             <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
                                             <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
                                         </td>
-                                        <td><span class="sl-role {{ $role }}"><i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}</span></td>
+                                        <td><span class="sl-role {{ $role }}"><i
+                                                    class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}</span>
+                                        </td>
                                         <td>
                                             <div class="sl-user">
                                                 <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
@@ -1554,15 +1731,19 @@
                                         </td>
                                         <td>
                                             <span class="sl-action {{ $actionClass }}">
-                                                <i class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                                <i
+                                                    class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
                                             </span>
                                         </td>
                                         <td>
                                             <span class="sl-module">
-                                                <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
+                                                <i
+                                                    class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
                                             </span>
                                         </td>
-                                        <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span></td>
+                                        <td><span
+                                                class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span>
+                                        </td>
                                     </tr>
                                 @empty
                                 @endforelse
@@ -1570,7 +1751,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <div class="sl-view" id="slGridView" hidden>
                     <div class="sl-grid" id="slGridBody">
                         @forelse($logs as $log)
@@ -1602,11 +1783,13 @@
                                 $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
                             @endphp
 
-                            <div class="sl-grid-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                            <div class="sl-grid-card" data-role="{{ $role }}"
+                                data-action="{{ $actionClass }}">
                                 <div class="sl-grid-top">
                                     <div class="sl-grid-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</div>
                                     <span class="sl-action {{ $actionClass }}">
-                                        <i class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                        <i
+                                            class="fa-solid {{ $actionIcon }}"></i>{{ ucwords(str_replace('_', ' ', $log->action)) }}
                                     </span>
                                 </div>
 
@@ -1637,14 +1820,16 @@
                                         <div class="sl-grid-label">Module</div>
                                         <div class="sl-grid-value">
                                             <span class="sl-module">
-                                                <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
+                                                <i
+                                                    class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module)) }}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div class="sl-grid-field">
                                         <div class="sl-grid-label">Description</div>
-                                        <div class="sl-grid-value">{{ $log->description ?? 'No description provided.' }}</div>
+                                        <div class="sl-grid-value">{{ $log->description ?? 'No description provided.' }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1671,6 +1856,91 @@
 
         </div>
     </main>
+    <div id="slFilterOverlay" class="sl-filter-overlay" onclick="closeSlFilterPanel()"></div>
+
+    <div id="slFilterPanel" class="sl-filter-panel">
+        <div class="sl-filter-head">
+            <span class="sl-filter-title">
+                <i class="fa-solid fa-sliders"></i> Filter logs
+            </span>
+            <button type="button" class="sl-filter-close" onclick="closeSlFilterPanel()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="sl-filter-body">
+            <div id="slActiveFiltersSection" class="sl-active-filters-section hidden">
+                <div class="sl-active-filters-head">
+                    <span class="sl-active-filters-title">Active Filters</span>
+                    <button id="slClearAllChipsBtn" type="button" class="sl-active-filters-clear-all">
+                        Clear All
+                    </button>
+                </div>
+                <div id="slActiveChipsContainer" class="sl-active-filters-container"></div>
+            </div>
+
+            <div class="sl-filter-section">
+                <div class="sl-filter-section-title">Sort order</div>
+                <div class="sl-filter-grid">
+                    <div class="sl-filter-group">
+                        <label for="slSortOrder">Sort order</label>
+                        <select id="slSortOrder" class="sl-filter-select">
+                            <option value="desc">Newest first</option>
+                            <option value="asc">Oldest first</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sl-filter-section">
+                <div class="sl-filter-section-title">Date range</div>
+                <div class="sl-filter-date-row">
+                    <div class="sl-filter-date-group">
+                        <span class="sl-filter-date-label">From</span>
+                        <input type="date" id="slDateFrom" class="sl-filter-input">
+                    </div>
+                    <div class="sl-filter-date-group">
+                        <span class="sl-filter-date-label">To</span>
+                        <input type="date" id="slDateTo" class="sl-filter-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sl-filter-section">
+                <div class="sl-filter-section-title">Action type</div>
+                <div class="sl-filter-grid">
+                    <div class="sl-filter-group">
+                        <label for="slActionType">Action type</label>
+                        <select id="slActionType" class="sl-filter-select">
+                            <option value="">All actions</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="create">Create</option>
+                            <option value="update">Update</option>
+                            <option value="delete">Delete</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sl-filter-section">
+                <div class="sl-filter-section-title">Module</div>
+                <div class="sl-filter-grid">
+                    <div class="sl-filter-group">
+                        <label for="slModuleFilter">Module</label>
+                        <input type="text" id="slModuleFilter" class="sl-filter-input"
+                            placeholder="e.g. appointments">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sl-filter-footer">
+            <button type="button" class="sl-filter-reset" onclick="clearSlFilterPanelDraft()">Clear All</button>
+            <button type="button" class="sl-filter-apply" onclick="applySlFilters()">Apply</button>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
@@ -1685,10 +1955,12 @@
                 e.stopPropagation();
             });
 
-            document.addEventListener('click', function(e) {
-                var wrap = document.querySelector('.sl-filter-wrap');
-                if (!wrap) return;
-                if (!wrap.contains(e.target)) closeSlFilterPanel();
+            ['slSortOrder', 'slDateFrom', 'slDateTo', 'slActionType', 'slModuleFilter'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', renderSlFilterChips);
+                    el.addEventListener('input', renderSlFilterChips);
+                }
             });
 
             @if (method_exists($logs, 'total') && $logs->total() > 0)
@@ -1760,9 +2032,6 @@
             setInterval(checkForNewLogs, 5000);
         });
 
-        /* ════════════════════════════════════════
-           AJAX STATE
-        ════════════════════════════════════════ */
         var slState = {
             role: '{{ $role ?? 'all' }}',
             search: '{{ $search ?? '' }}',
@@ -1832,15 +2101,27 @@
         }
 
         function toggleSearchClear(input) {
-            document.getElementById('searchClearBtn').classList.toggle('visible', input.value.length > 0);
+            var btn = document.getElementById('searchClearBtn');
+            if (!btn) return;
+
+            if ((input.value || '').trim().length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
         }
 
         function clearSearch() {
             var input = document.getElementById('slSearch');
+            var btn = document.getElementById('searchClearBtn');
+            if (!input) return;
+
             input.value = '';
-            document.getElementById('searchClearBtn').classList.remove('visible');
             slState.search = '';
             slState.page = 1;
+
+            if (btn) btn.classList.add('hidden');
+
             slFetch();
             input.focus();
         }
@@ -1879,6 +2160,7 @@
             var to = document.getElementById('slDateTo');
             var action = document.getElementById('slActionType');
             var module = document.getElementById('slModuleFilter');
+
             if (sort) sort.value = slState.sort || 'desc';
             if (from) from.value = slState.dateFrom || '';
             if (to) to.value = slState.dateTo || '';
@@ -1886,10 +2168,45 @@
             if (module) module.value = slState.module || '';
         }
 
+        function openSlFilterPanel() {
+            syncSlFilterInputs();
+            renderSlFilterChips();
+
+            document.getElementById('slFilterPanel')?.classList.add('open');
+            document.getElementById('slFilterOverlay')?.classList.add('open');
+            document.getElementById('slFilterBtn')?.classList.add('active');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeSlFilterPanel() {
+            document.getElementById('slFilterPanel')?.classList.remove('open');
+            document.getElementById('slFilterOverlay')?.classList.remove('open');
+            document.getElementById('slFilterBtn')?.classList.remove('active');
+            document.body.classList.remove('overflow-hidden');
+        }
+
         function updateSlClearFilterButton() {
             var btn = document.getElementById('slClearFilterBtn');
-            if (!btn) return;
-            btn.classList.toggle('hidden', !hasActiveSlFilters());
+            var badge = document.getElementById('slFilterBadge');
+            if (!btn || !badge) return;
+
+            var count = 0;
+            if (slState.sort && slState.sort !== 'desc') count++;
+            if (slState.dateFrom || slState.dateTo) count++;
+            if (slState.actionType) count++;
+            if (slState.module) count++;
+
+            var has = count > 0;
+
+            btn.classList.toggle('hidden', !has);
+
+            if (has) {
+                badge.classList.remove('hidden');
+                badge.textContent = count;
+            } else {
+                badge.classList.add('hidden');
+                badge.textContent = '';
+            }
         }
 
         function clearOnlySlFilters() {
@@ -1899,28 +2216,99 @@
             slState.actionType = '';
             slState.module = '';
             slState.page = 1;
+
             syncSlFilterInputs();
             updateSlClearFilterButton();
             closeSlFilterPanel();
             slFetch();
         }
 
-        function toggleSlFilterPanel(e) {
-            if (e) e.stopPropagation();
+        function clearSlFilterPanelDraft() {
+            var sort = document.getElementById('slSortOrder');
+            var from = document.getElementById('slDateFrom');
+            var to = document.getElementById('slDateTo');
+            var action = document.getElementById('slActionType');
+            var module = document.getElementById('slModuleFilter');
 
-            var panel = document.getElementById('slFilterPanel');
-            var btn = document.getElementById('slFilterBtn');
-            if (!panel || !btn) return;
+            if (sort) sort.value = 'desc';
+            if (from) from.value = '';
+            if (to) to.value = '';
+            if (action) action.value = '';
+            if (module) module.value = '';
 
-            panel.classList.toggle('hidden');
-            btn.classList.toggle('active', !panel.classList.contains('hidden'));
+            renderSlFilterChips();
         }
 
-        function closeSlFilterPanel() {
-            var panel = document.getElementById('slFilterPanel');
-            var btn = document.getElementById('slFilterBtn');
-            if (panel) panel.classList.add('hidden');
-            if (btn) btn.classList.remove('active');
+        function renderSlFilterChips() {
+            var container = document.getElementById('slActiveChipsContainer');
+            var section = document.getElementById('slActiveFiltersSection');
+            var clearAllBtn = document.getElementById('slClearAllChipsBtn');
+
+            if (!container || !section) return;
+
+            container.innerHTML = '';
+            var hasChips = false;
+
+            function addChip(label, callback) {
+                hasChips = true;
+
+                var chip = document.createElement('div');
+                chip.className = 'sl-filter-chip';
+                chip.innerHTML =
+                    "<span>" + label +
+                    "</span><span class='sl-filter-chip-remove'><i class='fa-solid fa-xmark'></i></span>";
+
+                chip.querySelector('.sl-filter-chip-remove').onclick = function() {
+                    callback();
+                    renderSlFilterChips();
+                };
+
+                container.appendChild(chip);
+            }
+
+            var sortVal = document.getElementById('slSortOrder')?.value || 'desc';
+            var fromVal = document.getElementById('slDateFrom')?.value || '';
+            var toVal = document.getElementById('slDateTo')?.value || '';
+            var actionVal = document.getElementById('slActionType')?.value || '';
+            var moduleVal = document.getElementById('slModuleFilter')?.value || '';
+
+            if (sortVal === 'asc') {
+                addChip('Sort: Oldest first', function() {
+                    document.getElementById('slSortOrder').value = 'desc';
+                });
+            }
+
+            if (fromVal || toVal) {
+                var lbl = fromVal && toVal ? (fromVal + ' to ' + toVal) : (fromVal ? 'From ' + fromVal : 'Until ' + toVal);
+                addChip('Date: ' + lbl, function() {
+                    document.getElementById('slDateFrom').value = '';
+                    document.getElementById('slDateTo').value = '';
+                });
+            }
+
+            if (actionVal) {
+                addChip('Action: ' + actionVal.charAt(0).toUpperCase() + actionVal.slice(1), function() {
+                    document.getElementById('slActionType').value = '';
+                });
+            }
+
+            if (moduleVal) {
+                addChip('Module: ' + moduleVal, function() {
+                    document.getElementById('slModuleFilter').value = '';
+                });
+            }
+
+            if (hasChips) {
+                section.classList.remove('hidden');
+
+                if (clearAllBtn) {
+                    clearAllBtn.onclick = function() {
+                        clearSlFilterPanelDraft();
+                    };
+                }
+            } else {
+                section.classList.add('hidden');
+            }
         }
 
         function applySlFilters() {
@@ -1930,6 +2318,7 @@
             slState.actionType = document.getElementById('slActionType')?.value || '';
             slState.module = document.getElementById('slModuleFilter')?.value || '';
             slState.page = 1;
+
             updateSlClearFilterButton();
             closeSlFilterPanel();
             slFetch();
@@ -2034,12 +2423,12 @@
             logs.forEach(function(log) {
                 var role = (log.actor_role || 'other').toLowerCase();
                 var action = (log.action || '').toLowerCase();
-                var actionClass = action.includes('login') ? 'login'
-                    : action.includes('logout') ? 'logout'
-                    : action.includes('create') ? 'create'
-                    : action.includes('update') ? 'update'
-                    : action.includes('delete') ? 'delete'
-                    : 'default';
+                var actionClass = action.includes('login') ? 'login' :
+                    action.includes('logout') ? 'logout' :
+                    action.includes('create') ? 'create' :
+                    action.includes('update') ? 'update' :
+                    action.includes('delete') ? 'delete' :
+                    'default';
 
                 var actionIcon = actionIcons[actionClass] || 'fa-bolt';
                 var roleIcon = roleIcons[role] || 'fa-circle-user';
@@ -2056,27 +2445,44 @@
 
                 tableHtml += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
                 tableHtml += '<td><span class="sl-id">' + idPadded + '</span></td>';
-                tableHtml += '<td><span class="sl-date-day">' + log.created_at_day + '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
-                tableHtml += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
-                tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter + '</div><span class="sl-username">' + actorName + '</span></div></td>';
-                tableHtml += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon + '"></i>' + actionLabel + '</span></td>';
-                tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel + '</span></td>';
-                tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description + '</span></td>';
+                tableHtml += '<td><span class="sl-date-day">' + log.created_at_day +
+                    '</span><span class="sl-date-time">' + log.created_at_time + '</span></td>';
+                tableHtml += '<td><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' +
+                    role.charAt(0).toUpperCase() + role.slice(1) + '</span></td>';
+                tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + role + '">' + letter +
+                    '</div><span class="sl-username">' + actorName + '</span></div></td>';
+                tableHtml += '<td><span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon +
+                    '"></i>' + actionLabel + '</span></td>';
+                tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel +
+                    '</span></td>';
+                tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description +
+                    '</span></td>';
                 tableHtml += '</tr>';
 
                 gridHtml += '<div class="sl-grid-card">';
                 gridHtml += '<div class="sl-grid-top">';
                 gridHtml += '<div class="sl-grid-id">' + idPadded + '</div>';
-                gridHtml += '<span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon + '"></i>' + actionLabel + '</span>';
+                gridHtml += '<span class="sl-action ' + actionClass + '"><i class="fa-solid ' + actionIcon +
+                    '"></i>' + actionLabel + '</span>';
                 gridHtml += '</div>';
 
-                gridHtml += '<div class="sl-user"><div class="sl-avatar ' + role + '">' + letter + '</div><span class="sl-username">' + actorName + '</span></div>';
+                gridHtml += '<div class="sl-user"><div class="sl-avatar ' + role + '">' + letter +
+                    '</div><span class="sl-username">' + actorName + '</span></div>';
 
                 gridHtml += '<div class="sl-grid-meta">';
-                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Timestamp</div><div class="sl-grid-value">' + log.created_at_day + '<br>' + log.created_at_time + '</div></div>';
-                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Role</div><div class="sl-grid-value"><span class="sl-role ' + role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role.slice(1) + '</span></div></div>';
-                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Module</div><div class="sl-grid-value"><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel + '</span></div></div>';
-                gridHtml += '<div class="sl-grid-field"><div class="sl-grid-label">Description</div><div class="sl-grid-value">' + description + '</div></div>';
+                gridHtml +=
+                    '<div class="sl-grid-field"><div class="sl-grid-label">Timestamp</div><div class="sl-grid-value">' +
+                    log.created_at_day + '<br>' + log.created_at_time + '</div></div>';
+                gridHtml +=
+                    '<div class="sl-grid-field"><div class="sl-grid-label">Role</div><div class="sl-grid-value"><span class="sl-role ' +
+                    role + '"><i class="fa-solid ' + roleIcon + '"></i>' + role.charAt(0).toUpperCase() + role
+                    .slice(1) + '</span></div></div>';
+                gridHtml +=
+                    '<div class="sl-grid-field"><div class="sl-grid-label">Module</div><div class="sl-grid-value"><span class="sl-module"><i class="fa-solid fa-cube"></i>' +
+                    moduleLabel + '</span></div></div>';
+                gridHtml +=
+                    '<div class="sl-grid-field"><div class="sl-grid-label">Description</div><div class="sl-grid-value">' +
+                    description + '</div></div>';
                 gridHtml += '</div>';
                 gridHtml += '</div>';
             });
@@ -2213,7 +2619,7 @@
                 title + '</p><p style="font-size:.78rem;color:#b0b7c3;margin:0;max-width:280px;">' + sub + '</p>' + extra +
                 '</div>';
 
-                window.addEventListener('resize', function() {
+            window.addEventListener('resize', function() {
                 applySlView(getPreferredSlView(), false);
             });
         }
