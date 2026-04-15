@@ -4,7 +4,6 @@
 
 @section('styles')
     <style>
-        /* TOAST */
         #toastContainer {
             position: fixed !important;
             top: 20px !important;
