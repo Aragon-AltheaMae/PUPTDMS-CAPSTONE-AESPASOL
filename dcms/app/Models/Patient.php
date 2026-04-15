@@ -18,11 +18,25 @@ class Patient extends Model
         'gender',
         'faculty_code',
         'student_no',
+        'course_code',
+        'course_name',
+        'year_level',
+        'section',
+        'is_pwd',
+        'is_senior',
+        'address',
         'password',
     ];
 
     protected $hidden = [
         'password',
+    ];
+
+    protected $casts = [
+        'birthdate' => 'date',
+        'year_level' => 'integer',
+        'is_pwd' => 'boolean',
+        'is_senior' => 'boolean',
     ];
 
     public function user()
@@ -57,11 +71,11 @@ class Patient extends Model
 
     public function appointments()
     {
-        return $this->hasMany(Appointment::class, 'patient_id');
+        return $this->hasMany(\App\Models\Appointment::class, 'patient_id');
     }
 
     public function documentRequests()
     {
-        return $this->hasMany(DocumentRequest::class);
+        return $this->hasMany(\App\Models\DocumentRequest::class);
     }
 }

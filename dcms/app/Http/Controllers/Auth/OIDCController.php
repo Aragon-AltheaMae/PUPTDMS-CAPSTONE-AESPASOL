@@ -10,6 +10,7 @@ use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FacultyApiService;
+use App\Services\StudentApiService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,11 +23,15 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OIDCController extends Controller
 {
+    protected StudentApiService $studentApiService;
     protected FacultyApiService $facultyApiService;
 
-    public function __construct(FacultyApiService $facultyApiService)
-    {
+    public function __construct(
+        FacultyApiService $facultyApiService,
+        StudentApiService $studentApiService
+    ) {
         $this->facultyApiService = $facultyApiService;
+        $this->studentApiService = $studentApiService;
     }
 
     public function redirect(Request $request)
@@ -87,7 +92,7 @@ class OIDCController extends Controller
             );
         }
 
-        $savedState    = session('oidc_state');
+        $savedState = session('oidc_state');
         $incomingState = $request->get('state');
 
         if (!$savedState) {
@@ -196,7 +201,7 @@ class OIDCController extends Controller
         $lastName   = trim((string) ($profile['last_name'] ?? ''));
         $suffixName = trim((string) ($profile['name_suffix'] ?? ''));
 
-        $nameParts = array_filter([$firstName, $middleName, $lastName, $suffixName], fn($value) => $value !== '');
+        $nameParts = array_filter([$firstName, $middleName, $lastName, $suffixName], fn ($value) => $value !== '');
         $fullName  = trim(implode(' ', $nameParts));
         $name      = $profile['name'] ?? ($fullName !== '' ? $fullName : $email);
 
@@ -216,11 +221,24 @@ class OIDCController extends Controller
                 ->with('error', 'Email not returned by identity provider.');
         }
 
-        $user = User::where('email', $email)
-            ->when($ssoUserId, function ($query) use ($ssoUserId) {
-                $query->orWhere('sso_user_id', $ssoUserId);
-            })
-            ->first();
+        $studentData = [];
+
+        try {
+            $studentProfile = $this->studentApiService->getStudentByEmail($email);
+            $studentData = is_array($studentProfile['data'] ?? null)
+                ? $studentProfile['data']
+                : [];
+
+            Log::info('Student API profile fetched', [
+                'email' => $email,
+                'student_profile' => $studentProfile,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Student API fetch failed', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         $incomingRoles = $profile['roles'] ?? [];
 
@@ -284,22 +302,28 @@ class OIDCController extends Controller
         $roleId = Role::where('slug', $roleSlug)->value('id');
 
         Log::info('ROLE MAPPING DEBUG', [
-            'incoming_roles'        => $incomingRoles,
-            'mapped_role'           => $roleSlug,
-            'mapped_role_id'        => $roleId,
-            'assigned_access_id'    => $assignedAccess?->id,
-            'assigned_cms_role'     => $assignedAccess?->cms_role,
-            'assigned_cms_status'   => $assignedAccess?->cms_status,
-            'faculty_access_id'     => $facultyAccess?->id,
-            'faculty_user_id'       => $facultyAccess?->user?->id,
-            'faculty_user_role'     => $facultyAccess?->user?->role?->slug,
-            'faculty_user_status'   => $facultyAccess?->user?->status,
+            'incoming_roles'      => $incomingRoles,
+            'mapped_role'         => $roleSlug,
+            'mapped_role_id'      => $roleId,
+            'assigned_access_id'  => $assignedAccess?->id,
+            'assigned_cms_role'   => $assignedAccess?->cms_role,
+            'assigned_cms_status' => $assignedAccess?->cms_status,
+            'faculty_access_id'   => $facultyAccess?->id,
+            'faculty_user_id'     => $facultyAccess?->user?->id,
+            'faculty_user_role'   => $facultyAccess?->user?->role?->slug,
+            'faculty_user_status' => $facultyAccess?->user?->status,
         ]);
 
         if (!$roleId) {
             return redirect()->route('login')
                 ->with('error', 'No matching local role found for this SSO account.');
         }
+
+        $user = User::where('email', $email)
+            ->when($ssoUserId, function ($query) use ($ssoUserId) {
+                $query->orWhere('sso_user_id', $ssoUserId);
+            })
+            ->first();
 
         if (!$user) {
             $user = User::create([
@@ -318,33 +342,9 @@ class OIDCController extends Controller
             ]);
 
             Log::info('OIDC user created', [
-                'user_id' => $user?->id,
-                'email'   => $user?->email,
-                'role_id' => $user?->role_id,
-            ]);
-        }
-
-        $user = User::where('email', $email)
-            ->when($ssoUserId, function ($query) use ($ssoUserId) {
-                $query->orWhere('sso_user_id', $ssoUserId);
-            })
-            ->first();
-
-        if (!$user) {
-            return redirect()->route('login')
-                ->with('error', 'User creation failed.');
-        }
-
-        $patient = Patient::where('email', $email)->first();
-
-        if ($patient && !$patient->user_id) {
-            $patient->user_id = $user->id;
-            $patient->save();
-
-            Log::info('Patient linked to user', [
-                'patient_id' => $patient->id,
-                'user_id'    => $user->id,
-                'email'      => $email,
+                'user_id' => $user->id,
+                'email'   => $user->email,
+                'role_id' => $user->role_id,
             ]);
         }
 
@@ -361,6 +361,32 @@ class OIDCController extends Controller
         $user->last_login_at = now();
         $user->status        = 'active';
         $user->save();
+
+        $patient = Patient::where('email', $email)->first();
+
+        if ($patient && !$patient->user_id) {
+            $patient->user_id = $user->id;
+            $patient->save();
+
+            Log::info('Patient linked to user', [
+                'patient_id' => $patient->id,
+                'user_id'    => $user->id,
+                'email'      => $email,
+            ]);
+        }
+
+        if ($roleSlug === 'patient') {
+            $patient = $this->syncPatientRecord(
+                $user,
+                $name,
+                $email,
+                $ssoUserId,
+                $studentData,
+                $patient,
+                $assignedAccess,
+                $facultyAccess
+            );
+        }
 
         $jwt = JWTAuth::fromUser($user);
 
@@ -382,113 +408,12 @@ class OIDCController extends Controller
         $request->session()->regenerate();
         session()->save();
 
-        $roleSlug = optional($user->role)->slug;
-
         if ($roleSlug === 'patient') {
-            $patient = $patient ?: Patient::where('user_id', $user->id)
-                ->orWhere('email', $user->email)
-                ->first();
-
-            $birthdate = null;
-            $gender = null;
-            $phone = '';
-            $facultyCode = null;
-            $studentNo = null;
-
-            // 🔥 1. CHECK ADMIN FIRST
-            if ($assignedAccess) {
-                try {
-                    $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
-                    $apiKey = (string) env('OCMS_EXTERNAL_API_KEY');
-
-                    /** @var \Illuminate\Http\Client\Response $response */
-                    $response = Http::timeout(15)
-                        ->acceptJson()
-                        ->withHeaders([
-                            'X-External-Api-Key' => $apiKey,
-                        ])
-                        ->get($baseUrl . '/external/admins/' . urlencode((string) $assignedAccess->external_admin_id));
-
-                    if ($response->successful()) {
-
-                        /** @var array<string, mixed> $payload */
-                        $payload = $response->json();
-
-                        /** @var array<string, mixed> $admin */
-                        $admin = is_array($payload['data'] ?? null) ? $payload['data'] : [];
-
-                        $birthdate = $admin['birthday'] ?? null;
-                        $gender = $admin['gender'] ?? null;
-                        $phone = $admin['emergency_contact_no'] ?? '';
-                    } else {
-                        $gender = $assignedAccess->gender ?? null;
-                        $phone = $assignedAccess->contact_number ?? '';
-                    }
-                } catch (\Throwable $e) {
-                    Log::error('Admin API fetch failed', [
-                        'email' => $email,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            }
-
-            // 🔥 2. IF NOT ADMIN, CHECK FACULTY
-            elseif (true) {
-                $faculties = $this->facultyApiService->getFaculties();
-
-                $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
-                    $facultyEmail = strtolower((string) ($faculty['email'] ?? ''));
-                    $userEmail = strtolower((string) $email);
-
-                    $facultyId = (string) ($faculty['faculty_id'] ?? '');
-                    $currentSsoUserId = (string) ($ssoUserId ?? '');
-
-                    return ($facultyEmail !== '' && $facultyEmail === $userEmail)
-                        || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
-                });
-
-                if ($matchedFaculty) {
-                    $birthdate = $matchedFaculty['profile']['birthday'] ?? null;
-                    $gender = $matchedFaculty['profile']['gender'] ?? null;
-                    $phone = $matchedFaculty['contact_number'] ?? '';
-                    $facultyCode = $matchedFaculty['faculty_code'] ?? null;
-                }
-            }
-
-            if ($patient) {
-                $patient->user_id = $patient->user_id ?: $user->id;
-                $patient->name = $user->name ?: $name ?: $email;
-                $patient->email = $user->email;
-                $patient->phone = $phone;
-                $patient->birthdate = $birthdate;
-                $patient->gender = $gender;
-                $patient->faculty_code = $facultyCode;
-                $patient->student_no = $studentNo;
-
-                if (empty($patient->password)) {
-                    $patient->password = Hash::make(Str::random(16));
-                }
-
-                $patient->save();
-            } else {
-                $patient = Patient::create([
-                    'user_id'   => $user->id,
-                    'name'      => $user->name ?: $name ?: $email,
-                    'email'     => $user->email,
-                    'phone'     => $phone,
-                    'birthdate' => $birthdate,
-                    'gender'    => $gender,
-                    'password'  => Hash::make(Str::random(16)),
-                    'faculty_code' => $facultyCode,
-                    'student_no' => $studentNo,
-                ]);
-            }
-
             session([
                 'role'         => 'patient',
-                'patient_id'   => $patient->id,
-                'patient_name' => $patient->name,
-                'email'        => $patient->email,
+                'patient_id'   => $patient?->id,
+                'patient_name' => $patient?->name,
+                'email'        => $patient?->email,
             ]);
 
             session()->save();
@@ -496,7 +421,7 @@ class OIDCController extends Controller
             AuditLogger::log('login', 'authentication', 'Patient logged in via OIDC');
 
             return redirect()->route('homepage')
-                ->with('login_as', $patient->name)
+                ->with('login_as', $patient?->name)
                 ->with('show_terms_modal', true);
         }
 
@@ -539,5 +464,174 @@ class OIDCController extends Controller
 
         return redirect()->route('login')
             ->with('error', 'Your account role is not allowed to log in.');
+    }
+
+    protected function syncPatientRecord(
+        User $user,
+        ?string $name,
+        string $email,
+        $ssoUserId,
+        array $studentData,
+        ?Patient $patient,
+        ?ExternalAdminAccess $assignedAccess,
+        ?Faculty $facultyAccess
+    ): Patient {
+        $phone = $studentData['mobileNumber'] ?? '';
+        $facultyCode = null;
+        $studentNo = $studentData['studentNumber'] ?? null;
+        $courseCode = $studentData['course']['code'] ?? null;
+        $courseName = $studentData['course']['name'] ?? null;
+        $yearLevel = $studentData['yearLevel'] ?? null;
+        $section = $studentData['section'] ?? null;
+
+        $personalInfo = [];
+        $birthdate = null;
+        $gender = null;
+
+        try {
+            if (!empty($studentNo)) {
+                $personalResponse = $this->studentApiService->getPersonalInfoByStudentNumber($studentNo);
+                $personalInfo = is_array($personalResponse['data'] ?? null)
+                    ? $personalResponse['data']
+                    : [];
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Student personal info fetch failed', [
+                'student_no' => $studentNo,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        $birthdate = $this->normalizeDate($personalInfo['dateOfBirth'] ?? null);
+        $gender = $personalInfo['gender']['name'] ?? null;
+
+        if ($assignedAccess) {
+            try {
+                $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
+                $apiKey = (string) env('OCMS_EXTERNAL_API_KEY');
+
+                $response = Http::timeout(15)
+                    ->acceptJson()
+                    ->withHeaders([
+                        'X-External-Api-Key' => $apiKey,
+                    ])
+                    ->get($baseUrl . '/external/admins/' . urlencode((string) $assignedAccess->external_admin_id));
+
+                if ($response->successful()) {
+                    $payload = $response->json();
+                    $admin = is_array($payload['data'] ?? null) ? $payload['data'] : [];
+
+                    $birthdate = $this->normalizeDate($admin['birthday'] ?? $birthdate);
+                    $gender = $admin['gender'] ?? $gender;
+                    $phone = $admin['emergency_contact_no'] ?? $phone;
+                } else {
+                    $gender = $assignedAccess->gender ?? $gender;
+                    $phone = $assignedAccess->contact_number ?? $phone;
+                }
+            } catch (\Throwable $e) {
+                Log::error('Admin API fetch failed', [
+                    'email' => $email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        } elseif ($facultyAccess && $facultyAccess->user) {
+            try {
+                $faculties = $this->facultyApiService->getFaculties();
+
+                $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
+                    $facultyEmail = strtolower((string) ($faculty['email'] ?? ''));
+                    $userEmail = strtolower((string) $email);
+
+                    $facultyId = (string) ($faculty['faculty_id'] ?? '');
+                    $currentSsoUserId = (string) ($ssoUserId ?? '');
+
+                    return ($facultyEmail !== '' && $facultyEmail === $userEmail)
+                        || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
+                });
+
+                if ($matchedFaculty) {
+                    $birthdate = $this->normalizeDate($matchedFaculty['profile']['birthday'] ?? $birthdate);
+                    $gender = $matchedFaculty['profile']['gender'] ?? $gender;
+                    $phone = $matchedFaculty['contact_number'] ?? $phone;
+                    $facultyCode = $matchedFaculty['faculty_code'] ?? null;
+                }
+            } catch (\Throwable $e) {
+                Log::error('Faculty API fetch failed', [
+                    'email' => $email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info('Resolved patient data before save', [
+            'email' => $email,
+            'phone' => $phone,
+            'birthdate' => $birthdate,
+            'gender' => $gender,
+            'faculty_code' => $facultyCode,
+            'student_no' => $studentNo,
+            'course_code' => $courseCode,
+            'course_name' => $courseName,
+            'year_level' => $yearLevel,
+            'section' => $section,
+        ]);
+
+        if ($patient) {
+            $patient->user_id = $patient->user_id ?: $user->id;
+            $patient->name = $user->name ?: $name ?: $email;
+            $patient->email = $user->email;
+            $patient->phone = $phone ?: $patient->phone;
+            $patient->birthdate = $birthdate ?: $patient->birthdate;
+            $patient->gender = $gender ?: $patient->gender;
+            $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
+            $patient->student_no = $studentNo ?: $patient->student_no;
+            $patient->course_code = $courseCode ?: $patient->course_code;
+            $patient->course_name = $courseName ?: $patient->course_name;
+            $patient->year_level = $yearLevel ?: $patient->year_level;
+            $patient->section = $section ?: $patient->section;
+            $patient->is_pwd = $patient->is_pwd ?? false;
+            $patient->is_senior = $patient->is_senior ?? false;
+            $patient->address = $patient->address ?? null;
+
+            if (empty($patient->password)) {
+                $patient->password = Hash::make(Str::random(16));
+            }
+
+            $patient->save();
+
+            return $patient;
+        }
+
+        return Patient::create([
+            'user_id' => $user->id,
+            'name' => $user->name ?: $name ?: $email,
+            'email' => $user->email,
+            'phone' => $phone,
+            'birthdate' => $birthdate,
+            'gender' => $gender,
+            'password' => Hash::make(Str::random(16)),
+            'faculty_code' => $facultyCode,
+            'student_no' => $studentNo,
+            'course_code' => $courseCode,
+            'course_name' => $courseName,
+            'year_level' => $yearLevel,
+            'section' => $section,
+            'is_pwd' => false,
+            'is_senior' => false,
+            'address' => null,
+        ]);
+    }
+
+    protected function normalizeDate(?string $value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable $e) {
+            return $value;
+        }
     }
 }
