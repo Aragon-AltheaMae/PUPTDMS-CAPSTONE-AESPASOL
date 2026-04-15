@@ -38,6 +38,98 @@
         }
     }
 
+    .voice-input-wrap,
+    .voice-search-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .voice-input-wrap>input,
+    .voice-input-wrap>textarea,
+    .voice-search-wrap>input,
+    .voice-search-wrap>textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .voice-input-wrap>input.has-voice-padding,
+    .voice-search-wrap>input.has-voice-padding {
+        padding-right: 3rem !important;
+    }
+
+    .voice-input-wrap>textarea.has-voice-padding,
+    .voice-search-wrap>textarea.has-voice-padding {
+        padding-right: 3rem !important;
+        resize: none;
+    }
+
+    .voice-mic-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: color .15s ease;
+    }
+
+    .voice-input-wrap>textarea.is-voice-textarea+.voice-mic-btn,
+    .voice-search-wrap>textarea.is-voice-textarea+.voice-mic-btn {
+        top: 12px;
+        transform: none;
+    }
+
+    .voice-mic-btn:hover {
+        color: #8B0000;
+    }
+
+    .voice-mic-btn.is-listening {
+        color: #8B0000;
+    }
+
+    .voice-status {
+        position: absolute;
+        right: 0;
+        top: -24px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        pointer-events: none;
+        z-index: 20;
+        display: block;
+    }
+
+    .voice-status.hidden {
+        display: none;
+    }
+
+    .voice-status.is-listening {
+        color: #2563eb;
+    }
+
+    .voice-status.is-error {
+        color: #dc2626;
+    }
+
+    .voice-status.is-success {
+        color: #16a34a;
+    }
+
+    .voice-status.is-default {
+        color: #6b7280;
+    }
+
     .wave-hand {
         transform-origin: 70% 70%;
         animation: wave 2.5s ease-in-out infinite;
@@ -923,6 +1015,8 @@
 
     #rescheduleModal .reason-textarea {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         border: 1.5px solid #ecdada;
         border-radius: 12px;
         padding: .75rem 1rem;

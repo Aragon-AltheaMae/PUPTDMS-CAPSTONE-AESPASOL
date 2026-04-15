@@ -4,7 +4,6 @@
 
 @section('styles')
 <style>
-  /* ── HIDE SIDEBAR & FULL WIDTH OVERRIDES ── */
   #sidebar,
   .sidebar {
     display: none !important;
@@ -24,7 +23,6 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   }
 
-  /* SIDE DRAWER STYLES */
   .drawer-overlay {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
@@ -138,7 +136,6 @@ $birthdateFormatted = $patient->birthdate ? Carbon::parse($patient->birthdate)->
 $futureCount = isset($futureVisits) ? $futureVisits->count() : 0;
 $pastCount = isset($pastVisits) ? $pastVisits->count() : 0;
 
-// Check for Medical Alerts (Diseases/Conditions or Allergies)
 $hasAlert = false;
 if(isset($patient->medicalHistory->diseaseAnswers) && $patient->medicalHistory->diseaseAnswers->count() > 0) $hasAlert =
 true;
@@ -157,6 +154,25 @@ $backUrl = $from === 'dashboard'
     ? route('dentist.dentist.dashboard')
     : route('dentist.dentist.appointments');
 $backLabel = $from === 'dashboard' ? 'Dashboard' : 'Appointments';
+
+$displayName = ucwords(strtolower($patient->name ?? 'Guest'));
+
+$patientAvatar = $patient->profile_image ?? null;
+$userAvatar = optional($patient->user)->profile_image ?? null;
+
+if (!empty($patientAvatar)) {
+    $avatarUrl = asset('storage/' . $patientAvatar);
+} elseif (!empty($userAvatar)) {
+    $avatarUrl = asset('storage/' . $userAvatar);
+} else {
+    $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($displayName) . '&background=8B0000&color=ffffff&bold=true';
+}
+
+$patientType = $patient->faculty_code
+    ? 'Faculty'
+    : ($patient->student_no ? 'Student' : 'Patient');
+
+$displayId = $patient->faculty_code ?: ($patient->student_no ?: ($patient->student_id ?: $patient->id));
 @endphp
 
 <main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 min-h-screen flex-1">
@@ -187,79 +203,11 @@ $backLabel = $from === 'dashboard' ? 'Dashboard' : 'Appointments';
 
     <div class="flex flex-col lg:flex-row gap-6 items-start">
 
-      <div class="w-full lg:w-[340px] flex-shrink-0 lg:sticky lg:top-[80px]">
-        <div class="glass-card overflow-hidden">
-
-          <div class="h-24 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative">
-            @if($hasAlert)
-            <div
-              class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/30 flex items-center gap-1.5 text-white text-[10px] font-bold tracking-wide uppercase shadow-sm">
-              <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Medical Alert
-            </div>
-            @endif
-          </div>
-
-          <div class="px-6 pb-6 relative flex flex-col items-center mt-[-48px]">
-            <img
-              src="{{ $patient->profile_image ? asset('storage/'.$patient->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($patientName).'&background=ffffff&color=8B0000&rounded=true&size=256&bold=true' }}"
-              class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md bg-white mb-3"
-              alt="{{ $patientName }}">
-
-            <h2 class="text-[19px] font-extrabold text-gray-900 text-center leading-tight">{{ $patientName }}</h2>
-            <p class="text-[13px] font-medium text-gray-500 mt-1">{{ $patient->course ?? 'BSIT' }} {{
-              $patient->year_level ?? '' }}</p>
-
-            <div
-              class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">
-              <i class="fa-regular fa-id-badge text-[10px]"></i> {{ $patient->student_id ?? $patient->id ?? 'No ID' }}
-            </div>
-          </div>
-
-          <div class="border-t border-gray-100"></div>
-
-          <div class="px-6 py-5 space-y-4 text-sm">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400 font-semibold text-xs flex items-center gap-2"><i
-                  class="fa-solid fa-cake-candles w-3"></i> Age <br> Date of Birth</span>
-              <span class="text-gray-800 font-medium text-right">{{ $age ? $age . ' yrs' : 'N/A' }} <span
-                  class="text-gray-400 text-xs font-normal block">{{ $birthdateFormatted }}</span></span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400 font-semibold text-xs flex items-center gap-2"><i
-                  class="fa-solid fa-venus-mars w-3"></i> Gender</span>
-              <span class="text-gray-800 font-medium">{{ $patient->gender ?? 'N/A' }}</span>
-            </div>
-            <div class="flex justify-between items-start">
-              <span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5"><i
-                  class="fa-solid fa-phone w-3"></i> Contact</span>
-              <span class="text-gray-800 font-medium text-right">{{ $patient->phone ?? 'N/A' }}</span>
-            </div>
-            <div class="flex justify-between items-start">
-              <span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5"><i
-                  class="fa-solid fa-envelope w-3"></i> Email</span>
-              <span class="text-gray-800 font-medium text-right break-all max-w-[150px]">{{ $patient->email ?? 'N/A'
-                }}</span>
-            </div>
-          </div>
-
-          <div class="bg-red-50/50 p-5 border-t border-red-100">
-            <p class="text-[10px] font-bold text-red-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-              <i class="fa-solid fa-heart-pulse"></i> Emergency Contact
-            </p>
-            <p class="text-sm font-bold text-gray-900">{{ optional($patient->medicalHistory)->emergency_person ?? 'Not
-              specified' }}</p>
-            <p class="text-xs font-medium text-gray-600 mt-0.5">
-              <i class="fa-solid fa-phone text-[10px] mr-1"></i> {{ optional($patient->medicalHistory)->emergency_number
-              ?? 'N/A' }}
-              @if(optional($patient->medicalHistory)->emergency_relation)
-              <span class="ml-1 text-gray-400">({{ $patient->medicalHistory->emergency_relation }})</span>
-              @endif
-            </p>
-          </div>
-        </div>
+      <div class="w-full lg:w-[400px] xl:w-[450px] 2xl:w-[480px] flex-shrink-0 lg:sticky lg:top-[80px]">
+        <div id="profileContainer"></div>
       </div>
 
-      <div class="flex-1 min-w-0 flex flex-col gap-6">
+      <div class="flex-1 min-w-0 flex flex-col gap-6 max-w-[1100px]">
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="glass-card p-4 flex items-center gap-4">
@@ -544,13 +492,17 @@ $backLabel = $from === 'dashboard' ? 'Dashboard' : 'Appointments';
   </div>
 </div>
 
-<div id="drawerOverlay" class="drawer-overlay fixed inset-0 z-[100]" onclick="closeDetailsDrawer()"></div>
+<div id="drawerOverlay"
+  class="drawer-overlay fixed left-0 right-0 bottom-0 z-[110]"
+  style="top: var(--header-h);"
+  onclick="closeDetailsDrawer()"></div>
 
 <div id="detailsDrawer"
-  class="side-drawer fixed top-0 right-0 bottom-0 w-full max-w-[500px] bg-white shadow-[-10px_0_40px_rgba(0,0,0,0.1)] z-[101] flex flex-col">
+  class="side-drawer fixed right-0 bottom-0 w-full max-w-[500px] bg-white shadow-[-10px_0_40px_rgba(0,0,0,0.1)] z-[120] flex flex-col"
+  style="top: var(--header-h); height: calc(100vh - var(--header-h));">
 
   <div
-    class="bg-gradient-to-r from-[#8B0000] to-[#b30000] px-6 py-5 flex items-start justify-between text-white flex-shrink-0">
+    class="bg-gradient-to-r from-[#8B0000] to-[#b30000] px-6 py-5 md:py-6 flex items-start justify-between text-white flex-shrink-0">
     <div>
       <p class="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-1">Appointment Details</p>
       <h2 id="drawerService" class="text-xl font-extrabold leading-tight">Service Type</h2>
@@ -662,6 +614,24 @@ $backLabel = $from === 'dashboard' ? 'Dashboard' : 'Appointments';
 
 @section('scripts')
 <script>
+  var PROFILE_DATA = {
+    name: "{{ ucwords(strtolower($patient->name ?? 'Guest')) }}",
+    course: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
+    yearLevel: "",
+    facultyCode: "{{ $patient->faculty_code ?? '' }}",
+    studentNo: "{{ $patient->student_no ?? '' }}",
+    age: "{{ $age ?? 'N/A' }}",
+    birthdate: "{{ $birthdateFormatted }}",
+    gender: "{{ $patient->gender ?? 'N/A' }}",
+    contact: "{{ $patient->phone ?? 'N/A' }}",
+    email: "{{ $patient->email ?? 'N/A' }}",
+    emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
+    emergencyNumber: "{{ optional($patient->medicalHistory)->emergency_number ?? 'N/A' }}",
+    emergencyRelation: "{{ optional($patient->medicalHistory)->emergency_relation ?? '' }}",
+    hasAlert: @json($hasAlert),
+    avatar: "{{ $avatarUrl }}"
+};
+
   const STATUS_THEME = {
   today: {
     badge: 'status-blue',
@@ -704,6 +674,129 @@ function getStatusTheme(status) {
 
   return STATUS_THEME.default;
 }
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderProfile() {
+            var pData = PROFILE_DATA;
+            console.log('PROFILE AVATAR:', pData.avatar);
+
+            var emergencyRelation = pData.emergencyRelation ?
+                '<span class="ml-1 text-gray-400">(' + escapeHtml(pData.emergencyRelation) + ')</span>' :
+                '';
+
+            var hasEmergency = pData.emergencyName && pData.emergencyName !== 'Not specified';
+
+            var emergencySection = hasEmergency ?
+                '<p class="text-sm font-bold text-gray-900">' + escapeHtml(pData.emergencyName) + '</p>' +
+                '<p class="text-xs font-medium text-gray-600 mt-0.5">' +
+                '<i class="fa-solid fa-phone text-[10px] mr-1"></i> ' +
+                escapeHtml(pData.emergencyNumber) +
+                emergencyRelation +
+                '</p>' :
+                '<div class="text-center py-2">' +
+                '<i class="fa-solid fa-user-plus text-red-300 text-lg mb-1"></i>' +
+                '<p class="text-xs text-gray-400 font-medium mb-2">No emergency contact added</p>' +
+                '</div>';
+
+            document.getElementById("profileContainer").innerHTML =
+                '<div class="glass-card overflow-hidden fade-up">' +
+
+                '<div class="h-24 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative"></div>' +
+
+                '<div class="px-5 pb-5 relative flex flex-col items-center mt-[-40px]">' +
+                '<div class="relative mb-3">' +
+                '<img src="' + pData.avatar + '" alt="Profile" ' +
+                'class="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md bg-white">' +
+                '</div>' +
+
+                '<h2 class="text-[19px] font-extrabold text-gray-900 text-center leading-tight">' +
+                escapeHtml(pData.name) +
+                '</h2>' +
+
+                '<p class="text-[13px] font-medium text-gray-500 mt-1 text-center">' +
+                escapeHtml(pData.course) +
+                (pData.yearLevel ? ' ' + escapeHtml(pData.yearLevel) : '') +
+                '</p>' +
+
+                (
+                    pData.facultyCode && pData.facultyCode !== 'null' ?
+                    '<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">' +
+                    '<i class="fa-regular fa-id-badge text-[10px]"></i> ' +
+                    escapeHtml('Faculty Code: ' + pData.facultyCode) +
+                    '</div>' :
+                    (
+                        pData.studentNo && pData.studentNo !== 'null' ?
+                        '<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-bold tracking-wide">' +
+                        '<i class="fa-regular fa-id-badge text-[10px]"></i> ' +
+                        escapeHtml('Student No: ' + pData.studentNo) +
+                        '</div>' :
+                        ''
+                    )
+                ) +
+                '</div>' +
+
+                '<div class="border-t border-gray-100"></div>' +
+
+                '<div class="px-5 py-4 space-y-3 text-sm">' +
+
+                '<div class="flex justify-between items-center gap-4">' +
+                '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2">' +
+                '<i class="fa-solid fa-cake-candles w-3"></i> Age <br> Date of Birth' +
+                '</span>' +
+                '<span class="text-gray-800 font-medium text-right">' +
+                escapeHtml(pData.age ? pData.age + " yrs" : "N/A") +
+                '<span class="text-gray-400 text-xs font-normal block">' +
+                escapeHtml(pData.birthdate) +
+                '</span>' +
+                '</span>' +
+                '</div>' +
+
+                '<div class="flex justify-between items-center gap-4">' +
+                '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2">' +
+                '<i class="fa-solid fa-venus-mars w-3"></i> Gender' +
+                '</span>' +
+                '<span class="text-gray-800 font-medium text-right">' +
+                escapeHtml(pData.gender) +
+                '</span>' +
+                '</div>' +
+
+                '<div class="flex justify-between items-start gap-4">' +
+                '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5">' +
+                '<i class="fa-solid fa-phone w-3"></i> Contact' +
+                '</span>' +
+                '<span class="text-gray-800 font-medium text-right">' +
+                escapeHtml(pData.contact) +
+                '</span>' +
+                '</div>' +
+
+                '<div class="flex justify-between items-start gap-3">' +
+                '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5 flex-shrink-0 w-[92px]">' +
+                '<i class="fa-solid fa-envelope w-3"></i> Email' +
+                '</span>' +
+                '<span class="text-gray-800 font-medium text-right break-words leading-snug flex-1 min-w-0">' +
+                escapeHtml(pData.email) +
+                '</span>' +
+                '</div>' +
+
+                '</div>' +
+
+                '<div class="bg-red-50/50 px-5 py-4 border-t border-red-100">' +
+                '<p class="text-[10px] font-bold text-red-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">' +
+                '<i class="fa-solid fa-heart-pulse"></i> Emergency Contact' +
+                '</p>' +
+                emergencySection +
+                '</div>' +
+
+                '</div>';
+        }
 
 function applyStatusTheme(el, type, status) {
   const theme = getStatusTheme(status);
@@ -770,12 +863,9 @@ function initStatusThemes() {
     }, 200);
   }
 
-  function confirmStart() {
-    closeStartModal();
-    setTimeout(() => {
-      window.location.href = "{{ route('dentist.odontogram', ['patient' => $patient->id ?? 0]) }}";
-    }, 250);
-  }
+function confirmStart() {
+    window.location.href = "{{ route('dentist.odontogram', $patient->id) }}";
+}
 
   // SIDE DRAWER LOGIC
   function openDetailsDrawer(appointmentId, date, time, service, status) {
@@ -858,6 +948,7 @@ function initStatusThemes() {
   });
   document.addEventListener('DOMContentLoaded', function () {
   initStatusThemes();
+  renderProfile();
 });
 </script>
 @endsection

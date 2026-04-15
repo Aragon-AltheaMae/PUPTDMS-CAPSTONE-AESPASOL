@@ -72,7 +72,7 @@
     @if (View::hasSection('usesAppointmentCalendar'))
         @include('components.appointment-calendar-script', [
             'mode' => 'booking',
-            'calendarContainerId' => 'calendarContainer',
+            'calendarContainerId' => 'calGridWrapReschedule',
             'calGridId' => 'calGrid',
             'calMonthLabelId' => 'calMonthLabel',
             'calYearLabelId' => 'calYearLabel',
@@ -89,17 +89,15 @@
             'datePillId' => 'datePill',
             'dateErrorId' => 'dateError',
             'timeErrorId' => 'timeError',
-            'calendarWrapSelector' => '.cal-wrap',
-            'slotsWrapSelector' => '.slots-wrap',
+            'calendarWrapSelector' => '#rescheduleModal .cal-wrap',
+            'slotsWrapSelector' => '#rescheduleModal .slots-wrap',
             'slotEndpoint' => route('dentist.appointment.slots'),
-            'scheduleRules' => isset($scheduleRules)
-                ? $scheduleRules
-                : \App\Models\ClinicSchedule::active()->get()->values()->toArray(),
-            'blockedDates' => isset($blockedDates)
-                ? $blockedDates
-                : (isset($unavailableDates)
-                    ? $unavailableDates
-                    : []),
+            'scheduleRules' => isset($schedules)
+                ? $schedules
+                : (isset($scheduleRules)
+                    ? $scheduleRules
+                    : \App\Models\ClinicSchedule::active()->get()->values()->toArray()),
+            'blockedDates' => isset($blockedDates) ? $blockedDates : [],
             'appointmentCountsPerDay' => isset($appointmentCountsPerDay) ? $appointmentCountsPerDay : [],
             'philippineHolidays' => isset($philippineHolidays) ? $philippineHolidays : [],
             'disallowToday' => true,
