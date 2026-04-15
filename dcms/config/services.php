@@ -25,17 +25,24 @@ return [
 
     // ✅ MOVE THIS OUTSIDE
     'oidc' => [
-            'authorize_url' => env('OIDC_AUTHORIZE_URL'),
-            'token_url' => env('OIDC_TOKEN_URL'),
-            'me_url' => env('OIDC_ME_URL'),
-            'logout_url' => env('OIDC_LOGOUT_URL'),
-            'client_id' => env('OIDC_CLIENT_ID'),
-            'client_secret' => env('OIDC_CLIENT_SECRET'),
-            'redirect' => env('OIDC_REDIRECT_URI'),
-            ],
+        'authorize_url' => env('OIDC_AUTHORIZE_URL'),
+        'token_url' => env('OIDC_TOKEN_URL'),
+        'me_url' => env('OIDC_ME_URL'),
+        'logout_url' => env('OIDC_LOGOUT_URL'),
+        'client_id' => env('OIDC_CLIENT_ID'),
+        'client_secret' => env('OIDC_CLIENT_SECRET'),
+        'redirect' => env('OIDC_REDIRECT_URI'),
+    ],
 
     'idp' => [
-    'login_url' => env('IDP_LOGIN_URL'),
-],
+        'login_url' => env('IDP_LOGIN_URL'),
+    ],
+
+    'ogos' => [
+        'base_url' => env('OGOS_API_BASE_URL'),
+        'token_url' => env('OGOS_M2M_TOKEN_URL'),
+        'client_id' => env('OGOS_M2M_CLIENT_ID'),
+        'client_secret' => env('OGOS_M2M_CLIENT_SECRET'),
+    ],
 
 ];
