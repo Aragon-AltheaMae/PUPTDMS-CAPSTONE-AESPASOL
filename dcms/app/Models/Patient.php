@@ -78,4 +78,9 @@ class Patient extends Model
     {
         return $this->hasMany(\App\Models\DocumentRequest::class);
     }
+
+    public function teeth()
+    {
+        return $this->hasMany(Tooth::class);
+    }
 }

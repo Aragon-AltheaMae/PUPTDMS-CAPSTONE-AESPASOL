@@ -20,11 +20,14 @@ use App\Models\Disease;
 use App\Models\MedicalHistoryDiseaseAnswer;
 
 use App\Models\Patient;
+use App\Models\User;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\ServiceType;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
+use App\Notifications\AppointmentBookedNotification;
+use App\Notifications\AppointmentRescheduledNotification;
 
 
 class AppointmentController extends Controller
@@ -571,6 +574,19 @@ class AppointmentController extends Controller
                 'appointments',
                 "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
             );
+
+            $dentists = User::query()
+                ->where('status', 'active')
+                ->whereHas('role', function ($query) {
+                    $query->where('slug', 'dentist');
+                })
+                ->get();
+
+            if ($dentists->isNotEmpty()) {
+                foreach ($dentists as $dentist) {
+                    $dentist->notify(new AppointmentBookedNotification($appointment, $patient));
+                }
+            }
         }
 
         return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
@@ -743,6 +759,21 @@ class AppointmentController extends Controller
             'service_type' => $request->service_type,
             'status' => 'rescheduled',
         ]);
+
+        $appointment->load('patient');
+
+        $dentists = User::query()
+            ->where('status', 'active')
+            ->whereHas('role', function ($query) {
+                $query->where('slug', 'dentist');
+            })
+            ->get();
+
+        if ($dentists->isNotEmpty()) {
+            foreach ($dentists as $dentist) {
+                $dentist->notify(new AppointmentRescheduledNotification($appointment, 'Patient'));
+            }
+        }
 
         return response()->json(['success' => true]);
     }

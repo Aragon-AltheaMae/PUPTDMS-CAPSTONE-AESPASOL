@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ClinicScheduleSeeder::class,
             DocumentTemplateFieldSeeder::class,
             DefaultDocumentTemplateSeeder::class,
+            ToothLegendsSeeder::class,
         ]);
     }
 }

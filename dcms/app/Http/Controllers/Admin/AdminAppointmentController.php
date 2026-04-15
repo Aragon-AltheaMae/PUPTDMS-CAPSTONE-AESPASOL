@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\User;
+use App\Notifications\AppointmentCompletedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -85,10 +87,20 @@ class AdminAppointmentController extends Controller
 
     public function start($id)
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with('patient.user')->findOrFail($id);
 
         $appointment->status = 'completed';
         $appointment->save();
+
+        $patientUser = optional($appointment->patient)->user;
+
+        if (!$patientUser && !empty(optional($appointment->patient)->email)) {
+            $patientUser = User::where('email', $appointment->patient->email)->first();
+        }
+
+        if ($patientUser) {
+            $patientUser->notify(new AppointmentCompletedNotification($appointment));
+        }
 
         return redirect()
             ->route('admin.admin.appointments')
