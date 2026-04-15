@@ -587,7 +587,6 @@
                 <div class="page-banner-inner">
                     <div>
                         <h1 class="page-title">Document Templates</h1>
-                        <p class="page-subtitle">Preview and manage default dental clinic document templates</p>
                     </div>
                     <div class="banner-badge">
                         <i class="fa-solid fa-lock"></i>
