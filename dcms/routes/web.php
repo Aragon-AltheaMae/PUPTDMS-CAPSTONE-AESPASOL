@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
 use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
@@ -215,6 +216,14 @@ Route::post('/login', function (Request $request) {
 
 // Logout (all roles)
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
+    Route::post('/{notificationId}/read', [NotificationController::class, 'markAsRead'])
+        ->name('mark-read');
+
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('mark-all-read');
+});
 
 /*
 |--------------------------------------------------------------------------
