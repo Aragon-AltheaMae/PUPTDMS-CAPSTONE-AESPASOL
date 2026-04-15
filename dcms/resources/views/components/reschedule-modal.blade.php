@@ -4,7 +4,8 @@
     <div
         class="reschedule-modal-panel bg-white w-full sm:max-w-5xl rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col">
 
-        <div class="relative bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 px-5 sm:px-6 py-4 border-b border-white/20">
+        <div
+            class="relative bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 px-5 sm:px-6 py-4 border-b border-white/20">
             <button type="button" onclick="closeRescheduleModal()"
                 class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/80 hover:text-white flex items-center justify-center transition text-sm">
                 <i class="fa-solid fa-xmark"></i>
@@ -30,8 +31,9 @@
             </div>
         </div>
 
-        <div class="reschedule-modal-body px-6 sm:px-8 py-5 sm:py-6 bg-gray-50 overflow-y-auto">
-            <div class="bg-white border border-[#f1ece7] rounded-2xl px-4 sm:px-5 py-4 mb-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
+        <div class="reschedule-modal-body px-5 sm:px-6 py-4 sm:py-5 bg-gray-50 overflow-y-auto">
+            <div
+                class="bg-white border border-[#f1ece7] rounded-2xl px-4 sm:px-5 py-4 mb-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
@@ -72,35 +74,9 @@
                     <i class="fa-solid fa-circle-exclamation"></i> Please select a date.
                 </div>
 
-                <div id="slotContainer" class="hidden"></div>
-                <div id="selectedSlotDisplay" class="hidden">
-                    <span id="selectedSlotText"></span>
-                </div>
-
-                <div class="two-col">
+                <div class="two-col mb-2 sm:mb-3">
                     <div class="cal-wrap">
-                        <div class="flex items-center justify-between mb-4">
-                            <button type="button" onclick="changeMonth(-1)"
-                                class="w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs hover:bg-[#FFF0F0] transition-colors">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-
-                            <div class="text-center">
-                                <p id="calMonthLabel" class="text-base font-extrabold text-[#660000]">Month</p>
-                                <p id="calYearLabel"
-                                    class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">Year</p>
-                            </div>
-
-                            <button type="button" onclick="changeMonth(1)"
-                                class="w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs hover:bg-[#FFF0F0] transition-colors">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        </div>
-
-                        <hr class="border-[#f0ebe6] mb-3">
-
-                        <div id="calGrid" class="grid grid-cols-7 gap-2"></div>
-                        <div id="dentistCalendarLegend"></div>
+                        <div id="calGridWrapReschedule"></div>
                     </div>
 
                     <div class="slots-wrap">
@@ -108,6 +84,7 @@
                             <i class="fa-regular fa-clock fa-xs"></i> Time Slot
                         </div>
 
+                        <div id="dateBanner" class="hidden"></div>
                         <div class="slots-date-pill" id="datePill"></div>
 
                         <div id="slotPlaceholder" class="slots-placeholder">
@@ -115,11 +92,25 @@
                             <span>Select a date to see available slots</span>
                         </div>
 
-                        <div id="slotGrid" class="slots-grid" style="display:none;"></div>
+                        <div id="slotContainer" class="hidden">
+                            <div id="slotGrid" class="slots-grid" style="display:none;"></div>
+                        </div>
 
-                        <div class="selected-time-pill" id="selectedTimePill">
-                            <i class="fa-solid fa-circle-check" style="color:var(--red);"></i>
-                            <span id="selectedTimeText"></span>
+                        <div id="selectedTimePill"
+                            class="hidden mt-4 w-full rounded-2xl border border-[#f0d5d5] bg-[linear-gradient(135deg,#fff7f7,#fff1f1)] px-4 py-3 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-[#8B0000] text-white shadow-sm">
+                                    <i class="fa-solid fa-circle-check text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#b35b5b]">
+                                        Selected Time
+                                    </p>
+                                    <p id="selectedTimeText" class="text-[15px] font-bold text-[#8B0000] leading-tight">
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,15 +119,15 @@
                     <i class="fa-solid fa-circle-exclamation"></i> Please select a time slot.
                 </div>
 
-                <div class="section-label">
+                <div class="section-label mt-5 sm:mt-6">
                     <i class="fa-regular fa-message fa-xs"></i>
                     Reason for Rescheduling
                     <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span>
                 </div>
 
-                <div class="reason-wrap">
-                    <textarea name="reschedule_reason" id="reschedule_reason" class="reason-textarea"
-                        placeholder="e.g. Patient requested a later date…" rows="3"></textarea>
+                <div class="reason-wrap w-full">
+                    <textarea id="reschedule_reason" name="reschedule_reason" rows="3"
+                        placeholder="e.g. Patient requested a later date…" class="reason-textarea w-full min-h-[112px] resize-none"></textarea>
                 </div>
 
                 <div class="btn-row flex flex-col-reverse sm:flex-row gap-3">

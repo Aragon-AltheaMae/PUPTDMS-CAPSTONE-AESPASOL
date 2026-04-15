@@ -15,7 +15,6 @@ class DentistAppointmentController extends Controller
 {
     public function index()
     {
-        // same session style you use
 
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -25,20 +24,17 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        // Fetch all appointments with patient info
         $appointments = Appointment::with('patient')
             ->whereDate('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // Upcoming appointments (today and future) + statuses you consider upcoming
         $upcomingAppointments = $appointments->filter(function ($a) use ($today) {
             return in_array($a->status, ['upcoming', 'rescheduled'], true)
                 && $a->appointment_date >= $today;
         })->values();
 
-        // Past appointments (completed/cancelled OR date already passed)
         $pastAppointments = Appointment::with('patient')
             ->where(function ($q) use ($today) {
                 $q->whereIn('status', ['completed', 'cancelled'])
@@ -49,6 +45,51 @@ class DentistAppointmentController extends Controller
             ->get();
 
         $notifications = collect($notifications ?? []);
+
+        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, COUNT(*) as count')
+            ->groupBy('appointment_date')
+            ->pluck('count', 'appointment_date')
+            ->toArray();
+
+        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
+            ->groupBy('appointment_date', 'appointment_time')
+            ->get()
+            ->groupBy('appointment_date')
+            ->map(function ($rows) {
+                return $rows->pluck('count', 'appointment_time')->toArray();
+            })
+            ->toArray();
+
+        $calendarAppointmentDetails = Appointment::with('patient')
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->get()
+            ->groupBy(function ($appointment) {
+                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            })
+            ->map(function ($items) {
+                return $items->map(function ($appointment) {
+                    return [
+                        'name' => $appointment->patient->name ?? 'Unknown',
+                        'time' => \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A'),
+                        'service' => $appointment->service_type,
+                    ];
+                })->toArray();
+            })
+            ->toArray();
+
+        $schedules = ClinicSchedule::active()->orderBy('id')->get()
+            ->map(function ($s) {
+                $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
+                return $s;
+            });
+
+        $blockedDates = BlockedDate::pluck('date')
+            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->toArray();
+
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
 
         AuditLogger::log(
             'view',
@@ -61,6 +102,12 @@ class DentistAppointmentController extends Controller
             'upcomingAppointments',
             'pastAppointments',
             'today',
+            'appointmentCountsPerDay',
+            'appointmentCountsPerSlot',
+            'calendarAppointmentDetails',
+            'schedules',
+            'blockedDates',
+            'philippineHolidays',
             'notifications'
         ));
     }
@@ -170,11 +217,28 @@ class DentistAppointmentController extends Controller
             })
             ->toArray();
 
+        $calendarAppointmentDetails = Appointment::with('patient')
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->get()
+            ->groupBy(function ($appointment) {
+                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            })
+            ->map(function ($items) {
+                return $items->map(function ($appointment) {
+                    return [
+                        'name' => $appointment->patient->name ?? 'Unknown',
+                        'time' => \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A'),
+                        'service' => $appointment->service_type,
+                    ];
+                })->toArray();
+            })
+            ->toArray();
+
         $schedules = ClinicSchedule::active()->orderBy('id')->get()
-        ->map(function ($s) {
-            $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
-            return $s;
-        });
+            ->map(function ($s) {
+                $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
+                return $s;
+            });
 
         $blockedDates = BlockedDate::pluck('date')
             ->map(fn($d) => Carbon::parse($d)->toDateString())
@@ -190,10 +254,11 @@ class DentistAppointmentController extends Controller
             "Dentist opened reschedule appointment page"
         );
 
-        return view('dentist.dentist-reschedule', compact(
+        return view('dentist.dentist-appointments', compact(
             'appointment',
             'appointmentCountsPerDay',
             'appointmentCountsPerSlot',
+            'calendarAppointmentDetails',
             'schedules',
             'blockedDates',
             'philippineHolidays',
