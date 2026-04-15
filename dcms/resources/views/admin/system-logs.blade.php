@@ -1946,10 +1946,11 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
+            
             syncSlFilterInputs();
             updateSlClearFilterButton();
             initSlViewToggle();
+            
 
             document.getElementById('slFilterPanel')?.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -2440,7 +2441,7 @@
                 var moduleLabel = (log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function(c) {
                     return c.toUpperCase();
                 });
-                var actorName = log.actor_display_name ?? log.actor_identifier ?? 'Unknown User';
+                var actorName = log.actor_name ?? log.actor_identifier ?? 'Unknown User';
                 var description = log.description || 'No description provided.';
 
                 tableHtml += '<tr data-role="' + role + '" data-action="' + actionClass + '" class="sl-row-new">';
