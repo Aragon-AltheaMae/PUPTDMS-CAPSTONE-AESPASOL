@@ -39,6 +39,25 @@ use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\ExternalAdminController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\Admin\DocumentTemplateController;
+use App\Services\StudentApiService;
+use App\Services\FacultyApiService;
+
+//api nila albert
+
+Route::get('/debug-ogos-config', function () {
+    return response()->json([
+        'base_url' => config('services.ogos.base_url'),
+        'token_url' => config('services.ogos.token_url'),
+        'client_id' => config('services.ogos.client_id'),
+        'client_secret_exists' => filled(config('services.ogos.client_secret')),
+        'client_secret_length' => strlen((string) config('services.ogos.client_secret')),
+    ]);
+});
+
+Route::get('/test-student-api', function (StudentApiService $studentApiService) {
+    $email = 'student5@gmail.com'; // palitan mo kung needed
+    return response()->json($studentApiService->getStudentByEmail($email));
+});
 
 
 
