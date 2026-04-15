@@ -251,7 +251,7 @@ Route::prefix('admin')
         */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.admin.dashboard');
-        
+
         /*
         |--------------------------------------------------------------------------
         | REPORTS & ANALYTICS
@@ -403,7 +403,7 @@ Route::prefix('admin')
 
         Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
             ->name('admin.clinic_schedule.slots');
-        
+
         // INVENTORY
         Route::get('/inventory', [AdminInventoryController::class, 'index'])
             ->name('admin.inventory');
@@ -444,12 +444,12 @@ Route::prefix('admin')
         Route::patch('/document-requests/{documentRequest}/release', [AdminDocumentRequestController::class, 'release'])
             ->name('admin.document-requests.release');
 
-    Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
-        ->name('document-requests.reject');
-});
+        Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
+            ->name('document-requests.reject');
+    });
 
-    // DOCUMENT TEMPLATES (SIMPLIFIED)
-    Route::prefix('admin')
+// DOCUMENT TEMPLATES (SIMPLIFIED)
+Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
@@ -961,10 +961,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/document-requests/generate', [DocumentRequestController::class, 'generate'])
         ->name('dentist.dentist.documentrequests.generate');
 
-    // View Odontogram
-    Route::get('/view-odontogram', function () {
-        return view('dentist-view_odontogram');
-    })->middleware('permission:manage_dental_records')->name('dentist.viewOdontogram');
+    // Odontogram
+    Route::get('/odontogram/{patient}', function (\App\Models\Patient $patient) {
+        return view('dentist.dentist-odontogram', compact('patient'));
+    })->name('dentist.odontogram');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])

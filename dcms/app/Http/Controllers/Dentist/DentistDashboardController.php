@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\BlockedDate;
+use App\Models\ClinicSchedule;
+use App\Helpers\PhilippineHolidays;
 use Carbon\Carbon;
 
 class DentistDashboardController extends Controller
@@ -59,8 +62,23 @@ class DentistDashboardController extends Controller
             })
             ->toArray();
 
+        $blockedDates = BlockedDate::pluck('date')
+            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->toArray();
+
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+
+        $schedules = ClinicSchedule::active()->orderBy('id')->get()
+            ->map(function ($s) {
+                $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
+                return $s;
+            })->toArray();
+
         return view('dentist.dentist-dashboard', compact(
             'appointmentCountsPerDay',
+            'blockedDates',
+            'philippineHolidays',
+            'schedules',
             'calendarAppointmentDetails'
         ));
     }

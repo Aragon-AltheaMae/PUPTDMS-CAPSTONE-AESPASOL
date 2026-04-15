@@ -1,4 +1,174 @@
 <style>
+    .slots-wrap #slotGrid.slot-grid-ui {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-template-rows: repeat(4, 56px);
+        grid-auto-rows: 56px;
+        grid-auto-flow: column;
+        gap: 0.75rem !important;
+        align-items: stretch;
+    }
+
+    .slots-wrap #slotGrid.slot-grid-ui .slot-chip {
+        width: 100%;
+        min-height: 56px;
+        height: 56px;
+        border-radius: 16px !important;
+        justify-content: center !important;
+        padding: 0 0.9rem !important;
+    }
+
+    @media (max-width: 640px) {
+        .slots-wrap #slotGrid.slot-grid-ui {
+            grid-template-columns: 1fr !important;
+            grid-template-rows: none;
+            grid-auto-flow: row;
+        }
+    }
+
+    .slots-wrap .slot-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .slots-wrap .slots-grid,
+    .slots-wrap .slot-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    @media (max-width: 480px) {
+        .slots-wrap .slot-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .slots-wrap .slots-grid,
+        .slots-wrap .slot-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    .cal-cell[data-disabled="1"],
+    .cal-cell.disabled,
+    .cal-cell.holiday,
+    .cal-cell.full {
+        cursor: not-allowed !important;
+    }
+
+    .cal-cell-wrap:has(.cal-cell.disabled) {
+        cursor: not-allowed !important;
+    }
+
+    .cal-time-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+        gap: 1.5rem;
+    }
+
+    .two-col {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    .two-col>.cal-wrap,
+    .two-col>.slots-wrap {
+        height: 100%;
+    }
+
+    .two-col>.slots-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .two-col>.slots-wrap #slotContainer,
+    .two-col>.slots-wrap #slotPlaceholder {
+        flex: 1 1 auto;
+    }
+
+    .two-col>.slots-wrap #slotContainer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .two-col>.slots-wrap #slotGrid.slot-grid-ui {
+        flex: 1 1 auto;
+        align-content: start;
+    }
+
+    .slots-wrap .slot-btn {
+        background: #fff !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        padding: 14px 16px !important;
+        text-align: left !important;
+        cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        justify-content: flex-start !important;
+        align-items: flex-start !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .slots-wrap .slot-btn.available:hover {
+        border-color: #8b0000;
+        background: #fffafb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 0, 0, 0.08);
+    }
+
+    .slots-wrap .slot-btn.selected {
+        background: #8b0000;
+        border-color: #8b0000;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(139, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .slots-wrap .slot-time {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .slots-wrap .slot-btn.selected .slot-time {
+        color: #fff;
+    }
+
+    .slots-wrap .slot-status {
+        font-size: 12px;
+        font-weight: 500;
+        color: #6b7280;
+    }
+
+    .slots-wrap .slot-btn.selected .slot-status {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .slots-wrap .slot-btn.booked {
+        background: #f9fafb;
+        border-color: #f3f4f6;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .slots-wrap .slot-btn.booked .slot-time {
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+
+    .slots-wrap .slot-btn.booked .slot-status {
+        color: #ef4444;
+    }
+
     .cal-shell {
         width: 100%;
     }
@@ -78,8 +248,8 @@
     }
 
     .cal-cell.holiday {
-        background: #fffbeb;
-        color: #a16207;
+        background: #fef3c7 !important;
+        color: #a16207 !important;
         font-weight: 800;
     }
 
@@ -91,6 +261,7 @@
 
     .cal-cell.disabled {
         color: #c7c2bd;
+        cursor: not-allowed !important;
     }
 
     .cal-cell.today {
@@ -527,24 +698,24 @@
                 } else {
                     cellClass += " today bg-[#8B0000] text-white font-extrabold ring-2 ring-[#8B0000]/30 ring-offset-1";
                 }
+            } else if (state.isHoliday) {
+                cellClass +=
+                    ` holiday ${CALENDAR_THEME.statuses.holiday.cellBg} ${CALENDAR_THEME.statuses.holiday.cellText} font-bold disabled`;
+            } else if (state.isFull) {
+                cellClass +=
+                    ` full ${CALENDAR_THEME.statuses.fullyBooked.cellBg} ${CALENDAR_THEME.statuses.fullyBooked.cellText} font-bold disabled`;
+            } else if (state.isClosed) {
+                cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
             } else if (state.isPastOrToday && state.isBookingMode) {
                 cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
             } else if (state.isPast) {
                 cellClass += " text-gray-400 cursor-default disabled";
-            } else if (state.isHoliday) {
-                cellClass +=
-                    ` holiday ${CALENDAR_THEME.statuses.holiday.cellBg} ${CALENDAR_THEME.statuses.holiday.cellText} font-bold disabled`;
-            } else if (state.isClosed) {
-                cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (state.isFull) {
-                cellClass +=
-                    ` full ${CALENDAR_THEME.statuses.fullyBooked.cellBg} ${CALENDAR_THEME.statuses.fullyBooked.cellText} font-bold disabled`;
             }
         } else {
             if (state.isSelected) {
                 cellClass += " selected";
             } else if (state.isToday) {
-                cellClass += " today";
+                cellClass += " today disabled";
             } else if (state.isHoliday) {
                 cellClass += " holiday disabled";
             } else if (state.isFull) {
@@ -587,7 +758,7 @@
                 tooltipBg = CALENDAR_THEME.statuses.clinicClosed.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.clinicClosed.tooltipArrow;
             }
-        } else if (variant === 'dentist' && state.hasPatients && !state.isPast) {
+        } else if (variant === 'dentist' && state.hasPatients && !state.isPast && !state.isHoliday) {
             badgeHtml += makeCalendarDot(
                 state.isFull ? CALENDAR_THEME.statuses.fullyBooked.dotClass : CALENDAR_THEME.statuses.hasPatients
                 .dotClass,
@@ -603,7 +774,7 @@
         }
 
         if (state.isBookingMode) {
-            if (state.isToday) {
+            if (state.isHoliday) {} else if (state.isToday) {
                 tooltip = "Same-day booking is not allowed.";
                 tooltipBg = "bg-gray-600";
                 tooltipArrow = "after:border-t-gray-600";
@@ -714,10 +885,13 @@
         }
 
         if (slotGrid) {
-            slotGrid.style.display = calendarConfig.renderStyle === 'dentist' ? "flex" : "grid";
-            slotGrid.className = calendarConfig.renderStyle === 'dentist' ?
-                slotGrid.className :
-                "slot-grid-ui";
+            slotGrid.style.display = "grid";
+
+            if (calendarConfig.renderStyle === 'dentist') {
+                slotGrid.className = "slot-grid-ui";
+            } else {
+                slotGrid.className = "slot-grid-ui";
+            }
 
             slotGrid.innerHTML = Array.from({
                 length: 8
@@ -835,8 +1009,6 @@
         const slotPlaceholder = document.getElementById(calendarConfig.slotPlaceholderId);
         const slotContainer = document.getElementById(calendarConfig.slotContainerId);
         const slotGrid = document.getElementById(calendarConfig.slotGridId);
-        const display = document.getElementById(calendarConfig.selectedSlotDisplayId);
-        const displayTxt = document.getElementById(calendarConfig.selectedSlotTextId);
         const timePill = document.getElementById(calendarConfig.selectedTimePillId);
         const timeText = document.getElementById(calendarConfig.selectedTimeTextId);
 
@@ -863,10 +1035,11 @@
             slotGrid.style.display = "none";
         }
 
-        if (display) display.classList.add("hidden");
-        if (displayTxt) displayTxt.textContent = "";
-
-        if (timePill) timePill.classList.remove("show");
+        if (timePill) {
+            timePill.classList.remove("show");
+            timePill.classList.add("hidden");
+            timePill.style.display = "none";
+        }
         if (timeText) timeText.textContent = "";
 
         if (slotPlaceholder) {
@@ -941,8 +1114,6 @@
         const slotGrid = document.getElementById(calendarConfig.slotGridId);
         const banner = document.getElementById(calendarConfig.dateBannerId);
         const pill = document.getElementById(calendarConfig.datePillId);
-        const display = document.getElementById(calendarConfig.selectedSlotDisplayId);
-        const displayTxt = document.getElementById(calendarConfig.selectedSlotTextId);
         const timePill = document.getElementById(calendarConfig.selectedTimePillId);
         const timeText = document.getElementById(calendarConfig.selectedTimeTextId);
 
@@ -952,12 +1123,16 @@
 
         if (slotGrid) {
             slotGrid.innerHTML = "";
-            slotGrid.style.display = calendarConfig.renderStyle === 'dentist' ? "flex" : "grid";
+            slotGrid.style.display = "grid";
+
+            slotGrid.className = "slot-grid-ui";
         }
 
-        if (display) display.classList.add("hidden");
-        if (displayTxt) displayTxt.textContent = "";
-        if (timePill) timePill.classList.remove("show");
+        if (timePill) {
+            timePill.classList.remove("show");
+            timePill.classList.add("hidden");
+            timePill.style.display = "none";
+        }
         if (timeText) timeText.textContent = "";
 
         const [y, m, d] = iso.split("-");
@@ -1010,13 +1185,22 @@
 
         slots.forEach(slot => {
             const timeValue = typeof slot === 'string' ? slot : slot.time;
-            const disabled = typeof slot === 'object' ? !slot.available : false;
+            const disabled = typeof slot === 'object' ?
+                (slot.is_taken || slot.taken || slot.booked || slot.available === false) :
+                false;
 
             const chip = document.createElement("div");
 
             if (calendarConfig.renderStyle === 'dentist') {
-                chip.className = "slot-chip" + (disabled ? " full" : "");
-                chip.textContent = disabled ? `${timeValue} – ` : timeValue;
+                chip.className =
+                    "slot-chip flex items-center justify-center gap-2 rounded-2xl border font-bold text-[0.98rem] " +
+                    (disabled ?
+                        "disabled border-[#e8dfdb] bg-[#f8f5f4] text-[#8f8580] line-through opacity-60 cursor-not-allowed pointer-events-none" :
+                        "border-[#e7d8d2] bg-white text-[#2f2f2f] cursor-pointer");
+
+                chip.innerHTML = disabled ?
+                    `<i class="fa-solid fa-ban text-[0.9rem]"></i><span>${timeValue}</span>` :
+                    `<i class="fa-regular fa-clock text-[0.9rem]"></i><span>${timeValue}</span>`;
             } else {
                 chip.className =
                     "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer " +
@@ -1049,22 +1233,32 @@
                         }
                     });
 
-                    if (calendarConfig.renderStyle === 'dentist') {
-                        chip.classList.add("selected");
-                    } else {
-                        chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]",
-                            "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
-                        chip.classList.remove("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
-                    }
+                    chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]");
+                    chip.classList.remove("border-[#e8e2dd]", "border-[#e7d8d2]", "bg-[#fafaf8]",
+                        "bg-white", "text-[#1a1410]", "text-[#2f2f2f]");
 
                     selectedTime = timeValue;
                     if (timeInput) timeInput.value = timeValue;
                     if (typeof markFormDirty === "function") markFormDirty();
-                    if (displayTxt) displayTxt.textContent = timeValue;
-                    if (display) display.classList.remove("hidden");
 
-                    if (timeText) timeText.textContent = timeValue;
-                    if (timePill) timePill.classList.add("show");
+                    let currentDisplay = document.getElementById(calendarConfig.selectedSlotDisplayId ||
+                        "selectedSlotDisplay");
+                    let currentDisplayTxt = document.getElementById(calendarConfig.selectedSlotTextId ||
+                        "selectedSlotText");
+                    let currentTimePill = document.getElementById(calendarConfig.selectedTimePillId ||
+                        "selectedTimePill");
+                    let currentTimeText = document.getElementById(calendarConfig.selectedTimeTextId ||
+                        "selectedTimeText");
+
+                    if (currentDisplayTxt) currentDisplayTxt.textContent = timeValue;
+                    if (currentDisplay) currentDisplay.classList.remove("hidden");
+
+                    if (currentTimeText) currentTimeText.textContent = timeValue;
+                    if (currentTimePill) {
+                        currentTimePill.classList.remove("hidden");
+                        currentTimePill.classList.add("show");
+                        currentTimePill.style.display = "block";
+                    }
                 });
             }
 
