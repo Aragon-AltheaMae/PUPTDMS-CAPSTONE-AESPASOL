@@ -403,6 +403,7 @@
             border-color: #30363d;
             color: #8b949e;
         }
+
         /* Page Banner */
         .page-banner {
             background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
@@ -550,13 +551,609 @@
             margin-top: .2rem;
         }
 
-         @media (max-width: 1024px) {
+        @media (max-width: 1024px) {
             .schedule-rules-grid {
                 grid-template-columns: 1fr;
             }
+
+            .modal-box.modal-form {
+                width: min(1280px, calc(100vw - 1.5rem));
+                height: auto;
+                max-height: 92vh;
+            }
+
+            .rule-modal-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .rule-modal-side {
+                position: static;
+            }
+
+            .rule-notes-textarea {
+                min-height: 180px;
+                height: 180px;
+            }
+        }
+
+        .modal-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .82);
+            margin-bottom: .55rem;
+        }
+
+        .modal-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .modal-title-block h3 {
+            margin: 0;
+        }
+
+        .modal-title-sub {
+            font-size: .82rem;
+            color: rgba(255, 255, 255, .78);
+            margin-top: .3rem;
+            line-height: 1.45;
+        }
+
+        .modal-close-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .18s ease;
+            flex-shrink: 0;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, .2);
+            transform: translateY(-1px);
+        }
+
+        .modal-section {
+            background: #fff;
+            border: 1px solid #f1e7e4;
+            border-radius: 18px;
+            padding: .8rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .03);
+        }
+
+        .modal-section+.modal-section {
+            margin-top: 1rem;
+        }
+
+        .modal-section-head {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            margin-bottom: .9rem;
+        }
+
+        .modal-section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #8B0000;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .modal-section-title {
+            font-size: .88rem;
+            font-weight: 800;
+            color: #2f1b1b;
+            line-height: 1.2;
+        }
+
+        .modal-section-sub {
+            font-size: .72rem;
+            color: #9a8f8c;
+            margin-top: .15rem;
+        }
+
+        .form-label {
+            font-size: .69rem;
+            font-weight: 800;
+            color: #6c5f5a;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: .45rem;
+            display: block;
+        }
+
+        .form-ctrl {
+            width: 100%;
+            min-height: 44px;
+            border: 1.5px solid #eadfd9;
+            border-radius: 12px;
+            padding: 10px 13px;
+            background: #fff;
+            font-size: .84rem;
+            color: #1a1410;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-ctrl:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+        }
+
+        .form-sel {
+            appearance: none;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .form-help {
+            font-size: .7rem;
+            color: #9b948f;
+            margin-top: .4rem;
+        }
+
+        .day-toggle-group {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: .4rem;
+            width: 100%;
+        }
+
+        .day-toggle-group>* {
+            min-width: 0;
+        }
+
+        .day-toggle {
+            width: 100%;
+            height: 46px;
+            border-radius: 14px;
+            border: 1.5px solid #eadfd9;
+            background: #fffdfc;
+            font-size: .78rem;
+            font-weight: 800;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
+            cursor: pointer;
+            transition: all .15s ease;
+            user-select: none;
+            overflow: hidden;
+            padding: 0 .35rem;
+            white-space: nowrap;
+        }
+
+        .day-toggle.active {
+            background: linear-gradient(135deg, #8B0000, #b91c1c);
+            border-color: #8B0000;
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(139, 0, 0, .18);
+        }
+
+      
+.voice-input-wrap {
+    position: relative !important; 
+}
+
+.rule-notes-section .voice-input-wrap {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 0.5rem;
+}
+
+.rule-notes-section .voice-input-wrap textarea {
+    flex: 1;
+    height: 100%;
+    margin-bottom: 0 !important;
+}
+
+        .break-chip-group {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .65rem;
+        }
+
+        .break-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 46px;
+            border-radius: 14px;
+            font-size: .76rem;
+            font-weight: 700;
+            text-align: center;
+            padding: .7rem .8rem;
+            border: 1.5px solid #e8e2dd;
+            background: #fafaf8;
+            color: #5c5550;
+            cursor: pointer;
+            transition: all .15s ease;
+            user-select: none;
+        }
+
+        .break-chip.selected {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            border-color: #f59e0b;
+            color: #fff;
+            box-shadow: 0 10px 18px rgba(245, 158, 11, .18);
+        }
+
+        .slot-stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: .75rem;
+            background: #fffaf8;
+            border: 1px solid #efe3dd;
+            border-radius: 16px;
+            padding: .45rem;
+        }
+
+        .slot-stepper-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #e5d6d0;
+            background: #fff;
+            color: #6b5d57;
+            font-size: 1.05rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s ease;
+        }
+
+        .slot-stepper-btn:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+            background: #fef2f2;
+        }
+
+        .slot-stepper-input {
+            width: 82px !important;
+            min-width: 82px;
+            text-align: center;
+            font-size: 1.05rem !important;
+            font-weight: 800 !important;
+            border-radius: 12px;
+        }
+
+        .btn-soft {
+            min-height: 44px;
+            padding: 0 1rem;
+            border-radius: 12px;
+            border: 1px solid #e5deda;
+            background: #fff;
+            color: #6b635f;
+            font-size: .84rem;
+            font-weight: 700;
+            transition: all .15s ease;
+        }
+
+        .btn-soft:hover {
+            background: #faf7f5;
+            border-color: #d9cdc7;
+        }
+
+        .btn-primary {
+            min-height: 44px;
+            padding: 0 1rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #8B0000, #b91c1c);
+            color: #fff;
+            font-size: .84rem;
+            font-weight: 800;
+            box-shadow: 0 10px 22px rgba(139, 0, 0, .18);
+            transition: all .18s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(139, 0, 0, .22);
+            background: linear-gradient(135deg, #7a0000, #991b1b);
+        }
+
+        .rule-save-btn {
+            min-height: 44px;
+            padding: 0 1rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+            font-size: .84rem;
+            font-weight: 800;
+            box-shadow: 0 10px 22px rgba(22, 163, 74, .18);
+            transition: all .18s ease;
+        }
+
+        .rule-save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(22, 163, 74, .24);
+            background: linear-gradient(135deg, #15803d, #166534);
+        }
+
+        [data-theme="dark"] .modal-box.modal-form {
+            background: #161b22;
+            border-color: #2a2f36;
+        }
+
+        [data-theme="dark"] .modal-body.modal-form-body {
+            background: linear-gradient(to bottom, #161b22, #12171d);
+        }
+
+        [data-theme="dark"] .modal-section {
+            background: #0d1117;
+            border-color: #2a2f36;
+        }
+
+        [data-theme="dark"] .modal-section-title {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .modal-section-sub,
+        [data-theme="dark"] .form-help {
+            color: #8b949e;
+        }
+
+        [data-theme="dark"] .form-ctrl {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #e6edf3;
+        }
+
+        [data-theme="dark"] .day-toggle {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #c9d1d9;
+        }
+
+        [data-theme="dark"] .break-chip {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #c9d1d9;
+        }
+
+        [data-theme="dark"] .slot-stepper {
+            background: #11161c;
+            border-color: #2a2f36;
+        }
+
+        [data-theme="dark"] .slot-stepper-btn {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #c9d1d9;
+        }
+
+        [data-theme="dark"] .btn-soft {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #c9d1d9;
+        }
+
+        [data-theme="dark"] .modal-footer {
+            background: #12171d;
+            border-top-color: #2a2f36;
+        }
+
+        [data-theme="dark"] .modal-body.modal-form-body::-webkit-scrollbar-track {
+            background: #111827;
+        }
+
+        [data-theme="dark"] .modal-body.modal-form-body::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-color: #111827;
+        }
+
+        [data-theme="dark"] .btn-primary {
+            background: linear-gradient(135deg, #8B0000, #b91c1c);
+            box-shadow: 0 10px 22px rgba(139, 0, 0, .2);
+        }
+
+        [data-theme="dark"] .btn-primary:hover {
+            background: linear-gradient(135deg, #7a0000, #991b1b);
+        }
+
+        [data-theme="dark"] .rule-save-btn {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            box-shadow: 0 10px 22px rgba(22, 163, 74, .2);
+        }
+
+        [data-theme="dark"] .rule-save-btn:hover {
+            background: linear-gradient(135deg, #15803d, #166534);
+        }
+
+        [data-theme="dark"] .notes-counter {
+            color: #c9d1d9;
+        }
+
+        [data-theme="dark"] .notes-counter.is-warning {
+            color: #fbbf24;
+        }
+
+        [data-theme="dark"] .notes-counter.is-danger {
+            color: #f87171;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 99999 !important;
+            background: rgba(0, 0, 0, .45);
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-backdrop.open {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+
+        .modal-box {
+            position: relative;
+            z-index: 100000;
+            width: min(720px, calc(100vw - 2rem));
+            max-height: calc(100dvh - 2rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #fff !important;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+            padding: 0 !important;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+
+        .modal-box.modal-form {
+            width: 1080px !important;
+            max-width: calc(100vw - 2rem) !important;
+            height: auto !important;
+            max-height: 92vh !important;
+            border-radius: 24px;
+            border: none;
+            overflow: hidden;
+            background: #fff !important;
+            display: flex !important;
+            flex-direction: column;
+        }
+
+        .modal-hdr.modal-form-hdr {
+            flex-shrink: 0;
+        }
+
+        .modal-body.modal-form-body {
+            padding: 1.15rem;
+            background: linear-gradient(to bottom, #fff, #fffdfc);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+        }
+
+        .modal-body.modal-form-body::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .modal-body.modal-form-body::-webkit-scrollbar-track {
+            background: #f5f5f5;
+            border-radius: 999px;
+        }
+
+        .modal-body.modal-form-body::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 999px;
+            border: 2px solid #f5f5f5;
+        }
+
+        .modal-body.modal-form-body::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        .rule-modal-layout {
+            display: grid;
+            grid-template-columns: 380px minmax(0, 1fr);
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .rule-modal-main,
+        .rule-modal-side {
+            min-width: 0;
+        }
+
+        .rule-modal-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rule-modal-main .modal-section+.modal-section {
+            margin-top: 0;
+        }
+
+        .rule-modal-side {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .rule-modal-side .modal-section {
+            width: 100%;
+        }
+
+        .rule-notes-section {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .rule-notes-textarea {
+            display: block;
+            width: 100%;
+            flex: 1;
+            min-height: 120px;
+            max-width: 100%;
+            overflow-y: auto;
+            resize: none;
+        }
+
+        .notes-counter {
+            font-weight: 800;
+            transition: color .18s ease;
+        }
+
+        .notes-counter.is-warning {
+            color: #d97706;
+        }
+
+        .notes-counter.is-danger {
+            color: #dc2626;
+        }
+
+        .modal-footer,
+        .rule-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid #efe8e4;
+            background: transparent;
+            box-shadow: none;
         }
 
         @media (max-width: 767px) {
+
             #toastContainer {
                 left: .75rem !important;
                 right: .75rem !important;
@@ -772,420 +1369,6 @@
                 width: 100%;
                 justify-content: center;
             }
-        }
-
-        .modal-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            font-size: .68rem;
-            font-weight: 800;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, .82);
-            margin-bottom: .55rem;
-        }
-
-        .modal-title-row {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .modal-title-block h3 {
-            margin: 0;
-        }
-
-        .modal-title-sub {
-            font-size: .82rem;
-            color: rgba(255, 255, 255, .78);
-            margin-top: .3rem;
-            line-height: 1.45;
-        }
-
-        .modal-close-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, .18);
-            background: rgba(255, 255, 255, .12);
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .18s ease;
-            flex-shrink: 0;
-        }
-
-        .modal-close-btn:hover {
-            background: rgba(255, 255, 255, .2);
-            transform: translateY(-1px);
-        }
-
-        .modal-section {
-            background: #fff;
-            border: 1px solid #f1e7e4;
-            border-radius: 18px;
-            padding: .8rem;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, .03);
-        }
-
-        .modal-section+.modal-section {
-            margin-top: 1rem;
-        }
-
-        .modal-section-head {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            margin-bottom: .9rem;
-        }
-
-        .modal-section-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: #fef2f2;
-            color: #8B0000;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .modal-section-title {
-            font-size: .88rem;
-            font-weight: 800;
-            color: #2f1b1b;
-            line-height: 1.2;
-        }
-
-        .modal-section-sub {
-            font-size: .72rem;
-            color: #9a8f8c;
-            margin-top: .15rem;
-        }
-
-        .form-label {
-            font-size: .69rem;
-            font-weight: 800;
-            color: #6c5f5a;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            margin-bottom: .45rem;
-            display: block;
-        }
-
-        .form-ctrl {
-            width: 100%;
-            min-height: 44px;
-            border: 1.5px solid #eadfd9;
-            border-radius: 12px;
-            padding: 10px 13px;
-            background: #fff;
-            font-size: .84rem;
-            color: #1a1410;
-            outline: none;
-            transition: border-color .15s, box-shadow .15s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .form-ctrl:focus {
-            border-color: #8B0000;
-            box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
-        }
-
-        .form-sel {
-            appearance: none;
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 16px;
-            padding-right: 32px;
-        }
-
-        .form-help {
-            font-size: .7rem;
-            color: #9b948f;
-            margin-top: .4rem;
-        }
-
-        .day-toggle-group {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: .5rem;
-        }
-
-        .day-toggle {
-            width: 100%;
-            height: 46px;
-            border-radius: 14px;
-            border: 1.5px solid #eadfd9;
-            background: #fffdfc;
-            font-size: .78rem;
-            font-weight: 800;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            line-height: 1;
-            cursor: pointer;
-            transition: all .15s ease;
-            user-select: none;
-            overflow: hidden;
-        }
-
-        .day-toggle.active {
-            background: linear-gradient(135deg, #8B0000, #b91c1c);
-            border-color: #8B0000;
-            color: #fff;
-            box-shadow: 0 8px 18px rgba(139, 0, 0, .18);
-        }
-
-        .break-chip-group {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .65rem;
-        }
-
-        .break-chip {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            min-height: 46px;
-            border-radius: 14px;
-            font-size: .76rem;
-            font-weight: 700;
-            text-align: center;
-            padding: .7rem .8rem;
-            border: 1.5px solid #e8e2dd;
-            background: #fafaf8;
-            color: #5c5550;
-            cursor: pointer;
-            transition: all .15s ease;
-            user-select: none;
-        }
-
-        .break-chip.selected {
-            background: linear-gradient(135deg, #f59e0b, #f97316);
-            border-color: #f59e0b;
-            color: #fff;
-            box-shadow: 0 10px 18px rgba(245, 158, 11, .18);
-        }
-
-        .slot-stepper {
-            display: inline-flex;
-            align-items: center;
-            gap: .75rem;
-            background: #fffaf8;
-            border: 1px solid #efe3dd;
-            border-radius: 16px;
-            padding: .45rem;
-        }
-
-        .slot-stepper-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            border: 1px solid #e5d6d0;
-            background: #fff;
-            color: #6b5d57;
-            font-size: 1.05rem;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .15s ease;
-        }
-
-        .slot-stepper-btn:hover {
-            border-color: #8B0000;
-            color: #8B0000;
-            background: #fef2f2;
-        }
-
-        .slot-stepper-input {
-            width: 82px !important;
-            min-width: 82px;
-            text-align: center;
-            font-size: 1.05rem !important;
-            font-weight: 800 !important;
-            border-radius: 12px;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: .75rem;
-            padding-top: 1rem;
-            margin-top: 1rem;
-            border-top: 1px solid #efe8e4;
-        }
-
-        .btn-soft {
-            min-height: 44px;
-            padding: 0 1rem;
-            border-radius: 12px;
-            border: 1px solid #e5deda;
-            background: #fff;
-            color: #6b635f;
-            font-size: .84rem;
-            font-weight: 700;
-            transition: all .15s ease;
-        }
-
-        .btn-soft:hover {
-            background: #faf7f5;
-            border-color: #d9cdc7;
-        }
-
-        .btn-primary {
-            min-height: 44px;
-            padding: 0 1rem;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(135deg, #8B0000, #b91c1c);
-            color: #fff;
-            font-size: .84rem;
-            font-weight: 800;
-            box-shadow: 0 10px 22px rgba(139, 0, 0, .18);
-            transition: all .18s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(139, 0, 0, .22);
-        }
-
-        [data-theme="dark"] .modal-box.modal-form {
-            background: #161b22;
-            border-color: #2a2f36;
-        }
-
-        [data-theme="dark"] .modal-body.modal-form-body {
-            background: linear-gradient(to bottom, #161b22, #12171d);
-        }
-
-        [data-theme="dark"] .modal-section {
-            background: #0d1117;
-            border-color: #2a2f36;
-        }
-
-        [data-theme="dark"] .modal-section-title {
-            color: #f3f4f6;
-        }
-
-        [data-theme="dark"] .modal-section-sub,
-        [data-theme="dark"] .form-help {
-            color: #8b949e;
-        }
-
-        [data-theme="dark"] .form-ctrl {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #e6edf3;
-        }
-
-        [data-theme="dark"] .day-toggle {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #c9d1d9;
-        }
-
-        [data-theme="dark"] .break-chip {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #c9d1d9;
-        }
-
-        [data-theme="dark"] .slot-stepper {
-            background: #11161c;
-            border-color: #2a2f36;
-        }
-
-        [data-theme="dark"] .slot-stepper-btn {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #c9d1d9;
-        }
-
-        [data-theme="dark"] .btn-soft {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #c9d1d9;
-        }
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .45);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .2s;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .modal-backdrop.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-backdrop.open .modal-box {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-box {
-            width: min(720px, calc(100vw - 2rem));
-            max-height: calc(100dvh - 2rem);
-            overflow-y: auto;
-            overflow-x: hidden;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-            transform: scale(.96) translateY(10px);
-            transition: transform .2s;
-            padding: 0 !important;
-        }
-
-        .modal-box.modal-form {
-            width: min(760px, calc(100vw - 2rem));
-            max-height: calc(100dvh - 2rem);
-            border-radius: 24px;
-            border: none;
-            overflow: hidden;
-            padding: 0 !important;
-            background: #fff;
-        }
-
-        .modal-box.modal-form.modal-compact {
-            width: min(520px, calc(100vw - 2rem));
-        }
-
-        .modal-hdr.modal-form-hdr {
-            background:
-                radial-gradient(circle at top right, rgba(255, 255, 255, .16), transparent 32%),
-                linear-gradient(135deg, #6b0000, #8B0000 65%, #b91c1c);
-            padding: 1.1rem 1.35rem .95rem;
-            border-radius: 24px 24px 0 0;
-            margin: 0;
-        }
-
-        .modal-body.modal-form-body {
-            padding: 1.15rem;
-            background: linear-gradient(to bottom, #fff, #fffdfc);
-            max-height: calc(100dvh - 170px);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        @media (max-width: 767px) {
 
             .holiday-item {
                 gap: .65rem;
@@ -1256,12 +1439,14 @@
                 max-height: min(84dvh, 700px);
                 border-radius: 18px 18px 0 0;
                 margin: 0 auto;
+                display: block !important;
             }
 
             .modal-box.modal-form,
             .modal-box.modal-form.modal-compact {
                 width: 100vw !important;
                 max-width: 100vw !important;
+                height: 86dvh;
                 max-height: 86dvh;
                 border-radius: 18px 18px 0 0;
                 margin: 0;
@@ -1495,7 +1680,8 @@
                         </button>
 
                         <div class="view-toggle" id="scheduleRulesViewToggle">
-                            <button type="button" class="view-toggle-btn active" id="scheduleRulesListViewBtn" title="List view">
+                            <button type="button" class="view-toggle-btn active" id="scheduleRulesListViewBtn"
+                                title="List view">
                                 <i class="fa-solid fa-table-list"></i>
                             </button>
                             <button type="button" class="view-toggle-btn" id="scheduleRulesGridViewBtn" title="Grid view">
@@ -1529,13 +1715,13 @@
                             'color' => 'from-green-500 to-green-600',
                             'val' => $blockedThisMonth,
                             'label' => 'Blocked
-        Dates',
+            Dates',
                             'sub' => 'This month',
                         ],
                         [
                             'icon' => 'fa-umbrella-beach',
                             'color' => 'from-amber-500
-        to-amber-600',
+            to-amber-600',
                             'val' => $holidaysThisMonth,
                             'label' => 'Holidays',
                             'sub' => 'This month',
@@ -1607,7 +1793,7 @@
                     </div>
 
                     {{-- Schedule rules table --}}
-                                        <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                         <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
                             <div class="weekly-toolbar flex items-center gap-2">
                                 <i class="fa-solid fa-list-check text-[#8B0000]"></i>
@@ -1616,7 +1802,7 @@
                             <span class="text-xs text-gray-400 font-medium">{{ $schedules->count() }} rules</span>
                         </div>
 
-                        @if($schedules->count())
+                        @if ($schedules->count())
                             <div id="scheduleRulesListView" class="schedule-rules-view">
                                 <div class="overflow-x-auto">
                                     <table class="sched-table">
@@ -1632,9 +1818,10 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($schedules as $rule)
+                                            @foreach ($schedules as $rule)
                                                 <tr>
-                                                    <td data-label="Day(s)" class="font-semibold text-gray-800">{{ $rule->days_label }}</td>
+                                                    <td data-label="Day(s)" class="font-semibold text-gray-800">
+                                                        {{ $rule->days_label }}</td>
                                                     <td data-label="Opens">
                                                         {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
                                                     </td>
@@ -1652,10 +1839,13 @@
                                                     </td>
                                                     <td data-label="Max Slots">
                                                         <div class="flex items-center gap-2">
-                                                            <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
+                                                            <span
+                                                                class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
                                                             @if ($rule->status !== 'closed')
                                                                 <div class="cap-bar w-16">
-                                                                    <div class="cap-fill" style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%"></div>
+                                                                    <div class="cap-fill"
+                                                                        style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%">
+                                                                    </div>
                                                                 </div>
                                                             @endif
                                                         </div>
@@ -1678,8 +1868,10 @@
                                                                 <i class="fa-solid fa-pen"></i>
                                                             </button>
 
-                                                            <form action="{{ route('admin.clinic_schedule.destroy', $rule) }}"
-                                                                method="POST" onsubmit="return confirm('Delete this rule?')">
+                                                            <form
+                                                                action="{{ route('admin.clinic_schedule.destroy', $rule) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Delete this rule?')">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit"
@@ -1699,7 +1891,7 @@
 
                             <div id="scheduleRulesGridView" class="schedule-rules-view" hidden>
                                 <div class="schedule-rules-grid">
-                                    @foreach($schedules as $rule)
+                                    @foreach ($schedules as $rule)
                                         <div class="schedule-rule-card">
                                             <div class="schedule-rule-card-top">
                                                 <div>
@@ -1747,10 +1939,13 @@
                                                 <div>
                                                     <div class="schedule-rule-card-label">Max Slots</div>
                                                     <div class="schedule-rule-card-value flex items-center gap-2">
-                                                        <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
+                                                        <span
+                                                            class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
                                                         @if ($rule->status !== 'closed')
                                                             <div class="cap-bar w-16">
-                                                                <div class="cap-fill" style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%"></div>
+                                                                <div class="cap-fill"
+                                                                    style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%">
+                                                                </div>
                                                             </div>
                                                         @endif
                                                     </div>
@@ -1787,7 +1982,9 @@
                                 <i class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
                                 <p class="text-gray-400 text-sm">
                                     No rules yet.
-                                    <button onclick="openRuleModal()" class="text-[#8B0000] font-semibold hover:underline">Add one.</button>
+                                    <button onclick="openRuleModal()"
+                                        class="text-[#8B0000] font-semibold hover:underline">Add
+                                        one.</button>
                                 </p>
                             </div>
                         @endif
@@ -1852,9 +2049,9 @@
                         </div>
 
                         <div class="p-4">
-                            @if($blockedDates->count())
+                            @if ($blockedDates->count())
                                 <div id="blockedDatesListView" class="blocked-dates-view">
-                                    @foreach($blockedDates as $blocked)
+                                    @foreach ($blockedDates as $blocked)
                                         @php
                                             $bd = \Carbon\Carbon::parse($blocked->date);
                                             $badgeCls = match ($blocked->reason) {
@@ -1864,8 +2061,10 @@
                                             };
                                         @endphp
 
-                                        <div class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
-                                            <div class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
+                                        <div
+                                            class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                                            <div
+                                                class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
                                                 {{ $bd->day }}
                                             </div>
 
@@ -1873,15 +2072,18 @@
                                                 <p class="blocked-title text-xs font-bold text-gray-800 truncate">
                                                     {{ $bd->format('D, M j, Y') }}
                                                 </p>
-                                                <span class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
+                                                <span
+                                                    class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
                                                 @if ($blocked->note)
-                                                    <p class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
+                                                    <p
+                                                        class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
                                                         {{ $blocked->note }}
                                                     </p>
                                                 @endif
                                             </div>
 
-                                            <form action="{{ route('admin.clinic_schedule.unblock', $blocked) }}" method="POST">
+                                            <form action="{{ route('admin.clinic_schedule.unblock', $blocked) }}"
+                                                method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="blocked-remove-btn" title="Remove">
@@ -2030,126 +2232,145 @@
                     @csrf
                     <div id="ruleMethodField"></div>
 
-                    <div class="modal-section">
-                        <div class="modal-section-head">
-                            <div class="modal-section-icon">
-                                <i class="fa-solid fa-calendar-days"></i>
-                            </div>
-                            <div>
-                                <div class="modal-section-title">Applicable Days</div>
-                                <div class="modal-section-sub">Select one or more days for this rule.</div>
-                            </div>
-                        </div>
-
-                        <label class="form-label">Select Days <span class="text-red-400">*</span></label>
-                        <div id="ruleDaysGroup" class="day-toggle-group mt-1">
-                            @foreach (['Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu' => 'Th', 'Fri' => 'F', 'Sat' => 'S', 'Sun' => 'Su'] as $abbr => $lbl)
-                                <div class="day-toggle" data-day="{{ $abbr }}" onclick="toggleDay(this)">
-                                    {{ $lbl }}
+                    <div class="rule-modal-layout">
+                        <div class="flex flex-col gap-4">
+                            <div class="modal-section m-0">
+                                <div class="modal-section-head">
+                                    <div class="modal-section-icon">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                    </div>
+                                    <div>
+                                        <div class="modal-section-title">Applicable Days</div>
+                                        <div class="modal-section-sub">Select one or more days for this rule.</div>
+                                    </div>
                                 </div>
-                            @endforeach
-                        </div>
-                        <div class="form-help">You can apply one schedule to multiple weekdays.</div>
-                        <div id="ruleDaysError" class="field-error"></div>
-                    </div>
 
-                    <div class="modal-section">
-                        <div class="modal-section-head">
-                            <div class="modal-section-icon">
-                                <i class="fa-solid fa-hospital-user"></i>
+                                <label class="form-label">Select Days <span class="text-red-400">*</span></label>
+                                <div id="ruleDaysGroup" class="day-toggle-group mt-1">
+                                    @foreach (['Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu' => 'Th', 'Fri' => 'F', 'Sat' => 'S', 'Sun' => 'Su'] as $abbr => $lbl)
+                                        <div class="day-toggle" data-day="{{ $abbr }}"
+                                            onclick="toggleDay(this)">
+                                            {{ $lbl }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="form-help">You can apply one schedule to multiple weekdays.</div>
+                                <div id="ruleDaysError" class="field-error"></div>
                             </div>
-                            <div>
-                                <div class="modal-section-title">Clinic Availability</div>
-                                <div class="modal-section-sub">Define whether the clinic is open, closed, or limited.</div>
+
+                            <div class="modal-section rule-notes-section m-0 flex-1 flex flex-col">
+                                <div class="modal-section-head">
+                                    <div class="modal-section-icon">
+                                        <i class="fa-solid fa-note-sticky"></i>
+                                    </div>
+                                    <div>
+                                        <div class="modal-section-title">Additional Notes</div>
+                                        <div class="modal-section-sub">Optional reminder or exception.</div>
+                                    </div>
+                                </div>
+
+                                <label class="form-label" for="ruleNotes">Notes (optional)</label>
+                                <textarea id="ruleNotes" class="form-ctrl resize-none rule-notes-textarea mb-2" maxlength="150"
+                                    placeholder="e.g. Reduced operations due to holiday program..."></textarea>
+                                <div class="form-help flex items-center justify-between gap-2 mt-auto">
+                                    <span>Maximum of 150 characters.</span>
+                                    <span id="ruleNotesCount" class="notes-counter">0/150</span>
+                                </div>
+                                <div id="ruleNotesError" class="field-error"></div>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label" for="ruleStatus">Clinic Status</label>
-                            <select id="ruleStatus" class="form-ctrl form-sel" onchange="toggleStatusFields(this.value)">
-                                <option value="open">Open</option>
-                                <option value="closed">Closed</option>
-                                <option value="limited">Limited Hours</option>
-                            </select>
-                            <div id="ruleStatusError" class="field-error"></div>
-                        </div>
+                        <div class="flex flex-col h-full">
+                            <div class="modal-section m-0 flex-1">
+                                <div class="modal-section-head">
+                                    <div class="modal-section-icon">
+                                        <i class="fa-solid fa-hospital-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="modal-section-title">Clinic Availability</div>
+                                        <div class="modal-section-sub">Define whether the clinic is open, closed, or
+                                            limited.</div>
+                                    </div>
+                                </div>
 
-                        <div id="ruleTimeFields">
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="form-label" for="ruleOpenTime">Opening Time</label>
-                                    <select id="ruleOpenTime" class="form-ctrl form-sel">
-                                        <option value="07:00">7:00 AM</option>
-                                        <option value="08:00">8:00 AM</option>
-                                        <option value="09:00" selected>9:00 AM</option>
-                                        <option value="10:00">10:00 AM</option>
+                                <div class="mb-5">
+                                    <label class="form-label" for="ruleStatus">Clinic Status</label>
+                                    <select id="ruleStatus" class="form-ctrl form-sel"
+                                        onchange="toggleStatusFields(this.value)">
+                                        <option value="open">Open</option>
+                                        <option value="closed">Closed</option>
+                                        <option value="limited">Limited Hours</option>
                                     </select>
-                                    <div id="ruleOpenTimeError" class="field-error"></div>
+                                    <div id="ruleStatusError" class="field-error"></div>
                                 </div>
 
-                                <div>
-                                    <label class="form-label" for="ruleCloseTime">Closing Time</label>
-                                    <select id="ruleCloseTime" class="form-ctrl form-sel">
-                                        <option value="15:00">3:00 PM</option>
-                                        <option value="16:00">4:00 PM</option>
-                                        <option value="17:00" selected>5:00 PM</option>
-                                        <option value="18:00">6:00 PM</option>
-                                    </select>
-                                    <div id="ruleCloseTimeError" class="field-error"></div>
-                                </div>
-                            </div>
+                                <div id="ruleTimeFields" class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-5">
+                                    <div class="space-y-5">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="form-label" for="ruleOpenTime">Opening Time</label>
+                                                <select id="ruleOpenTime" class="form-ctrl form-sel">
+                                                    <option value="07:00">7:00 AM</option>
+                                                    <option value="08:00">8:00 AM</option>
+                                                    <option value="09:00" selected>9:00 AM</option>
+                                                    <option value="10:00">10:00 AM</option>
+                                                </select>
+                                                <div id="ruleOpenTimeError" class="field-error"></div>
+                                            </div>
 
-                            <div class="mb-4">
-                                <label class="form-label">Lunch Break</label>
-                                <div id="ruleBreakGroup" class="break-chip-group">
-                                    <div class="break-chip selected" data-val="12:00-13:00" onclick="selectBreak(this)">
-                                        12:00 – 1:00 PM
-                                    </div>
-                                    <div class="break-chip" data-val="13:00-14:00" onclick="selectBreak(this)">
-                                        1:00 – 2:00 PM
-                                    </div>
-                                    <div class="break-chip" data-val="none" onclick="selectBreak(this)">
-                                        <i class="fa-solid fa-ban text-[10px]"></i> No Break
-                                    </div>
-                                </div>
-                                <div id="ruleBreakError" class="field-error"></div>
-                            </div>
+                                            <div>
+                                                <label class="form-label" for="ruleCloseTime">Closing Time</label>
+                                                <select id="ruleCloseTime" class="form-ctrl form-sel">
+                                                    <option value="15:00">3:00 PM</option>
+                                                    <option value="16:00">4:00 PM</option>
+                                                    <option value="17:00" selected>5:00 PM</option>
+                                                    <option value="18:00">6:00 PM</option>
+                                                </select>
+                                                <div id="ruleCloseTimeError" class="field-error"></div>
+                                            </div>
+                                        </div>
 
-                            <div>
-                                <label class="form-label" for="ruleMaxSlots">Max Appointments / Day</label>
-                                <div class="slot-stepper">
-                                    <button type="button" onclick="adjSlots(-1)" class="slot-stepper-btn">−</button>
-                                    <input type="number" id="ruleMaxSlots" class="form-ctrl slot-stepper-input"
-                                        value="5" min="1" max="30">
-                                    <button type="button" onclick="adjSlots(1)" class="slot-stepper-btn">+</button>
+                                        <div>
+                                            <label class="form-label" for="ruleMaxSlots">Max Appointments / Day</label>
+                                            <div class="slot-stepper mt-1">
+                                                <button type="button" onclick="adjSlots(-1)"
+                                                    class="slot-stepper-btn">−</button>
+                                                <input type="number" id="ruleMaxSlots"
+                                                    class="form-ctrl slot-stepper-input" value="5" min="1"
+                                                    max="30">
+                                                <button type="button" onclick="adjSlots(1)"
+                                                    class="slot-stepper-btn">+</button>
+                                            </div>
+                                            <div class="form-help">Set how many appointments may be accepted.</div>
+                                            <div id="ruleMaxSlotsError" class="field-error"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label">Lunch Break</label>
+                                        <div id="ruleBreakGroup"
+                                            style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.25rem;">
+                                            <div class="break-chip selected" data-val="12:00-13:00"
+                                                onclick="selectBreak(this)">
+                                                12:00 – 1:00 PM
+                                            </div>
+                                            <div class="break-chip" data-val="13:00-14:00" onclick="selectBreak(this)">
+                                                1:00 – 2:00 PM
+                                            </div>
+                                            <div class="break-chip" data-val="none" onclick="selectBreak(this)">
+                                                <i class="fa-solid fa-ban text-[10px]"></i> No Break
+                                            </div>
+                                        </div>
+                                        <div id="ruleBreakError" class="field-error"></div>
+                                    </div>
                                 </div>
-                                <div class="form-help">Set how many appointments may be accepted for this schedule.</div>
-                                <div id="ruleMaxSlotsError" class="field-error"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-section">
-                        <div class="modal-section-head">
-                            <div class="modal-section-icon">
-                                <i class="fa-solid fa-note-sticky"></i>
-                            </div>
-                            <div>
-                                <div class="modal-section-title">Additional Notes</div>
-                                <div class="modal-section-sub">Optional reminder for holidays, special hours, or
-                                    exceptions.</div>
-                            </div>
-                        </div>
-
-                        <label class="form-label" for="ruleNotes">Notes (optional)</label>
-                        <textarea id="ruleNotes" class="form-ctrl resize-none" rows="3"
-                            placeholder="e.g. Reduced operations due to holiday program, dentist unavailable in the afternoon..."></textarea>
-                        <div id="ruleNotesError" class="field-error"></div>
-                    </div>
-
-                    <div class="modal-footer">
+                    <div class="modal-footer rule-modal-footer">
                         <button type="button" onclick="closeRuleModal()" class="btn-soft">Cancel</button>
-                        <button type="button" onclick="submitRule()" class="btn-primary">
+                        <button type="button" onclick="submitRule()" class="rule-save-btn">
                             <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Rule
                         </button>
                     </div>
@@ -2343,13 +2564,18 @@
             document.getElementById('detailSchedule').textContent =
                 `${appt.appointment_date} ${appt.display_time || appt.appointment_time || ''}`;
 
-            document.getElementById('appointmentDetailModal').classList.add('open');
+            const modal = document.getElementById('appointmentDetailModal');
+            modal.style.display = 'flex';
+            modal.classList.add('open');
         }
 
         function closeAppointmentDetailModal() {
-            document.getElementById('appointmentDetailModal').classList.remove('open');
+            const backdrop = document.getElementById('appointmentDetailModal');
+            if (backdrop) {
+                backdrop.classList.remove('open');
+                backdrop.style.display = 'none';
+            }
         }
-
         // Weekly Calendar
         const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -2604,50 +2830,89 @@
         let selectedBreak = '12:00-13:00';
         let editingId = null;
 
-        function openRuleModal(mode, ruleId, rule) {
+        function openRuleModal(mode = 'create', ruleId = null, rule = null) {
             editingId = null;
-            document.getElementById('ruleModalTitle').textContent = 'Add Schedule Rule';
-            document.getElementById('ruleForm').action = '{{ route('admin.clinic_schedule.store') }}';
-            document.getElementById('ruleMethodField').innerHTML = '';
 
-            // Reset
-            document.querySelectorAll('.day-toggle').forEach(d => d.classList.remove('active'));
-            document.querySelectorAll('.break-chip').forEach(c => c.classList.remove('selected'));
-            document.querySelector('.break-chip[data-val="12:00-13:00"]').classList.add('selected');
+            const backdrop = document.getElementById('ruleModalBackdrop');
+            const form = document.getElementById('ruleForm');
+            const methodField = document.getElementById('ruleMethodField');
+            const title = document.getElementById('ruleModalTitle');
+            const status = document.getElementById('ruleStatus');
+            const openTime = document.getElementById('ruleOpenTime');
+            const closeTime = document.getElementById('ruleCloseTime');
+            const maxSlots = document.getElementById('ruleMaxSlots');
+            const notes = document.getElementById('ruleNotes');
+            const timeFields = document.getElementById('ruleTimeFields');
+            const defaultBreak = document.querySelector('.break-chip[data-val="12:00-13:00"]');
+
+            if (!backdrop || !form || !methodField || !title || !status || !openTime || !closeTime || !maxSlots || !notes ||
+                !timeFields) {
+                console.error('Rule modal elements not found.');
+                return;
+            }
+
+            clearRuleErrors();
+
+            title.textContent = 'Add Schedule Rule';
+            form.action = '{{ route('admin.clinic_schedule.store') }}';
+            methodField.innerHTML = '';
+
+            document.querySelectorAll('#ruleModalBackdrop .day-toggle').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('#ruleModalBackdrop .break-chip').forEach(c => c.classList.remove('selected'));
+
+            if (defaultBreak) defaultBreak.classList.add('selected');
+
             selectedBreak = '12:00-13:00';
-            document.getElementById('ruleStatus').value = 'open';
-            document.getElementById('ruleOpenTime').value = '09:00';
-            document.getElementById('ruleCloseTime').value = '17:00';
-            document.getElementById('ruleMaxSlots').value = '5';
-            document.getElementById('ruleNotes').value = '';
-            document.getElementById('ruleTimeFields').style.display = '';
+            status.value = 'open';
+            openTime.value = '09:00';
+            closeTime.value = '17:00';
+            maxSlots.value = '5';
+            notes.value = '';
+            const ruleNotesCount = document.getElementById('ruleNotesCount');
+            if (ruleNotesCount) ruleNotesCount.textContent = '0/150';
+            timeFields.style.display = '';
 
             if (mode === 'edit' && rule) {
                 editingId = ruleId;
-                document.getElementById('ruleModalTitle').textContent = 'Edit Schedule Rule';
-                document.getElementById('ruleForm').action = `/admin/clinic-schedule/rules/${ruleId}`;
-                document.getElementById('ruleMethodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+                title.textContent = 'Edit Schedule Rule';
+                form.action = `/admin/clinic-schedule/rules/${ruleId}`;
+                methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
                 (rule.days || []).forEach(day => {
-                    const el = document.querySelector(`.day-toggle[data-day="${day}"]`);
+                    const el = document.querySelector(`#ruleModalBackdrop .day-toggle[data-day="${day}"]`);
                     if (el) el.classList.add('active');
                 });
-                document.getElementById('ruleStatus').value = rule.status || 'open';
-                toggleStatusFields(rule.status);
-                if (rule.open_time) document.getElementById('ruleOpenTime').value = rule.open_time.substring(0, 5);
-                if (rule.close_time) document.getElementById('ruleCloseTime').value = rule.close_time.substring(0, 5);
-                document.getElementById('ruleMaxSlots').value = rule.max_slots || 5;
-                document.getElementById('ruleNotes').value = rule.notes || '';
+
+                status.value = rule.status || 'open';
+                toggleStatusFields(rule.status || 'open');
+
+                if (rule.open_time) openTime.value = String(rule.open_time).substring(0, 5);
+                if (rule.close_time) closeTime.value = String(rule.close_time).substring(0, 5);
+
+                maxSlots.value = rule.max_slots || 5;
+                notes.value = rule.notes || '';
+                const ruleNotesCount = document.getElementById('ruleNotesCount');
+                if (ruleNotesCount) ruleNotesCount.textContent = `${notes.value.length}/150`;
+
                 selectedBreak = rule.break_time || 'none';
-                document.querySelectorAll('.break-chip').forEach(c => c.classList.toggle('selected', c.dataset.val ===
-                    selectedBreak));
+
+                document.querySelectorAll('#ruleModalBackdrop .break-chip').forEach(c => {
+                    c.classList.toggle('selected', c.dataset.val === selectedBreak);
+                });
             }
 
-            document.getElementById('ruleModalBackdrop').classList.add('open');
+            backdrop.style.display = 'flex';
+            backdrop.classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeRuleModal() {
-            document.getElementById('ruleModalBackdrop').classList.remove('open');
+            const backdrop = document.getElementById('ruleModalBackdrop');
+            if (backdrop) {
+                backdrop.classList.remove('open');
+                backdrop.style.display = 'none';
+            }
+            document.body.style.overflow = '';
         }
 
         function toggleDay(el) {
@@ -2745,15 +3010,60 @@
 
         // Block date 
         function openBlockModal() {
-            document.getElementById('blockDate').min = new Date().toISOString().split('T')[0];
-            document.getElementById('blockModalBackdrop').classList.add('open');
+            const backdrop = document.getElementById('blockModalBackdrop');
+            const blockDate = document.getElementById('blockDate');
+
+            if (!backdrop || !blockDate) {
+                console.error('Block modal elements not found.');
+                return;
+            }
+
+            clearBlockErrors();
+            blockDate.min = new Date().toISOString().split('T')[0];
+            backdrop.style.display = 'flex';
+            backdrop.classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeBlockModal() {
-            document.getElementById('blockModalBackdrop').classList.remove('open');
+            const backdrop = document.getElementById('blockModalBackdrop');
+            if (backdrop) {
+                backdrop.classList.remove('open');
+                backdrop.style.display = 'none';
+            }
+            document.body.style.overflow = '';
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+
+            const ruleNotes = document.getElementById('ruleNotes');
+            const ruleNotesCount = document.getElementById('ruleNotesCount');
+
+            function updateRuleNotesCount() {
+                if (!ruleNotes || !ruleNotesCount) return;
+
+                const currentLength = ruleNotes.value.length;
+                ruleNotesCount.textContent = `${currentLength}/150`;
+
+                ruleNotesCount.classList.remove('is-warning', 'is-danger');
+
+                if (currentLength >= 140) {
+                    ruleNotesCount.classList.add('is-danger');
+                } else if (currentLength >= 110) {
+                    ruleNotesCount.classList.add('is-warning');
+                }
+            }
+
+            ruleNotes?.addEventListener('input', function() {
+                if (this.value.length > 150) {
+                    this.value = this.value.slice(0, 150);
+                }
+                updateRuleNotesCount();
+                clearFieldError('ruleNotesError', 'ruleNotes');
+            });
+
+            updateRuleNotesCount();
+
             buildWeekGrid();
 
             document.getElementById('ruleStatus')?.addEventListener('change', () => clearFieldError(
@@ -2771,19 +3081,19 @@
                 'blockReasonError', 'blockReason'));
             document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError',
                 'blockNote'));
-            
-        function getPreferredScheduleRulesView() {
-            if (window.innerWidth <= 767) return 'list';
-            return localStorage.getItem('scheduleRulesView') || 'list';
-        }
 
-        function applyScheduleRulesView(view, save = true) {
-            const listView = document.getElementById('scheduleRulesListView');
-            const gridView = document.getElementById('scheduleRulesGridView');
-            const listBtn = document.getElementById('scheduleRulesListViewBtn');
-            const gridBtn = document.getElementById('scheduleRulesGridViewBtn');
+            function getPreferredScheduleRulesView() {
+                if (window.innerWidth <= 767) return 'list';
+                return localStorage.getItem('scheduleRulesView') || 'list';
+            }
 
-            if (!listView || !gridView) return;
+            function applyScheduleRulesView(view, save = true) {
+                const listView = document.getElementById('scheduleRulesListView');
+                const gridView = document.getElementById('scheduleRulesGridView');
+                const listBtn = document.getElementById('scheduleRulesListViewBtn');
+                const gridBtn = document.getElementById('scheduleRulesGridViewBtn');
+
+                if (!listView || !gridView) return;
 
                 const finalView = window.innerWidth <= 767 ? 'list' : view;
 
@@ -2807,7 +3117,7 @@
             const scheduleRulesGridViewBtn = document.getElementById('scheduleRulesGridViewBtn');
 
             if (scheduleRulesListViewBtn) {
-                scheduleRulesListViewBtn.addEventListener('click', function (e) {
+                scheduleRulesListViewBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     applyScheduleRulesView('list', true);
@@ -2815,7 +3125,7 @@
             }
 
             if (scheduleRulesGridViewBtn) {
-                scheduleRulesGridViewBtn.addEventListener('click', function (e) {
+                scheduleRulesGridViewBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     applyScheduleRulesView('grid', true);
@@ -2824,7 +3134,7 @@
 
             applyScheduleRulesView(getPreferredScheduleRulesView(), false);
 
-            window.addEventListener('resize', function () {
+            window.addEventListener('resize', function() {
                 applyScheduleRulesView(getPreferredScheduleRulesView(), false);
             });
         });

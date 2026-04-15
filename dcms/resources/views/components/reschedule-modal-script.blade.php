@@ -56,17 +56,25 @@
         document.querySelector('.slots-wrap')?.classList.remove('error');
 
         document.getElementById('datePill')?.replaceChildren();
+
         const slotPlaceholder = document.getElementById('slotPlaceholder');
         const slotGrid = document.getElementById('slotGrid');
         const selectedTimePill = document.getElementById('selectedTimePill');
         const selectedTimeText = document.getElementById('selectedTimeText');
 
-        if (slotPlaceholder) slotPlaceholder.style.display = '';
+        if (slotPlaceholder) {
+            slotPlaceholder.classList.remove('hidden');
+            slotPlaceholder.style.display = 'flex';
+        }
         if (slotGrid) {
             slotGrid.style.display = 'none';
             slotGrid.innerHTML = '';
         }
-        if (selectedTimePill) selectedTimePill.style.display = 'none';
+        if (selectedTimePill) {
+            selectedTimePill.classList.remove('show');
+            selectedTimePill.classList.add('hidden');
+            selectedTimePill.style.display = 'none';
+        }
         if (selectedTimeText) selectedTimeText.textContent = '';
 
         modal.classList.remove('hidden');
@@ -78,6 +86,20 @@
                 panel.style.animation = '';
             }));
         }
+
+        if (typeof renderCalendarLoading === 'function') {
+            renderCalendarLoading();
+        }
+
+        if (typeof renderCalendar === 'function') {
+            setTimeout(() => {
+                renderCalendar();
+            }, 0);
+        }
+
+        if (dateInput) dateInput.value = '';
+        if (timeInput) timeInput.value = '';
+
     }
 
     function closeRescheduleModal() {
