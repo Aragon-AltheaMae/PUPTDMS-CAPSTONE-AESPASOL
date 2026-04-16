@@ -3,8 +3,11 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dentist Portal | PUP Taguig Dental Clinic')</title>
+@if(auth()->check())
+    <meta name="auth-user-id" content="{{ auth()->id() }}">
+@endif
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>@yield('title', 'Dentist Portal | PUP Taguig Dental Clinic')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">

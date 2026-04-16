@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentRequestController extends Controller
 {
-    private function ensureAdminAccess()
+    private function ensureAdminAccess(): void
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -21,6 +21,8 @@ class DocumentRequestController extends Controller
     public function index(Request $request)
     {
         $this->ensureAdminAccess();
+
+        $sort = $request->get('sort', 'newest');
 
         $query = DocumentRequest::with('patient');
 
@@ -48,7 +50,24 @@ class DocumentRequestController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $requests = $query->latest()->paginate(10);
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            case 'alpha':
+                $query->join('patients', 'document_requests.patient_id', '=', 'patients.id')
+                    ->orderBy('patients.last_name')
+                    ->select('document_requests.*');
+                break;
+
+            case 'newest':
+            default:
+                $query->latest();
+                break;
+        }
+
+        $requests = $query->paginate(10)->withQueryString();
 
         $stats = [
             'total' => DocumentRequest::count(),
@@ -72,18 +91,6 @@ class DocumentRequestController extends Controller
             'documentTypes',
             'notifications'
         ));
-
-        $sort = $request->get('sort', 'newest');
-
-        $query = DocumentRequest::with('patient');
-
-        match ($sort) {
-            'oldest' => $query->oldest(),
-            'alpha'  => $query->join('patients', 'document_requests.patient_id', '=', 'patients.id')
-                            ->orderBy('patients.last_name')
-                            ->select('document_requests.*'),
-            default  => $query->latest(),
-        };
     }
 
     public function show(DocumentRequest $documentRequest)
