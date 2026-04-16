@@ -1,3 +1,108 @@
+<style>
+    .patient-search-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 420px;
+        margin-bottom: 18px;
+        background: #fff;
+        border: 1.5px solid #ede8e2;
+        border-radius: 10px;
+        padding: 0 12px;
+        min-height: 42px;
+        overflow: visible;
+    }
+
+    .patient-search-wrap:focus-within {
+        border-color: #8B0000;
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+    }
+
+    .patient-search-wrap .search-icon {
+        color: #b5a99a;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .patient-search-wrap input {
+        width: 100%;
+        border: none;
+        background: none;
+        outline: none;
+        color: #2d2420;
+        font-size: 14px;
+        padding: 0;
+    }
+
+    .patient-search-wrap input.has-voice-padding {
+        padding-right: 1.8rem;
+    }
+
+    .patient-search-wrap [data-voice-trigger],
+    .patient-search-wrap .voice-search-mic {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #8B0000;
+        cursor: pointer;
+        z-index: 4;
+    }
+
+    .patient-search-wrap [data-voice-status] {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 6px);
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        font-size: .74rem;
+        font-weight: 700;
+        line-height: 1;
+        padding: .18rem .48rem;
+        border-radius: 999px;
+        pointer-events: none;
+        z-index: 6;
+        background: rgba(255, 255, 255, .92);
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    }
+
+    .patient-search-wrap [data-voice-status].hidden {
+        display: none;
+    }
+
+    .patient-search-wrap [data-voice-status].is-listening {
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+        background: #eff6ff;
+    }
+
+    .patient-search-wrap [data-voice-status].is-error {
+        color: #b91c1c;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+
+    .patient-search-wrap [data-voice-status].is-success {
+        color: #166534;
+        border-color: #bbf7d0;
+        background: #f0fdf4;
+    }
+</style>
+
 <div class="max-w-7xl mt-4 mx-auto fade-in">
 
     <!-- PAGE HEADER -->
@@ -35,24 +140,14 @@
     </div>
 
     <!-- SEARCH BAR -->
-    <div style="margin-bottom:18px; position:relative; max-width:420px;">
-        <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#B5A99A; font-size:13px;"></i>
+    <div class="search-wrap patient-search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input
             type="text"
             id="patientSearch"
             placeholder="Search patient name..."
             oninput="filterPatients()"
-            style="
-                width:100%;
-                padding:10px 14px 10px 38px;
-                border:1.5px solid #EDE8E2;
-                border-radius:10px;
-                font-size:14px;
-                font-family:'Inter', sans-serif;
-                background:#fff;
-                outline:none;
-                color:#2D2420;
-            "
+            style="font-family:'Inter', sans-serif;"
         >
     </div>
 
