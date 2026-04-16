@@ -576,6 +576,23 @@
             width: 100%;
         }
 
+        .ap-voice-row {
+            display: flex;
+            align-items: stretch;
+            gap: .5rem;
+            width: 100%;
+        }
+
+        .ap-voice-row .ap-input-wrap,
+        .ap-voice-row .ap-textarea-wrap {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .ap-voice-row.is-textarea {
+            align-items: flex-start;
+        }
+
         .ap-input-wrap.voice-input-wrap {
             position: relative;
             width: 100%;
@@ -648,20 +665,27 @@
             z-index: 5;
         }
 
-        .ap-textarea {
-            min-height: 140px;
-            height: 140px;
-            max-height: 140px;
-            font-size: 12px;
-            padding: 14px 15px;
+        .ap-voice-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            align-self: center;
+            flex: 0 0 auto;
+            transition: color .15s ease;
         }
 
-        .ap-textarea-wrap .ap-placeholder {
-            top: 14px;
-            left: 15px;
-            right: 58px;
-            font-size: 11px;
-            line-height: 1.35;
+        .ap-voice-clear-btn.hidden {
+            display: none;
+        }
+
+        .ap-voice-clear-btn:hover {
+            color: #991b1b;
         }
 
         .ap-textarea-wrap {
@@ -1675,30 +1699,120 @@
             color: #B0ABA6;
         }
 
-        .search-clear-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: #E0DDD8;
-            color: #7A7370;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
+        .ap-search-row {
+            display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            padding: 0;
+            gap: .5rem;
+            width: 220px;
+            max-width: 100%;
+        }
+
+        .ap-search-row .search-wrap {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto !important;
+        }
+
+        .search-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: color .15s ease;
         }
 
         .search-clear-btn:hover {
-            background: #8b000076;
-            color: #fff;
+            color: #991b1b;
         }
 
-        .search-clear-btn.visible {
-            display: flex;
+        .search-clear-btn.hidden {
+            display: none;
+        }
+
+        .search-wrap.voice-search-wrap {
+            position: relative;
+            padding-right: 42px;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-input {
+            padding-right: 0 !important;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B0000;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic i {
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .search-wrap.voice-search-wrap .voice-search-mic:hover,
+        .search-wrap.voice-search-wrap .voice-search-mic.text-\[\#8B0000\] {
+            color: #660000;
+        }
+
+        .search-wrap.voice-search-wrap [data-voice-status] {
+            position: absolute;
+            right: 0;
+            top: -1.35rem;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            font-size: .74rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: .18rem .48rem;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 6;
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .search-wrap.voice-search-wrap [data-voice-status].hidden {
+            display: none;
+        }
+
+        .search-wrap.voice-search-wrap [data-voice-status].is-listening {
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .search-wrap.voice-search-wrap [data-voice-status].is-error {
+            color: #b91c1c;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .search-wrap.voice-search-wrap [data-voice-status].is-success {
+            color: #166534;
+            border-color: #bbf7d0;
+            background: #f0fdf4;
         }
 
         .filter-select {
@@ -2383,14 +2497,14 @@
                             <form method="GET" action="{{ route('admin.academic_periods') }}" id="filterForm"
                                 class="ap-toolbar-right">
 
-                                <div class="search-wrap" style="width:220px;">
-                                    <i class="fa fa-search"></i>
-                                    <input id="searchInput" name="search" type="text" placeholder="Search periods…"
-                                        value="{{ request('search') }}" autocomplete="off">
+                                <div class="ap-search-row">
+                                    <div class="search-wrap">
+                                        <i class="fa fa-search"></i>
+                                        <input id="searchInput" name="search" type="text" placeholder="Search periods…"
+                                            value="{{ request('search') }}" autocomplete="off">
+                                    </div>
                                     <button type="button" id="clearSearch"
-                                        class="search-clear-btn {{ request('search') ? 'visible' : '' }}" title="Clear">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
+                                        class="search-clear-btn {{ request('search') ? '' : 'hidden' }}" title="Clear">Clear</button>
                                 </div>
 
                                 <select name="semester" id="semesterFilter" class="filter-select">
@@ -2820,12 +2934,15 @@
                             <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
                         </div>
 
-                        <div class="ap-input-wrap" id="addAcademicYearWrap">
-                            <span class="ap-input-icon">
-                                <i class="fa-solid fa-calendar"></i>
-                            </span>
-                            <input name="academic_year" type="text" placeholder="e.g. 2026-2027"
-                                class="ap-input field-input" required>
+                        <div class="ap-voice-row">
+                            <div class="ap-input-wrap" id="addAcademicYearWrap">
+                                <span class="ap-input-icon">
+                                    <i class="fa-solid fa-calendar"></i>
+                                </span>
+                                <input id="addYear" name="academic_year" type="text" placeholder="e.g. 2026-2027"
+                                    class="ap-input field-input" required>
+                            </div>
+                            <button type="button" id="addYearClearBtn" class="ap-voice-clear-btn hidden">Clear</button>
                         </div>
 
                         <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
@@ -2905,10 +3022,12 @@
                             <span class="ap-label-hint">Optional</span>
                         </div>
 
-                        <div class="ap-textarea-wrap" id="addDescWrap">
-                            <span class="ap-placeholder">Add any notes about this academic period...</span>
-                            <textarea name="description" rows="6"
-                                class="ap-textarea field-input" id="addDesc" data-word-limit="150" maxlength="150"></textarea>
+                        <div class="ap-voice-row is-textarea">
+                            <div class="ap-textarea-wrap">
+                                <textarea name="description" rows="6" placeholder="Add any notes about this academic period..."
+                                    class="ap-textarea field-input" id="addDesc" data-word-limit="150" maxlength="150"></textarea>
+                            </div>
+                            <button type="button" id="addDescClearBtn" class="ap-voice-clear-btn hidden">Clear</button>
                         </div>
 
                         <div class="ap-desc-meta">
@@ -2983,12 +3102,15 @@
                             <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
                         </div>
 
-                        <div class="ap-input-wrap" id="editAcademicYearWrap">
-                            <span class="ap-input-icon">
-                                <i class="fa-solid fa-calendar"></i>
-                            </span>
-                            <input type="text" name="academic_year" id="editYear" class="ap-input field-input"
-                                placeholder="e.g. 2026-2027" required>
+                        <div class="ap-voice-row">
+                            <div class="ap-input-wrap" id="editAcademicYearWrap">
+                                <span class="ap-input-icon">
+                                    <i class="fa-solid fa-calendar"></i>
+                                </span>
+                                <input type="text" name="academic_year" id="editYear" class="ap-input field-input"
+                                    placeholder="e.g. 2026-2027" required>
+                            </div>
+                            <button type="button" id="editYearClearBtn" class="ap-voice-clear-btn hidden">Clear</button>
                         </div>
 
                         <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
@@ -3069,10 +3191,12 @@
                             <span class="ap-label-hint">Optional</span>
                         </div>
 
-                        <div class="ap-textarea-wrap" id="editDescWrap">
-                            <span class="ap-placeholder">Add any notes about this academic period...</span>
-                            <textarea rows="6" name="description" id="editDesc"
-                                class="ap-textarea field-input" data-word-limit="150" maxlength="150"></textarea>
+                        <div class="ap-voice-row is-textarea">
+                            <div class="ap-textarea-wrap">
+                                <textarea rows="6" name="description" id="editDesc" placeholder="Add any notes about this academic period..."
+                                    class="ap-textarea field-input" data-word-limit="150" maxlength="150"></textarea>
+                            </div>
+                            <button type="button" id="editDescClearBtn" class="ap-voice-clear-btn hidden">Clear</button>
                         </div>
 
                         <div class="ap-desc-meta">
@@ -3159,8 +3283,52 @@
             const semRadios = addForm.querySelectorAll('[name="semester"]');
             const addDesc = addForm.querySelector('#addDesc');
             const addDescCounter = addForm.querySelector('#addDescCounter');
+            const addYear = addForm.querySelector('#addYear');
+            const editYearInput = document.getElementById('editYear');
             const editDesc = document.getElementById('editDesc');
             const editDescCounter = document.getElementById('editDescCounter');
+
+            function bindVoiceClear(field, clearBtn) {
+                if (!field || !clearBtn) return () => {};
+
+                const toggleClear = () => {
+                    clearBtn.classList.toggle('hidden', (field.value || '').trim().length === 0);
+                };
+
+                field.addEventListener('input', toggleClear);
+
+                clearBtn.addEventListener('click', () => {
+                    field.value = '';
+                    field.dispatchEvent(new Event('input', {
+                        bubbles: true
+                    }));
+                    field.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }));
+
+                    const status = field.closest('.voice-input-wrap')?.querySelector('[data-voice-status]') ||
+                        field.closest('.ap-input-wrap, .ap-textarea-wrap')?.querySelector('[data-voice-status]');
+                    if (status) status.classList.add('hidden');
+
+                    toggleClear();
+                    field.focus();
+                });
+
+                toggleClear();
+                return toggleClear;
+            }
+
+            const syncAddYearClear = bindVoiceClear(addYear, document.getElementById('addYearClearBtn'));
+            const syncAddDescClear = bindVoiceClear(addDesc, document.getElementById('addDescClearBtn'));
+            const syncEditYearClear = bindVoiceClear(editYearInput, document.getElementById('editYearClearBtn'));
+            const syncEditDescClear = bindVoiceClear(editDesc, document.getElementById('editDescClearBtn'));
+
+            window.syncAcademicVoiceClearButtons = function() {
+                syncAddYearClear();
+                syncAddDescClear();
+                syncEditYearClear();
+                syncEditDescClear();
+            };
 
             function getErr(field) {
                 const panel = field.closest('.ap-panel, .ap-panel-soft, .ap-desc-panel, .ap-input-wrap, div');
@@ -3325,6 +3493,8 @@
 
                 if (!y || !s || !d || !descOk) e.preventDefault();
             });
+
+            window.syncAcademicVoiceClearButtons();
         });
 
         function countChars(value) {
@@ -3547,6 +3717,9 @@
 
         window.openModal = function(id) {
             setModalState(id, true);
+            if (typeof window.syncAcademicVoiceClearButtons === 'function') {
+                window.syncAcademicVoiceClearButtons();
+            }
         };
 
         window.closeModal = function(id) {
@@ -3578,7 +3751,9 @@
             if (typeof updateWordCounter === 'function') {
                 updateWordCounter(editDesc, document.getElementById('editDescCounter'));
             }
-
+            if (typeof window.syncAcademicVoiceClearButtons === 'function') {
+                window.syncAcademicVoiceClearButtons();
+            }
             document.getElementById('editIsActive').checked = !!period.is_active;
 
             const semMap = {
@@ -3649,7 +3824,7 @@
             const clearBtn = document.getElementById('clearSearch');
 
             if (searchInput) searchInput.value = '';
-            if (clearBtn) clearBtn.classList.remove('visible');
+            if (clearBtn) clearBtn.classList.add('hidden');
 
             const items = document.querySelectorAll('.academic-item');
             items.forEach(item => item.style.display = '');
@@ -3691,7 +3866,7 @@
             if (searchInput) searchInput.value = '';
             if (semesterFilter) semesterFilter.value = '';
             if (statusFilter) statusFilter.value = '';
-            if (clearBtn) clearBtn.classList.remove('visible');
+            if (clearBtn) clearBtn.classList.add('hidden');
 
             items.forEach(item => item.style.display = '');
 
@@ -3975,7 +4150,7 @@
                 if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
 
                 if (clearBtn) {
-                    clearBtn.classList.toggle('visible', searchValue !== '');
+                    clearBtn.classList.toggle('hidden', searchValue === '');
                 }
             }
 

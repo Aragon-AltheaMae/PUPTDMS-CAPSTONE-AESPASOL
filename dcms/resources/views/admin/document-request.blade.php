@@ -233,37 +233,49 @@
         color: #B0ABA6;
     }
 
-    .search-clear-btn {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: none;
-        background: #E0DDD8;
-        color: #7A7370;
-        font-size: 10px;
-        cursor: pointer;
-        display: none;
+    .document-request-search-row {
+        display: flex;
         align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: all .2s;
-        padding: 0;
+        gap: .5rem;
+        width: 100%;
+        max-width: 320px;
     }
 
-    .search-clear-btn:hover { background: rgba(139,0,0,.47); color: #fff; }
-    .search-clear-btn.visible { display: flex; }
+    .document-request-search-row .search-wrap {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
+    }
+
+    .search-clear-btn {
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        font-size: .78rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0 .1rem;
+        margin: 0;
+        cursor: pointer;
+        flex: 0 0 auto;
+        transition: color .15s ease;
+    }
+
+    .search-clear-btn.hidden { display: none; }
+    .search-clear-btn:hover { color: #991b1b; }
 
     .search-wrap.voice-search-wrap {
         position: relative;
+        padding-right: 42px;
     }
 
     .search-wrap.voice-search-wrap input.has-voice-padding {
-        padding-right: 2.9rem;
+        padding-right: 0 !important;
     }
 
     .search-wrap.voice-search-wrap .voice-search-mic {
         position: absolute;
-        right: 34px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
         width: 18px;
@@ -278,7 +290,7 @@
         justify-content: center;
         color: #8B0000;
         cursor: pointer;
-        z-index: 4;
+        z-index: 5;
     }
 
     .search-wrap.voice-search-wrap .voice-search-mic i {
@@ -1238,18 +1250,18 @@
                 </div>
 
                 <div class="toolbar">
-                    <div class="search-wrap">
-                        <i class="fa fa-search search-icon"></i>
-                        <input
-                            type="text"
-                            id="documentRequestSearch"
-                            placeholder="Search name/ID..."
-                            value=""
-                            autocomplete="off"
-                        >
-                        <button type="button" id="documentRequestClearBtn" class="search-clear-btn" title="Clear">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                    <div class="document-request-search-row">
+                        <div class="search-wrap">
+                            <i class="fa fa-search search-icon"></i>
+                            <input
+                                type="text"
+                                id="documentRequestSearch"
+                                placeholder="Search name/ID..."
+                                value=""
+                                autocomplete="off"
+                            >
+                        </div>
+                        <button type="button" id="documentRequestClearBtn" class="search-clear-btn hidden" title="Clear">Clear</button>
                     </div>
 
                     <button
@@ -2001,7 +2013,7 @@
         const searchInput = document.getElementById('documentRequestSearch');
         const clearBtn    = document.getElementById('documentRequestClearBtn');
         if (!searchInput || !clearBtn) return;
-        clearBtn.classList.toggle('visible', searchInput.value.trim().length > 0);
+        clearBtn.classList.toggle('hidden', searchInput.value.trim().length === 0);
     }
 
     function filterDocumentRequestRows() {
@@ -2061,6 +2073,8 @@
             clearBtn.dataset.bound = '1';
             clearBtn.addEventListener('click', () => {
                 searchInput.value = '';
+                const status = searchInput.closest('.search-wrap')?.querySelector('[data-voice-status]');
+                if (status) status.classList.add('hidden');
                 updateDocumentRequestSearchClear();
                 filterDocumentRequestRows();
                 searchInput.focus();
