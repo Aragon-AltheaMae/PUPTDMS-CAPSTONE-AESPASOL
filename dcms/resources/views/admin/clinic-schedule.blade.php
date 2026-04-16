@@ -1573,10 +1573,10 @@
 
             .modal-box.modal-form,
             .modal-box.modal-form.modal-compact {
-                width: 100vw !important;
-                max-width: 100vw !important;
-                height: 86dvh;
-                max-height: 86dvh;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                max-height: 90vh;
                 border-radius: 18px 18px 0 0;
                 margin: 0;
             }
@@ -1589,7 +1589,7 @@
 
             .modal-body,
             .modal-body.modal-form-body {
-                padding: .9rem;
+                padding: 0.8rem !important;
             }
 
             .modal-title-sub {
@@ -1619,6 +1619,18 @@
             .day-toggle-group {
                 grid-template-columns: repeat(4, minmax(0, 1fr));
                 gap: .4rem;
+            }
+
+            .rule-modal-layout {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem;
+            }
+
+            .rule-modal-main,
+            .rule-modal-side {
+                width: 100% !important;
+                max-width: 100% !important;
             }
 
             .day-toggle {
