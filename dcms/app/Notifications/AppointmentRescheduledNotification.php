@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class AppointmentRescheduledNotification extends Notification
@@ -18,7 +19,7 @@ class AppointmentRescheduledNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     public function toArray(object $notifiable): array
@@ -37,6 +38,26 @@ class AppointmentRescheduledNotification extends Notification
             'patient_id' => $this->appointment->patient_id,
             'event' => 'appointment.rescheduled',
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'title' => 'Appointment Rescheduled',
+            'message' => sprintf(
+                'Your appointment was rescheduled by %s to %s at %s.',
+                $this->rescheduledBy,
+                $this->formatDate($this->appointment->appointment_date),
+                $this->formatTime($this->appointment->appointment_time)
+            ),
+            'url' => route('patient.appointment.index'),
+            'icon' => 'fa-calendar-days',
+            'appointment_id' => $this->appointment->id,
+            'patient_id' => $this->appointment->patient_id,
+            'event' => 'appointment.rescheduled',
+            'created_at_label' => 'Just now',
+            'state' => 'unread',
+        ]);
     }
 
     private function formatDate(mixed $date): string
