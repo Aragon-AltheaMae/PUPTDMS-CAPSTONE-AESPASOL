@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class AppointmentCompletedNotification extends Notification
@@ -17,7 +18,7 @@ class AppointmentCompletedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     public function toArray(object $notifiable): array
@@ -35,6 +36,25 @@ class AppointmentCompletedNotification extends Notification
             'patient_id' => $this->appointment->patient_id,
             'event' => 'appointment.completed',
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'title' => 'Appointment Completed',
+            'message' => sprintf(
+                'Your appointment on %s at %s has been marked as completed.',
+                $this->formatDate($this->appointment->appointment_date),
+                $this->formatTime($this->appointment->appointment_time)
+            ),
+            'url' => route('patient.record'),
+            'icon' => 'fa-circle-check',
+            'appointment_id' => $this->appointment->id,
+            'patient_id' => $this->appointment->patient_id,
+            'event' => 'appointment.completed',
+            'created_at_label' => 'Just now',
+            'state' => 'unread',
+        ]);
     }
 
     private function formatDate(mixed $date): string
