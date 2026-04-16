@@ -459,6 +459,18 @@
         background: #fff;
         border: 1px solid #f0eaea;
         border-radius: 14px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state > i {
+        display: block;
+        margin: 0 auto 1rem;
+        text-align: center;
+        line-height: 1;
     }
 
     .tab-bar {
@@ -631,13 +643,31 @@
             padding: calc(var(--header-h, 70px) + 12px) 1rem 2rem;
         }
 
-        .search-wrap { max-width: 100%; width: 100%; height: 42px; }
+        .search-wrap {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0;
+            height: 50px;
+            padding: 0 16px;
+            border-radius: 14px;
+            gap: 12px;
+        }
+
+        .search-wrap .search-icon {
+            font-size: 15px;
+        }
+
+        .search-wrap input {
+            font-size: 14px;
+        }
+
         .toolbar { gap: .5rem; }
         .page-banner { border-radius: 14px; padding: 1.1rem 1.1rem 1.4rem; }
         .page-title { font-size: 1.45rem; }
         .page-banner-inner { flex-direction: column; gap: .6rem; }
         .templates-grid { grid-template-columns: 1fr; }
         .tab-btn { font-size: .72rem; padding: .4rem .55rem; }
+
         .template-preview-modal {
             width: 98vw;
             height: 94vh;
@@ -648,6 +678,59 @@
     @media (max-width: 480px) {
         .stats-grid { grid-template-columns: 1fr 1fr; }
         .tab-btn .tab-label { display: none; }
+    }
+
+    @media (max-width: 640px) {
+        .toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: .6rem;
+        }
+
+        .toolbar > .search-wrap {
+            flex: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+
+            height: 52px;             
+            padding: 0 18px;
+            border-radius: 16px;
+
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .toolbar > .search-wrap input {
+            font-size: 15px;
+        }
+
+        .toolbar > .search-wrap .search-icon {
+            font-size: 16px;
+        }
+
+        .toolbar > .search-wrap .voice-search-mic i {
+            font-size: 15px;
+        }
+
+        .tab-bar {
+            width: 100% !important;
+            display: flex;
+            gap: .25rem;
+            padding: .3rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            justify-content: center;
+            font-size: .7rem;
+            padding: .45rem .3rem;
+        }
+
+        .toolbar .tab-bar + .tab-bar {
+            margin-top: -.2rem;
+        }
     }
 </style>
 @endsection

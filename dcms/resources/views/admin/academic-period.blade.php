@@ -648,9 +648,46 @@
             z-index: 5;
         }
 
+        .ap-textarea {
+            min-height: 140px;
+            height: 140px;
+            max-height: 140px;
+            font-size: 12px;
+            padding: 14px 15px;
+        }
+
+        .ap-textarea-wrap .ap-placeholder {
+            top: 14px;
+            left: 15px;
+            right: 58px;
+            font-size: 11px;
+            line-height: 1.35;
+        }
+
         .ap-textarea-wrap {
             position: relative;
             width: 100%;
+        }
+
+        .ap-textarea-wrap .ap-placeholder {
+            position: absolute;
+            top: 16px;
+            left: 18px;
+            right: 60px;
+            font-size: 12px;
+            line-height: 1.35;
+            color: #9ca3af;
+            pointer-events: none;
+            white-space: normal;
+            word-break: keep-all;
+            overflow: visible;
+            z-index: 2;
+        }
+
+        .ap-textarea-wrap.has-value .ap-placeholder,
+        .ap-textarea-wrap.is-focused .ap-placeholder {
+            opacity: 0;
+            visibility: hidden;
         }
 
         .ap-textarea-wrap .ap-textarea,
@@ -771,7 +808,8 @@
             resize: none;
             border-radius: 16px;
             padding: 16px 18px;
-            line-height: 1.65;
+            font-size: 12px; 
+            line-height: 1.4;
             box-sizing: border-box;
             vertical-align: top;
         }
@@ -1146,197 +1184,251 @@
         }
 
         @media (max-width: 767px) {
-            .ap-add-modal {
-                align-items: flex-end;
-                justify-content: center;
-                padding: 0;
-                padding-top: calc(var(--header-h, 68px) + 8px);
-                background: rgba(15, 23, 42, 0.42);
-                backdrop-filter: blur(5px);
-            }
-
-            .ap-add-modal .modal-box {
-                width: 100%;
-                max-width: 100%;
-                height: calc(100dvh - var(--header-h, 68px) - 8px);
-                max-height: calc(100dvh - var(--header-h, 68px) - 8px);
-                border-radius: 24px 24px 0 0;
-                border-left: none;
-                border-right: none;
-                border-bottom: none;
-                box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.18);
-                transform: translateY(100%);
-                transition: transform .28s cubic-bezier(.22, 1, .36, 1);
-                position: relative;
-                overflow: hidden;
-            }
-
-            .ap-add-modal.open .modal-box {
-                transform: translateY(0);
-            }
-
-            .ap-add-modal .modal-box::before {
-                content: '';
-                position: absolute;
-                top: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 44px;
-                height: 5px;
-                border-radius: 999px;
-                background: #cbd5e1;
-                z-index: 40;
-            }
-
-            .ap-add-form {
-                height: 100%;
-                min-height: 0;
-            }
-
-            .ap-add-header {
-                padding: 1.55rem 1rem 1rem;
-                padding-top: 2rem;
-                border-radius: 24px 24px 0 0;
-                gap: .85rem;
-            }
-
-            .ap-add-header-left {
-                align-items: center;
-                gap: .85rem;
-            }
-
-            .ap-add-header-icon {
-                width: 46px;
-                height: 46px;
-                border-radius: 14px;
-            }
-
-            .ap-add-header-title {
-                font-size: 1.12rem;
-                line-height: 1.12;
-            }
-
-            .ap-add-header-subtitle {
-                font-size: .76rem;
-                margin-top: .2rem;
-            }
-
-            .ap-add-close {
-                width: 40px;
-                height: 40px;
-                border-radius: 12px;
-            }
-
-            .ap-add-body {
-                grid-template-columns: 1fr;
-                padding: 1rem;
-                gap: .85rem;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .ap-col-span-2 {
-                grid-column: span 1;
-            }
-
-            .ap-panel,
-            .ap-panel-soft {
-                padding: .9rem;
-                border-radius: 16px;
-            }
-
-            .ap-label-text {
-                font-size: 10px;
-            }
-
-            .ap-label-hint {
-                font-size: 10px;
-            }
-
-            .ap-input {
-                height: 50px;
-                border-radius: 13px;
-            }
-
-            .ap-date-grid-redesign,
-            .ap-semester-grid-redesign {
-                grid-template-columns: 1fr;
-                gap: .75rem;
-            }
-
-            .ap-semester-card {
-                min-height: 72px;
-                border-radius: 15px;
-                padding: .8rem;
-            }
-
-            .ap-semester-card span {
-                font-size: 12px;
-            }
-
-            .ap-textarea {
-                min-height: 160px;
-                height: 160px;
-                max-height: 160px;
-                font-size: 14px;
-                padding: 14px 15px;
-            }
-
-            .ap-desc-meta {
-                gap: .55rem;
-            }
-
-            .ap-desc-help,
-            .ap-word-counter {
-                font-size: 11px;
-            }
-
-            .ap-active-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: .85rem;
-                padding: .95rem;
-            }
-
-            .ap-active-card-left {
-                gap: .75rem;
-            }
-
-            .ap-active-badge {
-                width: 38px;
-                height: 38px;
-            }
-
-            .ap-active-title {
-                font-size: 13px;
-            }
-
-            .ap-active-desc {
-                font-size: 11px;
-            }
-
-            .ap-switch {
-                align-self: flex-end;
-            }
-
-            .ap-add-footer {
-                padding: .85rem 1rem calc(.95rem + env(safe-area-inset-bottom));
-                justify-content: space-between;
-                gap: .7rem;
-                background: rgba(255, 255, 255, 0.96);
-                backdrop-filter: blur(12px);
-                border-top: 1px solid #e9eef5;
-            }
-
-            .ap-add-footer .ap-add-btn {
-                flex: 1;
-                min-width: 0;
-                height: 44px;
-                border-radius: 13px;
-                font-size: 12px;
-                padding: 0 .85rem;
-            }
+        .ap-add-modal {
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.42);
+            backdrop-filter: blur(5px);
         }
+
+        .ap-add-modal .modal-box {
+            width: 100%;
+            max-width: 100%;
+            height: min(92dvh, 92vh);
+            max-height: min(92dvh, 92vh);
+            margin: 0;
+            border-radius: 22px 22px 0 0;
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
+            box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.18);
+            transform: translateY(100%);
+            transition: transform .28s cubic-bezier(.22, 1, .36, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ap-add-modal.open .modal-box {
+            transform: translateY(0);
+        }
+
+        .ap-add-modal .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 5px;
+            border-radius: 999px;
+            background: #cbd5e1;
+            z-index: 40;
+        }
+
+        .ap-add-form {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .ap-add-header {
+            flex-shrink: 0;
+            display: grid;
+            grid-template-columns: 44px minmax(0, 1fr) 38px;
+            align-items: start;
+            column-gap: .75rem;
+            padding: 1.35rem 1rem .95rem;
+            padding-top: 2rem;
+            border-radius: 22px 22px 0 0;
+        }
+
+        .ap-add-header-left {
+            display: contents;
+        }
+
+        .ap-add-header-icon {
+            grid-column: 1;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+
+        .ap-add-header-left > div:last-child {
+            grid-column: 2;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .ap-add-header-title {
+            font-size: 1rem;
+            line-height: 1.08;
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .ap-add-header-subtitle {
+            display: block;
+            font-size: .72rem;
+            margin-top: .22rem;
+            line-height: 1.3;
+            color: #64748b;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            max-width: 100%;
+            padding-right: .15rem;
+        }
+
+        .ap-add-close {
+            grid-column: 3;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            align-self: start;
+            justify-self: end;
+        }
+
+        #editModal .ap-add-header-subtitle {
+            max-width: 100%;
+            font-size: .7rem;
+            line-height: 1.28;
+        }
+
+        .ap-add-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            grid-template-columns: 1fr;
+            padding: .95rem 1rem 1rem;
+            gap: .8rem;
+            align-content: start;
+        }
+
+        .ap-col-span-2 {
+            grid-column: span 1;
+        }
+
+        .ap-panel,
+        .ap-panel-soft {
+            padding: .9rem;
+            border-radius: 16px;
+            min-width: 0;
+        }
+
+        .ap-label {
+            margin-bottom: .45rem;
+        }
+
+        .ap-label-text,
+        .ap-label-hint {
+            font-size: 10px;
+        }
+
+        .ap-input-wrap,
+        .ap-textarea-wrap {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .ap-input {
+            height: 48px;
+            border-radius: 13px;
+            font-size: 14px;
+        }
+
+        .ap-date-grid-redesign,
+        .ap-semester-grid-redesign {
+            grid-template-columns: 1fr;
+            gap: .7rem;
+        }
+
+        .ap-semester-card {
+            min-height: 70px;
+            border-radius: 15px;
+            padding: .8rem;
+        }
+
+        .ap-semester-card span {
+            font-size: 12px;
+        }
+
+        .ap-textarea {
+            min-height: 140px;
+            height: 140px;
+            max-height: 140px;
+            font-size: 12px;
+            padding: 14px 15px;
+        }
+
+        .ap-desc-meta {
+            gap: .5rem;
+            align-items: flex-start;
+        }
+
+        .ap-desc-help,
+        .ap-word-counter {
+            font-size: 11px;
+        }
+
+        .ap-active-card {
+            flex-direction: column;
+            align-items: stretch;
+            gap: .8rem;
+            padding: .95rem;
+        }
+
+        .ap-active-card-left {
+            gap: .7rem;
+        }
+
+        .ap-active-badge {
+            width: 38px;
+            height: 38px;
+        }
+
+        .ap-active-title {
+            font-size: 13px;
+        }
+
+        .ap-active-desc {
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .ap-switch {
+            align-self: flex-end;
+        }
+
+        .ap-add-footer {
+            flex-shrink: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .7rem;
+            padding: .85rem 1rem calc(.95rem + env(safe-area-inset-bottom));
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #e9eef5;
+        }
+
+        .ap-add-footer .ap-add-btn {
+            width: 100%;
+            min-width: 0;
+            height: 44px;
+            border-radius: 13px;
+            font-size: 12px;
+            padding: 0 .85rem;
+        }
+    }
 
         [data-theme="dark"] .ap-add-header,
         [data-theme="dark"] .ap-add-footer,
@@ -2035,7 +2127,7 @@
                 font-size: 10px !important;
             }
 
-            .modal-overlay {
+            .modal-overlay:not(.ap-add-modal) {
                 align-items: flex-end;
                 padding: 0;
                 padding-top: calc(var(--header-h, 68px) + 10px);
@@ -2084,6 +2176,49 @@
             .ap-delete-body {
                 padding: 1.1rem 1rem;
             }
+        }
+
+        @media (max-width: 640px) {
+        #editModal .ap-add-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: .9rem 1rem calc(1rem + env(safe-area-inset-bottom));
+        }
+
+        #editModal .ap-add-footer .ap-add-btn {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        #editModal .ap-add-footer .ap-add-btn[type="submit"] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            text-align: center;
+            line-height: 1.15;
+            padding: 0 1rem;
+        }
+
+        #editModal .ap-add-footer .ap-add-btn[type="submit"] i {
+            flex-shrink: 0;
+            font-size: 12px;
+            line-height: 1;
+        }
+    }
+
+        input[type="date"] {
+            color: #111827;
+        }
+
+        input[type="date"]::-webkit-datetime-edit {
+            color: #111827;
+        }
+
+        input[type="date"]:invalid::-webkit-datetime-edit {
+            color: #9ca3af;
         }
     </style>
 @endsection
@@ -2670,7 +2805,7 @@
 
                         <div>
                             <h3 class="ap-add-header-title">Add Academic Period</h3>
-                            <p class="ap-add-header-subtitle">Define a new semester or academic term schedule</p>
+                            <p class="ap-add-header-subtitle">Add new semester or academic term schedule</p>
                         </div>
                     </div>
 
@@ -2741,7 +2876,8 @@
                                     <span class="ap-input-icon">
                                         <i class="fa-solid fa-calendar-day"></i>
                                     </span>
-                                    <input name="start_date" type="date" class="ap-input field-input" required>
+                                    <input name="start_date" type="date" class="ap-input field-input" 
+                                        required min="1900-01-01" max="9999-12-31" inputmode="numeric">
                                 </div>
                                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
                             </div>
@@ -2755,7 +2891,8 @@
                                     <span class="ap-input-icon">
                                         <i class="fa-solid fa-calendar-check"></i>
                                     </span>
-                                    <input name="end_date" type="date" class="ap-input field-input" required>
+                                    <input name="end_date" type="date" class="ap-input field-input" 
+                                        required min="1900-01-01" max="9999-12-31" inputmode="numeric">
                                 </div>
                                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
                             </div>
@@ -2768,8 +2905,9 @@
                             <span class="ap-label-hint">Optional</span>
                         </div>
 
-                        <div class="ap-textarea-wrap">
-                            <textarea name="description" rows="6" placeholder="Add any notes about this academic period..."
+                        <div class="ap-textarea-wrap" id="addDescWrap">
+                            <span class="ap-placeholder">Add any notes about this academic period...</span>
+                            <textarea name="description" rows="6"
                                 class="ap-textarea field-input" id="addDesc" data-word-limit="150" maxlength="150"></textarea>
                         </div>
 
@@ -2903,7 +3041,7 @@
                                         <i class="fa-solid fa-calendar-day"></i>
                                     </span>
                                     <input type="date" name="start_date" id="editStart" class="ap-input field-input"
-                                        required>
+                                         required min="1900-01-01" max="9999-12-31" inputmode="numeric">
                                 </div>
                                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
                             </div>
@@ -2918,7 +3056,7 @@
                                         <i class="fa-solid fa-calendar-check"></i>
                                     </span>
                                     <input type="date" name="end_date" id="editEnd" class="ap-input field-input"
-                                        required>
+                                        required min="1900-01-01" max="9999-12-31" inputmode="numeric">
                                 </div>
                                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
                             </div>
@@ -2931,8 +3069,9 @@
                             <span class="ap-label-hint">Optional</span>
                         </div>
 
-                        <div class="ap-textarea-wrap">
-                            <textarea rows="6" name="description" id="editDesc" placeholder="Add any notes about this academic period..."
+                        <div class="ap-textarea-wrap" id="editDescWrap">
+                            <span class="ap-placeholder">Add any notes about this academic period...</span>
+                            <textarea rows="6" name="description" id="editDesc"
                                 class="ap-textarea field-input" data-word-limit="150" maxlength="150"></textarea>
                         </div>
 
@@ -3091,13 +3230,35 @@
                 return true;
             }
 
+            function isStrictIsoDate(value) {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+                const [year, month, day] = value.split('-').map(Number);
+
+                if (year < 1900 || year > 9999) return false;
+                if (month < 1 || month > 12) return false;
+                if (day < 1 || day > 31) return false;
+
+                const date = new Date(`${value}T00:00:00`);
+                if (Number.isNaN(date.getTime())) return false;
+
+                return (
+                    date.getFullYear() === year &&
+                    date.getMonth() + 1 === month &&
+                    date.getDate() === day
+                );
+            }
+
             function validateDates() {
                 let ok = true;
-                const s = startInput.value;
-                const e = endInput.value;
+                const s = startInput.value.trim();
+                const e = endInput.value.trim();
 
                 if (!s) {
                     setError(startInput, 'Start date is required.');
+                    ok = false;
+                } else if (!isStrictIsoDate(s)) {
+                    setError(startInput, 'Start date must be a valid date in YYYY-MM-DD format.');
                     ok = false;
                 } else {
                     setValid(startInput);
@@ -3106,7 +3267,10 @@
                 if (!e) {
                     setError(endInput, 'End date is required.');
                     ok = false;
-                } else if (s && e <= s) {
+                } else if (!isStrictIsoDate(e)) {
+                    setError(endInput, 'End date must be a valid date in YYYY-MM-DD format.');
+                    ok = false;
+                } else if (s && isStrictIsoDate(s) && e <= s) {
                     setError(endInput, 'End date must be after start date.');
                     ok = false;
                 } else {
@@ -3209,6 +3373,22 @@
             return true;
         }
 
+        function bindTextareaPlaceholder(textareaId, wrapId) {
+            const textarea = document.getElementById(textareaId);
+            const wrap = document.getElementById(wrapId);
+            if (!textarea || !wrap) return;
+
+            const sync = () => {
+                wrap.classList.toggle('has-value', textarea.value.trim().length > 0);
+            };
+
+            textarea.addEventListener('focus', () => wrap.classList.add('is-focused'));
+            textarea.addEventListener('blur', () => wrap.classList.remove('is-focused'));
+            textarea.addEventListener('input', sync);
+
+            sync();
+        }
+
         const calendarPeriods = @json($calendarPeriodsPayload);
         const holidayEvents = @json($holidayEvents);
 
@@ -3301,9 +3481,55 @@
             return `${ph.getFullYear()}-${String(ph.getMonth() + 1).padStart(2, '0')}-${String(ph.getDate()).padStart(2, '0')}`;
         }
 
+        function resetModalForm(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+
+            const form = modal.querySelector('form');
+            if (!form) return;
+
+            form.reset();
+
+            form.querySelectorAll('.field-invalid, .field-valid').forEach(el => {
+                el.classList.remove('field-invalid', 'field-valid');
+            });
+
+            form.querySelectorAll('.field-error').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+
+            form.querySelectorAll('.sem-error').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+
+            const addDesc = document.getElementById('addDesc');
+            const addDescCounter = document.getElementById('addDescCounter');
+            const editDesc = document.getElementById('editDesc');
+            const editDescCounter = document.getElementById('editDescCounter');
+
+            if (id === 'addModal' && typeof updateWordCounter === 'function' && addDesc && addDescCounter) {
+                updateWordCounter(addDesc, addDescCounter);
+            }
+
+            if (id === 'editModal' && typeof updateWordCounter === 'function' && editDesc && editDescCounter) {
+                updateWordCounter(editDesc, editDescCounter);
+            }
+
+            if (typeof bindTextareaPlaceholder === 'function') {
+                bindTextareaPlaceholder('addDesc', 'addDescWrap');
+                bindTextareaPlaceholder('editDesc', 'editDescWrap');
+            }
+        }
+
         function setModalState(id, isOpen) {
             const modal = document.getElementById(id);
             if (!modal) return;
+
+            if (!isOpen && (id === 'addModal' || id === 'editModal')) {
+                resetModalForm(id);
+            }
 
             modal.classList.toggle('open', isOpen);
             modal.style.display = isOpen ? 'flex' : 'none';
@@ -3333,16 +3559,28 @@
             }
         };
 
-        window.openEditModal = function(period) {
+       window.openEditModal = function(period) {
             document.getElementById('editForm').action = `/admin/academic-periods/${period.id}`;
             document.getElementById('editYear').value = period.academic_year ?? '';
             document.getElementById('editStart').value = period.start_date ?? '';
             document.getElementById('editEnd').value = period.end_date ?? '';
-            document.getElementById('editDesc').value = period.description ?? '';
-            if (typeof updateWordCounter === 'function') {
-                updateWordCounter(document.getElementById('editDesc'), document.getElementById('editDescCounter'));
+
+            const editDesc = document.getElementById('editDesc');
+            const editDescWrap = document.getElementById('editDescWrap');
+
+            editDesc.value = period.description ?? '';
+
+            if (editDescWrap) {
+                editDescWrap.classList.toggle('has-value', editDesc.value.trim().length > 0);
+                editDescWrap.classList.remove('is-focused');
             }
+
+            if (typeof updateWordCounter === 'function') {
+                updateWordCounter(editDesc, document.getElementById('editDescCounter'));
+            }
+
             document.getElementById('editIsActive').checked = !!period.is_active;
+
             const semMap = {
                 '1st Semester': 'First Semester',
                 '2nd Semester': 'Second Semester',
@@ -3829,6 +4067,8 @@
                 }
             });
 
+            bindTextareaPlaceholder('addDesc', 'addDescWrap');
+            bindTextareaPlaceholder('editDesc', 'editDescWrap');
         });
     </script>
 @endsection
