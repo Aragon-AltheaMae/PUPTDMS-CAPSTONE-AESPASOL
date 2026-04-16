@@ -7,9 +7,482 @@
 @section('styles')
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+        :root {
+            --um-primary: #8B0000;
+            --um-primary-dark: #6b0000;
+            --um-primary-soft: #fff1f1;
+            --um-ink: #14213d;
+            --um-muted: #6b7280;
+            --um-border: #ebe7e2;
+            --um-surface: #ffffff;
+            --um-surface-soft: #fbfaf8;
+        }
+
+        .um-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            padding: 1.6rem 1.6rem;
+            margin-bottom: 1.5rem;
+            background:
+                radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 28%),
+                linear-gradient(135deg, #650000 0%, #8B0000 55%, #b91c1c 100%);
+            box-shadow: 0 18px 40px rgba(139, 0, 0, .18);
+        }
+
+        .um-hero-pattern {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            mask-image: linear-gradient(to bottom right, rgba(0, 0, 0, .9), transparent 75%);
+            opacity: .35;
+        }
+
+        .um-hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .um-hero-copy {
+            max-width: 760px;
+        }
+
+        .um-hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .45rem .75rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #fff;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .14);
+            backdrop-filter: blur(8px);
+            margin-bottom: .9rem;
+        }
+
+        .um-hero-title {
+            font-size: clamp(1.7rem, 2.4vw, 2.45rem);
+            line-height: 1.05;
+            font-weight: 900;
+            letter-spacing: -.03em;
+            color: #fff;
+            margin: 0;
+        }
+
+        .um-hero-subtitle {
+            margin-top: .65rem;
+            max-width: 720px;
+            color: rgba(255, 255, 255, .82);
+            font-size: .95rem;
+            line-height: 1.65;
+        }
+
+        .um-hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .65rem;
+            margin-top: 1rem;
+        }
+
+        .um-hero-meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .55rem .85rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+            font-size: .78rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, .12);
+            backdrop-filter: blur(8px);
+        }
+
+        .um-hero-btn {
+            min-height: 48px;
+            padding: 0 1.1rem;
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 14px;
+            background: #fff;
+            color: var(--um-primary);
+            font-weight: 800;
+            font-size: .92rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+        }
+
+        .um-hero-btn:hover {
+            transform: translateY(-1px);
+            background: #fff8f8;
+            box-shadow: 0 14px 26px rgba(0, 0, 0, .16);
+        }
+
+        .um-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .um-stat-card {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #ffffff 0%, #fcfbfa 100%);
+            border: 1px solid #ede8e2;
+            border-radius: 22px;
+            padding: 1.15rem 1.15rem 1.05rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .05);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+
+        .um-stat-card::after {
+            content: '';
+            position: absolute;
+            right: -22px;
+            top: -22px;
+            width: 110px;
+            height: 110px;
+            border-radius: 999px;
+            opacity: .08;
+        }
+
+        .um-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(15, 23, 42, .08);
+            border-color: #e5ddd5;
+        }
+
+        .um-stat-card--users::after {
+            background: #8B0000;
+        }
+
+        .um-stat-card--active::after {
+            background: #22c55e;
+        }
+
+        .um-stat-card--inactive::after {
+            background: #64748b;
+        }
+
+        .um-stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            margin-bottom: 1rem;
+        }
+
+        .um-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .12);
+        }
+
+        .um-stat-card--users .um-stat-icon {
+            background: linear-gradient(135deg, #8B0000, #5f0000);
+        }
+
+        .um-stat-card--active .um-stat-icon {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .um-stat-card--inactive .um-stat-icon {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+        }
+
+        .um-stat-trend {
+            font-size: .72rem;
+            font-weight: 700;
+            color: #94a3b8;
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 999px;
+            padding: .32rem .6rem;
+        }
+
+        .um-stat-label {
+            font-size: .76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #64748b;
+            margin-bottom: .35rem;
+        }
+
+        .um-stat-value {
+            font-size: clamp(2rem, 3vw, 2.5rem);
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -.04em;
+            color: #14213d;
+            margin: 0;
+        }
+
+        .um-stat-caption {
+            margin-top: .45rem;
+            font-size: .82rem;
+            color: #94a3b8;
+        }
+
+        .um-panel {
+            background: linear-gradient(180deg, #ffffff 0%, #fffdfb 100%);
+            border: 1px solid #ebe7e2;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
+        }
+
+        .um-panel-header {
+            padding: 1.1rem 1.2rem 1rem;
+            background: linear-gradient(180deg, #fff 0%, #fbfaf8 100%);
+            border-bottom: 1px solid #f1ece7;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .um-panel-title-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: .9rem;
+        }
+
+        .um-panel-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #8B0000, #6b0000);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 18px rgba(139, 0, 0, .18);
+            flex-shrink: 0;
+        }
+
+        .um-panel-title {
+            font-size: 1rem;
+            font-weight: 900;
+            color: #14213d;
+            margin: 0;
+            letter-spacing: -.02em;
+        }
+
+        .um-panel-subtitle {
+            margin-top: .2rem;
+            font-size: .83rem;
+            color: #8b95a7;
+        }
+
+        .um-panel-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 22px;
+            padding: 0 .55rem;
+            border-radius: 999px;
+            background: #8B0000;
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 800;
+        }
+
+        .search-wrap {
+            background: #fff;
+            border: 1.5px solid #e7e2dc;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+        }
+
+        .search-wrap:focus-within {
+            border-color: #c11b1b;
+            box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+        }
+
+        .um-role-tabs {
+            background: #f8f5f1;
+            border: 1px solid #ebe5de;
+            border-radius: 14px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            min-height: 36px;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #statusFilter {
+            border-radius: 14px !important;
+            border-color: #e7e2dc !important;
+            background: #fff !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+        }
+
+        .um-view-toggle {
+            height: 44px;
+            border-radius: 14px;
+            border-color: #e7e2dc;
+            background: #fff;
+        }
+
+        .um-view-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+        }
+
+        #umListView thead {
+            background: #faf8f6;
+        }
+
+        #umListView thead th {
+            font-size: .7rem;
+            letter-spacing: .08em;
+            color: #8B0000;
+            font-weight: 800;
+        }
+
+        .user-table-row {
+            transition: background .18s ease, transform .18s ease;
+        }
+
+        .user-table-row:hover {
+            background: #fff8f8;
+        }
+
+        .user-table-row td {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .um-grid-card {
+            border-radius: 18px;
+            border-color: #ece5dd;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, .04);
+        }
+
+        @media (max-width: 1024px) {
+            .um-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .um-hero {
+                border-radius: 20px;
+                padding: 1.15rem 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .um-hero-content {
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .um-hero-title {
+                font-size: 1.65rem;
+            }
+
+            .um-hero-subtitle {
+                font-size: .84rem;
+                line-height: 1.55;
+            }
+
+            .um-hero-meta {
+                gap: .5rem;
+            }
+
+            .um-hero-meta-pill {
+                font-size: .7rem;
+                padding: .48rem .7rem;
+            }
+
+            .um-hero-actions {
+                width: 100%;
+            }
+
+            .um-hero-btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 46px;
+                border-radius: 13px;
+            }
+
+            .um-stats-grid {
+                grid-template-columns: 1fr;
+                gap: .75rem;
+            }
+
+            .um-stat-card {
+                padding: 1rem;
+                border-radius: 18px;
+            }
+
+            .um-stat-top {
+                margin-bottom: .8rem;
+            }
+
+            .um-stat-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+            }
+
+            .um-stat-value {
+                font-size: 2.1rem;
+            }
+
+            .um-panel {
+                border-radius: 20px;
+            }
+
+            .um-panel-header {
+                padding: 1rem;
+                gap: .85rem;
+            }
+
+            .um-panel-title-wrap {
+                gap: .75rem;
+            }
+
+            .um-panel-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 12px;
+            }
+
+            .um-panel-title {
+                font-size: .95rem;
+            }
+
+            .um-panel-subtitle {
+                font-size: .76rem;
+            }
         }
 
         .scrollbar-thin::-webkit-scrollbar {
@@ -28,7 +501,7 @@
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
-        /* Page Banner */
+
         .page-banner {
             background: linear-gradient(135deg, #6b0000 0%, #8B0000 60%, #c0392b 100%);
             padding: 1.75rem 2rem 2rem;
@@ -211,7 +684,6 @@
             }
         }
 
-        /* ── DARK MODE ── */
         body,
         main,
         footer {
@@ -306,29 +778,80 @@
         }
 
         .search-clear-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: #E0DDD8;
-            color: #7A7370;
-            font-size: 10px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 12px;
+            border: 1.5px solid #E0DDD8;
+            background: #FAFAF9;
+            color: #8B0000;
+            font-size: 12px;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             transition: all .2s;
-            padding: 0;
+            padding: 0 12px;
+            box-shadow: 0 4px 12px rgba(139, 0, 0, .08);
         }
 
         .search-clear-btn:hover {
-            background: #8b000076;
-            color: #fff;
+            border-color: #8B0000;
+            background: #fff5f5;
+            color: #8B0000;
         }
 
         .search-clear-btn.visible {
+            display: inline-flex;
+        }
+
+        .search-clear-btn-outside {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: 1.5px solid #E0DDD8;
+            background: #FAFAF9;
+            color: #8B0000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+
+        .search-clear-btn-outside:hover {
+            background: rgba(139, 0, 0, 0.08);
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        .search-clear-btn-outside.visible {
+            display: inline-flex;
+        }
+
+        @media (max-width: 767px) {
+            .search-clear-btn-outside {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+            }
+        }
+
+        .um-filter-main {
             display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1 1 320px;
+        }
+
+        .um-filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .search-wrap.voice-search-wrap {
@@ -468,7 +991,99 @@
             }
         }
 
-        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .modal-overlay {
+                padding: 10px !important;
+                align-items: center !important;
+            }
+
+            .modal-box {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100vh - 32px) !important;
+                border-radius: 18px !important;
+                overflow: hidden !important;
+            }
+
+            .modal-box>div[class*="p-6"],
+            .modal-box>div[class*="p-8"] {
+                padding: 14px !important;
+            }
+
+            .modal-box .sticky.top-0,
+            .modal-box .border-b {
+                padding: 14px 14px 10px !important;
+            }
+
+            .modal-box .sticky.bottom-0,
+            .modal-box .border-t {
+                padding: 10px 14px 14px !important;
+            }
+
+            .modal-box h2,
+            .modal-box h3 {
+                font-size: 1.1rem !important;
+                line-height: 1.3 !important;
+            }
+
+            .modal-box p {
+                font-size: 0.8rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .modal-box .grid,
+            .modal-box .md\\:grid-cols-2,
+            .modal-box .lg\\:grid-cols-2 {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+
+            .modal-box input,
+            .modal-box select,
+            .modal-box textarea {
+                min-height: 44px !important;
+                font-size: 0.95rem !important;
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+
+            .modal-box textarea {
+                min-height: 90px !important;
+            }
+
+            .modal-box label {
+                font-size: 0.78rem !important;
+                margin-bottom: 6px !important;
+            }
+
+            .modal-box .flex.justify-end,
+            .modal-box .flex.items-center.justify-end {
+                gap: 8px !important;
+                flex-wrap: nowrap !important;
+            }
+
+            .modal-box .flex.justify-end>button,
+            .modal-box .flex.items-center.justify-end>button,
+            .modal-box .flex.justify-end>a,
+            .modal-box .flex.items-center.justify-end>a {
+                min-height: 42px !important;
+                padding: 0 14px !important;
+                font-size: 0.9rem !important;
+                border-radius: 12px !important;
+            }
+
+            .modal-box .w-10.h-10,
+            .modal-box .w-12.h-12 {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            .modal-box .text-2xl,
+            .modal-box .text-xl {
+                font-size: 1.1rem !important;
+            }
+        }
+
         @media (max-width: 767px) {
             #mainContent {
                 padding-bottom: 2rem !important;
@@ -574,6 +1189,42 @@
             border-color: #21262d;
         }
 
+        .modal-box.um-user-modal {
+            max-width: 980px !important;
+            width: min(980px, calc(100vw - 32px)) !important;
+        }
+
+        @media (min-width: 1024px) {
+            .um-user-modal .lg\:grid-cols-2 {
+                align-items: start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .um-user-modal {
+                max-width: 100% !important;
+            }
+
+            .um-user-modal .rounded-2xl {
+                border-radius: 16px !important;
+            }
+
+            .um-user-modal .px-6,
+            .um-user-modal .p-6 {
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+            }
+
+            .um-user-modal .py-5 {
+                padding-top: 14px !important;
+                padding-bottom: 12px !important;
+            }
+
+            .um-user-modal .p-4 {
+                padding: 14px !important;
+            }
+        }
+
         .stat-card {
             transition: transform .2s ease, box-shadow .2s ease;
         }
@@ -661,39 +1312,50 @@
         }
 
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .45);
-            z-index: 200;
+            position: fixed !important;
+            inset: 0 !important;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .2s;
+            background: rgba(0, 0, 0, 0.6) !important;
+            z-index: 99999 !important;
+            backdrop-filter: blur(4px);
+            pointer-events: auto !important;
+            padding: 16px;
         }
 
         .modal-overlay.open {
-            display: flex;
-            opacity: 1;
-            pointer-events: auto;
+            display: flex !important;
         }
 
         .modal-box {
-            background: #fff;
-            border-radius: 20px;
+            position: relative;
             width: 100%;
             max-width: 560px;
-            max-height: 90vh;
+            max-height: calc(100vh - 2rem);
             overflow-y: auto;
-            transform: scale(.95) translateY(10px);
-            transition: transform .25s cubic-bezier(.4, 0, .2, 1);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .18);
+            z-index: 20001;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(229, 231, 235, 0.9);
+            transform: scale(.96) translateY(14px);
+            opacity: 0;
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        .modal-overlay,
+        .modal-overlay * {
+            box-sizing: border-box;
+        }
+
+        body.modal-open {
+            overflow: hidden !important;
         }
 
         .modal-overlay.open .modal-box {
             transform: scale(1) translateY(0);
+            opacity: 1;
         }
 
         .modal-sm {
@@ -816,7 +1478,12 @@
         }
 
         .um-search-mobile {
-            width: 260px;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        #umViewToggle {
+            flex-shrink: 0;
         }
 
         .um-role-tabs {
@@ -833,8 +1500,61 @@
             max-width: 100%;
         }
 
+        #umListView table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        #umListView thead th,
+        #umListView tbody td {
+            vertical-align: middle;
+        }
+
+        #umListView thead th:nth-child(1),
+        #umListView tbody td:nth-child(1) {
+            width: 56px;
+        }
+
+        #umListView thead th:nth-child(2),
+        #umListView tbody td:nth-child(2) {
+            width: 34%;
+        }
+
+        #umListView thead th:nth-child(3),
+        #umListView tbody td:nth-child(3) {
+            width: 16%;
+        }
+
+        #umListView thead th:nth-child(4),
+        #umListView tbody td:nth-child(4) {
+            width: 14%;
+        }
+
+        #umListView thead th:nth-child(5),
+        #umListView tbody td:nth-child(5) {
+            width: 18%;
+        }
+
+        #umListView thead th:nth-child(6),
+        #umListView tbody td:nth-child(6) {
+            width: 18%;
+        }
+
+        .user-table-row td {
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .user-table-row:last-child td {
+            border-bottom: 0;
+        }
+
         @media (max-width: 767px) {
-            .um-search-mobile {
+
+            .um-search-mobile,
+            .um-filter-main,
+            .um-filter-actions {
                 width: 100%;
             }
 
@@ -850,12 +1570,34 @@
                 width: 100%;
             }
 
+            .search-wrap {
+                height: 38px;
+                padding: 0 12px;
+                border-radius: 12px;
+            }
+
+            .search-wrap input {
+                font-size: 13px;
+                min-width: 0;
+            }
+
+            .search-clear-btn-outside {
+                width: 38px;
+                min-width: 38px;
+                height: 38px;
+                border-radius: 12px;
+            }
+
             .um-role-tabs {
-                align-self: center;
-                margin: 0 auto;
+                width: 100%;
+                justify-content: flex-start;
                 overflow-x: auto;
+                overflow-y: hidden;
                 flex-wrap: nowrap;
+                white-space: nowrap;
                 scrollbar-width: none;
+                margin: 0;
+                padding: 3px;
             }
 
             .um-role-tabs::-webkit-scrollbar {
@@ -864,7 +1606,285 @@
 
             .um-role-tabs .tab-btn {
                 flex: 0 0 auto;
-                padding: 6px 12px;
+                padding: 6px 14px;
+            }
+
+            #statusFilter {
+                min-width: 100%;
+                height: 40px;
+            }
+
+            #umViewToggle {
+                display: none !important;
+            }
+
+            .um-grid-wrap {
+                padding: .75rem;
+            }
+
+            .um-grid {
+                grid-template-columns: 1fr;
+                gap: .75rem;
+            }
+
+            .um-grid-card {
+                border-radius: 14px;
+                padding: .8rem;
+                gap: .65rem;
+            }
+
+            .um-grid-top {
+                gap: .5rem;
+                align-items: center;
+            }
+
+            .um-grid-number {
+                font-size: .68rem;
+            }
+
+            .um-grid-card .w-10.h-10 {
+                width: 2.25rem !important;
+                height: 2.25rem !important;
+                border-radius: 12px !important;
+                font-size: .9rem !important;
+            }
+
+            .um-grid-card .font-semibold.text-gray-800.text-sm.leading-tight {
+                font-size: .95rem !important;
+                line-height: 1.2 !important;
+            }
+
+            .um-grid-card .text-\[11px\].text-gray-400.mt-0\.5 {
+                font-size: .74rem !important;
+                margin-top: 1px !important;
+                line-height: 1.2 !important;
+                word-break: break-word;
+            }
+
+            .um-grid-meta {
+                gap: .45rem;
+            }
+
+            .um-grid-label {
+                font-size: .62rem;
+                margin-bottom: .18rem;
+            }
+
+            .um-grid-value {
+                font-size: .78rem;
+                line-height: 1.25;
+            }
+
+            .um-grid-card .badge-role,
+            .um-grid-card .badge-active,
+            .um-grid-card .badge-inactive {
+                font-size: .68rem !important;
+                padding: .22rem .55rem !important;
+            }
+
+            .um-grid-card .action-btn {
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 10px !important;
+            }
+
+            .um-grid-card .action-btn i {
+                font-size: 10px !important;
+            }
+
+        }
+
+        .modal-box.um-user-modal {
+            max-width: 1100px !important;
+            width: min(1100px, calc(100vw - 40px)) !important;
+            max-height: calc(100vh - 28px) !important;
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .um-user-modal .um-user-modal-header {
+            flex-shrink: 0;
+        }
+
+        .um-user-modal .um-user-modal-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 1.25rem 1.5rem 1.1rem;
+        }
+
+        .um-user-modal .um-user-modal-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .um-user-modal .um-user-main-card,
+        .um-user-modal .um-user-side-card {
+            border: 1px solid #edf0f3;
+            border-radius: 22px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+        }
+
+        .um-user-modal .um-user-main-card {
+            padding: 1.15rem;
+        }
+
+        .um-user-modal .um-user-side-card {
+            padding: 1.15rem;
+        }
+
+        .um-user-modal .um-section-title {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            margin-bottom: 1rem;
+        }
+
+        .um-user-modal .um-section-icon {
+            width: 2.35rem;
+            height: 2.35rem;
+            border-radius: .95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .um-user-modal .um-field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .um-user-modal .um-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .um-user-modal .um-status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .75rem;
+        }
+
+        .um-user-modal .um-status-card {
+            display: flex;
+            align-items: flex-start;
+            gap: .75rem;
+            padding: .9rem .95rem;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all .18s ease;
+        }
+
+        .um-user-modal .um-status-card:hover {
+            border-color: #d1d5db;
+            transform: translateY(-1px);
+        }
+
+        .um-user-modal .um-status-card--active {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .um-user-modal .um-status-card--inactive {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+        }
+
+        .um-user-modal .um-password-note {
+            border: 1px dashed #d9dee5;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: .9rem 1rem;
+            font-size: .78rem;
+            line-height: 1.55;
+            color: #667085;
+        }
+
+        .um-user-modal .um-user-modal-footer {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+            padding: 1rem 1.5rem 1.2rem;
+            border-top: 1px solid #eef2f6;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .92), #fff);
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+        }
+
+        .um-user-modal .um-user-modal-footer .btn-cancel,
+        .um-user-modal .um-user-modal-footer .btn-save {
+            min-height: 46px;
+            border-radius: 14px;
+            padding: 0 1.1rem;
+        }
+
+        .um-user-modal .field-input {
+            min-height: 52px;
+        }
+
+        .um-user-modal .field-input,
+        .um-user-modal select,
+        .um-user-modal input {
+            border-radius: 14px !important;
+        }
+
+        .um-user-modal .um-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #edf0f3 12%, #edf0f3 88%, transparent);
+            margin: 1rem 0 1.1rem;
+        }
+
+        @media (max-width: 1023px) {
+            .modal-box.um-user-modal {
+                width: min(960px, calc(100vw - 28px)) !important;
+            }
+
+            .um-user-modal .um-user-modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .modal-box.um-user-modal {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100vh - 16px) !important;
+                border-radius: 18px !important;
+            }
+
+            .um-user-modal .um-user-modal-body {
+                padding: .95rem .95rem .85rem;
+            }
+
+            .um-user-modal .um-user-main-card,
+            .um-user-modal .um-user-side-card {
+                border-radius: 18px;
+                padding: .95rem;
+            }
+
+            .um-user-modal .um-field-grid,
+            .um-user-modal .um-status-grid {
+                grid-template-columns: 1fr;
+                gap: .75rem;
+            }
+
+            .um-user-modal .um-user-modal-footer {
+                padding: .85rem .95rem 1rem;
+                gap: .6rem;
+            }
+
+            .um-user-modal .um-user-modal-footer .btn-cancel,
+            .um-user-modal .um-user-modal-footer .btn-save {
+                flex: 1 1 0;
+                justify-content: center;
             }
         }
     </style>
@@ -872,58 +1892,26 @@
 
 @section('content')
 
-    <!-- ════════════ MAIN CONTENT ════════════ -->
     @php
-        $logs = $logs ?? collect([]);
-        $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
-        $adminCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() : $logs)
-            ->where('actor_role', 'admin')
-            ->count();
-        $dentistCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() : $logs)
-            ->where('actor_role', 'dentist')
-            ->count();
-        $patientCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() : $logs)
-            ->where('actor_role', 'patient')
-            ->count();
-        $loginCount = ($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->getCollection() : $logs)
-            ->whereIn('action', ['login', 'Login'])
-            ->count();
+        $totalUsers = $totalUsers ?? ($allUsersCount ?? ($users->total() ?? 0));
+        $activeCount = $activeCount ?? 0;
+        $inactiveCount = $inactiveCount ?? 0;
     @endphp
 
-    <main id="mainContent" class="px-4 sm:px-6 pt-[82px] pb-8 min-h-screen">
+    <main id="mainContent" class="px-3 sm:px-6 pt-[82px] pb-8 min-h-screen">
         <div style="max-width:1280px; margin:0 auto;">
 
             <div class="page-banner">
-                    <div class="page-banner-inner">
+                <div class="page-banner-inner">
                     <div>
                         <h1 class="page-title">User Management</h1>
                     </div>
 
                     <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
-                        <button
-                            onclick="openModal('addModal')"
-                            class="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-[#8B0000] 
-                            px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all w-full sm:w-auto">
+                        <button type="button" onclick="openModal('addModal', this)" class="um-hero-btn">
                             <i class="fa-solid fa-user-plus"></i>
-                            Add New User
+                            <span>Add New User</span>
                         </button>
-
-                        <div class="um-view-toggle" id="umViewToggle">
-                            <button type="button"
-                                class="um-view-toggle-btn active"
-                                id="umListViewBtn"
-                                title="List view"
-                                aria-label="List view">
-                                <i class="fa-solid fa-table-list"></i>
-                            </button>
-                            <button type="button"
-                                class="um-view-toggle-btn"
-                                id="umGridViewBtn"
-                                title="Grid view"
-                                aria-label="Grid view">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -944,104 +1932,121 @@
                 </script>
             @endif
 
-            @php
-                $totalUsers = $allUsersCount;
-            @endphp
-
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                <div class="stat-card bg-white rounded-xl p-4 shadow border border-gray-100 overflow-hidden relative">
-                    <div
-                        class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#8B0000]/5 to-transparent rounded-full -mr-10 -mt-10">
-                    </div>
-                    <div class="relative">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#6B0000] flex items-center justify-center shadow mb-3">
-                            <i class="fa-solid fa-users text-white text-sm"></i>
+            <div class="um-stats-grid mb-6">
+                <div class="um-stat-card um-stat-card--users">
+                    <div class="um-stat-top">
+                        <div class="um-stat-icon">
+                            <i class="fa-solid fa-users"></i>
                         </div>
-                        <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Users</p>
-                        <p class="text-3xl font-extrabold text-gray-800" id="countTotalUsers">{{ $totalUsers }}</p>
+                        <span class="um-stat-trend">Overview</span>
+                    </div>
+                    <div class="um-stat-body">
+                        <p class="um-stat-label">Total Users</p>
+                        <p class="um-stat-value" id="countTotalUsers">{{ $totalUsers }}</p>
+                        <p class="um-stat-caption">All registered system accounts</p>
                     </div>
                 </div>
 
-                <div class="stat-card bg-white rounded-xl p-4 shadow border border-gray-100 overflow-hidden relative">
-                    <div
-                        class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/5 to-transparent rounded-full -mr-10 -mt-10">
-                    </div>
-                    <div class="relative">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow mb-3">
-                            <i class="fa-solid fa-circle-check text-white text-sm"></i>
+                <div class="um-stat-card um-stat-card--active">
+                    <div class="um-stat-top">
+                        <div class="um-stat-icon">
+                            <i class="fa-solid fa-circle-check"></i>
                         </div>
-                        <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Active</p>
-                        <p class="text-3xl font-extrabold text-gray-800" id="countActiveUsers">{{ $activeCount }}</p>
+                        <span class="um-stat-trend">Healthy</span>
+                    </div>
+                    <div class="um-stat-body">
+                        <p class="um-stat-label">Active</p>
+                        <p class="um-stat-value" id="countActiveUsers">{{ $activeCount }}</p>
+                        <p class="um-stat-caption">Accounts currently enabled</p>
                     </div>
                 </div>
 
-                <div class="stat-card bg-white rounded-xl p-4 shadow border border-gray-100 overflow-hidden relative">
-                    <div
-                        class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-400/5 to-transparent rounded-full -mr-10 -mt-10">
-                    </div>
-                    <div class="relative">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center shadow mb-3">
-                            <i class="fa-solid fa-user-slash text-white text-sm"></i>
+                <div class="um-stat-card um-stat-card--inactive">
+                    <div class="um-stat-top">
+                        <div class="um-stat-icon">
+                            <i class="fa-solid fa-user-slash"></i>
                         </div>
-                        <p class="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Inactive</p>
-                        <p class="text-3xl font-extrabold text-gray-800" id="countInactiveUsers">{{ $inactiveCount }}</p>
+                        <span class="um-stat-trend">Attention</span>
+                    </div>
+                    <div class="um-stat-body">
+                        <p class="um-stat-label">Inactive</p>
+                        <p class="um-stat-value" id="countInactiveUsers">{{ $inactiveCount }}</p>
+                        <p class="um-stat-caption">Accounts currently disabled</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden mb-6">
-                <div class="px-4 sm:px-5 py-4 border-b bg-gray-50 flex flex-col gap-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-users-gear text-[#8B0000]"></i>
-                        <h2 class="font-bold text-gray-800 text-sm">All System Users</h2>
-                        <span id="countBadgeUsers"
-                            class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers }}</span>
+            <div class="um-panel mb-6">
+                <div class="um-panel-header">
+                    <div class="um-panel-title-wrap">
+                        <div class="um-panel-icon">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="um-panel-title">All System Users</h2>
+                                <span id="countBadgeUsers"
+                                    class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers ?? 0 }}</span>
+                            </div>
+                            <p class="um-panel-subtitle">Browse, filter, and manage all registered accounts.</p>
+                        </div>
                     </div>
 
-                    {{-- Filter bar --}}
                     <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
-                        class="flex items-center gap-2.5 flex-wrap">
-                        {{-- Search --}}
-                        <div class="search-wrap um-search-mobile">
-                            <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
-                            <input id="umSearch" name="search" placeholder="Search name or email…"
-                                value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
-                                onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                        class="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+                        <div class="flex items-center gap-2.5 flex-wrap order-2 md:order-1">
+                            <div class="um-role-tabs">
+                                <button type="button" onclick="setRoleFilter(this,'all')"
+                                    class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
+                                    data-role="">All</button>
+                                <button type="button" onclick="setRoleFilter(this,'admin')"
+                                    class="tab-btn {{ ($roleFilter ?? '') === 'admin' ? 'active' : '' }}"
+                                    data-role="admin">Admin</button>
+                                <button type="button" onclick="setRoleFilter(this,'dentist')"
+                                    class="tab-btn {{ ($roleFilter ?? '') === 'dentist' ? 'active' : '' }}"
+                                    data-role="dentist">Dentist</button>
+                                <button type="button" onclick="setRoleFilter(this,'patient')"
+                                    class="tab-btn {{ ($roleFilter ?? '') === 'patient' ? 'active' : '' }}"
+                                    data-role="patient">Patient</button>
+                            </div>
+
+                            <select id="statusFilter" name="status"
+                                class="field-input text-xs border border-gray-200 rounded-lg px-4 py-2 bg-white text-gray-600 cursor-pointer min-w-[140px] h-[44px]">
+                                <option value="">All Status</option>
+                                <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active
+                                </option>
+                                <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>
+                                    Inactive</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2 order-1 md:order-2 w-full md:w-auto md:justify-end">
+                            <div class="search-wrap um-search-mobile">
+                                <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
+                                <input id="umSearch" name="search" placeholder="Search name or email…"
+                                    value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                            </div>
+
                             <button type="button" id="searchClearBtn"
-                                class="search-clear-btn {{ $search ?? '' ? 'visible' : '' }}" onclick="clearSearch()"
-                                title="Clear">
+                                class="search-clear-btn search-clear-btn-outside {{ $search ?? '' ? 'visible' : '' }}"
+                                onclick="clearSearch()" title="Clear">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
-                        </div>
 
-                        {{-- Role filter --}}
-                        <div class="um-role-tabs">
-                            <button type="button" onclick="setRoleFilter(this,'all')"
-                                class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
-                                data-role="">All</button>
-                            <button type="button" onclick="setRoleFilter(this,'admin')"
-                                class="tab-btn {{ ($roleFilter ?? '') === 'admin' ? 'active' : '' }}"
-                                data-role="admin">Admin</button>
-                            <button type="button" onclick="setRoleFilter(this,'dentist')"
-                                class="tab-btn {{ ($roleFilter ?? '') === 'dentist' ? 'active' : '' }}"
-                                data-role="dentist">Dentist</button>
-                            <button type="button" onclick="setRoleFilter(this,'patient')"
-                                class="tab-btn {{ ($roleFilter ?? '') === 'patient' ? 'active' : '' }}"
-                                data-role="patient">Patient</button>
+                            <div class="um-view-toggle" id="umViewToggle">
+                                <button type="button" class="um-view-toggle-btn active" id="umListViewBtn"
+                                    title="List view" aria-label="List view">
+                                    <i class="fa-solid fa-table-list"></i>
+                                </button>
+                                <button type="button" class="um-view-toggle-btn" id="umGridViewBtn" title="Grid view"
+                                    aria-label="Grid view">
+                                    <i class="fa-solid fa-grip"></i>
+                                </button>
+                            </div>
                         </div>
-
-                        {{-- Status filter --}}
-                        <select id="statusFilter" name="status"
-                            class="field-input text-xs border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-600 cursor-pointer">
-                            <option value="">All Status</option>
-                            <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active
-                            </option>
-                            <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>Inactive
-                            </option>
-                        </select>
                     </form>
                 </div>
 
@@ -1162,9 +2167,11 @@
                                                 <i class="fa-solid fa-magnifying-glass"
                                                     style="font-size:1.6rem;color:#d1d5db;"></i>
                                             </div>
-                                            <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No users
+                                            <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">No
+                                                users
                                                 found</p>
-                                            <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.</p>
+                                            <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your filters.
+                                            </p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -1180,14 +2187,25 @@
                                 @php
                                     $roleSlug = optional($user->role)->slug;
                                     $roleName = optional($user->role)->name ?? 'No Role';
-                                    $roleBg = $roleSlug === 'patient' ? '#dbeafe' : ($roleSlug === 'dentist' ? '#d1fae5' : '#fee2e2');
-                                    $roleColor = $roleSlug === 'patient' ? '#1d4ed8' : ($roleSlug === 'dentist' ? '#065f46' : '#8B0000');
+                                    $roleBg =
+                                        $roleSlug === 'patient'
+                                            ? '#dbeafe'
+                                            : ($roleSlug === 'dentist'
+                                                ? '#d1fae5'
+                                                : '#fee2e2');
+                                    $roleColor =
+                                        $roleSlug === 'patient'
+                                            ? '#1d4ed8'
+                                            : ($roleSlug === 'dentist'
+                                                ? '#065f46'
+                                                : '#8B0000');
                                 @endphp
 
                                 <div class="um-grid-card">
                                     <div class="um-grid-top">
                                         <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}</div>
-                                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                        <span
+                                            class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
                                             {{ ucfirst($user->status) }}
                                         </span>
                                     </div>
@@ -1211,7 +2229,8 @@
                                         <div class="um-grid-field">
                                             <div class="um-grid-label">Role</div>
                                             <div class="um-grid-value">
-                                                <span class="badge-role" style="background:{{ $roleBg }};color:{{ $roleColor }};">
+                                                <span class="badge-role"
+                                                    style="background:{{ $roleBg }};color:{{ $roleColor }};">
                                                     {{ $roleName }}
                                                 </span>
                                             </div>
@@ -1241,7 +2260,8 @@
                                             onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
                                             class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
                                             title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                            <i class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                            <i
+                                                class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
                                         </button>
 
                                         <button type="button"
@@ -1271,17 +2291,17 @@
                     </div>
                 </div>
             </div>
-                
-                <div
-                    class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p class="text-xs text-gray-500 um-pagebar-info">
-                        Showing
-                        <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0 }}</strong>
-                        of <strong>{{ $users->total() }}</strong> users
-                    </p>
-                    <div class="um-pagination-wrap flex items-center gap-1.5"></div>
-                </div>
+
+            <div
+                class="px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-gray-500 um-pagebar-info">
+                    Showing
+                    <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0 }}</strong>
+                    of <strong>{{ $users->total() }}</strong> users
+                </p>
+                <div class="um-pagination-wrap flex items-center gap-1.5"></div>
             </div>
+        </div>
         </div>
     </main>
 
@@ -1290,133 +2310,223 @@
         style="position:fixed;top:16px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;width:340px;">
     </div>
 
-    <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event,'addModal')">
-        <div class="modal-box">
+    <div class="modal-overlay" id="addModal" aria-hidden="true" onclick="closeModalOutside(event,'addModal')">
+        <div class="modal-box um-user-modal">
             <div
-                class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-                <div class="flex items-center gap-3">
+                class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+                <div class="flex items-center gap-3 min-w-0">
                     <div
-                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#6B0000] flex items-center justify-center shadow">
+                        class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
                         <i class="fa-solid fa-user-plus text-white text-sm"></i>
                     </div>
-                    <div>
-                        <h3 class="font-extrabold text-gray-800 text-base">Add New User</h3>
-                        <p class="text-[10px] text-gray-500">Fill in the user's details below</p>
+                    <div class="min-w-0">
+                        <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Add New User</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Create a system account and assign access permissions.</p>
                     </div>
                 </div>
-                <button onclick="closeModal('addModal')"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
+
+                <button type="button" onclick="closeModal('addModal')"
+                    class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:border-red-200 hover:text-[#8B0000] transition-all flex-shrink-0">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <form method="POST" action="{{ route('admin.user_management.store') }}" class="p-6 space-y-4">
+            <form method="POST" action="{{ route('admin.user_management.store') }}"
+                class="flex-1 flex flex-col min-h-0">
                 @csrf
 
-                @if ($errors->any())
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i>
-                                {{ $error }}</div>
-                        @endforeach
+                <div class="um-user-modal-body">
+                    @if ($errors->any())
+                        <div class="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 text-xs text-red-700 space-y-1.5">
+                            @foreach ($errors->all() as $error)
+                                <div class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-xmark mt-0.5"></i>
+                                    <span>{{ $error }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="um-user-modal-grid">
+                        <div class="um-user-main-card">
+                            <div class="um-section-title">
+                                <div class="um-section-icon bg-red-50 text-[#8B0000]">
+                                    <i class="fa-solid fa-id-card text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-extrabold text-gray-800 leading-tight">Account Details</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Basic identity, role assignment, and account
+                                        status.</p>
+                                </div>
+                            </div>
+
+                            <div class="um-field-grid">
+                                <div class="um-field-full">
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Full Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="name" value="{{ old('name') }}"
+                                        placeholder="e.g. Juan dela Cruz"
+                                        class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white"
+                                        required>
+                                </div>
+
+                                <div class="um-field-full">
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Email Address <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i
+                                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                        <input type="email" name="email" value="{{ old('email') }}"
+                                            placeholder="user@pup.edu.ph"
+                                            class="field-input w-full border border-gray-200 pl-10 pr-3.5 py-3 text-sm bg-white"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Role
+                                    </label>
+                                    <select name="role_id"
+                                        class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                                        <option value="">— No Role —</option>
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}"
+                                                {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                                {{ $role->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Account Type
+                                    </label>
+                                    <div
+                                        class="field-input w-full border border-dashed border-gray-200 px-3.5 py-3 text-sm bg-gray-50 text-gray-500 flex items-center">
+                                        System-managed user account
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="um-divider"></div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-2">
+                                    Status <span class="text-red-500">*</span>
+                                </label>
+
+                                <div class="um-status-grid">
+                                    <label class="um-status-card um-status-card--active">
+                                        <input type="radio" name="status" value="active"
+                                            {{ old('status', 'active') === 'active' ? 'checked' : '' }}
+                                            style="accent-color:#8B0000; margin-top:.22rem;">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
+                                            <div class="text-[11px] text-emerald-700 mt-0.5">Can access the system
+                                                immediately</div>
+                                        </div>
+                                    </label>
+
+                                    <label class="um-status-card um-status-card--inactive">
+                                        <input type="radio" name="status" value="inactive"
+                                            {{ old('status') === 'inactive' ? 'checked' : '' }}
+                                            style="accent-color:#8B0000; margin-top:.22rem;">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-gray-700 leading-tight">Inactive</div>
+                                            <div class="text-[11px] text-gray-500 mt-0.5">Account exists but login is
+                                                disabled</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="um-user-side-card">
+                            <div class="um-section-title">
+                                <div class="um-section-icon bg-blue-50 text-blue-600">
+                                    <i class="fa-solid fa-lock text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-extrabold text-gray-800 leading-tight">Security Setup</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Set the initial login credentials.</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Password <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i
+                                            class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                        <input type="password" name="password" id="addPassword"
+                                            placeholder="Min. 8 characters"
+                                            class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
+                                            required>
+                                        <button type="button" onclick="togglePassVis('addPassword','addEye')"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <i class="fa-regular fa-eye text-sm" id="addEye"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400 mt-1.5">Use at least 8 characters for better
+                                        security.</p>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                        Confirm Password <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i
+                                            class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                        <input type="password" name="password_confirmation" id="addPasswordConf"
+                                            placeholder="Repeat password"
+                                            class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
+                                            required>
+                                        <button type="button" onclick="togglePassVis('addPasswordConf','addEye2')"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <i class="fa-regular fa-eye text-sm" id="addEye2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="um-password-note">
+                                    The user can update their password after first sign-in depending on your account
+                                    workflow.
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                @endif
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Full Name
-                        <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Juan dela Cruz"
-                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm" required>
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Email
-                        Address <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="user@pup.edu.ph"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm" required>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
-                    <select name="role_id"
-                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
-                        <option value="">— No Role —</option>
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                {{ $role->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Status
-                        <span class="text-red-500">*</span></label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="status" value="active"
-                                {{ old('status', 'active') === 'active' ? 'checked' : '' }}
-                                style="accent-color:#8B0000;">
-                            <span class="text-sm text-gray-700 font-medium">Active</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="status" value="inactive"
-                                {{ old('status') === 'inactive' ? 'checked' : '' }}
-                                style="accent-color:#8B0000;">
-                            <span class="text-sm text-gray-700 font-medium">Inactive</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Password
-                        <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="password" name="password" id="addPassword" placeholder="Min. 8 characters"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
-                            required>
-                        <button type="button" onclick="togglePassVis('addPassword','addEye')"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-regular fa-eye text-xs" id="addEye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
-                        Password <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="password" name="password_confirmation" id="addPasswordConf"
-                            placeholder="Repeat password"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
-                            required>
-                        <button type="button" onclick="togglePassVis('addPasswordConf','addEye2')"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-regular fa-eye text-xs" id="addEye2"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-2">
+                <div class="um-user-modal-footer">
                     <button type="button" onclick="closeModal('addModal')"
-                        class="px-5 py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
+                        class="btn-cancel px-5 py-2.5 border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all inline-flex items-center">
                         Cancel
                     </button>
+
                     <button type="submit"
-                        class="px-6 py-2.5 rounded-lg bg-[#8B0000] hover:bg-[#760000] text-white text-sm font-bold shadow transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Save User
+                        class="btn-save px-6 py-2.5 bg-[#8B0000] hover:bg-[#760000] text-white text-sm font-bold shadow transition-all inline-flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Save User</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event,'editModal')">
+    <div class="modal-overlay" id="editModal" aria-hidden="true" onclick="closeModalOutside(event,'editModal')">
         <div class="modal-box">
             <div
                 class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
@@ -1430,7 +2540,7 @@
                         <p class="text-[10px] text-gray-500" id="editModalSubtitle">Updating user details</p>
                     </div>
                 </div>
-                <button onclick="closeModal('editModal')"
+                <button type="button" data-close-modal="editModal"
                     class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1500,7 +2610,7 @@
     </div>
 
     <!-- Reset Password Modal -->
-    <div class="modal-overlay" id="resetModal" onclick="closeModalOutside(event,'resetModal')">
+    <div class="modal-overlay" id="resetModal" aria-hidden="true" onclick="closeModalOutside(event,'resetModal')">
         <div class="modal-box modal-sm">
             <div
                 class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
@@ -1514,7 +2624,7 @@
                         <p class="text-[10px] text-gray-500" id="resetModalSubtitle">Set a new password</p>
                     </div>
                 </div>
-                <button onclick="closeModal('resetModal')"
+                <button type="button" data-close-modal="resetModal"
                     class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1569,8 +2679,7 @@
         </div>
     </div>
 
-    <!-- View Details Modal -->
-    <div class="modal-overlay" id="viewModal" onclick="closeModalOutside(event,'viewModal')">
+    <div class="modal-overlay" id="viewModal" aria-hidden="true" onclick="closeModalOutside(event,'viewModal')">
         <div class="modal-box modal-sm">
             <div
                 class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
@@ -1584,7 +2693,7 @@
                         <p class="text-[10px] text-gray-500">View selected account information</p>
                     </div>
                 </div>
-                <button onclick="closeModal('viewModal')"
+                <button type="button" data-close-modal="viewModal"
                     class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1631,8 +2740,8 @@
         </div>
     </div>
 
-    <!-- Toggle Status Confirmation Modal -->
-    <div class="modal-overlay" id="toggleConfirmModal" onclick="closeModalOutside(event,'toggleConfirmModal')">
+    <div class="modal-overlay" id="toggleConfirmModal" aria-hidden="true"
+        onclick="closeModalOutside(event,'toggleConfirmModal')">
         <div class="modal-box modal-sm">
             <div
                 class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
@@ -1644,7 +2753,7 @@
                         <p class="text-[10px] text-gray-500" id="toggleModalSubtitle">Please confirm this change</p>
                     </div>
                 </div>
-                <button onclick="closeModal('toggleConfirmModal')"
+                <button type="button" data-close-modal="toggleConfirmModal"
                     class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-[#8B0000] transition-all">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1674,14 +2783,14 @@
 @section('scripts')
     <script>
         const currentDateEl = document.getElementById('currentDate');
-            if (currentDateEl) {
-                currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
+        if (currentDateEl) {
+            currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
 
         var umState = {
             search: '{{ $search ?? '' }}',
@@ -1746,51 +2855,74 @@
             }
         }
 
-        function closeAllModals() {
+        window.closeAllModals = function() {
             document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+                var activeEl = document.activeElement;
+
+                if (activeEl && modal.contains(activeEl)) {
+                    activeEl.blur();
+                }
+
                 modal.classList.remove('open');
-                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
             });
-            document.body.style.overflow = '';
-        }
 
-        function openModal(id) {
-            closeAllModals();
+            document.body.classList.remove('modal-open');
+        };
 
+        window.openModal = function(id, trigger = null) {
             var modal = document.getElementById(id);
             if (!modal) return;
 
-            modal.style.display = 'flex';
+            window.lastModalTrigger = trigger || document.activeElement;
 
-            requestAnimationFrame(function() {
-                modal.classList.add('open');
+            document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+                if (m.id !== id) {
+                    m.classList.remove('open');
+                    m.setAttribute('aria-hidden', 'true');
+                }
             });
 
-            document.body.style.overflow = 'hidden';
-        }
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
 
-        function closeModal(id) {
+            var firstField = modal.querySelector('input, select, textarea, button');
+            if (firstField) {
+                setTimeout(function() {
+                    firstField.focus();
+                }, 30);
+            }
+        };
+
+        window.closeModal = function(id) {
             var modal = document.getElementById(id);
             if (!modal) return;
+
+            var activeEl = document.activeElement;
+            if (activeEl && modal.contains(activeEl)) {
+                activeEl.blur();
+            }
 
             modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
 
-            setTimeout(function() {
-                modal.style.display = 'none';
-            }, 200);
-
-            document.body.style.overflow = '';
-        }
-
-        function closeModalOutside(e, id) {
-            if (e.target.id === id) {
-                closeModal(id);
+            if (!document.querySelector('.modal-overlay.open')) {
+                document.body.classList.remove('modal-open');
             }
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            closeAllModals();
-        });
+            if (window.lastModalTrigger && typeof window.lastModalTrigger.focus === 'function') {
+                setTimeout(function() {
+                    window.lastModalTrigger.focus();
+                }, 30);
+            }
+        };
+
+        window.closeModalOutside = function(e, id) {
+            if (e.target.id === id) {
+                window.closeModal(id);
+            }
+        };
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1869,7 +3001,6 @@
                 document.getElementById('editStatusInactive').disabled = false;
             }
 
-            // Store source for AJAX handler
             form.dataset.source = source;
 
             document.getElementById('editName').value = name;
@@ -1940,7 +3071,8 @@
         });
 
         function toggleSearchClear(input) {
-            document.getElementById('searchClearBtn')?.classList.toggle('visible', input.value.length > 0);
+            var hasValue = (input?.value || '').trim().length > 0;
+            document.getElementById('searchClearBtn')?.classList.toggle('visible', hasValue);
         }
 
         function clearSearch() {
@@ -2065,7 +3197,8 @@
                 var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
                 var initial = (user.name || 'U').charAt(0).toUpperCase();
                 var statusLabel = (user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1);
-                var createdFull = (user.created_at_day || '—') + (user.created_at_time ? ' ' + user.created_at_time : '');
+                var createdFull = (user.created_at_day || '—') + (user.created_at_time ? ' ' + user
+                    .created_at_time : '');
 
                 tableHtml += `
                 <tr class="user-table-row border-b border-gray-50 last:border-0">
@@ -2322,37 +3455,46 @@
             return html;
         }
 
-        // Toast helper function
         function showSuccessToast(message) {
             const container = document.getElementById('toastContainer');
             if (!container) return;
 
+            const normalizedMessage = String(message || '').trim();
+
+            const existing = Array.from(container.querySelectorAll('[data-toast-type="success"]'))
+                .find(toast => toast.dataset.toastMessage === normalizedMessage);
+
+            if (existing) return;
+
             const toast = document.createElement('div');
+            toast.dataset.toastType = 'success';
+            toast.dataset.toastMessage = normalizedMessage;
+
             toast.style.cssText =
                 'pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #d1fae5;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:14px;padding:10px 12px;width:320px;animation:slideIn .35s ease forwards;';
 
             toast.innerHTML = `
-                <div class="absolute inset-y-0 left-0 w-1 bg-emerald-500"></div>
+        <div class="absolute inset-y-0 left-0 w-1 bg-emerald-500"></div>
 
-                <div class="flex-shrink-0 ml-1">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
-                    </div>
-                </div>
+        <div class="flex-shrink-0 ml-1">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+            </div>
+        </div>
 
-                <div class="flex-1 min-w-0 pr-1">
-                    <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Success</h3>
-                    <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${message}</p>
-                </div>
+        <div class="flex-1 min-w-0 pr-1">
+            <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Success</h3>
+            <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${normalizedMessage}</p>
+        </div>
 
-                <button
-                    type="button"
-                    class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
-                    onclick="this.parentElement.remove()"
-                >
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
-            `;
+        <button
+            type="button"
+            class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+            onclick="this.parentElement.remove()"
+        >
+            <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+    `;
 
             container.appendChild(toast);
 
@@ -2368,32 +3510,42 @@
             const container = document.getElementById('toastContainer');
             if (!container) return;
 
+            const normalizedMessage = String(message || '').trim();
+
+            const existing = Array.from(container.querySelectorAll('[data-toast-type="error"]'))
+                .find(toast => toast.dataset.toastMessage === normalizedMessage);
+
+            if (existing) return;
+
             const toast = document.createElement('div');
+            toast.dataset.toastType = 'error';
+            toast.dataset.toastMessage = normalizedMessage;
+
             toast.style.cssText =
                 'pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #fee2e2;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:14px;padding:10px 12px;width:320px;animation:slideIn .35s ease forwards;';
 
             toast.innerHTML = `
-                <div class="absolute inset-y-0 left-0 w-1 bg-red-500"></div>
+        <div class="absolute inset-y-0 left-0 w-1 bg-red-500"></div>
 
-                <div class="flex-shrink-0 ml-1">
-                    <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
-                        <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
-                    </div>
-                </div>
+        <div class="flex-shrink-0 ml-1">
+            <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+                <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
+            </div>
+        </div>
 
-                <div class="flex-1 min-w-0 pr-1">
-                    <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Error</h3>
-                    <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${message}</p>
-                </div>
+        <div class="flex-1 min-w-0 pr-1">
+            <h3 class="text-[13px] sm:text-sm font-extrabold text-gray-800 leading-tight">Error</h3>
+            <p class="text-[12px] sm:text-[13px] text-gray-500 leading-4 mt-0.5 break-words">${normalizedMessage}</p>
+        </div>
 
-                <button
-                    type="button"
-                    class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
-                    onclick="this.parentElement.remove()"
-                >
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
-            `;
+        <button
+            type="button"
+            class="flex-shrink-0 w-7 h-7 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+            onclick="this.parentElement.remove()"
+        >
+            <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+    `;
 
             container.appendChild(toast);
 
@@ -2508,7 +3660,6 @@
                 });
             }
 
-            // ── AJAX: Edit User ──────────────────────────────────
             var editForm = document.getElementById('editForm');
             if (editForm) {
                 editForm.addEventListener('submit', function(e) {
@@ -2523,7 +3674,6 @@
                     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
                     var formData = new FormData(form);
-                    // FormData already includes _method=PUT from the hidden input
 
                     fetch(url, {
                             method: 'POST',
@@ -2565,7 +3715,6 @@
                 });
             }
 
-            // ── AJAX: Reset Password ─────────────────────────────
             var resetForm = document.getElementById('resetForm');
             if (resetForm) {
                 resetForm.addEventListener('submit', function(e) {
@@ -2606,7 +3755,6 @@
                             } else if (result.ok && result.data.success) {
                                 closeAllModals();
                                 showSuccessToast(result.data.message || 'Password reset successfully.');
-                                // Clear fields for next use
                                 document.getElementById('resetPassword').value = '';
                                 document.getElementById('resetPasswordConf').value = '';
                             } else {
