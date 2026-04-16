@@ -155,6 +155,7 @@
         recognition.maxAlternatives = 1;
 
         let hasRecognizedSpeech = false;
+let processedFinalIndex = -1;
 
         const controller = {
             input,
@@ -253,6 +254,7 @@
 
         recognition.onresult = (event) => {
             let transcript = '';
+let hasNewFinal = false;
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const result = event.results[i];
@@ -260,7 +262,11 @@
                 if (!chunk) continue;
 
                 if (result.isFinal) {
-                    transcript += ` ${chunk}`;
+                    if (i > processedFinalIndex) {
+                                    transcript += ` ${chunk}`;
+                                    processedFinalIndex = i;
+                                    hasNewFinal = true;
+                                }
                 } else if (!transcript) {
                     transcript = chunk;
                 }
@@ -268,7 +274,7 @@
 
             transcript = transcript.trim();
 
-            if (transcript) {
+            if (hasNewFinal && transcript) {
                 hasRecognizedSpeech = true;
                 if (isTextarea && input.value.trim()) {
                     input.value = `${input.value.trim()} ${transcript}`.trim();

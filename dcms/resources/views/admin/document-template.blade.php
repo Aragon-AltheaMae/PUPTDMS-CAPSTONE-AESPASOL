@@ -178,36 +178,43 @@
 
     .search-wrap input::placeholder { color: #B0ABA6; }
 
-    .search-clear-btn {
-        width: 20px; height: 20px;
-        border-radius: 50%;
-        border: none;
-        background: #E0DDD8;
-        color: #7A7370;
-        font-size: 10px;
-        cursor: pointer;
-        display: none;
+    .template-search-row {
+        display: flex;
         align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: all .2s;
-        padding: 0;
+        gap: .5rem;
     }
 
-    .search-clear-btn:hover { background: rgba(139,0,0,.47); color: #fff; }
-    .search-clear-btn.visible { display: flex; }
+    .template-search-clear-btn {
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        font-size: .78rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0 .1rem;
+        margin: 0;
+        cursor: pointer;
+        align-self: center;
+        flex: 0 0 auto;
+        transition: color .15s ease;
+    }
+
+    .template-search-clear-btn:hover {
+        color: #991b1b;
+    }
 
     .search-wrap.voice-search-wrap {
         position: relative;
+        padding-right: 42px;
     }
 
     .search-wrap.voice-search-wrap input.has-voice-padding {
-        padding-right: 2.9rem;
+        padding-right: 0 !important;
     }
 
     .search-wrap.voice-search-wrap .voice-search-mic {
         position: absolute;
-        right: 34px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
         width: 18px;
@@ -222,7 +229,7 @@
         justify-content: center;
         color: #8B0000;
         cursor: pointer;
-        z-index: 4;
+        z-index: 5;
     }
 
     .search-wrap.voice-search-wrap .voice-search-mic i {
@@ -736,6 +743,7 @@
 @endsection
 
 @section('content')
+        .template-search-row { width: 100%; }
 <div class="document-templates-page">
     <main class="w-full">
         <div class="max-w-[1280px] mx-auto">
@@ -778,11 +786,14 @@
             </div>
 
             <div class="toolbar">
-                <div class="search-wrap">
-                    <i class="fa fa-search search-icon"></i>
-                    <input type="text" id="templateSearch" placeholder="Search templates..." autocomplete="off">
-                    <button type="button" id="templateSearchClear" class="search-clear-btn" title="Clear">
-                        <i class="fa-solid fa-xmark"></i>
+                <div class="template-search-row">
+                    <div class="search-wrap" style="width:200px;">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text" id="templateSearch" placeholder="Search templates..." autocomplete="off">
+                    </div>
+
+                    <button type="button" id="templateSearchClear" class="template-search-clear-btn hidden" title="Clear">
+                        Clear
                     </button>
                 </div>
 
@@ -1105,6 +1116,25 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        function toggleSearchClear(input) {
+            if (!clearBtn) return;
+
+            if ((input?.value || '').trim().length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        function clearSearch() {
+            if (!searchInput) return;
+
+            searchInput.value = '';
+            toggleSearchClear(searchInput);
+            filterTemplateCards();
+            searchInput.focus();
+        }
+
         document.querySelectorAll('.tab-btn[data-filter-type]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.filterType;
@@ -1118,16 +1148,15 @@
         const clearBtn = document.getElementById('templateSearchClear');
 
         searchInput?.addEventListener('input', () => {
-            clearBtn?.classList.toggle('visible', searchInput.value.trim().length > 0);
+            toggleSearchClear(searchInput);
             filterTemplateCards();
         });
 
         clearBtn?.addEventListener('click', () => {
-            searchInput.value = '';
-            clearBtn.classList.remove('visible');
-            filterTemplateCards();
-            searchInput.focus();
+            clearSearch();
         });
+
+        toggleSearchClear(searchInput);
 
         document.getElementById('closeTemplatePreview')?.addEventListener('click', closePreviewModal);
 

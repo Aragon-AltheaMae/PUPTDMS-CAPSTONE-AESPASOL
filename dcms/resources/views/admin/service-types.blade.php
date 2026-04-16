@@ -343,6 +343,46 @@
             width: 100%;
         }
 
+        .st-voice-row {
+            display: flex;
+            align-items: stretch;
+            gap: .5rem;
+            width: 100%;
+        }
+
+        .st-voice-row .st-input-wrap {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .st-voice-row.is-textarea {
+            align-items: flex-start;
+        }
+
+        .st-voice-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            align-self: center;
+            flex: 0 0 auto;
+            transition: color .15s ease;
+        }
+
+        .st-voice-row.is-textarea .st-voice-clear-btn {
+            margin-top: 10px;
+            align-self: flex-start;
+        }
+
+        .st-voice-clear-btn:hover {
+            color: #991b1b;
+        }
+
         .st-input-wrap .voice-input-wrap > .st-input.has-voice-padding {
             padding-right: 2.35rem;
         }
@@ -1012,11 +1052,15 @@
 
                                 <div class="st-form-group">
                                     <label class="st-label">Service Name</label>
-                                    <div class="st-input-wrap">
-                                        <i class="fa-solid fa-tag st-input-icon"></i>
-                                        <input type="text" id="serviceNameInput" name="name"
-                                            placeholder="e.g. Tooth Extraction" autocomplete="off"
-                                            value="{{ old('name') }}" class="st-input with-icon">
+                                    <div class="st-voice-row">
+                                        <div class="st-input-wrap">
+                                            <i class="fa-solid fa-tag st-input-icon"></i>
+                                            <input type="text" id="serviceNameInput" name="name"
+                                                placeholder="e.g. Tooth Extraction" autocomplete="off"
+                                                value="{{ old('name') }}" class="st-input with-icon">
+                                        </div>
+
+                                        <button type="button" id="serviceNameClearBtn" class="st-voice-clear-btn hidden">Clear</button>
                                     </div>
 
                                     <div id="nameClientError" class="st-field-error" style="display: none;">
@@ -1032,14 +1076,18 @@
                                 <div class="st-form-group">
                                     <label class="st-label">Description (Optional)</label>
 
-                                    <div class="st-input-wrap st-textarea-wrap">
-                                        <textarea id="serviceDescInput"
-                                            name="description"
-                                            placeholder="Brief details about the service..."
-                                            class="st-input st-textarea"
-                                            maxlength="100">{{ old('description') }}</textarea>
+                                    <div class="st-voice-row is-textarea">
+                                        <div class="st-input-wrap st-textarea-wrap">
+                                            <textarea id="serviceDescInput"
+                                                name="description"
+                                                placeholder="Brief details about the service..."
+                                                class="st-input st-textarea"
+                                                maxlength="100">{{ old('description') }}</textarea>
 
-                                        <div id="serviceDescCount" class="st-char-count">0 / 100</div>
+                                            <div id="serviceDescCount" class="st-char-count">0 / 100</div>
+                                        </div>
+
+                                        <button type="button" id="serviceDescClearBtn" class="st-voice-clear-btn hidden">Clear</button>
                                     </div>
 
                                     @error('description')
@@ -1306,6 +1354,40 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initServiceTypeViewToggle();
+
+            function bindVoiceClear(fieldId, clearBtnId) {
+                const field = document.getElementById(fieldId);
+                const clearBtn = document.getElementById(clearBtnId);
+                if (!field || !clearBtn) return;
+
+                const toggleClear = () => {
+                    if ((field.value || '').trim().length > 0) {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                    }
+                };
+
+                field.addEventListener('input', toggleClear);
+
+                clearBtn.addEventListener('click', () => {
+                    field.value = '';
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+
+                    const status = field.closest('.voice-input-wrap')?.querySelector('[data-voice-status]')
+                        || field.closest('.st-input-wrap')?.querySelector('[data-voice-status]');
+                    if (status) status.classList.add('hidden');
+
+                    toggleClear();
+                    field.focus();
+                });
+
+                toggleClear();
+            }
+
+            bindVoiceClear('serviceNameInput', 'serviceNameClearBtn');
+            bindVoiceClear('serviceDescInput', 'serviceDescClearBtn');
 
             const descInput = document.getElementById('serviceDescInput');
             const charCount = document.getElementById('serviceDescCount');

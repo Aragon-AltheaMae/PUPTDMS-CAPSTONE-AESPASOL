@@ -764,6 +764,19 @@
     margin-bottom: 0.5rem;
 }
 
+.rule-notes-voice-row {
+    display: flex;
+    align-items: stretch;
+    gap: .5rem;
+    width: 100%;
+}
+
+.rule-notes-voice-row .voice-input-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
 .rule-notes-section .voice-input-wrap textarea {
     flex: 1;
     height: 100%;
@@ -833,6 +846,29 @@
     color: #166534;
     border-color: #bbf7d0;
     background: #f0fdf4;
+}
+
+.rule-notes-clear-btn {
+    border: none;
+    background: transparent;
+    color: #dc2626;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0 .1rem;
+    margin: 0;
+    cursor: pointer;
+    align-self: center;
+    flex: 0 0 auto;
+    transition: color .15s ease;
+}
+
+.rule-notes-clear-btn.hidden {
+    display: none;
+}
+
+.rule-notes-clear-btn:hover {
+    color: #991b1b;
 }
 
         .break-chip-group {
@@ -2479,8 +2515,11 @@
                                 </div>
 
                                 <label class="form-label" for="ruleNotes">Notes (optional)</label>
-                                <textarea id="ruleNotes" class="form-ctrl resize-none rule-notes-textarea mb-2" maxlength="150"
-                                    placeholder="e.g. Reduced operations due to holiday program..."></textarea>
+                                <div class="rule-notes-voice-row mb-2">
+                                    <textarea id="ruleNotes" class="form-ctrl resize-none rule-notes-textarea" maxlength="150"
+                                        placeholder="e.g. Reduced operations due to holiday program..."></textarea>
+                                    <button type="button" id="ruleNotesClearBtn" class="rule-notes-clear-btn hidden">Clear</button>
+                                </div>
                                 <div class="form-help flex items-center justify-between gap-2 mt-auto">
                                     <span>Maximum of 150 characters.</span>
                                     <span id="ruleNotesCount" class="notes-counter">0/150</span>
@@ -3110,6 +3149,10 @@
                 });
             }
 
+            if (typeof window.syncRuleNotesVoiceClear === 'function') {
+                window.syncRuleNotesVoiceClear();
+            }
+
             backdrop.style.display = 'flex';
             backdrop.classList.add('open');
             document.body.style.overflow = 'hidden';
@@ -3247,6 +3290,18 @@
 
             const ruleNotes = document.getElementById('ruleNotes');
             const ruleNotesCount = document.getElementById('ruleNotesCount');
+            const ruleNotesClearBtn = document.getElementById('ruleNotesClearBtn');
+
+            function syncRuleNotesVoiceClear() {
+                if (!ruleNotes || !ruleNotesClearBtn) return;
+                if ((ruleNotes.value || '').trim().length > 0) {
+                    ruleNotesClearBtn.classList.remove('hidden');
+                } else {
+                    ruleNotesClearBtn.classList.add('hidden');
+                }
+            }
+
+            window.syncRuleNotesVoiceClear = syncRuleNotesVoiceClear;
 
             function updateRuleNotesCount() {
                 if (!ruleNotes || !ruleNotesCount) return;
@@ -3268,10 +3323,30 @@
                     this.value = this.value.slice(0, 150);
                 }
                 updateRuleNotesCount();
+                syncRuleNotesVoiceClear();
                 clearFieldError('ruleNotesError', 'ruleNotes');
             });
 
+            ruleNotesClearBtn?.addEventListener('click', function() {
+                if (!ruleNotes) return;
+
+                ruleNotes.value = '';
+                ruleNotes.dispatchEvent(new Event('input', {
+                    bubbles: true
+                }));
+                ruleNotes.dispatchEvent(new Event('change', {
+                    bubbles: true
+                }));
+
+                const status = ruleNotes.closest('.voice-input-wrap')?.querySelector('[data-voice-status]');
+                if (status) status.classList.add('hidden');
+
+                syncRuleNotesVoiceClear();
+                ruleNotes.focus();
+            });
+
             updateRuleNotesCount();
+            syncRuleNotesVoiceClear();
 
             buildWeekGrid();
 

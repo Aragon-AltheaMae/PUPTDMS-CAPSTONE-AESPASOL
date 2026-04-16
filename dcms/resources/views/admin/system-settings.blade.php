@@ -350,6 +350,57 @@
     padding-right: 2.35rem;
   }
 
+  #tab-clinic .clinic-voice-row,
+  #settingsGridSectionContent .clinic-voice-row {
+    display: flex;
+    align-items: stretch;
+    gap: .55rem;
+    width: 100%;
+  }
+
+  #tab-clinic .clinic-voice-row .voice-input-wrap,
+  #settingsGridSectionContent .clinic-voice-row .voice-input-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  #tab-clinic .clinic-voice-clear-btn,
+  #settingsGridSectionContent .clinic-voice-clear-btn {
+    border: none;
+    background: transparent;
+    color: #dc2626;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0 .1rem;
+    margin: 0;
+    cursor: pointer;
+    align-self: center;
+    flex: 0 0 auto;
+    transition: color .15s ease;
+  }
+
+  #tab-clinic .clinic-voice-row.is-textarea,
+  #settingsGridSectionContent .clinic-voice-row.is-textarea {
+    align-items: flex-start;
+  }
+
+  #tab-clinic .clinic-voice-row.is-textarea .clinic-voice-clear-btn,
+  #settingsGridSectionContent .clinic-voice-row.is-textarea .clinic-voice-clear-btn {
+    margin-top: 10px;
+    align-self: flex-start;
+  }
+
+  #tab-clinic .clinic-voice-clear-btn.hidden,
+  #settingsGridSectionContent .clinic-voice-clear-btn.hidden {
+    display: none;
+  }
+
+  #tab-clinic .clinic-voice-clear-btn:hover,
+  #settingsGridSectionContent .clinic-voice-clear-btn:hover {
+    color: #991b1b;
+  }
+
   #tab-clinic .voice-input-wrap .voice-mic-btn,
   #settingsGridSectionContent .voice-input-wrap .voice-mic-btn {
     position: absolute;
@@ -1364,13 +1415,78 @@
     }, 0);
   }
 
+  function initializeClinicVoiceClearButtons(root = document) {
+    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+    const wrappers = scope.querySelectorAll('#tab-clinic .voice-input-wrap, #settingsGridSectionContent .voice-input-wrap');
+
+    wrappers.forEach((wrapper) => {
+      if (wrapper.dataset.clinicVoiceClearReady === 'true') return;
+
+      const field = wrapper.querySelector('input.form-ctrl, textarea.form-ctrl');
+      if (!field || field.readOnly || field.disabled) return;
+
+      const isTextarea = field.tagName.toLowerCase() === 'textarea';
+
+      let row = wrapper.parentElement && wrapper.parentElement.classList.contains('clinic-voice-row')
+        ? wrapper.parentElement
+        : null;
+
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'clinic-voice-row';
+        wrapper.parentNode.insertBefore(row, wrapper);
+        row.appendChild(wrapper);
+      }
+
+      row.classList.toggle('is-textarea', isTextarea);
+
+      let clearBtn = row.querySelector('.clinic-voice-clear-btn');
+      if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'clinic-voice-clear-btn hidden';
+        clearBtn.textContent = 'Clear';
+        row.appendChild(clearBtn);
+      }
+
+      const status = wrapper.querySelector('[data-voice-status]');
+
+      function toggleClear() {
+        if ((field.value || '').trim().length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      clearBtn.addEventListener('click', () => {
+        field.value = '';
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+        if (status) status.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        field.focus();
+      });
+
+      field.addEventListener('input', toggleClear);
+      toggleClear();
+
+      wrapper.dataset.clinicVoiceClearReady = 'true';
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initSettingsViewToggle();
     renderSettingsGridActiveSection();
+    initializeClinicVoiceClearButtons(document);
 
     window.addEventListener('resize', function () {
       applySettingsView(getPreferredSettingsView(), false);
     });
+  });
+
+  document.addEventListener('voice:refresh', function(event) {
+    initializeClinicVoiceClearButtons(event && event.detail ? event.detail.root : document);
   });
 </script>
 @endsection

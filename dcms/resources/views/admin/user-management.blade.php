@@ -777,94 +777,52 @@
             color: #B0ABA6;
         }
 
-        .search-clear-btn {
-            height: 38px;
-            min-width: 38px;
-            border-radius: 12px;
-            border: 1.5px solid #E0DDD8;
-            background: #FAFAF9;
-            color: #8B0000;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
+        .um-search-row {
+            display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            padding: 0 12px;
-            box-shadow: 0 4px 12px rgba(139, 0, 0, .08);
+            gap: .5rem;
+            width: 100%;
+        }
+
+        .um-search-row .search-wrap {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .search-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: color .15s ease;
         }
 
         .search-clear-btn:hover {
-            border-color: #8B0000;
-            background: #fff5f5;
-            color: #8B0000;
+            color: #991b1b;
         }
 
-        .search-clear-btn.visible {
-            display: inline-flex;
-        }
-
-        .search-clear-btn-outside {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            border: 1.5px solid #E0DDD8;
-            background: #FAFAF9;
-            color: #8B0000;
+        .search-clear-btn.hidden {
             display: none;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 13px;
-        }
-
-        .search-clear-btn-outside:hover {
-            background: rgba(139, 0, 0, 0.08);
-            border-color: #8B0000;
-            color: #8B0000;
-        }
-
-        .search-clear-btn-outside.visible {
-            display: inline-flex;
-        }
-
-        @media (max-width: 767px) {
-            .search-clear-btn-outside {
-                width: 36px;
-                height: 36px;
-                border-radius: 10px;
-            }
-        }
-
-        .um-filter-main {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
-            flex: 1 1 320px;
-        }
-
-        .um-filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: auto;
-            flex-wrap: wrap;
-            justify-content: flex-end;
         }
 
         .search-wrap.voice-search-wrap {
             position: relative;
+            padding-right: 42px;
         }
 
         .search-wrap.voice-search-wrap input.has-voice-padding {
-            padding-right: 2.9rem;
+            padding-right: 0 !important;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic {
             position: absolute;
-            right: 34px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             width: 18px;
@@ -879,7 +837,7 @@
             justify-content: center;
             color: #8B0000;
             cursor: pointer;
-            z-index: 4;
+            z-index: 5;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic i {
@@ -1976,65 +1934,29 @@
                 </div>
             </div>
 
-            <div class="um-panel mb-6">
-                <div class="um-panel-header">
-                    <div class="um-panel-title-wrap">
-                        <div class="um-panel-icon">
-                            <i class="fa-solid fa-users-gear"></i>
-                        </div>
-
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h2 class="um-panel-title">All System Users</h2>
-                                <span id="countBadgeUsers"
-                                    class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers ?? 0 }}</span>
-                            </div>
-                            <p class="um-panel-subtitle">Browse, filter, and manage all registered accounts.</p>
-                        </div>
+            <div class="bg-white rounded-xl shadow border border-gray-100 overflow-visible mb-6">
+                <div class="px-4 sm:px-5 py-4 border-b bg-gray-50 flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear text-[#8B0000]"></i>
+                        <h2 class="font-bold text-gray-800 text-sm">All System Users</h2>
+                        <span id="countBadgeUsers"
+                            class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">{{ $totalUsers }}</span>
                     </div>
 
                     <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
-                        class="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-
-                        <div class="flex items-center gap-2.5 flex-wrap order-2 md:order-1">
-                            <div class="um-role-tabs">
-                                <button type="button" onclick="setRoleFilter(this,'all')"
-                                    class="tab-btn {{ ($roleFilter ?? '') === '' ? 'active' : '' }}"
-                                    data-role="">All</button>
-                                <button type="button" onclick="setRoleFilter(this,'admin')"
-                                    class="tab-btn {{ ($roleFilter ?? '') === 'admin' ? 'active' : '' }}"
-                                    data-role="admin">Admin</button>
-                                <button type="button" onclick="setRoleFilter(this,'dentist')"
-                                    class="tab-btn {{ ($roleFilter ?? '') === 'dentist' ? 'active' : '' }}"
-                                    data-role="dentist">Dentist</button>
-                                <button type="button" onclick="setRoleFilter(this,'patient')"
-                                    class="tab-btn {{ ($roleFilter ?? '') === 'patient' ? 'active' : '' }}"
-                                    data-role="patient">Patient</button>
-                            </div>
-
-                            <select id="statusFilter" name="status"
-                                class="field-input text-xs border border-gray-200 rounded-lg px-4 py-2 bg-white text-gray-600 cursor-pointer min-w-[140px] h-[44px]">
-                                <option value="">All Status</option>
-                                <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Active
-                                </option>
-                                <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>
-                                    Inactive</option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-center gap-2 order-1 md:order-2 w-full md:w-auto md:justify-end">
-                            <div class="search-wrap um-search-mobile">
+                        class="flex items-center gap-2.5 flex-wrap">
+                        {{-- Search --}}
+                        <div class="um-search-mobile um-search-row">
+                            <div class="search-wrap">
                                 <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
                                 <input id="umSearch" name="search" placeholder="Search name or email…"
                                     value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
                                     onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
                             </div>
-
                             <button type="button" id="searchClearBtn"
-                                class="search-clear-btn search-clear-btn-outside {{ $search ?? '' ? 'visible' : '' }}"
-                                onclick="clearSearch()" title="Clear">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
+                                class="search-clear-btn {{ $search ?? '' ? '' : 'hidden' }}" onclick="clearSearch()"
+                                title="Clear">Clear</button>
+                        </div>
 
                             <div class="um-view-toggle" id="umViewToggle">
                                 <button type="button" class="um-view-toggle-btn active" id="umListViewBtn"
@@ -3071,8 +2993,7 @@
         });
 
         function toggleSearchClear(input) {
-            var hasValue = (input?.value || '').trim().length > 0;
-            document.getElementById('searchClearBtn')?.classList.toggle('visible', hasValue);
+            document.getElementById('searchClearBtn')?.classList.toggle('hidden', input.value.trim().length === 0);
         }
 
         function clearSearch() {
@@ -3080,7 +3001,8 @@
             if (!input) return;
 
             input.value = '';
-            document.getElementById('searchClearBtn')?.classList.remove('visible');
+            document.getElementById('searchClearBtn')?.classList.add('hidden');
+            input.closest('.search-wrap')?.querySelector('[data-voice-status]')?.classList.add('hidden');
             umState.search = '';
             umState.page = 1;
             umFetch();
@@ -3589,6 +3511,7 @@
 
             var searchInput = document.getElementById('umSearch');
             if (searchInput) {
+                toggleSearchClear(searchInput);
                 searchInput.addEventListener('input', function() {
                     toggleSearchClear(this);
                     clearTimeout(umSearchTimer);
