@@ -519,6 +519,26 @@
             gap: 18px;
         }
 
+        .fp-date-input-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .fp-date-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        #dateFrom[readonly],
+        #dateTo[readonly] {
+            cursor: pointer;
+        }
+
         @media (max-width: 767px) {
 
             .page-title-row {
@@ -1459,14 +1479,22 @@
                                 <p class="text-[10px] text-gray-500 font-semibold uppercase mb-1">From <span
                                         class="text-red-400">*</span>
                                 </p>
-                                <input id="dateFrom" type="date"
-                                    class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
+                                <div class="fp-date-input-wrap">
+                                    <input id="dateFrom" type="text"
+                                        class="w-full px-3.5 py-2 pr-10 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors js-flatpickr-date-max-today"
+                                        placeholder="Select start date" readonly />
+                                    <i class="fa-regular fa-calendar fp-date-icon"></i>
+                                </div>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-500 font-semibold uppercase mb-1">To <span
                                         class="text-gray-400 normal-case font-normal">(optional)</span></p>
-                                <input id="dateTo" type="date"
-                                    class="w-full px-3.5 py-2 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors" />
+                                <div class="fp-date-input-wrap">
+                                    <input id="dateTo" type="text"
+                                        class="w-full px-3.5 py-2 pr-10 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:border-[#8B0000] transition-colors js-flatpickr-date-max-today"
+                                        placeholder="Select end date" readonly />
+                                    <i class="fa-regular fa-calendar fp-date-icon"></i>
+                                </div>
                             </div>
                         </div>
                         <p class="text-[10px] text-gray-400 mt-1.5"><i class="fa-solid fa-circle-info mr-1"></i>Leave "To"
@@ -1622,6 +1650,10 @@
                     el.classList.remove('border-red-400');
                     el.classList.add('border-gray-300');
                 }
+            });
+
+            document.querySelectorAll('.flatpickr-calendar.open').forEach(cal => {
+                cal.classList.remove('open');
             });
         }
 

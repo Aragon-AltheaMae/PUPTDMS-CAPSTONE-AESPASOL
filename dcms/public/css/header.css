@@ -1,7 +1,7 @@
 :root {
     --header-h: 72px;
-    --header-z: 1200;
-    --dropdown-z: 1300;
+    --header-z: 1100;
+    --dropdown-z: 1150;
     --header-radius: 18px;
     --dropdown-radius: 20px;
     --sidebar-anim: 0.28s cubic-bezier(0.4, 0, 0.2, 1);

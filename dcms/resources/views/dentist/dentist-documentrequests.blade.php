@@ -39,6 +39,151 @@
     }
   }
 
+  .docreq-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .docreq-view-btn {
+    width: 36px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .docreq-view-btn.active {
+    background: #8B0000;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(139, 0, 0, .25);
+  }
+
+  .docreq-grid {
+    display: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .docreq-grid-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 14px 14px 14px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .docreq-grid-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--card-accent, #c2410c);
+  }
+
+  .docreq-grid-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+  }
+
+  .docreq-grid-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .docreq-grid-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1614;
+    line-height: 1.3;
+  }
+
+  .docreq-grid-sub {
+    font-size: 11px;
+    color: #9CA3AF;
+    margin-top: 3px;
+  }
+
+  .docreq-grid-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    margin-top: 12px;
+  }
+
+  .docreq-grid-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9A9490;
+    margin-bottom: 4px;
+  }
+
+  .docreq-grid-value {
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .docreq-grid-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    justify-content: flex-end;
+  }
+
+  .docreq-date-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .docreq-date-wrap input {
+    padding-right: 40px !important;
+    cursor: pointer;
+  }
+
+  .docreq-date-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    font-size: 14px;
+    pointer-events: none;
+    line-height: 1;
+    z-index: 2;
+  }
+
+  @media (max-width: 1024px) {
+    .docreq-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   .stat-card {
     background: #ffffff;
     border-radius: 12px;
@@ -264,8 +409,9 @@
   }
 
   .empty-state-wrapper {
-    padding: 5rem 2rem;
-    background: white;
+    padding: 4.5rem 2rem 4.75rem;
+    min-height: 320px;
+    background: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -273,15 +419,21 @@
     text-align: center;
   }
 
+  .empty-state-wrapper.compact {
+    min-height: 260px;
+    padding: 3.5rem 1.5rem 3.75rem;
+  }
+
   .empty-icon-box {
-    width: 72px;
-    height: 72px;
+    width: 78px;
+    height: 78px;
     background: #F3F4F6;
-    border-radius: 20px;
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.1rem;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
   }
 
   .empty-icon-box i {
@@ -290,17 +442,19 @@
   }
 
   .empty-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #5c616a;
-    margin-bottom: 0.4rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #4B5563;
+    margin-bottom: 0.45rem;
   }
 
   .empty-sub {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 400;
-    color: #8a95a6;
-    margin-bottom: 1.5rem;
+    color: #94A3B8;
+    margin-bottom: 1.35rem;
+    max-width: 420px;
+    line-height: 1.55;
   }
 
   .empty-clear-btn {
@@ -658,27 +812,47 @@
     border: 2px solid #ffffff;
   }
 
+  #fStatusGroup,
+  #fSortGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0;
+  }
+
   .ftag {
-    padding: 0.5rem 0.25rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 600;
+    flex: 1 1 auto;
+    min-height: 42px;
+    padding: 0.62rem 0.95rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
     color: #4B5563;
-    background: transparent;
-    border: none;
+    background: #F3F4F6;
+    border: 1px solid #E5E7EB;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   }
 
   .ftag:hover {
+    background: #E5E7EB;
     color: #111827;
+    border-color: #D1D5DB;
   }
 
   .ftag.ftag-active {
     background: #8B0000;
     color: #ffffff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border-color: #8B0000;
+    box-shadow: 0 6px 16px rgba(139, 0, 0, 0.22);
   }
 
   .ftag-dot {
@@ -1329,7 +1503,7 @@
   .filter-drawer-wrapper {
     position: fixed;
     inset: 0;
-    z-index: 1100;
+    z-index: 1300;
     visibility: hidden;
   }
 
@@ -1365,6 +1539,7 @@
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    z-index: 1301;
   }
 
   .filter-drawer-wrapper.open .filter-drawer-panel {
@@ -1376,27 +1551,130 @@
   }
 
   @media (max-width: 767px) {
+    .docreq-view-toggle {
+      display: none !important;
+    }
+
+    .docreq-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .empty-state-wrapper {
+      min-height: 240px;
+      padding: 3rem 1.25rem 3.25rem;
+    }
+
+    .empty-state-wrapper.compact {
+      min-height: 220px;
+      padding: 2.5rem 1rem 2.75rem;
+    }
+
+    .empty-icon-box {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1rem;
+    }
+
+    .empty-sub {
+      font-size: 0.82rem;
+      max-width: 280px;
+    }
+
     .filter-drawer-panel {
       top: auto;
       bottom: 0;
       right: 0;
       left: 0;
-      height: auto;
-      max-height: 85vh;
+      width: 100%;
       max-width: 100%;
+      height: auto;
+      max-height: min(78dvh, 720px);
       border-radius: 24px 24px 0 0;
       transform: translateY(100%);
+      overflow: hidden;
     }
 
     .filter-drawer-wrapper.open .filter-drawer-panel {
       transform: translateY(0);
     }
 
+    #filterModal .px-6.py-5.flex.items-center.justify-between.flex-shrink-0.bg-white {
+      padding: 14px 16px;
+    }
+
+    #filterModal .px-6.py-2.flex.flex-col.gap-6.flex-1.overflow-y-auto.bg-white {
+      padding: 10px 16px 8px;
+      gap: 16px;
+    }
+
+    #filterModal .px-6.py-5.bg-white.flex.flex-col.sm\:flex-row.items-center.justify-between.flex-shrink-0.border-t.border-gray-100.gap-4.sm\:gap-0.relative.z-20 {
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    #filterModal #fStatusGroup {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0;
+      background: transparent;
+    }
+
+    #filterModal #fSortGroup {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0;
+      background: transparent;
+    }
+
+    #filterModal #fStatusGroup .ftag,
+    #filterModal #fSortGroup .ftag {
+      min-height: 42px;
+      font-size: 11px;
+      line-height: 1.2;
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+
+    #filterModal .docreq-date-wrap input {
+      min-height: 40px;
+      font-size: 13px;
+    }
+
+    #filterModal .flex.items-center.gap-3.w-full.sm\:w-auto {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      gap: 8px;
+    }
+
+    #filterCancelBtn,
+    #filterApplyBtn {
+      width: 100%;
+      min-height: 42px;
+    }
+
+    #filterResetBtn {
+      width: 100%;
+      justify-content: center;
+      border-top: 1px solid #F1F5F9;
+      padding-top: 10px;
+    }
+
     #externalClearFilterBtn {
-    width: 38px;
-    height: 38px;
-    padding: 0;
-  }
+      width: 38px;
+      height: 38px;
+      padding: 0;
+    }
   }
 
   [data-theme="dark"] body {
@@ -1915,6 +2193,7 @@
     }
   }
 
+
   .mobile-req-card {
     display: none;
   }
@@ -1929,7 +2208,7 @@ $notifCount = $notifications->count();
 @endphp
 
 <main id="mainContent" class="pt-[100px] px-3 md:px-6 py-6 fade-in min-h-screen flex-1">
-    <div class="w-full fade-in">
+  <div class="w-full fade-in">
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-4 mb-6">
 
@@ -1978,7 +2257,7 @@ $notifCount = $notifications->count();
 
       <div class="px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          
+
           <div class="order-2 md:order-1">
             <span id="rowCount" class="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-wider">
               0 requests
@@ -1995,10 +2274,19 @@ $notifCount = $notifications->count();
                   class="pl-9 pr-4 py-2 w-full md:w-64 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8B0000]/10 focus:border-[#8B0000] transition-all"
                   oninput="onSearch(this)" />
               </div>
-              
+
               <button type="button" id="searchClearBtn" onclick="clearSearch()"
                 class="text-xs font-semibold text-red-600 hover:text-red-800 transition-colors hidden flex-shrink-0 px-1">
                 Clear
+              </button>
+            </div>
+
+            <div class="docreq-view-toggle" id="docreqViewToggle">
+              <button type="button" class="docreq-view-btn active" data-view="list" onclick="setViewMode('list', this)">
+                <i class="fa-solid fa-list"></i>
+              </button>
+              <button type="button" class="docreq-view-btn" data-view="grid" onclick="setViewMode('grid', this)">
+                <i class="fa-solid fa-table-cells-large"></i>
               </button>
             </div>
 
@@ -2018,18 +2306,20 @@ $notifCount = $notifications->count();
         </div>
       </div>
 
-      <div
+      <div id="docreqTableHead"
         class="hidden md:grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border-b border-gray-200"
         style="grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1fr) 100px;">
         <div class="text-left">Patient</div>
-        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date Requested</div>
+        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date
+          Requested</div>
         <div class="text-left">Document</div>
         <div class="text-left">Purpose</div>
         <div class="text-left">Status</div>
         <div class="text-right">Actions</div>
       </div>
 
-      <div id="requestContainer" class="pb-2"></div>
+      <div id="requestListContainer" class="pb-2"></div>
+      <div id="requestGridContainer" class="docreq-grid"></div>
 
       <div class="tfoot-bar">
         <span style="font-size:12px;color:#9A9490;" id="pageInfo"></span>
@@ -2094,16 +2384,23 @@ $notifCount = $notifications->count();
 
       <div>
         <label class="block text-[13px] font-bold text-gray-800 mb-2">Date Range</label>
-        <div class="flex gap-3">
+        <div class="flex gap-3 flex-col sm:flex-row">
           <div class="relative flex-1">
-            <input id="fDateFrom" type="date"
-              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer">
-            <i class="fa-regular fa-calendar absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-800 z-0"></i>
+            <div class="docreq-date-wrap">
+              <input id="fDateFrom" type="text"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] js-flatpickr-date-range-from"
+                placeholder="Select date" readonly>
+              <i class="fa-regular fa-calendar docreq-date-icon"></i>
+            </div>
           </div>
+
           <div class="relative flex-1">
-            <input id="fDateTo" type="date"
-              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer">
-            <i class="fa-regular fa-calendar absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-800 z-0"></i>
+            <div class="docreq-date-wrap">
+              <input id="fDateTo" type="text"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] js-flatpickr-date-range-to"
+                placeholder="Select date" readonly>
+              <i class="fa-regular fa-calendar docreq-date-icon"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -2111,10 +2408,13 @@ $notifCount = $notifications->count();
       <div class="pb-6">
         <label class="block text-[13px] font-bold text-gray-800 mb-2">Sort By</label>
         <div class="flex bg-gray-100 p-1 rounded-lg w-full" id="fSortGroup">
-          <button class="ftag ftag-active flex-1 text-[11px] leading-tight" data-val="newest">Newest First</button>
+          <button class="ftag ftag-active flex-1 text-[11px] leading-tight" data-val="newest">Newest
+            First</button>
           <button class="ftag flex-1 text-[11px] leading-tight" data-val="oldest">Oldest First</button>
-          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_asc">Patient<br>Name A-Z</button>
-          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_desc">Patient<br>Name Z-A</button>
+          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_asc">Patient<br>Name
+            A-Z</button>
+          <button class="ftag flex-1 text-[11px] leading-tight" data-val="name_desc">Patient<br>Name
+            Z-A</button>
         </div>
       </div>
     </div>
@@ -2124,8 +2424,8 @@ $notifCount = $notifications->count();
 
       <button id="filterResetBtn"
         class="flex items-center gap-2 text-[#8B0000] hover:text-[#6b0000] transition-colors w-full sm:w-auto justify-center sm:justify-start">
-        <i class="fa-regular fa-trash-can text-lg"></i>
-        <div class="text-left leading-tight text-[13px] font-bold">Clear<br>Filters</div>
+        <i class="fa-regular fa-trash-can text-base"></i>
+        <span class="text-[13px] font-bold whitespace-nowrap">Clear Filters</span>
       </button>
 
       <div class="flex items-center gap-3 w-full sm:w-auto">
@@ -2281,6 +2581,20 @@ $notifCount = $notifications->count();
   let filterDateTo = '';
   let filterSort = 'newest';
 
+  let currentViewMode = window.innerWidth <= 767 ? 'grid' : 'list';
+
+  function setViewMode(mode, btn) {
+    currentViewMode = mode;
+
+    document.querySelectorAll('.docreq-view-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+
+    if (btn) btn.classList.add('active');
+
+    renderList();
+  }
+
   async function loadData() {
     showSkeleton();
     try {
@@ -2292,12 +2606,24 @@ $notifCount = $notifications->count();
       updateStats(json.stats || {});
       renderList();
     } catch (e) {
-      document.getElementById('requestContainer').innerHTML = `
-          <div class="state-box">
-            <i class="fa-solid fa-circle-exclamation" style="color:#fca5a5;"></i>
-            <strong>Failed to load</strong>
-            <span>Could not fetch requests. Please refresh.</span>
-          </div>`;
+      const listContainer = document.getElementById('requestListContainer');
+      const gridContainer = document.getElementById('requestGridContainer');
+      const tableHead = document.getElementById('docreqTableHead');
+
+      if (tableHead) tableHead.style.display = 'none';
+      if (gridContainer) {
+        gridContainer.style.display = 'none';
+        gridContainer.innerHTML = '';
+      }
+      if (listContainer) {
+        listContainer.style.display = 'block';
+        listContainer.innerHTML = `
+    <div class="empty-state-wrapper compact">
+      <div class="empty-icon-box"><i class="fa-solid fa-circle-exclamation"></i></div>
+      <div class="empty-title">Failed to load requests</div>
+      <div class="empty-sub">Could not fetch document requests. Please refresh the page and try again.</div>
+    </div>`;
+      }
     }
   }
 
@@ -2336,7 +2662,25 @@ $notifCount = $notifications->count();
         </div>
       </div>`;
     }
-    document.getElementById('requestContainer').innerHTML = html;
+    const listContainer = document.getElementById('requestListContainer');
+    const gridContainer = document.getElementById('requestGridContainer');
+    const tableHead = document.getElementById('docreqTableHead');
+
+    if (tableHead && currentViewMode === 'list') {
+      tableHead.style.display = '';
+    } else if (tableHead) {
+      tableHead.style.display = 'none';
+    }
+
+    if (gridContainer) {
+      gridContainer.style.display = 'none';
+      gridContainer.innerHTML = '';
+    }
+
+    if (listContainer) {
+      listContainer.style.display = 'block';
+      listContainer.innerHTML = html;
+    }
 
     const rowCountEl = document.getElementById('rowCount');
     if (rowCountEl) rowCountEl.textContent = 'Loading...';
@@ -2393,11 +2737,11 @@ $notifCount = $notifications->count();
     return n;
   }
 
-function updateFilterBtn() {
+  function updateFilterBtn() {
     const badge = document.getElementById('filterBadge');
     const externalClear = document.getElementById('externalClearFilterBtn');
     const count = countAdvancedFilters();
-    
+
     if (count > 0) {
       if (badge) {
         badge.textContent = count;
@@ -2423,48 +2767,49 @@ function updateFilterBtn() {
   }
 
   function resetAllFilters() {
-  const searchInput = document.getElementById('searchInput');
-  const searchClearBtn = document.getElementById('searchClearBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchClearBtn = document.getElementById('searchClearBtn');
 
-  if (searchInput) searchInput.value = '';
-  if (searchClearBtn) searchClearBtn.classList.add('hidden');
+    if (searchInput) searchInput.value = '';
+    if (searchClearBtn) searchClearBtn.classList.add('hidden');
 
-  searchQuery = '';
+    searchQuery = '';
 
-  activeFilter = 'all';
-  filterStatus = 'all';
-  filterDocType = '';
-  filterDateFrom = '';
-  filterDateTo = '';
-  filterSort = 'newest';
+    activeFilter = 'all';
+    filterStatus = 'all';
+    filterDocType = '';
+    filterDateFrom = '';
+    filterDateTo = '';
+    filterSort = 'newest';
 
-  document.querySelectorAll('#statCards .stat-card').forEach(c =>
-    c.getAttribute('data-filter') === 'all'
-      ? c.classList.add('stat-active')
-      : c.classList.remove('stat-active')
-  );
+    document.querySelectorAll('#statCards .stat-card').forEach(c =>
+      c.getAttribute('data-filter') === 'all' ?
+        c.classList.add('stat-active') :
+        c.classList.remove('stat-active')
+    );
 
-  syncFilterTagGroup('fStatusGroup', 'all');
-  syncFilterTagGroup('fSortGroup', 'newest');
+    syncFilterTagGroup('fStatusGroup', 'all');
+    syncFilterTagGroup('fSortGroup', 'newest');
 
-  const fDoc = document.getElementById('fDocType');
-  if (fDoc) fDoc.value = '';
+    const fDoc = document.getElementById('fDocType');
+    if (fDoc) fDoc.value = '';
 
-  const fFrom = document.getElementById('fDateFrom');
-  if (fFrom) fFrom.value = '';
+    const fFrom = document.getElementById('fDateFrom');
+    if (fFrom) fFrom.value = '';
 
-  const fTo = document.getElementById('fDateTo');
-  if (fTo) fTo.value = '';
+    const fTo = document.getElementById('fDateTo');
+    if (fTo) fTo.value = '';
 
-  updateFilterBtn();
-  renderFilterChips();
-  currentPage = 1;
-  renderList();
-}
+    updateFilterBtn();
+    renderFilterChips();
+    currentPage = 1;
+    renderList();
+  }
 
   function renderList() {
     const filtered = getFiltered();
     const total = filtered.length;
+    const tableHead = document.getElementById('docreqTableHead');
     const lastPage = Math.max(1, Math.ceil(total / PER_PAGE));
     if (currentPage > lastPage) currentPage = lastPage;
     const start = (currentPage - 1) * PER_PAGE;
@@ -2473,47 +2818,70 @@ function updateFilterBtn() {
     const rowCountEl = document.getElementById('rowCount');
     if (rowCountEl) rowCountEl.textContent = `${total} ${total === 1 ? 'request' : 'requests'}`;
 
-    document.getElementById('pageInfo').textContent = total === 0 ? '' : `Showing ${start + 1}–${Math.min(start + PER_PAGE, total)} of ${total} requests`;
+    document.getElementById('pageInfo').textContent =
+      total === 0 ? '' : `Showing ${start + 1}–${Math.min(start + PER_PAGE, total)} of ${total} requests`;
 
     renderPagination(total, lastPage);
 
-    const container = document.getElementById('requestContainer');
+    const listContainer = document.getElementById('requestListContainer');
+    const gridContainer = document.getElementById('requestGridContainer');
+
+    if (listContainer) listContainer.innerHTML = '';
+    if (gridContainer) gridContainer.innerHTML = '';
 
     if (!page.length) {
-      const isSearchMiss = searchQuery !== '';
-      const isFilterMiss = !searchQuery && activeFilter !== 'all';
-      const isDataEmpty = allRequests.length === 0;
+      const emptyHtml = buildEmptyStateHtml();
 
-      let iconHtml, title, subtitle, showClear;
+      if (tableHead) tableHead.style.display = 'none';
 
-      if (isDataEmpty && !isSearchMiss && !isFilterMiss) {
-        iconHtml = '<i class="fa-regular fa-folder-open"></i>';
-        title = 'No requests yet';
-        subtitle = 'Incoming document requests will appear here.';
-        showClear = false;
-      } else if (isSearchMiss) {
-        iconHtml = '<i class="fa-solid fa-magnifying-glass"></i>';
-        title = `No results for "${esc(searchQuery)}"`;
-        subtitle = 'Try checking the spelling or search for a different patient name.';
-        showClear = true;
+      if (currentViewMode === 'grid') {
+        if (listContainer) {
+          listContainer.style.display = 'none';
+          listContainer.innerHTML = '';
+        }
+        if (gridContainer) {
+          gridContainer.style.display = 'block';
+          gridContainer.innerHTML = emptyHtml;
+        }
       } else {
-        iconHtml = '<i class="fa-solid fa-filter"></i>';
-        title = 'No matching requests found';
-        subtitle = 'Try adjusting or clearing your filters.';
-        showClear = true;
+        if (gridContainer) {
+          gridContainer.style.display = 'none';
+          gridContainer.innerHTML = '';
+        }
+        if (listContainer) {
+          listContainer.style.display = 'block';
+          listContainer.innerHTML = emptyHtml;
+        }
       }
 
-      container.innerHTML = `
-        <div class="empty-state-wrapper">
-          <div class="empty-icon-box">${iconHtml}</div>
-          <div class="empty-title">${title}</div>
-          <div class="empty-sub">${subtitle}</div>
-          ${showClear ? `<button onclick="resetAllFilters()" class="empty-clear-btn"><i class="fa-solid fa-xmark"></i> Clear search</button>` : ''}
-        </div>`;
       return;
     }
 
-    container.innerHTML = page.map(r => buildDesktopRow(r) + buildMobileCard(r)).join('');
+    if (currentViewMode === 'grid') {
+      if (tableHead) tableHead.style.display = 'none';
+
+      if (listContainer) {
+        listContainer.style.display = 'none';
+        listContainer.innerHTML = '';
+      }
+
+      if (gridContainer) {
+        gridContainer.style.display = 'grid';
+        gridContainer.innerHTML = page.map(r => buildGridCard(r)).join('');
+      }
+    } else {
+      if (tableHead) tableHead.style.display = '';
+
+      if (gridContainer) {
+        gridContainer.style.display = 'none';
+        gridContainer.innerHTML = '';
+      }
+
+      if (listContainer) {
+        listContainer.style.display = 'block';
+        listContainer.innerHTML = page.map(r => buildDesktopRow(r)).join('');
+      }
+    }
   }
 
   function buildDesktopRow(r) {
@@ -2543,6 +2911,107 @@ function updateFilterBtn() {
     const purposeCol =
       `<div class="req-purpose-col" style="text-align:right;"><div style="font-size:.65rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.18rem;">Purpose</div><div style="font-size:.8rem;color:#666;">${esc(r.purpose)}</div></div>`;
     return `<div class="req-row desktop-req-row"><div class="accent-bar" style="background:${accentHex};"></div><div class="req-inner" style="display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:center;gap:1rem;">${nameCol}${dateCol}${docCol}${purposeCol}</div></div>`;
+  }
+
+  function buildGridCard(r) {
+    const accentHex = r.status === 'approved' ? '#15803d' : r.status === 'rejected' ? '#b91c1c' : '#c2410c';
+    const badgeCls = r.status === 'approved' ? 'badge-approved' : r.status === 'rejected' ? 'badge-rejected' :
+      'badge-pending';
+
+    let actions = '';
+
+    if (r.status === 'pending') {
+      actions = `
+      <div class="docreq-grid-actions">
+        <button class="btn-approve" onclick="openApprove(${r.id},'${esc(r.patient_name)}')">
+          <i class="fa-solid fa-check"></i> Approve
+        </button>
+        <button class="btn-reject" onclick="openReject(${r.id},'${esc(r.patient_name)}')">
+          <i class="fa-solid fa-xmark"></i> Reject
+        </button>
+      </div>
+    `;
+    }
+
+    return `
+    <div class="docreq-grid-card" style="--card-accent:${accentHex}">
+      <div class="docreq-grid-head">
+        <div>
+          <div class="docreq-grid-name">${esc(r.patient_name)}</div>
+          <div class="docreq-grid-sub">${esc(r.sub_label || '—')}</div>
+        </div>
+        <span class="status-badge ${badgeCls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span>
+      </div>
+
+      <div class="docreq-grid-meta">
+        <div>
+          <div class="docreq-grid-label">Date</div>
+          <div class="docreq-grid-value">${esc(r.request_date)}</div>
+        </div>
+        <div>
+          <div class="docreq-grid-label">Time</div>
+          <div class="docreq-grid-value">${esc(r.request_time)}</div>
+        </div>
+        <div>
+          <div class="docreq-grid-label">Document</div>
+          <div class="docreq-grid-value">${esc(r.document_type)}</div>
+        </div>
+        <div>
+          <div class="docreq-grid-label">Purpose</div>
+          <div class="docreq-grid-value">${esc(r.purpose)}</div>
+        </div>
+      </div>
+
+      ${actions}
+    </div>
+  `;
+  }
+
+  function buildEmptyStateHtml() {
+    const isSearchMiss = searchQuery !== '';
+    const hasAdvancedFilters =
+      filterDocType !== '' ||
+      filterDateFrom !== '' ||
+      filterDateTo !== '' ||
+      filterSort !== 'newest' ||
+      activeFilter !== 'all';
+
+    const isDataEmpty = allRequests.length === 0;
+
+    let iconHtml, title, subtitle, buttonLabel = '',
+      buttonAction = '',
+      compactClass = 'compact';
+
+    if (isDataEmpty && !isSearchMiss && !hasAdvancedFilters) {
+      iconHtml = '<i class="fa-regular fa-folder-open"></i>';
+      title = 'No document requests yet';
+      subtitle = 'Incoming patient document requests will appear here once submitted.';
+    } else if (isSearchMiss) {
+      iconHtml = '<i class="fa-solid fa-magnifying-glass"></i>';
+      title = `No results for "${esc(searchQuery)}"`;
+      subtitle = 'Try another patient name or clear the search to see all requests.';
+      buttonLabel = 'Clear search';
+      buttonAction = 'clearSearch()';
+    } else {
+      iconHtml = '<i class="fa-solid fa-filter-circle-xmark"></i>';
+      title = 'No matching requests found';
+      subtitle = 'Your current filters did not return any records. Try adjusting or clearing them.';
+      buttonLabel = 'Clear filters';
+      buttonAction = 'resetAllFilters()';
+    }
+
+    return `
+    <div class="empty-state-wrapper ${compactClass}">
+      <div class="empty-icon-box">${iconHtml}</div>
+      <div class="empty-title">${title}</div>
+      <div class="empty-sub">${subtitle}</div>
+      ${buttonLabel ? `
+            <button onclick="${buttonAction}" class="empty-clear-btn">
+              <i class="fa-solid fa-xmark"></i> ${buttonLabel}
+            </button>
+          ` : ''}
+    </div>
+  `;
   }
 
   function buildMobileCard(r) {
@@ -2675,34 +3144,41 @@ function updateFilterBtn() {
   function goPage(p) {
     currentPage = p;
     renderList();
-    document.getElementById('requestContainer').scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    const activeContainer = currentViewMode === 'grid' ?
+      document.getElementById('requestGridContainer') :
+      document.getElementById('requestListContainer');
+
+    if (activeContainer) {
+      activeContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   }
 
   function setFilter(f) {
     activeFilter = f;
     currentPage = 1;
     document.querySelectorAll('#statCards .stat-card').forEach(c =>
-      c.getAttribute('data-filter') === f ? c.classList.add('stat-active') : c.classList.remove('stat-active'));
+      c.getAttribute('data-filter') === f ? c.classList.add('stat-active') : c.classList.remove('stat-active')
+    );
     renderList();
   }
 
   function onSearch(input) {
-      searchQuery = input.value.trim();
-      currentPage = 1;
-      
-      const clearBtn = document.getElementById('searchClearBtn');
-      if (clearBtn) {
-        if (searchQuery.length > 0) {
-          clearBtn.classList.remove('hidden');
-        } else {
-          clearBtn.classList.add('hidden');
-        }
+    searchQuery = input.value.trim();
+    currentPage = 1;
+
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (clearBtn) {
+      if (searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
       }
-      renderList();
     }
+    renderList();
+  }
 
   function clearSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -2768,7 +3244,8 @@ function updateFilterBtn() {
     filterStatus = statusActive ? statusActive.getAttribute('data-val') : 'all';
     activeFilter = filterStatus;
     document.querySelectorAll('#statCards .stat-card').forEach(c =>
-      c.getAttribute('data-filter') === activeFilter ? c.classList.add('stat-active') : c.classList.remove('stat-active')
+      c.getAttribute('data-filter') === activeFilter ? c.classList.add('stat-active') : c.classList.remove(
+        'stat-active')
     );
     const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
     filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
@@ -2795,7 +3272,8 @@ function updateFilterBtn() {
       hasChips = true;
       const chip = document.createElement("div");
       chip.className = "filter-chip";
-      chip.innerHTML = `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
+      chip.innerHTML =
+        `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
       chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
         onRemove();
         renderFilterChips();
@@ -2817,7 +3295,10 @@ function updateFilterBtn() {
     const tDate = document.getElementById('fDateTo').value;
     if (fDate || tDate) {
       let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
-      addChip(`Date: ${lbl}`, () => { document.getElementById('fDateFrom').value = ""; document.getElementById('fDateTo').value = ""; });
+      addChip(`Date: ${lbl}`, () => {
+        document.getElementById('fDateFrom').value = "";
+        document.getElementById('fDateTo').value = "";
+      });
     }
 
     const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
@@ -2856,6 +3337,25 @@ function updateFilterBtn() {
 
   document.addEventListener("DOMContentLoaded", () => {
 
+    document.querySelectorAll('.docreq-view-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    const defaultViewBtn = document.querySelector('.docreq-view-btn[data-view="' + currentViewMode + '"]');
+    if (defaultViewBtn) defaultViewBtn.classList.add('active');
+
+    window.addEventListener('resize', function () {
+      var shouldBeGrid = window.innerWidth <= 767;
+      if (shouldBeGrid && currentViewMode !== 'grid') {
+        currentViewMode = 'grid';
+        document.querySelectorAll('.docreq-view-btn').forEach(function (b) {
+          b.classList.remove('active');
+        });
+        var gridBtn = document.querySelector('.docreq-view-btn[data-view="grid"]');
+        if (gridBtn) gridBtn.classList.add('active');
+        renderList();
+      }
+    });
+
     document.getElementById('fDocType').addEventListener('change', renderFilterChips);
     document.getElementById('fDateFrom').addEventListener('change', renderFilterChips);
     document.getElementById('fDateTo').addEventListener('change', renderFilterChips);
@@ -2864,7 +3364,8 @@ function updateFilterBtn() {
       document.getElementById(groupId).addEventListener('click', e => {
         const btn = e.target.closest('.ftag');
         if (!btn) return;
-        document.querySelectorAll(`#${groupId} .ftag`).forEach(b => b.classList.remove('ftag-active'));
+        document.querySelectorAll(`#${groupId} .ftag`).forEach(b => b.classList.remove(
+          'ftag-active'));
         btn.classList.add('ftag-active');
         renderFilterChips();
       });

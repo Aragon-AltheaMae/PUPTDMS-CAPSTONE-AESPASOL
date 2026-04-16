@@ -1398,14 +1398,16 @@ $notifCount = $notifications->count();
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="space-y-1.5 relative">
             <label class="text-xs font-semibold text-gray-500">From:</label>
-            <input type="date" id="fromDate"
-              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
+            <input type="text" id="fromDate"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] js-flatpickr-date-range-from"
+              placeholder="Select date" />
             <i class="fa-regular fa-calendar absolute right-3.5 bottom-3.5 text-gray-800 z-0"></i>
           </div>
           <div class="space-y-1.5 relative">
             <label class="text-xs font-semibold text-gray-500">To:</label>
-            <input type="date" id="toDate"
-              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] appearance-none relative z-10 bg-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
+            <input type="text" id="toDate"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] js-flatpickr-date-range-to"
+              placeholder="Select date" />
             <i class="fa-regular fa-calendar absolute right-3.5 bottom-3.5 text-gray-800 z-0"></i>
           </div>
         </div>
