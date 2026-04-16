@@ -425,9 +425,92 @@
         }
 
         .search-input-wrap {
+            --faculty-toggle-width: 46px;
+            --faculty-search-gap: .65rem;
             display: grid;
-            grid-template-columns: 1fr 46px;
-            gap: .65rem;
+            grid-template-columns: 1fr var(--faculty-toggle-width);
+            gap: var(--faculty-search-gap);
+            position: relative;
+            align-items: stretch;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap .voice-search-input.has-voice-padding {
+            padding-right: 2.9rem;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap .voice-search-mic {
+            position: absolute;
+            right: calc(var(--faculty-toggle-width) + var(--faculty-search-gap) + .72rem);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B0000;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap .voice-search-mic i {
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status] {
+            position: absolute;
+            right: 0;
+            top: -1.35rem;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            font-size: .74rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: .18rem .48rem;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 6;
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status].hidden {
+            display: none;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status].is-listening {
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status].is-error {
+            color: #b91c1c;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status].is-success {
+            color: #166534;
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap [data-voice-status].is-default {
+            color: #4b5563;
+        }
+
+        .search-input-wrap.search-wrap.voice-search-wrap .voice-search-mic:hover,
+        .search-input-wrap.search-wrap.voice-search-wrap .voice-search-mic.text-\[\#8B0000\] {
+            color: #660000;
         }
 
         .dropdown-toggle-btn {
@@ -436,6 +519,7 @@
             background: #FAFAF9;
             color: #7b7b86;
             font-size: .95rem;
+            height: 100%;
             cursor: pointer;
             transition: all .15s ease;
             display: inline-flex;
@@ -801,7 +885,9 @@
             }
 
             .search-input-wrap {
-                grid-template-columns: 1fr 42px;
+                --faculty-toggle-width: 42px;
+                --faculty-search-gap: .5rem;
+                grid-template-columns: 1fr var(--faculty-toggle-width);
             }
         }
     </style>
@@ -860,7 +946,7 @@
                                             Select User<span class="required-mark">*</span>
                                         </label>
 
-                                        <div class="search-input-wrap">
+                                        <div class="search-input-wrap search-wrap">
                                             <input type="text" id="user_search" class="access-input"
                                                 placeholder="Search faculty by name or email" autocomplete="off">
 
