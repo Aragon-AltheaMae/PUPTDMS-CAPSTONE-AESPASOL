@@ -366,9 +366,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #8B0000;
-    cursor: pointer;
+    color: #9ca3af; 
+    cursor: not-allowed; 
+    pointer-events: none; 
     z-index: 4;
+    opacity: 0.6; 
   }
 
   #tab-clinic .voice-input-wrap > textarea.form-ctrl.is-voice-textarea + .voice-mic-btn,
@@ -842,38 +844,51 @@
                   <div class="md:col-span-2">
                     <label class="form-label">Clinic Name</label>
                     <input type="text" name="clinic_name" class="form-ctrl" placeholder="Clinic name"
-                      value="{{ old('clinic_name', $settings['clinic_name']->value ?? 'PUP Taguig Dental Clinic') }}">
+                      value="{{ old('clinic_name', $settings['clinic_name']->value ?? 'PUP Taguig Dental Clinic') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div>
                     <label class="form-label">Contact Number</label>
                     <input type="text" name="contact_number" class="form-ctrl" placeholder="+63 ..."
-                      value="{{ old('contact_number', $settings['contact_number']->value ?? '') }}">
+                      value="{{ old('contact_number', $settings['contact_number']->value ?? '') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div>
                     <label class="form-label">Email Address</label>
                     <input type="email" name="email_address" class="form-ctrl" placeholder="email@example.com"
-                      value="{{ old('email_address', $settings['email_address']->value ?? '') }}">
+                      value="{{ old('email_address', $settings['email_address']->value ?? '') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div class="md:col-span-2">
                     <label class="form-label">Address</label>
                     <input type="text" name="address" class="form-ctrl" placeholder="Full address"
-                      value="{{ old('address', $settings['address']->value ?? '') }}">
+                      value="{{ old('address', $settings['address']->value ?? '') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div>
                     <label class="form-label">Operating Since</label>
                     <input type="text" name="operating_since" class="form-ctrl" placeholder="Year"
-                      value="{{ old('operating_since', $settings['operating_since']->value ?? '1998') }}">
+                      value="{{ old('operating_since', $settings['operating_since']->value ?? '1998') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
+
                   <div>
                     <label class="form-label">Accreditation No.</label>
                     <input type="text" name="accreditation_no" class="form-ctrl" placeholder="License / accreditation number"
-                      value="{{ old('accreditation_no', $settings['accreditation_no']->value ?? '') }}">
+                      value="{{ old('accreditation_no', $settings['accreditation_no']->value ?? '') }}" disabled>
+                    <div class="setting-note">This setting is locked for now.</div>
                   </div>
                 </div>
+
                 <div>
                   <label class="form-label">Clinic Description</label>
                   <textarea name="description" class="form-ctrl resize-none" rows="3"
-                    placeholder="Short description shown on patient portal…">{{ old('description', $settings['description']->value ?? 'The PUP Taguig Dental Clinic provides free dental services to PUP students, faculty, and staff.') }}</textarea>
+                    placeholder="Short description shown on patient portal…" disabled>{{ old('description', $settings['description']->value ?? 'The PUP Taguig Dental Clinic provides free dental services to PUP students, faculty, and staff.') }}</textarea>
+                  <div class="setting-note">This setting is locked for now.</div>
                 </div>
               </div>
             </div>
