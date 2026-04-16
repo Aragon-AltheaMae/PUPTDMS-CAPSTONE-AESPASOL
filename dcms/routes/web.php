@@ -42,6 +42,8 @@ use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\Admin\DocumentTemplateController;
 use App\Services\StudentApiService;
 use App\Services\FacultyApiService;
+use App\Http\Controllers\Admin\DentalRecordController;
+
 
 //api nila albert
 
@@ -260,6 +262,9 @@ Route::prefix('admin')
         */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.admin.dashboard');
+
+        Route::get('/dental-records', [DentalRecordController::class, 'index'])
+            ->name('dental-records.index');
 
         /*
         |--------------------------------------------------------------------------

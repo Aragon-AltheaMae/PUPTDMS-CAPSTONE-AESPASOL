@@ -424,6 +424,12 @@
             position: relative;
         }
 
+        .user-search-row {
+            display: flex;
+            align-items: stretch;
+            gap: .65rem;
+        }
+
         .search-input-wrap {
             --faculty-toggle-width: 46px;
             --faculty-search-gap: .65rem;
@@ -432,6 +438,26 @@
             gap: var(--faculty-search-gap);
             position: relative;
             align-items: stretch;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .user-search-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .95rem;
+            font-weight: 700;
+            padding: 0 .15rem;
+            line-height: 1;
+            cursor: pointer;
+            align-self: center;
+            flex: 0 0 auto;
+            transition: color .15s ease;
+        }
+
+        .user-search-clear-btn:hover {
+            color: #991b1b;
         }
 
         .search-input-wrap.search-wrap.voice-search-wrap .voice-search-input.has-voice-padding {
@@ -889,6 +915,10 @@
                 --faculty-search-gap: .5rem;
                 grid-template-columns: 1fr var(--faculty-toggle-width);
             }
+
+            .user-search-row {
+                gap: .5rem;
+            }
         }
     </style>
 @endsection
@@ -946,13 +976,20 @@
                                             Select User<span class="required-mark">*</span>
                                         </label>
 
-                                        <div class="search-input-wrap search-wrap">
-                                            <input type="text" id="user_search" class="access-input"
-                                                placeholder="Search faculty by name or email" autocomplete="off">
+                                        <div class="user-search-row">
+                                            <div class="search-input-wrap search-wrap">
+                                                <input type="text" id="user_search" class="access-input"
+                                                    placeholder="Search faculty by name or email" autocomplete="off">
 
-                                            <button type="button" id="toggleUserDropdown" class="dropdown-toggle-btn"
-                                                aria-label="Show user list">
-                                                <i class="fa-solid fa-chevron-down"></i>
+                                                <button type="button" id="toggleUserDropdown" class="dropdown-toggle-btn"
+                                                    aria-label="Show user list">
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+
+                                            <button type="button" id="userSearchClearBtn" class="user-search-clear-btn hidden"
+                                                onclick="clearUserSearch()">
+                                                Clear
                                             </button>
                                         </div>
 
@@ -1152,6 +1189,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('user_search');
         const toggleButton = document.getElementById('toggleUserDropdown');
+        const clearSearchButton = document.getElementById('userSearchClearBtn');
         const resultsBox = document.getElementById('searchResults');
 
         const externalAdminId = document.getElementById('external_admin_id');
@@ -1177,6 +1215,26 @@
         let dropdownOpen = false;
         let fullListLoaded = false;
         let isDropdownMode = false;
+
+        function toggleUserSearchClear(input) {
+            if (!clearSearchButton) return;
+
+            if ((input.value || '').trim().length > 0) {
+                clearSearchButton.classList.remove('hidden');
+            } else {
+                clearSearchButton.classList.add('hidden');
+            }
+        }
+
+        window.clearUserSearch = function() {
+            if (!searchInput) return;
+
+            searchInput.value = '';
+            clearFormFields();
+            hideResults();
+            toggleUserSearchClear(searchInput);
+            searchInput.focus();
+        };
 
         function hideResults() {
             resultsBox.style.display = 'none';
@@ -1234,6 +1292,7 @@
             }
 
             hideResults();
+            toggleUserSearchClear(searchInput);
             resetPreview();
         }
 
@@ -1256,6 +1315,7 @@
             previewContact.textContent = user.contact_number ?? '—';
             previewAddress.textContent = user.address ?? '—';
 
+            toggleUserSearchClear(searchInput);
             hideResults();
         }
 
@@ -1344,6 +1404,7 @@
 
         searchInput.addEventListener('input', async function() {
             const query = this.value.trim();
+            toggleUserSearchClear(this);
 
             clearFormFields();
 
@@ -1421,6 +1482,7 @@
             });
         }
 
+        toggleUserSearchClear(searchInput);
         resetPreview();
     });
     </script>

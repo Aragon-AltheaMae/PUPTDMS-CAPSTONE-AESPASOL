@@ -131,7 +131,7 @@
             border-radius: 16px;
             border: 1px solid rgba(0, 0, 0, .05);
             box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
-            overflow: hidden;
+            overflow: visible;
             animation: fadeSlideUp .4s ease .2s both;
         }
 
@@ -231,43 +231,24 @@
             color: #B0ABA6;
         }
 
-        .search-clear-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: #E0DDD8;
-            color: #7A7370;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            padding: 0;
-        }
-
-        .search-clear-btn:hover {
-            background: #8b000076;
-            color: #fff;
-        }
-
-        .search-clear-btn.visible {
+        .inv-search-row {
             display: flex;
+            align-items: center;
+            gap: .5rem;
         }
 
         .search-wrap.voice-search-wrap {
             position: relative;
+            padding-right: 42px;
         }
 
         .search-wrap.voice-search-wrap input.has-voice-padding {
-            padding-right: 2.9rem;
+            padding-right: 0 !important;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic {
             position: absolute;
-            right: 34px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             width: 18px;
@@ -282,7 +263,7 @@
             justify-content: center;
             color: #8B0000;
             cursor: pointer;
-            z-index: 4;
+            z-index: 5;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic i {
@@ -293,7 +274,7 @@
         .search-wrap.voice-search-wrap [data-voice-status] {
             position: absolute;
             right: 0;
-            top: -0.75rem;
+            top: -1.35rem;
             display: inline-flex;
             align-items: center;
             white-space: nowrap;
@@ -918,6 +899,90 @@
             box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
         }
 
+        #addModal .add-modal-voice-row {
+            display: flex;
+            align-items: stretch;
+            gap: .5rem;
+            width: 100%;
+        }
+
+        #addModal .add-modal-voice-row .voice-input-wrap {
+            position: relative;
+            width: 100%;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        #addModal .voice-input-wrap > .form-input-custom.has-voice-padding {
+            padding-right: 2.35rem;
+        }
+
+        #addModal .voice-input-wrap .voice-mic-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B0000;
+            cursor: pointer;
+            z-index: 4;
+        }
+
+        #addModal .add-modal-voice-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            align-self: center;
+            flex: 0 0 auto;
+            transition: color .15s ease;
+        }
+
+        #addModal .add-modal-voice-clear-btn.hidden {
+            display: none;
+        }
+
+        #addModal .add-modal-voice-clear-btn:hover {
+            color: #991b1b;
+        }
+
+        #addModal .voice-input-wrap [data-voice-status] {
+            position: absolute;
+            right: 0;
+            top: -1.35rem;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            font-size: .74rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: .18rem .48rem;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 6;
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        #addModal .voice-input-wrap [data-voice-status].hidden {
+            display: none;
+        }
+
         .form-input-custom[readonly] {
             background: #F2F0EC;
             color: #9A9490;
@@ -1224,11 +1289,15 @@
                             <button class="tab-btn" type="button" onclick="setTab('supplies', this)">Sup</button>
                         </div>
 
-                        <div class="search-wrap">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input id="searchInput" type="text" placeholder="Search stock no. or item name...">
-                            <button type="button" id="searchClearBtn" class="search-clear-btn" title="Clear">
-                                <i class="fa-solid fa-xmark"></i>
+                        <div class="inv-search-row">
+                            <div class="search-wrap" style="width:200px;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input id="searchInput" type="text" placeholder="Search stock no. or item name...">
+                            </div>
+
+                            <button type="button" id="searchClearBtn"
+                                class="hidden text-xs font-semibold text-red-600 hover:text-red-800 transition-colors flex-shrink-0">
+                                Clear
                             </button>
                         </div>
 
@@ -1601,8 +1670,82 @@
             bindEvents();
             applyInventoryView(getPreferredInventoryView(), false);
             updateSearchClear();
+            initializeAddModalVoiceEnhancements();
             loadInventory();
         });
+
+        function initializeAddModalVoiceEnhancements() {
+            const modal = document.getElementById('addModal');
+            if (!modal) return;
+
+            const wrappers = modal.querySelectorAll('.voice-input-wrap');
+
+            wrappers.forEach((wrapper) => {
+                if (wrapper.dataset.addModalVoiceReady === 'true') return;
+
+                const field = wrapper.querySelector('input.form-input-custom, textarea.form-input-custom');
+                if (!field || field.readOnly || field.disabled) return;
+
+                let row = wrapper.parentElement && wrapper.parentElement.classList.contains('add-modal-voice-row')
+                    ? wrapper.parentElement
+                    : null;
+
+                if (!row) {
+                    row = document.createElement('div');
+                    row.className = 'add-modal-voice-row';
+                    wrapper.parentNode.insertBefore(row, wrapper);
+                    row.appendChild(wrapper);
+                }
+
+                let clearBtn = row.querySelector('.add-modal-voice-clear-btn');
+                if (!clearBtn) {
+                    clearBtn = document.createElement('button');
+                    clearBtn.type = 'button';
+                    clearBtn.className = 'add-modal-voice-clear-btn hidden';
+                    clearBtn.textContent = 'Clear';
+                    row.appendChild(clearBtn);
+                }
+
+                const status = wrapper.querySelector('[data-voice-status]');
+
+                function toggleClear() {
+                    if ((field.value || '').trim().length > 0) {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                    }
+                }
+
+                clearBtn.addEventListener('click', () => {
+                    field.value = '';
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                    if (status) status.classList.add('hidden');
+                    clearBtn.classList.add('hidden');
+                    field.focus();
+                });
+
+                field.addEventListener('input', toggleClear);
+                toggleClear();
+
+                wrapper.dataset.addModalVoiceReady = 'true';
+            });
+        }
+
+        function syncAddModalVoiceClearButtons() {
+            const rows = document.querySelectorAll('#addModal .add-modal-voice-row');
+            rows.forEach((row) => {
+                const field = row.querySelector('input.form-input-custom, textarea.form-input-custom');
+                const btn = row.querySelector('.add-modal-voice-clear-btn');
+                if (!field || !btn) return;
+
+                if ((field.value || '').trim().length > 0) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+        }
 
         function getPreferredInventoryView() {
             if (window.innerWidth <= 767) return 'grid';
@@ -1717,7 +1860,13 @@
         function updateSearchClear() {
             const btn = document.getElementById('searchClearBtn');
             const input = document.getElementById('searchInput');
-            btn?.classList.toggle('visible', input.value.trim().length > 0);
+            if (!btn || !input) return;
+
+            if (input.value.trim().length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
         }
 
         function updateFilterDot() {
@@ -2090,9 +2239,16 @@
 
             const counter = document.getElementById('charCounter-addName');
             if (counter) counter.textContent = '0 / 100';
+
+            document.querySelectorAll('#addModal [data-voice-status]').forEach((status) => {
+                status.classList.add('hidden');
+            });
+
+            syncAddModalVoiceClearButtons();
         }
 
         function openAddModal() {
+            initializeAddModalVoiceEnhancements();
             resetAddForm();
             document.getElementById('addModal').showModal();
         }

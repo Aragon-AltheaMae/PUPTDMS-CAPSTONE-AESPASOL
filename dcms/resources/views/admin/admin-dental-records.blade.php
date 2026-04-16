@@ -1,23 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Dental Reports | PUP Taguig Dental Clinic')
+@section('title', 'Dental Records | PUP Taguig Dental Clinic')
 
 @section('styles')
 <style>
-    :root {
-        --crimson: #8B0000;
-        --crimson-dark: #6b0000;
-        --crimson-light: #fef2f2;
-    }
-
     .page-banner {
         background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 60%, #c0392b 100%);
-        padding: 1.75rem 2rem 2rem;
+        padding: 2rem 2rem 3.5rem;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 24px rgba(139, 0, 0, .25);
-        margin-bottom: 1.5rem;
-        border-radius: 1rem;
     }
 
     .page-banner::before {
@@ -27,729 +18,754 @@
         background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
 
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        right: -60px;
+        top: -60px;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .04);
+        pointer-events: none;
+    }
+
     .page-banner-inner {
         position: relative;
         z-index: 1;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
+        flex-wrap: wrap;
         gap: 1rem;
-        flex-wrap: wrap;
     }
 
-    .page-title {
-        font-size: 2rem;
-        font-weight: 900;
-        color: #fff !important;
-        line-height: 1.1;
-        letter-spacing: -.02em;
-    }
-
-    .page-subtitle {
-        font-size: .85rem;
-        color: rgba(255, 255, 255, .78) !important;
-        margin-top: .45rem;
-    }
-
-    .page-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        font-size: .72rem;
-        font-weight: 700;
-        color: #8B0000;
-        background: rgba(255, 255, 255, .95);
-        border: 1px solid rgba(255, 255, 255, .8);
-        padding: .42rem .8rem;
-        border-radius: 999px;
-        white-space: nowrap;
-    }
-
-    .summary-bar {
-        background: linear-gradient(135deg, #7f0000 0%, #a00000 100%);
-        border-bottom: 1px solid rgba(255, 255, 255, .08);
-        border-radius: 1rem;
-        padding: 1rem 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.25rem;
-    }
-
-    .summary-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, .12);
-        border: 1px solid rgba(255, 255, 255, .18);
-        border-radius: 9999px;
-        padding: 4px 12px;
-        font-size: 12px;
-        font-weight: 500;
-        color: white;
-    }
-
-    .summary-chip-highlight {
-        background: rgba(255, 255, 255, .22);
-        border-color: rgba(255, 255, 255, .35);
-        font-weight: 700;
-    }
-
-    .tab-toggle-wrap {
-        background: #5a0000;
-        border-radius: 9999px;
-        padding: 5px;
-        display: flex;
-        gap: 4px;
-        box-shadow: 0 4px 16px rgba(139, 0, 0, .35);
-    }
-
-    .tab-btn-toggle {
-        padding: 8px 20px;
-        border-radius: 9999px;
-        font-size: 13px;
+    .page-greeting {
+        font-size: .75rem;
         font-weight: 600;
-        transition: all .25s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: rgba(255, 255, 255, .6);
-        border: none;
-        background: transparent;
-        cursor: pointer;
-    }
-
-    .tab-btn-toggle.active {
-        background: white;
-        color: #8b0000;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
-    }
-
-    .tab-count-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 20px;
-        height: 20px;
-        padding: 0 6px;
-        border-radius: 9999px;
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .tab-btn-toggle.active .tab-count-badge {
-        background: #8b0000;
-        color: white;
-    }
-
-    .tab-btn-toggle:not(.active) .tab-count-badge {
-        background: rgba(255, 255, 255, .2);
-        color: rgba(255, 255, 255, .8);
-    }
-
-    .report-card {
-        background: #fff;
-        border: 1px solid #EDE8E3;
-        border-radius: 18px;
-        padding: 1.25rem;
-        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-        transition: .2s ease;
-    }
-
-    .report-card:hover {
-        border-color: rgba(139, 0, 0, .18);
-        box-shadow: 0 12px 30px rgba(139, 0, 0, .08);
-        transform: translateY(-2px);
-    }
-
-    .stat-card {
-        background: #fff;
-        border: 1px solid #EDE8E3;
-        border-radius: 20px;
-        padding: 1.35rem;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-        transition: .2s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card:hover {
-        border-color: rgba(139, 0, 0, .22);
-        box-shadow: 0 12px 34px rgba(139, 0, 0, .08);
-    }
-
-    .stat-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        margin-bottom: 1rem;
-    }
-
-    .stat-icon-red {
-        background: #fef2f2;
-        color: #8B0000;
-    }
-
-    .stat-icon-green {
-        background: #ecfdf5;
-        color: #15803d;
-    }
-
-    .stat-icon-amber {
-        background: #fffbeb;
-        color: #b45309;
-    }
-
-    .stat-icon-blue {
-        background: #eff6ff;
-        color: #2563eb;
-    }
-
-    .stat-label {
-        font-size: .78rem;
-        font-weight: 800;
+        color: rgba(255, 255, 255, .65);
+        letter-spacing: .05em;
         text-transform: uppercase;
-        letter-spacing: .08em;
-        color: #9ca3af;
-        margin-bottom: .4rem;
-    }
-
-    .stat-value {
-        font-size: 2.35rem;
-        line-height: 1;
-        font-weight: 900;
-        color: #111827;
-    }
-
-    .stat-meta {
-        margin-top: .75rem;
-        font-size: .88rem;
-        color: #9ca3af;
+        margin-bottom: .3rem;
         display: flex;
         align-items: center;
         gap: .5rem;
     }
 
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #1f2937;
+    .page-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.1;
     }
 
-    .section-subtitle {
-        font-size: .85rem;
-        color: #9ca3af;
-        margin-top: .25rem;
+    .page-subtitle {
+        font-size: .78rem;
+        color: rgba(255, 255, 255, .68);
+        margin-top: .4rem;
     }
 
-    .table-shell {
-        background: #fff;
-        border: 1px solid #EDE8E3;
-        border-radius: 20px;
-        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-        overflow: hidden;
-    }
-
-    .table-head {
-        padding: 1.1rem 1.25rem;
-        border-bottom: 1px solid #f1f5f9;
+    .banner-actions {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
+        gap: .75rem;
         flex-wrap: wrap;
     }
 
-    .table-wrap {
-        overflow-x: auto;
-    }
-
-    .report-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .report-table th {
-        text-align: left;
-        font-size: .72rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: #9ca3af;
-        padding: .95rem 1.25rem;
-        border-bottom: 1px solid #f1f5f9;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .report-table td {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f8fafc;
-        color: #374151;
-        font-size: .92rem;
-        vertical-align: middle;
-    }
-
-    .report-table tr:hover td {
-        background: #fcfcfd;
-    }
-
-    .badge-soft {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        padding: .38rem .75rem;
-        border-radius: 999px;
+    .manage-btn {
+        background: rgba(255, 255, 255, .15);
+        border: 1px solid rgba(255, 255, 255, .25);
+        color: #fff;
+        padding: .7rem 1.1rem;
+        border-radius: 10px;
         font-size: .75rem;
         font-weight: 700;
-    }
-
-    .badge-red {
-        background: #fef2f2;
-        color: #8B0000;
-    }
-
-    .badge-green {
-        background: #ecfdf5;
-        color: #15803d;
-    }
-
-    .badge-amber {
-        background: #fffbeb;
-        color: #b45309;
-    }
-
-    .quick-btn {
+        cursor: pointer;
+        transition: all .15s;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: .55rem;
-        border-radius: 14px;
-        padding: .85rem 1rem;
-        font-size: .9rem;
-        font-weight: 700;
-        transition: .2s ease;
+        gap: .5rem;
+        white-space: nowrap;
         text-decoration: none;
     }
 
-    .quick-btn-primary {
-        background: #8B0000;
+    .manage-btn:hover {
+        background: rgba(255, 255, 255, .25);
+        transform: translateY(-1px);
+    }
+
+    .content-lift {
+        margin-top: -2rem;
+        padding: 0 1.75rem 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.25rem 1.4rem;
+        border: 1px solid rgba(0, 0, 0, .05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .04);
+        transition: transform .2s, box-shadow .2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, .1), 0 2px 6px rgba(0, 0, 0, .05);
+    }
+
+    .stat-card-accent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .stat-badge {
+        font-size: .68rem;
+        font-weight: 700;
+        padding: .3rem .75rem;
+        border-radius: 20px;
+    }
+
+    .stat-label {
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #9ca3af;
+        margin-bottom: .3rem;
+    }
+
+    .stat-value {
+        font-size: 2.4rem;
+        font-weight: 900;
+        line-height: 1;
+        color: #1a202c;
+        letter-spacing: -.03em;
+        margin-bottom: .5rem;
+    }
+
+    .stat-footer {
+        font-size: .7rem;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1.25rem;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, .05);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: .9rem 1.25rem;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafafa;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .card-header-left {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .card-header-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--crimson-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--crimson);
+    }
+
+    .card-title {
+        font-size: .82rem;
+        font-weight: 800;
+        color: #1a202c;
+    }
+
+    .card-link {
+        font-size: .72rem;
+        color: var(--crimson);
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+        transition: gap .15s;
+    }
+
+    .card-link:hover {
+        gap: .5rem;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .76rem;
+    }
+
+    .data-table thead th {
+        padding: .7rem 1rem;
+        text-align: left;
+        font-weight: 700;
+        color: #9ca3af;
+        font-size: .65rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        background: #fafafa;
+        border-bottom: 1px solid #f3f4f6;
+        white-space: nowrap;
+    }
+
+    .data-table tbody td {
+        padding: .85rem 1rem;
+        border-bottom: 1px solid #f9fafb;
+        vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover td {
+        background: #fafafa;
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .record-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .28rem .6rem;
+        border-radius: 999px;
+        font-size: .68rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .record-pill-completed {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+    }
+
+    .record-pill-pending {
+        background: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fde68a;
+    }
+
+    .record-pill-ongoing {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+    }
+
+    .side-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .quick-btn {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        padding: .85rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #f0f0f0;
+        background: #fff;
+        cursor: pointer;
+        transition: all .15s;
+        text-align: left;
+        width: 100%;
+        margin-bottom: .6rem;
+        text-decoration: none;
+    }
+
+    .quick-btn:last-child {
+        margin-bottom: 0;
+    }
+
+    .quick-btn:hover {
+        border-color: var(--crimson-mid);
+        background: var(--crimson-light);
+        transform: translateX(3px);
+    }
+
+    .quick-btn-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--crimson-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--crimson);
+        font-size: .95rem;
+        flex-shrink: 0;
+        transition: all .15s;
+    }
+
+    .quick-btn:hover .quick-btn-icon {
+        background: var(--crimson);
         color: #fff;
     }
 
-    .quick-btn-primary:hover {
-        background: #6b0000;
+    .quick-btn-text {
+        flex: 1;
     }
 
-    .quick-btn-light {
-        background: #f9f0f0;
-        color: #8B0000;
+    .quick-btn-title {
+        font-size: .8rem;
+        font-weight: 700;
+        color: var(--crimson);
+        display: block;
     }
 
-    .quick-btn-light:hover {
-        background: #f5e2e2;
+    .quick-btn-sub {
+        font-size: .68rem;
+        color: #9ca3af;
+        display: block;
+        margin-top: 1px;
     }
 
-    .quick-btn-muted {
-        background: #f3f4f6;
-        color: #4b5563;
+    .quick-btn-arrow {
+        color: #d1d5db;
+        font-size: .7rem;
+        transition: all .15s;
     }
 
-    .quick-btn-muted:hover {
-        background: #e5e7eb;
+    .quick-btn:hover .quick-btn-arrow {
+        color: var(--crimson);
     }
 
-    .empty-state {
-        padding: 3rem 1.5rem;
-        text-align: center;
+    .mini-insight {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .8rem .95rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: .7rem;
+    }
+
+    .mini-insight:last-child {
+        margin-bottom: 0;
+    }
+
+    .mini-insight-label {
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
         color: #9ca3af;
     }
 
-    [hidden] {
-        display: none !important;
+    .mini-insight-value {
+        font-size: .95rem;
+        font-weight: 900;
+        color: #1f2937;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.4rem;
+        color: #d1d5db;
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 767px) {
+        .stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .stat-grid .stat-card:last-child {
+            grid-column: span 2;
+        }
+
+        .content-lift {
+            padding: 0 1rem 2rem;
+        }
+
         .page-banner {
-            padding: 1rem 1rem 1.2rem !important;
+            padding: 1.5rem 1rem 3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stat-grid {
+            grid-template-columns: 1fr;
         }
 
-        .page-title {
-            font-size: 1.35rem !important;
+        .stat-grid .stat-card:last-child {
+            grid-column: span 1;
         }
+    }
 
-        .tab-btn-toggle {
-            padding: 7px 12px;
-            font-size: 11.5px;
-        }
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .stat-card {
+        background: #161b22 !important;
+        border-color: #21262d !important;
+    }
 
-        .summary-bar {
-            padding: .85rem 1rem;
-        }
+    [data-theme="dark"] .card-header {
+        background: #0d1117 !important;
+        border-color: #21262d !important;
+    }
 
-        .stat-value {
-            font-size: 1.9rem;
-        }
+    [data-theme="dark"] .stat-value,
+    [data-theme="dark"] .card-title,
+    [data-theme="dark"] .mini-insight-value {
+        color: #f3f4f6;
+    }
+
+    [data-theme="dark"] .stat-label,
+    [data-theme="dark"] .stat-footer,
+    [data-theme="dark"] .mini-insight-label,
+    [data-theme="dark"] .quick-btn-sub {
+        color: #9ca3af;
+    }
+
+    [data-theme="dark"] .data-table thead th {
+        background: #0d1117;
+        color: #6b7280;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .data-table tbody td {
+        color: #d1d5db;
+        border-color: #1c2128;
+    }
+
+    [data-theme="dark"] .data-table tbody tr:hover td {
+        background: #1c2128;
+    }
+
+    [data-theme="dark"] .quick-btn,
+    [data-theme="dark"] .mini-insight {
+        background: #1c2128;
+        border-color: #21262d;
+    }
+
+    [data-theme="dark"] .quick-btn:hover {
+        background: rgba(139, 0, 0, .15);
+        border-color: #5b2020;
+    }
+
+    [data-theme="dark"] .empty-icon {
+        background: #21262d;
     }
 </style>
 @endsection
 
 @section('content')
 @php
-    $reportType = request('report', 'overview');
-
-    $totalRecords = $totalRecords ?? 0;
-    $recordsThisMonth = $recordsThisMonth ?? 0;
-    $pendingFollowUps = $pendingFollowUps ?? 0;
-    $topProcedure = $topProcedure ?? 'No data yet';
-
-    $procedureBreakdown = collect($procedureBreakdown ?? []);
-    $recentRecords = collect($recentRecords ?? []);
+    use Carbon\Carbon;
 @endphp
 
-<main id="mainContent" class="pt-[80px] sm:pt-[88px] px-3 sm:px-6 pb-6 min-h-screen">
-    <div class="max-w-7xl mx-auto">
+<main id="mainContent" style="padding-top: var(--header-h); min-height: 100vh;">
 
-        <div class="page-banner mt-2">
-            <div class="page-banner-inner">
-                <div>
-                    <div class="page-badge mb-3">
-                        <i class="fa-solid fa-chart-line"></i>
-                        Dental analytics and monitoring
-                    </div>
-                    <h1 class="page-title">Dental Reports</h1>
-                    <p class="page-subtitle">
-                        Track clinic activity, treatment patterns, and follow-up workload in one place
-                    </p>
+    <div class="page-banner">
+        <div class="page-banner-inner">
+            <div>
+                <div class="page-greeting">
+                    <i class="fa-solid fa-tooth" style="color:#fcd34d;"></i>
+                    <span>Clinic Records Management</span>
                 </div>
+                <h1 class="page-title">Dental Records</h1>
+                <p class="page-subtitle">Manage, review, and monitor patient dental treatment entries.</p>
+            </div>
 
-                <div class="tab-toggle-wrap">
-                    <button type="button"
-                        class="tab-btn-toggle {{ $reportType === 'overview' ? 'active' : '' }}"
-                        onclick="switchReportTab('overview')">
-                        <i class="fa-solid fa-chart-pie text-xs"></i>
-                        Overview
-                        <span class="tab-count-badge">{{ $totalRecords }}</span>
-                    </button>
+            <div class="banner-actions">
+                <a href="{{ route('admin.dental-records.create') }}" class="manage-btn">
+                    <i class="fa-solid fa-plus"></i> Add Record
+                </a>
+                <a href="{{ route('admin.reports.index') }}" class="manage-btn">
+                    <i class="fa-solid fa-chart-column"></i> View Reports
+                </a>
+            </div>
+        </div>
+    </div>
 
-                    <button type="button"
-                        class="tab-btn-toggle {{ $reportType === 'procedures' ? 'active' : '' }}"
-                        onclick="switchReportTab('procedures')">
-                        <i class="fa-solid fa-tooth text-xs"></i>
-                        Procedures
-                        <span class="tab-count-badge">{{ $procedureBreakdown->count() }}</span>
-                    </button>
+    <div class="content-lift">
 
-                    <button type="button"
-                        class="tab-btn-toggle {{ $reportType === 'recent' ? 'active' : '' }}"
-                        onclick="switchReportTab('recent')">
-                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-                        Recent
-                        <span class="tab-count-badge">{{ $recentRecords->count() }}</span>
-                    </button>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-card-accent" style="background: linear-gradient(90deg, var(--crimson), #c0392b);"></div>
+                <div class="stat-top">
+                    <div class="stat-icon" style="background:#fef2f2;">
+                        <i class="fa-solid fa-folder-open" style="color:var(--crimson);"></i>
+                    </div>
+                    <span class="stat-badge" style="background:#fef2f2;color:var(--crimson);">All time</span>
+                </div>
+                <div class="stat-label">Total Records</div>
+                <div class="stat-value">{{ number_format($totalRecords ?? 0) }}</div>
+                <div class="stat-footer">
+                    <i class="fa-solid fa-file-medical" style="font-size:.65rem;color:var(--crimson);"></i>
+                    All encoded dental treatment records
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-accent" style="background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+                <div class="stat-top">
+                    <div class="stat-icon" style="background:#eff6ff;">
+                        <i class="fa-solid fa-calendar-day" style="color:#3b82f6;"></i>
+                    </div>
+                    <span class="stat-badge" style="background:#eff6ff;color:#3b82f6;">Today</span>
+                </div>
+                <div class="stat-label">Records Today</div>
+                <div class="stat-value">{{ $recordsToday ?? 0 }}</div>
+                <div class="stat-footer">
+                    <i class="fa-solid fa-clock" style="font-size:.65rem;color:#3b82f6;"></i>
+                    Newly added dental records today
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-accent" style="background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+                <div class="stat-top">
+                    <div class="stat-icon" style="background:#fffbeb;">
+                        <i class="fa-solid fa-user-clock" style="color:#d97706;"></i>
+                    </div>
+                    <span class="stat-badge" style="background:#fffbeb;color:#d97706;">Follow-up</span>
+                </div>
+                <div class="stat-label">Pending Records</div>
+                <div class="stat-value">{{ $pending ?? 0 }}</div>
+                <div class="stat-footer">
+                    <i class="fa-solid fa-bell" style="font-size:.65rem;color:#d97706;"></i>
+                    Records with pending treatment status
                 </div>
             </div>
         </div>
 
-        <div class="summary-bar">
-            <i class="fa-solid fa-circle-info text-white/60 text-sm"></i>
+        <div class="main-grid">
 
-            <span class="summary-chip summary-chip-highlight">
-                <i class="fa-solid fa-folder-open text-xs"></i>
-                {{ $totalRecords }} total dental records
-            </span>
-
-            <span class="summary-chip">
-                <i class="fa-solid fa-calendar-days text-xs"></i>
-                {{ $recordsThisMonth }} this month
-            </span>
-
-            <span class="summary-chip">
-                <i class="fa-solid fa-user-clock text-xs"></i>
-                {{ $pendingFollowUps }} pending follow-ups
-            </span>
-
-            <span class="summary-chip">
-                <i class="fa-solid fa-star text-xs"></i>
-                Top procedure: <strong>{{ $topProcedure }}</strong>
-            </span>
-        </div>
-
-        {{-- OVERVIEW TAB --}}
-        <section id="overviewSection" {{ $reportType !== 'overview' ? 'hidden' : '' }}>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-red">
-                        <i class="fa-solid fa-folder-open"></i>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-header-icon"><i class="fa-solid fa-notes-medical"></i></div>
+                        <span class="card-title">All Dental Records</span>
                     </div>
-                    <div class="stat-label">Total Dental Records</div>
-                    <div class="stat-value">{{ $totalRecords }}</div>
-                    <div class="stat-meta">
-                        <i class="fa-solid fa-file-medical text-[#8B0000]"></i>
-                        All encoded treatment records
-                    </div>
+
+                    <a href="{{ route('admin.dental-records.create') }}" class="card-link">
+                        Add New <i class="fa-solid fa-arrow-right" style="font-size:.65rem;"></i>
+                    </a>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-green">
-                        <i class="fa-solid fa-calendar-check"></i>
+                @if(($records ?? collect())->isEmpty())
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
+                        <p style="font-size:.82rem;font-weight:700;color:#6b7280;margin-bottom:.25rem;">
+                            No dental records found
+                        </p>
+                        <p style="font-size:.72rem;color:#b0b7c3;">New records will appear here once added.</p>
                     </div>
-                    <div class="stat-label">This Month</div>
-                    <div class="stat-value">{{ $recordsThisMonth }}</div>
-                    <div class="stat-meta">
-                        <i class="fa-solid fa-chart-column text-green-600"></i>
-                        Dental entries recorded this month
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-amber">
-                        <i class="fa-solid fa-user-clock"></i>
-                    </div>
-                    <div class="stat-label">Pending Follow-Ups</div>
-                    <div class="stat-value">{{ $pendingFollowUps }}</div>
-                    <div class="stat-meta">
-                        <i class="fa-solid fa-bell text-amber-600"></i>
-                        Patients needing next visit
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-blue">
-                        <i class="fa-solid fa-tooth"></i>
-                    </div>
-                    <div class="stat-label">Top Procedure</div>
-                    <div class="stat-value text-[1.4rem] sm:text-[1.6rem] leading-tight">{{ $topProcedure }}</div>
-                    <div class="stat-meta">
-                        <i class="fa-solid fa-ranking-star text-blue-600"></i>
-                        Most frequently recorded service
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
-                <div class="xl:col-span-2 table-shell">
-                    <div class="table-head">
-                        <div>
-                            <h3 class="section-title">Procedure Breakdown</h3>
-                            <p class="section-subtitle">Most commonly performed procedures in the clinic</p>
-                        </div>
-                    </div>
-
-                    <div class="table-wrap">
-                        <table class="report-table">
+                @else
+                    <div style="overflow-x:auto;">
+                        <table class="data-table">
                             <thead>
                                 <tr>
+                                    <th>Patient</th>
                                     <th>Procedure</th>
-                                    <th>Total Cases</th>
-                                    <th>Share</th>
+                                    <th>Dentist</th>
+                                    <th>Date</th>
                                     <th>Status</th>
+                                    <th style="text-align:right;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($procedureBreakdown as $procedure)
+                                @foreach($records as $record)
+                                    @php
+                                        $status = strtolower($record->status ?? 'pending');
+                                        $statusClass = 'record-pill-pending';
+
+                                        if ($status === 'completed') {
+                                            $statusClass = 'record-pill-completed';
+                                        } elseif ($status === 'ongoing') {
+                                            $statusClass = 'record-pill-ongoing';
+                                        }
+                                    @endphp
                                     <tr>
-                                        <td class="font-semibold text-gray-800">
-                                            {{ $procedure->name ?? $procedure['name'] ?? 'Unnamed Procedure' }}
+                                        <td>
+                                            <div style="font-size:.78rem;font-weight:700;color:#111827;">
+                                                {{ $record->patient_name ?? 'Unknown Patient' }}
+                                            </div>
+                                        </td>
+                                        <td>{{ $record->procedure ?? '—' }}</td>
+                                        <td>{{ $record->dentist_name ?? '—' }}</td>
+                                        <td>
+                                            {{ !empty($record->date) ? Carbon::parse($record->date)->format('M d, Y') : '—' }}
                                         </td>
                                         <td>
-                                            {{ $procedure->count ?? $procedure['count'] ?? 0 }}
-                                        </td>
-                                        <td>
-                                            {{ $procedure->percentage ?? $procedure['percentage'] ?? '0%' }}
-                                        </td>
-                                        <td>
-                                            <span class="badge-soft badge-red">
-                                                <i class="fa-solid fa-chart-simple text-[10px]"></i>
-                                                Active in reports
+                                            <span class="record-pill {{ $statusClass }}">
+                                                <i class="fa-solid fa-circle" style="font-size:.45rem;"></i>
+                                                {{ ucfirst($status) }}
                                             </span>
                                         </td>
+                                        <td style="text-align:right;">
+                                            @if(!empty($record->id))
+                                                <a href="{{ route('admin.dental-records.show', $record->id) }}"
+                                                   class="card-link"
+                                                   style="display:inline-flex;">
+                                                    View
+                                                </a>
+                                            @else
+                                                <span style="font-size:.72rem;color:#9ca3af;">No action</span>
+                                            @endif
+                                        </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="empty-state">No procedure data available yet.</td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-                </div>
+                @endif
+            </div>
 
-                <div class="space-y-5">
-                    <div class="report-card">
-                        <h3 class="section-title">Quick Actions</h3>
-                        <p class="section-subtitle mb-4">Fast access to report-related tasks</p>
+            <div class="side-stack">
 
-                        <div class="flex flex-col gap-3">
-                            <a href="{{ route('admin.reports.export.pdf') }}" class="quick-btn quick-btn-primary">
-                                <i class="fa-solid fa-file-pdf"></i>
-                                Export PDF Report
-                            </a>
-
-                            <a href="{{ route('admin.reports.export.excel') }}" class="quick-btn quick-btn-light">
-                                <i class="fa-solid fa-file-excel"></i>
-                                Export Excel Report
-                            </a>
-
-                            <a href="{{ route('admin.dental-records.index') }}" class="quick-btn quick-btn-muted">
-                                <i class="fa-solid fa-folder-open"></i>
-                                View Dental Records
-                            </a>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <span class="card-title">Quick Actions</span>
                         </div>
                     </div>
 
-                    <div class="report-card">
-                        <h3 class="section-title">Insights</h3>
-                        <p class="section-subtitle mb-4">Useful admin-level observations</p>
-
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between rounded-2xl bg-[#faf7f5] px-4 py-3">
-                                <span class="text-sm text-gray-500 font-semibold">Top Procedure</span>
-                                <span class="badge-soft badge-red">{{ $topProcedure }}</span>
+                    <div style="padding:1rem;">
+                        <a href="{{ route('admin.dental-records.create') }}" class="quick-btn">
+                            <div class="quick-btn-icon"><i class="fa-solid fa-plus"></i></div>
+                            <div class="quick-btn-text">
+                                <span class="quick-btn-title">Add Record</span>
+                                <span class="quick-btn-sub">Create a new dental entry</span>
                             </div>
+                            <i class="fa-solid fa-chevron-right quick-btn-arrow"></i>
+                        </a>
 
-                            <div class="flex items-center justify-between rounded-2xl bg-[#faf7f5] px-4 py-3">
-                                <span class="text-sm text-gray-500 font-semibold">Monthly Records</span>
-                                <span class="badge-soft badge-green">{{ $recordsThisMonth }}</span>
+                        <a href="{{ route('admin.reports.index') }}" class="quick-btn">
+                            <div class="quick-btn-icon"><i class="fa-solid fa-chart-column"></i></div>
+                            <div class="quick-btn-text">
+                                <span class="quick-btn-title">Dental Reports</span>
+                                <span class="quick-btn-sub">View analytics and summaries</span>
                             </div>
+                            <i class="fa-solid fa-chevron-right quick-btn-arrow"></i>
+                        </a>
 
-                            <div class="flex items-center justify-between rounded-2xl bg-[#faf7f5] px-4 py-3">
-                                <span class="text-sm text-gray-500 font-semibold">Follow-Up Load</span>
-                                <span class="badge-soft badge-amber">{{ $pendingFollowUps }}</span>
+                        <a href="{{ route('admin.appointments') }}" class="quick-btn">
+                            <div class="quick-btn-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div class="quick-btn-text">
+                                <span class="quick-btn-title">Appointments</span>
+                                <span class="quick-btn-sub">Check scheduled clinic visits</span>
                             </div>
+                            <i class="fa-solid fa-chevron-right quick-btn-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                            <span class="card-title">Record Insights</span>
+                        </div>
+                    </div>
+
+                    <div style="padding:1rem;">
+                        <div class="mini-insight">
+                            <div>
+                                <div class="mini-insight-label">Most Common Procedure</div>
+                                <div class="mini-insight-value">{{ $topProcedure ?? 'No data yet' }}</div>
+                            </div>
+                            <i class="fa-solid fa-tooth" style="color:var(--crimson);"></i>
+                        </div>
+
+                        <div class="mini-insight">
+                            <div>
+                                <div class="mini-insight-label">Completed This Week</div>
+                                <div class="mini-insight-value">{{ $completedThisWeek ?? 0 }}</div>
+                            </div>
+                            <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i>
+                        </div>
+
+                        <div class="mini-insight">
+                            <div>
+                                <div class="mini-insight-label">Patients For Follow-Up</div>
+                                <div class="mini-insight-value">{{ $patientsForFollowUp ?? 0 }}</div>
+                            </div>
+                            <i class="fa-solid fa-user-clock" style="color:#d97706;"></i>
                         </div>
                     </div>
                 </div>
+
             </div>
-        </section>
-
-        {{-- PROCEDURES TAB --}}
-        <section id="proceduresSection" {{ $reportType !== 'procedures' ? 'hidden' : '' }}>
-            <div class="table-shell">
-                <div class="table-head">
-                    <div>
-                        <h3 class="section-title">Procedure Report Details</h3>
-                        <p class="section-subtitle">Expanded list of procedures and clinic activity counts</p>
-                    </div>
-                </div>
-
-                <div class="table-wrap">
-                    <table class="report-table">
-                        <thead>
-                            <tr>
-                                <th>Procedure</th>
-                                <th>Total Count</th>
-                                <th>Percentage</th>
-                                <th>Recommendation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($procedureBreakdown as $procedure)
-                                @php
-                                    $procName = $procedure->name ?? $procedure['name'] ?? 'Unnamed Procedure';
-                                    $procCount = $procedure->count ?? $procedure['count'] ?? 0;
-                                    $procPercent = $procedure->percentage ?? $procedure['percentage'] ?? '0%';
-                                @endphp
-                                <tr>
-                                    <td class="font-semibold text-gray-800">{{ $procName }}</td>
-                                    <td>{{ $procCount }}</td>
-                                    <td>{{ $procPercent }}</td>
-                                    <td>
-                                        @if($procCount >= 10)
-                                            <span class="badge-soft badge-green">High demand</span>
-                                        @elseif($procCount >= 5)
-                                            <span class="badge-soft badge-amber">Monitor volume</span>
-                                        @else
-                                            <span class="badge-soft badge-red">Low frequency</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="empty-state">No procedure report data available.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        {{-- RECENT TAB --}}
-        <section id="recentSection" {{ $reportType !== 'recent' ? 'hidden' : '' }}>
-            <div class="table-shell">
-                <div class="table-head">
-                    <div>
-                        <h3 class="section-title">Recent Dental Records</h3>
-                        <p class="section-subtitle">Latest treatment entries included in reports</p>
-                    </div>
-                </div>
-
-                <div class="table-wrap">
-                    <table class="report-table">
-                        <thead>
-                            <tr>
-                                <th>Patient</th>
-                                <th>Procedure</th>
-                                <th>Dentist</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($recentRecords as $record)
-                                <tr>
-                                    <td class="font-semibold text-gray-800">
-                                        {{ $record->patient_name ?? $record['patient_name'] ?? 'Unknown Patient' }}
-                                    </td>
-                                    <td>
-                                        {{ $record->procedure ?? $record['procedure'] ?? '—' }}
-                                    </td>
-                                    <td>
-                                        {{ $record->dentist_name ?? $record['dentist_name'] ?? '—' }}
-                                    </td>
-                                    <td>
-                                        {{ $record->date ?? $record['date'] ?? '—' }}
-                                    </td>
-                                    <td>
-                                        @php
-                                            $status = strtolower($record->status ?? $record['status'] ?? 'completed');
-                                        @endphp
-
-                                        @if($status === 'completed')
-                                            <span class="badge-soft badge-green">Completed</span>
-                                        @elseif($status === 'pending')
-                                            <span class="badge-soft badge-amber">Pending</span>
-                                        @else
-                                            <span class="badge-soft badge-red">{{ ucfirst($status) }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="empty-state">No recent dental records found.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
+        </div>
     </div>
 </main>
-@endsection
-
-@section('scripts')
-<script>
-    function switchReportTab(tab) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('report', tab);
-        window.location.href = url.toString();
-    }
-</script>
 @endsection

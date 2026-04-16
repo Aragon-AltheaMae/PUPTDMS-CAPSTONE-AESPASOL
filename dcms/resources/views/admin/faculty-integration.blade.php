@@ -277,6 +277,12 @@
             position: relative;
         }
 
+        .faculty-search-row {
+            display: flex;
+            align-items: stretch;
+            gap: .65rem;
+        }
+
         .search-input-wrap {
             --faculty-toggle-width: 46px;
             --faculty-search-gap: .65rem;
@@ -285,6 +291,26 @@
             gap: var(--faculty-search-gap);
             position: relative;
             align-items: stretch;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .faculty-search-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .95rem;
+            font-weight: 700;
+            padding: 0 .15rem;
+            line-height: 1;
+            cursor: pointer;
+            align-self: center;
+            flex: 0 0 auto;
+            transition: color .15s ease;
+        }
+
+        .faculty-search-clear-btn:hover {
+            color: #991b1b;
         }
 
         .search-input-wrap.search-wrap.voice-search-wrap .voice-search-input.has-voice-padding {
@@ -800,6 +826,10 @@
                 --faculty-search-gap: .5rem;
                 grid-template-columns: 1fr var(--faculty-toggle-width);
             }
+
+            .faculty-search-row {
+                gap: .5rem;
+            }
         }
     </style>
 @endsection
@@ -873,13 +903,20 @@
                                             Select Faculty<span class="required-mark">*</span>
                                         </label>
 
-                                        <div class="search-input-wrap search-wrap">
-                                            <input type="text" id="faculty_search" class="access-input"
-                                                placeholder="Search faculty by name, email, or faculty code" autocomplete="off">
+                                        <div class="faculty-search-row">
+                                            <div class="search-input-wrap search-wrap">
+                                                <input type="text" id="faculty_search" class="access-input"
+                                                    placeholder="Search faculty by name, email, or faculty code" autocomplete="off">
 
-                                            <button type="button" id="toggleFacultyDropdown" class="dropdown-toggle-btn"
-                                                aria-label="Show faculty list">
-                                                <i class="fa-solid fa-chevron-down"></i>
+                                                <button type="button" id="toggleFacultyDropdown" class="dropdown-toggle-btn"
+                                                    aria-label="Show faculty list">
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+
+                                            <button type="button" id="facultySearchClearBtn" class="faculty-search-clear-btn hidden"
+                                                onclick="clearFacultySearch()">
+                                                Clear
                                             </button>
                                         </div>
 
@@ -1120,6 +1157,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('faculty_search');
             const toggleButton = document.getElementById('toggleFacultyDropdown');
+            const clearSearchButton = document.getElementById('facultySearchClearBtn');
             const resultsBox = document.getElementById('facultyResults');
 
             const facultyJson = document.getElementById('faculty_json');
@@ -1152,6 +1190,26 @@
             let faculties = [];
             let dropdownOpen = false;
             let isDropdownMode = false;
+
+            function toggleFacultySearchClear(input) {
+                if (!clearSearchButton) return;
+
+                if ((input.value || '').trim().length > 0) {
+                    clearSearchButton.classList.remove('hidden');
+                } else {
+                    clearSearchButton.classList.add('hidden');
+                }
+            }
+
+            window.clearFacultySearch = function() {
+                if (!searchInput) return;
+
+                searchInput.value = '';
+                clearFields();
+                hideResults();
+                toggleFacultySearchClear(searchInput);
+                searchInput.focus();
+            };
 
             function showResults() {
                 resultsBox.style.display = 'block';
@@ -1202,6 +1260,7 @@
                 document.getElementById('cms_role').value = '';
                 document.getElementById('account_status').value = '';
                 hideResults();
+                toggleFacultySearchClear(searchInput);
             }
 
             function fillFaculty(faculty) {
@@ -1236,6 +1295,7 @@
                 previewDepartment.textContent = faculty.department ?? '—';
                 previewType.textContent = faculty.faculty_type ?? '—';
 
+                toggleFacultySearchClear(searchInput);
                 hideResults();
             }
 
@@ -1315,6 +1375,7 @@
 
             searchInput.addEventListener('input', function() {
                 const query = this.value.trim();
+                toggleFacultySearchClear(this);
 
                 clearFields();
                 isDropdownMode = false;
@@ -1376,6 +1437,7 @@
                 });
             }
 
+            toggleFacultySearchClear(searchInput);
             resetPreview();
         });
     </script>

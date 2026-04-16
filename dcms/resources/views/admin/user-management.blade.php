@@ -305,43 +305,52 @@
             color: #B0ABA6;
         }
 
-        .search-clear-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: #E0DDD8;
-            color: #7A7370;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
+        .um-search-row {
+            display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            padding: 0;
+            gap: .5rem;
+            width: 100%;
+        }
+
+        .um-search-row .search-wrap {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .search-clear-btn {
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            font-size: .78rem;
+            font-weight: 600;
+            line-height: 1;
+            padding: 0 .1rem;
+            margin: 0;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: color .15s ease;
         }
 
         .search-clear-btn:hover {
-            background: #8b000076;
-            color: #fff;
+            color: #991b1b;
         }
 
-        .search-clear-btn.visible {
-            display: flex;
+        .search-clear-btn.hidden {
+            display: none;
         }
 
         .search-wrap.voice-search-wrap {
             position: relative;
+            padding-right: 42px;
         }
 
         .search-wrap.voice-search-wrap input.has-voice-padding {
-            padding-right: 2.9rem;
+            padding-right: 0 !important;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic {
             position: absolute;
-            right: 34px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             width: 18px;
@@ -356,7 +365,7 @@
             justify-content: center;
             color: #8B0000;
             cursor: pointer;
-            z-index: 4;
+            z-index: 5;
         }
 
         .search-wrap.voice-search-wrap .voice-search-mic i {
@@ -992,7 +1001,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden mb-6">
+            <div class="bg-white rounded-xl shadow border border-gray-100 overflow-visible mb-6">
                 <div class="px-4 sm:px-5 py-4 border-b bg-gray-50 flex flex-col gap-3">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-users-gear text-[#8B0000]"></i>
@@ -1005,16 +1014,16 @@
                     <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
                         class="flex items-center gap-2.5 flex-wrap">
                         {{-- Search --}}
-                        <div class="search-wrap um-search-mobile">
-                            <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
-                            <input id="umSearch" name="search" placeholder="Search name or email…"
-                                value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
-                                onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                        <div class="um-search-mobile um-search-row">
+                            <div class="search-wrap">
+                                <i class="fa fa-search" style="color:#8B0000;font-size:13px;flex-shrink:0;"></i>
+                                <input id="umSearch" name="search" placeholder="Search name or email…"
+                                    value="{{ $search ?? '' }}" autocomplete="off" oninput="toggleSearchClear(this)"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                            </div>
                             <button type="button" id="searchClearBtn"
-                                class="search-clear-btn {{ $search ?? '' ? 'visible' : '' }}" onclick="clearSearch()"
-                                title="Clear">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
+                                class="search-clear-btn {{ $search ?? '' ? '' : 'hidden' }}" onclick="clearSearch()"
+                                title="Clear">Clear</button>
                         </div>
 
                         {{-- Role filter --}}
@@ -1940,7 +1949,7 @@
         });
 
         function toggleSearchClear(input) {
-            document.getElementById('searchClearBtn')?.classList.toggle('visible', input.value.length > 0);
+            document.getElementById('searchClearBtn')?.classList.toggle('hidden', input.value.trim().length === 0);
         }
 
         function clearSearch() {
@@ -1948,7 +1957,8 @@
             if (!input) return;
 
             input.value = '';
-            document.getElementById('searchClearBtn')?.classList.remove('visible');
+            document.getElementById('searchClearBtn')?.classList.add('hidden');
+            input.closest('.search-wrap')?.querySelector('[data-voice-status]')?.classList.add('hidden');
             umState.search = '';
             umState.page = 1;
             umFetch();
@@ -2437,6 +2447,7 @@
 
             var searchInput = document.getElementById('umSearch');
             if (searchInput) {
+                toggleSearchClear(searchInput);
                 searchInput.addEventListener('input', function() {
                     toggleSearchClear(this);
                     clearTimeout(umSearchTimer);
