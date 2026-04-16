@@ -1,28 +1,36 @@
 <style>
+    .patient-search-row {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        width: 100%;
+        max-width: 430px;
+        margin-bottom: 18px;
+    }
+
     .patient-search-wrap {
         position: relative;
         display: flex;
         align-items: center;
         gap: 10px;
         width: 100%;
-        max-width: 420px;
-        margin-bottom: 18px;
-        background: #fff;
-        border: 1.5px solid #ede8e2;
-        border-radius: 10px;
-        padding: 0 12px;
-        min-height: 42px;
+        max-width: none;
+        background: #f5f5f5;
+        border: 2px solid #b91c1c;
+        border-radius: 16px;
+        padding: 0 14px;
+        min-height: 48px;
         overflow: visible;
     }
 
     .patient-search-wrap:focus-within {
         border-color: #8B0000;
-        box-shadow: 0 0 0 3px rgba(139, 0, 0, .1);
+        box-shadow: 0 0 0 3px rgba(139, 0, 0, .12);
     }
 
     .patient-search-wrap .search-icon {
-        color: #b5a99a;
-        font-size: 13px;
+        color: #8B0000;
+        font-size: 15px;
         flex-shrink: 0;
     }
 
@@ -31,19 +39,24 @@
         border: none;
         background: none;
         outline: none;
-        color: #2d2420;
-        font-size: 14px;
+        color: #1f2937;
+        font-size: 1rem;
         padding: 0;
     }
 
+    .patient-search-wrap input::placeholder {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
     .patient-search-wrap input.has-voice-padding {
-        padding-right: 1.8rem;
+        padding-right: 0 !important;
     }
 
     .patient-search-wrap [data-voice-trigger],
     .patient-search-wrap .voice-search-mic {
         position: absolute;
-        right: 12px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
         width: 18px;
@@ -58,13 +71,13 @@
         justify-content: center;
         color: #8B0000;
         cursor: pointer;
-        z-index: 4;
+        z-index: 5;
     }
 
     .patient-search-wrap [data-voice-status] {
         position: absolute;
-        right: 0;
-        top: calc(100% + 6px);
+        right: 48px;
+        top: -1.15rem;
         display: inline-flex;
         align-items: center;
         white-space: nowrap;
@@ -75,7 +88,7 @@
         border-radius: 999px;
         pointer-events: none;
         z-index: 6;
-        background: rgba(255, 255, 255, .92);
+        background: #f0fdf4;
         border: 1px solid #e5e7eb;
         box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
     }
@@ -100,6 +113,29 @@
         color: #166534;
         border-color: #bbf7d0;
         background: #f0fdf4;
+    }
+
+    .patient-search-clear-btn {
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        font-size: .95rem;
+        font-weight: 700;
+        line-height: 1;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        flex: 0 0 auto;
+        transition: color .15s ease;
+        align-self: center;
+    }
+
+    .patient-search-clear-btn.hidden {
+        display: none;
+    }
+
+    .patient-search-clear-btn:hover {
+        color: #991b1b;
     }
 </style>
 
@@ -140,15 +176,18 @@
     </div>
 
     <!-- SEARCH BAR -->
-    <div class="search-wrap patient-search-wrap">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-            type="text"
-            id="patientSearch"
-            placeholder="Search patient name..."
-            oninput="filterPatients()"
-            style="font-family:'Inter', sans-serif;"
-        >
+    <div class="patient-search-row">
+        <div class="search-wrap patient-search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input
+                type="text"
+                id="patientSearch"
+                placeholder="Search patient name..."
+                oninput="filterPatients()"
+                style="font-family:'Inter', sans-serif;"
+            >
+        </div>
+        <button type="button" id="patientSearchClearBtn" class="patient-search-clear-btn hidden" title="Clear">Clear</button>
     </div>
 
     <!-- DIRECTORY CARD -->
@@ -304,5 +343,30 @@ function filterPatients() {
         noResults.style.display = 'none';
         searchQueryText.textContent = '';
     }
+
+    syncPatientSearchClear();
 }
+
+function syncPatientSearchClear() {
+    const input = document.getElementById('patientSearch');
+    const clearBtn = document.getElementById('patientSearchClearBtn');
+    if (!input || !clearBtn) return;
+    clearBtn.classList.toggle('hidden', input.value.trim().length === 0);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('patientSearch');
+    const clearBtn = document.getElementById('patientSearchClearBtn');
+    if (!input || !clearBtn) return;
+
+    syncPatientSearchClear();
+
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        const status = input.closest('.patient-search-wrap')?.querySelector('[data-voice-status]');
+        if (status) status.classList.add('hidden');
+        filterPatients();
+        input.focus();
+    });
+});
 </script>

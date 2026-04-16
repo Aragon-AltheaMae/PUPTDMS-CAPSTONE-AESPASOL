@@ -466,7 +466,7 @@
         border-radius: 16px;
         border: 1px solid rgba(0, 0, 0, .05);
         box-shadow: 0 4px 20px rgba(0, 0, 0, .03);
-        overflow: hidden;
+        overflow: visible;
     }
 
     .card-header {
@@ -484,6 +484,68 @@
         position: relative;
         display: flex;
         align-items: center;
+    }
+
+    .perm-search-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex: 1;
+        min-width: 240px;
+    }
+
+    .perm-search-row .st-input-wrap {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .perm-search-clear-btn {
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        font-size: .78rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0 .1rem;
+        margin: 0;
+        cursor: pointer;
+        flex: 0 0 auto;
+        transition: color .15s ease;
+    }
+
+    .perm-search-clear-btn.hidden {
+        display: none;
+    }
+
+    .perm-search-clear-btn:hover {
+        color: #991b1b;
+    }
+
+    .perm-search-row .st-input-wrap.voice-search-wrap {
+        position: relative;
+        padding-right: 42px;
+    }
+
+    .perm-search-row .st-input-wrap.voice-search-wrap .st-input.has-voice-padding,
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-search-input {
+        padding-right: 0 !important;
+    }
+
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-mic-btn,
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-search-mic {
+        right: 14px;
+        z-index: 5;
+        color: #8B0000;
+    }
+
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-mic-btn:hover,
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-search-mic:hover,
+    .perm-search-row .st-input-wrap.voice-search-wrap .voice-search-mic.text-\[\#8B0000\] {
+        color: #660000;
+    }
+
+    .perm-search-row .st-input-wrap [data-voice-status] {
+        top: -1.35rem;
     }
 
     .voice-mic-btn {
@@ -1741,10 +1803,13 @@
                 <div>
                     <div class="card" style="display:flex; flex-direction:column; min-height:600px;">
                         <div class="card-header">
-                            <div class="st-input-wrap" style="flex:1; min-width:240px;">
-                                <i class="fa-solid fa-magnifying-glass st-input-icon"></i>
-                                <input type="text" id="permSearch" placeholder="Search permissions..." class="st-input"
-                                    oninput="filterPerms(this.value)">
+                            <div class="perm-search-row">
+                                <div class="st-input-wrap">
+                                    <i class="fa-solid fa-magnifying-glass st-input-icon"></i>
+                                    <input type="text" id="permSearch" placeholder="Search permissions..." class="st-input"
+                                        oninput="filterPerms(this.value)">
+                                </div>
+                                <button type="button" id="permSearchClearBtn" class="perm-search-clear-btn hidden" title="Clear">Clear</button>
                             </div>
                             <div style="display:flex; gap:8px;">
                                 <button type="button" class="btn-view-as" id="globalViewAsBtn" onclick="openViewAs()">
@@ -2249,6 +2314,36 @@
         document.addEventListener('DOMContentLoaded', () => {
             const firstCard = document.querySelector('.role-card');
             const protectedBanner = document.getElementById('protectedBanner');
+            const permSearch = document.getElementById('permSearch');
+            const permSearchClearBtn = document.getElementById('permSearchClearBtn');
+
+            function syncPermSearchClear() {
+                if (!permSearch || !permSearchClearBtn) return;
+                permSearchClearBtn.classList.toggle('hidden', (permSearch.value || '').trim().length === 0);
+            }
+
+            if (permSearchClearBtn && !permSearchClearBtn.dataset.bound) {
+                permSearchClearBtn.dataset.bound = '1';
+                permSearchClearBtn.addEventListener('click', () => {
+                    if (!permSearch) return;
+                    permSearch.value = '';
+                    filterPerms('');
+                    syncPermSearchClear();
+
+                    const status = permSearch.closest('.st-input-wrap')?.querySelector('[data-voice-status]');
+                    if (status) status.classList.add('hidden');
+
+                    permSearch.focus();
+                });
+            }
+
+            if (permSearch && !permSearch.dataset.clearSyncBound) {
+                permSearch.dataset.clearSyncBound = '1';
+                permSearch.addEventListener('input', syncPermSearchClear);
+            }
+
+            syncPermSearchClear();
+
             if (firstCard && protectedBanner && firstCard.dataset.isSuper === '1') {
                 protectedBanner.style.display = 'flex';
             }
@@ -2310,6 +2405,8 @@
 
             const permSearch = document.getElementById('permSearch');
             if (permSearch) permSearch.value = '';
+            const permSearchClearBtn = document.getElementById('permSearchClearBtn');
+            if (permSearchClearBtn) permSearchClearBtn.classList.add('hidden');
             filterPerms('');
 
             activeRoleId = roleId;
@@ -2628,6 +2725,10 @@
             q = q.toLowerCase().trim();
             const form = [...document.querySelectorAll('.role-form')].find(f => f.style.display === 'block');
             if (!form) return;
+
+            const permSearchClearBtn = document.getElementById('permSearchClearBtn');
+            if (permSearchClearBtn) permSearchClearBtn.classList.toggle('hidden', q.length === 0);
+
             form.querySelectorAll('.perm-row').forEach(row => {
                 row.style.display = (!q || (row.dataset.permSearch || '').includes(q)) ? '' : 'none';
             });
