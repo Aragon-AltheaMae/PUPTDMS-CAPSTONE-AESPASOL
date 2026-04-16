@@ -104,8 +104,8 @@
         }
 
         /* ════════════════════
-                                                                       STAT CARDS
-                                                                    ════════════════════ */
+                                                                                                           STAT CARDS
+                                                                                                        ════════════════════ */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -408,8 +408,8 @@
         }
 
         /* ════════════════════
-                                                                       TABLE
-                                                                    ════════════════════ */
+                                                                                                           TABLE
+                                                                                                        ════════════════════ */
         .inv-table {
             width: 100%;
             border-collapse: collapse;
@@ -581,7 +581,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 190;
+            z-index: 1250;
             background: rgba(0, 0, 0, .35);
             backdrop-filter: blur(2px);
         }
@@ -592,12 +592,12 @@
 
         .filter-panel {
             position: fixed;
-            bottom: 0;
             left: 0;
-            top: auto;
-            right: auto;
+            right: 0;
+            bottom: 0;
+            top: var(--header-h, 72px);
             width: 100%;
-            height: 85vh;
+            height: calc(100dvh - var(--header-h, 72px));
             max-width: none;
             background: #fff;
             border-radius: 24px 24px 0 0;
@@ -606,11 +606,29 @@
             flex-direction: column;
             transform: translateY(100%);
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 200;
+            z-index: 1260;
         }
 
         .filter-panel.open {
             transform: translateY(0);
+        }
+
+        @media (min-width: 768px) {
+            .filter-panel {
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: auto;
+                width: 490px;
+                max-width: 90vw;
+                height: 100vh;
+                border-radius: 24px 0 0 24px;
+                transform: translateX(100%);
+            }
+
+            .filter-panel.open {
+                transform: translateX(0);
+            }
         }
 
         .active-filters-container {
@@ -655,23 +673,6 @@
 
         .hidden {
             display: none !important;
-        }
-
-        @media (min-width: 768px) {
-            .filter-panel {
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: auto;
-                width: 360px;
-                height: 100vh;
-                border-radius: 24px 0 0 24px;
-                transform: translateX(100%);
-            }
-
-            .filter-panel.open {
-                transform: translateX(0);
-            }
         }
 
         .fp-header {
@@ -779,7 +780,7 @@
 
         .fp-date-input {
             height: 38px;
-            padding: 0 12px;
+            padding: 0 40px 0 12px;
             border: 1.5px solid #E0DDD8;
             border-radius: 8px;
             font-size: 12px;
@@ -787,6 +788,7 @@
             transition: border-color .2s;
             background: #FFFFFF;
             color: #333;
+            width: 100%;
         }
 
         .fp-date-input:focus {
@@ -948,8 +950,37 @@
             }
 
             .filter-panel {
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 width: 100%;
-                right: -100%;
+                height: auto;
+                max-height: min(82vh, 720px);
+                border-radius: 24px 24px 0 0;
+                right: 0;
+            }
+
+            .fp-body {
+                flex: 0 1 auto;
+                padding: 16px 16px 10px;
+            }
+
+            .fp-section {
+                margin-bottom: 16px;
+            }
+
+            .fp-section:last-child {
+                margin-bottom: 8px;
+            }
+
+            .fp-date-row {
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+
+            .fp-footer {
+                padding: 12px 16px 16px;
             }
 
             .stat-value {
@@ -1078,9 +1109,44 @@
         }
 
         .form-input-custom[readonly] {
-            background: #F2F0EC;
-            color: #9A9490;
-            cursor: not-allowed;
+            background: #FFFFFF;
+            color: #333333;
+            cursor: pointer;
+        }
+
+        .fp-date-input-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .fp-date-input-wrap .form-input-custom,
+        .fp-date-input-wrap .fp-date-input {
+            width: 100%;
+            padding-right: 40px !important;
+        }
+
+        .fp-date-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+            font-size: 14px;
+            pointer-events: none;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .fp-date-input,
+        .form-input-custom.js-flatpickr-date {
+            cursor: pointer;
+        }
+
+        .fp-date-input[readonly],
+        .form-input-custom.js-flatpickr-date[readonly] {
+            background: #FFFFFF;
+            color: #333333;
+            cursor: pointer;
         }
 
         .modal-footer-custom {
@@ -1457,6 +1523,20 @@
 
         @media (max-width: 767px) {
 
+            .filter-panel {
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                max-height: min(82vh, 720px);
+                border-radius: 24px 24px 0 0;
+            }
+
+            .fp-body {
+                flex: 0 1 auto;
+            }
+
             .modal-sticky-header {
                 padding: 18px 18px 14px;
             }
@@ -1757,11 +1837,20 @@
                 <div class="fp-date-row">
                     <div class="fp-date-group">
                         <span class="fp-date-label">From</span>
-                        <input id="fp_dateFrom" type="date" class="fp-date-input">
+                        <div class="fp-date-input-wrap">
+                            <input id="fp_dateFrom" type="text" class="fp-date-input js-flatpickr-date-range-from"
+                                placeholder="Select date" readonly>
+                            <i class="fa-regular fa-calendar fp-date-icon"></i>
+                        </div>
                     </div>
+
                     <div class="fp-date-group">
                         <span class="fp-date-label">To</span>
-                        <input id="fp_dateTo" type="date" class="fp-date-input">
+                        <div class="fp-date-input-wrap">
+                            <input id="fp_dateTo" type="text" class="fp-date-input js-flatpickr-date-range-to"
+                                placeholder="Select date" readonly>
+                            <i class="fa-regular fa-calendar fp-date-icon"></i>
+                        </div>
                     </div>
                 </div>
                 <label class="fp-radio-item"><input type="radio" name="fp_dateOrder"
@@ -1808,8 +1897,11 @@
 
                     <div class="form-group-custom">
                         <div class="form-label-custom">Date Received <span style="color:#C0392B">*</span></div>
-                        <input id="addDate" type="date" class="form-input-custom"
-                            onchange="validateAddField('addDate')">
+                        <div class="fp-date-input-wrap">
+                            <input id="addDate" type="text" class="form-input-custom js-flatpickr-date"
+                                placeholder="Select date" onchange="validateAddField('addDate')" readonly>
+                            <i class="fa-regular fa-calendar fp-date-icon"></i>
+                        </div>
                         <div class="field-error" id="err-addDate"></div>
                     </div>
 
@@ -1822,8 +1914,8 @@
 
                     <div class="form-group-custom">
                         <div class="form-label-custom">Unit <span style="color:#C0392B">*</span></div>
-                        <input id="addUnit" list="unitOptions" class="form-input-custom" placeholder="Type or select unit"
-                            maxlength="50" oninput="validateAddField('addUnit')">
+                        <input id="addUnit" list="unitOptions" class="form-input-custom"
+                            placeholder="Type or select unit" maxlength="50" oninput="validateAddField('addUnit')">
 
                         <datalist id="unitOptions">
                             <option value="Box">
@@ -1901,7 +1993,11 @@
                 </div>
                 <div class="form-group-custom">
                     <div class="form-label-custom">Date Received</div>
-                    <input id="editDate" type="date" class="form-input-custom">
+                    <div class="fp-date-input-wrap">
+                        <input id="editDate" type="text" class="form-input-custom js-flatpickr-date"
+                            placeholder="Select date" readonly>
+                        <i class="fa-regular fa-calendar fp-date-icon"></i>
+                    </div>
                 </div>
                 <div class="form-group-custom">
                     <div class="form-label-custom">Stock Number</div>
@@ -1909,19 +2005,20 @@
                 </div>
                 <div class="form-group-custom">
                     <div class="form-label-custom">Unit</div>
-                        <input id="editUnit" list="unitOptionsEdit" class="form-input-custom" placeholder="Type or select unit">
+                    <input id="editUnit" list="unitOptionsEdit" class="form-input-custom"
+                        placeholder="Type or select unit">
 
-                        <datalist id="unitOptionsEdit">
-                            <option value="Box">
-                            <option value="Pack">
-                            <option value="Bottle">
-                            <option value="Piece">
-                            <option value="Set">
-                            <option value="Tube">
-                            <option value="Vial">
-                            <option value="Roll">
-                        </datalist>
-                    </div>
+                    <datalist id="unitOptionsEdit">
+                        <option value="Box">
+                        <option value="Pack">
+                        <option value="Bottle">
+                        <option value="Piece">
+                        <option value="Set">
+                        <option value="Tube">
+                        <option value="Vial">
+                        <option value="Roll">
+                    </datalist>
+                </div>
                 <div class="form-group-custom full">
                     <div class="form-label-custom">Supply / Medicine Name</div>
                     <input id="editName" class="form-input-custom">

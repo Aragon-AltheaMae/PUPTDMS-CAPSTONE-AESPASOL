@@ -12,7 +12,6 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/* Base launcher position */
 [id*="sienna"],
 [class*="sienna"],
 iframe[src*="sienna"],
@@ -24,7 +23,6 @@ iframe[src*="sienna"],
     z-index: 9999 !important;
 }
 
-/* Mobile / tablet: above mobile nav */
 @media only screen and (max-width: 1199px) {
 
     [id*="sienna"],
@@ -58,7 +56,6 @@ iframe[src*="sienna"],
     }
 }
 
-/* Desktop: lower right corner */
 @media only screen and (min-width: 1200px) {
 
     [id*="sienna"],
