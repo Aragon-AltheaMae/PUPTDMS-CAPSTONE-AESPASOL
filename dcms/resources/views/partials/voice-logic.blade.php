@@ -1,5 +1,5 @@
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'textarea:not([readonly])'
     ].join(', ');
 
-    const inputs = document.querySelectorAll(selector);
+    function initializeVoiceInputs(root = document) {
+    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+    const inputs = scope.querySelectorAll(selector);
 
     inputs.forEach((input) => {
         if (input.classList.contains('no-voice')) return;
@@ -27,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isTextarea = input.tagName.toLowerCase() === 'textarea';
         const parent = input.parentNode;
         const isInsideSearchWrap = parent && parent.classList && parent.classList.contains('search-wrap');
+        const isPatientDirectorySearch = input.id === 'patientSearch';
 
         let wrapper = input.closest('[data-voice-field]');
         let micBtn = wrapper?.querySelector('[data-voice-trigger]') || null;
@@ -53,6 +56,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 micBtn.className = 'voice-mic-btn voice-search-mic';
                 micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
                 parent.appendChild(micBtn);
+            }
+
+            if (isPatientDirectorySearch) {
+                parent.style.overflow = 'visible';
+                Object.assign(micBtn.style, {
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '18px',
+                    height: '18px',
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '0',
+                    margin: '0',
+                    lineHeight: '1',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: '4'
+                });
+
+                Object.assign(statusLabel.style, {
+                    position: 'absolute',
+                    right: '0',
+                    top: 'calc(100% + 6px)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    whiteSpace: 'nowrap',
+                    fontSize: '.74rem',
+                    fontWeight: '700',
+                    lineHeight: '1',
+                    padding: '.18rem .48rem',
+                    borderRadius: '999px',
+                    pointerEvents: 'none',
+                    zIndex: '6'
+                });
             }
         } else if (!wrapper) {
             wrapper = document.createElement('div');
@@ -108,9 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
         input.dataset.voiceReady = 'true';
 
         const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
+        recognition.lang = input.dataset.voiceLang || 'en-US';
         recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        let hasRecognizedSpeech = false;
 
         const controller = {
             input,
@@ -119,12 +163,43 @@ document.addEventListener('DOMContentLoaded', () => {
             recognition
         };
 
+        function enforcePatientSearchLayout() {
+            if (!isPatientDirectorySearch || !parent || !statusLabel || !micBtn) return;
+
+            parent.style.setProperty('position', 'relative', 'important');
+            parent.style.setProperty('overflow', 'visible', 'important');
+
+            input.style.setProperty('padding-right', '1.8rem', 'important');
+
+            micBtn.style.setProperty('position', 'absolute', 'important');
+            micBtn.style.setProperty('right', '12px', 'important');
+            micBtn.style.setProperty('top', '50%', 'important');
+            micBtn.style.setProperty('transform', 'translateY(-50%)', 'important');
+            micBtn.style.setProperty('width', '18px', 'important');
+            micBtn.style.setProperty('height', '18px', 'important');
+            micBtn.style.setProperty('display', 'inline-flex', 'important');
+            micBtn.style.setProperty('align-items', 'center', 'important');
+            micBtn.style.setProperty('justify-content', 'center', 'important');
+            micBtn.style.setProperty('z-index', '4', 'important');
+
+            statusLabel.style.setProperty('position', 'absolute', 'important');
+            statusLabel.style.setProperty('right', '0', 'important');
+            statusLabel.style.setProperty('top', 'calc(100% + 6px)', 'important');
+            statusLabel.style.setProperty('display', 'inline-flex', 'important');
+            statusLabel.style.setProperty('align-items', 'center', 'important');
+            statusLabel.style.setProperty('white-space', 'nowrap', 'important');
+            statusLabel.style.setProperty('z-index', '6', 'important');
+        }
+
+        enforcePatientSearchLayout();
+
         function resetVisualState() {
             micBtn.classList.remove('is-listening', 'text-[#8B0000]');
             micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         }
 
         function showStatus(message, state = 'default') {
+            enforcePatientSearchLayout();
             statusLabel.textContent = message;
             statusLabel.className = 'voice-status';
 
@@ -163,9 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
             activeController = controller;
 
             try {
+                hasRecognizedSpeech = false;
                 recognition.start();
                 micBtn.classList.add('is-listening', 'text-[#8B0000]');
-                micBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                micBtn.innerHTML = '<span aria-hidden="true" style="display:block;width:10px;height:10px;border-radius:2px;background:currentColor;"></span>';
                 showStatus('Listening...', 'listening');
             } catch (err) {
                 showStatus('Unable to start voice input.', 'error');
@@ -176,9 +252,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         recognition.onresult = (event) => {
-            const transcript = event.results?.[0]?.[0]?.transcript?.trim() || '';
+            let transcript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                const chunk = result?.[0]?.transcript?.trim() || '';
+                if (!chunk) continue;
+
+                if (result.isFinal) {
+                    transcript += ` ${chunk}`;
+                } else if (!transcript) {
+                    transcript = chunk;
+                }
+            }
+
+            transcript = transcript.trim();
 
             if (transcript) {
+                hasRecognizedSpeech = true;
                 if (isTextarea && input.value.trim()) {
                     input.value = `${input.value.trim()} ${transcript}`.trim();
                 } else {
@@ -214,9 +305,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (statusLabel.textContent === 'Listening...') {
-                statusLabel.classList.add('hidden');
+                if (!hasRecognizedSpeech) {
+                    showStatus("Didn't catch that. Try again.", 'error');
+                    hideStatus(1800);
+                } else {
+                    statusLabel.classList.add('hidden');
+                }
             }
         };
     });
-});
+    }
+
+    window.initializeVoiceInputs = initializeVoiceInputs;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeVoiceInputs(document);
+    });
+
+    document.addEventListener('voice:refresh', (event) => {
+        initializeVoiceInputs(event?.detail?.root || document);
+    });
+})();
 </script>

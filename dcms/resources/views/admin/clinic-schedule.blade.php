@@ -770,6 +770,71 @@
     margin-bottom: 0 !important;
 }
 
+.rule-notes-section .voice-input-wrap textarea.has-voice-padding {
+    padding-right: 2.4rem;
+}
+
+.rule-notes-section .voice-input-wrap .voice-mic-btn {
+    position: absolute;
+    right: .8rem;
+    top: .8rem;
+    transform: none;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8B0000;
+    cursor: pointer;
+    z-index: 4;
+}
+
+.rule-notes-section .voice-input-wrap [data-voice-status] {
+    position: absolute;
+    right: 0;
+    top: -1.35rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: .74rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: .18rem .48rem;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 6;
+    background: rgba(255, 255, 255, .92);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+}
+
+.rule-notes-section .voice-input-wrap [data-voice-status].hidden {
+    display: none;
+}
+
+.rule-notes-section .voice-input-wrap [data-voice-status].is-listening {
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.rule-notes-section .voice-input-wrap [data-voice-status].is-error {
+    color: #b91c1c;
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.rule-notes-section .voice-input-wrap [data-voice-status].is-success {
+    color: #166534;
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
         .break-chip-group {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
