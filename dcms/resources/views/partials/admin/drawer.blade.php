@@ -86,9 +86,11 @@
                     class="fa-solid fa-list-check"></i> Service Types
             </a>
 
-            <a href="{{ route('admin.admin.dashboard') }}" class="drawer-link"><i class="fa-solid fa-file-pen"></i>
-                Document
-                Templates</a>
+            <a href="{{ route('admin.document-template') }}"
+                    class="drawer-link {{ request()->routeIs('admin.document-template*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file-pen"></i>
+                    Document Templates
+            </a>
 
             <a href="{{ route('admin.inventory') }}"
                 class="drawer-link {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
