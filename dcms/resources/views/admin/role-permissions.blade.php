@@ -482,6 +482,27 @@
 
     .st-input-wrap {
         position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .voice-mic-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .voice-mic-btn:hover {
+        color: #8B0000;
     }
 
     .st-input-icon {
@@ -496,7 +517,7 @@
 
     .st-input {
         width: 100%;
-        padding: 10px 14px 10px 34px;
+        padding: 10px 40px 10px 34px;
         border: 1px solid #e5e7eb;
         border-radius: 10px;
         font-size: .8rem;
@@ -860,10 +881,16 @@
             MODALS (MODERN PILL STYLE)
         ══════════════════════════════════════ */
     .modern-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
         border: none;
         padding: 32px 24px 24px;
         border-radius: 20px;
         width: min(90vw, 400px);
+        max-width: calc(100vw - 2rem);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         background: #ffffff;
         text-align: center;
@@ -873,6 +900,10 @@
     .modern-modal::backdrop {
         background: rgba(17, 24, 39, 0.6);
         backdrop-filter: blur(4px);
+    }
+
+    .modern-modal[open] {
+        display: block;
     }
 
     .modal-icon {
@@ -1456,6 +1487,13 @@
             padding: 10px 12px 10px 12px;
             flex-wrap: wrap;
             gap: 10px;
+        }
+
+        .modern-modal {
+            width: calc(100vw - 1.5rem);
+            max-width: calc(100vw - 1.5rem);
+            padding: 24px 16px 18px;
+            border-radius: 18px;
         }
     }
 
@@ -2560,7 +2598,12 @@
             document.getElementById('newRoleName').value = '';
             document.getElementById('newRoleSlug').value = '';
             document.getElementById('newRoleError').style.display = 'none';
-            document.getElementById('newRoleModal').showModal();
+
+            const modal = document.getElementById('newRoleModal');
+            modal.showModal();
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
         }
 
         function closeNewRoleModal() {
@@ -2663,7 +2706,11 @@
 
             document.getElementById('deleteRoleName').textContent = roleName;
             document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
-            document.getElementById('deleteRoleModal').showModal();
+            const deleteModal = document.getElementById('deleteRoleModal');
+            deleteModal.showModal();
+            deleteModal.style.top = '50%';
+            deleteModal.style.left = '50%';
+            deleteModal.style.transform = 'translate(-50%, -50%)';
         }
 
         function closeDeleteModal() {
@@ -2732,7 +2779,11 @@
         function ajaxResetDefaults() {
             isModalActive = true;
             updateFABVisibility();
-            document.getElementById('resetConfirmModal').showModal();
+            const resetModal = document.getElementById('resetConfirmModal');
+            resetModal.showModal();
+            resetModal.style.top = '50%';
+            resetModal.style.left = '50%';
+            resetModal.style.transform = 'translate(-50%, -50%)';
         }
 
         function closeResetConfirm() {
