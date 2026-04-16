@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<<head>
     <meta charset="UTF-8" />
+    @if(auth()->check())
+        <meta name="auth-user-id" content="{{ auth()->id() }}">
+    @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'PUP Taguig Dental Clinic')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
