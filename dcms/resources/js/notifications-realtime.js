@@ -26,7 +26,7 @@ function syncBellBadge(unreadCount) {
             notifBtn.appendChild(badge);
         }
 
-        badge.textContent = unreadCount;
+       badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
         badge.style.display = 'inline-flex';
     } else if (badge) {
         badge.textContent = '0';
