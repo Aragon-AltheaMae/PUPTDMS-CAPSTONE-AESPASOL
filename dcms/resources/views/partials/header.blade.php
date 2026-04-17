@@ -7,15 +7,19 @@
     $databaseNotifications = collect();
 
     if ($authUser) {
-        $databaseNotifications = $authUser->notifications()
+        $databaseNotifications = $authUser
+            ->notifications()
             ->latest()
             ->take(15)
             ->get()
             ->map(function ($notification) {
                 $payload = $notification->data ?? [];
-                $title = data_get($payload, 'title') ?? data_get($payload, 'subject') ?? class_basename($notification->type);
-                $message = data_get($payload, 'message') ?? data_get($payload, 'body') ?? data_get($payload, 'description');
-                $actionUrl = data_get($payload, 'url') ?? data_get($payload, 'action_url') ?? '#';
+                $title =
+                    data_get($payload, 'title') ??
+                    (data_get($payload, 'subject') ?? class_basename($notification->type));
+                $message =
+                    data_get($payload, 'message') ?? (data_get($payload, 'body') ?? data_get($payload, 'description'));
+                $actionUrl = data_get($payload, 'url') ?? (data_get($payload, 'action_url') ?? '#');
 
                 return [
                     'id' => $notification->id,
@@ -34,25 +38,28 @@
     if ($databaseNotifications->isNotEmpty()) {
         $notifications = $databaseNotifications->values();
     } else {
-        $notifications = $legacyNotifications->map(function ($notification) {
-            $createdAt = $notification['created_at'] ?? null;
+        $notifications = $legacyNotifications
+            ->map(function ($notification) {
+                $createdAt = $notification['created_at'] ?? null;
 
-            if (is_string($createdAt) && $createdAt !== '') {
-                $createdAt = \Illuminate\Support\Carbon::parse($createdAt);
-            }
+                if (is_string($createdAt) && $createdAt !== '') {
+                    $createdAt = \Illuminate\Support\Carbon::parse($createdAt);
+                }
 
-            return [
-                'id' => $notification['id'] ?? uniqid('notif_', true),
-                'title' => $notification['title'] ?? 'Notification',
-                'message' => $notification['message'] ?? null,
-                'url' => $notification['url'] ?? '#',
-                'state' => $notification['state'] ?? 'unread',
-                'created_at' => $createdAt,
-                'created_at_label' => $notification['created_at_label'] ?? ($createdAt ? $createdAt->diffForHumans() : null),
-                'icon' => $notification['icon'] ?? 'fa-bell',
-                'mark_read_url' => $notification['mark_read_url'] ?? null,
-            ];
-        })->values();
+                return [
+                    'id' => $notification['id'] ?? uniqid('notif_', true),
+                    'title' => $notification['title'] ?? 'Notification',
+                    'message' => $notification['message'] ?? null,
+                    'url' => $notification['url'] ?? '#',
+                    'state' => $notification['state'] ?? 'unread',
+                    'created_at' => $createdAt,
+                    'created_at_label' =>
+                        $notification['created_at_label'] ?? ($createdAt ? $createdAt->diffForHumans() : null),
+                    'icon' => $notification['icon'] ?? 'fa-bell',
+                    'mark_read_url' => $notification['mark_read_url'] ?? null,
+                ];
+            })
+            ->values();
     }
 
     $unreadNotifications = $notifications->where('state', 'unread')->values();
@@ -128,7 +135,9 @@
             <button class="hdr-icon-btn" id="notifBtn" type="button" aria-label="Notifications">
                 <i class="fa-regular fa-bell"></i>
                 @if ($notifCount > 0)
-                    <span class="notif-badge" data-notif-badge>{{ $notifCount }}</span>
+                    <span class="notif-badge" data-notif-badge>
+                        {{ $notifCount > 9 ? '9+' : $notifCount }}
+                    </span>
                 @endif
             </button>
 
@@ -140,13 +149,17 @@
                             <span>Notifications</span>
                         </div>
                         <div class="header-notif-head-meta">
-                            <span class="header-notif-pill" data-notif-unread-pill>{{ $notifCount }} unread</span>
-                            <span class="header-notif-pill header-notif-pill-muted" data-notif-total-pill>{{ $notifTotalCount }} total</span>
+                            <span class="header-notif-pill" data-notif-unread-pill>
+                                {{ $notifCount > 9 ? '9+' : $notifCount }} unread
+                            </span>
+                            <span class="header-notif-pill header-notif-pill-muted"
+                                data-notif-total-pill>{{ $notifTotalCount }} total</span>
                         </div>
                     </div>
 
                     @if ($notifCount > 0)
-                        <form method="POST" action="{{ route('notifications.mark-all-read') }}" class="header-notif-actions" data-notif-mark-all-form>
+                        <form method="POST" action="{{ route('notifications.mark-all-read') }}"
+                            class="header-notif-actions" data-notif-mark-all-form>
                             @csrf
                             <button type="submit" class="header-notif-mark-all">Mark all as read</button>
                         </form>
@@ -171,8 +184,7 @@
                 <div class="header-notif-body">
                     @forelse($notifications as $n)
                         <div class="header-notif-item {{ ($n['state'] ?? 'unread') === 'unread' ? 'is-unread' : 'is-read' }}"
-                            data-notif-state="{{ $n['state'] ?? 'unread' }}"
-                            data-notif-item>
+                            data-notif-state="{{ $n['state'] ?? 'unread' }}" data-notif-item>
                             <div class="header-notif-item-icon">
                                 <i class="fa-solid {{ $n['icon'] ?? 'fa-bell' }}"></i>
                             </div>
@@ -180,9 +192,11 @@
                             <div class="header-notif-item-content">
                                 <div class="header-notif-item-top">
                                     @if (!empty($n['url']) && $n['url'] !== '#')
-                                        <a href="{{ $n['url'] }}" class="header-notif-item-title">{{ $n['title'] ?? 'Notification' }}</a>
+                                        <a href="{{ $n['url'] }}"
+                                            class="header-notif-item-title">{{ $n['title'] ?? 'Notification' }}</a>
                                     @else
-                                        <span class="header-notif-item-title">{{ $n['title'] ?? 'Notification' }}</span>
+                                        <span
+                                            class="header-notif-item-title">{{ $n['title'] ?? 'Notification' }}</span>
                                     @endif
 
                                     @if (!empty($n['created_at_label']))
@@ -200,9 +214,11 @@
                                     @endif
 
                                     @if (($n['state'] ?? 'unread') === 'unread' && !empty($n['mark_read_url']))
-                                        <form method="POST" action="{{ $n['mark_read_url'] }}" class="header-notif-action-form" data-notif-mark-read-form>
+                                        <form method="POST" action="{{ $n['mark_read_url'] }}"
+                                            class="header-notif-action-form" data-notif-mark-read-form>
                                             @csrf
-                                            <button type="submit" class="header-notif-link-action header-notif-link-action-secondary">
+                                            <button type="submit"
+                                                class="header-notif-link-action header-notif-link-action-secondary">
                                                 Mark read
                                             </button>
                                         </form>
