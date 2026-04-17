@@ -5,222 +5,266 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentRequest;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Response;
 
 class DocumentRequestController extends Controller
 {
-    private function ensureAdminAccess(): void
-    {
-        $activeRole = session('impersonated_role') ?: session('role');
-
-        if (!session('admin_logged_in') || !in_array($activeRole, ['super_admin', 'admin'])) {
-            abort(403, 'Unauthorized access.');
-        }
-    }
-
     public function index(Request $request)
     {
-        $this->ensureAdminAccess();
-
-        $sort = $request->get('sort', 'newest');
+        $search   = trim((string) $request->get('search', ''));
+        $status   = trim((string) $request->get('status', ''));
+        $type     = trim((string) $request->get('type', ''));
+        $dateFrom = trim((string) $request->get('date_from', ''));
+        $dateTo   = trim((string) $request->get('date_to', ''));
+        $sort     = trim((string) $request->get('sort', 'newest'));
 
         $query = DocumentRequest::with('patient');
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('reference_number', 'like', "%{$search}%")
+                    ->orWhere('document_type', 'like', "%{$search}%")
+                    ->orWhere('purpose', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($patientQuery) use ($search) {
                         $patientQuery->where('name', 'like', "%{$search}%")
-                            ->orWhere('id', 'like', "%{$search}%");
+                            ->orWhere('student_no', 'like', "%{$search}%")
+                            ->orWhere('faculty_code', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($status !== '') {
+            $query->whereRaw('LOWER(status) = ?', [strtolower($status)]);
         }
 
-        if ($request->filled('type')) {
-            $query->where('document_type', $request->type);
+        if ($type !== '') {
+            $query->whereRaw('LOWER(document_type) = ?', [strtolower($type)]);
         }
 
-        if ($request->filled('priority')) {
-            $query->where('priority', $request->priority);
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
         }
 
-        switch ($sort) {
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        switch (strtolower($sort)) {
             case 'oldest':
-                $query->oldest();
+                $query->orderBy('created_at', 'asc');
                 break;
 
             case 'alpha':
-                $query->join('patients', 'document_requests.patient_id', '=', 'patients.id')
-                    ->orderBy('patients.last_name')
+                $query->leftJoin('patients', 'document_requests.patient_id', '=', 'patients.id')
+                    ->orderBy('patients.name', 'asc')
                     ->select('document_requests.*');
                 break;
 
             case 'newest':
             default:
-                $query->latest();
+                $query->orderBy('created_at', 'desc');
                 break;
         }
 
         $requests = $query->paginate(10)->withQueryString();
 
         $stats = [
-            'total' => DocumentRequest::count(),
-            'pending' => DocumentRequest::where('status', 'pending')->count(),
-            'approved' => DocumentRequest::where('status', 'approved')->count(),
-            'ready' => DocumentRequest::where('status', 'ready')->count(),
-            'released' => DocumentRequest::where('status', 'released')->count(),
-            'rejected' => DocumentRequest::where('status', 'rejected')->count(),
+            'total'     => DocumentRequest::count(),
+            'pending'   => DocumentRequest::whereRaw('LOWER(status) = ?', ['pending'])->count(),
+            'approved'  => DocumentRequest::whereRaw('LOWER(status) = ?', ['approved'])->count(),
+            'ready'     => DocumentRequest::whereRaw('LOWER(status) = ?', ['ready'])->count(),
+            'released'  => DocumentRequest::whereRaw('LOWER(status) = ?', ['released'])->count(),
+            'rejected'  => DocumentRequest::whereRaw('LOWER(status) = ?', ['rejected'])->count(),
         ];
-
-        $documentTypes = DocumentRequest::select('document_type')
-            ->distinct()
-            ->orderBy('document_type')
-            ->pluck('document_type');
-
-        $notifications = collect([]);
 
         return view('admin.document-request', compact(
             'requests',
             'stats',
-            'documentTypes',
-            'notifications'
+            'search',
+            'status',
+            'type',
+            'dateFrom',
+            'dateTo',
+            'sort'
         ));
     }
 
-    public function show(DocumentRequest $documentRequest)
+    public function show($id)
     {
-        $this->ensureAdminAccess();
+        $documentRequest = DocumentRequest::with('patient')->findOrFail($id);
 
-        $documentRequest->load('patient');
+        $patient = $documentRequest->patient;
 
         return response()->json([
             'id' => $documentRequest->id,
             'reference_number' => $documentRequest->reference_number,
-            'patient_name' => $documentRequest->patient->name ?? 'Unknown Patient',
-            'patient_id' => $documentRequest->patient->id ?? 'No ID',
             'document_type' => $documentRequest->document_type,
             'purpose' => $documentRequest->purpose,
-            'priority' => $documentRequest->priority,
-            'status' => $documentRequest->status,
-            'created_at' => optional($documentRequest->created_at)->format('M d, Y h:i A'),
+            'request_date' => $documentRequest->request_date,
+            'request_time' => $documentRequest->request_time,
+            'status' => strtolower((string) $documentRequest->status),
+            'created_at' => optional($documentRequest->created_at)?->format('M d, Y'),
+            'patient_name' => optional($patient)->name ?? 'Unknown Patient',
+            'patient_id' => optional($patient)->student_no
+                ?? optional($patient)->faculty_code
+                ?? optional($patient)->id
+                ?? 'No ID',
             'copies_needed' => 1,
             'activities' => [
                 [
-                    'date' => optional($documentRequest->created_at)->format('M d, Y h:i A'),
+                    'date' => optional($documentRequest->created_at)?->format('M d, Y h:i A') ?? '—',
                     'description' => 'Request submitted.',
-                ],
-                [
-                    'date' => optional($documentRequest->updated_at)->format('M d, Y h:i A'),
-                    'description' => 'Current status: ' . ucfirst($documentRequest->status),
                 ],
             ],
         ]);
     }
 
-    public function approve(DocumentRequest $documentRequest)
+    public function approve($id)
     {
-        $this->ensureAdminAccess();
+        $documentRequest = DocumentRequest::findOrFail($id);
+        $documentRequest->status = 'approved';
+        $documentRequest->save();
 
-        if ($documentRequest->status !== 'pending') {
-            return back()->withErrors(['This request cannot be approved anymore.']);
-        }
-
-        $documentRequest->update([
-            'status' => 'approved',
-        ]);
-
-        return back()->with('success', 'Request approved successfully.');
+        return redirect()
+            ->route('admin.document-requests.index')
+            ->with('success', 'Document request approved successfully.');
     }
 
-    public function release(DocumentRequest $documentRequest)
+    public function release($id)
     {
-        $this->ensureAdminAccess();
+        $documentRequest = DocumentRequest::findOrFail($id);
+        $documentRequest->status = 'released';
+        $documentRequest->save();
 
-        if (!in_array($documentRequest->status, ['approved', 'ready'])) {
-            return back()->withErrors(['Only approved or ready requests can be released.']);
-        }
-
-        $documentRequest->update([
-            'status' => 'released',
-        ]);
-
-        return back()->with('success', 'Document released successfully.');
+        return redirect()
+            ->route('admin.document-requests.index')
+            ->with('success', 'Document request released successfully.');
     }
 
-    public function reject(DocumentRequest $documentRequest)
+    public function reject($id)
     {
-        $this->ensureAdminAccess();
+        $documentRequest = DocumentRequest::findOrFail($id);
+        $documentRequest->status = 'rejected';
+        $documentRequest->save();
 
-        if (!in_array($documentRequest->status, ['pending', 'approved'])) {
-            return back()->withErrors(['This request cannot be rejected anymore.']);
-        }
-
-        $documentRequest->update([
-            'status' => 'rejected',
-        ]);
-
-        return back()->with('success', 'Request rejected successfully.');
+        return redirect()
+            ->route('admin.document-requests.index')
+            ->with('success', 'Document request rejected successfully.');
     }
 
-    public function export(): StreamedResponse
+    public function export(Request $request)
     {
-        $this->ensureAdminAccess();
+        $search   = trim((string) $request->get('search', ''));
+        $status   = trim((string) $request->get('status', ''));
+        $type     = trim((string) $request->get('type', ''));
+        $dateFrom = trim((string) $request->get('date_from', ''));
+        $dateTo   = trim((string) $request->get('date_to', ''));
+        $sort     = trim((string) $request->get('sort', 'newest'));
+
+        $query = DocumentRequest::with('patient');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                    ->orWhere('document_type', 'like', "%{$search}%")
+                    ->orWhere('purpose', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($patientQuery) use ($search) {
+                        $patientQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('student_no', 'like', "%{$search}%")
+                            ->orWhere('faculty_code', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($status !== '') {
+            $query->whereRaw('LOWER(status) = ?', [strtolower($status)]);
+        }
+
+        if ($type !== '') {
+            $query->whereRaw('LOWER(document_type) = ?', [strtolower($type)]);
+        }
+
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        switch (strtolower($sort)) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+
+            case 'alpha':
+                $query->leftJoin('patients', 'document_requests.patient_id', '=', 'patients.id')
+                    ->orderBy('patients.name', 'asc')
+                    ->select('document_requests.*');
+                break;
+
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $requests = $query->get();
+
+        $filename = 'document_requests_' . now()->format('Ymd_His') . '.csv';
 
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=document_requests.csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function () {
-            $handle = fopen('php://output', 'w');
+        $callback = function () use ($requests) {
+            $file = fopen('php://output', 'w');
 
-            fputcsv($handle, [
+            fputcsv($file, [
                 'Reference Number',
                 'Patient Name',
-                'Student ID',
+                'Patient ID',
                 'Document Type',
                 'Purpose',
-                'Priority',
-                'Status',
                 'Request Date',
                 'Request Time',
+                'Status',
+                'Created At',
             ]);
 
-            DocumentRequest::with('patient')->chunk(100, function ($requests) use ($handle) {
-                foreach ($requests as $request) {
-                    fputcsv($handle, [
-                        $request->reference_number,
-                        $request->patient->name ?? '',
-                        $request->patient->id ?? '',
-                        $request->document_type,
-                        $request->purpose,
-                        $request->priority,
-                        $request->status,
-                        $request->request_date,
-                        $request->request_time,
-                    ]);
-                }
-            });
+            foreach ($requests as $request) {
+                fputcsv($file, [
+                    $request->reference_number,
+                    optional($request->patient)->name ?? '',
+                    optional($request->patient)->student_no
+                        ?? optional($request->patient)->faculty_code
+                        ?? optional($request->patient)->id
+                        ?? '',
+                    $request->document_type,
+                    $request->purpose,
+                    $request->request_date,
+                    $request->request_time,
+                    $request->status,
+                    optional($request->created_at)?->format('Y-m-d h:i A'),
+                ]);
+            }
 
-            fclose($handle);
+            fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers);
+        return Response::stream($callback, 200, $headers);
     }
 
     public function printQueue()
     {
-        $this->ensureAdminAccess();
-
         $requests = DocumentRequest::with('patient')
-            ->whereIn('status', ['approved', 'ready'])
-            ->latest()
+            ->whereIn(\DB::raw('LOWER(status)'), ['pending', 'approved', 'ready'])
+            ->orderBy('created_at', 'asc')
             ->get();
 
         return view('admin.document-request-print-queue', compact('requests'));
