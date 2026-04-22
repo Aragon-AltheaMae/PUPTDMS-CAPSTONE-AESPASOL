@@ -454,7 +454,7 @@ Route::prefix('admin')
             ->name('admin.document-requests.release');
 
         Route::patch('/document-requests/{documentRequest}/reject', [AdminDocumentRequestController::class, 'reject'])
-            ->name('document-requests.reject');
+            ->name('admin.document-requests.reject');
     });
 
 // DOCUMENT TEMPLATES (SIMPLIFIED)
