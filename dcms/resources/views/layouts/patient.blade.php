@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<<head>
+<head>
     <meta charset="UTF-8" />
     @if(auth()->check())
         <meta name="auth-user-id" content="{{ auth()->id() }}">

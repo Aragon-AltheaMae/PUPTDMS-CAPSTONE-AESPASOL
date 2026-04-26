@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\DocumentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use App\Notifications\DocumentRequestApprovedNotification;
+use App\Notifications\DocumentRequestRejectedNotification;
+
 
 class DocumentRequestController extends Controller
 {
@@ -123,9 +126,16 @@ class DocumentRequestController extends Controller
 
     public function approve($id)
     {
-        $documentRequest = DocumentRequest::findOrFail($id);
+        $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+
         $documentRequest->status = 'approved';
         $documentRequest->save();
+
+        if ($documentRequest->patient && $documentRequest->patient->user) {
+            $documentRequest->patient->user->notify(
+                new DocumentRequestApprovedNotification($documentRequest)
+            );
+        }
 
         return redirect()
             ->route('admin.document-requests.index')
@@ -143,11 +153,24 @@ class DocumentRequestController extends Controller
             ->with('success', 'Document request released successfully.');
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
-        $documentRequest = DocumentRequest::findOrFail($id);
-        $documentRequest->status = 'rejected';
-        $documentRequest->save();
+        $request->validate([
+            'reason' => 'required|string|max:255'
+        ]);
+
+        $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+
+        $documentRequest->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->reason
+        ]);
+
+        if ($documentRequest->patient && $documentRequest->patient->user) {
+            $documentRequest->patient->user->notify(
+                new DocumentRequestRejectedNotification($documentRequest)
+            );
+        }
 
         return redirect()
             ->route('admin.document-requests.index')
