@@ -174,19 +174,20 @@ class DentistAppointmentController extends Controller
 
     public function cancel(Request $request, $id)
     {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
         $appointment = Appointment::with('patient.user')->findOrFail($id);
 
-        if (!in_array($appointment->status, ['upcoming', 'rescheduled'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This appointment cannot be cancelled.',
-            ], 422);
-        }
-
-        $appointment->update(['status' => 'cancelled']);
+        $appointment->update([
+            'status' => 'cancelled',
+            'cancellation_reason' => $request->reason,
+        ]);
 
         $patientUser = optional($appointment->patient)->user;
 
+        // fallback kung walang relationship
         if (!$patientUser && !empty(optional($appointment->patient)->email)) {
             $patientUser = User::where('email', $appointment->patient->email)->first();
         }
@@ -195,18 +196,11 @@ class DentistAppointmentController extends Controller
             $patientUser->notify(
                 new AppointmentCancelledNotification(
                     $appointment,
-                    'Dentist',
-                    $request->input('reason')
+                    auth()->user()->name ?? 'the dentist',
+                    $request->reason
                 )
             );
         }
-
-        AuditLogger::log(
-            'update',
-            'dentist_appointments',
-            "Dentist cancelled an appointment"
-        );
-
         return response()->json(['success' => true]);
     }
 
@@ -300,13 +294,13 @@ class DentistAppointmentController extends Controller
             ], 422);
         }
 
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with('patient.user')->findOrFail($id);
 
         $mysqlTime = Carbon::createFromFormat('g:i A', trim($request->new_appointment_time))->format('H:i:s');
 
         $slotTaken = Appointment::where('appointment_date', $request->new_appointment_date)
             ->where('appointment_time', $mysqlTime)
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $appointment->id)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->exists();
 
@@ -324,7 +318,6 @@ class DentistAppointmentController extends Controller
             'status' => 'rescheduled',
         ]);
 
-        $appointment->load('patient.user');
         $patientUser = optional($appointment->patient)->user;
 
         if (!$patientUser && !empty(optional($appointment->patient)->email)) {
@@ -332,15 +325,23 @@ class DentistAppointmentController extends Controller
         }
 
         if ($patientUser) {
-            $patientUser->notify(new AppointmentRescheduledNotification($appointment, 'Dentist'));
+            $patientUser->notify(
+                new AppointmentRescheduledNotification(
+                    $appointment,
+                    auth()->user()->name ?? 'the dentist'
+                )
+            );
         }
 
         AuditLogger::log(
             'update',
             'dentist_appointments',
-            "Dentist rescheduled an appointment"
+            'Dentist rescheduled an appointment'
         );
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment rescheduled successfully.'
+        ]);
     }
 }

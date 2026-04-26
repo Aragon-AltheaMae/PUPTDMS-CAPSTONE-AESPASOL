@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
+use Carbon\Carbon;
 
 class AppointmentCancelledNotification extends Notification
 {
@@ -13,7 +14,7 @@ class AppointmentCancelledNotification extends Notification
 
     public function __construct(
         private readonly Appointment $appointment,
-        private readonly string $cancelledBy = 'Dentist',
+        private readonly string $cancelledBy = 'the dentist',
         private readonly ?string $reason = null
     ) {
     }
@@ -25,9 +26,25 @@ class AppointmentCancelledNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
+        return $this->notificationData();
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage(array_merge(
+            $this->notificationData(),
+            [
+                'created_at_label' => 'Just now',
+                'state' => 'unread',
+            ]
+        ));
+    }
+
+    private function notificationData(): array
+    {
         $message = sprintf(
             'Your appointment on %s at %s was cancelled by %s.',
-            optional($this->appointment->appointment_date)->format('M d, Y') ?? (string) $this->appointment->appointment_date,
+            $this->formatDate($this->appointment->appointment_date),
             $this->formatTime($this->appointment->appointment_time),
             $this->cancelledBy
         );
@@ -43,46 +60,35 @@ class AppointmentCancelledNotification extends Notification
             'icon' => 'fa-calendar-xmark',
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->appointment->patient_id,
+            'status' => $this->appointment->status,
+            'reason' => $this->reason,
             'event' => 'appointment.cancelled',
         ];
     }
 
-    public function toBroadcast(object $notifiable): BroadcastMessage
+    private function formatDate($date): string
     {
-        $message = sprintf(
-            'Your appointment on %s at %s was cancelled by %s.',
-            optional($this->appointment->appointment_date)->format('M d, Y') ?? (string) $this->appointment->appointment_date,
-            $this->formatTime($this->appointment->appointment_time),
-            $this->cancelledBy
-        );
-
-        if (!empty($this->reason)) {
-            $message .= ' Reason: ' . $this->reason;
+        if (empty($date)) {
+            return 'N/A';
         }
 
-        return new BroadcastMessage([
-            'title' => 'Appointment Cancelled',
-            'message' => $message,
-            'url' => route('patient.appointment.index'),
-            'icon' => 'fa-calendar-xmark',
-            'appointment_id' => $this->appointment->id,
-            'patient_id' => $this->appointment->patient_id,
-            'event' => 'appointment.cancelled',
-            'created_at_label' => 'Just now',
-            'state' => 'unread',
-        ]);
+        try {
+            return Carbon::parse($date)->format('M d, Y');
+        } catch (\Throwable) {
+            return (string) $date;
+        }
     }
 
-    private function formatTime(?string $time): string
+    private function formatTime($time): string
     {
         if (empty($time)) {
             return 'N/A';
         }
 
         try {
-            return \Carbon\Carbon::createFromFormat('H:i:s', $time)->format('g:i A');
+            return Carbon::parse($time)->format('g:i A');
         } catch (\Throwable) {
-            return $time;
+            return (string) $time;
         }
     }
 }

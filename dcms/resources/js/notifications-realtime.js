@@ -4,34 +4,23 @@ function escapeHtml(value) {
     return div.innerHTML;
 }
 
-function getNotifButton() {
-    return document.querySelector('#notifBtn');
-}
-
-function getBadge() {
-    return document.querySelector('[data-notif-badge]');
-}
-
 function syncBellBadge(unreadCount) {
-    const notifBtn = getNotifButton();
+    const notifBtn = document.querySelector('#notifBtn');
     if (!notifBtn) return;
 
-    let badge = getBadge();
+    let badge = notifBtn.querySelector('[data-notif-badge]');
 
-    if (unreadCount > 0) {
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'notif-badge';
-            badge.setAttribute('data-notif-badge', '');
-            notifBtn.appendChild(badge);
-        }
-
-       badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-        badge.style.display = 'inline-flex';
-    } else if (badge) {
-        badge.textContent = '0';
-        badge.style.display = 'none';
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'notif-badge';
+        badge.setAttribute('data-notif-badge', '');
+        notifBtn.appendChild(badge);
     }
+
+    badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+    badge.hidden = unreadCount <= 0;
+    badge.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
+    badge.style.visibility = unreadCount > 0 ? 'visible' : 'hidden';
 }
 
 function updateNotificationCounts(unreadDelta = 0, totalDelta = 0) {
@@ -63,9 +52,7 @@ function updateNotificationCounts(unreadDelta = 0, totalDelta = 0) {
 
 function removeEmptyState() {
     const emptyState = document.querySelector('.header-notif-empty');
-    if (emptyState) {
-        emptyState.remove();
-    }
+    if (emptyState) emptyState.remove();
 }
 
 function prependNotificationItem(notification) {
@@ -92,22 +79,20 @@ function prependNotificationItem(notification) {
 
         <div class="header-notif-item-content">
             <div class="header-notif-item-top">
-                ${
-                    url && url !== '#'
-                        ? `<a href="${escapeHtml(url)}" class="header-notif-item-title">${escapeHtml(title)}</a>`
-                        : `<span class="header-notif-item-title">${escapeHtml(title)}</span>`
-                }
+                ${url && url !== '#'
+            ? `<a href="${escapeHtml(url)}" class="header-notif-item-title">${escapeHtml(title)}</a>`
+            : `<span class="header-notif-item-title">${escapeHtml(title)}</span>`
+        }
                 <span class="header-notif-item-time">${escapeHtml(createdAtLabel)}</span>
             </div>
 
             ${message ? `<div class="header-notif-item-message">${escapeHtml(message)}</div>` : ''}
 
             <div class="header-notif-item-actions">
-                ${
-                    url && url !== '#'
-                        ? `<a href="${escapeHtml(url)}" class="header-notif-link-action">Open</a>`
-                        : ''
-                }
+                ${url && url !== '#'
+            ? `<a href="${escapeHtml(url)}" class="header-notif-link-action">Open</a>`
+            : ''
+        }
             </div>
         </div>
 
@@ -121,8 +106,6 @@ function prependNotificationItem(notification) {
     } else {
         notifBody.prepend(item);
     }
-
-    updateNotificationCounts(1, 1);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -135,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.Echo.private(`App.Models.User.${userId}`)
         .notification((notification) => {
+            console.log('REALTIME NOTIF:', notification);
+
+            updateNotificationCounts(1, 1);
+            const unreadTab = document.querySelector('[data-notif-tab-count="unread"]');
+            syncBellBadge(parseInt(unreadTab?.textContent?.trim() || '0', 10));
             prependNotificationItem(notification);
         });
 });

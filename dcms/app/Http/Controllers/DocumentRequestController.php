@@ -10,67 +10,69 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helpers\AuditLogger;
 use App\Notifications\DocumentRequestSubmittedNotification;
+use App\Notifications\DocumentRequestApprovedNotification;
+use App\Notifications\DocumentRequestRejectedNotification;
 
 class DocumentRequestController extends Controller
 {
-   public function store(Request $request)
-{
-    $request->validate([
-        'document_type' => 'required|string|max:100',
-        'purpose' => 'required|string|max:150',
-    ]);
-
-    if (!session('patient_id')) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Patient session not found. Please log in again.',
-        ], 401);
-    }
-
-    try {
-        $documentRequest = DB::transaction(function () use ($request) {
-            $nextId = (DocumentRequest::max('id') ?? 0) + 1;
-
-            return DocumentRequest::create([
-                'patient_id' => session('patient_id'),
-                'reference_number' => 'DOC-' . now()->format('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
-                'document_type' => $request->document_type,
-                'purpose' => $request->purpose,
-                'request_date' => Carbon::now()->toDateString(),
-                'request_time' => Carbon::now()->toTimeString(),
-                'status' => 'pending',
-            ]);
-        });
-
-        $dentists = User::whereHas('role', function ($query) {
-            $query->where('slug', 'dentist');
-        })->get();
-
-        foreach ($dentists as $dentist) {
-            $dentist->notify(new DocumentRequestSubmittedNotification($documentRequest));
-        }
-
-        $patient = Patient::find(session('patient_id'));
-
-        if ($patient) {
-            AuditLogger::log(
-                'create',
-                'document_request',
-                'Patient submitted document request'
-            );
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Document request submitted successfully.',
+    public function store(Request $request)
+    {
+        $request->validate([
+            'document_type' => 'required|string|max:100',
+            'purpose' => 'required|string|max:150',
         ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to submit request: ' . $e->getMessage(),
-        ], 500);
+
+        if (!session('patient_id')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Patient session not found. Please log in again.',
+            ], 401);
+        }
+
+        try {
+            $documentRequest = DB::transaction(function () use ($request) {
+                $nextId = (DocumentRequest::max('id') ?? 0) + 1;
+
+                return DocumentRequest::create([
+                    'patient_id' => session('patient_id'),
+                    'reference_number' => 'DOC-' . now()->format('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
+                    'document_type' => $request->document_type,
+                    'purpose' => $request->purpose,
+                    'request_date' => Carbon::now()->toDateString(),
+                    'request_time' => Carbon::now()->toTimeString(),
+                    'status' => 'pending',
+                ]);
+            });
+
+            $dentists = User::whereHas('role', function ($query) {
+                $query->where('slug', 'dentist');
+            })->get();
+
+            foreach ($dentists as $dentist) {
+                $dentist->notify(new DocumentRequestSubmittedNotification($documentRequest));
+            }
+
+            $patient = Patient::where('user_id', auth()->id())->first();
+
+            if ($patient) {
+                AuditLogger::log(
+                    'create',
+                    'document_request',
+                    'Patient submitted document request'
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Document request submitted successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit request: ' . $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
     public function index()
     {
@@ -78,16 +80,13 @@ class DocumentRequestController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        $patient = Patient::find(session('patient_id'));
+        $patient = Patient::where('user_id', auth()->id())->first();
 
-        if ($patient) {
-            AuditLogger::log(
-                'view',
-                'document_request',
-                'Patient viewed document request history'
+        if ($patient && $patient->user) {
+            $patient->user->notify(
+                new DocumentRequestSubmittedNotification($documentRequest)
             );
         }
-
         return view('document-requests.index', compact('requests'));
     }
 
@@ -100,8 +99,8 @@ class DocumentRequestController extends Controller
         }
 
         $notifications = auth()->user()
-    ? auth()->user()->notifications()->latest()->take(10)->get()
-    : collect([]);
+            ? auth()->user()->notifications()->latest()->take(10)->get()
+            : collect([]);
 
         return view('dentist.dentist-documentrequests', compact('notifications'));
     }
@@ -217,8 +216,14 @@ class DocumentRequestController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $docRequest = DocumentRequest::findOrFail($id);
+        $docRequest = DocumentRequest::with('patient.user')->findOrFail($id);
         $docRequest->update(['status' => 'approved']);
+
+        if ($docRequest->patient && $docRequest->patient->user) {
+            $docRequest->patient->user->notify(
+                new DocumentRequestApprovedNotification($docRequest)
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -234,8 +239,22 @@ class DocumentRequestController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $docRequest = DocumentRequest::findOrFail($id);
-        $docRequest->update(['status' => 'rejected']);
+        $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $docRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+
+        $docRequest->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->reason,
+        ]);
+
+        if ($docRequest->patient && $docRequest->patient->user) {
+            $docRequest->patient->user->notify(
+                new DocumentRequestRejectedNotification($docRequest)
+            );
+        }
 
         return response()->json([
             'success' => true,

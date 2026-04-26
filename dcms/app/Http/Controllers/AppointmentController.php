@@ -340,6 +340,24 @@ class AppointmentController extends Controller
                 'appointment_time' => $mysqlTime,
                 'status'           => 'upcoming',
             ]);
+            
+            //  Notify dentists
+            $dentists = User::whereHas('role', function ($q) {
+                $q->where('slug', 'dentist');
+            })->get();
+
+            foreach ($dentists as $dentist) {
+                $dentist->notify(new AppointmentBookedNotification($appointment, $appointment->patient));
+            }
+
+            //  Notify admins
+            $admins = User::whereHas('role', function ($q) {
+                $q->where('slug', 'admin');
+            })->get();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new AppointmentBookedNotification($appointment, $appointment->patient));
+            }
 
             // 2) DENTAL HISTORY (patient-based)
             DentalHistory::updateOrCreate(
