@@ -3442,7 +3442,7 @@ $notifCount = $notifications->count();
           'X-CSRF-TOKEN': CSRF
         },
         body: JSON.stringify({
-          rejection_notes: notes
+          reason: notes
         })
       });
       btn.disabled = false;
