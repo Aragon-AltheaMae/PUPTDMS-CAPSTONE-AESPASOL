@@ -349,7 +349,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const themeIcon = document.getElementById('themeIcon');
 
     if (themeCheckbox && themeIcon) {
-        const currentTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
 
         if (currentTheme === 'dark') {
             themeCheckbox.checked = true;
@@ -371,6 +373,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('theme', 'light');
                 themeIcon.className = 'fa-regular fa-sun text-gray-400 text-base';
             }
+        });
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            if (localStorage.getItem('theme')) return;
+
+            const theme = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            themeCheckbox.checked = theme === 'dark';
+            themeIcon.className = theme === 'dark'
+                ? 'fa-solid fa-moon text-gray-400 text-base'
+                : 'fa-regular fa-sun text-gray-400 text-base';
         });
     }
 });
