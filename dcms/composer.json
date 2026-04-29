@@ -39,7 +39,7 @@
             "app/Helpers/PhilippineHolidays.php",
             "app/Helpers/AuditLogger.php",
             "app/Helpers/SettingHelper.php",
-            "app/Helpers/notification_settings.php"
+            "app/Helpers/NotificationSettings.php"
         ]
     },
     "autoload-dev": {

@@ -47,12 +47,14 @@ class AppointmentController extends Controller
         $today = $now->toDateString();
         $nowTime = $now->format('H:i:s');
 
-        $appointments = Appointment::where('patient_id', $patientId)
+        $appointments = Appointment::with(['dentist.role'])
+            ->where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $futureVisits = Appointment::where('patient_id', $patientId)
+        $futureVisits = Appointment::with(['dentist.role'])
+            ->where('patient_id', $patientId)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereDate('appointment_date', '>', $today)
@@ -65,7 +67,8 @@ class AppointmentController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::where('patient_id', $patientId)
+        $pastVisits = Appointment::with(['dentist.role'])
+            ->where('patient_id', $patientId)
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereIn('status', ['completed', 'cancelled'])
                     ->orWhereDate('appointment_date', '<', $today)
@@ -98,6 +101,34 @@ class AppointmentController extends Controller
 
         $philippineHolidays = PhilippineHolidays::range(1, 3);
 
+        $odontogramTeeth = \App\Models\Tooth::with('surfaces.legends')
+            ->where('patient_id', $patient->id)
+            ->get()
+            ->map(function ($tooth) {
+                $legends = $tooth->surfaces
+                    ->flatMap(fn($surface) => $surface->legends)
+                    ->unique('id')
+                    ->values();
+
+                return [
+                    'tooth' => $tooth->tooth_number,
+                    'legends' => $legends->map(fn($legend) => [
+                        'code' => $legend->code,
+                        'description' => $legend->description,
+                        'category' => $legend->category,
+                    ])->values(),
+                    'surfaces' => $tooth->surfaces->map(fn($surface) => [
+                        'surface_number' => $surface->surface_number,
+                        'legends' => $surface->legends->map(fn($legend) => [
+                            'code' => $legend->code,
+                            'description' => $legend->description,
+                            'category' => $legend->category,
+                        ])->values(),
+                    ])->values(),
+                ];
+            })
+            ->values();
+
         $notifications = [];
 
         AuditLogger::log(
@@ -106,15 +137,21 @@ class AppointmentController extends Controller
             "Patient viewed appointment page"
         );
 
+        $clinicDentist = \App\Models\User::with('role')
+            ->whereHas('role', fn($q) => $q->where('slug', 'dentist'))
+            ->first();
+
         return view('patient.appointment', compact(
             'appointments',
+            'clinicDentist',
             'futureVisits',
             'pastVisits',
             'patient',
             'appointmentCountsPerDay',
             'unavailableDates',
             'philippineHolidays',
-            'notifications'
+            'notifications',
+            'odontogramTeeth'
         ));
     }
 
@@ -177,6 +214,34 @@ class AppointmentController extends Controller
                 ];
             });
 
+        $odontogramTeeth = \App\Models\Tooth::with('surfaces.legends')
+            ->where('patient_id', $patient->id)
+            ->get()
+            ->map(function ($tooth) {
+                $legends = $tooth->surfaces
+                    ->flatMap(fn($surface) => $surface->legends)
+                    ->unique('id')
+                    ->values();
+
+                return [
+                    'tooth' => $tooth->tooth_number,
+                    'legends' => $legends->map(fn($legend) => [
+                        'code' => $legend->code,
+                        'description' => $legend->description,
+                        'category' => $legend->category,
+                    ])->values(),
+                    'surfaces' => $tooth->surfaces->map(fn($surface) => [
+                        'surface_number' => $surface->surface_number,
+                        'legends' => $surface->legends->map(fn($legend) => [
+                            'code' => $legend->code,
+                            'description' => $legend->description,
+                            'category' => $legend->category,
+                        ])->values(),
+                    ])->values(),
+                ];
+            })
+            ->values();
+
         AuditLogger::log(
             'view',
             'appointments',
@@ -191,7 +256,8 @@ class AppointmentController extends Controller
             'blockedDates',
             'philippineHolidays',
             'diseases',
-            'serviceTypes'
+            'serviceTypes',
+            'odontogramTeeth'
         ));
     }
 
@@ -340,7 +406,7 @@ class AppointmentController extends Controller
                 'appointment_time' => $mysqlTime,
                 'status'           => 'upcoming',
             ]);
-            
+
             //  Notify dentists
             $dentists = User::whereHas('role', function ($q) {
                 $q->where('slug', 'dentist');
