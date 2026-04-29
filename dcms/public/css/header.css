@@ -934,3 +934,11 @@ body.sidebar-collapsed .aside-sidebar .nav-link i {
         width: var(--sidebar-collapsed-w);
     }
 }
+/* Smooth dark mode toggle motion */
+.theme-switch-input + .switch-slider {
+    transition: background-color 0.28s ease-in-out, box-shadow 0.28s ease-in-out;
+}
+
+.theme-switch-input + .switch-slider::after {
+    transition: transform 0.28s ease-in-out, background-color 0.28s ease-in-out, box-shadow 0.28s ease-in-out;
+}

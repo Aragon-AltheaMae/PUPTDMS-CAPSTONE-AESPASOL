@@ -43,7 +43,7 @@ use App\Http\Controllers\Admin\DocumentTemplateController;
 use App\Services\StudentApiService;
 use App\Services\FacultyApiService;
 use App\Http\Controllers\Admin\DentalRecordController;
-
+use App\Http\Controllers\ChatbotController;
 
 //api nila albert
 
@@ -1023,10 +1023,4 @@ Route::prefix('report')->middleware(['role:dentist', 'permission:manage_reports'
     })->name('dentist.dentist.report.dental-services');
 });
 
-Route::get('/test-401', fn() => abort(401));
-Route::get('/test-403', fn() => abort(403));
-Route::get('/test-404', fn() => abort(404));
-Route::get('/test-419', fn() => abort(419));
-Route::get('/test-429', fn() => abort(429));
-Route::get('/test-500', fn() => abort(500));
-Route::get('/test-503', fn() => abort(503));
+Route::post('/chat/send', [ChatbotController::class, 'chat']);

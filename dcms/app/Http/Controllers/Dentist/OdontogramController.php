@@ -9,12 +9,10 @@ class OdontogramController extends Controller
 {
     public function show($id)
     {
-        // 🔐 Dentist guard (same logic you use now)
         if (session('role') !== 'dentist') {
             return redirect('/login');
         }
 
-        // TEMP SAMPLE DATA (replace with DB later)
         $patient = [
             'id' => $id,
             'name' => 'Capilitan, Beyonce',
