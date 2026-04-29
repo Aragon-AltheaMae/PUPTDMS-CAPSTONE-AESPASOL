@@ -1,293 +1,3 @@
-<style>
-    .slots-wrap #slotGrid.slot-grid-ui {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        grid-template-rows: repeat(4, 56px);
-        grid-auto-rows: 56px;
-        grid-auto-flow: column;
-        gap: 0.75rem !important;
-        align-items: stretch;
-    }
-
-    .slots-wrap #slotGrid.slot-grid-ui .slot-chip {
-        width: 100%;
-        min-height: 56px;
-        height: 56px;
-        border-radius: 16px !important;
-        justify-content: center !important;
-        padding: 0 0.9rem !important;
-    }
-
-    @media (max-width: 640px) {
-        .slots-wrap #slotGrid.slot-grid-ui {
-            grid-template-columns: 1fr !important;
-            grid-template-rows: none;
-            grid-auto-flow: row;
-        }
-    }
-
-    .slots-wrap .slot-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-    }
-
-    .slots-wrap .slots-grid,
-    .slots-wrap .slot-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 12px !important;
-    }
-
-    @media (max-width: 480px) {
-        .slots-wrap .slot-grid {
-            grid-template-columns: 1fr !important;
-        }
-
-        .slots-wrap .slots-grid,
-        .slots-wrap .slot-grid {
-            grid-template-columns: 1fr !important;
-        }
-    }
-
-    .cal-cell[data-disabled="1"],
-    .cal-cell.disabled,
-    .cal-cell.holiday,
-    .cal-cell.full {
-        cursor: not-allowed !important;
-    }
-
-    .cal-cell-wrap:has(.cal-cell.disabled) {
-        cursor: not-allowed !important;
-    }
-
-    .cal-time-layout {
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
-        gap: 1.5rem;
-    }
-
-    .two-col {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
-        gap: 1.5rem;
-        align-items: stretch;
-    }
-
-    .two-col>.cal-wrap,
-    .two-col>.slots-wrap {
-        height: 100%;
-    }
-
-    .two-col>.slots-wrap {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .two-col>.slots-wrap #slotContainer,
-    .two-col>.slots-wrap #slotPlaceholder {
-        flex: 1 1 auto;
-    }
-
-    .two-col>.slots-wrap #slotContainer {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .two-col>.slots-wrap #slotGrid.slot-grid-ui {
-        flex: 1 1 auto;
-        align-content: start;
-    }
-
-    .slots-wrap .slot-btn {
-        background: #fff !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 10px !important;
-        padding: 14px 16px !important;
-        text-align: left !important;
-        cursor: pointer !important;
-        position: relative !important;
-        overflow: hidden !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-        justify-content: flex-start !important;
-        align-items: flex-start !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .slots-wrap .slot-btn.available:hover {
-        border-color: #8b0000;
-        background: #fffafb;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 0, 0, 0.08);
-    }
-
-    .slots-wrap .slot-btn.selected {
-        background: #8b0000;
-        border-color: #8b0000;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(139, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .slots-wrap .slot-time {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1f2937;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .slots-wrap .slot-btn.selected .slot-time {
-        color: #fff;
-    }
-
-    .slots-wrap .slot-status {
-        font-size: 12px;
-        font-weight: 500;
-        color: #6b7280;
-    }
-
-    .slots-wrap .slot-btn.selected .slot-status {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .slots-wrap .slot-btn.booked {
-        background: #f9fafb;
-        border-color: #f3f4f6;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    .slots-wrap .slot-btn.booked .slot-time {
-        color: #9ca3af;
-        text-decoration: line-through;
-    }
-
-    .slots-wrap .slot-btn.booked .slot-status {
-        color: #ef4444;
-    }
-
-    .cal-shell {
-        width: 100%;
-    }
-
-    .cal-nav-btn {
-        transition: all 0.18s ease;
-    }
-
-    .cal-nav-btn:hover {
-        background: #f9e8e8;
-        border-color: #8B0000;
-    }
-
-    .cal-cell-wrap {
-        min-height: 46px;
-    }
-
-    .cal-tooltip {
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
-    }
-
-    .cal-cell-wrap:hover .cal-tooltip {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .cal-day,
-    .cal-cell {
-        transition: all 0.18s ease;
-        user-select: none;
-    }
-
-    .cal-day:hover:not(.disabled):not(.other-month):not(.today),
-    .cal-cell:hover:not(.disabled):not(.other-month):not(.today) {
-        background: #f9e8e8;
-        color: #8B0000;
-        transform: translateY(-1px);
-    }
-
-    .cal-day.today:hover,
-    .cal-cell.today:hover {
-        background: #8B0000 !important;
-        color: #fff !important;
-        transform: none;
-    }
-
-    .cal-day.disabled,
-    .cal-cell.disabled {
-        cursor: not-allowed;
-        opacity: 0.58;
-    }
-
-    .cal-day.selected,
-    .cal-cell.selected {
-        background: #8B0000 !important;
-        color: #fff !important;
-        font-weight: 800;
-        box-shadow: 0 2px 12px rgba(139, 0, 0, 0.28);
-    }
-
-    .cal-cell {
-        width: 40px;
-        height: 40px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-inline: auto;
-        position: relative;
-        font-size: 0.92rem;
-        font-weight: 700;
-        color: #4b5563;
-        background: transparent;
-        border: 1px solid transparent;
-    }
-
-    .cal-cell.holiday {
-        background: #fef3c7 !important;
-        color: #a16207 !important;
-        font-weight: 800;
-    }
-
-    .cal-cell.full {
-        background: #fef2f2;
-        color: #b91c1c;
-        font-weight: 800;
-    }
-
-    .cal-cell.disabled {
-        color: #c7c2bd;
-        cursor: not-allowed !important;
-    }
-
-    .cal-cell.today {
-        background: #8B0000;
-        color: #fff;
-        font-weight: 800;
-        box-shadow: 0 2px 12px rgba(139, 0, 0, 0.25);
-    }
-
-    .cal-legend {
-        margin-top: 1.25rem;
-        padding-top: 0.9rem;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .cal-legend-item {
-        display: inline-flex;
-        align-items: center;
-        line-height: 1;
-    }
-</style>
-
 <script>
     function makeCalendarDot(colorClass, text = '') {
         const sizeClass = text ? 'min-w-[16px] h-4 px-1 text-[9px] font-bold' : 'w-4 h-4 text-[9px]';
@@ -492,7 +202,7 @@
                 </div>
 
                 <div class="relative group">
-                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold cursor-default">
+                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full skeleton-line text-gray-600 text-[11px] font-semibold cursor-default">
                         <i class="fa-solid fa-circle-minus text-[10px]"></i>
                         Unavailable
                     </div>
@@ -536,7 +246,7 @@
                 cellBg: "bg-emerald-50",
                 cellText: "text-emerald-700",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-green">
                         <i class="fa-regular fa-calendar-check text-[10px]"></i>
                         My Appointment
                     </span>
@@ -552,7 +262,7 @@
                 cellBg: "bg-[#8B0000]",
                 cellText: "text-white",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B0000]/10 text-[#8B0000] text-[11px] font-semibold">
+                     <span class="cal-pill cal-pill-maroon">
                         <i class="fa-solid fa-calendar-day text-[10px]"></i>
                         Today
                     </span>
@@ -567,7 +277,7 @@
                 cellBg: "bg-emerald-50",
                 cellText: "text-emerald-700",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-green">
                         <i class="fa-solid fa-user-check text-[10px]"></i>
                         Has Patients
                     </span>
@@ -582,7 +292,7 @@
                 cellBg: "bg-red-50",
                 cellText: "text-red-700",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-red">
                         <i class="fa-solid fa-ban text-[10px]"></i>
                         Fully Booked
                     </span>
@@ -596,7 +306,7 @@
                 cellBg: "bg-yellow-50",
                 cellText: "text-yellow-700",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-yellow">
                         <i class="fa-solid fa-star text-[10px]"></i>
                         Holiday
                     </span>
@@ -609,10 +319,10 @@
                 dotClass: "bg-gray-500",
                 tooltipBg: "bg-gray-600",
                 tooltipArrow: "after:border-t-gray-600",
-                cellBg: "bg-gray-100",
+                cellBg: "skeleton-line",
                 cellText: "text-gray-500",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-gray">
                         <i class="fa-solid fa-circle-minus text-[10px]"></i>
                         Unavailable
                     </span>
@@ -625,10 +335,10 @@
                 dotClass: "bg-gray-500",
                 tooltipBg: "bg-gray-600",
                 tooltipArrow: "after:border-t-gray-600",
-                cellBg: "bg-gray-100",
+                cellBg: "skeleton-line",
                 cellText: "text-gray-500",
                 legendIcon: `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-semibold">
+                    <span class="cal-pill cal-pill-gray">
                         <i class="fa-solid fa-circle-minus text-[10px]"></i>
                         Today not available
                     </span>
@@ -694,7 +404,7 @@
                 cellClass += " selected bg-[#8B0000] text-white font-bold shadow-[0_2px_12px_rgba(139,0,0,0.3)]";
             } else if (state.isToday) {
                 if (state.isBookingMode) {
-                    cellClass += " bg-gray-200 text-gray-500 cursor-not-allowed disabled";
+                    cellClass += " skeleton-block text-gray-500 cursor-not-allowed disabled";
                 } else {
                     cellClass += " today bg-[#8B0000] text-white font-extrabold ring-2 ring-[#8B0000]/30 ring-offset-1";
                 }
@@ -761,7 +471,7 @@
         } else if (variant === 'dentist' && state.hasPatients && !state.isPast && !state.isHoliday) {
             badgeHtml += makeCalendarDot(
                 state.isFull ? CALENDAR_THEME.statuses.fullyBooked.dotClass : CALENDAR_THEME.statuses.hasPatients
-                .dotClass,
+                    .dotClass,
                 state.count > 0 ? String(state.count) : ''
             );
             cellClass +=
@@ -774,7 +484,7 @@
         }
 
         if (state.isBookingMode) {
-            if (state.isHoliday) {} else if (state.isToday) {
+            if (state.isHoliday) { } else if (state.isToday) {
                 tooltip = "Same-day booking is not allowed.";
                 tooltipBg = "bg-gray-600";
                 tooltipArrow = "after:border-t-gray-600";
@@ -796,11 +506,17 @@
         }
 
         if (tooltip) {
+            const day = state.cellDate.getDay();
+            const tooltipSide = day >= 5 ? "tooltip-left" : day <= 1 ? "tooltip-right" : "tooltip-center";
+
             tooltipHtml = `
-            <div class="cal-tooltip absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 ${tooltipBg} text-white text-[0.65rem] font-medium px-2.5 py-1.5 rounded-lg whitespace-nowrap z-50 pointer-events-none after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent ${tooltipArrow}">
+        <div class="day-smart-tooltip ${tooltipSide} absolute bottom-[calc(100%+10px)] z-[9999] pointer-events-none">
+            <div class="${tooltipBg} relative text-white text-[0.65rem] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl
+                after:content-[''] after:absolute after:top-full after:border-4 after:border-transparent ${tooltipArrow}">
                 ${tooltip}
             </div>
-        `;
+        </div>
+    `;
         }
 
         return {
@@ -817,26 +533,26 @@
         const dayHeaderSkeleton = Array.from({
             length: 7
         }).map(() =>
-            '<div class="h-4 bg-gray-100 rounded mx-2"></div>'
+            '<div class="h-4 skeleton-line rounded mx-2"></div>'
         ).join("");
 
         const dayCellSkeleton = Array.from({
             length: 35
         }).map(() =>
             '<div class="flex items-center justify-center py-1.5">' +
-            '<div class="w-10 h-10 rounded-xl bg-gray-100"></div>' +
+            '<div class="w-10 h-10 rounded-xl skeleton-line"></div>' +
             '</div>'
         ).join("");
 
         container.innerHTML =
-            '<div class="cal-shell animate-pulse">' +
+            '<div class="skeleton-shell space-y-5 p-5 sm:p-6">' +
             '<div class="flex items-center justify-between mb-5">' +
-            '<div class="w-8 h-8 rounded-full bg-gray-200"></div>' +
+            '<div class="w-8 h-8 rounded-full skeleton-block"></div>' +
             '<div class="text-center space-y-2">' +
-            '<div class="h-5 w-28 bg-gray-200 rounded mx-auto"></div>' +
-            '<div class="h-3 w-16 bg-gray-100 rounded mx-auto"></div>' +
+            '<div class="h-5 w-28 skeleton-block rounded mx-auto"></div>' +
+            '<div class="h-3 w-16 skeleton-line rounded mx-auto"></div>' +
             '</div>' +
-            '<div class="w-8 h-8 rounded-full bg-gray-200"></div>' +
+            '<div class="w-8 h-8 rounded-full skeleton-block"></div>' +
             '</div>' +
 
             '<div class="border-t border-gray-100 mb-3"></div>' +
@@ -897,7 +613,7 @@
                 length: 8
             }).map(() => `
             <div class="px-4 py-3 rounded-xl border border-gray-100 bg-gray-50">
-                <div class="h-4 w-24 bg-gray-200 rounded"></div>
+                <div class="h-4 w-24 skeleton-block rounded"></div>
             </div>
         `).join("");
         }
@@ -931,7 +647,9 @@
         const nextDisabled = lockMonth ? true : false;
 
         const header = dayLabels.map((d, i) => `
-        <div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${i === 0 || i === 6 ? 'text-[rgba(139,0,0,0.4)]' : 'text-[#9e9690]'}">
+        <div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${i === 0 || i === 6
+                ? 'cal-day-weekend text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest'
+                : 'cal-day-label text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest'}">
             ${d}
         </div>
     `).join("");
@@ -944,7 +662,7 @@
             const ui = getCalendarDayDecorations(state, isDentist ? 'dentist' : 'patient');
 
             cells += `
-            <div class="cal-cell-wrap relative flex items-center justify-center py-1.5 group">
+            <div class="cal-cell-wrap relative flex items-center justify-center group">
                 ${ui.tooltipHtml}
                 <div class="${ui.cellClass}" data-date="${state.iso}" data-disabled="${state.isDisabled ? 1 : 0}">
                     <span>${d}</span>
@@ -964,7 +682,7 @@
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 <div class="text-center">
-                    <p class="text-base font-extrabold text-[#660000]">${MONTHS[month]}</p>
+                    <p class="cal-month-label text-base font-extrabold">${MONTHS[month]}</p>
                     <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
                 </div>
                 <button
@@ -975,15 +693,28 @@
                 </button>
             </div>
             <hr class="border-[#f0ebe6] mb-3">
-            <div class="grid grid-cols-7 gap-0.5">${header}${cells}</div>
+            <div class="cal-grid">${header}${cells}</div>
             ${renderUnifiedCalendarLegend(calendarConfig.mode)}
         </div>
     `;
 
         const container = document.getElementById(calendarConfig.calendarContainerId);
-        if (container) container.innerHTML = markup;
 
-        bindCalendarClicks(`#${calendarConfig.calendarContainerId} [data-date]`);
+        if (container) {
+            if (calendarConfig.mode === 'booking') {
+                container.innerHTML = markup;
+                container.classList.remove('skeleton-fade-leave');
+                container.style.pointerEvents = '';
+            } else {
+                swapSkeletonContent(calendarConfig.calendarContainerId, markup);
+                setTimeout(() => {
+                    bindCalendarClicks(`#${calendarConfig.calendarContainerId} [data-date]`);
+                }, 180);
+                return;
+            }
+
+            bindCalendarClicks(`#${calendarConfig.calendarContainerId} [data-date]`);
+        }
     }
 
     function renderCalendar() {
@@ -1221,37 +952,64 @@
                     const slotsWrap = document.querySelector(calendarConfig.slotsWrapSelector);
                     const timeInput = document.getElementById(calendarConfig.timeInputId);
 
+                    const currentDisplay = document.getElementById(calendarConfig.selectedSlotDisplayId || "selectedSlotDisplay");
+                    const currentDisplayTxt = document.getElementById(calendarConfig.selectedSlotTextId || "selectedSlotText");
+                    const currentTimePill = document.getElementById(calendarConfig.selectedTimePillId || "selectedTimePill");
+                    const currentTimeText = document.getElementById(calendarConfig.selectedTimeTextId || "selectedTimeText");
+
                     if (timeError) timeError.style.display = "none";
                     if (slotsWrap) slotsWrap.classList.remove("error");
 
-                    slotGrid.querySelectorAll(".slot-chip").forEach(c => {
-                        c.classList.remove("selected", "bg-[#8B0000]", "text-white",
-                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]");
-                        if (calendarConfig.renderStyle !== 'dentist') {
-                            c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]",
-                                "text-[#1a1410]");
+                    // click ulit sa same selected time = unselect
+                    if (selectedTime === timeValue) {
+                        chip.classList.remove(
+                            "selected", "bg-[#8B0000]", "text-white",
+                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
+                        );
+
+                        chip.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
+                        chip.setAttribute("aria-pressed", "false");
+
+                        selectedTime = null;
+                        if (timeInput) {
+                            timeInput.value = "";
+                            timeInput.dispatchEvent(new Event("change", { bubbles: true }));
                         }
+
+                        if (currentDisplayTxt) currentDisplayTxt.textContent = "";
+                        currentDisplay?.classList.add("hidden");
+
+                        if (currentTimeText) currentTimeText.textContent = "";
+                        currentTimePill?.classList.add("hidden");
+
+                        if (typeof markFormDirty === "function") markFormDirty();
+                        return;
+                    }
+
+                    slotGrid.querySelectorAll(".slot-chip").forEach(c => {
+                        c.classList.remove(
+                            "selected", "bg-[#8B0000]", "text-white",
+                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
+                        );
+                        c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
+                        c.setAttribute("aria-pressed", "false");
                     });
 
                     chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]");
-                    chip.classList.remove("border-[#e8e2dd]", "border-[#e7d8d2]", "bg-[#fafaf8]",
-                        "bg-white", "text-[#1a1410]", "text-[#2f2f2f]");
+                    chip.classList.remove(
+                        "border-[#e8e2dd]", "border-[#e7d8d2]", "bg-[#fafaf8]",
+                        "bg-white", "text-[#1a1410]", "text-[#2f2f2f]"
+                    );
+                    chip.setAttribute("aria-pressed", "true");
 
                     selectedTime = timeValue;
-                    if (timeInput) timeInput.value = timeValue;
-                    if (typeof markFormDirty === "function") markFormDirty();
-
-                    let currentDisplay = document.getElementById(calendarConfig.selectedSlotDisplayId ||
-                        "selectedSlotDisplay");
-                    let currentDisplayTxt = document.getElementById(calendarConfig.selectedSlotTextId ||
-                        "selectedSlotText");
-                    let currentTimePill = document.getElementById(calendarConfig.selectedTimePillId ||
-                        "selectedTimePill");
-                    let currentTimeText = document.getElementById(calendarConfig.selectedTimeTextId ||
-                        "selectedTimeText");
+                    if (timeInput) {
+                        timeInput.value = timeValue;
+                        timeInput.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
 
                     if (currentDisplayTxt) currentDisplayTxt.textContent = timeValue;
-                    if (currentDisplay) currentDisplay.classList.remove("hidden");
+                    currentDisplay?.classList.remove("hidden");
 
                     if (currentTimeText) currentTimeText.textContent = timeValue;
                     if (currentTimePill) {
@@ -1259,6 +1017,8 @@
                         currentTimePill.classList.add("show");
                         currentTimePill.style.display = "block";
                     }
+
+                    if (typeof markFormDirty === "function") markFormDirty();
                 });
             }
 
@@ -1269,7 +1029,7 @@
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
 
-    window.changeMonth = function(dir) {
+    window.changeMonth = function (dir) {
         if (calendarConfig.mode === 'patient-dashboard') {
             currentYear = todayDate.getFullYear();
             currentMonth = todayDate.getMonth();
@@ -1292,16 +1052,18 @@
         renderCalendar();
     };
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         if (calendarConfig.mode === 'patient-dashboard') {
             currentYear = todayDate.getFullYear();
             currentMonth = todayDate.getMonth();
         }
 
-        renderCalendarLoading();
+        if (calendarConfig.mode !== 'booking') {
+            renderCalendarLoading();
+        }
 
         setTimeout(() => {
             renderCalendar();
-        }, 350);
+        }, calendarConfig.mode === 'booking' ? 0 : 650);
     });
 </script>

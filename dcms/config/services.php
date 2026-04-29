@@ -23,7 +23,6 @@ return [
         ],
     ],
 
-    // ✅ MOVE THIS OUTSIDE
     'oidc' => [
         'authorize_url' => env('OIDC_AUTHORIZE_URL'),
         'token_url' => env('OIDC_TOKEN_URL'),
@@ -43,6 +42,10 @@ return [
         'token_url' => env('OGOS_M2M_TOKEN_URL'),
         'client_id' => env('OGOS_M2M_CLIENT_ID'),
         'client_secret' => env('OGOS_M2M_CLIENT_SECRET'),
+    ],
+
+    'chatbot' => [
+        'api_key' => env('CHATBOT_API_KEY'),
     ],
 
 ];
