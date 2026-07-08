@@ -90,7 +90,7 @@ body.role-patient #mainContent.patient-dashboard-page .request-doc-card {
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1199px) {
-    #mainContent {
+    body.role-patient #mainContent.patient-dashboard-page {
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
@@ -101,7 +101,7 @@ body.role-patient #mainContent.patient-dashboard-page .request-doc-card {
 }
 
 @media only screen and (min-width: 320px) and (max-width: 600px) {
-    #mainContent {
+    body.role-patient #mainContent.patient-dashboard-page {
         padding-left: 0.75rem !important;
         padding-right: 0.75rem !important;
         padding-bottom: 1rem !important;
@@ -326,7 +326,7 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
 }
 
 @media only screen and (min-width: 1200px) {
-    #mainContent {
+    body.role-patient #mainContent.patient-dashboard-page {
         padding-top: 78px !important;
     }
 
@@ -416,19 +416,6 @@ body.role-patient #mainContent.patient-dashboard-page .greeting-time-icon.is-moo
 
 .stat-soft-rise:nth-child(3) {
     animation-delay: 0.12s;
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    .card-reveal,
-    .card-lift,
-    .stat-soft-rise,
-    .fade-in,
-    .fade-up {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-    }
 }
 
 @media only screen and (min-width: 1200px) {
@@ -757,7 +744,7 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
     flex-wrap: nowrap;
 }
 
-.dashboard-greeting-copyy {
+.dashboard-greeting-copy{
     min-width: 0;
 }
 
@@ -822,4 +809,122 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
     .dashboard-greeting-copy p {
         font-size: 0.72rem !important;
     }
+}
+
+body.role-patient #mainContent.patient-dashboard-page,
+body.role-patient #mainContent.patient-dashboard-page * {
+    min-width: 0;
+}
+
+.dashboard-greeting-name-line,
+.dashboard-greeting-copy p,
+.request-doc-card h3,
+.request-doc-card p,
+.upcoming-card-title,
+.upcoming-status-pill,
+.upcoming-reminder-label,
+.upcoming-reminder-text {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+@media only screen and (max-width: 375px) {
+
+    body.role-patient #mainContent.patient-dashboard-page {
+        padding-left: .6rem !important;
+        padding-right: .6rem !important;
+    }
+
+    .dashboard-greeting-name-line {
+        font-size: 1.18rem !important;
+    }
+
+    .dashboard-greeting-copy p {
+        font-size: .68rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .request-doc-card {
+        padding: .75rem !important;
+    }
+
+    .request-doc-card .icon-box {
+        width: 2.65rem !important;
+        height: 2.65rem !important;
+    }
+
+    .upcoming-card-mobile .upcoming-status-pill {
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+
+@media only screen and (min-width:376px) and (max-width:480px){
+
+    .dashboard-greeting-name-line{
+        font-size:clamp(1.2rem,7vw,1.45rem)!important;
+    }
+
+    .request-doc-card{
+        padding:.85rem!important;
+    }
+
+    .upcoming-reminder-chip{
+        padding:.6rem .75rem;
+    }
+
+}
+
+@media (hover:none){
+
+    .request-doc-card:hover,
+    .card-lift:hover,
+    .check-dates-btn:hover,
+    .book-appointment-btn:hover,
+    .profile-toggle-btn:hover,
+    .greeting-insight-chip:hover,
+    .greeting-scroll-cue:hover{
+
+        transform:none!important;
+        box-shadow:inherit;
+        filter:none!important;
+
+    }
+
+}
+
+@media (prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+
+        animation:none!important;
+        transition:none!important;
+        scroll-behavior:auto!important;
+
+    }
+
+}
+
+@supports not ((backdrop-filter:blur(18px)) or (-webkit-backdrop-filter:blur(18px))){
+
+    body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
+    [data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
+    .upcoming-tooth-glass,
+    .glass-icon-red{
+
+        background:rgba(255,255,255,.95)!important;
+
+    }
+
+    [data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
+    [data-theme="dark"] .upcoming-tooth-glass,
+    [data-theme="dark"] .glass-icon-red{
+
+        background:#161B22!important;
+
+    }
+
 }

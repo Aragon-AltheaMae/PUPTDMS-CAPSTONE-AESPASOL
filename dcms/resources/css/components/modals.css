@@ -2296,8 +2296,8 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     position: fixed !important;
     inset: 0 !important;
     margin: auto !important;
-    width: min(92vw, 440px) !important;
-    max-width: 440px !important;
+    width: min(92vw, 520px) !important;
+    max-width: 520px !important;
     height: fit-content !important;
     max-height: min(88dvh, 720px) !important;
     padding: 0 !important;
@@ -2360,9 +2360,9 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 }
 
 .patient-doc-icon {
-    width: 46px;
-    height: 46px;
-    min-width: 46px;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
     border-radius: 16px;
     display: inline-flex;
     align-items: center;
@@ -2391,7 +2391,7 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 .patient-doc-title {
     margin: 0;
     color: #FFFFFF;
-    font-size: 22px;
+    font-size: clamp(18px, 2.2vw, 20px);
     line-height: 1.1;
     font-weight: 950;
     letter-spacing: -0.03em;
@@ -2419,32 +2419,32 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 }
 
 .patient-doc-modal-body {
-    padding: 18px 22px 8px;
+    padding: 16px 20px 6px;
     overflow: visible;
 }
 
 .patient-doc-help {
-    margin: 0 0 18px;
-    padding: 12px 14px;
-    border-radius: 16px;
+    margin: 0 0 16px;
+    padding: 11px 13px;
+    border-radius: 14px;
     background: #FFF7F7;
     border: 1px solid #F5D7D7;
     color: #6B7280;
-    font-size: 13px;
+    font-size: clamp(12px, 3.2vw, 13px);
     font-weight: 650;
-    line-height: 1.45;
+    line-height: 1.42;
 }
 
 .patient-doc-field-grid {
     display: grid;
-    gap: 16px;
+    gap: 13px;
 }
 
 .patient-doc-label {
     display: block;
     margin: 0 0 8px;
     color: #8B0000;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 950;
     letter-spacing: .10em;
     text-transform: uppercase;
@@ -2482,8 +2482,8 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 
 .doc-dd-btn {
     width: 100%;
-    min-height: 46px;
-    padding: 0 14px 0 16px;
+    min-height: 42px;
+    padding: 0 13px 0 16px;
     border-radius: 14px;
     border: 1px solid #E5E7EB;
     background: #FAFAFA;
@@ -2492,8 +2492,8 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    font-size: 13px;
-    font-weight: 850;
+    font-size: 12px;
+    font-weight: 800;
     text-align: left;
     cursor: pointer;
     transition: all .18s ease;
@@ -2554,10 +2554,10 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     border-radius: 14px;
     background: transparent;
     color: #374151;
-    padding: 10px;
+    padding: 8px;
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 9px;
     text-align: left;
     cursor: pointer;
     transition: all .16s ease;
@@ -2570,9 +2570,9 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 }
 
 .doc-dd-option-icon {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -2585,8 +2585,8 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 .doc-dd-option strong {
     display: block;
     color: inherit;
-    font-size: 13px;
-    font-weight: 950;
+    font-size: 12px;
+    font-weight: 850;
     line-height: 1.15;
 }
 
@@ -2594,8 +2594,8 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     display: block;
     margin-top: 3px;
     color: #6B7280;
-    font-size: 11px;
-    font-weight: 650;
+    font-size: 10.5px;
+    font-weight: 600;
     line-height: 1.3;
 }
 
@@ -2604,12 +2604,13 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .patient-doc-btn {
     min-height: 42px;
     padding: 0 18px;
+    white-space: nowrap;
     border-radius: 14px;
     display: inline-flex;
     align-items: center;
@@ -2962,6 +2963,26 @@ body.doc-modal-lock .floating-action {
     color: #F8FAFC !important;
 }
 
+@media (min-width: 641px) {
+    .patient-doc-modal-box {
+        max-height: min(84dvh, 680px);
+    }
+
+    .patient-doc-modal-head {
+        padding: 18px 20px;
+    }
+
+    .patient-doc-help {
+        font-size: 12px;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+    }
+
+    .doc-dd-menu {
+        max-height: 210px;
+    }
+}
+
 @media (max-width: 640px) {
     .patient-doc-modal {
         width: 100vw !important;
@@ -2988,12 +3009,58 @@ body.doc-modal-lock .floating-action {
         padding: 14px 18px 18px;
     }
 
-    .patient-doc-btn {
-        flex: 1 1 0;
+   .patient-doc-btn {
+        flex: 1 1 auto;
+        white-space: nowrap;
+    }
+
+    .patient-doc-btn-primary {
+        min-width: 165px;
     }
 
     .doc-success-card {
         padding: 24px 18px;
         border-radius: 24px;
+    }
+
+    .patient-doc-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 14px;
+    }
+
+    .patient-doc-icon i {
+        font-size: 16px;
+    }
+
+    .patient-doc-eyebrow {
+        font-size: 9px;
+        letter-spacing: .13em;
+    }
+
+    .patient-doc-title {
+        font-size: 19px;
+    }
+
+    .patient-doc-label {
+        font-size: 10px;
+    }
+
+    .doc-dd-btn {
+        min-height: 44px;
+        font-size: 12px;
+    }
+
+    .doc-dd-option {
+        padding: 9px;
+        gap: 9px;
+    }
+
+    .doc-dd-option-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        border-radius: 10px;
     }
 }
