@@ -2,6 +2,7 @@
 
 @section('title', 'Book Appointment')
 
+<<<<<<< Updated upstream
 @section('styles')
 
     <style>
@@ -2444,6 +2445,8 @@
     </style>
 @endsection
 
+=======
+>>>>>>> Stashed changes
 @php
     $notifications = collect($notifications ?? []);
     $notifCount = $notifications->count();
@@ -2469,8 +2472,7 @@
                 </div>
 
                 <div class="w-full h-2 rounded-full bg-[#e8e2dd] overflow-hidden mb-5">
-                    <div id="headerProgressFill" class="h-full rounded-full progress-fill"
-                        style="width:20%; background: linear-gradient(90deg, #8B0000, #c9a84c)"></div>
+                    <div id="headerProgressFill" class="h-full rounded-full progress-fill progress-fill-initial"></div>
                 </div>
 
                 <div class="text-center mb-1">
@@ -2485,8 +2487,8 @@
 
             <div class="w-full pb-16">
 
-                <div class="w-full mt-4 mb-0 animate-fade-up-1 py-3 px-2" style="overflow: visible;">
-                    <div class="flex items-start justify-between w-full" style="padding: 6px 0;">
+                <div class="w-full mt-4 mb-0 animate-fade-up-1 py-3 px-2 stepper-wrap-overflow">
+                    <div class="flex items-start justify-between w-full stepper-row-padding">
                         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
                             <div id="sc1"
                                 class="step-circle w-10 h-10 rounded-full border-2 border-blue-600 bg-blue-600 flex items-center justify-center text-sm font-bold text-white shadow-[0_0_0_6px_rgba(37,99,235,0.12)] scale-110">
@@ -2495,8 +2497,7 @@
                                 class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-blue-600 text-center hidden sm:block mt-4">Date
                                 &amp; Time</span>
                         </div>
-                        <div id="conn1" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
-                            style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
+                        <div id="conn1" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
                         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
                             <div id="sc2"
                                 class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
@@ -2504,8 +2505,7 @@
                             <span id="sl2"
                                 class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Service</span>
                         </div>
-                        <div id="conn2" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
-                            style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
+                        <div id="conn2" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
                         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
                             <div id="sc3"
                                 class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
@@ -2514,8 +2514,7 @@
                                 class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Dental
                                 History</span>
                         </div>
-                        <div id="conn3" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
-                            style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
+                        <div id="conn3" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
                         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
                             <div id="sc4"
                                 class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
@@ -2524,8 +2523,7 @@
                                 class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Medical
                                 History</span>
                         </div>
-                        <div id="conn4" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector"
-                            style="width:clamp(8px, 3vw, 40px); margin-top:20px;"></div>
+                        <div id="conn4" class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
                         <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
                             <div id="sc5"
                                 class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
@@ -2538,7 +2536,7 @@
 
                 <div
                     class="book-card mt-6 w-full mx-auto bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.08),0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden animate-fade-up-2">
-                    <div class="h-1 w-full" style="background: linear-gradient(90deg, #660000, #8B0000, #c9a84c)"></div>
+                    <div class="h-1 w-full book-card-topline"></div>
                     <div class="p-6 sm:p-8">
 
                         <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST"
@@ -2577,8 +2575,7 @@
                                                 </div>
 
                                                 <div id="dateBanner"
-                                                    class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md"
-                                                    style="background: linear-gradient(135deg, #660000, #8B0000)"></div>
+                                                    class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient"></div>
 
                                                 <div id="slotContainer" class="hidden">
                                                     <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
@@ -2640,8 +2637,7 @@
                                                             <div class="service-option-icon">
                                                                 @if (!empty($service['img']))
                                                                     <img src="{{ asset('images/' . $service['img'] . '.png') }}"
-                                                                        class="w-6 h-6"
-                                                                        style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                                                                        class="w-6 h-6 service-option-img-red" />
                                                                 @else
                                                                     <i class="fa-solid fa-tooth"></i>
                                                                 @endif
@@ -3304,13 +3300,12 @@
                                             </div>
                                         </div>
 
-                                        <div class="section-card signature-section-card">
-                                            <div class="signature-full-row">
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                    Patient's Signature <span class="required-star">*</span>
-                                                </label>
+                                        <div class="signature-section-card">
+                                            <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                Patient's Signature <span class="required-star">*</span>
+                                            </label>
 
-                                                <div class="signature-methods-grid">
+                                            <div class="signature-methods-grid">
                                                     <div
                                                         class="file-upload-zone border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer">
                                                         <i class="fa-regular fa-image text-gray-400 text-3xl mb-2"></i>
@@ -3381,7 +3376,6 @@
                                                         {{ $message }}
                                                     </p>
                                                 @enderror
-                                            </div>
                                         </div>
                                     </div>
 
@@ -3469,7 +3463,7 @@
                             </div>
 
                             <div id="navBtns" class="flex justify-end mt-8 gap-3 nav-btns-row">
-                                <button type="button" id="prevBtn" style="display:none;"
+                                <button type="button" id="prevBtn"
                                     class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-2xl px-6 py-3 text-sm font-semibold text-[#5c5550] bg-white shadow-sm">
                                     <i class="fa-solid fa-chevron-left text-xs"></i> Previous
                                 </button>
@@ -4120,6 +4114,7 @@
             const patientGender = @json($patient->gender ?? 'N/A');
             const dentalHistoryBody = `
     ${subSection("Basic Info", `
+<<<<<<< Updated upstream
                                                                                                                                                                         ${row("Last Dental Visit", get("last_dental_visit"))}
                                                                                                                                                                         ${row("Previous Dentist", get("previous_dentist"))}
                                                                                                                                                                     `)}
@@ -4165,9 +4160,57 @@
                                                                                                                                                                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
                                                                                                                                                                     `)}
 `;
+=======
+        ${row("Last Dental Visit", get("last_dental_visit"))}
+        ${row("Previous Dentist", get("previous_dentist"))}
+    `)}
 
-            const medicalHistoryBody = `
+    ${subSection("Dental Symptoms", `
+        ${row("Bleeding Gums", get("bleeding_gums"))}
+        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+        ${row("Tooth Pain", get("tooth_pain"))}
+        ${row("Sores/Lumps", get("sores"))}
+        ${row("Jaw Injuries", get("injuries"))}
+    `)}
+
+    ${subSection("Jaw & Bite Symptoms", `
+        ${row("Clicking", get("clicking"))}
+        ${row("Joint Pain", get("joint_pain"))}
+        ${row("Difficulty Moving", get("difficulty_moving"))}
+        ${row("Difficulty Chewing", get("difficulty_chewing"))}
+        ${row("Frequent Headaches", get("jaw_headaches"))}
+        ${row("Grinding/Clenching", get("clench_grind"))}
+        ${row("Lips/Cheek Biting", get("biting"))}
+        ${row("Teeth Loosening", get("teeth_loosening"))}
+        ${row("Food Caught Between Teeth", get("food_teeth"))}
+        ${row("Medicine Reaction", get("med_reaction"))}
+    `)}
+
+    ${subSection("Dental Procedures", `
+        ${row("Periodontal Treatment", get("periodontal"))}
+        ${row("Difficult Extraction", get("difficult_extraction"))}
+        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+
+        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+        ${row("Dentures", get("dentures"))}
+        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+
+        ${row("Orthodontic Treatment", get("ortho_treatment"))}
+        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+    `)}
+
+    ${fullWidthSection("Additional Concerns", `
+        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+        ? get("additional_concerns")
+        : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
+    `)}
+    `;
+>>>>>>> Stashed changes
+
+    const medicalHistoryBody = `
     ${subSection("General Health", `
+<<<<<<< Updated upstream
                                                                                                                                                                     ${row("Good Health", get("good_health"))}
                                                                                                                                                                     ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
@@ -4214,9 +4257,58 @@
                                                                                                                                                                     ${row("Neck Aches", get("neck_aches"))}
                                                                                                                                                                 `)}
 `;
+=======
+        ${row("Good Health", get("good_health"))}
+        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-            document.getElementById("summaryBox").innerHTML = `
+        ${row("Had Medical Exam", get("had_medical_exam"))}
+        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+
+        ${row("Under Treatment", get("under_treatment"))}
+        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+
+        ${row("Hospitalized", get("hospitalized"))}
+        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+    `)}
+
+    ${subSection("Allergies", `
+        ${row("Allergy (Medicine)", get("allergy_medicine"))}
+        ${row("Allergy (Food)", get("allergy_food"))}
+        ${optionalRow("Allergy (Others)", get("allergy_others"))}
+    `)}
+
+    ${subSection("Medications", `
+        ${row("Medication", get("medication"))}
+        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+    `)}
+
+    ${isFemalePatient ? subSection("For Women Only", `
+        ${row("Pregnant", get("pregnant"))}
+        ${row("Nursing", get("nursing"))}
+        ${row("Birth Control Pills", get("birth_control"))}
+    `) : ""}
+
+    ${fullWidthSection("Medical Conditions", `
+        <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+    `)}
+
+    ${subSection("Tobacco Use", `
+        ${row("Tobacco Use", get("tobacco_use"))}
+        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+    `)}
+
+    ${subSection("Do You Suffer From", `
+        ${row("Headaches", get("headaches"))}
+        ${row("Earaches", get("earaches"))}
+        ${row("Neck Aches", get("neck_aches"))}
+    `)}
+    `;
+>>>>>>> Stashed changes
+
+    document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
+<<<<<<< Updated upstream
                                                                                                                                                                     <div class="grid grid-cols-1 gap-y-1">
                                                                                                                                                                         ${row("Name", patientName)}
                                                                                                                                                                         ${row("Gender", patientGender)}
@@ -4236,6 +4328,27 @@
                                                                                                                                                                             ${row("Type", get("service_type"))}
                                                                                                                                                                         </div>
                                                                                                                                                                     `)}
+=======
+        <div class="grid grid-cols-1 gap-y-1">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+        </div>
+    `)}
+
+    <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+        ${summaryCard("Appointment Details", "fa-calendar-check", `
+        <div class="grid grid-cols-1 gap-y-1">
+            ${row("Date", get("appointment_date"))}
+            ${row("Time", get("appointment_time"))}
+        </div>
+    `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Type", get("service_type"))}
+            </div>
+        `)}
+>>>>>>> Stashed changes
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -4244,12 +4357,21 @@
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
+<<<<<<< Updated upstream
                                                                                                                                                                         <div class="grid grid-cols-1 gap-y-1">
                                                                                                                                                                             ${row("Name", get("emergency_person"))}
                                                                                                                                                                             ${row("Number", get("emergency_number"))}
                                                                                                                                                                             ${row("Relation", emergencyRelation)}
                                                                                                                                                                         </div>
                                                                                                                                                                     `)}
+=======
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Name", get("emergency_person"))}
+                ${row("Number", get("emergency_number"))}
+                ${row("Relation", emergencyRelation)}
+            </div>
+        `)}
+>>>>>>> Stashed changes
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
