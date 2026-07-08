@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\ApplySystemModes;
+use App\Http\Middleware\ValidateFormInput;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
      })
     ->withMiddleware(function ($middleware) {
         $middleware->web(append: [
+            ValidateFormInput::class,
             ApplySystemModes::class,
         ]);
     })

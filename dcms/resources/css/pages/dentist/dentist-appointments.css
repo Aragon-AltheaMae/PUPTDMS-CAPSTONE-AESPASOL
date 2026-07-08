@@ -1691,10 +1691,16 @@
 }
 
 .dentist-appointments-page .appointment-status-trigger-text {
-    display: grid !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
     gap: 1px !important;
     text-align: left !important;
     min-width: 0 !important;
+    min-height: 30px !important;
+    align-self: center !important;
+    position: relative !important;
+    top: -1px !important;
 }
 
 .dentist-appointments-page .appointment-status-trigger-label {
@@ -1704,14 +1710,16 @@
     letter-spacing: .10em !important;
     color: #9CA3AF !important;
     line-height: 1 !important;
+    display: block !important;
 }
 
 .dentist-appointments-page .appointment-status-trigger-text strong {
     color: #111827 !important;
     font-size: 12px !important;
     font-weight: 950 !important;
-    line-height: 1.05 !important;
+    line-height: 1 !important;
     white-space: nowrap !important;
+    display: block !important;
 }
 
 .dentist-appointments-page .appointment-status-count-badge {

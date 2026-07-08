@@ -1050,8 +1050,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 <i class="fa-solid ${icon}"></i>
             </div>
 
-            <h3 class="empty-state-title">${title}</h3>
-            <p class="empty-state-sub">${sub}</p>
+            <h3 class="empty-state-title">${escapeDentalText(title)}</h3>
+            <p class="empty-state-sub">${escapeDentalText(sub)}</p>
 
             ${action}
         </div>

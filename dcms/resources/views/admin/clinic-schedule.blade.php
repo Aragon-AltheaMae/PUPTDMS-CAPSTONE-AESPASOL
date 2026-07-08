@@ -1234,6 +1234,27 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         inp.value = Math.max(1, Math.min(30, parseInt(inp.value || 5) + delta));
     }
 
+    function sortScheduleDays(days) {
+        const order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        return [...new Set(days)].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    }
+
+    function findConflictingScheduleDays(activeDays) {
+        const selected = new Set(activeDays);
+        const conflicts = [];
+
+        (scheduleRules || []).forEach(rule => {
+            if (!rule || !rule.is_active) return;
+            if (editingId !== null && String(rule.id) === String(editingId)) return;
+
+            (rule.days || []).forEach(day => {
+                if (selected.has(day)) conflicts.push(day);
+            });
+        });
+
+        return sortScheduleDays(conflicts);
+    }
+
     function submitRule() {
         clearRuleErrors();
 
@@ -1249,6 +1270,18 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             setFieldError('ruleDaysError', 'Please select at least one day.', null, 'ruleDaysGroup');
             hasError = true;
         }
+
+        const conflictingDays = findConflictingScheduleDays(activeDays);
+        if (conflictingDays.length) {
+            setFieldError(
+                'ruleDaysError',
+                `A schedule already exists for ${conflictingDays.join(', ')}. Edit the existing schedule instead of adding another rule for the same day.`,
+                null,
+                'ruleDaysGroup'
+            );
+            hasError = true;
+        }
+
         if (!status) {
             setFieldError('ruleStatusError', 'Please select a clinic status.', 'ruleStatus');
             hasError = true;

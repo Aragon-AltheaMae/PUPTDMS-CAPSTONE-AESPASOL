@@ -24,7 +24,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Document Templates', 'slug' => 'manage_document_templates', 'module' => 'Document Templates'],
             ['name' => 'Manage Reports', 'slug' => 'manage_reports', 'module' => 'Reports'],
             ['name' => 'Manage Inventory', 'slug' => 'manage_inventory', 'module' => 'Inventory'],
-            ['name' => 'Manage Backup', 'slug' => 'manage_backup', 'module' => 'System Settings'],
             ['name' => 'Set Academic Year', 'slug' => 'set_academic_year', 'module' => 'System Settings'],
             ['name' => 'Set Archive Records', 'slug' => 'set_archive_records', 'module' => 'System Settings'],
             ['name' => 'Set Report Periods', 'slug' => 'set_report_periods', 'module' => 'System Settings'],

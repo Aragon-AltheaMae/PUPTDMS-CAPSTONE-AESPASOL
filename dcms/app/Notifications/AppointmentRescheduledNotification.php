@@ -32,7 +32,7 @@ class AppointmentRescheduledNotification extends Notification
                 $this->formatDate($this->appointment->appointment_date),
                 $this->formatTime($this->appointment->appointment_time)
             ),
-            'url' => route('patient.appointment.index'),
+            'url' => $this->resolveTargetUrl($notifiable),
             'icon' => 'fa-calendar-days',
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->appointment->patient_id,
@@ -50,7 +50,7 @@ class AppointmentRescheduledNotification extends Notification
                 $this->formatDate($this->appointment->appointment_date),
                 $this->formatTime($this->appointment->appointment_time)
             ),
-            'url' => route('patient.appointment.index'),
+            'url' => $this->resolveTargetUrl($notifiable),
             'icon' => 'fa-calendar-days',
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->appointment->patient_id,
@@ -84,5 +84,17 @@ class AppointmentRescheduledNotification extends Notification
         } catch (\Throwable) {
             return $time;
         }
+    }
+
+    private function resolveTargetUrl(object $notifiable): string
+    {
+        $role = optional($notifiable->role)->slug;
+
+        return match ($role) {
+            'admin', 'super_admin' => route('admin.admin.appointments'),
+            'dentist' => route('dentist.dentist.appointments'),
+            'patient' => route('patient.appointment.index'),
+            default => route('patient.appointment.index'),
+        };
     }
 }

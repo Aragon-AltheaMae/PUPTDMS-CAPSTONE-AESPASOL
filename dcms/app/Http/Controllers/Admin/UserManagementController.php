@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Helpers\AuditLogger;
@@ -174,7 +175,7 @@ class UserManagementController extends Controller
     }
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -191,17 +192,24 @@ class UserManagementController extends Controller
             'gender' => 'nullable|in:Male,Female',
         ]);
 
-        DB::transaction(function () use ($request, $user) {
-            $role = $request->role_id ? Role::find($request->role_id) : null;
+        $originalRole = $user->role;
+        $newRoleId = $validated['role_id'] ?? null;
+        $newRole = $newRoleId ? Role::find($newRoleId) : null;
+        $roleChanged = (string) ($user->role_id ?? '') !== (string) ($newRoleId ?? '');
 
+        if ($roleChanged) {
+            $this->authorizeRoleChange($request, $user);
+        }
+
+        DB::transaction(function () use ($request, $user, $newRole, $newRoleId) {
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
-                'role_id' => $request->role_id,
+                'role_id' => $newRoleId,
                 'status' => $request->status,
             ]);
 
-            if ($role && $role->slug === 'patient') {
+            if ($newRole && $newRole->slug === 'patient') {
                 $patient = Patient::firstOrNew(['user_id' => $user->id]);
 
                 $patient->fill([
@@ -227,6 +235,19 @@ class UserManagementController extends Controller
             }
         });
 
+        if ($roleChanged) {
+            AuditLogger::log(
+                'security',
+                'user',
+                sprintf(
+                    'Role changed for user #%d from %s to %s after admin password confirmation',
+                    $user->id,
+                    optional($originalRole)->name ?? 'No Role',
+                    optional($newRole)->name ?? 'No Role'
+                )
+            );
+        }
+
         AuditLogger::log(
             'update',
             'user',
@@ -241,6 +262,41 @@ class UserManagementController extends Controller
         }
 
         return back()->with('success', 'User updated successfully.');
+    }
+
+    private function authorizeRoleChange(Request $request, User $user): void
+    {
+        $actor = Auth::user();
+
+        if (!$actor) {
+            abort(403, 'Authentication is required before changing a user role.');
+        }
+
+        if ((int) $actor->id === (int) $user->id) {
+            $request->validate([
+                'role_id' => [
+                    function ($attribute, $value, $fail) {
+                        $fail('You cannot change your own role.');
+                    },
+                ],
+            ]);
+        }
+
+        $request->validate([
+            'admin_current_password' => ['required', 'string'],
+        ], [
+            'admin_current_password.required' => 'Enter your current admin password before changing a user role.',
+        ]);
+
+        if (!$actor->password || !Hash::check((string) $request->input('admin_current_password'), $actor->password)) {
+            $request->validate([
+                'admin_current_password' => [
+                    function ($attribute, $value, $fail) {
+                        $fail('The admin password confirmation is incorrect.');
+                    },
+                ],
+            ]);
+        }
     }
 
     public function resetPassword(Request $request, User $user)

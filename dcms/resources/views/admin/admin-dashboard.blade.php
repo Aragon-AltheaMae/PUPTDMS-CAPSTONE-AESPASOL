@@ -151,10 +151,6 @@
                             <div class="log-stat-value" style="color:#d97706;">{{ $logWarnings ?? 0 }}</div>
                             <div class="log-stat-label" style="color:#f59e0b;">Logins</div>
                         </div>
-                        <div class="log-stat" style="background:#f0fdf4;">
-                            <div class="log-stat-value" style="color:#16a34a;">{{ $logBackups ?? 0 }}</div>
-                            <div class="log-stat-label" style="color:#22c55e;">Backups</div>
-                        </div>
                         <div class="log-stat" style="background:#fef2f2;">
                             <div class="log-stat-value" style="color:var(--crimson);">{{ $logErrors ?? 0 }}</div>
                             <div class="log-stat-label" style="color:#ef4444;">Errors</div>
@@ -454,73 +450,6 @@
                             <i class="fa-solid fa-boxes-stacked quick-action-bg-icon"></i>
                         </a>
 
-                        <a href="{{ route('admin.data_backup') }}" class="quick-action quick-action-card">
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-database"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Data Backup</span>
-                                <span class="quick-action-sub">View backup status and history</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-database quick-action-bg-icon"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card dashboard-backup-card">
-                    <div class="card-header">
-                        <div class="card-header-left">
-                            <div class="card-header-icon">
-                                <i class="fa-solid fa-database"></i>
-                            </div>
-                            <div>
-                                <div class="card-title">Data Backup</div>
-                                <div class="card-subtitle">Automated backup status</div>
-                            </div>
-                        </div>
-
-                        @if ($autoBackupEnabled)
-                        <span class="status-pill status-active">Active</span>
-                        @else
-                        <span class="status-pill status-pending">Paused</span>
-                        @endif
-                    </div>
-
-                    <div class="dashboard-backup-card-body">
-                        <div class="backup-status" style="margin-bottom:0;">
-                            <div class="backup-check">
-                                <i class="fa-solid {{ $lastBackup ? 'fa-check' : 'fa-clock' }}"></i>
-                            </div>
-                            <div>
-                                <span class="backup-label">Last Backup</span>
-                                <span class="backup-date">
-                                    {{ $lastBackup ? $lastBackup->created_at->format('F d, Y h:i A') : 'No backup yet'
-                                    }}
-                                </span>
-                                <span class="backup-sub">
-                                    {{ $lastBackup ? '✓ Completed successfully' : 'No completed backup found' }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="next-backup" style="margin-bottom:0;">
-                            <i class="fa-regular fa-clock next-icon"></i>
-                            <div>
-                                <div class="next-label">Next Scheduled</div>
-                                <div class="next-date">
-                                    {{ $nextBackupDate ? $nextBackupDate->format('F d, Y h:i A') : 'No schedule set' }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <a href="{{ route('admin.data_backup') }}" class="ui-btn ui-btn-primary"
-                            style="width:100%;text-decoration:none;">
-                            <i class="fa-solid fa-database"></i>
-                            View Backups ({{ $totalBackups }})
-                        </a>
                     </div>
                 </div>
 

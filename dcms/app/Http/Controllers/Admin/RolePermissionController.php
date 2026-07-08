@@ -19,7 +19,10 @@ class RolePermissionController extends Controller
         $this->seedDefaultsIfEmpty();
 
         $roles = Role::with('permissions')->get();
-        $permissions = Permission::orderBy('module')->orderBy('name')->get();
+        $permissions = Permission::where('slug', '!=', 'manage_backup')
+            ->orderBy('module')
+            ->orderBy('name')
+            ->get();
         $groupedPermissions = $permissions->groupBy('module');
 
         $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
@@ -58,7 +61,6 @@ class RolePermissionController extends Controller
                 'manage_super_admin_accounts',
                 'manage_system_settings',
                 'manage_audit_trail',
-                'manage_backup',
                 'manage_document_templates',
                 'manage_reports',
                 'manage_patient_profiles',
@@ -180,7 +182,6 @@ class RolePermissionController extends Controller
             'manage_patient_profiles',
             'manage_appointments',
             'manage_inventory',
-            'manage_backup',
             'set_academic_year',
             'set_archive_records',
             'set_report_periods',

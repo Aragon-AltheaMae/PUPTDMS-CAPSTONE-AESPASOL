@@ -304,7 +304,12 @@ class AppointmentController extends Controller
             'appointment_time'     => 'required|string', // "1:00 PM"
             'service_type' => 'required|string|max:255',
 
-            'emergency_person'     => 'required|string|max:50',
+            'emergency_person' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[A-Za-zÑñ\s.\'-]+$/u',
+            ],
             'emergency_number'     => 'required|string|max:15',
             'emergency_relation' => [
                 'required',
@@ -329,6 +334,7 @@ class AppointmentController extends Controller
                 'mimes:jpg,jpeg,png',
                 'max:25600', // 25 MB
             ],
+            'signature_source' => 'nullable|in:drawn',
 
             'diseases'   => 'array',
             'diseases.*' => 'string|exists:diseases,code',
@@ -456,25 +462,34 @@ class AppointmentController extends Controller
 | Kapag hindi pasado, huwag i-save yung appointment.
 */
         $signatureFile = $request->file('patient_signature');
+        $isDrawnSignature = $this->isDrawnSignatureSubmission($request);
 
-        $aiResult = $signatureVerifier->verify($signatureFile);
+        if (! $isDrawnSignature) {
+            $aiResult = $signatureVerifier->verify($signatureFile);
 
-        \Log::info('Store Appointment Signature Result', $aiResult);
+            \Log::info('Store Appointment Signature Result', $aiResult);
 
-        if (!($aiResult['accepted'] ?? false)) {
-            $reason = $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.';
-            $detectedType = $aiResult['detected_type'] ?? 'unknown';
-            $confidence = $aiResult['confidence'] ?? 0;
+            if (!($aiResult['accepted'] ?? false)) {
+                $reason = $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.';
+                $detectedType = $aiResult['detected_type'] ?? 'unknown';
+                $confidence = $aiResult['confidence'] ?? 0;
 
-            return redirect()->back()
-                ->withInput()
-                ->withErrors([
-                    'patient_signature' =>
-                    'Signature could not be processed. Please try again. ' .
-                        'Reason: ' . $reason .
-                        ' Detected: ' . $detectedType .
-                        ' Confidence: ' . $confidence,
-                ]);
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'patient_signature' =>
+                        'Signature could not be processed. Please try again. ' .
+                            'Reason: ' . $reason .
+                            ' Detected: ' . $detectedType .
+                            ' Confidence: ' . $confidence,
+                    ]);
+            }
+        } else {
+            \Log::info('Store Appointment Signature Result', [
+                'accepted' => true,
+                'source' => 'drawn',
+                'reason' => 'Drawn signature skipped AI validation.',
+            ]);
         }
 
         $signaturePath = $signatureFile->store('signatures', 'public');
@@ -736,7 +751,7 @@ class AppointmentController extends Controller
             }
         });
 
-       if ($appointment) {
+        if ($appointment) {
             AuditLogger::log(
                 'create',
                 'appointments',
@@ -824,43 +839,54 @@ class AppointmentController extends Controller
     /* =======================
    VALIDATE SIGNATURE AJAX
 ======================= */
-  public function validateSignature(Request $request, SignatureAiVerifier $signatureVerifier)
-{
-    $request->validate([
-        'patient_signature' => [
-            'required',
-            'file',
-            'mimes:jpg,jpeg,png',
-            'max:25600', // 25 MB
-        ],
-    ]);
+    public function validateSignature(Request $request, SignatureAiVerifier $signatureVerifier)
+    {
+        $request->validate([
+            'patient_signature' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png',
+                'max:25600', // 25 MB
+            ],
+        ]);
 
-    $signatureFile = $request->file('patient_signature');
+        $signatureFile = $request->file('patient_signature');
 
-    $aiResult = $signatureVerifier->verify($signatureFile);
+        if ($this->isDrawnSignatureSubmission($request)) {
+            return response()->json([
+                'valid' => true,
+                'accepted' => true,
+                'message' => 'Drawn signature accepted',
+                'detected_type' => 'drawn_signature',
+                'confidence' => 1,
+                'reason' => '',
+            ]);
+        }
 
-    \Log::info('Validate Signature Endpoint Result', $aiResult);
+        $aiResult = $signatureVerifier->verify($signatureFile);
 
-    if (!($aiResult['accepted'] ?? false)) {
+        \Log::info('Validate Signature Endpoint Result', $aiResult);
+
+        if (!($aiResult['accepted'] ?? false)) {
+            return response()->json([
+                'valid' => false,
+                'accepted' => false,
+                'message' => 'Signature could not be processed. Please try again.',
+                'detected_type' => $aiResult['detected_type'] ?? 'unknown',
+                'confidence' => $aiResult['confidence'] ?? 0,
+                'reason' => $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.',
+            ], 422);
+        }
+
         return response()->json([
-            'valid' => false,
-            'accepted' => false,
-            'message' => 'Signature could not be processed. Please try again.',
-            'detected_type' => $aiResult['detected_type'] ?? 'unknown',
+            'valid' => true,
+            'accepted' => true,
+            'message' => 'Signature verified and accepted',
+            'detected_type' => $aiResult['detected_type'] ?? 'signature',
             'confidence' => $aiResult['confidence'] ?? 0,
-            'reason' => $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.',
-        ], 422);
+            'reason' => $aiResult['reason'] ?? '',
+        ]);
     }
-
-    return response()->json([
-        'valid' => true,
-        'accepted' => true,
-        'message' => 'Signature verified and accepted',
-        'detected_type' => $aiResult['detected_type'] ?? 'signature',
-        'confidence' => $aiResult['confidence'] ?? 0,
-        'reason' => $aiResult['reason'] ?? '',
-    ]);
-}
     /* =======================
        HELPERS
     ======================= */
@@ -971,5 +997,14 @@ class AppointmentController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    private function isDrawnSignatureSubmission(Request $request): bool
+    {
+        $signatureFile = $request->file('patient_signature');
+
+        return $request->input('signature_source') === 'drawn'
+            && $signatureFile
+            && str_starts_with($signatureFile->getClientOriginalName(), 'drawn-signature-');
     }
 }

@@ -880,6 +880,7 @@ $topServices = collect($topServices ?? []);
         "{{ route('dentist.dentist.report.dental-supplies-inventory-download') }}";
     const DENTAL_CASES_DOWNLOAD_URL = "{{ route('dentist.dentist.report.dental-cases-download') }}";
     const MONTHLY_REPORT_DOWNLOAD_URL = "{{ route('dentist.dentist.report.monthly-report-download') }}";
+    const CSRF_REFRESH_URL = "{{ route('csrf.token') }}";
 
     function getCookieValue(name) {
         return document.cookie
@@ -888,10 +889,33 @@ $topServices = collect($topServices ?? []);
             ?.split('=')[1] || '';
     }
 
-    const CSRF_TOKEN =
+    let CSRF_TOKEN =
         document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
         decodeURIComponent(getCookieValue('XSRF-TOKEN')) ||
         "{{ csrf_token() }}";
+
+    async function refreshCsrfToken() {
+        const response = await fetch(CSRF_REFRESH_URL, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            cache: 'no-store'
+        });
+
+        if (!response.ok) return CSRF_TOKEN;
+
+        const data = await response.json();
+
+        if (data.token) {
+            CSRF_TOKEN = data.token;
+            document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', CSRF_TOKEN);
+        }
+
+        return CSRF_TOKEN;
+    }
 
     const PIE_COLORS = [
         '#8B0000',
@@ -1727,8 +1751,9 @@ $topServices = collect($topServices ?? []);
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
 
             try {
+                const csrfToken = await refreshCsrfToken();
                 const formData = new FormData();
-                formData.append('_token', CSRF_TOKEN);
+                formData.append('_token', csrfToken);
                 formData.append('report_name', name);
                 formData.append('document_template_id', type);
                 formData.append('date_from', from);
@@ -1741,8 +1766,7 @@ $topServices = collect($topServices ?? []);
                 const response = await fetch(downloadEndpoint, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                        'X-XSRF-TOKEN': CSRF_TOKEN,
+                        'X-CSRF-TOKEN': csrfToken,
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/pdf, application/json'
                     },
@@ -1768,6 +1792,11 @@ $topServices = collect($topServices ?? []);
                             'Some report fields are invalid. Please review the form and try again.';
                     }
 
+                    if (response.status === 419) {
+                        message =
+                            'Your secure session token expired. Please refresh the page, then try downloading again.';
+                    }
+
                     const contentType = response.headers.get('content-type') || '';
 
                     if (contentType.includes('application/json')) {
@@ -1788,8 +1817,21 @@ $topServices = collect($topServices ?? []);
                     throw new Error(message);
                 }
 
+                const responseContentType = response.headers.get('content-type') || '';
+
+                if (!responseContentType.toLowerCase().includes('application/pdf')) {
+                    const fallbackText = await response.text();
+                    throw new Error(
+                        fallbackText.trim() ||
+                        'The server did not return a valid PDF file. Please try again.'
+                    );
+                }
+
                 const blob = await response.blob();
-                const downloadUrl = window.URL.createObjectURL(blob);
+                const pdfBlob = blob.type === 'application/pdf'
+                    ? blob
+                    : new Blob([blob], { type: 'application/pdf' });
+                const downloadUrl = window.URL.createObjectURL(pdfBlob);
 
                 let fileName = `${name.replace(/[^A-Za-z0-9_-]/g, '_')}.pdf`;
                 const disposition = response.headers.get('Content-Disposition') || response.headers
@@ -1807,7 +1849,7 @@ $topServices = collect($topServices ?? []);
                 link.click();
                 link.remove();
 
-                window.URL.revokeObjectURL(downloadUrl);
+                setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 30000);
 
                 closeModal('createReportModal');
                 openModal('downloadCompleteModal');

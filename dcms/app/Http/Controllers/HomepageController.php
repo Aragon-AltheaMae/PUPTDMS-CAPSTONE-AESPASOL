@@ -23,6 +23,14 @@ class HomepageController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
+        if (!session('impersonated_patient_id')) {
+            $user = auth()->user();
+
+            if ($user?->email && $patient->user_id === $user->id && $patient->email !== $user->email) {
+                $patient->forceFill(['email' => $user->email])->save();
+            }
+        }
+
         AuditLogger::log(
             'view',
             'patient_dashboard',

@@ -1655,6 +1655,15 @@ $notifCount = $notifications->count();
           };
 
           var icon, title, sub, extraHtml = "";
+          var escapeText = window.escapeHtml || function (value) {
+            return String(value || "")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+          };
+
           if (isSearching) {
             icon = "fa-magnifying-glass";
             title = 'No results for "' + searchKeyword + '"';
@@ -1680,8 +1689,8 @@ $notifCount = $notifications->count();
       <i class="fa-solid ${icon}"></i>
     </div>
 
-    <p class="empty-state-title">${title}</p>
-    <p class="empty-state-sub">${sub}</p>
+    <p class="empty-state-title">${escapeText(title)}</p>
+    <p class="empty-state-sub">${escapeText(sub)}</p>
 
     ${extraHtml}
   </div>

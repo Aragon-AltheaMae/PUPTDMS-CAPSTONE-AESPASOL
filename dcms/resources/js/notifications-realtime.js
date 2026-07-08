@@ -90,6 +90,7 @@ function prependNotificationItem(notification) {
     const icon = notification.icon ?? 'fa-bell';
     const createdAtLabel = notification.created_at_label ?? 'Just now';
     const dedupeKey = getNotificationDedupeKey(notification);
+    const markReadUrl = notification.mark_read_url ?? notification.data?.mark_read_url ?? '';
 
     const item = document.createElement('div');
     item.className = 'header-notif-item is-unread';
@@ -100,6 +101,10 @@ function prependNotificationItem(notification) {
         item.setAttribute('data-notif-dedupe-key', String(dedupeKey));
     }
 
+    if (markReadUrl) {
+        item.setAttribute('data-notif-mark-read-url', String(markReadUrl));
+    }
+
     item.innerHTML = `
         <div class="header-notif-item-icon">
             <i class="fa-solid ${escapeHtml(icon)}"></i>
@@ -108,7 +113,7 @@ function prependNotificationItem(notification) {
         <div class="header-notif-item-content">
             <div class="header-notif-item-top">
                 ${url && url !== '#'
-            ? `<a href="${escapeHtml(url)}" class="header-notif-item-title">${escapeHtml(title)}</a>`
+            ? `<a href="${escapeHtml(url)}" class="header-notif-item-title" data-notif-open-link>${escapeHtml(title)}</a>`
             : `<span class="header-notif-item-title">${escapeHtml(title)}</span>`
         }
                 <span class="header-notif-item-time">${escapeHtml(createdAtLabel)}</span>
@@ -118,7 +123,7 @@ function prependNotificationItem(notification) {
 
             <div class="header-notif-item-actions">
                 ${url && url !== '#'
-            ? `<a href="${escapeHtml(url)}" class="header-notif-link-action">Open</a>`
+            ? `<a href="${escapeHtml(url)}" class="header-notif-link-action" data-notif-open-link>Open</a>`
             : ''
         }
             </div>

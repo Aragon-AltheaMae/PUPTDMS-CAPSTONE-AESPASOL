@@ -1848,6 +1848,106 @@ function validateCharLimit(fieldId, max = 150, errorId = null) {
     return isValid;
 }
 
+const unsafeFormInputPatterns = [
+    /<\s*\/?\s*script\b/i,
+    /<\s*(iframe|object|embed|svg|math|link|meta|style)\b/i,
+    /\bon[a-z]+\s*=/i,
+    /\bjavascript\s*:/i,
+    /\bdata\s*:\s*text\/html/i,
+    /(?:^|[\s'"`])or\s+1\s*=\s*1(?:$|[\s;#\-)])/i,
+    /(?:^|[\s'"`])or\s+['"]?1['"]?\s*=\s*['"]?1['"]?(?:$|[\s;#\-)])/i,
+    /;\s*(drop|delete|insert|update|alter|truncate)\s+/i,
+    /--\s*$/,
+];
+
+function isUnsafeFormText(value = '') {
+    const decoded = document.createElement('textarea');
+    decoded.innerHTML = String(value);
+
+    return unsafeFormInputPatterns.some(pattern => pattern.test(decoded.value));
+}
+
+function isContactInput(field) {
+    const key = `${field.name || ''} ${field.id || ''}`.toLowerCase();
+
+    return /(^|[\s._-])(phone|mobile|contact[-_]?number|contact[-_]?no|emergency[-_]?number|emergency[-_]?contact[-_]?no)($|[\s._-])/.test(key);
+}
+
+function getFormInputValidationMessage(field) {
+    if (!field || field.disabled || field.readOnly) return '';
+
+    const type = String(field.type || '').toLowerCase();
+    const ignoredTypes = ['hidden', 'password', 'file', 'submit', 'button', 'reset', 'checkbox', 'radio'];
+
+    if (ignoredTypes.includes(type)) return '';
+
+    const value = String(field.value || '').trim();
+
+    if (!value) return '';
+
+    if (isContactInput(field) && !/^\d{11}$/.test(value)) {
+        return 'Contact number must be exactly 11 digits.';
+    }
+
+    if (isUnsafeFormText(value)) {
+        return 'Please enter readable text only. Scripts and SQL-like input are not allowed.';
+    }
+
+    return '';
+}
+
+function showFormInputValidationMessage(field, message) {
+    field.setCustomValidity(message);
+    field.classList.toggle('is-invalid', Boolean(message));
+
+    const errorId = field.dataset.errorTarget || field.dataset.charError || `err-${field.id || field.name}`;
+    const error = errorId ? document.getElementById(String(errorId).replace('#', '')) : null;
+
+    if (error) {
+        error.innerHTML = message
+            ? `<i class="fa-solid fa-circle-exclamation" style="font-size:9px;"></i> ${escapeHtml(message)}`
+            : '';
+    }
+}
+
+function validateFormInputField(field) {
+    const message = getFormInputValidationMessage(field);
+    showFormInputValidationMessage(field, message);
+
+    return !message;
+}
+
+function bindFormInputValidation(root = document) {
+    root.querySelectorAll('form').forEach(form => {
+        if (form.dataset.formInputValidationInitialized === 'true') return;
+
+        form.dataset.formInputValidationInitialized = 'true';
+
+        form.addEventListener('input', event => {
+            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+                validateFormInputField(event.target);
+            }
+        });
+
+        form.addEventListener('change', event => {
+            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+                validateFormInputField(event.target);
+            }
+        });
+
+        form.addEventListener('submit', event => {
+            const fields = Array.from(form.querySelectorAll('input, textarea'));
+            const invalidField = fields.find(field => !validateFormInputField(field));
+
+            if (!invalidField) return;
+
+            event.preventDefault();
+            invalidField.reportValidity();
+            invalidField.focus({ preventScroll: false });
+        });
+    });
+}
+
 function bindCharLimitField(field) {
     if (!field || field.dataset.charLimitInitialized === 'true') return;
 
@@ -1883,10 +1983,15 @@ function initCharLimitFields(root = document) {
     root.querySelectorAll('[data-char-limit]').forEach(bindCharLimitField);
 }
 
-document.addEventListener('DOMContentLoaded', () => initCharLimitFields());
+document.addEventListener('DOMContentLoaded', () => {
+    initCharLimitFields();
+    bindFormInputValidation();
+});
 
 window.validateCharLimit = validateCharLimit;
 window.initCharLimitFields = initCharLimitFields;
+window.bindFormInputValidation = bindFormInputValidation;
+window.validateFormInputField = validateFormInputField;
 
 function formatStockNo(input) {
     if (!input) return;

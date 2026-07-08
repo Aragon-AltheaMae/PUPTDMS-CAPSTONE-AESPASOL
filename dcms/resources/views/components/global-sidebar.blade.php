@@ -141,12 +141,6 @@ $sidebarGroups = [
 'label' => 'Faculty Integration',
 ],
 [
-'route' => 'admin.data_backup',
-'active' => ['admin.data_backup'],
-'icon' => 'fa-database',
-'label' => 'Data Backup',
-],
-[
 'route' => 'admin.system_logs',
 'active' => ['admin.system_logs'],
 'icon' => 'fa-clipboard-list',

@@ -61,7 +61,10 @@ class OdontogramController extends Controller
 
         $patient = $appointment->patient;
 
-        $procedure = AppointmentProcedure::where('appointment_id', $appointment->id)->first();
+        $procedure = AppointmentProcedure::where('patient_id', $patient->id)
+            ->whereNotNull('odontogram_data')
+            ->latest('updated_at')
+            ->first();
 
         $savedOdontogramData = $procedure?->odontogram_data ?? [];
 
@@ -224,9 +227,9 @@ class OdontogramController extends Controller
 
                     if ($surfaceCode !== '') {
                         $cleanEntry['surfaces'][$surfaceKey] = [
-                            'code' => $surfaceCode,
-                            'label' => data_get($entry, "surfaces.$surfaceKey.label", $surfaceCode),
-                            'colorHex' => data_get($entry, "surfaces.$surfaceKey.colorHex"),
+                            'code' => $surface['code'] ?? null,
+                            'label' => $surface['label'] ?? null,
+                            'colorHex' => '#2563eb',
                         ];
                     }
                 }
@@ -336,10 +339,11 @@ class OdontogramController extends Controller
 
             AppointmentProcedure::updateOrCreate(
                 [
-                    'appointment_id' => $appointment->id,
+                    'patient_id' => $patient->id,
                 ],
                 [
                     'patient_id' => $patient->id,
+                    'appointment_id' => $appointment->id,
                     'odontogram_data' => $cleanOdontogramData,
                     'oral_examination' => $validated['oral_examination'] ?? null,
                     'diagnosis' => $validated['diagnosis'] ?? null,

@@ -710,8 +710,8 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
                 <i class="fa-solid ${icon}"></i>
             </div>
 
-            <p class="empty-state-title">${title}</p>
-            <p class="empty-state-sub">${sub}</p>
+            <p class="empty-state-title">${escapeHtml(title)}</p>
+            <p class="empty-state-sub">${escapeHtml(sub)}</p>
 
             ${actionHtml}
         </div>

@@ -1237,6 +1237,14 @@ $activePeriodPayload = $activePeriod
         const addDescCounter = addForm.querySelector('#addDescCounter');
         const editDesc = document.getElementById('editDesc');
         const editDescCounter = document.getElementById('editDescCounter');
+        const existingAcademicPeriods = @json($calendarPeriodsPayload);
+        const semesterAliases = {
+            '1st Semester': ['First Semester', '1st Semester'],
+            'First Semester': ['First Semester', '1st Semester'],
+            '2nd Semester': ['Second Semester', '2nd Semester'],
+            'Second Semester': ['Second Semester', '2nd Semester'],
+            'Summer': ['Summer'],
+        };
 
         function getErr(field) {
             if (field.id === 'addDesc' || field.id === 'editDesc') {
@@ -1310,6 +1318,35 @@ $activePeriodPayload = $activePeriod
             }
             if (semErr) semErr.classList.remove('show');
             return true;
+        }
+
+        function findDuplicateAcademicPeriod(year, semester, ignoreId = null) {
+            const aliases = semesterAliases[semester] || [semester];
+
+            return existingAcademicPeriods.find(period => {
+                if (ignoreId !== null && String(period.id) === String(ignoreId)) return false;
+
+                return period.academic_year === year && aliases.includes(period.semester);
+            });
+        }
+
+        function validateDuplicateAcademicPeriod(form, ignoreId = null) {
+            const yearField = form.querySelector('[name="academic_year"]');
+            const checkedSemester = form.querySelector('[name="semester"]:checked');
+
+            if (!yearField || !checkedSemester) return true;
+
+            const year = yearField.value.trim();
+            const semester = checkedSemester.value;
+
+            if (!year || !semester) return true;
+
+            const duplicate = findDuplicateAcademicPeriod(year, semester, ignoreId);
+
+            if (!duplicate) return true;
+
+            setError(yearField, `${year} ${semester} already exists.`);
+            return false;
         }
 
         function isStrictIsoDate(value) {
@@ -1403,10 +1440,23 @@ $activePeriodPayload = $activePeriod
             const y = validateYear();
             const s = validateSemester();
             const d = validateDates();
+            const dup = validateDuplicateAcademicPeriod(addForm);
             const descOk = validateDescription(addDesc, addDescCounter, setError, clearError);
 
-            if (!y || !s || !d || !descOk) e.preventDefault();
+            if (!y || !s || !d || !dup || !descOk) e.preventDefault();
         });
+
+        const editForm = document.getElementById('editForm');
+
+        if (editForm) {
+            editForm.addEventListener('submit', e => {
+                const periodId = editForm.action.split('/').pop();
+                const dup = validateDuplicateAcademicPeriod(editForm, periodId);
+                const descOk = validateDescription(editDesc, editDescCounter, setError, clearError);
+
+                if (!dup || !descOk) e.preventDefault();
+            });
+        }
     });
 
     function countChars(value) {

@@ -32,7 +32,7 @@ class DocumentRequestSubmittedNotification extends Notification
             'document_request_id' => $this->documentRequest->id ?? null,
             'patient_id' => $this->documentRequest->patient_id ?? null,
             'type' => 'document_request_submitted',
-            'url' => url('/dentist/document-requests'),
+            'url' => $this->resolveTargetUrl($notifiable),
             'icon' => 'fa-file-lines',
             'event' => 'document.request.submitted',
         ];
@@ -52,5 +52,16 @@ class DocumentRequestSubmittedNotification extends Notification
                 'state' => 'unread',
             ]
         ));
+    }
+
+    private function resolveTargetUrl(object $notifiable): string
+    {
+        $role = optional($notifiable->role)->slug;
+
+        return match ($role) {
+            'admin', 'super_admin' => route('admin.document-requests.index'),
+            'dentist' => route('dentist.dentist.documentrequests'),
+            default => '#',
+        };
     }
 }
