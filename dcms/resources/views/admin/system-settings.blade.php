@@ -56,9 +56,6 @@
                 <a href="#" class="settings-nav-item" onclick="switchTab('email', this); return false;"><i
                     class="fa-solid fa-envelope"></i> Email / SMTP</a>
                 --}}
-                                    <a href="#" class="settings-nav-item"
-                                        onclick="switchTab('backup', this); return false;"><i
-                                            class="fa-solid fa-database"></i> Backup & Data</a>
                                     {{-- Temporarily hidden: Integrations
                 <a href="#" class="settings-nav-item" onclick="switchTab('integrations', this); return false;"><i
                     class="fa-solid fa-plug"></i> Integrations</a>
@@ -511,107 +508,6 @@
             </div>
 
             --}}
-
-                            <div id="tab-backup" class="settings-section">
-                                <div class="section-card">
-                                    <div class="section-card-hdr">
-                                        <div class="section-card-hdr-left">
-                                            <i class="fa-solid fa-database text-[#8B0000]"></i>
-                                            <h2 class="font-bold text-gray-800 text-sm">Backup & Data Management</h2>
-                                        </div>
-                                    </div>
-                                    <div class="section-card-body">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            <div>
-                                                <label class="form-label">Auto Backup Frequency</label>
-                                                <select name="backup_frequency" class="form-ctrl form-sel">
-                                                    @foreach (['Every 6 hours', 'Daily', 'Weekly', 'Monthly'] as $opt)
-                                                        <option
-                                                            {{ old('backup_frequency', $settings['backup_frequency']->value ?? 'Daily') === $opt ? 'selected' : '' }}>
-                                                            {{ $opt }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="form-label">Backup Retention (days)</label>
-                                                <input type="number" name="backup_retention_days" class="form-ctrl"
-                                                    min="7" max="365"
-                                                    value="{{ old('backup_retention_days', $settings['backup_retention_days']->value ?? 30) }}">
-                                            </div>
-                                            <div>
-                                                <label class="form-label">Backup Storage Location</label>
-                                                <select name="backup_storage" class="form-ctrl form-sel">
-                                                    @foreach (['Local Server', 'Google Drive', 'AWS S3'] as $opt)
-                                                        <option
-                                                            {{ old('backup_storage', $settings['backup_storage']->value ?? 'Local Server') === $opt ? 'selected' : '' }}>
-                                                            {{ $opt }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="form-label">Backup Time</label>
-                                                <div class="settings-timepicker-wrap">
-                                                    <input type="text" name="backup_time"
-                                                        class="form-ctrl js-flatpickr-time"
-                                                        value="{{ old('backup_time', $settings['backup_time']->value ?? '02:00') }}"
-                                                        readonly>
-                                                    <i class="fa-regular fa-clock settings-timepicker-icon"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="setting-row">
-                                            <div class="setting-row-info">
-                                                <div class="setting-row-label">Auto Backup Enabled</div>
-                                                <div class="setting-row-desc">Automatically backup database on the schedule
-                                                    above</div>
-                                            </div>
-                                            <label class="toggle-wrap">
-                                                <input type="hidden" name="auto_backup_enabled" value="0">
-                                                <input type="checkbox" name="auto_backup_enabled" value="1"
-                                                    {{ old('auto_backup_enabled', $settings['auto_backup_enabled']->value ?? '1') === '1' ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="setting-row">
-                                            <div class="setting-row-info">
-                                                <div class="setting-row-label">Include File Attachments</div>
-                                                <div class="setting-row-desc">Include uploaded documents and images in the
-                                                    backup</div>
-                                            </div>
-                                            <label class="toggle-wrap">
-                                                <input type="hidden" name="backup_include_files" value="0">
-                                                <input type="checkbox" name="backup_include_files" value="1"
-                                                    {{ old('backup_include_files', $settings['backup_include_files']->value ?? '1') === '1' ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="setting-row">
-                                            <div class="setting-row-info">
-                                                <div class="setting-row-label">Encrypt Backups</div>
-                                                <div class="setting-row-desc">Use AES-256 encryption on all backup files
-                                                </div>
-                                            </div>
-                                            <label class="toggle-wrap">
-                                                <input type="hidden" name="backup_encrypt" value="0">
-                                                <input type="checkbox" name="backup_encrypt" value="1"
-                                                    {{ old('backup_encrypt', $settings['backup_encrypt']->value ?? '1') === '1' ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="pt-4 flex flex-wrap items-center gap-3">
-                                            <a href="{{ route('admin.data_backup') }}"
-                                                class="settings-backup-manager-btn">
-                                                <i class="fa-solid fa-database"></i>
-                                                <span>Open Backup Manager</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                             {{-- Temporarily hidden: Integrations
             <div id="tab-integrations" class="settings-section">

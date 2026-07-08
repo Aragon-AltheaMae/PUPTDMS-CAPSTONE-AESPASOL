@@ -61,18 +61,31 @@ $pastGrouped = $pastAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->ap
 $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
 $allAppointments = $upcomingAppointments->merge($pastAppointments);
+$normalizeAppointmentStatus = function ($status) {
+  $normalized = strtolower(trim((string) ($status ?? '')));
+
+  return match ($normalized) {
+    'pending', 'confirmed', 'upcoming' => 'upcoming',
+    'reschedule', 'rescheduled' => 'rescheduled',
+    'canceled', 'cancelled' => 'cancelled',
+    'completed' => 'completed',
+    default => $normalized ?: 'upcoming',
+  };
+};
 
 $statusCounts = [
 'all' => $allAppointments->count(),
-'upcoming' => $allAppointments
-->filter(fn($a) => strtolower($a->status ?? 'upcoming') === 'upcoming')
+'upcoming' => $upcomingAppointments
+->filter(fn($a) => $normalizeAppointmentStatus($a->status ?? 'upcoming') === 'upcoming')
 ->count(),
-'rescheduled' => $allAppointments
-->filter(fn($a) => strtolower($a->status ?? '') === 'rescheduled')
+'rescheduled' => $upcomingAppointments
+->filter(fn($a) => $normalizeAppointmentStatus($a->status ?? '') === 'rescheduled')
 ->count(),
-'completed' => $allAppointments->filter(fn($a) => strtolower($a->status ?? '') === 'completed')->count(),
-'cancelled' => $allAppointments
-->filter(fn($a) => in_array(strtolower($a->status ?? ''), ['cancelled', 'canceled']))
+'completed' => $pastAppointments
+->filter(fn($a) => $normalizeAppointmentStatus($a->status ?? '') === 'completed')
+->count(),
+'cancelled' => $pastAppointments
+->filter(fn($a) => $normalizeAppointmentStatus($a->status ?? '') === 'cancelled')
 ->count(),
 ];
 
@@ -1196,6 +1209,28 @@ $notifCount = $notifications->count();
   let appointmentFromDate = '';
   let appointmentToDate = '';
 
+  function normalizeAppointmentStatusFilter(status = '') {
+    const normalized = String(status || '').toLowerCase().trim();
+
+    if (['pending', 'confirmed', 'upcoming'].includes(normalized)) {
+      return 'upcoming';
+    }
+
+    if (['reschedule', 'rescheduled'].includes(normalized)) {
+      return 'rescheduled';
+    }
+
+    if (['canceled', 'cancelled'].includes(normalized)) {
+      return 'cancelled';
+    }
+
+    if (normalized.includes('complete')) {
+      return 'completed';
+    }
+
+    return normalized || 'upcoming';
+  }
+
   const apptStatusMeta = {
     all: {
       label: 'All statuses',
@@ -1300,7 +1335,11 @@ $notifCount = $notifications->count();
     appointmentStatusFilterSource = source === 'panel' ? 'panel' : 'dropdown';
 
     if (source === 'dropdown') {
-      appointmentPeriodFilter = ['completed', 'cancelled'].includes(nextValue) ? 'past' : 'upcoming';
+      appointmentPeriodFilter = nextValue === 'all'
+        ? 'all'
+        : ['completed', 'cancelled'].includes(nextValue)
+          ? 'past'
+          : 'upcoming';
     }
 
     if (apptStatusFilter) {
@@ -1430,7 +1469,7 @@ $notifCount = $notifications->count();
     const patient = card.dataset.patient || '';
     const patientId = card.dataset.patientId || '';
     const service = card.dataset.service || '';
-    const status = card.dataset.status || '';
+    const status = normalizeAppointmentStatusFilter(card.dataset.status || '');
     const period = card.dataset.period || '';
     const date = normalizeAppointmentDate(card.dataset.date || '');
 
@@ -1440,8 +1479,7 @@ $notifCount = $notifications->count();
       service.includes(searchValue);
 
     const matchesPeriod = filters.period === 'all' || period === filters.period;
-    const matchesStatus = filters.status === 'all' || status === filters.status ||
-      (filters.status === 'cancelled' && status === 'canceled');
+    const matchesStatus = filters.status === 'all' || status === filters.status;
 
     let matchesDate = true;
     const fromDate = normalizeAppointmentDate(filters.fromDate);
@@ -1642,7 +1680,8 @@ $notifCount = $notifications->count();
     const showUpcomingStaticEmpty =
       upcomingAllowed &&
       isDefaultState &&
-      upcomingCards.length === 0;
+      upcomingCards.length === 0 &&
+      pastCards.length === 0;
 
     const showPastStaticEmpty =
       pastAllowed &&

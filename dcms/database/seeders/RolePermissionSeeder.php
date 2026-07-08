@@ -27,7 +27,6 @@ class RolePermissionSeeder extends Seeder
             'manage_document_templates',
             'manage_reports',
             'manage_inventory',
-            'manage_backup',
             'set_academic_year',
             'set_archive_records',
             'set_report_periods',

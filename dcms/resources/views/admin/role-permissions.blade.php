@@ -611,10 +611,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         color: '#059669'
     },
     {
-        module: 'Data Backup',
-        color: '#ea580c'
-    },
-    {
         module: 'System Logs',
         color: '#dc2626'
     },

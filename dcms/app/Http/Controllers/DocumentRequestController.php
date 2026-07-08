@@ -23,6 +23,7 @@ class DocumentRequestController extends Controller
             'purpose' => 'required|string|max:150',
         ]);
 
+        $user = Auth::user();
         $patient = Patient::where('user_id', Auth::id())->first();
 
         if (!$patient) {
@@ -30,6 +31,10 @@ class DocumentRequestController extends Controller
                 'success' => false,
                 'message' => 'Patient record not found. Please log in again.',
             ], 401);
+        }
+
+        if ($user && $user->email && $patient->email !== $user->email) {
+            $patient->forceFill(['email' => $user->email])->save();
         }
 
         session(['patient_id' => $patient->id]);

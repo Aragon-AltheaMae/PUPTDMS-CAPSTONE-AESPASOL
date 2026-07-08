@@ -33,7 +33,7 @@ class AppointmentBookedNotification extends Notification
                 optional($this->appointment->appointment_date)->format('M d, Y') ?? (string) $this->appointment->appointment_date,
                 $this->formatTime($this->appointment->appointment_time)
             ),
-            'url' => route('dentist.dentist.appointments'),
+            'url' => $this->resolveTargetUrl($notifiable),
             'icon' => 'fa-calendar-check',
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->patient->id,
@@ -54,7 +54,7 @@ class AppointmentBookedNotification extends Notification
                 optional($this->appointment->appointment_date)->format('M d, Y') ?? (string) $this->appointment->appointment_date,
                 $this->formatTime($this->appointment->appointment_time)
             ),
-            'url' => route('dentist.dentist.appointments'),
+            'url' => $this->resolveTargetUrl($notifiable),
             'icon' => 'fa-calendar-check',
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->patient->id,
@@ -104,5 +104,17 @@ class AppointmentBookedNotification extends Notification
         } catch (\Throwable) {
             return $time;
         }
+    }
+
+    private function resolveTargetUrl(object $notifiable): string
+    {
+        $role = optional($notifiable->role)->slug;
+
+        return match ($role) {
+            'admin', 'super_admin' => route('admin.admin.appointments'),
+            'dentist' => route('dentist.dentist.appointments'),
+            'patient' => route('patient.appointment.index'),
+            default => route('dentist.dentist.appointments'),
+        };
     }
 }

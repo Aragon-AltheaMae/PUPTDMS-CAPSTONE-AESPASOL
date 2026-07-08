@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
 
 class DentistClinicScheduleController extends Controller
 {
+    private const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
     public function index()
     {
         $schedules = ClinicSchedule::active()->orderBy('id')->get();
@@ -69,6 +71,7 @@ class DentistClinicScheduleController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateRule($request);
+        $this->ensureDaysAreAvailable($request, $validated['days']);
 
         ClinicSchedule::create($this->prepareRule($validated));
 
@@ -78,6 +81,7 @@ class DentistClinicScheduleController extends Controller
     public function update(Request $request, ClinicSchedule $clinicSchedule)
     {
         $validated = $this->validateRule($request);
+        $this->ensureDaysAreAvailable($request, $validated['days'], $clinicSchedule->id);
 
         $clinicSchedule->update($this->prepareRule($validated));
 
@@ -232,6 +236,57 @@ class DentistClinicScheduleController extends Controller
             'max_slots' => 'required_unless:status,closed|nullable|integer|min:1|max:50',
             'notes' => 'nullable|string|max:500',
         ]);
+    }
+
+    private function ensureDaysAreAvailable(Request $request, array $days, ?int $ignoreId = null): void
+    {
+        $conflictingDays = $this->findConflictingScheduleDays($days, $ignoreId);
+
+        if (empty($conflictingDays)) {
+            return;
+        }
+
+        $request->validate([
+            'days' => [
+                function ($attribute, $value, $fail) use ($conflictingDays) {
+                    $fail('A schedule already exists for ' . $this->formatDays($conflictingDays) . '. Edit the existing schedule instead of adding another rule for the same day.');
+                },
+            ],
+        ]);
+    }
+
+    private function findConflictingScheduleDays(array $days, ?int $ignoreId = null): array
+    {
+        $query = ClinicSchedule::active();
+
+        if ($ignoreId !== null) {
+            $query->whereKeyNot($ignoreId);
+        }
+
+        $conflictingDays = [];
+
+        foreach ($query->get() as $schedule) {
+            $conflictingDays = array_merge(
+                $conflictingDays,
+                array_intersect($days, $schedule->days ?? [])
+            );
+        }
+
+        return $this->sortDays(array_values(array_unique($conflictingDays)));
+    }
+
+    private function sortDays(array $days): array
+    {
+        $order = array_flip(self::ALL_DAYS);
+
+        usort($days, fn($a, $b) => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
+
+        return $days;
+    }
+
+    private function formatDays(array $days): string
+    {
+        return implode(', ', $this->sortDays($days));
     }
 
     private function prepareRule(array $validated): array

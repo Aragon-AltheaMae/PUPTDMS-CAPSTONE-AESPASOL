@@ -2,6 +2,35 @@
     $authUser = auth()->user();
 
     $role = $role ?? (optional(optional($authUser)->role)->slug ?? (session('role') ?? 'patient'));
+    $resolveNotificationUrl = function (array $payload, string $activeRole): string {
+        $fallbackUrl = data_get($payload, 'url') ?? (data_get($payload, 'action_url') ?? '#');
+        $event = data_get($payload, 'event') ?? data_get($payload, 'type');
+
+        return match ($event) {
+            'appointment.booked', 'appointment.rescheduled' => match ($activeRole) {
+                'admin', 'super_admin' => Route::has('admin.admin.appointments')
+                    ? route('admin.admin.appointments')
+                    : $fallbackUrl,
+                'dentist' => Route::has('dentist.dentist.appointments')
+                    ? route('dentist.dentist.appointments')
+                    : $fallbackUrl,
+                'patient' => Route::has('patient.appointment.index')
+                    ? route('patient.appointment.index')
+                    : $fallbackUrl,
+                default => $fallbackUrl,
+            },
+            'document.request.submitted', 'document_request_submitted' => match ($activeRole) {
+                'admin', 'super_admin' => Route::has('admin.document-requests.index')
+                    ? route('admin.document-requests.index')
+                    : $fallbackUrl,
+                'dentist' => Route::has('dentist.dentist.documentrequests')
+                    ? route('dentist.dentist.documentrequests')
+                    : $fallbackUrl,
+                default => $fallbackUrl,
+            },
+            default => $fallbackUrl,
+        };
+    };
 
     $legacyNotifications = collect($notifications ?? []);
     $databaseNotifications = collect();
@@ -12,14 +41,14 @@
             ->latest()
             ->take(15)
             ->get()
-            ->map(function ($notification) {
+            ->map(function ($notification) use ($resolveNotificationUrl, $role) {
                 $payload = $notification->data ?? [];
                 $title =
                     data_get($payload, 'title') ??
                     (data_get($payload, 'subject') ?? class_basename($notification->type));
                 $message =
                     data_get($payload, 'message') ?? (data_get($payload, 'body') ?? data_get($payload, 'description'));
-                $actionUrl = data_get($payload, 'url') ?? (data_get($payload, 'action_url') ?? '#');
+                $actionUrl = $resolveNotificationUrl($payload, $role);
 
                 return [
                     'id' => $notification->id,

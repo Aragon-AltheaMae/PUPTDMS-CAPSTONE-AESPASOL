@@ -397,9 +397,14 @@ class DentistReportController extends Controller
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
         $fileName = $safeName . '.pdf';
 
-        return response($pdf->Output('S'), 200)
+        $pdfContent = $pdf->Output('S');
+
+        return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', (string) strlen($pdfContent))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     public function downloadAnnualDentalClearance(Request $request)
@@ -489,9 +494,14 @@ class DentistReportController extends Controller
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
         $fileName = $safeName . '.pdf';
 
-        return response($pdf->Output('S'), 200)
+        $pdfContent = $pdf->Output('S');
+
+        return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', (string) strlen($pdfContent))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     public function downloadDentalClearance(Request $request)
@@ -1021,9 +1031,14 @@ class DentistReportController extends Controller
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
         $fileName = $safeName . '.pdf';
 
-        return response($pdf->Output('S'), 200)
+        $pdfContent = $pdf->Output('S');
+
+        return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Content-Length', (string) strlen($pdfContent))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     public function downloadMonthlyReport(Request $request)
@@ -1598,7 +1613,7 @@ class DentistReportController extends Controller
             10
         );
 
-        $this->drawDentalCasesSection($pdf, $caseGroups['students'] ?? [], 225.5);
+        $this->drawDentalCasesSection($pdf, $caseGroups['students'] ?? [], 241.0);
         $this->drawDentalCasesSection($pdf, $caseGroups['faculty'] ?? [], 320.5);
         $this->drawDentalCasesSection($pdf, $caseGroups['administrative'] ?? [], 415.5);
         $this->drawDentalCasesSection($pdf, $caseGroups['dependents'] ?? [], 511.5);

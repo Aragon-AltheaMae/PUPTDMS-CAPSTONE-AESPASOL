@@ -683,6 +683,7 @@ $inactiveCount = $inactiveCount ?? 0;
         <form method="POST" id="editForm" class="p-6 space-y-4">
             @csrf
             @method('PUT')
+            <input type="hidden" id="editOriginalRole" value="">
 
             <div>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
@@ -760,6 +761,19 @@ $inactiveCount = $inactiveCount ?? 0;
                         @endforeach
                     </div>
                 </div>
+            </div>
+
+            <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
+                    Confirm Role Change
+                </label>
+                <p class="text-[12px] text-amber-700 mb-2">
+                    Enter your current admin password to continue changing this user's role.
+                </p>
+                <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
+                    placeholder="Current admin password"
+                    class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                    autocomplete="current-password">
             </div>
 
             <div>
@@ -1273,6 +1287,28 @@ $inactiveCount = $inactiveCount ?? 0;
         });
 
         label.textContent = selected ? selected.querySelector('span').textContent.trim() : '— No Role —';
+        syncEditRoleConfirmation();
+    }
+
+    function syncEditRoleConfirmation() {
+        const form = document.getElementById('editForm');
+        const roleInput = document.getElementById('editRole');
+        const originalRoleInput = document.getElementById('editOriginalRole');
+        const panel = document.getElementById('editRoleConfirmPanel');
+        const password = document.getElementById('editAdminCurrentPassword');
+
+        if (!form || !roleInput || !originalRoleInput || !panel || !password) return;
+
+        const roleChanged = String(roleInput.value || '') !== String(originalRoleInput.value || '');
+        const shouldConfirm = form.dataset.source !== 'patients' && roleChanged;
+
+        panel.classList.toggle('hidden', !shouldConfirm);
+        password.required = shouldConfirm;
+
+        if (!shouldConfirm) {
+            password.value = '';
+            password.setCustomValidity('');
+        }
     }
 
     function setEditRoleDisabled(isDisabled) {
@@ -1353,8 +1389,11 @@ $inactiveCount = $inactiveCount ?? 0;
         document.getElementById('editName').value = name;
         document.getElementById('editEmail').value = email;
         document.getElementById('editModalSubtitle').textContent = 'Editing: ' + name;
+        document.getElementById('editOriginalRole').value = roleId || '';
+        document.getElementById('editAdminCurrentPassword').value = '';
 
         setEditRoleValue(roleId || '');
+        syncEditRoleConfirmation();
 
         document.getElementById('editStatusActive').checked = (status === 'active');
         document.getElementById('editStatusInactive').checked = (status === 'inactive');
@@ -2114,6 +2153,12 @@ $inactiveCount = $inactiveCount ?? 0;
             params.append('role_id', document.getElementById('editRole').value);
             params.append('status', form.querySelector('input[name="status"]:checked')?.value ??
                 '');
+
+            if (String(document.getElementById('editRole').value || '') !== String(document.getElementById(
+                    'editOriginalRole').value || '')) {
+                params.append('admin_current_password', document.getElementById('editAdminCurrentPassword')
+                    .value);
+            }
 
             fetch(url, {
                 method: 'POST',

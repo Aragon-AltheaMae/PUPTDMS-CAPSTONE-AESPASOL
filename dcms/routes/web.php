@@ -32,7 +32,6 @@ use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequest
 use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
@@ -83,6 +82,10 @@ Route::post('/faculty-integration/store', [FacultyController::class, 'store'])
 Route::get('/debug-session', function () {
     return response()->json(session()->all());
 });
+
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf.token');
 
 Route::middleware(['web'])->group(function () {
     Route::get('/auth/oidc/redirect', [OIDCController::class, 'redirect'])
@@ -521,39 +524,6 @@ Route::prefix('admin')
             ->name('document-template.default');
     });
 
-// DATA BACKUP
-Route::prefix('admin')
-    ->middleware(['auth', 'role:admin'])
-    ->group(function () {
-
-        Route::get('/data-backup', [DataBackupController::class, 'index'])
-            ->name('admin.data_backup');
-
-        Route::post('/data-backup/store', [DataBackupController::class, 'store'])
-            ->name('admin.data_backup.store');
-
-        Route::get('/data-backup/download/{id}', [DataBackupController::class, 'download'])
-            ->name('admin.data_backup.download');
-
-        Route::post('/data-backup/toggle-auto', [DataBackupController::class, 'toggleAuto'])
-            ->name('admin.data_backup.toggle_auto');
-
-        Route::post('/data-backup/restore/{id}', [DataBackupController::class, 'restore'])
-            ->name('admin.data_backup.restore');
-
-        Route::delete('/data-backup/delete/{id}', [DataBackupController::class, 'destroy'])
-            ->name('admin.data_backup.delete');
-
-        Route::post('/data-backup/update-schedule', [DataBackupController::class, 'updateSchedule'])
-            ->name('admin.data_backup.update_schedule');
-
-        Route::get('/data-backup/hpanel', [DataBackupController::class, 'openHpanel'])
-            ->name('admin.data_backup.hpanel');
-
-        Route::post('/data-backup/verify-hostinger', [DataBackupController::class, 'verifyHostingerBackup'])
-            ->name('admin.data_backup.verify_hostinger');
-    });
-
 // SYSTEM SETTINGS
 Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
@@ -779,7 +749,12 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         if (session()->has('impersonated_patient_id')) {
             $patient = Patient::find(session('impersonated_patient_id'));
         } else {
-            $patient = Auth::user()->patient;
+            $user = Auth::user();
+            $patient = $user?->patient;
+
+            if ($patient && $user?->email && $patient->email !== $user->email) {
+                $patient->forceFill(['email' => $user->email])->save();
+            }
         }
 
         return view('patient.index', compact('patient'));

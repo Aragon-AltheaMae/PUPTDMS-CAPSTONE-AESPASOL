@@ -176,6 +176,17 @@ class WalkInController extends Controller
             'patient_id' => ['required', 'exists:patients,id'],
             'service_type' => ['required', 'string', 'max:255'],
             'concern' => ['nullable', 'string', 'max:1000'],
+
+            'emergency_person' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[A-Za-zÑñ\s.\'-]+$/u',
+            ],
+
+            'emergency_number' => ['required', 'string', 'max:15'],
+            'emergency_relation' => ['required', 'string', 'max:50'],
+
             'patient_signature' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:25600'],
         ]);
 

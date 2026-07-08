@@ -3193,7 +3193,7 @@
             [
                 'name' => 'birth_control',
                 'q' => 'Are you taking birth
-                                                                                                                                                                        control pills?',
+                                                                                                                                                                                        control pills?',
             ],
         ] as $i => $q)
                                                     <div
@@ -3305,9 +3305,16 @@
                                                     <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                         Person to contact in case of emergency
                                                     </label>
-                                                    <input type="text" name="emergency_person" maxlength="50"
+                                                    <input type="text" id="emergency_person" name="emergency_person"
+                                                        maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
+                                                        title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
                                                         class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                                         placeholder="Full name" required>
+
+                                                    <p id="emergency_person_feedback"
+                                                        class="field-help-text text-[#9e9690]">
+                                                        Only letters, spaces, apostrophe, period, and hyphen are allowed.
+                                                    </p>
                                                 </div>
 
                                                 <div>
@@ -3379,6 +3386,8 @@
                                                             <input type="file" name="patient_signature"
                                                                 id="patient_signature" class="hidden"
                                                                 accept=".jpg,.jpeg,.png" required>
+                                                            <input type="hidden" name="signature_source"
+                                                                id="signature_source" value="">
                                                         </label>
                                                     </div>
 
@@ -3975,7 +3984,12 @@
                     }
                 }
             }
-
+            const person = stepEl.querySelector("#emergency_person");
+            if (person && !validateEmergencyPerson(true)) {
+                showMiniTab("This name is invalid. Please use letters only.");
+                scrollToInvalidTarget(person);
+                return false;
+            }
             const phone = stepEl.querySelector("#emergency_number");
             if (phone) {
                 const digits = phone.value.replace(/\D/g, "");
@@ -4164,122 +4178,122 @@
             const patientGender = @json($patient->gender ?? 'N/A');
             const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                                                                    `)}
+                                                                                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                                                                                    `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                                                                        ${row("Sores/Lumps", get("sores"))}
-                                                                                                                                                        ${row("Jaw Injuries", get("injuries"))}
-                                                                                                                                                    `)}
+                                                                                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                                                                                        ${row("Sores/Lumps", get("sores"))}
+                                                                                                                                                                        ${row("Jaw Injuries", get("injuries"))}
+                                                                                                                                                                    `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                                                                        ${row("Clicking", get("clicking"))}
-                                                                                                                                                        ${row("Joint Pain", get("joint_pain"))}
-                                                                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                                                                    `)}
+                                                                                                                                                                        ${row("Clicking", get("clicking"))}
+                                                                                                                                                                        ${row("Joint Pain", get("joint_pain"))}
+                                                                                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                                                                                    `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                                                                        ${row("Dentures", get("dentures"))}
-                                                                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                                                                                        ${row("Dentures", get("dentures"))}
+                                                                                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                                                                    `)}
+                                                                                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                                                                                    `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
-                                                                                                                                                ? get("additional_concerns")
-                                                                                                                                                : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                                                                    `)}
+                                                                                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                                                                                ? get("additional_concerns")
+                                                                                                                                                                : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
+                                                                                                                                                                    `)}
 `;
 
             const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                                                                    ${row("Good Health", get("good_health"))}
-                                                                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                                                                                    ${row("Good Health", get("good_health"))}
+                                                                                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                                                                    ${row("Under Treatment", get("under_treatment"))}
-                                                                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                                                                                    ${row("Under Treatment", get("under_treatment"))}
+                                                                                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                                                                    ${row("Hospitalized", get("hospitalized"))}
-                                                                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                                                                `)}
+                                                                                                                                                                    ${row("Hospitalized", get("hospitalized"))}
+                                                                                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                                                                                `)}
 
     ${subSection("Allergies", `
-                                                                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                                                                `)}
+                                                                                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                                                                                `)}
 
     ${subSection("Medications", `
-                                                                                                                                                    ${row("Medication", get("medication"))}
-                                                                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                                                                `)}
+                                                                                                                                                                    ${row("Medication", get("medication"))}
+                                                                                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                                                                                `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                                                                    ${row("Pregnant", get("pregnant"))}
-                                                                                                                                                    ${row("Nursing", get("nursing"))}
-                                                                                                                                                    ${row("Birth Control Pills", get("birth_control"))}
-                                                                                                                                                `) : ""}
+                                                                                                                                                                    ${row("Pregnant", get("pregnant"))}
+                                                                                                                                                                    ${row("Nursing", get("nursing"))}
+                                                                                                                                                                    ${row("Birth Control Pills", get("birth_control"))}
+                                                                                                                                                                `) : ""}
 
     ${fullWidthSection("Medical Conditions", `
-                                                                                                                                                    <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-                                                                                                                                                `)}
+                                                                                                                                                                    <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+                                                                                                                                                                `)}
 
     ${subSection("Tobacco Use", `
-                                                                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                                                                `)}
+                                                                                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                                                                                `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                                                                    ${row("Headaches", get("headaches"))}
-                                                                                                                                                    ${row("Earaches", get("earaches"))}
-                                                                                                                                                    ${row("Neck Aches", get("neck_aches"))}
-                                                                                                                                                `)}
+                                                                                                                                                                    ${row("Headaches", get("headaches"))}
+                                                                                                                                                                    ${row("Earaches", get("earaches"))}
+                                                                                                                                                                    ${row("Neck Aches", get("neck_aches"))}
+                                                                                                                                                                `)}
 `;
 
             document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                        ${row("Name", patientName)}
-                                                                                                                                                        ${row("Gender", patientGender)}
-                                                                                                                                                    </div>
-                                                                                                                                                `)}
+                                                                                                                                                                    <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                        ${row("Name", patientName)}
+                                                                                                                                                                        ${row("Gender", patientGender)}
+                                                                                                                                                                    </div>
+                                                                                                                                                                `)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                            ${row("Date", get("appointment_date"))}
-                                                                                                                                                            ${row("Time", get("appointment_time"))}
-                                                                                                                                                        </div>
-                                                                                                                                                    `)}
+                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                            ${row("Date", get("appointment_date"))}
+                                                                                                                                                                            ${row("Time", get("appointment_time"))}
+                                                                                                                                                                        </div>
+                                                                                                                                                                    `)}
 
         ${summaryCard("Service", "fa-tooth", `
-                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                            ${row("Type", get("service_type"))}
-                                                                                                                                                        </div>
-                                                                                                                                                    `)}
+                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                            ${row("Type", get("service_type"))}
+                                                                                                                                                                        </div>
+                                                                                                                                                                    `)}
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -4288,12 +4302,12 @@
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                            ${row("Name", get("emergency_person"))}
-                                                                                                                                                            ${row("Number", get("emergency_number"))}
-                                                                                                                                                            ${row("Relation", emergencyRelation)}
-                                                                                                                                                        </div>
-                                                                                                                                                    `)}
+                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                            ${row("Name", get("emergency_person"))}
+                                                                                                                                                                            ${row("Number", get("emergency_number"))}
+                                                                                                                                                                            ${row("Relation", emergencyRelation)}
+                                                                                                                                                                        </div>
+                                                                                                                                                                    `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
@@ -4495,6 +4509,7 @@
             else document.getElementById("tobacco_details")?.classList.add("hidden");
         }));
         const sigInput = document.getElementById("patient_signature");
+        const signatureSourceInput = document.getElementById("signature_source");
         const sigName = document.getElementById("signature_filename");
         const sigError = document.getElementById("signature_error");
         const sigResultBox = document.getElementById("signature_result_box");
@@ -4614,6 +4629,11 @@
                 sigError.classList.add("hidden");
             }
         }
+
+        function isDrawnSignatureFile(file) {
+            return file?.name?.startsWith("drawn-signature-");
+        }
+
         async function validateSignatureWithAi(file) {
             const formData = new FormData();
             formData.append("patient_signature", file);
@@ -4642,13 +4662,23 @@
 
         sigInput?.addEventListener("change", () => {
             const file = sigInput.files?.[0];
+            const isDrawnSignature = isDrawnSignatureFile(file);
 
             signatureAiValid = false;
             clearSignatureError();
 
             if (!file) {
+                if (signatureSourceInput) signatureSourceInput.value = "";
                 clearSignatureDisplay();
                 return;
+            }
+
+            if (signatureSourceInput) {
+                signatureSourceInput.value = isDrawnSignature ? "drawn" : "";
+            }
+
+            if (!isDrawnSignature) {
+                drawnSignatureWasUsed = false;
             }
 
             const allowedTypes = ["image/jpeg", "image/png"];
@@ -4669,6 +4699,15 @@
                     detected_type: "file_too_large",
                     confidence: 0,
                 });
+                return;
+            }
+
+            if (isDrawnSignature) {
+                drawnSignatureWasUsed = true;
+                signatureAiValid = true;
+                signatureAiChecking = false;
+                showSignatureStatus(file.name, "Drawn signature accepted.", "success");
+                markFormDirty();
                 return;
             }
 
@@ -4847,6 +4886,10 @@
                 sigInput.value = "";
             }
 
+            if (signatureSourceInput) {
+                signatureSourceInput.value = "";
+            }
+
             showSignatureStatus(
                 "",
                 "Draw changed. Click Use Drawn Signature again to verify it.",
@@ -4911,6 +4954,10 @@
                 sigInput.value = "";
             }
 
+            if (signatureSourceInput) {
+                signatureSourceInput.value = "";
+            }
+
             clearSignatureDisplay();
             markFormDirty();
         }
@@ -4930,6 +4977,10 @@
 
                 if (sigInput) {
                     sigInput.value = "";
+                }
+
+                if (signatureSourceInput) {
+                    signatureSourceInput.value = "";
                 }
 
                 clearSignatureDisplay();
@@ -4979,6 +5030,9 @@
                 if (!attached) return;
 
                 drawnSignatureWasUsed = true;
+                if (signatureSourceInput) {
+                    signatureSourceInput.value = "drawn";
+                }
 
                 sigInput.dispatchEvent(new Event("change", {
                     bubbles: true,
@@ -5006,6 +5060,57 @@
 
         const emergencyNumber = document.getElementById("emergency_number");
         const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
+        const emergencyPerson = document.getElementById("emergency_person");
+        const emergencyPersonFeedback = document.getElementById("emergency_person_feedback");
+
+        function setEmergencyPersonFeedback(message, type = "") {
+            if (!emergencyPersonFeedback) return;
+
+            emergencyPersonFeedback.textContent = message;
+            emergencyPersonFeedback.classList.remove("error", "success", "text-[#9e9690]");
+
+            if (type === "error") emergencyPersonFeedback.classList.add("error");
+            else if (type === "success") emergencyPersonFeedback.classList.add("success");
+            else emergencyPersonFeedback.classList.add("text-[#9e9690]");
+        }
+
+        function validateEmergencyPerson(showNeutral = false) {
+            if (!emergencyPerson) return false;
+
+            const value = emergencyPerson.value.trim();
+            const validNamePattern = /^[A-Za-zÑñ\s.'-]+$/;
+
+            emergencyPerson.classList.remove("input-invalid", "input-valid");
+
+            if (!value.length) {
+                if (showNeutral) {
+                    setEmergencyPersonFeedback("Only letters, spaces, apostrophe, period, and hyphen are allowed.");
+                } else {
+                    setEmergencyPersonFeedback("");
+                }
+                return false;
+            }
+
+            if (!validNamePattern.test(value)) {
+                emergencyPerson.classList.add("input-invalid");
+                setEmergencyPersonFeedback("This name is invalid. Please use letters only.", "error");
+                return false;
+            }
+
+            emergencyPerson.classList.add("input-valid");
+            setEmergencyPersonFeedback("Valid emergency contact name.", "success");
+            return true;
+        }
+
+        emergencyPerson?.addEventListener("input", () => {
+            validateEmergencyPerson(true);
+            markFormDirty();
+        });
+
+        emergencyPerson?.addEventListener("blur", () => {
+            validateEmergencyPerson(true);
+        });
+        let emergencyNumberFeedbackTimer = null;
 
         function formatPhoneDisplay(rawDigits) {
             const digits = rawDigits.slice(0, 11);
@@ -5020,11 +5125,25 @@
 
         function setPhoneFeedback(message, type = "") {
             if (!emergencyNumberFeedback) return;
+
+            if (emergencyNumberFeedbackTimer) {
+                clearTimeout(emergencyNumberFeedbackTimer);
+                emergencyNumberFeedbackTimer = null;
+            }
+
             emergencyNumberFeedback.textContent = message;
             emergencyNumberFeedback.classList.remove("error", "success", "text-[#9e9690]");
             if (type === "error") emergencyNumberFeedback.classList.add("error");
             else if (type === "success") emergencyNumberFeedback.classList.add("success");
             else emergencyNumberFeedback.classList.add("text-[#9e9690]");
+
+            if (type === "success") {
+                emergencyNumberFeedbackTimer = setTimeout(() => {
+                    emergencyNumberFeedback.textContent = "";
+                    emergencyNumberFeedback.classList.remove("success");
+                    emergencyNumberFeedbackTimer = null;
+                }, 2000);
+            }
         }
 
         function validateEmergencyNumber(showNeutral = false) {
@@ -5395,6 +5514,8 @@
                     star.textContent = " *";
                     label.appendChild(star);
                 }
+
+
             });
         });
     </script>

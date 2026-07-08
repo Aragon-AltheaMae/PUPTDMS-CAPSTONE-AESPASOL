@@ -634,7 +634,11 @@
         }
 
         function renderNoResults(message = 'No results found.') {
-            resultsBox.innerHTML = `<div class="search-empty">${message}</div>`;
+            resultsBox.innerHTML = '';
+            const empty = document.createElement('div');
+            empty.className = 'search-empty';
+            empty.textContent = message;
+            resultsBox.appendChild(empty);
             showResults();
         }
 
@@ -644,10 +648,16 @@
                 const item = document.createElement('button');
                 item.type = 'button';
                 item.className = 'search-item';
-                item.innerHTML = `
-<div class="search-name">${user.full_name ?? ''}</div>
-<div class="search-email">${user.email ?? ''}</div>
-`;
+
+                const name = document.createElement('div');
+                name.className = 'search-name';
+                name.textContent = user.full_name ?? '';
+
+                const email = document.createElement('div');
+                email.className = 'search-email';
+                email.textContent = user.email ?? '';
+
+                item.append(name, email);
                 item.addEventListener('click', function (e) {
                     e.preventDefault();
                     fillUser(user);

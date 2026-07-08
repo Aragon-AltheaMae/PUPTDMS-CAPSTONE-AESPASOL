@@ -2656,170 +2656,164 @@
                                 <input type="hidden" name="patient_mode" id="patientMode" value="existing">
                                 @csrf
 
-                              <div class="step-content hidden">
-    <div class="booking-step-shell walkin-step1-layout" id="patientAccountSection">
-        <div class="booking-step-header">
-            <p class="booking-step-eyebrow">
-                <i class="fa-solid fa-user-plus text-[11px] mr-1"></i>
-                Step 1 of 5
-            </p>
+                                <div class="step-content hidden">
+                                    <div class="booking-step-shell walkin-step1-layout" id="patientAccountSection">
+                                        <div class="booking-step-header">
+                                            <p class="booking-step-eyebrow">
+                                                <i class="fa-solid fa-user-plus text-[11px] mr-1"></i>
+                                                Step 1 of 5
+                                            </p>
 
-            <h2 class="booking-step-title">Patient account</h2>
+                                            <h2 class="booking-step-title">Patient account</h2>
 
-            <p class="booking-step-subtitle">
-                Search an existing student, faculty, or administrative patient, or create a
-                guest account for walk-in onboarding.
-            </p>
-        </div>
+                                            <p class="booking-step-subtitle">
+                                                Search an existing student, faculty, or administrative patient, or create a
+                                                guest account for walk-in onboarding.
+                                            </p>
+                                        </div>
 
-        <div class="booking-step-body">
-            <div class="section-card walkin-account-card">
-                <p class="section-card-title">
-                    <i class="fa-solid fa-user-magnifying-glass text-xs"></i>
-                    Select or create patient
-                    <span class="section-card-title-line"></span>
-                </p>
-
-                <div class="account-tabs">
-                    <button type="button" class="account-tab active" data-tab="existing">
-                        <i class="fa-solid fa-database text-[13px]"></i>
-                        Existing / Unified DB
-                    </button>
-
-                    <button type="button" class="account-tab" data-tab="guest">
-                        <i class="fa-solid fa-user-plus text-[13px]"></i>
-                        Guest onboarding
-                    </button>
-                </div>
-
-                <div class="tab-panel active" id="existingPanel">
-                    <div class="walkin-search-wrap">
-                        <i class="fa-solid fa-magnifying-glass walkin-search-icon"></i>
-
-                        <input type="text" id="patientSearch"
-                            class="form-input walkin-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                            placeholder="Search by name, ID, or email..."
-                            autocomplete="off">
-                    </div>
-
-                    <div class="patient-results" id="patientResults">
-                        <div class="empty-state">
-                            Search for a student, faculty, or administrative patient.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-panel" id="guestPanel">
-                    <div class="guest-fields-grid">
-                        <div>
-                            <label class="walkin-field-label" for="guestName">
-                                Guest full name <span class="required-star">*</span>
-                            </label>
-
-                            <input type="text" id="guestName" name="guest_name"
-                                class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                placeholder="Enter guest full name"
-                                autocomplete="off"
-                                disabled>
-                        </div>
-
-                        <div class="walkin-two-col">
-                            <div>
-                                <label class="walkin-field-label" for="guestEmail">
-                                    Email
-                                </label>
-
-                                <input type="email" id="guestEmail" name="guest_email"
-                                    class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                    placeholder="Optional"
-                                    autocomplete="off"
-                                    disabled>
-                            </div>
-
-                            <div>
-                                <label class="walkin-field-label" for="guestPhone">
-                                    Phone
-                                </label>
-
-                                <input type="text" id="guestPhone" name="guest_phone"
-                                    class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                    placeholder="Optional"
-                                    autocomplete="off"
-                                    disabled>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="button" class="guest-create-btn" id="createGuestBtn">
-                        <i class="fa-solid fa-user-plus"></i>
-                        Create guest account
-                    </button>
-                </div>
-
-                <div class="selected-patient-box" id="selectedPatientBox" hidden>
-                    <span>
-                        <i class="fa-solid fa-circle-check text-[11px] mr-1"></i>
-                        Selected patient
-                    </span>
-                    <strong id="selectedPatientName"></strong>
-                    <small id="selectedPatientMeta"></small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-                                    <div class="step-content hidden">
-                                        <div class="booking-step-shell">
-                                            <div class="booking-step-header">
-                                                <p class="booking-step-eyebrow">Step 2 of 5</p>
-                                                <h2 class="booking-step-title">Choose Your Dental Service</h2>
-                                                <p class="booking-step-subtitle">
-                                                    Select the type of service for this walk-in appointment.
+                                        <div class="booking-step-body">
+                                            <div class="section-card walkin-account-card">
+                                                <p class="section-card-title">
+                                                    <i class="fa-solid fa-user-magnifying-glass text-xs"></i>
+                                                    Select or create patient
+                                                    <span class="section-card-title-line"></span>
                                                 </p>
-                                            </div>
 
-                                            <div class="booking-step-body">
-                                                <div class="service-step-grid">
-                                                    @foreach ($serviceTypes as $service)
-                                                        <label class="service-option group">
-                                                            <input type="radio" name="service_type"
-                                                                value="{{ $service['name'] }}"
-                                                                class="service-option-input">
+                                                <div class="account-tabs">
+                                                    <button type="button" class="account-tab active"
+                                                        data-tab="existing">
+                                                        <i class="fa-solid fa-database text-[13px]"></i>
+                                                        Existing / Unified DB
+                                                    </button>
 
-                                                            <div class="service-option-card">
-                                                                <div class="service-option-main">
-                                                                    <div class="service-option-icon">
-                                                                        @if (!empty($service['img']))
-                                                                            <img src="{{ asset('images/' . $service['img'] . '.png') }}"
-                                                                                class="w-6 h-6"
-                                                                                style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
-                                                                        @else
-                                                                            <i class="fa-solid fa-tooth"></i>
-                                                                        @endif
-                                                                    </div>
+                                                    <button type="button" class="account-tab" data-tab="guest">
+                                                        <i class="fa-solid fa-user-plus text-[13px]"></i>
+                                                        Guest onboarding
+                                                    </button>
+                                                </div>
 
-                                                                    <div class="service-option-copy">
-                                                                        <div class="service-option-topline">
-                                                                            <p class="service-option-title">
-                                                                                {{ $service['name'] }}</p>
-                                                                            <span
-                                                                                class="service-option-badge">Available</span>
-                                                                        </div>
-                                                                        <p class="service-option-desc">
-                                                                            {{ $service['desc'] }}</p>
-                                                                    </div>
-                                                                </div>
+                                                <div class="tab-panel active" id="existingPanel">
+                                                    <div class="walkin-search-wrap">
+                                                        <i class="fa-solid fa-magnifying-glass walkin-search-icon"></i>
 
-                                                                <div class="service-option-arrow">
-                                                                    <i class="fa-solid fa-chevron-right"></i>
-                                                                </div>
+                                                        <input type="text" id="patientSearch"
+                                                            class="form-input walkin-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
+                                                            placeholder="Search by name, ID, or email..."
+                                                            autocomplete="off">
+                                                    </div>
+
+                                                    <div class="patient-results" id="patientResults">
+                                                        <div class="empty-state">
+                                                            Search for a student, faculty, or administrative patient.
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="tab-panel" id="guestPanel">
+                                                    <div class="guest-fields-grid">
+                                                        <div>
+                                                            <label class="walkin-field-label" for="guestName">
+                                                                Guest full name <span class="required-star">*</span>
+                                                            </label>
+
+                                                            <input type="text" id="guestName" name="guest_name"
+                                                                class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
+                                                                placeholder="Enter guest full name" autocomplete="off"
+                                                                disabled>
+                                                        </div>
+
+                                                        <div class="walkin-two-col">
+                                                            <div>
+                                                                <label class="walkin-field-label" for="guestEmail">
+                                                                    Email
+                                                                </label>
+
+                                                                <input type="email" id="guestEmail" name="guest_email"
+                                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
+                                                                    placeholder="Optional" autocomplete="off" disabled>
                                                             </div>
-                                                        </label>
-                                                    @endforeach
+
+                                                            <div>
+                                                                <label class="walkin-field-label" for="guestPhone">
+                                                                    Phone
+                                                                </label>
+
+                                                                <input type="text" id="guestPhone" name="guest_phone"
+                                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
+                                                                    placeholder="Optional" autocomplete="off" disabled>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <button type="button" class="guest-create-btn" id="createGuestBtn">
+                                                        <i class="fa-solid fa-user-plus"></i>
+                                                        Create guest account
+                                                    </button>
+                                                </div>
+
+                                                <div class="selected-patient-box" id="selectedPatientBox" hidden>
+                                                    <span>
+                                                        <i class="fa-solid fa-circle-check text-[11px] mr-1"></i>
+                                                        Selected patient
+                                                    </span>
+                                                    <strong id="selectedPatientName"></strong>
+                                                    <small id="selectedPatientMeta"></small>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="step-content hidden">
+                                    <div class="booking-step-shell">
+                                        <div class="booking-step-header">
+                                            <p class="booking-step-eyebrow">Step 2 of 5</p>
+                                            <h2 class="booking-step-title">Choose Your Dental Service</h2>
+                                            <p class="booking-step-subtitle">
+                                                Select the type of service for this walk-in appointment.
+                                            </p>
+                                        </div>
+
+                                        <div class="booking-step-body">
+                                            <div class="service-step-grid">
+                                                @foreach ($serviceTypes as $service)
+                                                    <label class="service-option group">
+                                                        <input type="radio" name="service_type"
+                                                            value="{{ $service['name'] }}" class="service-option-input">
+
+                                                        <div class="service-option-card">
+                                                            <div class="service-option-main">
+                                                                <div class="service-option-icon">
+                                                                    @if (!empty($service['img']))
+                                                                        <img src="{{ asset('images/' . $service['img'] . '.png') }}"
+                                                                            class="w-6 h-6"
+                                                                            style="filter:brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg)" />
+                                                                    @else
+                                                                        <i class="fa-solid fa-tooth"></i>
+                                                                    @endif
+                                                                </div>
+
+                                                                <div class="service-option-copy">
+                                                                    <div class="service-option-topline">
+                                                                        <p class="service-option-title">
+                                                                            {{ $service['name'] }}</p>
+                                                                        <span class="service-option-badge">Available</span>
+                                                                    </div>
+                                                                    <p class="service-option-desc">
+                                                                        {{ $service['desc'] }}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="service-option-arrow">
+                                                                <i class="fa-solid fa-chevron-right"></i>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="step-content hidden">
                                     <div class="booking-step-header">
@@ -3287,7 +3281,7 @@
             [
                 'name' => 'birth_control',
                 'q' => 'Are you taking birth
-                                                                                                                                                                                                control pills?',
+                                                                                                                                                                                                            control pills?',
             ],
         ] as $i => $q)
                                                 <div
@@ -3396,9 +3390,15 @@
                                                 <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                     Person to contact in case of emergency
                                                 </label>
-                                                <input type="text" name="emergency_person" maxlength="50"
+                                                <input type="text" id="emergency_person" name="emergency_person"
+                                                    maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
+                                                    title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
                                                     class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                                     placeholder="Full name" required>
+
+                                                <p id="emergency_person_feedback" class="field-help-text text-[#9e9690]">
+                                                    Only letters, spaces, apostrophe, period, and hyphen are allowed.
+                                                </p>
                                             </div>
 
                                             <div>
@@ -4019,59 +4019,59 @@
     `;
         }
 
-  function getPatientInitials(name) {
-    const parts = String(name || "Patient")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+        function getPatientInitials(name) {
+            const parts = String(name || "Patient")
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
 
-    if (!parts.length) return "P";
+            if (!parts.length) return "P";
 
-    return parts
-        .slice(0, 2)
-        .map(part => part.charAt(0).toUpperCase())
-        .join("");
-}
+            return parts
+                .slice(0, 2)
+                .map(part => part.charAt(0).toUpperCase())
+                .join("");
+        }
 
-function safePatientText(value) {
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
+        function safePatientText(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
 
-function renderPatients(patients) {
-    if (!patientResults) return;
+        function renderPatients(patients) {
+            if (!patientResults) return;
 
-    if (!patients.length) {
-        renderPatientMessage("No patient found.");
-        return;
-    }
+            if (!patients.length) {
+                renderPatientMessage("No patient found.");
+                return;
+            }
 
-    patientResults.innerHTML = "";
+            patientResults.innerHTML = "";
 
-    patients.forEach(patient => {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.className = "patient-result";
-        item.dataset.patientId = patient.id;
+            patients.forEach(patient => {
+                const item = document.createElement("button");
+                item.type = "button";
+                item.className = "patient-result";
+                item.dataset.patientId = patient.id;
 
-        const patientName = patient.name || "Unnamed Patient";
-        const patientType = patient.type || "Patient";
-        const patientEmail = patient.email || "";
-        const studentNumber = patient.student_number || "";
-        const program = patient.program || "";
+                const patientName = patient.name || "Unnamed Patient";
+                const patientType = patient.type || "Patient";
+                const patientEmail = patient.email || "";
+                const studentNumber = patient.student_number || "";
+                const program = patient.program || "";
 
-        const metaParts = [
-            patientType,
-            studentNumber,
-            program,
-            patientEmail,
-        ].filter(Boolean);
+                const metaParts = [
+                    patientType,
+                    studentNumber,
+                    program,
+                    patientEmail,
+                ].filter(Boolean);
 
-        item.innerHTML = `
+                item.innerHTML = `
             <span class="patient-avatar">${safePatientText(getPatientInitials(patientName))}</span>
 
             <span class="patient-result-main">
@@ -4085,31 +4085,31 @@ function renderPatients(patients) {
             </span>
         `;
 
-        item.addEventListener("click", function() {
-            selectWalkInPatient(patient);
+                item.addEventListener("click", function() {
+                    selectWalkInPatient(patient);
 
-            document.querySelectorAll(".patient-result").forEach(result => {
-                result.classList.remove("selected");
+                    document.querySelectorAll(".patient-result").forEach(result => {
+                        result.classList.remove("selected");
 
-                const pill = result.querySelector(".patient-select-pill");
-                if (pill) {
-                    pill.classList.remove("chosen");
-                    pill.innerHTML = `<i class="fa-solid fa-plus"></i> Select`;
-                }
+                        const pill = result.querySelector(".patient-select-pill");
+                        if (pill) {
+                            pill.classList.remove("chosen");
+                            pill.innerHTML = `<i class="fa-solid fa-plus"></i> Select`;
+                        }
+                    });
+
+                    item.classList.add("selected");
+
+                    const pill = item.querySelector(".patient-select-pill");
+                    if (pill) {
+                        pill.classList.add("chosen");
+                        pill.innerHTML = `<i class="fa-solid fa-check"></i> Selected`;
+                    }
+                });
+
+                patientResults.appendChild(item);
             });
-
-            item.classList.add("selected");
-
-            const pill = item.querySelector(".patient-select-pill");
-            if (pill) {
-                pill.classList.add("chosen");
-                pill.innerHTML = `<i class="fa-solid fa-check"></i> Selected`;
-            }
-        });
-
-        patientResults.appendChild(item);
-    });
-}
+        }
 
         async function loadPatients(query = "", showAll = false) {
             if (!patientResults) return;
@@ -4488,6 +4488,13 @@ function renderPatients(patients) {
                     }
                 }
             }
+            const person = stepEl.querySelector("#emergency_person");
+
+            if (person && !validateEmergencyPerson(true)) {
+                showMiniTab("This name is invalid. Please use letters only.");
+                scrollToInvalidTarget(person);
+                return false;
+            }
 
             const phone = stepEl.querySelector("#emergency_number");
             if (phone) {
@@ -4672,121 +4679,121 @@ function renderPatients(patients) {
             const patientGender = selectedWalkInPatient?.gender || selectedWalkInPatient?.type || "N/A";
             const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                                                                                                ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                                                                                                ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                                                                                                            ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                                                                                                        `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                                                                                                ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                                                                                                ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                                                                                                ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                                                                                                ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                                                                                                ${row("Sores/Lumps", get("sores"))}
-                                                                                                                                                                                ${row("Jaw Injuries", get("injuries"))}
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                                                                                                            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                                                                                                            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                                                                                                            ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                                                                                                            ${row("Sores/Lumps", get("sores"))}
+                                                                                                                                                                                            ${row("Jaw Injuries", get("injuries"))}
+                                                                                                                                                                                        `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                                                                                                ${row("Clicking", get("clicking"))}
-                                                                                                                                                                                ${row("Joint Pain", get("joint_pain"))}
-                                                                                                                                                                                ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                                                                                                ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                                                                                                ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                                                                                                ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                                                                                                ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                                                                                                ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                                                                                                ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                                                                                                ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            ${row("Clicking", get("clicking"))}
+                                                                                                                                                                                            ${row("Joint Pain", get("joint_pain"))}
+                                                                                                                                                                                            ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                                                                                                            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                                                                                                            ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                                                                                                            ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                                                                                                            ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                                                                                                            ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                                                                                                            ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                                                                                                            ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                                                                                                        `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                                                                                                ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                                                                                                ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                                                                                                ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                                                                                                            ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                                                                                                            ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                                                                                                            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                                                                                                ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                                                                                                ${row("Dentures", get("dentures"))}
-                                                                                                                                                                                ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                                                                                                            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                                                                                                            ${row("Dentures", get("dentures"))}
+                                                                                                                                                                                            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                                                                                                ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                                                                                                ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                                                                                                            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                                                                                                        `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                                                                                                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
-                                                                                                                                                                        ? get("additional_concerns")
-                                                                                                                                                                        : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                                                                                                    ? get("additional_concerns")
+                                                                                                                                                                                    : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
+                                                                                                                                                                                        `)}
 `;
 
             const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                                                                                            ${row("Good Health", get("good_health"))}
-                                                                                                                                                                            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                                                                                                        ${row("Good Health", get("good_health"))}
+                                                                                                                                                                                        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                                                                                            ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                                                                                            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                                                                                                        ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                                                                                                        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                                                                                            ${row("Under Treatment", get("under_treatment"))}
-                                                                                                                                                                            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                                                                                                        ${row("Under Treatment", get("under_treatment"))}
+                                                                                                                                                                                        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                                                                                            ${row("Hospitalized", get("hospitalized"))}
-                                                                                                                                                                            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        ${row("Hospitalized", get("hospitalized"))}
+                                                                                                                                                                                        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                                                                                                    `)}
 
     ${subSection("Allergies", `
-                                                                                                                                                                            ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                                                                                            ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                                                                                            ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                                                                                                        ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                                                                                                        ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                                                                                                    `)}
 
     ${subSection("Medications", `
-                                                                                                                                                                            ${row("Medication", get("medication"))}
-                                                                                                                                                                            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        ${row("Medication", get("medication"))}
+                                                                                                                                                                                        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                                                                                                    `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                                                                                            ${row("Pregnant", get("pregnant"))}
-                                                                                                                                                                            ${row("Nursing", get("nursing"))}
-                                                                                                                                                                            ${row("Birth Control Pills", get("birth_control"))}
-                                                                                                                                                                        `) : ""}
+                                                                                                                                                                                        ${row("Pregnant", get("pregnant"))}
+                                                                                                                                                                                        ${row("Nursing", get("nursing"))}
+                                                                                                                                                                                        ${row("Birth Control Pills", get("birth_control"))}
+                                                                                                                                                                                    `) : ""}
 
     ${fullWidthSection("Medical Conditions", `
-                                                                                                                                                                            <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+                                                                                                                                                                                    `)}
 
     ${subSection("Tobacco Use", `
-                                                                                                                                                                            ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                                                                                                    `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                                                                                            ${row("Headaches", get("headaches"))}
-                                                                                                                                                                            ${row("Earaches", get("earaches"))}
-                                                                                                                                                                            ${row("Neck Aches", get("neck_aches"))}
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        ${row("Headaches", get("headaches"))}
+                                                                                                                                                                                        ${row("Earaches", get("earaches"))}
+                                                                                                                                                                                        ${row("Neck Aches", get("neck_aches"))}
+                                                                                                                                                                                    `)}
 `;
 
             document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                ${row("Name", patientName)}
-                                                                                                                                                                                ${row("Gender", patientGender)}
-                                                                                                                                                                            </div>
-                                                                                                                                                                        `)}
+                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                            ${row("Name", patientName)}
+                                                                                                                                                                                            ${row("Gender", patientGender)}
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                    `)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
      ${summaryCard("Walk-in Schedule", "fa-clock", `
-                <div class="grid grid-cols-1 gap-y-1">
-                    <p><b class="text-[#5c5550] font-semibold">Date & Time:</b> Recorded automatically when Start Procedure is clicked.</p>
-                </div>
-            `)}
+                            <div class="grid grid-cols-1 gap-y-1">
+                                <p><b class="text-[#5c5550] font-semibold">Date & Time:</b> Recorded automatically when Start Procedure is clicked.</p>
+                            </div>
+                        `)}
 
         ${summaryCard("Service", "fa-tooth", `
-                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                    ${row("Type", get("service_type"))}
-                                                                                                                                                                                </div>
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                ${row("Type", get("service_type"))}
+                                                                                                                                                                                            </div>
+                                                                                                                                                                                        `)}
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -4795,12 +4802,12 @@ function renderPatients(patients) {
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                    ${row("Name", get("emergency_person"))}
-                                                                                                                                                                                    ${row("Number", get("emergency_number"))}
-                                                                                                                                                                                    ${row("Relation", emergencyRelation)}
-                                                                                                                                                                                </div>
-                                                                                                                                                                            `)}
+                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                ${row("Name", get("emergency_person"))}
+                                                                                                                                                                                                ${row("Number", get("emergency_number"))}
+                                                                                                                                                                                                ${row("Relation", emergencyRelation)}
+                                                                                                                                                                                            </div>
+                                                                                                                                                                                        `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
@@ -5302,6 +5309,57 @@ function renderPatients(patients) {
 
         const emergencyNumber = document.getElementById("emergency_number");
         const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
+        let emergencyNumberFeedbackTimer = null;
+        const emergencyPerson = document.getElementById("emergency_person");
+        const emergencyPersonFeedback = document.getElementById("emergency_person_feedback");
+
+        function setEmergencyPersonFeedback(message, type = "") {
+            if (!emergencyPersonFeedback) return;
+
+            emergencyPersonFeedback.textContent = message;
+            emergencyPersonFeedback.classList.remove("error", "success", "text-[#9e9690]");
+
+            if (type === "error") emergencyPersonFeedback.classList.add("error");
+            else if (type === "success") emergencyPersonFeedback.classList.add("success");
+            else emergencyPersonFeedback.classList.add("text-[#9e9690]");
+        }
+
+        function validateEmergencyPerson(showNeutral = false) {
+            if (!emergencyPerson) return false;
+
+            const value = emergencyPerson.value.trim();
+            const validNamePattern = /^[A-Za-zÑñ\s.'-]+$/;
+
+            emergencyPerson.classList.remove("input-invalid", "input-valid");
+
+            if (!value.length) {
+                if (showNeutral) {
+                    setEmergencyPersonFeedback("Only letters, spaces, apostrophe, period, and hyphen are allowed.");
+                } else {
+                    setEmergencyPersonFeedback("");
+                }
+                return false;
+            }
+
+            if (!validNamePattern.test(value)) {
+                emergencyPerson.classList.add("input-invalid");
+                setEmergencyPersonFeedback("This name is invalid. Please use letters only.", "error");
+                return false;
+            }
+
+            emergencyPerson.classList.add("input-valid");
+            setEmergencyPersonFeedback("Valid emergency contact name.", "success");
+            return true;
+        }
+
+        emergencyPerson?.addEventListener("input", () => {
+            validateEmergencyPerson(true);
+            markFormDirty();
+        });
+
+        emergencyPerson?.addEventListener("blur", () => {
+            validateEmergencyPerson(true);
+        });
 
         function formatPhoneDisplay(rawDigits) {
             const digits = rawDigits.slice(0, 11);
@@ -5316,11 +5374,24 @@ function renderPatients(patients) {
 
         function setPhoneFeedback(message, type = "") {
             if (!emergencyNumberFeedback) return;
+            if (emergencyNumberFeedbackTimer) {
+                clearTimeout(emergencyNumberFeedbackTimer);
+                emergencyNumberFeedbackTimer = null;
+            }
+
             emergencyNumberFeedback.textContent = message;
             emergencyNumberFeedback.classList.remove("error", "success", "text-[#9e9690]");
             if (type === "error") emergencyNumberFeedback.classList.add("error");
-            else if (type === "success") emergencyNumberFeedback.classList.add("success");
-            else emergencyNumberFeedback.classList.add("text-[#9e9690]");
+            else if (type === "success") {
+                emergencyNumberFeedback.classList.add("success");
+                emergencyNumberFeedbackTimer = setTimeout(() => {
+                    if (!emergencyNumberFeedback.classList.contains("success")) return;
+                    emergencyNumberFeedback.textContent = "";
+                    emergencyNumberFeedback.classList.remove("success");
+                    emergencyNumberFeedback.classList.add("text-[#9e9690]");
+                    emergencyNumberFeedbackTimer = null;
+                }, 3000);
+            } else emergencyNumberFeedback.classList.add("text-[#9e9690]");
         }
 
         function validateEmergencyNumber(showNeutral = false) {

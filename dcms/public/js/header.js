@@ -85,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const notifMenu = document.getElementById('notifMenu');
     const notifDropdown = document.getElementById('notifDropdown');
     const notifTabs = notifMenu ? notifMenu.querySelectorAll('[data-notif-filter]') : [];
-    const notifItems = notifMenu ? notifMenu.querySelectorAll('[data-notif-item]') : [];
     const notifFilterEmpty = notifMenu ? notifMenu.querySelector('.header-notif-filter-empty') : null;
     const notifBadge = notifDropdown ? notifDropdown.querySelector('[data-notif-badge]') : null;
     const unreadPill = notifMenu ? notifMenu.querySelector('[data-notif-unread-pill]') : null;
@@ -96,6 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const userBtn = document.getElementById('userBtn');
     const userMenu = document.getElementById('userMenu');
     const userDropdown = document.getElementById('userDropdown');
+
+    function getNotifItems() {
+        return notifMenu ? Array.from(notifMenu.querySelectorAll('[data-notif-item]')) : [];
+    }
 
     function setButtonState(button, isActive) {
         if (!button) return;
@@ -153,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let visibleCount = 0;
 
-        notifItems.forEach(function (item) {
+        getNotifItems().forEach(function (item) {
             const state = item.dataset.notifState || 'unread';
             const isVisible = filter === 'all' || filter === state;
 
@@ -165,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (notifFilterEmpty) {
-            notifFilterEmpty.hidden = notifItems.length === 0 || visibleCount > 0;
+            notifFilterEmpty.hidden = getNotifItems().length === 0 || visibleCount > 0;
         }
     }
 
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let unread = 0;
         let read = 0;
 
-        notifItems.forEach(function (item) {
+        getNotifItems().forEach(function (item) {
             if ((item.dataset.notifState || 'unread') === 'unread') {
                 unread += 1;
             } else {
@@ -343,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (form.matches('[data-notif-mark-read-form]')) {
                     markItemAsRead(form.closest('[data-notif-item]'));
                 } else if (form.matches('[data-notif-mark-all-form]')) {
-                    notifItems.forEach(function (item) {
+                    getNotifItems().forEach(function (item) {
                         markItemAsRead(item);
                     });
                 }
@@ -359,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         notifMenu.addEventListener('click', function (e) {
-            const openLink = e.target.closest('[data-notif-open-link]');
+            const openLink = e.target.closest('[data-notif-open-link], .header-notif-link-action, .header-notif-item-title');
 
             if (!openLink || !notifMenu.contains(openLink)) {
                 return;

@@ -62,28 +62,40 @@
 <div class="card">
     <div class="spinner"></div>
     <h2>Signing you out...</h2>
-    <p>Please wait while we securely log you out.</p>
+    <p>Please wait while we securely close your sign-in session.</p>
 </div>
 
 <script>
     window.addEventListener('load', async function () {
-        try {
-            await fetch(@json($logoutUrl), {
-                method: 'POST',
-                credentials: 'include', // VERY IMPORTANT
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    client_id: @json($clientId)
-                })
-            });
-        } catch (e) {
-            console.error('IDP logout failed:', e);
+        const logoutTargets = @json($logoutTargets ?? []);
+        const redirectUrl = @json($redirectUrl);
+        const loginRedirectUrl = @json($loginRedirectUrl ?? null);
+
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const hiddenFrameLogout = (url) => new Promise((resolve) => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.referrerPolicy = 'no-referrer';
+            iframe.onload = () => resolve();
+            iframe.onerror = () => resolve();
+            document.body.appendChild(iframe);
+            iframe.src = url;
+
+            setTimeout(resolve, 1200);
+        });
+
+        for (const url of logoutTargets) {
+            try {
+                await hiddenFrameLogout(url);
+                await wait(400);
+            } catch (e) {
+                console.error('Background IdP logout attempt failed:', e);
+            }
         }
 
-        // redirect back to your system login
-        window.location.href = @json($redirectUrl);
+        await wait(500);
+        window.location.replace(redirectUrl || loginRedirectUrl || '/login');
     });
 </script>
 

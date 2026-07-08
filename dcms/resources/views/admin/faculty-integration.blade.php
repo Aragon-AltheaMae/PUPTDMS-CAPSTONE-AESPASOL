@@ -491,7 +491,11 @@
         }
 
         function renderNoResults(message = 'No results found.') {
-            resultsBox.innerHTML = `<div class="search-empty">${message}</div>`;
+            resultsBox.innerHTML = '';
+            const empty = document.createElement('div');
+            empty.className = 'search-empty';
+            empty.textContent = message;
+            resultsBox.appendChild(empty);
             showResults();
         }
 
@@ -512,10 +516,15 @@
                     `${faculty.first_name ?? ''} ${faculty.middle_name ?? ''} ${faculty.last_name ?? ''}`
                         .replace(/\s+/g, ' ').trim();
 
-                item.innerHTML = `
-                        <div class="search-name">${fullName || 'Unnamed Faculty'}</div>
-                        <div class="search-email">${faculty.email ?? faculty.faculty_code ?? ''}</div>
-                    `;
+                const name = document.createElement('div');
+                name.className = 'search-name';
+                name.textContent = fullName || 'Unnamed Faculty';
+
+                const email = document.createElement('div');
+                email.className = 'search-email';
+                email.textContent = faculty.email ?? faculty.faculty_code ?? '';
+
+                item.append(name, email);
 
                 item.addEventListener('click', function (e) {
                     e.preventDefault();

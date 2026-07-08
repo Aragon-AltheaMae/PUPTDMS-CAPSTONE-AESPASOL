@@ -102,6 +102,8 @@ class AcademicPeriodController extends Controller
             'end_date.after' => 'End Date must be after Start Date.',
         ]);
 
+        $this->ensureAcademicPeriodIsUnique($request, $validated['academic_year'], $validated['semester']);
+
         $isActive = (bool) ($validated['is_active'] ?? false);
 
         if ($isActive) {
@@ -141,6 +143,8 @@ class AcademicPeriodController extends Controller
             'academic_year.regex' => 'Academic Year must be in YYYY-YYYY format.',
             'end_date.after' => 'End Date must be after Start Date.',
         ]);
+
+        $this->ensureAcademicPeriodIsUnique($request, $validated['academic_year'], $validated['semester'], $academicPeriod->id);
 
         $isActive = (bool) ($validated['is_active'] ?? false);
 
@@ -215,5 +219,43 @@ class AcademicPeriodController extends Controller
                 ->route('admin.academic_periods')
                 ->with('error', 'Failed to sync academic period from FLSS: ' . $e->getMessage());
         }
+    }
+
+    private function ensureAcademicPeriodIsUnique(
+        Request $request,
+        string $academicYear,
+        string $semester,
+        ?int $ignoreId = null
+    ): void {
+        $semesterAliases = $this->semesterAliases($semester);
+
+        $duplicateQuery = AcademicPeriod::query()
+            ->where('academic_year', $academicYear)
+            ->whereIn('semester', $semesterAliases);
+
+        if ($ignoreId !== null) {
+            $duplicateQuery->whereKeyNot($ignoreId);
+        }
+
+        if (!$duplicateQuery->exists()) {
+            return;
+        }
+
+        $request->validate([
+            'academic_year' => [
+                function ($attribute, $value, $fail) use ($semester) {
+                    $fail("The {$value} {$semester} academic period already exists.");
+                },
+            ],
+        ]);
+    }
+
+    private function semesterAliases(string $semester): array
+    {
+        return match ($semester) {
+            'First Semester', '1st Semester' => ['First Semester', '1st Semester'],
+            'Second Semester', '2nd Semester' => ['Second Semester', '2nd Semester'],
+            default => [$semester],
+        };
     }
 }
