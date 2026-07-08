@@ -1200,6 +1200,15 @@ dialog#appt_detail_modal::backdrop {
     .service-card-desc {
         font-size: .74rem;
     }
+
+    .vo-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-primary-btn,
+    .appt-secondary-btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 340px) {
@@ -2032,4 +2041,96 @@ dialog#appt_detail_modal::backdrop {
     background: rgba(252, 165, 165, .10) !important;
     color: #FECACA !important;
     border-color: rgba(252, 165, 165, .22) !important;
+}
+
+.services-grid,
+.service-card,
+.appt-summary-grid,
+.appt-summary-card,
+.appt-record-box,
+.appt-detail-box,
+.vo-card,
+.vo-tooth-card {
+    min-width: 0;
+}
+
+.service-card-title,
+.service-card-desc,
+.service-card-tag,
+.appt-info-value,
+.appt-record-panel,
+.appt-empty-mini-title,
+.appt-empty-mini-text,
+.vo-label,
+.vo-sub,
+.vo-info-box strong,
+.vo-history-item {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+@media (min-width: 1440px) {
+
+    #mainContent {
+        max-width: 1440px;
+        margin-inline: auto;
+    }
+
+}
+
+@media (min-width: 1920px) {
+
+    #mainContent {
+        max-width: 1600px;
+    }
+
+}
+
+@media (hover: none) {
+
+    .service-card:hover,
+    .appt-quick-btn:hover,
+    .appt-primary-btn:hover,
+    .appt-secondary-btn:hover,
+    .appt-fab:hover,
+    .appt-record-accordion:hover,
+    .vo-tooth:hover .vo-box,
+    .appt-recommended-btn:hover {
+
+        transform: none !important;
+        box-shadow: inherit !important;
+
+    }
+
+}
+
+@supports not (height: 100dvh) {
+
+    .appt-record-box,
+    .appt-detail-box,
+    .vo-tooth-card {
+
+        max-height: 88vh;
+
+    }
+
+    .appt-detail-box .appt-record-body {
+
+        max-height: calc(88vh - 112px);
+
+    }
+
+}
+
+@supports not (backdrop-filter: blur(8px)) {
+
+    .appt-detail-backdrop,
+    .vo-tooth-backdrop,
+    dialog#appt_detail_modal::backdrop,
+    .appt-record-modal::backdrop {
+
+        background: rgba(20,10,10,.72) !important;
+
+    }
+
 }
