@@ -948,3 +948,22 @@
         transform: translateY(0);
     }
 }
+
+@keyframes chatActionShimmer {
+    from {
+        transform: translateX(-130%) skewX(-18deg);
+    }
+
+    to {
+        transform: translateX(135%) skewX(-18deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .chat-action-btn,
+    .chat-action-btn::before {
+        animation: none !important;
+        transition: none !important;
+    }
+}

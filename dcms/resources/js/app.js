@@ -472,29 +472,71 @@ window.setDashboardLoadingStatus = setDashboardLoadingStatus;
 window.finishDashboardLoading = finishDashboardLoading;
 
 function initBackToTop() {
-    if (document.querySelector('.back-to-top')) return;
+    let button = document.querySelector('.back-to-top');
 
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'back-to-top floating-btn';
-    button.setAttribute('aria-label', 'Back to top');
-    button.setAttribute('title', 'Back to top');
-    button.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+    if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'back-to-top floating-btn';
+        button.setAttribute('aria-label', 'Back to top');
+        button.setAttribute('title', 'Back to top');
+        button.setAttribute('data-tooltip', 'Back to top');
+        button.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
 
-    document.body.appendChild(button);
+        document.body.appendChild(button);
+    }
 
-    const toggleButton = () => {
-        button.classList.toggle('is-visible', window.scrollY > 350);
+    button.setAttribute('data-tooltip', 'Back to top');
+    if (button.dataset.backToTopInitialized === 'true') return;
+    button.dataset.backToTopInitialized = 'true';
+
+    const getScrollTop = () => {
+        return window.scrollY ||
+            document.documentElement.scrollTop ||
+            document.body.scrollTop ||
+            document.getElementById('mainContent')?.scrollTop ||
+            0;
     };
 
-    button.addEventListener('click', () => {
+    const scrollPageToTop = () => {
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
+
+        document.documentElement.scrollTo?.({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        document.body.scrollTo?.({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        const mainContent = document.getElementById('mainContent');
+
+        if (mainContent) {
+            mainContent.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const toggleButton = () => {
+        button.classList.toggle('is-visible', getScrollTop() > 350);
+    };
+
+    button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        scrollPageToTop();
     });
 
     window.addEventListener('scroll', toggleButton, { passive: true });
+    document.getElementById('mainContent')?.addEventListener('scroll', toggleButton, { passive: true });
+
     toggleButton();
 }
 
@@ -506,22 +548,20 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAiHelpPopover() {
     if (document.querySelector('.ai-help-popover')) return;
 
-    const alreadyShown = sessionStorage.getItem('ai_help_shown');
-
     const popover = document.createElement('div');
     popover.className = 'ai-help-popover';
     popover.innerHTML = `
         <strong>Need help?</strong>
-        <span>Get help with our AI assistant for appointments, records, and requests.</span>
+        <span>Open assistance tools for chatbot and accessibility options.</span>
     `;
 
     document.body.appendChild(popover);
 
-    const chatbotBtn = document.querySelector('.chatbot-fab');
-    if (!chatbotBtn) return;
+    const assistiveBtn = document.getElementById('assistiveMainFab');
+    if (!assistiveBtn) return;
 
     const showPopover = () => {
-        if (document.querySelector('.chatbot-panel.show')) return;
+        if (document.getElementById('assistiveFabGroup')?.classList.contains('open')) return;
         popover.classList.add('show');
     };
 
@@ -529,19 +569,12 @@ function initAiHelpPopover() {
         popover.classList.remove('show');
     };
 
-    if (!alreadyShown) {
-        setTimeout(() => {
-            showPopover();
-            sessionStorage.setItem('ai_help_shown', 'true');
-        }, 1200);
-    }
+    assistiveBtn.addEventListener('mouseenter', showPopover);
+    assistiveBtn.addEventListener('focus', showPopover);
 
-    chatbotBtn.addEventListener('mouseenter', showPopover);
-    chatbotBtn.addEventListener('mouseleave', () => {
-        setTimeout(hidePopover, 600);
-    });
-
-    chatbotBtn.addEventListener('click', hidePopover);
+    assistiveBtn.addEventListener('mouseleave', hidePopover);
+    assistiveBtn.addEventListener('blur', hidePopover);
+    assistiveBtn.addEventListener('click', hidePopover);
 }
 
 function initAccessibilitySheetGesture() {
@@ -620,8 +653,8 @@ function fixSiennaPosition() {
         ? navHeight + 16
         : 24;
 
-    const chatbotBottom = accessibilityBottom + fabSize + gap;
-    const backTopBottom = chatbotBottom + fabSize + gap;
+    const chatbotBottom = accessibilityBottom;
+    const backTopBottom = accessibilityBottom + fabSize + gap;
 
     document.documentElement.style.setProperty('--float-right', `${right}px`);
     document.documentElement.style.setProperty('--float-right-final', `${right}px`);
@@ -647,6 +680,30 @@ document.addEventListener('DOMContentLoaded', fixSiennaPosition);
 window.addEventListener('load', fixSiennaPosition);
 window.addEventListener('resize', fixSiennaPosition);
 window.addEventListener('orientationchange', fixSiennaPosition);
+
+function syncAssistiveFloatingState() {
+    const group = document.getElementById('assistiveFabGroup');
+
+    if (!group) return;
+
+    const sync = () => {
+        document.body.classList.toggle(
+            'assistive-menu-open',
+            group.classList.contains('open')
+        );
+    };
+
+    sync();
+
+    const observer = new MutationObserver(sync);
+
+    observer.observe(group, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+}
+
+document.addEventListener('DOMContentLoaded', syncAssistiveFloatingState);
 
 function clearSearchInput(input, options = {}) {
     if (!input) return;
@@ -1078,8 +1135,8 @@ function applyGlobalTheme(theme = 'light') {
 
     localStorage.setItem('theme', nextTheme);
 
-    document.querySelectorAll('.theme-option[data-theme]').forEach(option => {
-        option.classList.toggle('active', option.dataset.theme === nextTheme);
+    document.querySelectorAll('.theme-option[data-theme-choice]').forEach(option => {
+        option.classList.toggle('active', option.dataset.themeChoice === nextTheme);
     });
 
     document.querySelectorAll('.theme-indicator').forEach(indicator => {
@@ -1107,7 +1164,7 @@ function initGlobalThemeControls(root = document) {
 
     applyGlobalTheme(savedTheme);
 
-    scope.querySelectorAll('.theme-option[data-theme]').forEach(option => {
+    scope.querySelectorAll('.theme-option[data-theme-choice]').forEach(option => {
         if (option.dataset.themeInitialized === 'true') return;
 
         option.dataset.themeInitialized = 'true';
@@ -1115,7 +1172,7 @@ function initGlobalThemeControls(root = document) {
         option.addEventListener('click', event => {
             event.preventDefault();
             event.stopPropagation();
-            applyGlobalTheme(option.dataset.theme || 'light');
+            applyGlobalTheme(option.dataset.themeChoice || 'light');
         });
     });
 
@@ -1188,8 +1245,12 @@ function initSidebarThemeDropdowns() {
             dropdown.classList.toggle('open');
         });
 
-        dropdown.querySelectorAll('[data-theme]').forEach(option => {
-            option.addEventListener('click', () => {
+        dropdown.querySelectorAll('[data-theme-choice]').forEach(option => {
+            option.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                applyGlobalTheme(option.dataset.themeChoice || 'light');
                 dropdown.classList.remove('open');
                 setTimeout(syncThemeIcons, 0);
             });

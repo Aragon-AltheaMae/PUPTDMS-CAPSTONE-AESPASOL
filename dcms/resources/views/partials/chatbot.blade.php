@@ -1,6 +1,21 @@
-<button type="button" class="chatbot-fab" onclick="toggleChat()" aria-label="Open dental chatbot">
-    <i class="fas fa-comments"></i>
-</button>
+<div class="assistive-fab-group" id="assistiveFabGroup">
+    <button type="button" class="assistive-main-fab" id="assistiveMainFab" onclick="toggleAssistiveMenu()"
+        aria-label="Open assistance tools" aria-expanded="false">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </button>
+
+    <div class="assistive-mini-menu" id="assistiveMiniMenu" aria-hidden="true">
+        <button type="button" class="assistive-mini-fab chatbot-fab" onclick="closeAssistiveMenu(); toggleChat();"
+            aria-label="Open dental chatbot" data-tooltip="Chatbot">
+            <i class="fas fa-comments"></i>
+        </button>
+
+        <button type="button" class="assistive-mini-fab accessibility-fab" onclick="toggleAccessibilityFromMain()"
+            aria-label="Open accessibility tools" data-tooltip="Accessibility">
+            <i class="fa-solid fa-universal-access"></i>
+        </button>
+    </div>
+</div>
 
 <div id="chat-window" class="chatbot-panel">
     <div class="chatbot-header">
@@ -31,8 +46,8 @@
                 <span></span>
             </div>
 
-            <h4>How can I help you today?</h4>
-            <p>Ask me about appointments, dental records, odontogram, or document requests.</p>
+            <h4 id="chat-empty-title">How can I help you today?</h4>
+            <p id="chat-empty-desc">Ask me about appointments, dental records, odontogram, or document requests.</p>
         </div>
     </div>
 
@@ -58,7 +73,10 @@
 
     <div class="chatbot-footer">
         <div class="chatbot-input-wrap">
-            <input type="text" id="user-input" placeholder="Type your question..." autocomplete="off">
+            <input type="text" id="user-input" placeholder="Type your question..." autocomplete="off" maxlength="300"
+                aria-describedby="chat-input-counter">
+
+            <span id="chat-input-counter" class="chat-input-counter">0/300</span>
             <button type="button" id="send-btn" class="chatbot-send" onclick="sendMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>
@@ -68,6 +86,9 @@
 
 <script>
     window.authUserName = "{{ optional(auth()->user())->name ?? '' }}";
+    window.authUserId = "{{ auth()->id() ?? 'guest' }}";
+    window.authUserRole = "{{ session('impersonated_role') ?? optional(optional(auth()->user())->role)->slug ?? 'guest' }}";
+    window.chatbotSessionId = "{{ session()->getId() }}";
     window.chatbotBotName = 'PUP SmileGuide AI';
 </script>
 
@@ -79,7 +100,206 @@
     const chatbotContext = window.chatbotContext || {};
     const isLoginPage = chatbotContext.page === 'login' || window.location.pathname === '/login';
     const botName = window.chatbotBotName || 'PUP SmileGuide AI';
+
+    const currentUserId = window.authUserId || document.querySelector('meta[name="auth-user-id"]')?.getAttribute('content') || 'guest';
+    const currentUserRole = window.authUserRole || 'guest';
+    const currentChatSessionId = window.chatbotSessionId || 'session';
+
+    const chatStorageKey = `puptdms_chatbot_messages_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
+    const chatOpenStorageKey = `puptdms_chatbot_open_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
+    const assistiveOpenStorageKey = `puptdms_assistive_menu_open_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
+
     let introShown = false;
+    let lastMessageType = null;
+
+    let lastChatSentAt = 0;
+    let chatBurstCount = 0;
+    let chatBurstWindowStartedAt = Date.now();
+
+    const CHAT_COOLDOWN_MS = 2500;
+    const CHAT_BURST_LIMIT = 6;
+    const CHAT_BURST_WINDOW_MS = 60000;
+    const CHAT_MAX_CHARS = 300;
+    const CHAT_MAX_WORDS = 60;
+    const inputCounter = document.getElementById('chat-input-counter');
+
+    function countWords(value) {
+        return value.trim().split(/\s+/).filter(Boolean).length;
+    }
+
+    function trimToWordLimit(value) {
+        const words = value.trim().split(/\s+/).filter(Boolean);
+
+        if (words.length <= CHAT_MAX_WORDS) {
+            return value;
+        }
+
+        return words.slice(0, CHAT_MAX_WORDS).join(' ');
+    }
+
+    function updateChatInputCounter() {
+        if (!input || !inputCounter) return;
+
+        const words = countWords(input.value);
+        const chars = input.value.length;
+
+        inputCounter.textContent = `${chars}/${CHAT_MAX_CHARS}`;
+
+        inputCounter.classList.toggle(
+            'is-warning',
+            chars >= CHAT_MAX_CHARS - 30 || words >= CHAT_MAX_WORDS - 10
+        );
+    }
+
+    input.addEventListener('input', function () {
+        if (input.value.length > CHAT_MAX_CHARS) {
+            input.value = input.value.slice(0, CHAT_MAX_CHARS);
+        }
+
+        if (countWords(input.value) > CHAT_MAX_WORDS) {
+            input.value = trimToWordLimit(input.value);
+        }
+
+        updateChatInputCounter();
+    });
+
+    updateChatInputCounter();
+
+    function canSendChatMessage() {
+        const now = Date.now();
+
+        if (now - lastChatSentAt < CHAT_COOLDOWN_MS) {
+            addMessage('ai', 'Please wait a few seconds before sending another message.');
+            return false;
+        }
+
+        if (now - chatBurstWindowStartedAt > CHAT_BURST_WINDOW_MS) {
+            chatBurstWindowStartedAt = now;
+            chatBurstCount = 0;
+        }
+
+        if (chatBurstCount >= CHAT_BURST_LIMIT) {
+            addMessage('ai', 'You have sent too many messages. Please wait a minute before trying again.');
+            return false;
+        }
+
+        lastChatSentAt = now;
+        chatBurstCount++;
+
+        return true;
+    }
+
+    const roleConfig = {
+        admin: {
+            intro: `Hi! I’m <strong>${botName}</strong>. I can help you with <strong>dashboard analytics</strong>, <strong>patient directory</strong>, <strong>appointments management</strong>, <strong>document requests</strong>, <strong>reports</strong>, and <strong>system settings</strong>.`,
+            emptyDesc: 'Ask me about admin dashboard, patients, appointments, reports, inventory, document requests, and system settings.',
+            defaultChips: [
+                ['Patients', 'How can I manage patients in the admin dashboard?'],
+                ['Appointments', 'How can I view and manage clinic appointments as admin?'],
+                ['Reports', 'Where can I view reports and analytics?']
+            ]
+        },
+        dentist: {
+            intro: `Hi! I’m <strong>${botName}</strong>. I can help you with <strong>today’s appointments</strong>, <strong>patient profiles</strong>, <strong>odontogram</strong>, <strong>walk-ins</strong>, <strong>clinic schedule</strong>, and <strong>reports</strong>.`,
+            emptyDesc: 'Ask me about dentist appointments, patient profiles, odontogram, walk-ins, reports, and clinic schedule.',
+            defaultChips: [
+                ['Today', 'How can I check today’s appointments?'],
+                ['Patients', 'How can I open a patient profile?'],
+                ['Odontogram', 'How can I start or view a patient odontogram?']
+            ]
+        },
+        patient: {
+            intro: `Hi! I’m <strong>${botName}</strong>. I’m ready to help with <strong>appointments</strong>, <strong>dental records</strong>, <strong>schedules</strong>, and <strong>document requests</strong>.`,
+            emptyDesc: 'Ask me about appointments, dental records, odontogram, or document requests.',
+            defaultChips: [
+                ['Book', 'How do I book an appointment from the patient dashboard?'],
+                ['Records', 'How can I open my dental records from the dashboard?'],
+                ['Documents', 'Where can I request a dental clearance document?']
+            ]
+        },
+        guest: {
+            intro: `Hi! I’m <strong>${botName}</strong>. This is the <strong>login page</strong>, so I can help you with <strong>signing in</strong>, <strong>SSO access</strong>, and what you can do after you log in.`,
+            emptyDesc: 'Ask me about signing in, SSO access, or login help.',
+            defaultChips: [
+                ['Log in', 'How do I log in to the clinic system?'],
+                ['SSO', 'How do I use the SSO login option?'],
+                ['Help', 'What can I do on this login page?']
+            ]
+        }
+    };
+
+    const activeRoleConfig = roleConfig[currentUserRole] || roleConfig.guest;
+
+    function syncChatEmptyState() {
+        document.getElementById('chat-empty-desc')?.replaceChildren(document.createTextNode(activeRoleConfig.emptyDesc));
+    }
+
+    syncChatEmptyState();
+
+    function toggleAssistiveMenu(forceClose = false) {
+        const group = document.getElementById('assistiveFabGroup');
+        const menu = document.getElementById('assistiveMiniMenu');
+        const mainBtn = document.getElementById('assistiveMainFab');
+
+        if (!group || !menu || !mainBtn) return;
+
+        const isOpen = group.classList.contains('open');
+        const shouldOpen = forceClose ? false : !isOpen;
+
+        group.classList.toggle('open', shouldOpen);
+        menu.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+        mainBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+
+        localStorage.setItem(assistiveOpenStorageKey, shouldOpen ? '1' : '0');
+    }
+
+    function openAssistiveMenu() {
+        toggleAssistiveMenu(false);
+    }
+
+    function closeAssistiveMenu() {
+        toggleAssistiveMenu(true);
+    }
+
+    function toggleAccessibilityFromMain() {
+        closeChatOnly();
+        closeAssistiveMenu();
+
+        const clickAccessibilityButton = (attempt = 0) => {
+            const aswButton = document.querySelector('.asw-menu-btn');
+
+            if (aswButton) {
+                aswButton.dispatchEvent(new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                }));
+                return;
+            }
+
+            if (attempt < 10) {
+                setTimeout(() => clickAccessibilityButton(attempt + 1), 150);
+            } else {
+                console.warn('Sienna accessibility button was not found.');
+            }
+        };
+
+        clickAccessibilityButton();
+    }
+
+    function closeChatOnly() {
+        if (!chatWindow.classList.contains('show')) return;
+
+        chatWindow.classList.remove('show');
+        chatWindow.classList.add('closing');
+
+        setTimeout(() => {
+            chatWindow.classList.remove('closing');
+        }, 380);
+
+        document.body.classList.remove('chatbot-open-mobile');
+        localStorage.setItem(chatOpenStorageKey, '0');
+    }
 
     function toggleChat(forceClose = false) {
 
@@ -101,6 +321,7 @@
         }
 
         const isNowOpen = chatWindow.classList.contains('show');
+        localStorage.setItem(chatOpenStorageKey, isNowOpen ? '1' : '0');
         const isMobile = window.matchMedia('(max-width: 640px)').matches;
 
         document.body.classList.toggle('chatbot-open-mobile', isNowOpen && isMobile);
@@ -116,9 +337,7 @@
     }
 
     function showIntroMessage() {
-        const introText = isLoginPage
-            ? `Hi! I’m <strong>${botName}</strong>. This is the <strong>login page</strong>, so I can help you with <strong>signing in</strong>, <strong>SSO access</strong>, and what you can do after you log in.`
-            : `Hi! I’m <strong>${botName}</strong>. I’m ready to help with <strong>appointments</strong>, <strong>dental records</strong>, <strong>schedules</strong>, and <strong>document requests</strong>.`;
+        const introText = isLoginPage ? roleConfig.guest.intro : activeRoleConfig.intro;
 
         addMessage('ai', introText, { allowHtml: true });
     }
@@ -129,7 +348,53 @@
         return div.innerHTML;
     }
 
-    let lastMessageType = null;
+    function getStoredMessages() {
+        try {
+            return JSON.parse(localStorage.getItem(chatStorageKey) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveStoredMessages(messages) {
+        localStorage.setItem(chatStorageKey, JSON.stringify(messages.slice(-60)));
+    }
+
+    function saveChatMessage(type, text, options = {}) {
+        const messages = getStoredMessages();
+
+        messages.push({
+            type,
+            text,
+            allowHtml: Boolean(options.allowHtml),
+            status: options.status || '',
+            createdAt: Date.now()
+        });
+
+        saveStoredMessages(messages);
+    }
+
+    function restoreChatMessages() {
+        const messages = getStoredMessages();
+
+        if (!messages.length) return false;
+
+        const empty = msgDiv.querySelector('.chat-empty-state');
+        if (empty) empty.remove();
+
+        messages.forEach(message => {
+            addMessage(message.type, message.text, {
+                allowHtml: message.allowHtml,
+                status: message.status,
+                skipSave: true
+            });
+        });
+
+        introShown = true;
+        scrollChat();
+
+        return true;
+    }
 
     function addMessage(type, text, options = {}) {
         const row = document.createElement('div');
@@ -163,6 +428,10 @@
         lastMessageType = type;
         scrollChat();
 
+        if (!options.skipSave && type !== 'typing') {
+            saveChatMessage(type, text, options);
+        }
+
         return bubble;
     }
 
@@ -195,6 +464,49 @@
         msgDiv.scrollTop = msgDiv.scrollHeight;
     }
 
+    function lockPageScrollInsideChatbot() {
+        if (!chatWindow || !msgDiv) return;
+
+        msgDiv.addEventListener('wheel', function (event) {
+            const atTop = msgDiv.scrollTop <= 0;
+            const atBottom = Math.ceil(msgDiv.scrollTop + msgDiv.clientHeight) >= msgDiv.scrollHeight;
+
+            const scrollingUp = event.deltaY < 0;
+            const scrollingDown = event.deltaY > 0;
+
+            if ((scrollingUp && atTop) || (scrollingDown && atBottom)) {
+                event.preventDefault();
+            }
+
+            event.stopPropagation();
+        }, { passive: false });
+
+        let startY = 0;
+
+        msgDiv.addEventListener('touchstart', function (event) {
+            startY = event.touches[0].clientY;
+        }, { passive: true });
+
+        msgDiv.addEventListener('touchmove', function (event) {
+            const currentY = event.touches[0].clientY;
+            const deltaY = startY - currentY;
+
+            const atTop = msgDiv.scrollTop <= 0;
+            const atBottom = Math.ceil(msgDiv.scrollTop + msgDiv.clientHeight) >= msgDiv.scrollHeight;
+
+            const scrollingUp = deltaY < 0;
+            const scrollingDown = deltaY > 0;
+
+            if ((scrollingUp && atTop) || (scrollingDown && atBottom)) {
+                event.preventDefault();
+            }
+
+            event.stopPropagation();
+        }, { passive: false });
+    }
+
+    lockPageScrollInsideChatbot();
+
     function setLoading(isLoading) {
         input.disabled = isLoading;
         sendBtn.disabled = isLoading;
@@ -223,6 +535,10 @@
     function cleanErrorMessage(data) {
         const message = data?.error || data?.body || '';
 
+        if (data?.status === 429 || message.toLowerCase().includes('too many')) {
+            return 'You are sending messages too quickly. Please wait before trying again.';
+        }
+
         if (
             data?.status === 503 ||
             message.toLowerCase().includes('high demand') ||
@@ -247,23 +563,36 @@
     function runSystemCommand(message) {
         const command = message.trim().toLowerCase();
 
-        if (command === '/book') {
-            window.location.href = '/book-appointment';
-            return true;
-        }
+        const roleRoutes = {
+            admin: {
+                '/patients': '/admin/patient-directory',
+                '/appointments': '/admin/appointments',
+                '/documents': '/admin/document-requests',
+                '/reports': '/admin/reports',
+                '/inventory': '/admin/inventory',
+                '/settings': '/admin/system-settings'
+            },
+            dentist: {
+                '/patients': '/dentist/patients',
+                '/appointments': '/dentist/appointments',
+                '/documents': '/dentist/document-requests',
+                '/reports': '/dentist/report',
+                '/inventory': '/dentist/inventory',
+                '/schedule': '/dentist/clinic-schedule',
+                '/walkin': '/dentist/walk-in'
+            },
+            patient: {
+                '/book': '/book-appointment',
+                '/records': '/record',
+                '/appointments': '/patient/appointments',
+                '/documents': '/document-requests'
+            }
+        };
 
-        if (command === '/records') {
-            window.location.href = '/record';
-            return true;
-        }
+        const routes = roleRoutes[currentUserRole] || {};
 
-        if (command === '/appointments') {
-            window.location.href = '/patient/appointments';
-            return true;
-        }
-
-        if (command === '/documents') {
-            window.location.href = '/document-requests';
+        if (routes[command]) {
+            window.location.href = routes[command];
             return true;
         }
 
@@ -297,11 +626,21 @@
 
         if (!message || sendBtn.disabled) return;
 
+        if (message.length > CHAT_MAX_CHARS || countWords(message) > CHAT_MAX_WORDS) {
+            addMessage('ai', `Please keep your message within ${CHAT_MAX_CHARS} characters or ${CHAT_MAX_WORDS} words.`);
+            return;
+        }
+
+        if (!canSendChatMessage()) {
+            return;
+        }
+
         addMessage('user', message, {
             status: 'Sent ✓'
         });
 
         input.value = '';
+        updateChatInputCounter();
         setLoading(true);
         runSystemCommand(message);
         await smartDelay();
@@ -338,6 +677,10 @@
             removeTyping();
 
             if (!response.ok) {
+                if (response.status === 429) {
+                    throw new Error(data?.error || 'You are sending messages too quickly. Please wait before trying again.');
+                }
+
                 throw new Error(cleanErrorMessage(data));
             }
 
@@ -348,7 +691,7 @@
             }
 
             addMessage('ai', reply);
-            handleSmartActions(data.reply || '');
+            handleSmartActions(data.reply || '', message);
 
         } catch (error) {
             removeTyping();
@@ -360,31 +703,62 @@
         }
     }
 
-    function handleSmartActions(reply) {
-        if (isLoginPage) {
+    function handleSmartActions(reply, originalMessage = '') {
+        if (isLoginPage) return;
+
+        const replyText = (reply || '').toLowerCase();
+        const userText = (originalMessage || '').toLowerCase();
+
+        const unclearWords = [
+            'unclear',
+            'please specify',
+            'specify what you need',
+            'request is unclear',
+            'i am not sure',
+            "i'm not sure"
+        ];
+
+        if (unclearWords.some(word => replyText.includes(word))) {
             return;
         }
 
-        const text = reply.toLowerCase();
+        const actionMap = {
+            admin: [
+                [['dashboard', 'admin dashboard'], 'Go to Dashboard', '/admin/dashboard'],
+                [['patient directory', 'patients page', 'manage patients', 'search patients'], 'Go to Patients', '/admin/patient-directory'],
+                [['appointment', 'appointments', 'reschedule', 'cancel appointment'], 'Go to Appointments', '/admin/appointments'],
+                [['document request', 'document requests', 'approve request', 'reject request'], 'Go to Document Requests', '/admin/document-requests'],
+                [['report', 'reports', 'analytics'], 'Go to Reports', '/admin/reports'],
+                [['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/admin/inventory'],
+                [['setting', 'settings', 'system settings'], 'Go to System Settings', '/admin/system-settings']
+            ],
+            dentist: [
+                [['patient profile', 'patient profiles', 'manage patients'], 'Go to Patients', '/dentist/patients'],
+                [['appointment', 'appointments', 'follow-up', 'consultation'], 'Go to Appointments', '/dentist/appointments'],
+                [['odontogram'], 'Go to Patients', '/dentist/patients'],
+                [['walk-in', 'walk in'], 'Go to Walk-in', '/dentist/walk-in'],
+                [['document request', 'document requests'], 'Go to Document Requests', '/dentist/document-requests'],
+                [['report', 'reports'], 'Go to Reports', '/dentist/report'],
+                [['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/dentist/inventory'],
+                [['schedule', 'clinic schedule'], 'Go to Clinic Schedule', '/dentist/clinic-schedule']
+            ],
+            patient: [
+                [['appointment', 'appointments'], 'Go to Appointments', '/patient/appointments'],
+                [['book', 'booking', 'available date'], 'Book Appointment', '/book-appointment'],
+                [['record', 'records', 'dental record', 'odontogram'], 'Go to Dental Records', '/record'],
+                [['document', 'clearance', 'document request'], 'Go to Document Requests', '/document-requests'],
+                [['schedule', 'available'], 'Check Available Dates', '/book-appointment']
+            ]
+        };
 
-        if (text.includes('appointment') || text.includes('book')) {
-            addActionButton('Go to Appointments', '/patient/appointments');
-            scrollToFeature('#appointments, .appointments, [data-section="appointments"]');
-        }
+        const actions = actionMap[currentUserRole] || [];
 
-        if (text.includes('records') || text.includes('dental record')) {
-            addActionButton('Go to Dental Records', '/record');
-            scrollToFeature('#records, .records, [data-section="records"]');
-        }
+        const matched = actions.find(([keywords]) => {
+            return keywords.some(keyword => userText.includes(keyword));
+        });
 
-        if (text.includes('schedule') || text.includes('available')) {
-            addActionButton('Check Available Dates', '/book-appointment');
-            scrollToFeature('#calendar, .calendar, [data-section="calendar"]');
-        }
-
-        if (text.includes('document')) {
-            addActionButton('Go to Document Requests', '/document-requests');
-            scrollToFeature('#documents, .documents, [data-section="documents"]');
+        if (matched) {
+            addActionButton(matched[1], matched[2]);
         }
     }
 
@@ -392,7 +766,7 @@
     let chatCurrentY = 0;
     let isDraggingChat = false;
 
-    chatWindow.addEventListener('touchstart', function(e) {
+    chatWindow.addEventListener('touchstart', function (e) {
         if (!window.matchMedia('(max-width: 640px)').matches) return;
 
         chatStartY = e.touches[0].clientY;
@@ -403,7 +777,7 @@
         passive: true
     });
 
-    chatWindow.addEventListener('touchmove', function(e) {
+    chatWindow.addEventListener('touchmove', function (e) {
         if (!isDraggingChat) return;
 
         chatCurrentY = e.touches[0].clientY;
@@ -414,7 +788,7 @@
         passive: true
     });
 
-    chatWindow.addEventListener('touchend', function() {
+    chatWindow.addEventListener('touchend', function () {
         if (!isDraggingChat) return;
 
         const diff = Math.max(0, chatCurrentY - chatStartY);
@@ -429,49 +803,113 @@
         isDraggingChat = false;
     });
 
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             sendMessage();
         }
     });
 
-    const pageChips = {
-        '/login': [
-            ['Log in', 'How do I log in to the clinic system?'],
-            ['SSO', 'How do I use the SSO login option?'],
-            ['Help', 'What can I do on this login page?']
-        ],
-        '/homepage': [
-            ['Book', 'How do I book an appointment from the patient dashboard?'],
-            ['Schedule', 'Where can I check available appointment dates and clinic schedule?'],
-            ['Records', 'How can I open my dental records from the dashboard?']
-        ],
-        '/patient/appointments': [
-            ['Available', 'How can I check available dates for booking an appointment?'],
-            ['Reschedule', 'How can I reschedule my existing appointment?'],
-            ['Cancel', 'How can I cancel my appointment in the system?']
-        ],
-        '/record': [
-            ['Records', 'What information can I see on the Dental Records page?'],
-            ['Odontogram', 'Where can I view my odontogram in the Dental Records page?'],
-            ['Treatment', 'Where can I see my treatment history and diagnosis?']
-        ],
-        '/document-requests': [
-            ['Clearance', 'How can I request a dental clearance document?'],
-            ['Health Record', 'How can I request my dental health record?'],
-            ['Status', 'Where can I check the status of my document request?']
-        ]
+    const rolePageChips = {
+        admin: {
+            default: [
+                ['Patients', 'How can I manage patients in the admin dashboard?'],
+                ['Appointments', 'How can I view and manage clinic appointments as admin?'],
+                ['Reports', 'Where can I view reports and analytics?']
+            ],
+            '/admin/dashboard': [
+                ['Dashboard', 'What can I see on the admin dashboard?'],
+                ['Inventory', 'How can I check inventory overview as admin?'],
+                ['Reports', 'Where can I view clinic reports?']
+            ],
+            '/admin/patient-directory': [
+                ['Patients', 'How can I search and manage patients?'],
+                ['Records', 'How can I view patient dental records?'],
+                ['Profile', 'How can I open a patient profile?']
+            ],
+            '/admin/appointments': [
+                ['Appointments', 'How can I manage appointments as admin?'],
+                ['Reschedule', 'How can I reschedule an appointment?'],
+                ['Cancel', 'How can I cancel an appointment?']
+            ],
+            '/admin/document-requests': [
+                ['Requests', 'How can I review document requests?'],
+                ['Approve', 'How can I approve a document request?'],
+                ['Reject', 'How can I reject a document request?']
+            ]
+        },
+        dentist: {
+            default: [
+                ['Today', 'How can I check today’s appointments?'],
+                ['Patients', 'How can I open a patient profile?'],
+                ['Odontogram', 'How can I start or view a patient odontogram?']
+            ],
+            '/dentist/dashboard': [
+                ['Today', 'How can I check today’s appointments?'],
+                ['Calendar', 'How can I view scheduled appointments?'],
+                ['Reports', 'Where can I view dentist reports?']
+            ],
+            '/dentist/appointments': [
+                ['Appointments', 'How can I manage appointments as dentist?'],
+                ['Start', 'How can I start an appointment?'],
+                ['Follow-up', 'How can I set a follow-up appointment?']
+            ],
+            '/dentist/patients': [
+                ['Patients', 'How can I view patient profiles?'],
+                ['Records', 'How can I review patient dental records?'],
+                ['Odontogram', 'How can I open a patient odontogram?']
+            ],
+            '/dentist/walk-in': [
+                ['Walk-in', 'How can I add a walk-in patient?'],
+                ['Search', 'How can I search an existing patient for walk-in?'],
+                ['Start', 'How can I start a walk-in consultation?']
+            ]
+        },
+        patient: {
+            default: [
+                ['Book', 'How do I book an appointment from the patient dashboard?'],
+                ['Records', 'How can I open my dental records from the dashboard?'],
+                ['Documents', 'Where can I request a dental clearance document?']
+            ],
+            '/homepage': [
+                ['Book', 'How do I book an appointment from the patient dashboard?'],
+                ['Schedule', 'Where can I check available appointment dates and clinic schedule?'],
+                ['Records', 'How can I open my dental records from the dashboard?']
+            ],
+            '/patient/appointments': [
+                ['Available', 'How can I check available dates for booking an appointment?'],
+                ['Reschedule', 'How can I reschedule my existing appointment?'],
+                ['Cancel', 'How can I cancel my appointment in the system?']
+            ],
+            '/record': [
+                ['Records', 'What information can I see on the Dental Records page?'],
+                ['Odontogram', 'Where can I view my odontogram in the Dental Records page?'],
+                ['Treatment', 'Where can I see my treatment history and diagnosis?']
+            ],
+            '/document-requests': [
+                ['Clearance', 'How can I request a dental clearance document?'],
+                ['Health Record', 'How can I request my dental health record?'],
+                ['Status', 'Where can I check the status of my document request?']
+            ]
+        },
+        guest: {
+            default: [
+                ['Log in', 'How do I log in to the clinic system?'],
+                ['SSO', 'How do I use the SSO login option?'],
+                ['Help', 'What can I do on this login page?']
+            ]
+        }
     };
 
     function renderDynamicChips() {
         const chipWrap = document.querySelector('.chatbot-quick-chips');
         if (!chipWrap) return;
 
-        const chips = pageChips[window.location.pathname] || pageChips[isLoginPage ? '/login' : '/homepage'];
+        const roleChips = rolePageChips[currentUserRole] || rolePageChips.guest;
+        const chips = roleChips[window.location.pathname] || roleChips.default;
 
         chipWrap.innerHTML = chips.map(([label, message]) => `
-        <button type="button" class="chatbot-chip" onclick="sendQuickMessage('${message}')">
+        <button type="button" class="chatbot-chip" onclick="sendQuickMessage('${message.replace(/'/g, "\\'")}')">
             ${label}
         </button>
     `).join('');
@@ -502,7 +940,7 @@
         scrollChat();
     }
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const target = e.target.closest('.chatbot-chip, .chatbot-send, .chat-action-btn');
         if (!target) return;
 
@@ -522,7 +960,7 @@
     });
 
     function closeAccessibilityWidget() {
-        const widget = document.querySelector('.asw-menu'); // actual panel
+        const widget = document.querySelector('.asw-menu');
 
         if (widget && widget.classList.contains('active')) {
             const btn = document.querySelector('.asw-menu-btn');
@@ -530,7 +968,7 @@
         }
     }
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const isAccessibilityBtn =
             e.target.closest('.asw-menu-btn') ||
             e.target.closest('[aria-label="Accessibility"]');
@@ -539,4 +977,59 @@
             chatWindow.classList.remove('show');
         }
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        restoreChatMessages();
+
+        if (localStorage.getItem(assistiveOpenStorageKey) === '1') {
+            const group = document.getElementById('assistiveFabGroup');
+            const menu = document.getElementById('assistiveMiniMenu');
+            const mainBtn = document.getElementById('assistiveMainFab');
+
+            group?.classList.add('open');
+            menu?.setAttribute('aria-hidden', 'false');
+            mainBtn?.setAttribute('aria-expanded', 'true');
+        }
+
+        if (localStorage.getItem(chatOpenStorageKey) === '1') {
+            chatWindow.classList.add('show');
+
+            const isMobile = window.matchMedia('(max-width: 640px)').matches;
+            document.body.classList.toggle('chatbot-open-mobile', isMobile);
+        }
+
+        document.querySelectorAll('form[action*="logout"], a[href*="logout"], button[data-logout]').forEach(item => {
+            item.addEventListener('click', clearAssistiveStorageOnLogout);
+            item.addEventListener('submit', clearAssistiveStorageOnLogout);
+        });
+    });
+
+    function clearAssistiveStorageOnLogout() {
+        Object.keys(localStorage).forEach(key => {
+            if (
+                key.startsWith('puptdms_chatbot_') ||
+                key.startsWith('puptdms_assistive_') ||
+                key.toLowerCase().includes('sienna') ||
+                key.toLowerCase().includes('asw') ||
+                key.toLowerCase().includes('accessibility')
+            ) {
+                localStorage.removeItem(key);
+            }
+        });
+    }
+
+    function clearOldChatbotStorageKeys() {
+        Object.keys(localStorage).forEach(key => {
+            const isOldChatKey =
+                key === `puptdms_chatbot_messages_${currentUserId}` ||
+                key === `puptdms_chatbot_open_${currentUserId}` ||
+                key === `puptdms_assistive_menu_open_${currentUserId}`;
+
+            if (isOldChatKey) {
+                localStorage.removeItem(key);
+            }
+        });
+    }
+
+    clearOldChatbotStorageKeys();
 </script>
