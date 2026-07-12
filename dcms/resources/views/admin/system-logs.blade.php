@@ -10,7 +10,7 @@ $perPage = $perPage ?? 10;
 @endphp
 
 <main id="mainContent" class="admin-page-shell system-logs-page page-enter mode-list">
-    <div class="w-full system-logs-shell">
+    <div class="w-full">
 
         <div class="page-banner rounded-2xl mb-6">
             <div class="page-banner-inner">
@@ -567,7 +567,7 @@ $perPage = $perPage ?? 10;
         role: @json($role ?? 'all'),
         search: @json($search ?? ''),
         perPage: {{ (int)($perPage ?? 10) }},
-    page: { { (int) request('page', 1) } },
+    page: @json((int) request('page', 1)),
     sort: @json($sort ?? 'desc'),
     dateFrom: @json($dateFrom ?? ''),
     dateTo: @json($dateTo ?? ''),
@@ -1349,7 +1349,7 @@ $perPage = $perPage ?? 10;
         var params = new URLSearchParams({
             role: slState.role || 'all',
             search: slState.search || '',
-            per_page: slState.perPage || 20,
+            per_page: slState.perPage || 10,
             page: slState.page || 1,
             sort: slState.sort || 'desc',
             date_from: slState.dateFrom || '',

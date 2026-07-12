@@ -18,13 +18,13 @@ class UserManagementController extends Controller
     public function index(Request $request)
     {
         $roles = Role::withCount('users')->orderBy('name')->get();
-        $roleCounts = $roles->mapWithKeys(fn ($role) => [$role->slug => $role->users_count]);
+        $roleCounts = $roles->mapWithKeys(fn($role) => [$role->slug => $role->users_count]);
 
         $search = trim((string) $request->get('search', ''));
         $roleFilter = trim((string) $request->get('role', ''));
         $statusFilter = trim((string) $request->get('status', ''));
         $perPage = (int) $request->get('per_page', 10);
-        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
 
         $query = User::with(['role', 'patient']);
 
@@ -219,7 +219,7 @@ class UserManagementController extends Controller
                     'birthdate' => $request->birthdate ?? ($patient->birthdate ?? now()->toDateString()),
                     'gender' => $request->gender ?? ($patient->gender ?? 'Male'),
                     'password' => $user->password ?? $patient->password ?? Hash::make(\Str::random(16)),
-                
+
                 ]);
 
                 $patient->user_id = $user->id;

@@ -3,7 +3,7 @@
 @section('title', 'Faculty Integration | PUP Taguig Dental Clinic')
 
 @section('content')
-<main id="mainContent" class="admin-page-shell faculty-page page-enter">
+<main id="mainContent" class="admin-page-shell page-enter">
     <div class="w-full">
         <div class="page-banner faculty-banner"
             style="display:flex!important; align-items:center!important;

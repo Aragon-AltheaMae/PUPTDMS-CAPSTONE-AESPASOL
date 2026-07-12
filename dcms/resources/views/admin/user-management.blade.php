@@ -382,25 +382,26 @@ $inactiveCount = $inactiveCount ?? 0;
                     </div>
                 </div>
 
-                <div class="pagebar um-pagebar">
+                <div class="sl-pagebar um-pagebar">
                     <div class="flex items-center gap-3 flex-wrap">
-                        <p class="pagebar-info um-pagebar-info">
+                        <span class="sl-pagebar-info um-pagebar-info">
                             Showing
                             <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0
                                 }}</strong>
                             of <strong>{{ $users->total() }}</strong> users
-                        </p>
+                        </span>
 
-                        <div class="global-page-size-control um-page-size-control">
+                        <div class="sl-page-size-control global-page-size-control um-page-size-control">
                             <label for="umPerPageSelect">Show</label>
 
                             <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#umPerPageSelect">
+                                data-page-size-input="#umPerPageSelect" data-page-size-callback="umSelectPerPage">
                                 <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
                                     aria-hidden="true">
                                     @foreach ([10, 20, 50, 100] as $size)
                                     <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
-                                        {{ $size }}</option>
+                                        {{ $size }}
+                                    </option>
                                     @endforeach
                                 </select>
 
@@ -427,7 +428,8 @@ $inactiveCount = $inactiveCount ?? 0;
                         </div>
                     </div>
 
-                    <div class="um-pagination-wrap flex items-center gap-1.5"></div>
+                    <div class="sl-pagination-wrap um-pagination-wrap">
+                    </div>
                 </div>
             </div>
         </div>
@@ -1935,40 +1937,45 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function umBuildPagination(p) {
-        if (p.last_page <= 1) return '';
+        if (!p || Number(p.last_page || 1) <= 1) return '';
 
-        var current = p.current_page;
-        var last = p.last_page;
-        var windowSize = 5;
-        var half = Math.floor(windowSize / 2);
+        var current = Number(p.current_page || 1);
+        var last = Number(p.last_page || 1);
+        var winSize = 5;
+        var half = Math.floor(winSize / 2);
+
         var start = Math.max(1, current - half);
-        var end = Math.min(last, start + windowSize - 1);
+        var end = Math.min(last, start + winSize - 1);
 
-        if (end - start + 1 < windowSize) {
-            start = Math.max(1, end - windowSize + 1);
+        if (end - start + 1 < winSize) {
+            start = Math.max(1, end - winSize + 1);
         }
 
-        var html = '<nav aria-label="User pagination">';
+        var html = '<nav class="sl-pagination" aria-label="User pagination">';
 
-        if (current <= 1) {
-            html += '<button type="button" class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>';
-        } else {
-            html += '<button type="button" class="page-btn" onclick="umGoPage(' + (current - 1) + ')"><i class="fa-solid fa-chevron-left"></i></button>';
+        html += current <= 1
+            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
+            : '<button type="button" onclick="umGoPage(' + (current - 1) + ')" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>';
+
+        if (start > 1) {
+            html += '<button type="button" onclick="umGoPage(1)" class="sl-page-btn">1</button>';
+            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
         }
 
         for (var i = start; i <= end; i++) {
-            if (i === current) {
-                html += '<span class="page-btn active" aria-current="page">' + i + '</span>';
-            } else {
-                html += '<button type="button" class="page-btn" onclick="umGoPage(' + i + ')">' + i + '</button>';
-            }
+            html += i === current
+                ? '<span class="sl-page-current" aria-current="page">' + i + '</span>'
+                : '<button type="button" onclick="umGoPage(' + i + ')" class="sl-page-btn">' + i + '</button>';
         }
 
-        if (current >= last) {
-            html += '<button type="button" class="page-btn" disabled><i class="fa-solid fa-chevron-right"></i></button>';
-        } else {
-            html += '<button type="button" class="page-btn" onclick="umGoPage(' + (current + 1) + ')"><i class="fa-solid fa-chevron-right"></i></button>';
+        if (end < last) {
+            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += '<button type="button" onclick="umGoPage(' + last + ')" class="sl-page-btn">' + last + '</button>';
         }
+
+        html += current >= last
+            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
+            : '<button type="button" onclick="umGoPage(' + (current + 1) + ')" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>';
 
         html += '</nav>';
 
