@@ -1,10 +1,6 @@
 @php
 use Illuminate\Support\Facades\Route;
-$sidebarRole = $role ?? (
-request()->is('admin*') ? 'admin' : (
-request()->is('dentist*') ? 'dentist' : 'patient'
-)
-);
+$sidebarRole = $role ?? (request()->is('admin*') ? 'admin' : (request()->is('dentist*') ? 'dentist' : 'patient'));
 
 $authUser = auth()->user();
 
@@ -18,7 +14,9 @@ default => ucwords(str_replace('_', ' ', $sidebarRole)),
 
 $drawerAvatarUrl = !empty($authUser?->profile_image)
 ? asset('storage/' . $authUser->profile_image)
-: 'https://ui-avatars.com/api/?name=' . urlencode($drawerDisplayName) . '&background=8B0000&color=ffffff&bold=true';
+: 'https://ui-avatars.com/api/?name=' .
+urlencode($drawerDisplayName) .
+'&background=8B0000&color=ffffff&bold=true';
 
 $sidebarGroups = [
 'admin' => [
@@ -367,15 +365,15 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
     <div class="sidebar-bottom">
         <div class="sidebar-theme-block mb-2">
             <div class="theme-toggle-container sidebar-theme-expanded">
-                <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+                <button type="button" class="theme-option active" data-theme-choice="light" aria-label="Light mode">
                     <i class="fa-solid fa-sun"></i>
                 </button>
 
-                <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+                <button type="button" class="theme-option" data-theme-choice="dark" aria-label="Dark mode">
                     <i class="fa-regular fa-moon"></i>
                 </button>
 
-                <div class="theme-indicator" aria-hidden="true"></div>
+                <div class="theme-indicator"></div>
             </div>
 
             <div class="sidebar-theme-collapsed" data-sidebar-theme-dropdown>
@@ -386,12 +384,12 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
                 </button>
 
                 <div class="sidebar-theme-popover">
-                    <button type="button" class="sidebar-theme-popover-option theme-option active" data-theme="light">
+                    <button type="button" class="sidebar-theme-popover-option theme-option active" data-theme-choice="light">
                         <i class="fa-solid fa-sun"></i>
                         <span>Light</span>
                     </button>
 
-                    <button type="button" class="sidebar-theme-popover-option theme-option" data-theme="dark">
+                    <button type="button" class="sidebar-theme-popover-option theme-option" data-theme-choice="dark">
                         <i class="fa-regular fa-moon"></i>
                         <span>Dark</span>
                     </button>
@@ -470,11 +468,11 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
 
     <div class="drawer-bottom">
         <div class="theme-toggle-container mb-2">
-            <button type="button" class="theme-option active" data-theme="light" aria-label="Light mode">
+            <button type="button" class="theme-option active" data-theme-choice="light" aria-label="Light mode">
                 <i class="fa-solid fa-sun"></i>
             </button>
 
-            <button type="button" class="theme-option" data-theme="dark" aria-label="Dark mode">
+            <button type="button" class="theme-option" data-theme-choice="dark" aria-label="Dark mode">
                 <i class="fa-regular fa-moon"></i>
             </button>
 

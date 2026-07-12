@@ -1,17 +1,6 @@
 .admin-page-shell {
-    padding: 90px 0.75rem 1.25rem !important;
-    min-height: 100dvh !important;
-    flex: 1 1 auto !important;
-    background: #F9FAFB !important;
-    color: #111827 !important;
-    overflow-x: hidden !important;
-    margin-top: 1rem;
-}
-
-.admin-page-container {
-    width: 100%;
-    max-width: none !important;
-    margin: 0 !important;
+    padding: 80px 0.75rem 1.25rem !important;
+    margin-top: 1rem !important;
 }
 
 .admin-page-body {

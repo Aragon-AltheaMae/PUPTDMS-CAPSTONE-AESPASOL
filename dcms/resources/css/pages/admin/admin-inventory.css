@@ -381,34 +381,6 @@
     overflow: visible !important;
 }
 
-#mainContent.inventory-page .action-btn {
-    --action-bg: #F3F4F6;
-    --action-color: #4B5563;
-    --action-hover-bg: var(--action-bg);
-    --action-hover-color: var(--action-color);
-    --action-tooltip-bg: var(--action-color);
-
-    position: relative !important;
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease,
-        color .18s ease,
-        filter .18s ease !important;
-    isolation: isolate !important;
-}
-
 #mainContent.inventory-page .action-btn:hover,
 #mainContent.inventory-page .action-btn:focus-visible {
     background: var(--action-hover-bg) !important;
