@@ -554,14 +554,6 @@ body.filter-lock .asw-widget {
 }
 
 @media (max-width: 640px) {
-    .asw-menu {
-        right: calc(var(--float-right-final) + 58px) !important;
-        bottom: var(--accessibility-bottom-final) !important;
-        width: min(300px, calc(100vw - 86px)) !important;
-        max-height: 58dvh !important;
-        border-radius: 20px !important;
-    }
-
     .asw-menu-content {
         padding: 8px !important;
     }
@@ -601,7 +593,7 @@ body.filter-lock .asw-widget {
     .asw-container,
     .asw-widget {
         right: 18px !important;
-        bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+        bottom: var(--accessibility-bottom-final, 24px) !important;
         width: 48px !important;
         height: 48px !important;
     }
@@ -613,6 +605,39 @@ body.filter-lock .asw-widget {
         bottom: 0 !important;
         width: 48px !important;
         height: 48px !important;
-        transform: none !important;
     }
+
+    body.role-patient .asw-menu {
+        right: 12px !important;
+        bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+        width: min(330px, calc(100vw - 24px)) !important;
+        max-width: calc(100vw - 24px) !important;
+        max-height: 58dvh !important;
+        border-radius: 20px !important;
+    }
+
+    body.role-admin .asw-menu,
+    body.role-dentist .asw-menu,
+    body:not(.role-patient) .asw-menu {
+        right: 12px !important;
+        bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+        width: min(330px, calc(100vw - 24px)) !important;
+        max-width: calc(100vw - 24px) !important;
+        max-height: 72dvh !important;
+        border-radius: 20px !important;
+    }
+}
+
+.asw-menu-btn {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: visible !important;
+    transform: scale(0.01) !important;
+}
+
+.asw-menu {
+    pointer-events: auto !important;
+    right: calc(var(--float-right-final, 22px) + 64px) !important;
+    bottom: var(--accessibility-bottom-final, 24px) !important;
+    z-index: 99999 !important;
 }

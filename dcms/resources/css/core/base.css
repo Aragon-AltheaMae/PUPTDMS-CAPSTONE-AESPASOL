@@ -106,21 +106,3 @@ body {
 [data-theme="dark"] .bg-white {
     background-color: #101111 !important;
 }
-
-[data-theme="dark"] .theme-toggle-container {
-    background: #1F1F1F;
-    border-color: #2A2A2A;
-}
-
-[data-theme="dark"] .theme-option {
-    color: #6B7280;
-}
-
-[data-theme="dark"] .theme-option.active {
-    color: #F3F4F6;
-}
-
-[data-theme="dark"] .theme-indicator {
-    background: #2A2A2A;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-}

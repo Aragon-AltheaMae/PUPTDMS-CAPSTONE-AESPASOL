@@ -5,16 +5,36 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Patient;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ChatbotController extends Controller
 {
     public function chat(Request $request)
     {
         $request->validate([
-            'message' => 'required|string|max:1000',
+            'message' => 'required|string|max:300',
         ]);
+
+        $wordCount = str_word_count(strip_tags($request->message));
+
+        if ($wordCount > 60) {
+            return response()->json([
+                'error' => 'Message is too long. Please keep it within 60 words.',
+            ], 422);
+        }
+
+        $rateKey = 'chatbot:' . ($request->user()?->id ?? $request->ip());
+
+        if (RateLimiter::tooManyAttempts($rateKey, 12)) {
+            return response()->json([
+                'error' => 'Too many chatbot messages. Please wait before trying again.',
+            ], 429);
+        }
+
+        RateLimiter::hit($rateKey, 60);
 
         $apiKey = config('services.chatbot.api_key');
 
@@ -30,30 +50,84 @@ class ChatbotController extends Controller
         Log::info('Chatbot question', [
             'message' => $request->message,
             'context' => $request->context,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
         ]);
 
         $context = (string) $request->context;
         $isLoginPage = str_contains($context, '/login');
 
-        $patient = Patient::with(['appointments', 'teeth', 'dentalHistory'])
-            ->where('user_id', auth()->id())
-            ->first();
+        $user = Auth::user();
+        $role = session('impersonated_role') ?? optional($user?->role)->slug ?? 'guest';
+
+        $patient = null;
+
+        if ($role === 'patient') {
+            $patient = Patient::with(['appointments', 'teeth', 'dentalHistory'])
+                ->where('user_id', Auth::id())
+                ->first();
+        }
 
         $appointment = $patient?->appointments?->sortByDesc('created_at')->first();
         $record = $patient?->dentalHistory;
 
-        $patientContext = "
-Patient Information:
-    - Name: " . ($patient?->name ?? optional(auth()->user())->name ?? 'Unknown') . "
-- Latest Appointment Date: " . ($appointment->appointment_date ?? 'None') . "
-- Latest Appointment Time: " . ($appointment->appointment_time ?? 'None') . "
-- Latest Appointment Status: " . ($appointment->status ?? 'None') . "
-- Last Treatment: " . ($record->treatment ?? 'None') . "
-- Last Diagnosis: " . ($record->diagnosis ?? 'None') . "
-";
+        $roleContext = match ($role) {
+            'admin' => "
+    User Role: Admin
+    Allowed help topics:
+    - Admin dashboard and analytics
+    - Patient directory and patient records
+    - Appointment management, reschedule, cancellation, and viewing schedules
+    - Document request approval/rejection
+    - Reports, inventory, clinic schedule, system settings, user management, roles and permissions
 
-        $localReply = $this->getLocalSystemReply($request->message, $context, $patient, $isLoginPage);
+    Important:
+    - Admins do not book appointments for themselves.
+    - If asked how to book as a patient, explain that booking is a patient feature.
+    ",
+
+            'dentist' => "
+    User Role: Dentist
+    Allowed help topics:
+    - Dentist dashboard and today's appointments
+    - Patient profiles and dental records
+    - Odontogram and treatment records
+    - Walk-in patients
+    - Appointment management and follow-ups
+    - Clinic schedule, document requests, reports, and inventory
+
+    Important:
+    - Dentists manage appointments and patient records.
+    - Dentists do not book personal patient appointments from the patient dashboard.
+    ",
+
+            'patient' => "
+    User Role: Patient
+    Patient Information:
+    - Name: " . ($patient?->name ?? optional($user)->name ?? 'Unknown') . "
+    - Latest Appointment Date: " . ($appointment->appointment_date ?? 'None') . "
+    - Latest Appointment Time: " . ($appointment->appointment_time ?? 'None') . "
+    - Latest Appointment Status: " . ($appointment->status ?? 'None') . "
+    - Last Treatment: " . ($record->treatment ?? 'None') . "
+    - Last Diagnosis: " . ($record->diagnosis ?? 'None') . "
+
+    Allowed help topics:
+    - Booking appointments
+    - Own appointments
+    - Own dental records and odontogram
+    - Document requests
+    - Clinic schedule and available dates
+    ",
+
+            default => "
+    User Role: Guest/Login
+    Allowed help topics:
+    - Login help
+    - SSO/login buttons
+    - What users can do after login
+    ",
+        };
+
+        $localReply = $this->getLocalSystemReply($request->message, $context, $patient, $isLoginPage, $role);
 
         if ($localReply) {
             return response()->json([
@@ -63,9 +137,51 @@ Patient Information:
 
         try {
             $models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
+            $currentContext = $context ?: 'unknown';
+            $userMessage = $request->message;
 
             foreach ($models as $model) {
                 $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+                $prompt = <<<PROMPT
+You are the official AI assistant of the PUP Taguig Dental Clinic Management System.
+
+{$roleContext}
+
+Current page/context: {$currentContext}
+
+System route guide:
+Admin:
+- /admin/dashboard = admin dashboard
+- /admin/patient-directory = patient directory
+- /admin/appointments = appointment management
+- /admin/document-requests = document request management
+- /admin/reports = reports
+- /admin/inventory = inventory
+- /admin/system-settings = system settings
+
+Dentist:
+- /dentist/dashboard = dentist dashboard
+- /dentist/appointments = appointment management
+- /dentist/patients = patient profiles
+- /dentist/walk-in = walk-in patients
+- /dentist/clinic-schedule = clinic schedule
+- /dentist/document-requests = document requests
+- /dentist/report = reports
+- /dentist/inventory = inventory
+
+Patient:
+- /homepage = patient dashboard
+- /patient/appointments = own appointments
+- /book-appointment = booking page / available dates
+- /record = own dental records
+- /document-requests = own document requests
+
+Answer only based on the user's role. Do not tell admins/dentists to use patient-only booking features unless explaining that it is a patient feature.
+Keep answers short but complete. Use 1 to 3 complete sentences. Do not cut off mid-sentence.
+
+User message: {$userMessage}
+PROMPT;
 
                 $response = Http::withoutVerifying()
                     ->timeout(20)
@@ -78,37 +194,14 @@ Patient Information:
                                 'role' => 'user',
                                 'parts' => [
                                     [
-                                        'text' => '
-You are the official AI assistant of the PUP Taguig Dental Clinic Management System.
-
-' . $patientContext . '
-
-Current page/context: ' . ($context ?: 'unknown') . '
-
-System route guide:
-- /login = login page for signing in and accessing the system
-- /homepage = patient dashboard
-- /patient/appointments = appointments page
-- /book-appointment = booking page / available dates
-- /record = dental records
-- /document-requests = document requests
-
-If the current page is /login, only answer questions about signing in, login help, login buttons, or what the login page does.
-Otherwise, only answer questions about appointments, booking, clinic schedule, dentist availability, document requests, odontogram, dental records, account navigation, and system features.
-
-If the user asks about their own appointment, record, treatment, or diagnosis, answer using Patient Information above.
-If the information is None, say that there is no available record yet.
-
-Keep answers short. Maximum 2 sentences.
-
-User message: ' . $request->message,
+                                        'text' => $prompt,
                                     ],
                                 ],
                             ],
                         ],
                         'generationConfig' => [
                             'temperature' => 0.2,
-                            'maxOutputTokens' => 120,
+                            'maxOutputTokens' => 220,
                         ],
                     ]);
 
@@ -149,7 +242,7 @@ User message: ' . $request->message,
             );
         }
     }
-    private function getLocalSystemReply(string $message, ?string $context = null, ?Patient $patient = null, bool $isLoginPage = false): ?string
+    private function getLocalSystemReply(string $message, ?string $context = null, ?Patient $patient = null, bool $isLoginPage = false, string $role = 'guest'): ?string
     {
         $text = strtolower($message);
 
@@ -174,9 +267,77 @@ User message: ' . $request->message,
         }
 
         if (str_contains($text, 'hello') || str_contains($text, 'hi')) {
-            $name = $patient?->name ?? auth()->user()->name ?? 'there';
+            $name = $patient?->name ?? optional(Auth::user())->name ?? 'there';
 
             return "Hello {$name}! How can I assist you today regarding appointments, dental records, or system features?";
+        }
+
+        if ($role === 'admin') {
+            if (strlen(trim($text)) < 4 || !preg_match('/[aeiou]/i', $text)) {
+                return 'I’m sorry, but your request is unclear. Please specify what admin feature you need help with, such as dashboard, appointments, patients, reports, inventory, or settings.';
+            }
+            if (str_contains($text, 'dashboard')) {
+                return 'On the Admin Dashboard, you can view clinic activity summaries, system logs, GAD analytics, inventory overview, and quick links to important admin modules.';
+            }
+            if (str_contains($text, 'book') || str_contains($text, 'booking')) {
+                return 'Admins do not book personal appointments. As admin, you can view, manage, reschedule, or cancel appointments from the Appointments page.';
+            }
+
+            if (str_contains($text, 'appointment') || str_contains($text, 'schedule')) {
+                return 'Go to Appointments to view, manage, reschedule, or cancel clinic appointments. You can also check Clinic Schedule for availability rules.';
+            }
+
+            if (str_contains($text, 'patient')) {
+                return 'Go to Patient Directory to search patients, view profiles, and access related dental records.';
+            }
+
+            if (str_contains($text, 'document') || str_contains($text, 'clearance')) {
+                return 'Go to Document Requests to review, approve, reject, or manage patient document requests.';
+            }
+
+            if (str_contains($text, 'report') || str_contains($text, 'analytics')) {
+                return 'Go to Reports to view clinic analytics, summaries, and generated reports.';
+            }
+
+            if (str_contains($text, 'inventory')) {
+                return 'Go to Inventory to monitor medicine and supply stock levels.';
+            }
+        }
+
+        if ($role === 'dentist') {
+            if (strlen(trim($text)) < 4 || !preg_match('/[aeiou]/i', $text)) {
+                return 'I’m sorry, but your request is unclear. Please specify what dentist feature you need help with, such as appointments, patients, odontogram, walk-in, reports, or inventory.';
+            }
+            if (str_contains($text, 'dashboard')) {
+                return 'On the Dentist Dashboard, you can view today’s appointments, monthly appointment summaries, calendar schedules, GAD analytics, and supply or medicine inventory overview.';
+            }
+            if (str_contains($text, 'book') || str_contains($text, 'booking')) {
+                return 'Dentists do not book appointments from the patient dashboard. As dentist, you can manage appointments, set follow-ups, and handle walk-in patients.';
+            }
+
+            if (str_contains($text, 'appointment') || str_contains($text, 'schedule')) {
+                return 'Go to Appointments to view today’s appointments, start consultations, reschedule, cancel, or set follow-ups.';
+            }
+
+            if (str_contains($text, 'patient')) {
+                return 'Go to Patients to search patient profiles, review records, and open dental information.';
+            }
+
+            if (str_contains($text, 'odontogram')) {
+                return 'Open the patient profile or appointment, then use the odontogram option to view or update dental charting.';
+            }
+
+            if (str_contains($text, 'walk')) {
+                return 'Go to Walk-in to search an existing patient or add a guest walk-in consultation.';
+            }
+
+            if (str_contains($text, 'report')) {
+                return 'Go to Reports to view and download dentist-side clinic reports.';
+            }
+        }
+
+        if ($role !== 'patient') {
+            return null;
         }
 
         $askingLastAppointment =
