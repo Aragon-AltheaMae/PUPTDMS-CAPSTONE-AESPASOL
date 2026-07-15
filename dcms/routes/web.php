@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
 use App\Http\Controllers\Auth\OIDCController;
+use App\Http\Controllers\Auth\BackupLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
@@ -105,9 +106,8 @@ Route::get('/', fn() => redirect('/login'));
 
 
 // Patient Login
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::view('/login', 'auth.login')->name('login');
+Route::get('/backup-login', [BackupLoginController::class, 'show'])->name('backup.login');
 
 // Patient Register
 Route::get('/register', function () {
@@ -185,42 +185,7 @@ Route::post('/register', function (Request $request) {
 
 // Single Login POST — handles patient, dentist, and admin
 // ── PATIENT ──
-Route::post('/login', function (Request $request) {
-    $patient = Patient::where('email', $request->email)->first();
-
-    if (!$patient) {
-        return back()->with('error', 'No account associated with this email.');
-    }
-
-    if (!Hash::check($request->password, $patient->password)) {
-        return back()->with('error', 'Incorrect password. Please try again.');
-    }
-
-    $user = User::where('email', $patient->email)->first();
-
-    if (!$user) {
-        return back()->with('error', 'No linked user account found for this patient.');
-    }
-
-    if (!$user->hasRole('patient')) {
-        return back()->with('error', 'This account is not allowed to log in as patient.');
-    }
-
-    Auth::login($user);
-
-    session([
-        'patient_id' => $patient->id,
-        'email' => $patient->email,
-    ]);
-
-    session()->save();
-
-    AuditLogger::log('login', 'authentication', 'Patient logged into the system');
-
-    return redirect()->route('patient.dashboard')
-        ->with('login_as', $patient->name)
-        ->with('show_terms_modal', true);
-});
+Route::post('/login', [BackupLoginController::class, 'store'])->name('login.store');
 
 
 // Logout (all roles)
