@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             DocumentTemplateFieldSeeder::class,
             DefaultDocumentTemplateSeeder::class,
             ToothLegendsSeeder::class,
+            AdminLocalAccountSeeder::class,
         ]);
     }
 }

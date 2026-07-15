@@ -142,6 +142,7 @@
 <body>
     <div class="auth-container">
         @yield('content')
+        @include('partials.global-toast')
         @include('partials.voice-logic')
         @include('partials.chatbot')
 
@@ -158,30 +159,31 @@
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
 
-        function updateThemeIcon() {
-            const isDark = html.getAttribute('data-theme') === 'dark';
-            themeIcon.classList = isDark ? 'fas fa-sun' : 'fas fa-moon';
-        }
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-            html.setAttribute('data-theme', newTheme);
-            html.classList.toggle('dark', newTheme === 'dark');
-            localStorage.setItem('theme', newTheme);
-
-            if (newTheme === 'dark') {
-                html.style.backgroundColor = '#0F172A';
-            } else {
-                html.style.backgroundColor = '#F8F9FA';
+        if (themeToggle && themeIcon) {
+            function updateThemeIcon() {
+                const isDark = html.getAttribute('data-theme') === 'dark';
+                themeIcon.classList = isDark ? 'fas fa-sun' : 'fas fa-moon';
             }
 
-            updateThemeIcon();
-        });
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-        // Set initial icon
-        updateThemeIcon();
+                html.setAttribute('data-theme', newTheme);
+                html.classList.toggle('dark', newTheme === 'dark');
+                localStorage.setItem('theme', newTheme);
+
+                if (newTheme === 'dark') {
+                    html.style.backgroundColor = '#0F172A';
+                } else {
+                    html.style.backgroundColor = '#F8F9FA';
+                }
+
+                updateThemeIcon();
+            });
+
+            updateThemeIcon();
+        }
     </script>
 
     @yield('scripts')

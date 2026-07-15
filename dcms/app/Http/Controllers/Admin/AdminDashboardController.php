@@ -11,13 +11,16 @@ use Carbon\Carbon;
 use App\Models\AuditLog;
 use App\Helpers\AuditLogger;
 use App\Helpers\PhilippineHolidays;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        if (!session('admin_logged_in')) {
-            return redirect('/admin/login');
+        $user = Auth::user();
+
+        if (!$user || !in_array(optional($user->role)->slug, ['admin', 'super_admin'], true)) {
+            return redirect('/login');
         }
 
         AuditLogger::log(

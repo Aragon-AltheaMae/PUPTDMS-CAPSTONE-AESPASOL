@@ -15,6 +15,7 @@ class LogoutController extends Controller
     {
         $user = Auth::user();
         $idToken = (string) $request->session()->get('oidc_id_token', '');
+        $reason = $request->input('reason') === 'idle' ? 'idle' : 'manual';
 
         if (!$user) {
             if (session('admin_id')) {
@@ -27,7 +28,10 @@ class LogoutController extends Controller
         $idpLogoutUrl = config('services.oidc.logout_url');
         $idpLoginUrl = config('services.idp.login_url');
         $clientId = config('services.oidc.client_id');
-        $postLogoutRedirect = route('login', ['logged_out' => 1]);
+        $postLogoutRedirect = route('login', [
+            'logged_out' => 1,
+            'reason' => $reason,
+        ]);
 
         if ($user) {
             $user->access_token = null;
@@ -40,7 +44,9 @@ class LogoutController extends Controller
         AuditLogger::log(
             'logout',
             'authentication',
-            'User logged out of the system (global logout)'
+            $reason === 'idle'
+                ? 'User was logged out due to inactivity'
+                : 'User logged out of the system (global logout)'
         );
 
         Auth::guard('patient')->logout();
@@ -64,6 +70,7 @@ class LogoutController extends Controller
             'impersonator_role',
             'impersonator_admin_id',
             'impersonator_admin_email',
+            'last_activity_at',
         ]);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -79,12 +86,12 @@ class LogoutController extends Controller
 
             return view('auth.oidc-logout', [
                 'logoutTargets' => $logoutTargets,
-                'redirectUrl' => route('oidc.redirect', ['reauth' => 1]),
+                'redirectUrl' => $postLogoutRedirect,
                 'loginRedirectUrl' => $postLogoutRedirect,
             ]);
         }
 
-        return redirect()->route('login');
+        return redirect()->to($postLogoutRedirect);
     }
 
     protected function buildLogoutTargets(
