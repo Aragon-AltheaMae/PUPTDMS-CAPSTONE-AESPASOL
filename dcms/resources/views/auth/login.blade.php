@@ -383,6 +383,45 @@
       transform: translateX(3px);
     }
 
+    .btn-local {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+      border: 1px solid rgba(139, 0, 0, 0.12);
+      box-shadow: 0 12px 28px rgba(139, 0, 0, 0.16);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-local:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 18px 36px rgba(139, 0, 0, 0.22);
+    }
+
+    .btn-local-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-local:hover .btn-local-icon {
+      background: rgba(255, 255, 255, 0.26);
+      transform: translateX(3px);
+    }
+
     /* ─── MAIN CONTENT ─── */
     main {
       position: relative;
@@ -1370,6 +1409,19 @@
       .dentist-tags { gap: 8px; }
     }
 
+    @media (max-width: 640px) {
+      .hero-login-actions {
+        flex-direction: column;
+        width: min(100%, 340px);
+        margin: 0 auto;
+      }
+
+      .hero-login-actions a {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
     /* ─── DARK MODE SUPPORT ─── */
     html[data-theme="dark"] {
       --crimson: #8B0000;
@@ -1435,6 +1487,13 @@
       background: rgba(28, 33, 40, 0.92);
       border-color: rgba(139, 0, 0, 0.38);
       box-shadow: 0 12px 40px 0 rgba(139, 0, 0, 0.24);
+    }
+
+    html[data-theme="dark"] .btn-local {
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #8B0000, #C1121F);
+      border-color: rgba(139, 0, 0, 0.28);
+      box-shadow: 0 12px 36px rgba(139, 0, 0, 0.24);
     }
 
     html[data-theme="dark"] .hero-title {
@@ -1534,6 +1593,9 @@
     <a href="/auth/oidc/redirect" class="nav-cta-mob">
       <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;font-size:11px;"></i>Login with SSO
     </a>
+    <a href="{{ route('backup.login') }}" class="nav-cta-mob" style="margin-top:10px;">
+      <i class="fa-solid fa-key" style="margin-right:6px;font-size:11px;"></i>Login Locally
+    </a>
   </div>
 
   <section class="hero" id="home">
@@ -1563,12 +1625,20 @@
     </ul>
 
     <div id="login" class="reveal" style="animation-delay: 1.1s;">
-      <a href="/auth/oidc/redirect" class="btn-sso">
-        <div class="btn-sso-icon">
-          <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px;"></i>
-        </div>
-        Login with SSO
-      </a>
+      <div class="hero-login-actions">
+        <a href="/auth/oidc/redirect" class="btn-sso">
+          <div class="btn-sso-icon">
+            <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px;"></i>
+          </div>
+          Login with SSO
+        </a>
+        <a href="{{ route('backup.login') }}" class="btn-local">
+          <div class="btn-local-icon">
+            <i class="fa-solid fa-key" style="font-size:12px;"></i>
+          </div>
+          Login Locally
+        </a>
+      </div>
     </div>
     </div>
   </section>
@@ -1830,10 +1900,16 @@
         <h2 class="closing-heading">Mula Sayo,<br><em>Para Sa Bayan.</em></h2>
         <p class="closing-desc">Developed to manage appointments and records more effectively, supporting accessible and
           efficient dental care for the entire PUP Taguig community.</p>
-        <a href="/auth/oidc/redirect" class="btn-sso btn-sso-alt" style="margin:0 auto;">
-          <div class="btn-sso-icon"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:11px;"></i></div>
-          Login with SSO
-        </a>
+        <div class="hero-login-actions" style="margin-top:1.2rem;">
+          <a href="/auth/oidc/redirect" class="btn-sso btn-sso-alt" style="margin:0;">
+            <div class="btn-sso-icon"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:11px;"></i></div>
+            Login with SSO
+          </a>
+          <a href="{{ route('backup.login') }}" class="btn-local">
+            <div class="btn-local-icon"><i class="fa-solid fa-key" style="font-size:11px;"></i></div>
+            Login Locally
+          </a>
+        </div>
       </div>
     </div>
   </section>

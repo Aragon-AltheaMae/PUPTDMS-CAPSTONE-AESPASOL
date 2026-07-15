@@ -62,6 +62,7 @@
 
     @include('partials.global-toast')
     @include('partials.terms-modal')
+    @include('partials.inactivity-logout')
 
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="18,118" defer></script>

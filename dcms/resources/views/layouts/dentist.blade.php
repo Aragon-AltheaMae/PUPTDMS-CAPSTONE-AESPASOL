@@ -96,6 +96,7 @@
 
     {{-- GLOBAL TERMS MODAL --}}
     @include('partials.terms-modal')
+    @include('partials.inactivity-logout')
 
     @if (View::hasSection('usesAppointmentCalendar'))
         @include('components.appointment-calendar-script', [
