@@ -98,6 +98,7 @@
 
     {{-- GLOBAL TERMS MODAL --}}
     @include('partials.terms-modal')
+    @include('partials.inactivity-logout')
 
     @stack('scripts')
     @yield('scripts')

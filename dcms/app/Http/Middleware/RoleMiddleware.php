@@ -21,6 +21,10 @@ class RoleMiddleware
         // If admin is impersonating, use impersonated role first
         $userRole = session('impersonated_role') ?: optional($user->role)->slug;
 
+        if ($userRole === 'super_admin' && in_array('admin', $roles, true)) {
+            return $next($request);
+        }
+
         if (!$userRole || !in_array($userRole, $roles, true)) {
             abort(403, 'Unauthorized access.');
         }
