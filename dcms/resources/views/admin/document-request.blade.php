@@ -914,32 +914,32 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         for (let i = 0; i < 4; i++) {
             html += `
       <div class="req-row desktop-req-row border-b border-gray-100 hidden md:block">
-        <div class="req-inner" style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1.5fr 1fr 100px;align-items:center;gap:12px;">
-          <div style="display:flex;align-items:center;gap:.8rem;">
-            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;"></div>
-            <div><div class="skeleton" style="height:13px;width:110px;margin-bottom:6px;"></div><div class="skeleton" style="height:10px;width:70px;"></div></div>
+        <div class="req-inner docreq-skel-inner">
+          <div class="docreq-skel-user">
+            <div class="skeleton skel-avatar-round"></div>
+            <div><div class="skeleton skel-line-13-110"></div><div class="skeleton skel-line-10-70"></div></div>
           </div>
-          <div><div class="skeleton" style="height:13px;width:80px;margin-bottom:5px;"></div><div class="skeleton" style="height:10px;width:60px;"></div></div>
-          <div><div class="skeleton" style="height:13px;width:120px;"></div></div>
-          <div><div class="skeleton" style="height:13px;width:140px;"></div></div>
-          <div><div class="skeleton" style="height:20px;width:60px;border-radius:999px;"></div></div>
-          <div class="skeleton" style="height:28px;width:70px;border-radius:8px;"></div>
+          <div><div class="skeleton skel-line-13-80"></div><div class="skeleton skel-line-10-60"></div></div>
+          <div><div class="skeleton skel-line-13-120"></div></div>
+          <div><div class="skeleton skel-line-13-140"></div></div>
+          <div><div class="skeleton skel-pill-20-60"></div></div>
+          <div class="skeleton skel-btn-28-70"></div>
         </div>
       </div>
       
       <div class="mobile-req-card md:hidden bg-white border border-gray-200 rounded-xl p-4 mb-3 mx-2">
         <div class="mobile-card-inner">
-          <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.75rem;">
-            <div class="skeleton" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;"></div>
-            <div style="flex:1;">
-              <div class="skeleton" style="height:13px;width:130px;margin-bottom:5px;"></div>
-              <div class="skeleton" style="height:10px;width:80px;"></div>
+          <div class="docreq-skel-mobile-head">
+            <div class="skeleton skel-avatar-rounded"></div>
+            <div class="docreq-skel-mobile-body">
+              <div class="skeleton skel-line-13-130"></div>
+              <div class="skeleton skel-line-10-80"></div>
             </div>
-            <div class="skeleton" style="height:28px;width:60px;border-radius:9px;"></div>
+            <div class="skeleton skel-btn-28-60"></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;">
-            <div><div class="skeleton" style="height:9px;width:60px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:80px;"></div></div>
-            <div><div class="skeleton" style="height:9px;width:50px;margin-bottom:4px;"></div><div class="skeleton" style="height:12px;width:90px;"></div></div>
+          <div class="docreq-skel-mobile-grid">
+            <div><div class="skeleton skel-line-9-60"></div><div class="skeleton skel-line-12-80"></div></div>
+            <div><div class="skeleton skel-line-9-50"></div><div class="skeleton skel-line-12-90"></div></div>
           </div>
         </div>
       </div>`;
