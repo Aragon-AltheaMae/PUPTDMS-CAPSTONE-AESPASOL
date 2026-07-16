@@ -30,7 +30,7 @@ class ChatbotController extends Controller
 
         if (RateLimiter::tooManyAttempts($rateKey, 12)) {
             return response()->json([
-                'error' => 'Too many chatbot messages. Please wait before trying again.',
+                'error' => 'You have sent too many messages. Please wait a minute before trying again.',
             ], 429);
         }
 
