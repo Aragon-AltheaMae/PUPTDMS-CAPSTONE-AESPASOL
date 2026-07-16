@@ -37,6 +37,21 @@
         </button>
     </div>
 
+    <div id="chat-warning" class="chat-warning" role="alert" aria-live="polite">
+        <div class="chat-warning-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="chat-warning-content">
+            <strong id="chat-warning-title">Warning</strong>
+            <p id="chat-warning-message"></p>
+        </div>
+
+        <button type="button" class="chat-warning-close" onclick="hideChatWarning()" aria-label="Close warning">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
     <div class="chatbot-messages" id="chat-messages">
         <div class="chat-empty-state">
             <div class="chat-empty-orbit">
@@ -122,6 +137,33 @@
     const CHAT_MAX_CHARS = 300;
     const CHAT_MAX_WORDS = 60;
     const inputCounter = document.getElementById('chat-input-counter');
+    const chatWarning = document.getElementById('chat-warning');
+    const chatWarningTitle = document.getElementById('chat-warning-title');
+    const chatWarningMessage = document.getElementById('chat-warning-message');
+
+    let chatWarningTimer = null;
+
+    function showChatWarning(message, title = 'Warning') {
+        if (!chatWarning) return;
+
+        chatWarningTitle.textContent = title;
+        chatWarningMessage.textContent = message;
+
+        chatWarning.classList.add('show');
+
+        clearTimeout(chatWarningTimer);
+
+        chatWarningTimer = setTimeout(() => {
+            hideChatWarning();
+        }, 5000);
+    }
+
+    function hideChatWarning() {
+        if (!chatWarning) return;
+
+        chatWarning.classList.remove('show');
+        clearTimeout(chatWarningTimer);
+    }
 
     function countWords(value) {
         return value.trim().split(/\s+/).filter(Boolean).length;
@@ -169,7 +211,11 @@
         const now = Date.now();
 
         if (now - lastChatSentAt < CHAT_COOLDOWN_MS) {
-            addMessage('ai', 'Please wait a few seconds before sending another message.');
+            showChatWarning(
+                'Please wait a few seconds before sending another message.',
+                'Please slow down'
+            );
+
             return false;
         }
 
@@ -179,7 +225,11 @@
         }
 
         if (chatBurstCount >= CHAT_BURST_LIMIT) {
-            addMessage('ai', 'You have sent too many messages. Please wait a minute before trying again.');
+            showChatWarning(
+                'You have sent too many messages. Please wait a minute before trying again.',
+                'Too many messages'
+            );
+
             return false;
         }
 
@@ -339,7 +389,9 @@
     function showIntroMessage() {
         const introText = isLoginPage ? roleConfig.guest.intro : activeRoleConfig.intro;
 
-        addMessage('ai', introText, { allowHtml: true });
+        addMessage('ai', introText, {
+            allowHtml: true
+        });
     }
 
     function escapeHTML(text) {
@@ -627,7 +679,11 @@
         if (!message || sendBtn.disabled) return;
 
         if (message.length > CHAT_MAX_CHARS || countWords(message) > CHAT_MAX_WORDS) {
-            addMessage('ai', `Please keep your message within ${CHAT_MAX_CHARS} characters or ${CHAT_MAX_WORDS} words.`);
+            showChatWarning(
+                `Please keep your message within ${CHAT_MAX_CHARS} characters or ${CHAT_MAX_WORDS} words.`,
+                'Message too long'
+            );
+
             return;
         }
 
@@ -678,7 +734,12 @@
 
             if (!response.ok) {
                 if (response.status === 429) {
-                    throw new Error(data?.error || 'You are sending messages too quickly. Please wait before trying again.');
+                    showChatWarning(
+                        data?.error || 'You have sent too many messages. Please wait a minute before trying again.',
+                        'Too many messages'
+                    );
+
+                    return;
                 }
 
                 throw new Error(cleanErrorMessage(data));
@@ -696,7 +757,11 @@
         } catch (error) {
             removeTyping();
             console.error(error);
-            addMessage('ai', error.message || 'AI assistant is unavailable. Try again.');
+
+            showChatWarning(
+                error.message || 'AI assistant is unavailable. Please try again.',
+                'Unable to send message'
+            );
         } finally {
             setLoading(false);
             input.focus();
