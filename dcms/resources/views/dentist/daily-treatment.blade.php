@@ -1,8 +1,11 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Daily Treatment Record | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Daily Treatment Records')
 
 @section('content')
+
 <main id="mainContent" class="dentist-page-shell dentist-records-page daily-treatment-page page-enter">
   <div class="w-full">
 

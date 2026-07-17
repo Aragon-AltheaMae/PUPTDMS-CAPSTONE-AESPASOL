@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Document Templates | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Document Templates')
 
 @section('content')
+
 <main id="mainContent" class="admin-page-shell document-templates-page page-enter">
     <div class="w-full">
         <section class="page-banner document-template-banner">

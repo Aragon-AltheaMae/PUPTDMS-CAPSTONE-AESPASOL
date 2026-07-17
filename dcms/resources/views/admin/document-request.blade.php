@@ -1,6 +1,8 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Document Requests | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Document Requests')
 
 @section('content')
 

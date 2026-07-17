@@ -1,6 +1,8 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Assign CMS Access | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'CMS Access')
 
 @section('content')
 <main id="mainContent" class="admin-page-shell page-enter">

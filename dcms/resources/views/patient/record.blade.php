@@ -1,13 +1,15 @@
-@extends('layouts.patient')
+@extends('layouts.app')
 
-@section('title', 'Dental Records | PUP Taguig Dental Clinic')
+@section('layout-role', 'patient')
+
+@section('title', 'Dental Records')
+
+@section('content')
 
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 @endphp
-
-@section('content')
 
 <main id="mainContent" class="patient-page-shell page-enter patient-records-page">
     <div class="w-full">
