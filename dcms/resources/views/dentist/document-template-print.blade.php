@@ -1,10 +1,5 @@
 @php
-    /*
-    |--------------------------------------------------------------------------
-    | Manual paper setup per template
-    |--------------------------------------------------------------------------
-    | Dito mo pwedeng i-force ang paper size/orientation kahit ano pa nasa DB.
-    */
+
     $manualPaperSettings = [
         'DCASE-DEFAULT' => [
             'paper_size' => 'legal',

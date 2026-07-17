@@ -1,8 +1,11 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Dental Services Record | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Dental Services Records')
 
 @section('content')
+
 @php
 $frontendRecords = collect($records ?? [])->values();
 $selectedMonth = $selectedMonth ?? now()->format('Y-m');

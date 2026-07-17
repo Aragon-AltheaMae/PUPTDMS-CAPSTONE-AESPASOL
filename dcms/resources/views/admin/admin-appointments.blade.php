@@ -1,6 +1,8 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Appointments | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Appointments')
 
 @section('usesAppointmentCalendar', true)
 

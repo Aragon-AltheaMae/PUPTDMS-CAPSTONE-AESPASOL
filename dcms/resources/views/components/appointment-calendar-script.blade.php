@@ -26,6 +26,17 @@
         `;
     }
 
+    function makeCompletedAppointmentBadge() {
+        return `
+        <span
+            class="completed-appointment-badge"
+            aria-hidden="true"
+        >
+            <i class="fa-solid fa-check"></i>
+        </span>
+    `;
+    }
+
     function makeMyAppointmentBadge() {
         return `
             <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-emerald-600 text-[9px] leading-none
@@ -57,13 +68,17 @@
         calendarWrapSelector: @json($calendarWrapSelector ?? '.cal-wrap'),
         slotsWrapSelector: @json($slotsWrapSelector ?? '.slots-wrap'),
         slotEndpoint: @json($slotEndpoint),
+        bookingUrl: @json($bookingUrl ?? null),
+        maxFutureMonths: @json($maxFutureMonths ?? 6),
+        historyMonths: @json($historyMonths ?? 12),
+        appointmentHistoryUrl: @json($appointmentHistoryUrl ?? null),
 
         scheduleRules: @json($scheduleRules ?? []),
         blockedDates: @json($blockedDates ?? []),
         apptCounts: @json($appointmentCountsPerDay ?? []),
         holidaysMap: @json($philippineHolidays ?? []),
         personalAppointments: @json($personalAppointments ?? []),
-
+        completedAppointments: @json($completedAppointments ?? []),
         disallowToday: @json($disallowToday ?? true),
         allowToggleOffDate: @json($allowToggleOffDate ?? true),
         useDynamicScheduleRules: @json($useDynamicScheduleRules ?? false),
@@ -72,6 +87,11 @@
 
     let selectedDate = null;
     let selectedTime = null;
+    let activeCalendarFilter = 'all';
+    let focusedDateIso = null;
+    let hasCalendarRenderedOnce = false;
+    let dashboardLoadingTimer = null;
+    const dashboardSlotCache = new Map();
 
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
@@ -101,13 +121,23 @@
         return [];
     }
 
+    function isRuleActive(rule) {
+        return (
+            rule?.is_active === true ||
+            rule?.is_active === 1 ||
+            rule?.is_active === '1'
+        );
+    }
+
     function getRuleForDate(dateObj) {
         if (!calendarConfig.useDynamicScheduleRules) return null;
+
         const dayAbbr = getDayAbbrFromDate(dateObj);
 
         return (calendarConfig.scheduleRules || []).find(rule => {
             const days = normalizeDays(rule.days);
-            return Boolean(rule.is_active) && days.includes(dayAbbr);
+
+            return isRuleActive(rule) && days.includes(dayAbbr);
         }) || null;
     }
 
@@ -117,14 +147,28 @@
     }
 
     function isDateSchedulable(dateObj, iso) {
+        if (calendarConfig.blockedDates.includes(iso)) {
+            return false;
+        }
+
+        if (calendarConfig.holidaysMap?.[iso]) {
+            return false;
+        }
+
         if (!calendarConfig.useDynamicScheduleRules) {
-            return !calendarConfig.blockedDates.includes(iso) && !calendarConfig.holidaysMap?.[iso];
+            return true;
         }
 
         const rule = getRuleForDate(dateObj);
-        if (!rule || rule.status === 'closed') return false;
-        if (calendarConfig.blockedDates.includes(iso)) return false;
-        if (calendarConfig.holidaysMap?.[iso]) return false;
+        const status = String(rule?.status || '').trim().toLowerCase();
+
+        if (
+            !rule ||
+            !isRuleActive(rule) ||
+            status === 'closed'
+        ) {
+            return false;
+        }
 
         return true;
     }
@@ -149,8 +193,25 @@
             return ['today', 'hasPatients', 'fullyBooked', 'holiday', 'clinicClosed'];
         }
 
-        if (mode === 'patient-dashboard' || mode === 'patient-appointment') {
-            return ['myAppointment', 'today', 'fullyBooked', 'holiday', 'clinicClosed'];
+        if (mode === 'patient-dashboard') {
+            return [
+                'myAppointment',
+                'completedAppointment',
+                'today',
+                'fullyBooked',
+                'holiday',
+                'clinicClosed'
+            ];
+        }
+
+        if (mode === 'patient-appointment') {
+            return [
+                'myAppointment',
+                'today',
+                'fullyBooked',
+                'holiday',
+                'clinicClosed'
+            ];
         }
 
         return ['today', 'hasPatients', 'fullyBooked', 'holiday',
@@ -196,6 +257,22 @@
                     </span>
                 `,
                 badge: () => makeMyAppointmentBadge(),
+            },
+            completedAppointment: {
+                key: "completedAppointment",
+                label: "Completed Visit",
+
+                tooltipBg: "bg-indigo-600",
+                tooltipArrow: "after:border-t-indigo-600",
+
+                legendIcon: `
+        <span class="cal-pill cal-pill-blue">
+            <i class="fa-solid fa-circle-check text-[10px]"></i>
+            Completed Visit
+        </span>
+    `,
+
+                badge: () => makeCompletedAppointmentBadge(),
             },
             today: {
                 key: "today",
@@ -309,10 +386,21 @@
         const isFull = !isClosed && maxPerDay > 0 ? count >= maxPerDay : false;
 
         const myAppointment = calendarConfig.personalAppointments?.[iso] || null;
+        const completedAppointments =
+            calendarConfig.completedAppointments?.[iso] || [];
+
+        const hasCompletedAppointment =
+            Array.isArray(completedAppointments) &&
+            completedAppointments.length > 0;
         const hasPatients = count > 0;
 
         const isBookingMode = calendarConfig.mode === 'booking';
-        const isDisabled = isPastOrToday || isHoliday || isClosed || isFull;
+
+        const isDisabled =
+            isPastOrToday ||
+            isHoliday ||
+            isClosed ||
+            isFull;
         const isSelected = iso === selectedDate;
 
         return {
@@ -326,12 +414,39 @@
             isClosed,
             isFull,
             myAppointment,
+            completedAppointments,
+            hasCompletedAppointment,
             hasPatients,
             count,
             isBookingMode,
             isDisabled,
             isSelected
         };
+    }
+
+    function resetDashboardAvailabilityPanel() {
+        const panel = getDashboardAvailabilityPanel();
+
+        if (!panel) return;
+
+        panel.innerHTML = `
+            <div class="dashboard-calendar-side-empty">
+                <div class="dashboard-calendar-side-empty-icon">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </div>
+
+                <span class="dashboard-calendar-eyebrow">
+                    Check availability
+                </span>
+
+                <strong>Select an available date</strong>
+
+                <p>
+                    Choose a future date from the calendar to view available
+                    appointment times.
+                </p>
+            </div>
+        `;
     }
 
     function getCalendarDayDecorations(state, variant = 'patient') {
@@ -344,7 +459,14 @@
         let tooltipArrow = "after:border-t-[#1a1410]";
 
         if (variant !== 'dentist') {
-            if (state.isSelected) {
+            if (
+                state.isSelected &&
+                state.hasCompletedAppointment
+            ) {
+                cellClass += " completed-appointment selected-history";
+            } else if (state.hasCompletedAppointment) {
+                cellClass += " completed-appointment";
+            } else if (state.isSelected && !state.isDisabled) {
                 cellClass += " selected";
             } else if (state.isToday) {
                 if (state.isBookingMode) {
@@ -360,11 +482,11 @@
                 cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
             } else if (state.isPastOrToday && state.isBookingMode) {
                 cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (state.isPast) {
+            } else if (state.isPast && !state.hasCompletedAppointment) {
                 cellClass += " text-gray-400 cursor-default disabled";
             }
         } else {
-            if (state.isSelected) {
+            if (state.isSelected && !state.isDisabled) {
                 cellClass += " selected";
             } else if (state.isToday) {
                 cellClass += " today disabled";
@@ -382,6 +504,27 @@
             tooltip = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${state.myAppointment}`;
             tooltipBg = CALENDAR_THEME.statuses.myAppointment.tooltipBg;
             tooltipArrow = CALENDAR_THEME.statuses.myAppointment.tooltipArrow;
+        }
+        if (
+            state.hasCompletedAppointment &&
+            calendarConfig.mode === 'patient-dashboard'
+        ) {
+            badgeHtml +=
+                CALENDAR_THEME.statuses.completedAppointment.badge();
+
+            const firstVisit =
+                state.completedAppointments[0];
+
+            tooltip = `
+        <i class="fa-solid fa-circle-check mr-1"></i>
+        Completed: ${firstVisit?.service || 'Dental Visit'}
+    `;
+
+            tooltipBg =
+                CALENDAR_THEME.statuses.completedAppointment.tooltipBg;
+
+            tooltipArrow =
+                CALENDAR_THEME.statuses.completedAppointment.tooltipArrow;
         }
 
         if (state.isHoliday) {
@@ -405,10 +548,23 @@
             if (!state.myAppointment) {
                 badgeHtml += CALENDAR_THEME.statuses.clinicClosed.badge();
             }
+
             if (!tooltip) {
-                tooltip = "Clinic Closed";
+                tooltip = `
+            <i class="fa-solid fa-circle-minus mr-1"></i>
+            Clinic Closed
+        `;
                 tooltipBg = CALENDAR_THEME.statuses.clinicClosed.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.clinicClosed.tooltipArrow;
+            }
+        } else if (state.isPast && !state.hasCompletedAppointment) {
+            if (!tooltip) {
+                tooltip = `
+            <i class="fa-solid fa-clock-rotate-left mr-1"></i>
+            Past date
+        `;
+                tooltipBg = "bg-gray-500";
+                tooltipArrow = "after:border-t-gray-500";
             }
         } else if (variant === 'dentist' && state.hasPatients && !state.isPast && !state.isHoliday) {
             badgeHtml += makeCalendarDot(
@@ -425,26 +581,34 @@
             }
         }
 
-        if (state.isBookingMode) {
-            if (state.isHoliday) {} else if (state.isToday) {
-                tooltip = "Same-day booking is not allowed.";
-                tooltipBg = "bg-gray-600";
-                tooltipArrow = "after:border-t-gray-600";
-            } else if (state.isPastOrToday) {
-                tooltip = "Past date — booking not allowed";
-                tooltipBg = "bg-gray-500";
-                tooltipArrow = "after:border-t-gray-500";
-            } else if (state.isClosed && !state.isPast) {
-                tooltip = "Clinic closed on this date.";
-                tooltipBg = "bg-gray-600";
-                tooltipArrow = "after:border-t-gray-600";
-            }
-        } else {
-            if (state.isToday && !tooltip && !state.myAppointment) {
-                tooltip = `<i class="fa-solid fa-calendar-day mr-1 text-white/90"></i>Today`;
-                tooltipBg = CALENDAR_THEME.statuses.today.tooltipBg;
-                tooltipArrow = CALENDAR_THEME.statuses.today.tooltipArrow;
-            }
+        if (state.isHoliday) {} else if (state.isToday && calendarConfig.disallowToday) {
+            tooltip = `
+        <i class="fa-solid fa-calendar-day mr-1"></i>
+        Same-day booking is not allowed
+    `;
+            tooltipBg = "bg-gray-600";
+            tooltipArrow = "after:border-t-gray-600";
+        } else if (state.isPast && !state.hasCompletedAppointment) {
+            tooltip = `
+        <i class="fa-solid fa-clock-rotate-left mr-1"></i>
+        Past date — booking not allowed
+    `;
+            tooltipBg = "bg-gray-500";
+            tooltipArrow = "after:border-t-gray-500";
+        } else if (state.isClosed) {
+            tooltip = `
+        <i class="fa-solid fa-circle-minus mr-1"></i>
+        Clinic closed on this date
+    `;
+            tooltipBg = "bg-gray-600";
+            tooltipArrow = "after:border-t-gray-600";
+        } else if (state.isToday && !tooltip && !state.myAppointment) {
+            tooltip = `
+        <i class="fa-solid fa-calendar-day mr-1 text-white/90"></i>
+        Today
+    `;
+            tooltipBg = CALENDAR_THEME.statuses.today.tooltipBg;
+            tooltipArrow = CALENDAR_THEME.statuses.today.tooltipArrow;
         }
 
         if (tooltip) {
@@ -561,12 +725,298 @@
         }
     }
 
-    function isPatientDashboardLockedMonth() {
-        return calendarConfig.mode === 'patient-dashboard';
-    }
-
     function isCurrentMonthView(year, month) {
         return year === todayDate.getFullYear() && month === todayDate.getMonth();
+    }
+
+
+    function getMonthBounds() {
+        const isDashboard =
+            calendarConfig.mode === 'patient-dashboard';
+
+        const minimum = isDashboard ?
+            new Date(
+                todayDate.getFullYear(),
+                todayDate.getMonth() -
+                Number(calendarConfig.historyMonths || 12),
+                1
+            ) :
+            new Date(
+                todayDate.getFullYear(),
+                todayDate.getMonth(),
+                1
+            );
+
+        const maximum = new Date(
+            todayDate.getFullYear(),
+            todayDate.getMonth() +
+            Number(calendarConfig.maxFutureMonths || 6),
+            1
+        );
+
+        return {
+            minimum,
+            maximum
+        };
+    }
+
+    function getVisibleMonthOptions() {
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
+        const options = [];
+        const cursor = new Date(minimum);
+
+        while (cursor <= maximum) {
+            options.push({
+                year: cursor.getFullYear(),
+                month: cursor.getMonth(),
+                label: cursor.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                })
+            });
+
+            cursor.setMonth(cursor.getMonth() + 1);
+        }
+
+        return options;
+    }
+
+    function getMonthSummary(year, month) {
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        let available = 0;
+        let unavailable = 0;
+        let myAppointments = 0;
+
+        for (let day = 1; day <= totalDays; day++) {
+            const state = resolveCalendarDayState(year, month, day);
+
+            if (!state.isDisabled) available++;
+            if (state.isDisabled && !state.isPast) unavailable++;
+            if (state.myAppointment) myAppointments++;
+        }
+
+        return {
+            available,
+            unavailable,
+            myAppointments
+        };
+    }
+
+    function getCalendarDateStateFromIso(iso) {
+        const [year, month, day] = String(iso).split('-').map(Number);
+
+        if (!year || !month || !day) return null;
+
+        return resolveCalendarDayState(year, month - 1, day);
+    }
+
+    function getDateCellSelector(iso) {
+        return `#${calendarConfig.calendarContainerId} [data-date="${iso}"]`;
+    }
+
+    function focusCalendarDate(iso) {
+        if (!iso) return;
+
+        focusedDateIso = iso;
+
+        requestAnimationFrame(() => {
+            const target = document.querySelector(getDateCellSelector(iso));
+            target?.focus({
+                preventScroll: true
+            });
+        });
+    }
+
+    function navigateCalendarFocus(currentIso, deltaDays) {
+        const state = getCalendarDateStateFromIso(currentIso);
+        if (!state) return;
+
+        const candidate = new Date(state.cellDate);
+        candidate.setDate(candidate.getDate() + deltaDays);
+
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
+        const maximumDay = new Date(maximum.getFullYear(), maximum.getMonth() + 1, 0);
+
+        const minimumDay = new Date(
+            minimum.getFullYear(),
+            minimum.getMonth(),
+            1
+        );
+
+        if (candidate < minimumDay || candidate > maximumDay) {
+            return;
+        }
+
+        const nextIso = `${candidate.getFullYear()}-${pad(candidate.getMonth() + 1)}-${pad(candidate.getDate())}`;
+
+        if (
+            candidate.getFullYear() !== currentYear ||
+            candidate.getMonth() !== currentMonth
+        ) {
+            currentYear = candidate.getFullYear();
+            currentMonth = candidate.getMonth();
+            renderCalendar();
+        }
+
+        focusCalendarDate(nextIso);
+    }
+
+    function applyCalendarFilter(filter = activeCalendarFilter) {
+        activeCalendarFilter = filter || 'all';
+
+        const container = document.getElementById(calendarConfig.calendarContainerId);
+        if (!container) return;
+
+        container.querySelectorAll('[data-calendar-filter]').forEach(button => {
+            const active = button.dataset.calendarFilter === activeCalendarFilter;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+
+        container.querySelectorAll('.cal-cell-wrap[data-date-wrap]').forEach(wrapper => {
+            const cell = wrapper.querySelector('[data-date]');
+            if (!cell) return;
+
+            const state = getCalendarDateStateFromIso(cell.dataset.date);
+            let visible = true;
+
+            if (activeCalendarFilter === 'available') {
+                visible = Boolean(state && !state.isDisabled);
+            } else if (
+                activeCalendarFilter === 'appointment'
+            ) {
+                visible = Boolean(
+                    state?.myAppointment ||
+                    state?.hasCompletedAppointment
+                );
+            }
+
+            wrapper.classList.toggle('calendar-filter-dimmed', !visible);
+            wrapper.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        });
+    }
+
+    async function findEarliestAvailableDate() {
+        const button = document.querySelector(
+            `#${calendarConfig.calendarContainerId} [data-calendar-filter="earliest"]`
+        );
+
+        button?.classList.add('is-loading');
+        button?.setAttribute('aria-busy', 'true');
+
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
+        const endDate = new Date(maximum.getFullYear(), maximum.getMonth() + 1, 0);
+        const cursor = new Date(Math.max(todayDate.getTime(), minimum.getTime()));
+
+        try {
+            while (cursor <= endDate) {
+                const state = resolveCalendarDayState(
+                    cursor.getFullYear(),
+                    cursor.getMonth(),
+                    cursor.getDate()
+                );
+
+                if (!state.isDisabled) {
+                    let payload = dashboardSlotCache.get(state.iso);
+
+                    if (!payload) {
+                        payload = await fetchSlotsForDate(state.iso);
+                        dashboardSlotCache.set(state.iso, payload);
+                    }
+
+                    const slots = Array.isArray(payload?.slots) ? payload.slots : [];
+                    const available = slots.some(slot => {
+                        if (typeof slot === 'string') return true;
+
+                        return !(
+                            slot.is_taken ||
+                            slot.taken ||
+                            slot.booked ||
+                            slot.available === false
+                        );
+                    });
+
+                    if (available) {
+                        currentYear = cursor.getFullYear();
+                        currentMonth = cursor.getMonth();
+                        selectedDate = state.iso;
+                        activeCalendarFilter = 'all';
+                        renderCalendar();
+                        await selectDate(state.iso);
+                        focusCalendarDate(state.iso);
+                        return;
+                    }
+                }
+
+                cursor.setDate(cursor.getDate() + 1);
+            }
+
+            if (typeof window.showToast === 'function') {
+                window.showToast({
+                    type: 'info',
+                    title: 'No available dates',
+                    message: 'No open appointment slot was found in the visible booking range.'
+                });
+            }
+        } catch (_) {
+            if (typeof window.showToast === 'function') {
+                window.showToast({
+                    type: 'error',
+                    title: 'Availability check failed',
+                    message: 'Unable to search for the earliest appointment slot.'
+                });
+            }
+        } finally {
+            button?.classList.remove('is-loading');
+            button?.removeAttribute('aria-busy');
+        }
+    }
+
+    function bindCalendarToolbar() {
+        const container = document.getElementById(calendarConfig.calendarContainerId);
+        if (!container) return;
+
+        const monthPicker = container.querySelector('[data-calendar-month-picker]');
+
+        monthPicker?.addEventListener('change', event => {
+            const [year, month] = String(event.target.value)
+                .split('-')
+                .map(Number);
+
+            if (!year || Number.isNaN(month)) return;
+
+            clearTimeout(dashboardLoadingTimer);
+            dashboardLoadingTimer = null;
+
+            currentYear = year;
+            currentMonth = month;
+            selectedDate = null;
+            focusedDateIso = null;
+
+            renderCalendar();
+        });
+
+        container.querySelectorAll('[data-calendar-filter]').forEach(button => {
+            button.addEventListener('click', async () => {
+                const filter = button.dataset.calendarFilter || 'all';
+
+                if (filter === 'earliest') {
+                    await findEarliestAvailableDate();
+                    return;
+                }
+
+                applyCalendarFilter(filter);
+            });
+        });
     }
 
     function renderUnifiedCalendar(year, month) {
@@ -577,86 +1027,245 @@
         const DAYS_DENTIST = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
         const isDentist = calendarConfig.renderStyle === 'dentist';
+        const isDashboard = calendarConfig.mode === 'patient-dashboard';
         const dayLabels = isDentist ? DAYS_DENTIST : DAYS_PATIENT;
 
         const firstDow = new Date(year, month, 1).getDay();
         const totalDays = new Date(year, month + 1, 0).getDate();
+        const summary = getMonthSummary(year, month);
 
-        const lockMonth = isPatientDashboardLockedMonth();
-        const atCurrentMonth = isCurrentMonthView(year, month);
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
+        const currentViewDate = new Date(year, month, 1);
+        const prevDisabled = currentViewDate <= minimum;
+        const nextDisabled = currentViewDate >= maximum;
 
-        const prevDisabled = lockMonth ? true : false;
-        const nextDisabled = lockMonth ? true : false;
+        const monthOptions = getVisibleMonthOptions().map(option => `
+            <option value="${option.year}-${option.month}"
+                ${option.year === year && option.month === month ? 'selected' : ''}>
+                ${option.label}
+            </option>
+        `).join('');
 
         const header = dayLabels.map((d, i) => `
-        <div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${i === 0 || i === 6
-                ? 'cal-day-weekend text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest'
-                : 'cal-day-label text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest'}">
-            ${d}
-        </div>
-    `).join("");
+            <div class="${i === 0 || i === 6 ? 'cal-day-weekend' : 'cal-day-label'} text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest">
+                ${d}
+            </div>
+        `).join("");
 
         let cells = "";
-        for (let i = 0; i < firstDow; i++) cells += `<div></div>`;
+        for (let i = 0; i < firstDow; i++) cells += `<div aria-hidden="true"></div>`;
 
         for (let d = 1; d <= totalDays; d++) {
             const state = resolveCalendarDayState(year, month, d);
             const ui = getCalendarDayDecorations(state, isDentist ? 'dentist' : 'patient');
 
             cells += `
-            <div class="cal-cell-wrap relative flex items-center justify-center group">
-                ${ui.tooltipHtml}
-                <div class="${ui.cellClass}" data-date="${state.iso}" data-disabled="${state.isDisabled ? 1 : 0}">
-                    <span>${d}</span>
-                    ${ui.badgeHtml}
+                <div class="cal-cell-wrap relative flex items-center justify-center group"
+                    data-date-wrap
+                    data-calendar-state="${state.isDisabled ? 'unavailable' : 'available'}">
+                    ${ui.tooltipHtml}
+                    <div class="${ui.cellClass}"
+                        data-date="${state.iso}"
+                        data-disabled="${state.isDisabled ? 1 : 0}"
+                        data-past="${state.isPast ? 1 : 0}"
+                        data-my-appointment="${state.myAppointment ? 1 : 0}"
+                        data-saturday="${state.cellDate.getDay() === 6 ? 1 : 0}"
+                        aria-label="${formatCalendarDateLabel(state.iso)}">
+                        <span>${d}</span>
+                        ${ui.badgeHtml}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
         }
 
-        const markup = `
-        <div class="cal-shell">
-            <div class="flex items-center justify-between mb-5">
+        const dashboardToolbar = isDashboard ? `
+            <div class="dashboard-calendar-toolbar">
+                <div class="dashboard-calendar-summary" aria-live="polite">
+                    <span>
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <strong>${summary.available}</strong> bookable dates
+                    </span>
+
+                    ${summary.myAppointments ? `
+                        <span>
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <strong>${summary.myAppointments}</strong> my appointment
+                        </span>
+                    ` : ''}
+                </div>
+
+                <div class="dashboard-calendar-filters" aria-label="Calendar filters">
+                    <button type="button" data-calendar-filter="all" aria-pressed="true">
+                        All
+                    </button>
+
+                    <button type="button" data-calendar-filter="available" aria-pressed="false">
+                        Available
+                    </button>
+
+                    <button type="button" data-calendar-filter="earliest" aria-pressed="false">
+                        <i class="fa-solid fa-bolt"></i>
+                        Earliest slot
+                    </button>
+
+                    <button type="button" data-calendar-filter="appointment" aria-pressed="false">
+                        My visits
+                    </button>
+                </div>
+            </div>
+        ` : '';
+
+        const monthControl = isDashboard ? `
+            <label class="calendar-month-picker-wrap">
+                <span class="sr-only">Choose month</span>
+
+                <select
+                    data-calendar-month-picker
+                    class="calendar-month-picker"
+                >
+                    ${monthOptions}
+                </select>
+
+                <i
+                    class="fa-solid fa-chevron-down"
+                    aria-hidden="true"
+                ></i>
+            </label>
+        ` : `
+            <div class="text-center">
+                <p class="cal-month-label text-base font-extrabold">
+                    ${MONTHS[month]}
+                </p>
+
+                <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">
+                    ${year}
+                </p>
+            </div>
+        `;
+
+        const calendarBody = `
+            <div class="calendar-main-header">
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}"
-                    ${prevDisabled ? 'disabled' : 'onclick="changeMonth(-1)"'}>
+                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    ${prevDisabled ? 'disabled' : 'onclick="changeMonth(-1)"'}
+                    aria-label="Previous month"
+                >
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <div class="text-center">
-                    <p class="cal-month-label text-base font-extrabold">${MONTHS[month]}</p>
-                    <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
-                </div>
+
+                ${monthControl}
+
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}"
-                    ${nextDisabled ? 'disabled' : 'onclick="changeMonth(1)"'}>
+                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    ${nextDisabled ? 'disabled' : 'onclick="changeMonth(1)"'}
+                    aria-label="Next month"
+                >
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
+
+            ${dashboardToolbar}
+
             <hr class="border-[#f0ebe6] mb-3">
-            <div class="cal-grid">${header}${cells}</div>
+
+            <div
+                class="cal-grid"
+                role="grid"
+                aria-label="${MONTHS[month]} ${year}"
+            >
+                ${header}${cells}
+            </div>
+
             ${renderUnifiedCalendarLegend(calendarConfig.mode)}
-        </div>
-    `;
+        `;
 
-        const container = document.getElementById(calendarConfig.calendarContainerId);
+        const dashboardSidePanel = isDashboard ? `
+            <aside
+                class="dashboard-calendar-side-panel"
+                data-dashboard-availability
+                aria-live="polite"
+            >
+                <div class="dashboard-calendar-side-empty">
+                    <div class="dashboard-calendar-side-empty-icon">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
 
-        if (container) {
-            if (calendarConfig.mode === 'booking') {
-                container.innerHTML = markup;
-                container.classList.remove('skeleton-fade-leave');
-                container.style.pointerEvents = '';
-            } else {
-                swapSkeletonContent(calendarConfig.calendarContainerId, markup);
-                setTimeout(() => {
-                    bindCalendarClicks(`#${calendarConfig.calendarContainerId} [data-date]`);
-                }, 180);
-                return;
-            }
+                    <span class="dashboard-calendar-eyebrow">
+                        Check availability
+                    </span>
 
-            bindCalendarClicks(`#${calendarConfig.calendarContainerId} [data-date]`);
+                    <strong>Select an available date</strong>
+
+                    <p>
+                        Choose a future date from the calendar to view available
+                        appointment times.
+                    </p>
+                </div>
+            </aside>
+        ` : '';
+
+        const markup = isDashboard
+            ? `
+                <div class="cal-shell dashboard-calendar-shell">
+                    <div class="dashboard-calendar-layout">
+                        <div class="dashboard-calendar-main">
+                            ${calendarBody}
+                        </div>
+
+                        ${dashboardSidePanel}
+                    </div>
+                </div>
+            `
+            : `
+                <div class="cal-shell">
+                    ${calendarBody}
+                </div>
+            `;
+
+        const container = document.getElementById(
+            calendarConfig.calendarContainerId
+        );
+
+        if (!container) return;
+
+        const isInitialAnimatedRender = !hasCalendarRenderedOnce &&
+            calendarConfig.mode !== 'booking';
+
+        if (isInitialAnimatedRender) {
+            swapSkeletonContent(
+                calendarConfig.calendarContainerId,
+                markup
+            );
+        } else {
+            container.innerHTML = markup;
+
+            container.classList.remove(
+                'skeleton-fade-leave',
+                'skeleton-fade-enter'
+            );
+
+            container.style.pointerEvents = '';
         }
+
+        hasCalendarRenderedOnce = true;
+
+        setTimeout(() => {
+            bindCalendarClicks(
+                `#${calendarConfig.calendarContainerId} [data-date]`
+            );
+
+            bindCalendarToolbar();
+            applyCalendarFilter(activeCalendarFilter);
+
+            if (focusedDateIso) {
+                focusCalendarDate(focusedDateIso);
+            }
+        }, isInitialAnimatedRender ? 180 : 0);
     }
 
     function renderCalendar() {
@@ -664,13 +1273,88 @@
     }
 
     function bindCalendarClicks(selector) {
-        if (!calendarConfig.dateInputId && calendarConfig.mode !== 'dentist') return;
+        const canSelectWithoutInput =
+            calendarConfig.mode === 'patient-dashboard' ||
+            calendarConfig.mode === 'patient-appointment' ||
+            calendarConfig.mode === 'dentist';
+
+        if (!calendarConfig.dateInputId && !canSelectWithoutInput) {
+            return;
+        }
 
         document.querySelectorAll(selector).forEach(el => {
-            el.addEventListener("click", () => {
-                if (el.dataset.disabled === "1") return;
+            if (el.dataset.calendarClickBound === 'true') return;
+
+            el.dataset.calendarClickBound = 'true';
+
+            const state = getCalendarDateStateFromIso(el.dataset.date);
+            const isDisabled =
+                el.dataset.disabled === '1';
+
+            const isCompletedAppointment =
+                state?.hasCompletedAppointment === true;
+
+            const isInteractive = !isDisabled || isCompletedAppointment;
+
+            el.setAttribute(
+                'tabindex',
+                isInteractive ? '0' : '-1'
+            );
+
+            el.setAttribute(
+                'role',
+                isInteractive ? 'button' : 'presentation'
+            );
+
+            el.setAttribute(
+                'aria-disabled',
+                isInteractive ? 'false' : 'true'
+            );
+
+            const activateDate = () => {
+                if (isCompletedAppointment) {
+                    selectedDate = state.iso;
+                    focusedDateIso = state.iso;
+
+                    renderCalendar();
+                    renderCompletedAppointmentPanel(state);
+
+                    return;
+                }
+
+                if (isDisabled) return;
+
+                focusedDateIso = el.dataset.date;
                 selectDate(el.dataset.date);
+            };
+
+            el.addEventListener('click', activateDate);
+
+            el.addEventListener('keydown', event => {
+                const keyMap = {
+                    ArrowLeft: -1,
+                    ArrowRight: 1,
+                    ArrowUp: -7,
+                    ArrowDown: 7
+                };
+
+                if (event.key in keyMap) {
+                    event.preventDefault();
+                    navigateCalendarFocus(el.dataset.date, keyMap[event.key]);
+                    return;
+                }
+
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+
+                event.preventDefault();
+                activateDate();
             });
+
+            if (isInteractive) {
+                el.addEventListener('focus', () => {
+                    focusedDateIso = el.dataset.date;
+                });
+            }
         });
     }
 
@@ -730,7 +1414,53 @@
     }
 
     async function selectDate(iso) {
-        if (calendarConfig.mode === 'patient-dashboard' || calendarConfig.mode === 'patient-appointment') {
+        if (calendarConfig.mode === 'patient-dashboard') {
+            selectedDate = iso;
+            selectedTime = null;
+
+            renderCalendar();
+
+            clearTimeout(dashboardLoadingTimer);
+
+            const cachedPayload = dashboardSlotCache.get(iso);
+
+            if (cachedPayload) {
+                renderDashboardAvailability(cachedPayload, iso);
+                return;
+            }
+
+            dashboardLoadingTimer = setTimeout(() => {
+                if (selectedDate === iso) {
+                    renderDashboardAvailabilityLoading(iso);
+                }
+            }, 250);
+
+            try {
+                const payload = await fetchSlotsForDate(iso);
+
+                dashboardSlotCache.set(iso, payload);
+                clearTimeout(dashboardLoadingTimer);
+                dashboardLoadingTimer = null;
+
+                if (selectedDate !== iso) return;
+
+                renderDashboardAvailability(payload, iso);
+            } catch (error) {
+                clearTimeout(dashboardLoadingTimer);
+                dashboardLoadingTimer = null;
+
+                if (selectedDate !== iso) return;
+
+                renderDashboardAvailability({
+                    slots: [],
+                    message: 'Unable to load availability for this date.'
+                }, iso);
+            }
+
+            return;
+        }
+
+        if (calendarConfig.mode === 'patient-appointment') {
             return;
         }
 
@@ -785,6 +1515,306 @@
                 message: 'Unable to load available slots.'
             }, iso);
         }
+    }
+
+    function formatCalendarDateLabel(iso) {
+        const [year, month, day] = iso.split('-').map(Number);
+
+        return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+
+    function getDashboardAvailabilityPanel() {
+        const container = document.getElementById(
+            calendarConfig.calendarContainerId
+        );
+
+        if (!container) return null;
+
+        return container.querySelector(
+            '[data-dashboard-availability]'
+        );
+    }
+
+    function renderCompletedAppointmentPanel(state) {
+        const panel = getDashboardAvailabilityPanel();
+
+        if (!panel) return;
+
+        const appointments =
+            Array.isArray(state.completedAppointments) ?
+            state.completedAppointments : [];
+
+        if (!appointments.length) {
+            resetDashboardAvailabilityPanel();
+            return;
+        }
+
+        const historyUrl =
+            calendarConfig.appointmentHistoryUrl || '#';
+
+        panel.innerHTML = `
+        <div class="dashboard-calendar-side-content history-panel">
+            <div class="dashboard-calendar-side-top">
+                <div>
+                    <span class="dashboard-calendar-eyebrow">
+                        Completed visit
+                    </span>
+
+                    <strong class="dashboard-calendar-side-date">
+                        ${formatCalendarDateLabel(state.iso)}
+                    </strong>
+                </div>
+
+                <span class="dashboard-calendar-status completed">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Completed
+                </span>
+            </div>
+
+            <div class="completed-visit-list">
+                ${appointments.map(appointment => `
+                    <article class="completed-visit-card">
+                        <div class="completed-visit-heading">
+                            <span class="completed-visit-icon">
+                                <i class="fa-solid fa-tooth"></i>
+                            </span>
+
+                            <div>
+                                <strong>
+                                    ${escapeCalendarText(
+                                        appointment.service ||
+                                        'Dental Appointment'
+                                    )}
+                                </strong>
+
+                                <span>
+                                    <i class="fa-regular fa-clock"></i>
+                                    ${escapeCalendarText(
+                                        appointment.time ||
+                                        'Time not recorded'
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="completed-visit-details">
+                            <div>
+                                <span>Dentist</span>
+                                <strong>
+                                    ${escapeCalendarText(
+                                        appointment.dentist ||
+                                        'Assigned Dentist'
+                                    )}
+                                </strong>
+                            </div>
+
+                            ${appointment.duration ? `
+                                <div>
+                                    <span>Duration</span>
+                                    <strong>
+                                        ${escapeCalendarText(
+                                            appointment.duration
+                                        )}
+                                    </strong>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${appointment.remarks ? `
+                            <div class="completed-visit-note">
+                                <span>Remarks</span>
+                                <p>
+                                    ${escapeCalendarText(
+                                        appointment.remarks
+                                    )}
+                                </p>
+                            </div>
+                        ` : ''}
+                    </article>
+                `).join('')}
+            </div>
+
+            <div class="dashboard-calendar-side-footer">
+                <span>
+                    This appointment is part of your dental visit history.
+                </span>
+
+                <a
+                    href="${historyUrl}"
+                    class="dashboard-calendar-history-btn"
+                >
+                    <i class="fa-solid fa-folder-open"></i>
+                    View dental records
+                </a>
+            </div>
+        </div>
+    `;
+    }
+
+    function escapeCalendarText(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function renderDashboardAvailabilityLoading(iso) {
+        const panel = getDashboardAvailabilityPanel();
+
+        if (!panel) return;
+
+        panel.innerHTML = `
+            <div class="dashboard-calendar-side-content">
+                <div class="dashboard-calendar-side-top">
+                    <div>
+                        <span class="dashboard-calendar-eyebrow">
+                            Checking availability
+                        </span>
+
+                        <strong class="dashboard-calendar-side-date">
+                            ${formatCalendarDateLabel(iso)}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="dashboard-calendar-side-state loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    <p>
+                        Checking available appointment times…
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderDashboardAvailability(payload, iso) {
+        const panel = getDashboardAvailabilityPanel();
+
+        if (!panel) return;
+
+        dashboardSlotCache.set(iso, payload);
+
+        const slots = Array.isArray(payload?.slots) ? payload.slots : [];
+
+        const availableSlots = slots.filter(slot => {
+            if (typeof slot === 'string') return true;
+
+            return !(
+                slot.is_taken ||
+                slot.taken ||
+                slot.booked ||
+                slot.available === false
+            );
+        });
+
+        const previewSlots = availableSlots.slice(0, 5);
+        const earliestSlot = previewSlots.length ?
+            (typeof previewSlots[0] === 'string' ? previewSlots[0] : previewSlots[0]?.time) :
+            null;
+
+        const bookingUrl = calendarConfig.bookingUrl ?
+            `${calendarConfig.bookingUrl}?date=${encodeURIComponent(iso)}` :
+            '#';
+
+        if (!availableSlots.length) {
+            panel.innerHTML = `
+        <div class="dashboard-calendar-side-content">
+            <div class="dashboard-calendar-side-top">
+                <div>
+                    <span class="dashboard-calendar-eyebrow">
+                        Selected date
+                    </span>
+
+                    <strong class="dashboard-calendar-side-date">
+                        ${formatCalendarDateLabel(iso)}
+                    </strong>
+                </div>
+
+                <span class="dashboard-calendar-status unavailable">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    No slots
+                </span>
+            </div>
+
+            <div class="dashboard-calendar-side-state unavailable">
+                <i class="fa-regular fa-calendar-xmark"></i>
+
+                <p>
+                    ${payload?.message || 'No available appointment slots for this date.'}
+                </p>
+            </div>
+        </div>
+    `;
+
+            return;
+        }
+
+        panel.innerHTML = `
+            <div class="dashboard-calendar-side-content">
+                <div class="dashboard-calendar-side-top">
+                    <div>
+                        <span class="dashboard-calendar-eyebrow">
+                            Selected date
+                        </span>
+
+                        <strong class="dashboard-calendar-side-date">
+                            ${formatCalendarDateLabel(iso)}
+                        </strong>
+                    </div>
+
+                    <span class="dashboard-calendar-status available">
+                        <i class="fa-solid fa-circle-check"></i>
+                        ${availableSlots.length}
+                        ${availableSlots.length === 1 ? 'time slot' : 'time slots'}
+                    </span>
+                </div>
+
+                <div class="dashboard-calendar-side-section">
+                    <span class="dashboard-calendar-side-label">
+                        Available times
+                    </span>
+
+                    <div class="dashboard-calendar-preview-slots">
+                        ${previewSlots.map(slot => {
+                            const time = typeof slot === 'string'
+                                ? slot
+                                : slot.time;
+
+                            return `
+                                <span class="dashboard-calendar-preview-slot">
+                                    <i class="fa-regular fa-clock"></i>
+                                    ${time}
+                                </span>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <div class="dashboard-calendar-side-footer">
+                    <span>
+                        ${earliestSlot
+                            ? `Earliest available: ${earliestSlot}`
+                            : 'Slots are subject to confirmation'}
+                    </span>
+
+                    <a
+                        href="${bookingUrl}"
+                        class="dashboard-calendar-book-btn"
+                    >
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Book this date
+                    </a>
+                </div>
+            </div>
+        `;
     }
 
     function renderSlots(payload, iso) {
@@ -1006,40 +2036,63 @@
     let currentMonth = new Date().getMonth();
 
     window.changeMonth = function(dir) {
-        if (calendarConfig.mode === 'patient-dashboard') {
-            currentYear = todayDate.getFullYear();
-            currentMonth = todayDate.getMonth();
-            renderCalendar();
+        const candidate = new Date(
+            currentYear,
+            currentMonth + Number(dir),
+            1
+        );
+
+        const { minimum, maximum } = getMonthBounds();
+
+        if (candidate < minimum || candidate > maximum) {
             return;
         }
 
-        currentMonth += dir;
+        clearTimeout(dashboardLoadingTimer);
+        dashboardLoadingTimer = null;
 
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
+        currentYear = candidate.getFullYear();
+        currentMonth = candidate.getMonth();
+        selectedDate = null;
+        focusedDateIso = null;
 
         renderCalendar();
     };
 
     document.addEventListener("DOMContentLoaded", function() {
+        const queryDate = new URLSearchParams(window.location.search).get('date');
+        const queryDateState = queryDate ? getCalendarDateStateFromIso(queryDate) : null;
+
         if (calendarConfig.mode === 'patient-dashboard') {
             currentYear = todayDate.getFullYear();
             currentMonth = todayDate.getMonth();
+        }
+
+        if (
+            calendarConfig.mode === 'booking' &&
+            queryDateState &&
+            !queryDateState.isDisabled
+        ) {
+            currentYear = queryDateState.cellDate.getFullYear();
+            currentMonth = queryDateState.cellDate.getMonth();
+            selectedDate = queryDateState.iso;
+            focusedDateIso = queryDateState.iso;
         }
 
         if (calendarConfig.mode !== 'booking') {
             renderCalendarLoading();
         }
 
-        setTimeout(() => {
+        setTimeout(async () => {
             renderCalendar();
+
+            if (
+                calendarConfig.mode === 'booking' &&
+                queryDateState &&
+                !queryDateState.isDisabled
+            ) {
+                await selectDate(queryDateState.iso);
+            }
         }, calendarConfig.mode === 'booking' ? 0 : 650);
     });
 </script>

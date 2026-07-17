@@ -1506,3 +1506,76 @@ body.role-patient:has(#sidebar.collapsed) #mainContent {
         max-width: 100% !important;
     }
 }
+
+#sidebar.sidebar-patient .sidebar-inner {
+    padding: 14px 10px 8px;
+}
+
+#sidebar.sidebar-patient .toggle-row {
+    margin-bottom: 12px !important;
+}
+
+#sidebar.sidebar-patient .nav-section-label {
+    padding: 0 4px 8px;
+    margin-top: 2px;
+    font-size: .58rem;
+    letter-spacing: .09em;
+}
+
+#sidebar.sidebar-patient .nav-group {
+    margin: 0;
+}
+
+#sidebar.sidebar-patient .group-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+}
+
+#sidebar.sidebar-patient .nav-link {
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    padding: 7px 10px;
+    gap: 11px;
+    border-radius: 12px;
+    font-size: .78rem;
+    font-weight: 650;
+}
+
+#sidebar.sidebar-patient .nav-icon-wrap {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    flex: 0 0 36px;
+    border-radius: 11px;
+}
+
+#sidebar.sidebar-patient .nav-icon-wrap i {
+    width: auto;
+    font-size: 13px;
+}
+
+#sidebar.sidebar-patient .menu-text,
+#sidebar.sidebar-patient .sidebar-nav-text {
+    flex: 1;
+    min-width: 0;
+}
+
+#sidebar.sidebar-patient.collapsed .nav-link,
+body.sidebar-collapsed #sidebar.sidebar-patient .nav-link {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    margin: 6px auto;
+    justify-content: center;
+}
+
+#sidebar.sidebar-patient.collapsed .nav-icon-wrap,
+body.sidebar-collapsed #sidebar.sidebar-patient .nav-icon-wrap {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+}

@@ -1,6 +1,8 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Reports & Analytics | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Reports & Analytics')
 
 @section('content')
 

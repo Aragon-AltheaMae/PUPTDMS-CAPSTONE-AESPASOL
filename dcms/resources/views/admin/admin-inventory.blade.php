@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Inventory | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Inventory')
 
 @section('content')
+
 <main id="mainContent" class="admin-page-shell page-enter inventory-page">
     <div class="full">
 

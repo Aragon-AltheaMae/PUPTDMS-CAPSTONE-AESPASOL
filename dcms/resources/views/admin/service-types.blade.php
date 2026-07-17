@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Service Types | Admin Dashboard')
+@section('layout-role', 'admin')
+
+@section('title', 'Service Types')
 
 @section('content')
+
 <main id="mainContent" class="admin-page-shell page-enter mode-list">
 
     <div class="page-banner">
@@ -763,9 +766,6 @@ $serviceTypeRoutes = [
         bindVoiceClear('serviceNameInput', 'serviceNameClearBtn');
         bindVoiceClear('serviceDescInput', 'serviceDescClearBtn');
 
-        // ─────────────────────────────────────────────────────────────
-        // Voice controllers for service inputs
-        // ─────────────────────────────────────────────────────────────
         (function initServiceVoice() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return;
@@ -797,7 +797,6 @@ $serviceTypeRoutes = [
                 const toggleWrapper = document.getElementById(config.toggleWrapperId);
                 if (!input || !toggleWrapper) return;
 
-                // Build mic button
                 const micBtn = document.createElement('button');
                 micBtn.type = 'button';
                 micBtn.id = config.micId;
@@ -806,18 +805,16 @@ $serviceTypeRoutes = [
                 micBtn.title = 'Toggle voice input';
                 toggleWrapper.appendChild(micBtn);
 
-                // Build status chip
                 const status = document.createElement('span');
                 status.className = 'voice-status hidden';
                 status.setAttribute('aria-hidden', 'true');
                 status.setAttribute('aria-live', 'polite');
                 toggleWrapper.appendChild(status);
 
-                // State
                 let recognition = null;
                 let listening = false;
                 let manualStop = false;
-                let capturedText = false; // ← tracks whether any speech was recorded
+                let capturedText = false;
 
                 const setStatus = (text, state) => {
                     status.textContent = text || '';
@@ -834,7 +831,6 @@ $serviceTypeRoutes = [
                         '<i class="fa-solid fa-microphone"></i>';
                 };
 
-                // ── FIX: manual stop now checks whether speech was captured ──
                 const stopNow = () => {
                     manualStop = true;
                     listening = false;
@@ -860,7 +856,7 @@ $serviceTypeRoutes = [
                 };
 
                 const createRecognition = () => {
-                    capturedText = false; // reset per session
+                    capturedText = false;
 
                     const r = new SpeechRecognition();
                     r.lang = 'en-US';
@@ -912,7 +908,7 @@ $serviceTypeRoutes = [
                         transcript = transcript.trim();
                         if (transcript) {
                             clearTimeout_();
-                            capturedText = true; // ← speech was actually received
+                            capturedText = true;
                             input.value = transcript;
                             input.dispatchEvent(new Event('input', {
                                 bubbles: true
@@ -959,7 +955,6 @@ $serviceTypeRoutes = [
                     return r;
                 };
 
-                // Click: toggle on / off
                 micBtn.addEventListener('click', () => {
                     if (listening && recognition) {
                         stopNow();
@@ -980,7 +975,6 @@ $serviceTypeRoutes = [
                     setStatus('Listening...', 'listening');
                 });
 
-                // pointerdown: immediate stop while active
                 micBtn.addEventListener('pointerdown', (ev) => {
                     if (listening && recognition) {
                         ev.preventDefault();

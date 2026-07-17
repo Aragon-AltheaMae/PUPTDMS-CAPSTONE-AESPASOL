@@ -1,35 +1,5 @@
-:root {
-  --crimson: #8B0000;
-  --crimson-dark: #660000;
-  --gold: #FFD700;
+.backup-page {
   --gold-soft: #FFE58A;
-}
-
-.auth-container {
-  min-height: 100vh;
-  width: 100%;
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-#siteFooter {
-  display: block;
-  width: 100%;
-  margin-top: auto;
-}
-
-body {
-  background:
-    radial-gradient(circle at top left, rgba(255, 215, 0, 0.2), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(139, 0, 0, 0.18), transparent 40%),
-    linear-gradient(135deg, #f7f4ef 0%, #fcfbf8 42%, #f1ece5 100%);
-}
-
-html[data-theme="dark"] body {
-  background:
-    radial-gradient(circle at top left, rgba(255, 215, 0, 0.12), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(139, 0, 0, 0.16), transparent 40%),
-    linear-gradient(135deg, #0f172a 0%, #131d33 42%, #1b2437 100%);
 }
 
 .backup-page {
@@ -71,7 +41,7 @@ html[data-theme="dark"] .backup-panel {
   color: #fff;
   background:
     linear-gradient(rgba(102, 0, 0, 0.72), rgba(70, 0, 0, 0.82)),
-    url('../images/PUP TAGUIG CAMPUS.jpg') center center / cover no-repeat;
+    url('/images/PUP%20TAGUIG%20CAMPUS.jpg') center center / cover no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -88,7 +58,7 @@ html[data-theme="dark"] .backup-panel {
   pointer-events: none;
 }
 
-.backup-brand > * {
+.backup-brand>* {
   position: relative;
   z-index: 1;
 }
