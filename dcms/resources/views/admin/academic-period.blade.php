@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Academic Period | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Academic Period')
 
 @section('content')
+
 @php
 $calendarPeriodsPayload = collect($calendarPeriods ?? [])
 ->sortBy('start_date')

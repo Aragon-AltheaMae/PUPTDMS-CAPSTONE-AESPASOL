@@ -1,6 +1,8 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'User Management | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'User Management')
 
 @section('content')
 
@@ -2162,7 +2164,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 '');
 
             if (String(document.getElementById('editRole').value || '') !== String(document.getElementById(
-                    'editOriginalRole').value || '')) {
+                'editOriginalRole').value || '')) {
                 params.append('admin_current_password', document.getElementById('editAdminCurrentPassword')
                     .value);
             }

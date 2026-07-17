@@ -1,6 +1,8 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Appointments | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Appointments')
 
 @section('usesAppointmentCalendar', true)
 
@@ -59,15 +61,15 @@ $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
 $allAppointments = $upcomingAppointments->merge($pastAppointments);
 $normalizeAppointmentStatus = function ($status) {
-    $normalized = strtolower(trim((string) ($status ?? '')));
+$normalized = strtolower(trim((string) ($status ?? '')));
 
-    return match ($normalized) {
-        'pending', 'confirmed', 'upcoming' => 'upcoming',
-        'reschedule', 'rescheduled' => 'rescheduled',
-        'canceled', 'cancelled' => 'cancelled',
-        'completed' => 'completed',
-        default => $normalized ?: 'upcoming',
-    };
+return match ($normalized) {
+'pending', 'confirmed', 'upcoming' => 'upcoming',
+'reschedule', 'rescheduled' => 'rescheduled',
+'canceled', 'cancelled' => 'cancelled',
+'completed' => 'completed',
+default => $normalized ?: 'upcoming',
+};
 };
 
 $statusCounts = [

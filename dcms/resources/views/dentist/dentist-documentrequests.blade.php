@@ -1,6 +1,8 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Document Request | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Document Requests')
 
 @section('content')
 
@@ -1202,7 +1204,6 @@ $documentTypes = $requestableDocumentTypes;
     function getPatientDisplayName(name) {
         const raw = String(name || '').trim();
 
-        // Converts: "Romero, Dianna Rain Margaja" -> "Dianna Rain Margaja Romero"
         if (raw.includes(',')) {
             const [lastName, firstPart] = raw.split(',').map(part => part.trim());
             return `${firstPart} ${lastName}`.replace(/\s+/g, ' ').trim();

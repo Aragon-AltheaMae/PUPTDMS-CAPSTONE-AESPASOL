@@ -1037,9 +1037,29 @@ window.showToast = showToast;
 window.dismissToast = dismissToast;
 
 function getCurrentRole() {
-    if (document.body.classList.contains('role-admin')) return 'admin';
-    if (document.body.classList.contains('role-dentist')) return 'dentist';
-    if (document.body.classList.contains('role-patient')) return 'patient';
+    const sidebar = document.getElementById('sidebar');
+
+    if (
+        document.body.classList.contains('role-admin') ||
+        sidebar?.classList.contains('sidebar-admin')
+    ) {
+        return 'admin';
+    }
+
+    if (
+        document.body.classList.contains('role-dentist') ||
+        sidebar?.classList.contains('sidebar-dentist')
+    ) {
+        return 'dentist';
+    }
+
+    if (
+        document.body.classList.contains('role-patient') ||
+        sidebar?.classList.contains('sidebar-patient')
+    ) {
+        return 'patient';
+    }
+
     return 'global';
 }
 
@@ -1197,19 +1217,23 @@ function initGlobalThemeControls(root = document) {
         item.dataset.themeItemInitialized = 'true';
 
         item.addEventListener('click', event => {
-            const clickedSwitch = event.target.closest('#themeSwitchCheckbox, .modern-switch');
-
-            if (clickedSwitch) return;
-
             event.preventDefault();
             event.stopPropagation();
 
+            const clickedCheckbox = event.target.closest('#themeSwitchCheckbox');
+
+            if (clickedCheckbox) {
+                return;
+            }
+
             const checkbox = item.querySelector('#themeSwitchCheckbox');
 
-            if (checkbox) {
-                checkbox.checked = !checkbox.checked;
-                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', {
+                bubbles: true
+            }));
         });
     });
 }
@@ -1337,40 +1361,85 @@ function closeDrawer() {
 
 function applySidebarState(isCollapsed) {
     const sidebar = document.getElementById('sidebar');
+
+    if (!sidebar) return;
+
     const mainContent = document.getElementById('mainContent');
+    const currentRole = getCurrentRole();
+    const collapsed = Boolean(isCollapsed);
 
-    if (!sidebar || !mainContent) return;
-
-    if (window.innerWidth <= 767 && !document.body.classList.contains('role-patient')) {
+    if (window.innerWidth <= 767 && currentRole !== 'patient') {
         sidebar.classList.remove('collapsed');
         document.body.classList.remove('sidebar-collapsed');
+
+        document.querySelectorAll('#sidebarIcon, #sidebarToggleIcon').forEach(icon => {
+            icon.className = 'fa-solid fa-xmark';
+        });
+
         return;
     }
 
-    sidebar.classList.toggle('collapsed', isCollapsed);
-    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+    sidebar.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+
+    if (mainContent) {
+        mainContent.classList.toggle('sidebar-content-collapsed', collapsed);
+    }
 
     document.querySelectorAll('#sidebarIcon, #sidebarToggleIcon').forEach(icon => {
-        icon.className = isCollapsed ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
+        icon.className = collapsed
+            ? 'fa-solid fa-bars'
+            : 'fa-solid fa-xmark';
+    });
+
+    document.querySelectorAll(
+        '#sidebarToggleBtn, #desktopSidebarToggle, [data-sidebar-toggle]'
+    ).forEach(button => {
+        button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        button.setAttribute(
+            'aria-label',
+            collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+        );
     });
 }
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+
     if (!sidebar) return;
 
     const nextState = !sidebar.classList.contains('collapsed');
 
     applySidebarState(nextState);
-    localStorage.setItem(getSidebarStorageKey(), nextState ? '1' : '0');
+
+    localStorage.setItem(
+        getSidebarStorageKey(),
+        nextState ? '1' : '0'
+    );
 }
 
 function initGlobalSidebar() {
-    const savedState = localStorage.getItem(getSidebarStorageKey()) === '1';
+    const sidebar = document.getElementById('sidebar');
+
+    if (!sidebar) {
+        document.documentElement.classList.remove(
+            'sidebar-preload',
+            'sidebar-collapsed-init'
+        );
+        return;
+    }
+
+    const storageKey = getSidebarStorageKey();
+    const storedValue = localStorage.getItem(storageKey);
+    const savedState = storedValue === '1';
+
+    document.documentElement.classList.remove('sidebar-collapsed-init');
 
     applySidebarState(savedState);
 
-    document.querySelectorAll('#sidebarToggleBtn, #desktopSidebarToggle, [data-sidebar-toggle]').forEach(button => {
+    document.querySelectorAll(
+        '#sidebarToggleBtn, #desktopSidebarToggle, [data-sidebar-toggle]'
+    ).forEach(button => {
         if (button.dataset.sidebarInitialized === 'true') return;
 
         button.dataset.sidebarInitialized = 'true';
@@ -1378,13 +1447,19 @@ function initGlobalSidebar() {
         if (!button.getAttribute('onclick')) {
             button.addEventListener('click', event => {
                 event.preventDefault();
+                event.stopPropagation();
                 toggleSidebar();
             });
         }
     });
 
     requestAnimationFrame(() => {
-        document.documentElement.classList.remove('sidebar-preload', 'sidebar-collapsed-init');
+        document.documentElement.classList.remove(
+            'sidebar-preload',
+            'sidebar-collapsed-init'
+        );
+
+        applySidebarState(savedState);
     });
 }
 
@@ -1637,7 +1712,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initSessionStorageToasts();
 });
 
-document.addEventListener('click', closeHeaderMenus);
+document.addEventListener('click', event => {
+    const clickedInsideHeaderMenu = event.target.closest(
+        '#notifDropdown, #userDropdown'
+    );
+
+    if (clickedInsideHeaderMenu) {
+        return;
+    }
+
+    closeHeaderMenus();
+});
 
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {

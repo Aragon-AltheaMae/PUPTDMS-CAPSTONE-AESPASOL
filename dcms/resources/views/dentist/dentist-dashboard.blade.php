@@ -1,6 +1,9 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Dentist Dashboard | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Dashboard')
+
 @section('usesAppointmentCalendar', true)
 
 @section('content')
