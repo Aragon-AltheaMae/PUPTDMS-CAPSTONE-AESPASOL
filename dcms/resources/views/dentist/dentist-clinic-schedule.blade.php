@@ -1,8 +1,11 @@
-@extends('layouts.dentist')
+@extends('layouts.app')
 
-@section('title', 'Clinic Schedule | PUP Taguig Dental Clinic')
+@section('layout-role', 'dentist')
+
+@section('title', 'Clinic Schedule')
 
 @section('content')
+
 @php
 $openRules = $schedules->where('status', '!=', 'closed');
 $openDays = $openRules->sum(fn($s) => count($s->days ?? []));

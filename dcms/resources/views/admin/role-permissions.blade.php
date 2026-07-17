@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Role Permissions | Admin Dashboard')
+@section('layout-role', 'admin')
+
+@section('title', 'Roles & Permissions')
 
 @section('content')
+
 @php
 $logs = $logs ?? collect([]);
 $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();

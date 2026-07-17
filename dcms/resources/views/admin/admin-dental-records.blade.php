@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Dental Records | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Dental Records')
 
 @section('content')
+
 @php
 use Carbon\Carbon;
 

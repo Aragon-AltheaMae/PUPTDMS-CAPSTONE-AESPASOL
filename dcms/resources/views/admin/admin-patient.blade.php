@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Patient List | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Patient List')
 
 @section('content')
+
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();

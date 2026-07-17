@@ -1,8 +1,11 @@
-@extends('layouts.patient')
+@extends('layouts.app')
 
-@section('title', 'Patient Dashboard | PUP Taguig Dental Clinic')
+@section('layout-role', 'patient')
+
+@section('title', 'Dashboard')
 
 @section('content')
+
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
@@ -38,6 +41,45 @@ $calendarAppointments[\Carbon\Carbon::parse($appt->appointment_date)->format('Y-
 $appt->service_type .
 ' • ' .
 \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A');
+}
+
+$completedCalendarAppointments = [];
+
+foreach (
+    collect($records ?? [])->filter(function ($record) {
+        return strtolower($record->status ?? '') === 'completed';
+    }) as $record
+) {
+    if (empty($record->appointment_date)) {
+        continue;
+    }
+
+    $dateKey = \Carbon\Carbon::parse(
+        $record->appointment_date
+    )->format('Y-m-d');
+
+    $completedCalendarAppointments[$dateKey] ??= [];
+
+    $completedCalendarAppointments[$dateKey][] = [
+        'service' => $record->service_type ?? 'Dental Appointment',
+
+        'time' => !empty($record->appointment_time)
+            ? \Carbon\Carbon::parse(
+                $record->appointment_time
+            )->format('g:i A')
+            : 'Time not recorded',
+
+        'status' => 'completed',
+
+        'dentist' => $record->dentist_name
+            ?? optional($record->dentist)->name
+            ?? 'Assigned Dentist',
+
+        'duration' => $record->duration ?? null,
+        'remarks' => $record->remarks ?? null,
+        'diagnosis' => $record->diagnosis ?? null,
+        'prescription' => $record->prescription ?? null,
+    ];
 }
 
 $dashboardDisplayName = ucwords(
@@ -186,10 +228,10 @@ isset($upcomingAppointment) && $upcomingAppointment
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch dashboard-grid-tight">
-            <div class="xl:col-span-4">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start dashboard-grid-tight">
+            <div class="xl:col-span-4 self-start">
                 <div id="profileSkeletonContainer"
-                    class="dashboard-glass rounded-[1rem] overflow-hidden skeleton-section h-full skeleton-shell skeleton-fade-swap mt-3">
+                    class="dashboard-glass rounded-[1rem] overflow-hidden skeleton-section skeleton-shell skeleton-fade-swap mt-3">
                     <div>
                         <div class="bg-gray-200 px-5 sm:px-6 py-5">
                             <div class="h-3 w-28 skeleton-line mb-3"></div>
@@ -342,19 +384,41 @@ isset($upcomingAppointment) && $upcomingAppointment
 </main>
 
 @include('components.appointment-calendar-script', [
-'mode' => 'patient-dashboard',
-'renderStyle' => 'patient',
-'calendarContainerId' => 'calendarSkeletonContainer',
-'dateInputId' => null,
-'timeInputId' => null,
-'slotEndpoint' => route('book.appointment.slots'),
-'blockedDates' => $unavailableDates ?? [],
-'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
-'philippineHolidays' => $philippineHolidays ?? [],
-'personalAppointments' => $calendarAppointments ?? [],
-'useDynamicScheduleRules' => false,
-'disallowToday' => false,
-'allowToggleOffDate' => false,
+    'mode' => 'patient-dashboard',
+    'renderStyle' => 'patient',
+    'calendarContainerId' => 'calendarSkeletonContainer',
+
+    'dateInputId' => null,
+    'timeInputId' => null,
+
+    'slotEndpoint' => route('book.appointment.slots'),
+    'bookingUrl' => route('patient.book.appointment'),
+
+    'scheduleRules' => isset($schedules)
+        ? $schedules
+        : (
+            isset($scheduleRules)
+                ? $scheduleRules
+                : \App\Models\ClinicSchedule::active()
+                    ->get()
+                    ->values()
+                    ->toArray()
+        ),
+
+    'blockedDates' => $unavailableDates ?? [],
+    'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+    'philippineHolidays' => $philippineHolidays ?? [],
+    'personalAppointments' => $calendarAppointments ?? [],
+    'completedAppointments' => $completedCalendarAppointments ?? [],
+
+    'useDynamicScheduleRules' => true,
+    'disallowToday' => true,
+    'allowToggleOffDate' => false,
+
+    'maxFutureMonths' => 6,
+    'historyMonths' => 12,
+
+    'appointmentHistoryUrl' => route('patient.record'),
 ])
 @endsection
 
@@ -509,9 +573,6 @@ isset($upcomingAppointment) && $upcomingAppointment
             {
                 label: 'Loading calendar and appointment details',
                 tasks: [
-                    () => {
-                        if (typeof renderCalendar === 'function') renderCalendar();
-                    },
                     renderUpcomingAppointment
                 ]
             },
@@ -831,7 +892,7 @@ isset($upcomingAppointment) && $upcomingAppointment
             '</div>';
 
         window.swapSkeletonContent('profileSkeletonContainer',
-            '<div class="dashboard-card-polished dashboard-glass overflow-hidden h-full flex flex-col rounded-[1rem]">' +
+            '<div class="dashboard-card-polished dashboard-glass overflow-hidden flex flex-col rounded-[1rem]">' +
             '<div class="h-20 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative"></div>' +
 
             '<div class="px-4 pb-4 relative flex flex-col items-center mt-[-34px]">' +

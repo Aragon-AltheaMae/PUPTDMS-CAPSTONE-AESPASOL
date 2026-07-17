@@ -1,8 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Faculty Integration | PUP Taguig Dental Clinic')
+@section('layout-role', 'admin')
+
+@section('title', 'Faculty Integration')
 
 @section('content')
+
 <main id="mainContent" class="admin-page-shell page-enter">
     <div class="w-full">
         <div class="page-banner faculty-banner"

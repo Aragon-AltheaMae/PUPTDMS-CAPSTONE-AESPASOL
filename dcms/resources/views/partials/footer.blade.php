@@ -1,10 +1,20 @@
 <footer id="siteFooter">
     <div class="footer-inner">
-        <span style="color:rgba(255,255,255,.5);">© 1998–2026</span>
-        <span style="font-weight:700;color:#fff;">Polytechnic University of the Philippines</span>
-        <span class="footer-dot">|</span>
-        <a href="https://www.pup.edu.ph/terms/">Terms of Use</a>
-        <span class="footer-dot">|</span>
-        <a href="https://www.pup.edu.ph/privacy/">Privacy Statement</a>
+        <div class="footer-copyright">
+            <span>© 1998–2026</span>
+            <strong>Polytechnic University of the Philippines</strong>
+        </div>
+
+        <nav class="footer-links" aria-label="Legal links">
+            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">
+                Terms and Conditions
+            </a>
+
+            <span class="footer-dot" aria-hidden="true">|</span>
+
+            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">
+                Privacy Policy
+            </a>
+        </nav>
     </div>
 </footer>
