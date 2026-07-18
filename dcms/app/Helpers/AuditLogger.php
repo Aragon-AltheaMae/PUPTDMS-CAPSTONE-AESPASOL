@@ -33,6 +33,7 @@ class AuditLogger
         }
 
         AuditLog::create([
+            'actor_id' => $user?->id,
             'actor_name' => $actorName,
             'actor_role' => $actorRole,
             'actor_identifier' => $actorIdentifier,

@@ -2610,7 +2610,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return true;
     }
 
-    emergencyPerson?.addEventListener("input", () => {
+    emergencyPerson?.addEventListener("input", (e) => {
+        const sanitizedValue = e.target.value.replace(/[^A-Za-zÑñ\s.'-]/g, "");
+        const hadInvalidChars = sanitizedValue !== e.target.value;
+
+        if (hadInvalidChars) {
+            e.target.value = sanitizedValue;
+            showMiniTab("Emergency contact name must contain letters only.");
+        }
+
         validateEmergencyPerson(true);
         markFormDirty();
     });
