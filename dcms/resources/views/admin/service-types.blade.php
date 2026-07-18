@@ -24,459 +24,479 @@
 
     <div class="admin-page-body">
 
-    <div class="content-lift">
-        <div class="main-grid">
+        <div class="content-lift">
+            <div class="main-grid">
 
-            <div class="admin-stack">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-header-left">
-                            <div class="card-header-icon"><i class="fa-solid fa-plus"></i></div>
-                            <span class="card-title">Add New Service</span>
+                <div class="admin-stack">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <div class="card-header-icon"><i class="fa-solid fa-plus"></i></div>
+                                <span class="card-title">Add New Service</span>
+                            </div>
+                        </div>
+
+                        <div class="admin-card-pad">
+                            <form id="addServiceForm" method="POST" action="{{ route('admin.service-types.store') }}"
+                                novalidate>
+                                @csrf
+
+                                <div class="st-form-group">
+                                    <label class="st-label">Service Name</label>
+                                    <div class="st-voice-row">
+                                        <div class="st-input-wrap">
+                                            <i class="fa-solid fa-tag st-input-icon"></i>
+                                            <input type="text" id="serviceNameInput" name="name"
+                                                placeholder="e.g. Tooth Extraction" autocomplete="off"
+                                                value="{{ old('name') }}" class="st-input with-icon no-voice">
+                                            <button type="button" id="serviceNameClearBtn"
+                                                class="st-voice-clear-btn hidden" aria-label="Clear service name"
+                                                title="Clear">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                        {{-- Mic toggle is a sibling of st-input-wrap, not inside it --}}
+                                        <div class="service-voice-toggle" id="serviceNameVoiceToggle"></div>
+                                    </div>
+
+                                    <div id="nameClientError" class="st-field-error admin-hidden">
+                                        <i class="fa-solid fa-circle-exclamation"></i> Please provide a service name.
+                                    </div>
+
+                                    @error('name')
+                                    <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{
+                                        $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+
+                                <div class="st-form-group">
+                                    <div class="st-label-row">
+                                        <label class="st-label">Description (Optional)</label>
+
+                                        <button type="button" class="st-copy-bullet-box" data-copy-bullet
+                                            data-copy-target="#serviceDescInput" title="Copy bullet">
+                                            <span class="st-copy-bullet-symbol">•</span>
+                                            <span class="st-copy-bullet-label">Copy this bullet</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="st-voice-row is-textarea">
+                                        <div class="st-input-wrap st-textarea-wrap">
+                                            <textarea id="serviceDescInput" name="description"
+                                                placeholder="Brief details about the service..."
+                                                class="st-input st-textarea no-voice"
+                                                maxlength="255">{{ old('description') }}</textarea>
+
+                                            <div id="serviceDescCount" class="st-char-count">0 / 255</div>
+                                            <button type="button" id="serviceDescClearBtn"
+                                                class="st-voice-clear-btn hidden" aria-label="Clear description"
+                                                title="Clear">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                        <div class="service-voice-toggle" id="serviceDescVoiceToggle"></div>
+                                    </div>
+
+                                    @error('description')
+                                    <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{
+                                        $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="st-btn st-btn-primary st-save-service-btn">
+                                    <span class="btn-confirm-icon">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                    </span>
+                                    Save Service
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-stack">
+                    <div class="card">
+                        <div class="card-header service-list-card-header">
+                            <div class="card-header-left">
+                                <div class="card-header-icon"><i class="fa-solid fa-list-check"></i></div>
+                                <span class="card-title">Existing Services</span>
+                            </div>
+
+                            <div class="service-card-header-actions">
+                                <span class="entry-badge" id="serviceEntryCountBadge">
+                                    {{ $services->count() }} {{ Str::plural('Item', $services->count()) }}
+                                </span>
+
+                                <div class="view-toggle-container service-type-view-toggle" id="serviceTypeViewToggle"
+                                    aria-label="View options">
+                                    <span class="view-slider" aria-hidden="true"></span>
+
+                                    <button type="button" class="btn-view-mode active" id="serviceTypeListBtn"
+                                        title="List view" aria-label="List view" aria-pressed="true">
+                                        <i class="fa-solid fa-table-list"></i>
+                                    </button>
+
+                                    <button type="button" class="btn-view-mode" id="serviceTypeGridBtn"
+                                        title="Grid view" aria-label="Grid view" aria-pressed="false">
+                                        <i class="fa-solid fa-grip"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-type-view" id="serviceTypeListView">
+                            <div class="admin-scroll-x">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="service-col-id">ID</th>
+                                            <th class="service-col-name">Service Name</th>
+                                            <th>Description</th>
+                                            <th class="service-col-visibility">Booking Visibility</th>
+                                            <th class="service-col-action">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="serviceTypeTableBody">
+                                        @forelse($services as $service)
+                                        <tr>
+                                            <td><span class="service-badge">#{{ $service->id }}</span></td>
+                                            <td>
+                                                <div class="service-name-cell">
+                                                    <div class="service-name-icon">
+                                                        <i class="fa-solid fa-tooth"></i>
+                                                    </div>
+                                                    <span class="service-name-text">
+                                                        {{ $service->name }}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="service-desc-cell">
+                                                {{ $service->description ?: '—' }}
+                                            </td>
+                                            <td class="service-center-cell">
+                                                <div class="service-visibility-actions">
+                                                    @if ($service->is_active_for_booking)
+                                                    <span class="service-visibility-badge is-visible">
+                                                        <i class="fa-solid fa-thumbtack"></i> Visible
+                                                    </span>
+                                                    @else
+                                                    <span class="service-visibility-badge is-hidden">
+                                                        <i class="fa-solid fa-eye-slash"></i> Hidden
+                                                    </span>
+                                                    @endif
+
+                                                    @if ($service->is_default)
+                                                    <span class="service-badge service-badge-bookable">
+                                                        Default
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="service-center-cell">
+                                                <div class="service-inline-actions ui-action-group">
+                                                    <button type="button" class="ui-action-btn ui-action-edit"
+                                                        data-tooltip="Manage service" aria-label="Manage service"
+                                                        onclick="openManageServiceModal(
+        '{{ route('admin.service-types.update', $service->id) }}',
+        @js($service->name),
+        @js($service->description),
+        {{ $service->is_active_for_booking ? 'true' : 'false' }},
+        {{ $service->is_default ? 'true' : 'false' }}
+    )">
+
+                                                        <i class="fa-solid fa-pen"></i>
+                                                    </button>
+
+                                                    @if (!$service->is_default)
+                                                    <button type="button" class="ui-action-btn ui-action-delete"
+                                                        data-tooltip="Delete service" aria-label="Delete service"
+                                                        onclick="openDeleteModal(
+        '{{ route('admin.service-types.destroy', $service->id) }}',
+        '{{ addslashes($service->name) }}'
+    )">
+
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <div class="empty-icon"><i class="fa-solid fa-folder-open"></i>
+                                                    </div>
+                                                    <p class="service-empty-title">
+                                                        No services found
+                                                    </p>
+                                                    <p class="service-empty-subtitle">
+                                                        Your clinic doesn't have any service types yet. Use the form
+                                                        to
+                                                        add
+                                                        one.
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="service-type-view" id="serviceTypeGridView" hidden>
+                            @if ($services->count())
+                            <div class="service-types-grid" id="serviceTypeGridContainer">
+                                @foreach ($services as $service)
+                                <div class="service-type-card">
+                                    <div class="service-type-card-top">
+                                        <span class="service-badge service-type-card-id">#{{ $service->id }}</span>
+
+                                        @if ($service->is_default)
+                                        <span class="service-badge service-badge-bookable">
+                                            Default
+                                        </span>
+                                        @endif
+                                    </div>
+
+                                    <div class="service-type-card-name-wrap">
+                                        <div class="service-type-card-icon">
+                                            <i class="fa-solid fa-tooth"></i>
+                                        </div>
+                                        <div class="service-type-card-name">{{ $service->name }}</div>
+                                    </div>
+
+                                    <div class="service-type-card-desc-wrap">
+                                        <div class="service-type-card-label">Description</div>
+                                        <div class="service-type-card-desc">
+                                            {{ $service->description ?: '—' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="service-type-card-footer">
+                                        <div class="service-card-actions">
+                                            @if ($service->is_active_for_booking)
+                                            <span class="service-visibility-badge is-visible">
+                                                <i class="fa-solid fa-thumbtack"></i> Visible
+                                            </span>
+                                            @else
+                                            <span class="service-visibility-badge is-hidden">
+                                                <i class="fa-solid fa-eye-slash"></i> Hidden
+                                            </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="service-type-card-actions ui-action-group">
+                                            <button type="button" class="ui-action-btn ui-action-edit"
+                                                data-tooltip="Manage service" aria-label="Manage service" onclick="openManageServiceModal(
+            '{{ route('admin.service-types.update', $service->id) }}',
+            @js($service->name),
+            @js($service->description),
+            {{ $service->is_active_for_booking ? 'true' : 'false' }},
+            {{ $service->is_default ? 'true' : 'false' }}
+        )">
+
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+
+                                            @if (!$service->is_default)
+                                            <button type="button" class="ui-action-btn ui-action-delete"
+                                                data-tooltip="Delete service" aria-label="Delete service" onclick="openDeleteModal(
+        '{{ route('admin.service-types.destroy', $service->id) }}',
+        '{{ addslashes($service->name) }}'
+    )">
+
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            @else
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                                <p class="service-empty-title">
+                                    No services found
+                                </p>
+                                <p class="service-empty-subtitle">
+                                    Your clinic doesn't have any service types yet. Use the form to add one.
+                                </p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-modal modal-overlay st-delete-confirm-modal" id="deleteServiceModal"
+            onclick="closeModalOnBackdrop(event, 'deleteServiceModal')" aria-hidden="true">
+
+            <div class="modal-box-inner um-user-modal um-user-modal-sm st-delete-user-modal"
+                onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="deleteServiceTitle">
+
+                <div class="st-delete-head">
+                    <div class="st-delete-head-left">
+                        <div class="st-delete-head-icon">
+                            <i class="fa-solid fa-trash"></i>
+                        </div>
+
+                        <div>
+                            <h3 id="deleteServiceTitle" class="st-delete-title">Delete Service Type</h3>
+                            <p class="st-delete-subtitle">This action requires confirmation</p>
                         </div>
                     </div>
 
-                    <div class="admin-card-pad">
-                        <form id="addServiceForm" method="POST" action="{{ route('admin.service-types.store') }}"
-                            novalidate>
+                    <button type="button" onclick="closeDeleteModal()" class="um-modal-x"
+                        aria-label="Close delete modal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="st-delete-body">
+                    <div class="st-delete-alert">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        <div>
+                            <p>
+                                Are you sure you want to delete
+                                <strong id="deleteServiceName" class="st-delete-name"></strong>?
+                            </p>
+                            <span>This action cannot be undone.</span>
+                        </div>
+                    </div>
+
+                    <div class="st-delete-actions">
+                        <button type="button" onclick="closeDeleteModal()" class="ui-btn ui-btn-secondary">
+                            Cancel
+                        </button>
+
+                        <form id="deleteServiceForm" method="POST" action="" class="service-delete-form">
                             @csrf
+                            @method('DELETE')
 
-                            <div class="st-form-group">
-                                <label class="st-label">Service Name</label>
-                                <div class="st-voice-row">
-                                    <div class="st-input-wrap">
-                                        <i class="fa-solid fa-tag st-input-icon"></i>
-                                        <input type="text" id="serviceNameInput" name="name"
-                                            placeholder="e.g. Tooth Extraction" autocomplete="off"
-                                            value="{{ old('name') }}" class="st-input with-icon no-voice">
-                                        <button type="button" id="serviceNameClearBtn" class="st-voice-clear-btn hidden"
-                                            aria-label="Clear service name" title="Clear">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </div>
-                                    {{-- Mic toggle is a sibling of st-input-wrap, not inside it --}}
-                                    <div class="service-voice-toggle" id="serviceNameVoiceToggle"></div>
-                                </div>
-
-                                <div id="nameClientError" class="st-field-error admin-hidden">
-                                    <i class="fa-solid fa-circle-exclamation"></i> Please provide a service name.
-                                </div>
-
-                                @error('name')
-                                <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}
-                                </div>
-                                @enderror
-                            </div>
-
-                            <div class="st-form-group">
-                                <div class="st-label-row">
-                                    <label class="st-label">Description (Optional)</label>
-
-                                    <button type="button" class="st-copy-bullet-box" data-copy-bullet
-                                        data-copy-target="#serviceDescInput" title="Copy bullet">
-                                        <span class="st-copy-bullet-symbol">•</span>
-                                        <span class="st-copy-bullet-label">Copy this bullet</span>
-                                    </button>
-                                </div>
-
-                                <div class="st-voice-row is-textarea">
-                                    <div class="st-input-wrap st-textarea-wrap">
-                                        <textarea id="serviceDescInput" name="description"
-                                            placeholder="Brief details about the service..."
-                                            class="st-input st-textarea no-voice"
-                                            maxlength="255">{{ old('description') }}</textarea>
-
-                                        <div id="serviceDescCount" class="st-char-count">0 / 255</div>
-                                        <button type="button" id="serviceDescClearBtn" class="st-voice-clear-btn hidden"
-                                            aria-label="Clear description" title="Clear">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </div>
-                                    <div class="service-voice-toggle" id="serviceDescVoiceToggle"></div>
-                                </div>
-
-                                @error('description')
-                                <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}
-                                </div>
-                                @enderror
-                            </div>
-
-                            <button type="submit" class="st-btn st-btn-primary st-save-service-btn">
-                                <span class="btn-confirm-icon">
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                </span>
-                                Save Service
+                            <button type="submit" class="ui-btn ui-btn-danger">
+                                <i class="fa-solid fa-trash"></i>
+                                Delete
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-
-            <div class="admin-stack">
-                <div class="card">
-                    <div class="card-header service-list-card-header">
-                        <div class="card-header-left">
-                            <div class="card-header-icon"><i class="fa-solid fa-list-check"></i></div>
-                            <span class="card-title">Existing Services</span>
-                        </div>
-
-                        <div class="service-card-header-actions">
-                            <span class="entry-badge" id="serviceEntryCountBadge">
-                                {{ $services->count() }} {{ Str::plural('Item', $services->count()) }}
-                            </span>
-
-                            <div class="view-toggle-container service-type-view-toggle" id="serviceTypeViewToggle"
-                                aria-label="View options">
-                                <span class="view-slider" aria-hidden="true"></span>
-
-                                <button type="button" class="btn-view-mode active" id="serviceTypeListBtn"
-                                    title="List view" aria-label="List view" aria-pressed="true">
-                                    <i class="fa-solid fa-table-list"></i>
-                                </button>
-
-                                <button type="button" class="btn-view-mode" id="serviceTypeGridBtn" title="Grid view"
-                                    aria-label="Grid view" aria-pressed="false">
-                                    <i class="fa-solid fa-grip"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="service-type-view" id="serviceTypeListView">
-                        <div class="admin-scroll-x">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th class="service-col-id">ID</th>
-                                        <th class="service-col-name">Service Name</th>
-                                        <th>Description</th>
-                                        <th class="service-col-visibility">Booking Visibility</th>
-                                        <th class="service-col-action">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="serviceTypeTableBody">
-                                    @forelse($services as $service)
-                                    <tr>
-                                        <td><span class="service-badge">#{{ $service->id }}</span></td>
-                                        <td>
-                                            <div class="service-name-cell">
-                                                <div class="service-name-icon">
-                                                    <i class="fa-solid fa-tooth"></i>
-                                                </div>
-                                                <span class="service-name-text">
-                                                    {{ $service->name }}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="service-desc-cell">
-                                            {{ $service->description ?: '—' }}
-                                        </td>
-                                        <td class="service-center-cell">
-                                            <div class="service-visibility-actions">
-                                                @if ($service->is_active_for_booking)
-                                                <span class="service-visibility-badge is-visible">
-                                                    <i class="fa-solid fa-thumbtack"></i> Visible
-                                                </span>
-                                                @else
-                                                <span class="service-visibility-badge is-hidden">
-                                                    <i class="fa-solid fa-eye-slash"></i> Hidden
-                                                </span>
-                                                @endif
-
-                                                @if ($service->is_default)
-                                                <span class="service-badge service-badge-bookable">
-                                                    Default
-                                                </span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="service-center-cell">
-                                            <div class="service-inline-actions">
-                                                <button type="button" class="action-btn btn-edit" title="Manage service"
-                                                    onclick="openManageServiceModal(
-                                                                '{{ route('admin.service-types.update', $service->id) }}',
-                                                                @js($service->name),
-                                                                @js($service->description),
-                                                                {{ $service->is_active_for_booking ? 'true' : 'false' }},
-                                                                {{ $service->is_default ? 'true' : 'false' }}
-                                                            )">
-                                                    <i class="fa-solid fa-pen"></i>
-                                                </button>
-
-                                                @if (!$service->is_default)
-                                                <button type="button" class="action-btn btn-delete-service"
-                                                    title="Delete service"
-                                                    onclick="openDeleteModal('{{ route('admin.service-types.destroy', $service->id) }}', '{{ addslashes($service->name) }}')">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5">
-                                            <div class="empty-state">
-                                                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i>
-                                                </div>
-                                                <p class="service-empty-title">
-                                                    No services found
-                                                </p>
-                                                <p class="service-empty-subtitle">
-                                                    Your clinic doesn't have any service types yet. Use the form to
-                                                    add
-                                                    one.
-                                                </p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="service-type-view" id="serviceTypeGridView" hidden>
-                        @if ($services->count())
-                        <div class="service-types-grid" id="serviceTypeGridContainer">
-                            @foreach ($services as $service)
-                            <div class="service-type-card">
-                                <div class="service-type-card-top">
-                                    <span class="service-badge service-type-card-id">#{{ $service->id }}</span>
-
-                                    @if ($service->is_default)
-                                    <span class="service-badge service-badge-bookable">
-                                        Default
-                                    </span>
-                                    @endif
-                                </div>
-
-                                <div class="service-type-card-name-wrap">
-                                    <div class="service-type-card-icon">
-                                        <i class="fa-solid fa-tooth"></i>
-                                    </div>
-                                    <div class="service-type-card-name">{{ $service->name }}</div>
-                                </div>
-
-                                <div class="service-type-card-desc-wrap">
-                                    <div class="service-type-card-label">Description</div>
-                                    <div class="service-type-card-desc">
-                                        {{ $service->description ?: '—' }}
-                                    </div>
-                                </div>
-
-                                <div class="service-type-card-footer">
-                                    <div class="service-card-actions">
-                                        @if ($service->is_active_for_booking)
-                                        <span class="service-visibility-badge is-visible">
-                                            <i class="fa-solid fa-thumbtack"></i> Visible
-                                        </span>
-                                        @else
-                                        <span class="service-visibility-badge is-hidden">
-                                            <i class="fa-solid fa-eye-slash"></i> Hidden
-                                        </span>
-                                        @endif
-                                    </div>
-
-                                    <div class="service-type-card-actions">
-                                        <button type="button" class="action-btn btn-edit" title="Manage service"
-                                            onclick="openManageServiceModal(
-                                                            '{{ route('admin.service-types.update', $service->id) }}',
-                                                            @js($service->name),
-                                                            @js($service->description),
-                                                            {{ $service->is_active_for_booking ? 'true' : 'false' }},
-                                                            {{ $service->is_default ? 'true' : 'false' }}
-                                                        )">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-
-                                        @if (!$service->is_default)
-                                        <button type="button" class="action-btn btn-delete-service"
-                                            title="Delete service"
-                                            onclick="openDeleteModal('{{ route('admin.service-types.destroy', $service->id) }}', '{{ addslashes($service->name) }}')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        @else
-                        <div class="empty-state">
-                            <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
-                            <p class="service-empty-title">
-                                No services found
-                            </p>
-                            <p class="service-empty-subtitle">
-                                Your clinic doesn't have any service types yet. Use the form to add one.
-                            </p>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
 
-    <div class="ui-modal modal-overlay st-delete-confirm-modal" id="deleteServiceModal"
-        onclick="closeModalOnBackdrop(event, 'deleteServiceModal')" aria-hidden="true">
+        <div class="ui-modal st-manage-modal modal-theme-edit" id="manageServiceModal"
+            onclick="closeModalOnBackdrop(event, 'manageServiceModal')">
+            <div class="ui-modal-card st-modal-box" role="dialog" aria-modal="true"
+                aria-labelledby="manageServiceTitle">
+                <form id="manageServiceForm" method="POST" class="st-manage-form">
+                    @csrf
+                    @method('PUT')
 
-        <div class="modal-box-inner um-user-modal um-user-modal-sm st-delete-user-modal"
-            onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="deleteServiceTitle">
+                    <div class="st-modal-header modal-themed-header">
+                        <div class="st-modal-header-left">
+                            <div class="st-modal-header-icon modal-themed-icon">
+                                <i class="fa-solid fa-pen"></i>
+                            </div>
 
-            <div class="st-delete-head">
-                <div class="st-delete-head-left">
-                    <div class="st-delete-head-icon">
-                        <i class="fa-solid fa-trash"></i>
-                    </div>
+                            <div>
+                                <h3 class="st-modal-title" id="manageServiceTitle">Manage Service Type</h3>
+                                <p class="st-modal-subtitle">Update service details and booking visibility</p>
+                            </div>
+                        </div>
 
-                    <div>
-                        <h3 id="deleteServiceTitle" class="st-delete-title">Delete Service Type</h3>
-                        <p class="st-delete-subtitle">This action requires confirmation</p>
-                    </div>
-                </div>
-
-                <button type="button" onclick="closeDeleteModal()" class="um-modal-x" aria-label="Close delete modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="st-delete-body">
-                <div class="st-delete-alert">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-
-                    <div>
-                        <p>
-                            Are you sure you want to delete
-                            <strong id="deleteServiceName" class="st-delete-name"></strong>?
-                        </p>
-                        <span>This action cannot be undone.</span>
-                    </div>
-                </div>
-
-                <div class="st-delete-actions">
-                    <button type="button" onclick="closeDeleteModal()" class="modal-btn-ghost">
-                        Cancel
-                    </button>
-
-                    <form id="deleteServiceForm" method="POST" action="" class="service-delete-form">
-                        @csrf
-                        @method('DELETE')
-
-                        <button type="submit" class="st-delete-confirm-btn">
-                            <i class="fa-solid fa-trash"></i>
-                            Delete
+                        <button type="button" class="st-modal-close" onclick="closeModal('manageServiceModal')"
+                            aria-label="Close modal">
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="st-modal-body">
+                        <div class="st-panel">
+                            <label class="st-modal-label">Service Name <span class="text-red-500">*</span></label>
+
+                            <div class="st-modal-voice-row">
+                                <div class="st-modal-field-wrap">
+                                    <span class="st-modal-field-icon"><i class="fa-solid fa-tag"></i></span>
+                                    <input type="text" id="manageServiceName" name="name"
+                                        class="st-modal-input no-voice" maxlength="255" required>
+                                </div>
+
+                                <div class="service-voice-toggle" id="manageServiceNameVoiceToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="st-panel">
+                            <div class="st-label-row">
+                                <label class="st-modal-label">Description</label>
+
+                                <button type="button" class="st-copy-bullet-box" data-copy-bullet
+                                    data-copy-target="#manageServiceDescription" title="Copy bullet">
+                                    <span class="st-copy-bullet-symbol">•</span>
+                                    <span class="st-copy-bullet-label">Copy this bullet</span>
+                                </button>
+                            </div>
+
+                            <div class="st-modal-voice-row st-modal-voice-row--textarea">
+                                <div class="st-modal-textarea-wrap">
+                                    <textarea id="manageServiceDescription" name="description"
+                                        class="st-modal-textarea no-voice" maxlength="255"
+                                        placeholder="Brief details about the service..."></textarea>
+                                </div>
+
+                                <div class="service-voice-toggle" id="manageServiceDescVoiceToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="st-panel st-col-span-2">
+                            <div class="st-active-card">
+                                <div class="st-active-card-left">
+                                    <div class="st-active-badge">
+                                        <i class="fa-solid fa-thumbtack"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="st-active-title">Show in Book Appointment</p>
+                                        <p class="st-active-desc">Turn this off if you want the service hidden from
+                                            booking
+                                            but still kept in Service Types.</p>
+                                    </div>
+                                </div>
+
+                                <label class="st-switch">
+                                    <input type="checkbox" id="manageServiceBookingToggle" name="is_active_for_booking"
+                                        value="1">
+                                    <span class="st-switch-slider"></span>
+                                </label>
+                            </div>
+
+                            <div id="manageDefaultNote" class="st-default-note admin-hidden">
+                                This is a default service type. It can be edited and hidden from booking, but it cannot
+                                be
+                                deleted.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="st-modal-footer">
+                        <button type="button" class="ui-btn ui-btn-secondary"
+                            onclick="closeModal('manageServiceModal')">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="ui-btn ui-btn-edit">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
-
-    <div class="ui-modal st-manage-modal" id="manageServiceModal"
-        onclick="closeModalOnBackdrop(event, 'manageServiceModal')">
-        <div class="ui-modal-card st-modal-box" role="dialog" aria-modal="true" aria-labelledby="manageServiceTitle">
-            <form id="manageServiceForm" method="POST" class="st-manage-form">
-                @csrf
-                @method('PUT')
-
-                <div class="st-modal-header">
-                    <div class="st-modal-header-left">
-                        <div class="st-modal-header-icon">
-                            <i class="fa-solid fa-pen"></i>
-                        </div>
-
-                        <div>
-                            <h3 class="st-modal-title" id="manageServiceTitle">Manage Service Type</h3>
-                            <p class="st-modal-subtitle">Update service details and booking visibility</p>
-                        </div>
-                    </div>
-
-                    <button type="button" class="st-modal-close" onclick="closeModal('manageServiceModal')"
-                        aria-label="Close modal">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <div class="st-modal-body">
-                    <div class="st-panel">
-                        <label class="st-modal-label">Service Name <span class="text-red-500">*</span></label>
-
-                        <div class="st-modal-voice-row">
-                            <div class="st-modal-field-wrap">
-                                <span class="st-modal-field-icon"><i class="fa-solid fa-tag"></i></span>
-                                <input type="text" id="manageServiceName" name="name" class="st-modal-input no-voice"
-                                    maxlength="255" required>
-                            </div>
-
-                            <div class="service-voice-toggle" id="manageServiceNameVoiceToggle"></div>
-                        </div>
-                    </div>
-
-                    <div class="st-panel">
-                        <div class="st-label-row">
-                            <label class="st-modal-label">Description</label>
-
-                            <button type="button" class="st-copy-bullet-box" data-copy-bullet
-                                data-copy-target="#manageServiceDescription" title="Copy bullet">
-                                <span class="st-copy-bullet-symbol">•</span>
-                                <span class="st-copy-bullet-label">Copy this bullet</span>
-                            </button>
-                        </div>
-
-                        <div class="st-modal-voice-row st-modal-voice-row--textarea">
-                            <div class="st-modal-textarea-wrap">
-                                <textarea id="manageServiceDescription" name="description"
-                                    class="st-modal-textarea no-voice" maxlength="255"
-                                    placeholder="Brief details about the service..."></textarea>
-                            </div>
-
-                            <div class="service-voice-toggle" id="manageServiceDescVoiceToggle"></div>
-                        </div>
-                    </div>
-
-                    <div class="st-panel st-col-span-2">
-                        <div class="st-active-card">
-                            <div class="st-active-card-left">
-                                <div class="st-active-badge">
-                                    <i class="fa-solid fa-thumbtack"></i>
-                                </div>
-
-                                <div>
-                                    <p class="st-active-title">Show in Book Appointment</p>
-                                    <p class="st-active-desc">Turn this off if you want the service hidden from booking
-                                        but still kept in Service Types.</p>
-                                </div>
-                            </div>
-
-                            <label class="st-switch">
-                                <input type="checkbox" id="manageServiceBookingToggle" name="is_active_for_booking"
-                                    value="1">
-                                <span class="st-switch-slider"></span>
-                            </label>
-                        </div>
-
-                        <div id="manageDefaultNote" class="st-default-note admin-hidden">
-                            This is a default service type. It can be edited and hidden from booking, but it cannot be
-                            deleted.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="st-modal-footer">
-                    <button type="button" class="st-btn st-btn-ghost" onclick="closeModal('manageServiceModal')">
-                        Cancel
-                    </button>
-
-                    <button type="submit" class="st-btn st-btn-primary">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        Save Changes
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
 </main>
 @endsection
@@ -1086,23 +1106,30 @@ $serviceTypeRoutes = [
 
         function actionButtons(service) {
             const deleteButton = service.is_default ? '' : `
-            <button type="button"
-                class="action-btn btn-delete-service"
-                title="Delete service"
-                data-service-action="delete"
-                data-service-id="${service.id}">
-                <i class="fa-solid fa-trash"></i>
-            </button>`;
+        <button type="button"
+            class="ui-action-btn ui-action-delete"
+            data-tooltip="Delete service"
+            aria-label="Delete service"
+            data-service-action="delete"
+            data-service-id="${service.id}">
+
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    `;
 
             return `
-            <button type="button"
-                class="action-btn btn-edit"
-                title="Manage service"
-                data-service-action="edit"
-                data-service-id="${service.id}">
-                <i class="fa-solid fa-pen"></i>
-            </button>
-            ${deleteButton}`;
+        <button type="button"
+            class="ui-action-btn ui-action-edit"
+            data-tooltip="Manage service"
+            aria-label="Manage service"
+            data-service-action="edit"
+            data-service-id="${service.id}">
+
+            <i class="fa-solid fa-pen"></i>
+        </button>
+
+        ${deleteButton}
+    `;
         }
 
         function emptyStateHtml() {
@@ -1144,9 +1171,9 @@ $serviceTypeRoutes = [
                     </div>
                 </td>
                 <td class="service-center-cell">
-                    <div class="service-inline-actions">
-                        ${actionButtons(service)}
-                    </div>
+                    <div class="service-inline-actions ui-action-group">
+    ${actionButtons(service)}
+</div>
                 </td>
             </tr>
         `).join('');
@@ -1164,37 +1191,37 @@ $serviceTypeRoutes = [
             gridView.innerHTML = `
             <div class="service-types-grid" id="serviceTypeGridContainer">
                 ${serviceTypeServices.map((service) => `
-                        <div class="service-type-card" data-service-id="${service.id}">
-                            <div class="service-type-card-top">
-                                <span class="service-badge service-type-card-id">#${service.id}</span>
-                                ${defaultBadge(service)}
-                            </div>
+                                <div class="service-type-card" data-service-id="${service.id}">
+                                    <div class="service-type-card-top">
+                                        <span class="service-badge service-type-card-id">#${service.id}</span>
+                                        ${defaultBadge(service)}
+                                    </div>
 
-                            <div class="service-type-card-name-wrap">
-                                <div class="service-type-card-icon">
-                                    <i class="fa-solid fa-tooth"></i>
-                                </div>
-                                <div class="service-type-card-name">${escapeHtml(service.name)}</div>
-                            </div>
+                                    <div class="service-type-card-name-wrap">
+                                        <div class="service-type-card-icon">
+                                            <i class="fa-solid fa-tooth"></i>
+                                        </div>
+                                        <div class="service-type-card-name">${escapeHtml(service.name)}</div>
+                                    </div>
 
-                            <div class="service-type-card-desc-wrap">
-                                <div class="service-type-card-label">Description</div>
-                                <div class="service-type-card-desc">
-                                    ${service.description ? escapeHtml(service.description) : '—'}
-                                </div>
-                            </div>
+                                    <div class="service-type-card-desc-wrap">
+                                        <div class="service-type-card-label">Description</div>
+                                        <div class="service-type-card-desc">
+                                            ${service.description ? escapeHtml(service.description) : '—'}
+                                        </div>
+                                    </div>
 
-                            <div class="service-type-card-footer">
-                                <div class="service-card-actions">
-                                    ${visibilityBadge(service)}
-                                </div>
+                                    <div class="service-type-card-footer">
+                                        <div class="service-card-actions">
+                                            ${visibilityBadge(service)}
+                                        </div>
 
-                                <div class="service-type-card-actions">
-                                    ${actionButtons(service)}
+                                        <div class="service-type-card-actions ui-action-group">
+                                            ${actionButtons(service)}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    `).join('')}
+                            `).join('')}
             </div>`;
         }
 
@@ -1479,9 +1506,9 @@ $serviceTypeRoutes = [
                     showServiceToast(
                         'success',
                         'Service added',
-                        data.service?.is_active_for_booking
-                            ? 'Patients can now select it when booking.'
-                            : 'Saved in Service Types and hidden from booking.'
+                        data.service?.is_active_for_booking ?
+                            'Patients can now select it when booking.' :
+                            'Saved in Service Types and hidden from booking.'
                     );
                 } catch (error) {
                     const message = firstValidationMessage(error, 'Unable to add service type.');

@@ -1192,98 +1192,12 @@
     }
 }
 
-#mainContent.docreq-page .docreq-pagebar,
-.document-requests-page .docreq-pagebar {
-    padding: .85rem 1.4rem;
-    border-top: 1px solid #f3f4f6;
-    background: #fafafa;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .75rem;
-    flex-wrap: wrap;
-}
-
-#mainContent.docreq-page .docreq-pagination-wrap,
-.document-requests-page .docreq-pagination-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 0;
-    overflow-x: auto;
-}
-
-#mainContent.docreq-page .docreq-pagination-wrap nav,
-.document-requests-page .docreq-pagination-wrap nav {
-    width: max-content;
-}
-
-[data-theme="dark"] #mainContent.docreq-page .docreq-pagebar,
-[data-theme="dark"] .document-requests-page .docreq-pagebar,
-.dark #mainContent.docreq-page .docreq-pagebar,
-.dark .document-requests-page .docreq-pagebar {
-    background: rgba(13, 17, 23, .82) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
 @media (max-width: 767px) {
 
-    #mainContent.docreq-page .docreq-pagebar,
-    .document-requests-page .docreq-pagebar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: .6rem;
-        padding: .75rem 1rem;
-    }
-
-    #mainContent.docreq-page .docreq-pagination-wrap,
-    .document-requests-page .docreq-pagination-wrap {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    #mainContent.docreq-page .sl-page-size-control,
-    .document-requests-page .sl-page-size-control {
+    #mainContent.docreq-page .global-page-size-control,
+    .document-requests-page .global-page-size-control {
         width: 100%;
     }
-}
-
-#mainContent.docreq-page .docreq-pagebar-top,
-.document-requests-page .docreq-pagebar-top {
-    border-top: 0 !important;
-    border-bottom: 1px solid #f3f4f6 !important;
-}
-
-#mainContent.docreq-page .docreq-pagebar-bottom,
-.document-requests-page .docreq-pagebar-bottom {
-    border-top: 1px solid #f3f4f6 !important;
-}
-
-[data-theme="dark"] #mainContent.docreq-page .docreq-pagebar-top,
-[data-theme="dark"] .document-requests-page .docreq-pagebar-top,
-.dark #mainContent.docreq-page .docreq-pagebar-top,
-.dark .document-requests-page .docreq-pagebar-top {
-    border-bottom-color: rgba(255, 255, 255, .10) !important;
-}
-
-#mainContent.docreq-page .docreq-page-size-control,
-.document-requests-page .docreq-page-size-control {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    color: #9CA3AF !important;
-    font-size: .72rem !important;
-    font-weight: 850 !important;
-    white-space: nowrap !important;
-}
-
-#mainContent.docreq-page .docreq-page-size-control label,
-#mainContent.docreq-page .docreq-page-size-control>span,
-.document-requests-page .docreq-page-size-control label,
-.document-requests-page .docreq-page-size-control>span {
-    color: inherit !important;
-    font-size: .72rem !important;
-    font-weight: 850 !important;
 }
 
 #mainContent.docreq-page .docreq-page-size-select-wrap,
@@ -1478,13 +1392,6 @@
     color: var(--status-rejected-text) !important;
     border-color: var(--status-rejected-border) !important;
     box-shadow: none !important;
-}
-
-[data-theme="dark"] #mainContent.docreq-page .docreq-page-size-control,
-[data-theme="dark"] .document-requests-page .docreq-page-size-control,
-.dark #mainContent.docreq-page .docreq-page-size-control,
-.dark .document-requests-page .docreq-page-size-control {
-    color: #8B949E !important;
 }
 
 [data-theme="dark"] #mainContent.docreq-page .docreq-page-size-trigger,
@@ -1910,18 +1817,6 @@
         font-size: .68rem !important;
         padding: 0 .65rem !important;
         white-space: nowrap !important;
-    }
-
-    #mainContent.docreq-page .docreq-pagebar,
-    .document-requests-page .docreq-pagebar {
-        padding: .75rem .9rem !important;
-        gap: .6rem !important;
-    }
-
-    #mainContent.docreq-page .docreq-pagination-wrap,
-    .document-requests-page .docreq-pagination-wrap {
-        max-width: 100% !important;
-        overflow-x: auto !important;
     }
 }
 

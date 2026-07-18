@@ -2484,17 +2484,6 @@
     border-radius: 10px !important;
 }
 
-#filterModal.academic-filter-modal .filter-show-results-btn {
-    min-height: 42px !important;
-    border-radius: 10px !important;
-    min-width: 170px !important;
-}
-
-#filterModal.academic-filter-modal .filter-show-results-btn i,
-#filterModal.academic-filter-modal .filter-clear-btn i {
-    color: currentColor !important;
-}
-
 #mainContent.academic-period-page .ap-actions,
 #mainContent.academic-period-page .academic-card-actions,
 #mainContent.academic-period-page .ap-table td:last-child {
@@ -2689,13 +2678,6 @@
     --action-hover-bg: rgba(245, 158, 11, .26);
     --action-hover-color: #FCD34D;
     --action-tooltip-bg: #B45309;
-}
-
-@media (max-width: 640px) {
-    #filterModal.academic-filter-modal .filter-show-results-btn {
-        min-width: 0 !important;
-        width: 100% !important;
-    }
 }
 
 #mainContent.academic-period-page .ap-content-layout {

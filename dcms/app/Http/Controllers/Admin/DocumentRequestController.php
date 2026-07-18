@@ -33,7 +33,12 @@ class DocumentRequestController extends Controller
         $sort     = trim((string) $request->get('sort', 'newest'));
 
         $perPageInput = (int) $request->input('per_page', 10);
-        $perPage = in_array($perPageInput, [10, 20, 50, 100], true) ? $perPageInput : 10;
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        ) ? $perPageInput : 10;
 
         $query = $this->buildFilteredQuery($request);
 

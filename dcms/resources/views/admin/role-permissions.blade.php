@@ -388,57 +388,78 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     </div>
 
     <h2 class="modal-title">Create New Role</h2>
-    <div class="modal-body">Define a new role and assign permissions to it right away.</div>
+    <p class="modal-body modal-subtitle">
+        Define a new role and assign permissions to it right away.
+    </p>
 
-    <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST">
+    <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST"
+        data-global-validation data-form-validation-rule="createRole" novalidate>
         @csrf
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">Role Name</label>
+        <div class="modal-form-group st-form-group" data-global-field>
+
+            <label class="modal-label field-label" for="newRoleName">
+                Role Name
+                <span class="text-red-400">*</span>
+            </label>
+
             <div class="st-input-wrap">
                 <i class="fa-solid fa-tag st-input-icon"></i>
+
                 <input type="text" id="newRoleName" name="name" class="st-input" placeholder="e.g. Dental Intern"
-                    autocomplete="off">
+                    data-field-label="Role Name" required autocomplete="off">
             </div>
         </div>
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">Role Slug</label>
+        <div class="modal-form-group st-form-group" data-global-field>
+
+            <label class="modal-label field-label" for="newRoleSlug">
+                Role Slug
+                <span class="text-red-400">*</span>
+            </label>
+
             <div class="st-input-wrap">
                 <i class="fa-solid fa-link st-input-icon"></i>
+
                 <input type="text" id="newRoleSlug" name="slug" class="st-input" placeholder="e.g. dental-intern"
-                    autocomplete="off">
+                    data-field-label="Role Slug"
+                    data-pattern-message="Use lowercase letters, numbers, and hyphens only."
+                    pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required autocomplete="off">
             </div>
         </div>
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">User Name</label>
+        <div class="modal-form-group st-form-group" data-global-field>
+            <label class="modal-label field-label" for="newRoleUserName">
+                User Name
+                <span class="text-red-400">*</span>
+            </label>
             <div class="st-input-wrap">
                 <i class="fa-solid fa-user st-input-icon"></i>
-                <input type="text" id="newRoleUserName" name="user_name" class="st-input"
-                    placeholder="e.g. Nelson P. Angeles" autocomplete="off">
+                <input type="text" id="newRoleUserName" name="user_name" class="st-input" data-field-label="User Name"
+                    required autocomplete="off">
             </div>
         </div>
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">User Email</label>
+        <div class="modal-form-group st-form-group" data-global-field>
+            <label class="modal-label field-label" for="newRoleUserEmail">
+                User Email
+                <span class="text-red-400">*</span>
+            </label>
             <div class="st-input-wrap">
                 <i class="fa-solid fa-envelope st-input-icon"></i>
                 <input type="email" id="newRoleUserEmail" name="user_email" class="st-input"
-                    placeholder="e.g. user@example.com" autocomplete="off">
+                    data-field-label="User Email" required autocomplete="off">
             </div>
         </div>
 
-        <div id="newRoleError" class="modal-inline-error" style="display:none;"></div>
-
         <div class="modal-actions">
-            <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeNewRoleModal()">
+            <button type="button" class="modal-btn-cancel" onclick="closeNewRoleModal()">
                 Cancel
             </button>
 
-            <button type="submit" class="modal-btn-confirm modal-btn-confirm-approve primary" id="btnSubmitNewRole">
+            <button type="submit" class="modal-btn-confirm primary" id="btnSubmitNewRole">
                 <i class="fa-solid fa-plus"></i>
-                Create Role
+                <span>Create Role</span>
             </button>
         </div>
     </form>
@@ -467,7 +488,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     </div>
 
     <div class="modal-actions">
-        <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeDeleteModal()">
+        <button type="button" class="modal-btn-cancel" onclick="closeDeleteModal()">
             Cancel
         </button>
 
@@ -503,7 +524,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     </div>
 
     <div class="modal-actions role-reset-modal-actions">
-        <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeResetConfirm()">
+        <button type="button" class="modal-btn-cancel" onclick="closeResetConfirm()">
             Cancel
         </button>
 
@@ -646,10 +667,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         if (!dialog.open) {
             dialog.showModal();
         }
-
-        dialog.style.top = '50%';
-        dialog.style.left = '50%';
-        dialog.style.removeProperty('transform');
 
         requestAnimationFrame(() => {
             dialog.classList.add('is-open');
@@ -867,11 +884,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 showToast('Error', '{!! addslashes(session('error')) !!}', 'error');
             }
         @endif
-
-        document.getElementById('newRoleName')?.addEventListener('input', function () {
-            document.getElementById('newRoleSlug').value = this.value.toLowerCase().trim()
-                .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-        });
     });
 
     function selectRole(card) {
@@ -1246,19 +1258,70 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         isModalActive = true;
         updateFABVisibility();
 
-        document.getElementById('newRoleName').value = '';
-        document.getElementById('newRoleSlug').value = '';
-        document.getElementById('newRoleUserName').value = '';
-        document.getElementById('newRoleUserEmail').value = '';
-        document.getElementById('newRoleError').style.display = 'none';
+        const form =
+            document.getElementById('createRoleForm');
 
-        const modal = document.getElementById('newRoleModal');
+        const modal =
+            document.getElementById('newRoleModal');
+
+        if (!form || !modal) {
+            isModalActive = false;
+            updateFABVisibility();
+            return;
+        }
+
+        form.reset();
+
+        form
+            .querySelectorAll('.global-field-error')
+            .forEach(error => {
+                error.innerHTML = '';
+                error.classList.remove('show');
+                error.setAttribute('aria-hidden', 'true');
+            });
+
+        form
+            .querySelectorAll('.is-invalid')
+            .forEach(field => {
+                field.classList.remove('is-invalid');
+                field.removeAttribute('aria-invalid');
+                field.removeAttribute('aria-describedby');
+            });
+
         openRoleDialog(modal);
 
-        document.dispatchEvent(new CustomEvent('voice:refresh', {
-            detail: { root: modal }
-        }));
+        document.dispatchEvent(
+            new CustomEvent('voice:refresh', {
+                detail: {
+                    root: modal
+                }
+            })
+        );
     }
+
+    const roleNameField =
+        document.getElementById('newRoleName');
+
+    const roleSlugField =
+        document.getElementById('newRoleSlug');
+
+    roleNameField?.addEventListener('input', function () {
+        if (!roleSlugField) return;
+
+        roleSlugField.value = this.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+        roleSlugField.dispatchEvent(
+            new Event('input', {
+                bubbles: true
+            })
+        );
+    });
 
     function closeNewRoleModal() {
         closeRoleDialog('newRoleModal', () => {
@@ -1267,101 +1330,111 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         });
     }
 
-    document.getElementById('createRoleForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = document.getElementById('newRoleName').value.trim();
-        const slug = document.getElementById('newRoleSlug').value.trim();
-        const userName = document.getElementById('newRoleUserName').value.trim();
-        const userEmail = document.getElementById('newRoleUserEmail').value.trim();
-        const errEl = document.getElementById('newRoleError');
+    document
+        .getElementById('createRoleForm')
+        ?.addEventListener('submit', function (e) {
+            e.preventDefault();
 
-        if (!name || !slug) {
-            errEl.textContent = 'Please fill out all fields.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if ((userName && !userEmail) || (!userName && userEmail)) {
-            errEl.textContent = 'Please enter both user name and user email.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if (userEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
-            errEl.textContent = 'Please enter a valid user email.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if (document.querySelector(`.role-card[data-slug="${slug}"]`)) {
-            errEl.textContent = 'A role with this slug already exists.';
-            errEl.style.display = 'block';
-            return;
-        }
+            const validation =
+                window.validateGlobalForm?.(this);
 
-        const form = this;
-        const btn = document.getElementById('btnSubmitNewRole');
-
-        btn.disabled = true;
-        btn.innerHTML = 'Creating...';
-
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+            if (!validation || !validation.valid) {
+                return;
             }
-        })
-            .then(async res => {
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    let errorMsg = 'Could not create role.';
-                    if (data.errors) errorMsg = Object.values(data.errors).flat().join(' ');
-                    else if (data.message) errorMsg = data.message;
-                    throw new Error(errorMsg);
+
+            const form = this;
+
+            const slug = String(
+                form.querySelector('[name="slug"]')
+                    ?.value || ''
+            ).trim();
+
+            const btn =
+                document.getElementById(
+                    'btnSubmitNewRole'
+                );
+
+            btn.disabled = true;
+
+            btn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Creating...
+        `;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With':
+                        'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
-                return data;
             })
-            .then(data => {
-                closeNewRoleModal();
-                if (typeof showToast === 'function') {
-                    showToast('Success', data.message || 'Role created successfully.', 'success');
-                }
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        let errorMsg = 'Could not create role.';
+                        if (data.errors) errorMsg = Object.values(data.errors).flat().join(' ');
+                        else if (data.message) errorMsg = data.message;
+                        throw new Error(errorMsg);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    closeNewRoleModal();
+                    if (typeof showToast === 'function') {
+                        showToast('Success', data.message || 'Role created successfully.', 'success');
+                    }
 
-                fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const doc = new DOMParser().parseFromString(html, 'text/html');
-                        const newGrid = doc.querySelector('.main-grid');
+                    fetch(window.location.href)
+                        .then(r => r.text())
+                        .then(html => {
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            const newGrid = doc.querySelector('.main-grid');
 
-                        if (newGrid) {
-                            const currentGrid = document.querySelector('.main-grid');
+                            if (newGrid) {
+                                const currentGrid = document.querySelector('.main-grid');
 
-                            if (currentGrid) {
-                                currentGrid.innerHTML = newGrid.innerHTML;
+                                if (currentGrid) {
+                                    currentGrid.innerHTML = newGrid.innerHTML;
 
-                                document.dispatchEvent(new CustomEvent('voice:refresh', {
-                                    detail: { root: currentGrid }
-                                }));
+                                    document.dispatchEvent(new CustomEvent('voice:refresh', {
+                                        detail: { root: currentGrid }
+                                    }));
+                                }
+                                initRoleForms();
+                                keepRoleListLayout();
+                                syncScrollStateForSaveBar();
+
+                                const newRoleCard = document.querySelector(
+                                    `.role-card[data-slug="${slug}"]`) || document.querySelector(
+                                        '.role-card');
+                                if (newRoleCard) selectRole(newRoleCard);
                             }
-                            initRoleForms();
-                            keepRoleListLayout();
-                            syncScrollStateForSaveBar();
+                            btn.disabled = false;
+                            btn.innerHTML = `
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Create Role</span>
+                            `;
+                        });
+                })
+                .catch(err => {
+                    if (typeof showToast === 'function') {
+                        showToast(
+                            'Create Role Failed',
+                            err.message || 'Could not create the role.',
+                            'error'
+                        );
+                    }
 
-                            const newRoleCard = document.querySelector(
-                                `.role-card[data-slug="${slug}"]`) || document.querySelector(
-                                    '.role-card');
-                            if (newRoleCard) selectRole(newRoleCard);
-                        }
-                        btn.disabled = false;
-                        btn.innerHTML = 'Create Role';
-                    });
-            })
-            .catch(err => {
-                errEl.textContent = err.message;
-                errEl.style.display = 'block';
-                btn.disabled = false;
-                btn.innerHTML = 'Create Role';
-            });
-    });
+                    btn.disabled = false;
+
+                    btn.innerHTML = `
+        <i class="fa-solid fa-plus"></i>
+        <span>Create Role</span>
+    `;
+                });
+        });
 
     const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
 
@@ -1545,6 +1618,91 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 confirmBtn.innerHTML = 'Yes, Reset';
             });
     }
+
+    function registerCreateRoleValidation() {
+        if (
+            typeof window.registerGlobalFormValidationRule !==
+            'function'
+        ) {
+            return false;
+        }
+
+        window.registerGlobalFormValidationRule(
+            'createRole',
+            form => {
+                const nameField =
+                    form.querySelector('[name="name"]');
+
+                const slugField =
+                    form.querySelector('[name="slug"]');
+
+                const name =
+                    String(nameField?.value || '').trim();
+
+                const slug =
+                    String(slugField?.value || '')
+                        .trim()
+                        .toLowerCase();
+
+                let valid = true;
+                let firstInvalid = null;
+
+                const duplicateName = Array.from(
+                    document.querySelectorAll('.role-card')
+                ).some(card => {
+                    return String(
+                        card.dataset.roleName || ''
+                    ).trim().toLowerCase() ===
+                        name.toLowerCase();
+                });
+
+                if (name && duplicateName) {
+                    window.showFormInputValidationMessage?.(
+                        nameField,
+                        'A role with this name already exists.'
+                    );
+
+                    valid = false;
+                    firstInvalid ||= nameField;
+                }
+
+                const duplicateSlug = Array.from(
+                    document.querySelectorAll('.role-card')
+                ).some(card => {
+                    return String(
+                        card.dataset.slug || ''
+                    ).trim().toLowerCase() === slug;
+                });
+
+                if (slug && duplicateSlug) {
+                    window.showFormInputValidationMessage?.(
+                        slugField,
+                        'A role with this slug already exists.'
+                    );
+
+                    valid = false;
+                    firstInvalid ||= slugField;
+                }
+
+                return {
+                    valid,
+                    firstInvalid
+                };
+            }
+        );
+
+        return true;
+    }
+
+    window.addEventListener(
+        'global-validation-ready',
+        registerCreateRoleValidation
+    );
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        registerCreateRoleValidation
+    );
 
     function openViewAs() {
         isModalActive = true;

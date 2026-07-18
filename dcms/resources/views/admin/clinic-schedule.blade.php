@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole)
 
 @section('title', 'Clinic Schedule')
 
@@ -34,8 +34,13 @@ $dayNames = [
 $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !== 'none');
 @endphp
 
-<main id="mainContent" class="admin-page-shell clinic-schedule-page page-enter mode-list">
-    <div class="full">
+<main id="mainContent" class="{{ $pageShellClass }}
+        clinic-schedule-page
+        {{ $isDentistView ? 'dentist-clinic-schedule-page' : '' }}
+        page-enter
+        mode-list">
+
+    <div class="{{ $isDentistView ? 'w-full' : 'full' }}">
 
         @if ($errors->any())
         <script>
@@ -92,11 +97,45 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         </script>
         @endif
 
+        @if ($isDentistView)
+        <section class="dentist-hero cs-dentist-hero mb-5">
+            <div class="dentist-hero-content">
+                <div class="dentist-hero-icon">
+                    <i class="fa-solid fa-calendar-week"></i>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="dentist-hero-eyebrow">
+                        <i class="fa-solid fa-tooth"></i>
+                        Clinic Availability
+                    </div>
+
+                    <h1 class="dentist-hero-title">
+                        Clinic Schedule
+                    </h1>
+                </div>
+            </div>
+
+            <div class="dentist-hero-actions cs-hero-actions">
+                <button type="button" onclick="openRuleModal()" class="btn-primary-global cs-hero-action-btn">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add Schedule Rule</span>
+                </button>
+
+                <button type="button" onclick="openBlockModal()"
+                    class="btn-secondary-global cs-hero-action-btn cs-hero-danger-btn">
+                    <i class="fa-solid fa-ban"></i>
+                    <span>Block Date</span>
+                </button>
+            </div>
+        </section>
+        @else
         <div class="page-banner">
             <div class="page-banner-inner">
-
                 <div>
-                    <h1 class="page-title">Clinic Schedule</h1>
+                    <h1 class="page-title">
+                        Clinic Schedule
+                    </h1>
                 </div>
 
                 <div class="flex items-center gap-3 flex-wrap page-actions">
@@ -113,167 +152,275 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                 </div>
             </div>
         </div>
+        @endif
 
         <div class="admin-page-body">
 
-        <div id="statCards" class="stat-grid cs-stat-grid">
-            @php
-            $statCards = [
-            [
-            'icon' => 'fa-calendar-days',
-            'class' => 's-crimson',
-            'val' => $openDays,
-            'label' => 'Open Days/Week',
-            'sub' => 'Active schedule days',
-            ],
-            [
-            'icon' => 'fa-clock',
-            'class' => 's-blue',
-            'val' => $maxSlots,
-            'label' => 'Daily Slot Cap',
-            'sub' => 'Max patients/day',
-            ],
-            [
-            'icon' => 'fa-ban',
-            'class' => 's-green',
-            'val' => $blockedThisMonth,
-            'label' => 'Blocked Dates',
-            'sub' => 'This month',
-            ],
-            [
-            'icon' => 'fa-umbrella-beach',
-            'class' => 's-amber',
-            'val' => $holidaysThisMonth,
-            'label' => 'Holidays',
-            'sub' => 'This month',
-            ],
-            ];
-            @endphp
+            <div id="statCards" class="stat-grid cs-stat-grid">
+                @php
+                $statCards = [
+                [
+                'icon' => 'fa-calendar-days',
+                'class' => 's-crimson',
+                'val' => $openDays,
+                'label' => 'Open Days/Week',
+                'sub' => 'Active schedule days',
+                ],
+                [
+                'icon' => 'fa-clock',
+                'class' => 's-blue',
+                'val' => $maxSlots,
+                'label' => 'Daily Slot Cap',
+                'sub' => 'Max patients/day',
+                ],
+                [
+                'icon' => 'fa-ban',
+                'class' => 's-green',
+                'val' => $blockedThisMonth,
+                'label' => 'Blocked Dates',
+                'sub' => 'This month',
+                ],
+                [
+                'icon' => 'fa-umbrella-beach',
+                'class' => 's-amber',
+                'val' => $holidaysThisMonth,
+                'label' => 'Holidays',
+                'sub' => 'This month',
+                ],
+                ];
+                @endphp
 
-            @foreach ($statCards as $card)
-            <div class="stat-card {{ $card['class'] }}">
-                <div class="stat-card-info">
-                    <div class="stat-label">{{ $card['label'] }}</div>
-                    <div class="stat-num">{{ $card['val'] }}</div>
-                    <div class="stat-footer">{{ $card['sub'] }}</div>
-                </div>
+                @foreach ($statCards as $card)
+                <div class="stat-card {{ $card['class'] }}">
+                    <div class="stat-card-info">
+                        <div class="stat-label">{{ $card['label'] }}</div>
+                        <div class="stat-num">{{ $card['val'] }}</div>
+                        <div class="stat-footer">{{ $card['sub'] }}</div>
+                    </div>
 
-                <div class="stat-icon-wrapper">
-                    <i class="fa-solid {{ $card['icon'] }}"></i>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid {{ $card['icon'] }}"></i>
+                    </div>
                 </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
-            <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-2 space-y-6">
 
-                <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
 
-                    <div
-                        class="px-4 py-4 border-b bg-gray-50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex items-start gap-2">
-                            <i class="fa-solid fa-calendar-week text-[#8B0000] mt-0.5"></i>
-                            <h2 class="font-bold text-gray-800 text-sm leading-5">Weekly Appointment View</h2>
-                        </div>
-                        <div class="flex items-center justify-between gap-2 sm:justify-end">
-
-                            <button id="prevWeek"
-                                class="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#8B0000] hover:text-[#8B0000] transition-all text-xs"><i
-                                    class="fa-solid fa-chevron-left"></i></button>
-                            <span id="weekRangeLabel"
-                                class="text-xs font-semibold text-gray-600 px-1 min-w-[140px] text-center"></span>
-                            <button id="nextWeek"
-                                class="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#8B0000] hover:text-[#8B0000] transition-all text-xs"><i
-                                    class="fa-solid fa-chevron-right"></i></button>
-                            <button id="todayBtn"
-                                class="text-[10px] font-bold text-[#8B0000] bg-red-50 border border-red-200 px-2.5 py-1 rounded-lg hover:bg-red-100 transition-colors">Today</button>
-                        </div>
-                    </div>
-
-                    <div class="p-4 overflow-x-auto">
-                        <div id="weekGrid" class="week-grid" style="min-width:480px;"></div>
-                        <div class="flex flex-wrap gap-3 mt-3 justify-end">
-                            <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
-                                    class="w-3 h-3 rounded bg-blue-200 border-l-2 border-blue-500 inline-block"></span>Check-up
+                        <div
+                            class="px-4 py-4 border-b bg-gray-50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-calendar-week text-[#8B0000] mt-0.5"></i>
+                                <h2 class="font-bold text-gray-800 text-sm leading-5">Weekly Appointment View</h2>
                             </div>
-                            <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
-                                    class="w-3 h-3 rounded bg-green-200 border-l-2 border-green-500 inline-block"></span>Cleaning
-                            </div>
-                            <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
-                                    class="w-3 h-3 rounded bg-yellow-100 border-l-2 border-yellow-400 inline-block"></span>Surgery
-                            </div>
-                            <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
-                                    class="w-3 h-3 rounded bg-purple-100 border-l-2 border-purple-400 inline-block"></span>Prosthesis
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            <div class="flex items-center justify-between gap-2 sm:justify-end">
 
-                <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                    <div class="px-5 py-4 flex items-center justify-between cs-rules-card-header">
-                        <div class="weekly-toolbar flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Schedule Rules</h2>
-                        </div>
-
-                        <div class="cs-rules-header-actions">
-                            <span class="cs-rules-count">{{ $schedules->count() }} rules</span>
-
-                            <div class="view-toggle-container" id="scheduleRulesViewToggle" aria-label="View options">
-                                <span class="view-slider" aria-hidden="true"></span>
-
-                                <button type="button" class="btn-view-mode active" id="scheduleRulesListViewBtn"
-                                    title="List view" aria-label="List view" aria-pressed="true">
-                                    <i class="fa-solid fa-table-list"></i>
+                                <button type="button" id="prevWeek" class="ui-icon-btn neutral"
+                                    aria-label="Previous week">
+                                    <i class="fa-solid fa-chevron-left"></i>
                                 </button>
-
-                                <button type="button" class="btn-view-mode" id="scheduleRulesGridViewBtn"
-                                    title="Grid view" aria-label="Grid view" aria-pressed="false">
-                                    <i class="fa-solid fa-grip"></i>
+                                <span id="weekRangeLabel"
+                                    class="text-xs font-semibold text-gray-600 px-1 min-w-[140px] text-center"></span>
+                                <button type="button" id="nextWeek" class="ui-icon-btn neutral" aria-label="Next week">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                                <button type="button" id="todayBtn" class="ui-btn ui-btn-secondary ui-btn-sm">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                    <span>Today</span>
                                 </button>
                             </div>
                         </div>
+
+                        <div class="p-4 overflow-x-auto">
+                            <div id="weekGrid" class="week-grid" style="min-width:480px;"></div>
+                            <div class="flex flex-wrap gap-3 mt-3 justify-end">
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
+                                        class="w-3 h-3 rounded bg-blue-200 border-l-2 border-blue-500 inline-block"></span>Check-up
+                                </div>
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
+                                        class="w-3 h-3 rounded bg-green-200 border-l-2 border-green-500 inline-block"></span>Cleaning
+                                </div>
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
+                                        class="w-3 h-3 rounded bg-yellow-100 border-l-2 border-yellow-400 inline-block"></span>Surgery
+                                </div>
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500"><span
+                                        class="w-3 h-3 rounded bg-purple-100 border-l-2 border-purple-400 inline-block"></span>Prosthesis
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    @if ($schedules->count())
-                    <div id="scheduleRulesListView" class="schedule-rules-view">
-                        <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
-                            <table class="sched-table">
-                                <thead>
-                                    <tr>
-                                        <th>Day(s)</th>
-                                        <th>Opens</th>
-                                        <th>Closes</th>
-                                        <th>Lunch Break</th>
-                                        <th>Max Slots</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($schedules as $rule)
-                                    <tr>
-                                        <td data-label="Day(s)" class="font-semibold text-gray-800">
-                                            {{ $rule->days_label }}</td>
-                                        <td data-label="Opens">
-                                            {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
-                                        </td>
-                                        <td data-label="Closes">
-                                            {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—' }}
-                                        </td>
-                                        <td data-label="Lunch Break" class="text-xs text-gray-500">
-                                            @if ($rule->break_time && $rule->break_time !== 'none')
-                                            @php [$bs,$be]=explode('-', $rule->break_time); @endphp
-                                            {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
-                                            {{ date('g:i A', strtotime(trim($be) . ':00')) }}
-                                            @else
-                                            —
-                                            @endif
-                                        </td>
-                                        <td data-label="Max Slots">
-                                            <div class="flex items-center gap-2">
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                        <div class="px-5 py-4 flex items-center justify-between cs-rules-card-header">
+                            <div class="weekly-toolbar flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-[#8B0000]"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">Schedule Rules</h2>
+                            </div>
+
+                            <div class="cs-rules-header-actions">
+                                <span class="cs-rules-count">{{ $schedules->count() }} rules</span>
+
+                                <div class="view-toggle-container" id="scheduleRulesViewToggle"
+                                    aria-label="View options">
+                                    <span class="view-slider" aria-hidden="true"></span>
+
+                                    <button type="button" class="btn-view-mode active" id="scheduleRulesListViewBtn"
+                                        title="List view" aria-label="List view" aria-pressed="true">
+                                        <i class="fa-solid fa-table-list"></i>
+                                    </button>
+
+                                    <button type="button" class="btn-view-mode" id="scheduleRulesGridViewBtn"
+                                        title="Grid view" aria-label="Grid view" aria-pressed="false">
+                                        <i class="fa-solid fa-grip"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if ($schedules->count())
+                        <div id="scheduleRulesListView" class="schedule-rules-view">
+                            <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
+                                <table class="sched-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Day(s)</th>
+                                            <th>Opens</th>
+                                            <th>Closes</th>
+                                            <th>Lunch Break</th>
+                                            <th>Max Slots</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($schedules as $rule)
+                                        <tr>
+                                            <td data-label="Day(s)" class="font-semibold text-gray-800">
+                                                {{ $rule->days_label }}</td>
+                                            <td data-label="Opens">
+                                                {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—'
+                                                }}
+                                            </td>
+                                            <td data-label="Closes">
+                                                {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—'
+                                                }}
+                                            </td>
+                                            <td data-label="Lunch Break" class="text-xs text-gray-500">
+                                                @if ($rule->break_time && $rule->break_time !== 'none')
+                                                @php [$bs,$be]=explode('-', $rule->break_time); @endphp
+                                                {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
+                                                {{ date('g:i A', strtotime(trim($be) . ':00')) }}
+                                                @else
+                                                —
+                                                @endif
+                                            </td>
+                                            <td data-label="Max Slots">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
+                                                    @if ($rule->status !== 'closed')
+                                                    <div class="cap-bar w-16">
+                                                        <div class="cap-fill"
+                                                            style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%">
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td data-label="Status">
+                                                @if ($rule->status === 'open')
+                                                <span class="badge-open">Open</span>
+                                                @elseif($rule->status === 'limited')
+                                                <span class="badge-limited">Limited</span>
+                                                @else
+                                                <span class="badge-closed">Closed</span>
+                                                @endif
+                                            </td>
+                                            <td data-label="Actions">
+                                                <div class="ui-action-group">
+                                                    <button type="button" onclick='openRuleModal(
+        "edit",
+        {{ $rule->id }},
+        {{ json_encode($rule) }}
+    )' class="ui-action-btn ui-action-edit" data-tooltip="Edit schedule" aria-label="Edit schedule">
+
+                                                        <i class="fa-solid fa-pen"></i>
+                                                    </button>
+
+                                                    <button type="button" class="ui-action-btn ui-action-delete"
+                                                        data-tooltip="Delete schedule" aria-label="Delete schedule"
+                                                        onclick='openScheduleDeleteModal(
+        @json(route($clinicScheduleRouteNames["destroy"], $rule)),
+        @json($rule->days_label)
+    )'>
+
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="scheduleRulesGridView" class="schedule-rules-view" hidden>
+                            <div class="schedule-rules-grid">
+                                @foreach ($schedules as $rule)
+                                <div class="schedule-rule-card">
+                                    <div class="schedule-rule-card-top">
+                                        <div>
+                                            <div class="schedule-rule-card-title">{{ $rule->days_label }}
+                                            </div>
+                                            <div class="mt-2">
+                                                @if ($rule->status === 'open')
+                                                <span class="badge-open">Open</span>
+                                                @elseif($rule->status === 'limited')
+                                                <span class="badge-limited">Limited</span>
+                                                @else
+                                                <span class="badge-closed">Closed</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="schedule-rule-card-meta">
+                                        <div>
+                                            <div class="schedule-rule-card-label">Opens</div>
+                                            <div class="schedule-rule-card-value">
+                                                {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—'
+                                                }}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="schedule-rule-card-label">Closes</div>
+                                            <div class="schedule-rule-card-value">
+                                                {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—'
+                                                }}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="schedule-rule-card-label">Lunch Break</div>
+                                            <div class="schedule-rule-card-value">
+                                                @if ($rule->break_time && $rule->break_time !== 'none')
+                                                @php [$bs,$be]=explode('-', $rule->break_time); @endphp
+                                                {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
+                                                {{ date('g:i A', strtotime(trim($be) . ':00')) }}
+                                                @else
+                                                —
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="schedule-rule-card-label">Max Slots</div>
+                                            <div class="schedule-rule-card-value flex items-center gap-2">
                                                 <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
                                                 @if ($rule->status !== 'closed')
                                                 <div class="cap-bar w-16">
@@ -283,294 +430,215 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                                 </div>
                                                 @endif
                                             </div>
-                                        </td>
-                                        <td data-label="Status">
-                                            @if ($rule->status === 'open')
-                                            <span class="badge-open">Open</span>
-                                            @elseif($rule->status === 'limited')
-                                            <span class="badge-limited">Limited</span>
-                                            @else
-                                            <span class="badge-closed">Closed</span>
-                                            @endif
-                                        </td>
-                                        <td data-label="Actions">
-                                            <div class="cs-action-group">
-                                                <button type="button"
-                                                    onclick='openRuleModal("edit", {{ $rule->id }}, {{ json_encode($rule) }})'
-                                                    class="cs-action-btn cs-action-edit" data-tooltip="Edit"
-                                                    aria-label="Edit schedule rule">
-                                                    <i class="fa-solid fa-pen"></i>
-                                                </button>
-
-                                                <button type="button" class="cs-action-btn cs-action-delete"
-                                                    data-tooltip="Delete" aria-label="Delete schedule rule"
-                                                    onclick='openScheduleDeleteModal(@json(route("admin.clinic_schedule.destroy", $rule)), @json($rule->days_label))'>
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div id="scheduleRulesGridView" class="schedule-rules-view" hidden>
-                        <div class="schedule-rules-grid">
-                            @foreach ($schedules as $rule)
-                            <div class="schedule-rule-card">
-                                <div class="schedule-rule-card-top">
-                                    <div>
-                                        <div class="schedule-rule-card-title">{{ $rule->days_label }}</div>
-                                        <div class="mt-2">
-                                            @if ($rule->status === 'open')
-                                            <span class="badge-open">Open</span>
-                                            @elseif($rule->status === 'limited')
-                                            <span class="badge-limited">Limited</span>
-                                            @else
-                                            <span class="badge-closed">Closed</span>
-                                            @endif
                                         </div>
+                                    </div>
+
+                                    <div class="schedule-rule-card-actions ui-action-group">
+                                        <button type="button" onclick='openRuleModal(
+        "edit",
+        {{ $rule->id }},
+        {{ json_encode($rule) }}
+    )' class="ui-action-btn ui-action-edit" data-tooltip="Edit schedule" aria-label="Edit schedule">
+
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+
+                                        <button type="button" class="ui-action-btn ui-action-delete"
+                                            data-tooltip="Delete schedule" aria-label="Delete schedule" onclick='openScheduleDeleteModal(
+        @json(route($clinicScheduleRouteNames["destroy"], $rule)),
+        @json($rule->days_label)
+    )'>
+
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div class="schedule-rule-card-meta">
-                                    <div>
-                                        <div class="schedule-rule-card-label">Opens</div>
-                                        <div class="schedule-rule-card-value">
-                                            {{ $rule->open_time ? date('g:i A', strtotime($rule->open_time)) : '—' }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="schedule-rule-card-label">Closes</div>
-                                        <div class="schedule-rule-card-value">
-                                            {{ $rule->close_time ? date('g:i A', strtotime($rule->close_time)) : '—' }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="schedule-rule-card-label">Lunch Break</div>
-                                        <div class="schedule-rule-card-value">
-                                            @if ($rule->break_time && $rule->break_time !== 'none')
-                                            @php [$bs,$be]=explode('-', $rule->break_time); @endphp
-                                            {{ date('g:i A', strtotime(trim($bs) . ':00')) }} –
-                                            {{ date('g:i A', strtotime(trim($be) . ':00')) }}
-                                            @else
-                                            —
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="schedule-rule-card-label">Max Slots</div>
-                                        <div class="schedule-rule-card-value flex items-center gap-2">
-                                            <span class="font-bold text-[#8B0000]">{{ $rule->max_slots }}</span>
-                                            @if ($rule->status !== 'closed')
-                                            <div class="cap-bar w-16">
-                                                <div class="cap-fill"
-                                                    style="width:{{ min(100, ($rule->max_slots / 10) * 100) }}%">
-                                                </div>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="schedule-rule-card-actions cs-action-group">
-                                    <button type="button"
-                                        onclick='openRuleModal("edit", {{ $rule->id }}, {{ json_encode($rule) }})'
-                                        class="cs-action-btn cs-action-edit" data-tooltip="Edit"
-                                        aria-label="Edit schedule rule">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-
-                                    <button type="button" class="cs-action-btn cs-action-delete" data-tooltip="Delete"
-                                        aria-label="Delete schedule rule"
-                                        onclick='openScheduleDeleteModal(@json(route("admin.clinic_schedule.destroy", $rule)), @json($rule->days_label))'>
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
+                                @endforeach
                             </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @else
-                    <div class="text-center py-10">
-                        <i class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
-                        <p class="text-gray-400 text-sm">
-                            No rules yet.
-                            <button onclick="openRuleModal()" class="text-[#8B0000] font-semibold hover:underline">Add
-                                one.</button>
-                        </p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="space-y-6">
-
-                <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                    <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
-                        <div class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Clinic Hours</h2>
-                        </div>
-                        <button onclick="openRuleModal()"
-                            class="text-xs text-[#8B0000] font-semibold hover:underline flex items-center gap-1"><i
-                                class="fa-solid fa-pen text-[9px]"></i> Edit</button>
-                    </div>
-                    <div class="p-4 space-y-0.5">
-                        @foreach ($dayNames as $fullName => $abbr)
-                        @php $s = $scheduleByDay[$abbr] ?? null; @endphp
-                        <div
-                            class="flex justify-between items-center py-1.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
-                            <span class="text-xs font-semibold text-gray-600">{{ $fullName }}</span>
-                            @if ($s && $s->status !== 'closed')
-                            <span class="text-xs font-bold text-[#8B0000]">{{ $s->hours_range }}</span>
-                            @else
-                            <span class="text-xs font-medium text-gray-400">Closed</span>
-                            @endif
-                        </div>
-                        @endforeach
-                        @if ($breakSchedule)
-                        <div class="pt-2 mt-1 border-t border-gray-100">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-400 italic flex items-center gap-1"><i
-                                        class="fa-solid fa-mug-hot text-yellow-400"></i> Lunch</span>
-                                @php [$bs,$be]=explode('-',$breakSchedule->break_time); @endphp
-                                <span class="text-xs font-medium text-gray-500">{{ date('g:i A', strtotime(trim($bs) .
-                                    ':00')) }}
-                                    – {{ date('g:i A', strtotime(trim($be) . ':00')) }}</span>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                    <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between gap-3 flex-wrap">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-ban text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Blocked Dates</h2>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <button onclick="openBlockModal()"
-                                class="text-xs text-[#8B0000] font-semibold hover:underline flex items-center gap-1">
-                                <i class="fa-solid fa-plus text-[9px]"></i> Add
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="p-4">
-                        @if ($blockedDates->count())
-                        <div id="blockedDatesListView" class="blocked-dates-view">
-                            @foreach ($blockedDates as $blocked)
-                            @php
-                            $bd = \Carbon\Carbon::parse($blocked->date);
-                            $badgeCls = match ($blocked->reason) {
-                            'Holiday' => 'badge-holiday',
-                            'Dentist Unavailable' => 'badge-limited',
-                            default => 'badge-closed',
-                            };
-                            @endphp
-
-                            <div
-                                class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
-                                <div
-                                    class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
-                                    {{ $bd->day }}
-                                </div>
-
-                                <div class="flex-1 min-w-0">
-                                    <p class="blocked-title text-xs font-bold text-gray-800 truncate">
-                                        {{ $bd->format('D, M j, Y') }}
-                                    </p>
-                                    <span class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
-                                    @if ($blocked->note)
-                                    <p class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
-                                        {{ $blocked->note }}
-                                    </p>
-                                    @endif
-                                </div>
-
-                                <form action="{{ route('admin.clinic_schedule.unblock', $blocked) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="blocked-remove-btn" title="Remove">
-                                        <i class="fa-solid fa-xmark text-xs"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            @endforeach
                         </div>
                         @else
-                        <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <i class="fa-solid fa-check-circle text-4xl text-green-400 mb-3"></i>
-                            <p class="text-sm text-gray-400">No blocked dates</p>
+                        <div class="text-center py-10">
+                            <i class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
+                            <p class="text-gray-400 text-sm">
+                                No rules yet.
+                                <button onclick="openRuleModal()"
+                                    class="text-[#8B0000] font-semibold hover:underline">Add
+                                    one.</button>
+                            </p>
                         </div>
                         @endif
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                    <div class="px-5 py-4 border-b bg-gray-50">
-                        <div class="flex items-center gap-2"><i class="fa-solid fa-umbrella-beach text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Upcoming Holidays</h2>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        @php
-                        $today = now()->startOfDay();
-                        $MONTHS_SHORT = [
-                        'Jan',
-                        'Feb',
-                        'Mar',
-                        'Apr',
-                        'May',
-                        'Jun',
-                        'Jul',
-                        'Aug',
-                        'Sep',
-                        'Oct',
-                        'Nov',
-                        'Dec',
-                        ];
-                        $upcoming = collect($philippineHolidays)
-                        ->filter(fn($n, $d) => \Carbon\Carbon::parse($d)->gte($today))
-                        ->take(5);
-                        @endphp
-                        @forelse($upcoming as $hDate => $hName)
-                        @php
-                        $hC = \Carbon\Carbon::parse($hDate);
-                        $diff = (int) $today->diffInDays($hC, false);
-                        @endphp
-                        <div class="holiday-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0">
-                            <div class="w-10 text-center flex-shrink-0">
-                                <div class="month text-[10px] font-bold uppercase text-[#8B0000]">
-                                    {{ $MONTHS_SHORT[$hC->month - 1] }}</div>
-                                <div class="day text-xl font-extrabold text-gray-800 leading-tight">
-                                    {{ $hC->day }}</div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="holiday-title text-xs font-semibold text-gray-800 truncate">
-                                    {{ $hName }}</p>
-                                <p class="holiday-meta text-[10px] text-gray-400">
-                                    {{ $diff === 0 ? 'Today' : ($diff === 1 ? 'Tomorrow' : "In $diff days") }}
-                                </p>
-                            </div>
-                            <span class="holiday-badge badge-holiday flex-shrink-0">Holiday</span>
-                        </div>
-                        @empty
-                        <p class="text-xs text-gray-400 text-center py-4">No upcoming holidays.</p>
-                        @endforelse
-                    </div>
-                </div>
+                <div class="space-y-6">
 
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#8B0000]"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">Clinic Hours</h2>
+                            </div>
+                            <button type="button" onclick="openRuleModal()" class="ui-btn ui-btn-edit ui-btn-sm">
+                                <i class="fa-solid fa-pen"></i>
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                        <div class="p-4 space-y-0.5">
+                            @foreach ($dayNames as $fullName => $abbr)
+                            @php $s = $scheduleByDay[$abbr] ?? null; @endphp
+                            <div
+                                class="flex justify-between items-center py-1.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                                <span class="text-xs font-semibold text-gray-600">{{ $fullName }}</span>
+                                @if ($s && $s->status !== 'closed')
+                                <span class="text-xs font-bold text-[#8B0000]">{{ $s->hours_range }}</span>
+                                @else
+                                <span class="text-xs font-medium text-gray-400">Closed</span>
+                                @endif
+                            </div>
+                            @endforeach
+                            @if ($breakSchedule)
+                            <div class="pt-2 mt-1 border-t border-gray-100">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-400 italic flex items-center gap-1"><i
+                                            class="fa-solid fa-mug-hot text-yellow-400"></i> Lunch</span>
+                                    @php [$bs,$be]=explode('-',$breakSchedule->break_time); @endphp
+                                    <span class="text-xs font-medium text-gray-500">{{ date('g:i A', strtotime(trim($bs)
+                                        . ':00')) }}
+                                        – {{ date('g:i A', strtotime(trim($be) . ':00')) }}</span>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between gap-3 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-ban text-[#8B0000]"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">Blocked Dates</h2>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openBlockModal()"
+                                    class="ui-btn ui-btn-primary ui-btn-sm">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Add</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4">
+                            @if ($blockedDates->count())
+                            <div id="blockedDatesListView" class="blocked-dates-view">
+                                @foreach ($blockedDates as $blocked)
+                                @php
+                                $bd = \Carbon\Carbon::parse($blocked->date);
+                                $badgeCls = match ($blocked->reason) {
+                                'Holiday' => 'badge-holiday',
+                                'Dentist Unavailable' => 'badge-limited',
+                                default => 'badge-closed',
+                                };
+                                @endphp
+
+                                <div
+                                    class="blocked-list-item flex items-start gap-3 py-2.5 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                                    <div
+                                        class="blocked-date-pill w-9 h-9 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#8B0000] text-xs font-bold">
+                                        {{ $bd->day }}
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <p class="blocked-title text-xs font-bold text-gray-800 truncate">
+                                            {{ $bd->format('D, M j, Y') }}
+                                        </p>
+                                        <span class="{{ $badgeCls }} mt-0.5 inline-block">{{ $blocked->reason }}</span>
+                                        @if ($blocked->note)
+                                        <p class="blocked-note text-[10px] text-gray-400 mt-0.5 italic truncate">
+                                            {{ $blocked->note }}
+                                        </p>
+                                        @endif
+                                    </div>
+
+                                    <form action="{{ route($clinicScheduleRouteNames['unblock'], $blocked) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="ui-action-btn ui-action-delete"
+                                            data-tooltip="Remove blocked date" aria-label="Remove blocked date">
+
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                @endforeach
+                            </div>
+                            @else
+                            <div class="flex flex-col items-center justify-center py-10 text-center">
+                                <i class="fa-solid fa-check-circle text-4xl text-green-400 mb-3"></i>
+                                <p class="text-sm text-gray-400">No blocked dates</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+                        <div class="px-5 py-4 border-b bg-gray-50">
+                            <div class="flex items-center gap-2"><i
+                                    class="fa-solid fa-umbrella-beach text-[#8B0000]"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">Upcoming Holidays</h2>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            @php
+                            $today = now()->startOfDay();
+                            $MONTHS_SHORT = [
+                            'Jan',
+                            'Feb',
+                            'Mar',
+                            'Apr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Aug',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dec',
+                            ];
+                            $upcoming = collect($philippineHolidays)
+                            ->filter(fn($n, $d) => \Carbon\Carbon::parse($d)->gte($today))
+                            ->take(5);
+                            @endphp
+                            @forelse($upcoming as $hDate => $hName)
+                            @php
+                            $hC = \Carbon\Carbon::parse($hDate);
+                            $diff = (int) $today->diffInDays($hC, false);
+                            @endphp
+                            <div
+                                class="holiday-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0">
+                                <div class="w-10 text-center flex-shrink-0">
+                                    <div class="month text-[10px] font-bold uppercase text-[#8B0000]">
+                                        {{ $MONTHS_SHORT[$hC->month - 1] }}</div>
+                                    <div class="day text-xl font-extrabold text-gray-800 leading-tight">
+                                        {{ $hC->day }}</div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="holiday-title text-xs font-semibold text-gray-800 truncate">
+                                        {{ $hName }}</p>
+                                    <p class="holiday-meta text-[10px] text-gray-400">
+                                        {{ $diff === 0 ? 'Today' : ($diff === 1 ? 'Tomorrow' : "In $diff days") }}
+                                    </p>
+                                </div>
+                                <span class="holiday-badge badge-holiday flex-shrink-0">Holiday</span>
+                            </div>
+                            @empty
+                            <p class="text-xs text-gray-400 text-center py-4">No upcoming holidays.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
 </main>
 
 <div id="appointmentDetailModal" class="ui-modal cs-modal">
@@ -607,8 +675,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             </div>
 
             <div class="flex justify-end gap-3 pt-4 mt-4 border-t border-gray-100">
-                <button type="button" onclick="closeAppointmentDetailModal()"
-                    class="px-5 py-2 rounded-xl bg-[#8B0000] hover:bg-[#760000] text-white text-sm font-bold shadow">
+                <button type="button" onclick="closeAppointmentDetailModal()" class="ui-btn ui-btn-primary">
                     Close
                 </button>
             </div>
@@ -616,15 +683,26 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
     </div>
 </div>
 
-<div id="ruleModalBackdrop" class="ui-modal cs-modal cs-rule-modal">
+<div id="ruleModalBackdrop" class="ui-modal cs-modal cs-rule-modal modal-theme-primary">
     <div class="ui-modal-card cs-modal-card cs-rule-modal-card" onclick="event.stopPropagation()">
-        <div class="modal-hdr modal-form-hdr">
 
+        <div class="modal-hdr modal-form-hdr modal-themed-header">
             <div class="modal-title-row">
-                <div class="modal-title-block">
-                    <h3 class="text-xl font-extrabold" id="ruleModalTitle">Add Schedule Rule</h3>
-                    <p class="modal-title-sub">Choose clinic days, set operating hours, and control booking capacity.
-                    </p>
+                <div class="modal-title-main">
+                    <div class="modal-title-icon modal-themed-icon">
+                        <i class="fa-solid fa-calendar-plus" id="ruleModalIcon"></i>
+                    </div>
+
+                    <div class="modal-title-block">
+                        <h3 class="text-xl font-extrabold" id="ruleModalTitle">
+                            Add Schedule Rule
+                        </h3>
+
+                        <p class="modal-title-sub" id="ruleModalSubtitle">
+                            Choose clinic days, set operating hours,
+                            and control booking capacity.
+                        </p>
+                    </div>
                 </div>
 
                 <button type="button" onclick="closeRuleModal()" class="modal-close-btn">
@@ -634,67 +712,109 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         </div>
 
         <div class="modal-body modal-form-body">
-            <form id="ruleForm" method="POST" action="{{ route('admin.clinic_schedule.store') }}">
+            <form id="ruleForm" method="POST" action="{{ route($clinicScheduleRouteNames['store']) }}"
+                data-global-validation data-discard-changes data-form-validation-rule="clinicScheduleRule" novalidate>
                 @csrf
                 <div id="ruleMethodField"></div>
-
                 <div class="rule-modal-layout">
                     <div class="flex flex-col gap-4">
+
                         <div class="modal-section m-0">
                             <div class="modal-section-head">
                                 <div class="modal-section-icon">
                                     <i class="fa-solid fa-calendar-days"></i>
                                 </div>
+
                                 <div>
-                                    <div class="modal-section-title">Applicable Days</div>
-                                    <div class="modal-section-sub">Select one or more days for this rule.</div>
+                                    <div class="modal-section-title">
+                                        Applicable Days
+                                    </div>
+
+                                    <div class="modal-section-sub">
+                                        Select one or more days for this rule.
+                                    </div>
                                 </div>
                             </div>
 
-                            <label class="form-label">Select Days <span class="text-red-400">*</span></label>
-                            <div id="ruleDaysGroup" class="day-toggle-group mt-1">
-                                @foreach (['Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu' => 'Th', 'Fri' => 'F', 'Sat'
-                                => 'S', 'Sun' => 'Su'] as $abbr => $lbl)
-                                <div class="day-toggle" data-day="{{ $abbr }}" onclick="toggleDay(this)">
-                                    {{ $lbl }}
+                            <div data-global-field>
+                                <label class="form-label">
+                                    Select Days
+                                    <span class="text-red-400">*</span>
+                                </label>
+
+                                <div id="ruleDaysGroup" class="day-toggle-group mt-1" tabindex="-1">
+                                    @foreach ([
+                                    'Mon' => 'M',
+                                    'Tue' => 'T',
+                                    'Wed' => 'W',
+                                    'Thu' => 'Th',
+                                    'Fri' => 'F',
+                                    'Sat' => 'S',
+                                    'Sun' => 'Su',
+                                    ] as $abbr => $lbl)
+                                    <button type="button" class="day-toggle" data-day="{{ $abbr }}"
+                                        onclick="toggleDay(this)" aria-pressed="false">
+
+                                        <span class="day-toggle-label">
+                                            {{ $lbl }}
+                                        </span>
+
+                                        <span class="day-toggle-check" aria-hidden="true">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    </button>
+                                    @endforeach
                                 </div>
-                                @endforeach
+
+                                <div class="form-help">
+                                    You can apply one schedule to multiple weekdays.
+                                </div>
                             </div>
-                            <div class="form-help">You can apply one schedule to multiple weekdays.</div>
-                            <div id="ruleDaysError" class="field-error"></div>
                         </div>
 
-                        <div class="modal-section rule-notes-section m-0 flex-1 flex flex-col">
+                        <div class="modal-section rule-notes-section m-0 flex-1 flex flex-col" data-global-field>
+
                             <div class="modal-section-head">
                                 <div class="modal-section-icon">
                                     <i class="fa-solid fa-note-sticky"></i>
                                 </div>
+
                                 <div>
-                                    <div class="modal-section-title">Additional Notes</div>
-                                    <div class="modal-section-sub">Optional reminder or exception.</div>
+                                    <div class="modal-section-title">
+                                        Additional Notes
+                                    </div>
+
+                                    <div class="modal-section-sub">
+                                        Optional reminder or exception.
+                                    </div>
                                 </div>
                             </div>
 
-                            <label class="form-label" for="ruleNotes">Notes (optional)</label>
+                            <label class="form-label" for="ruleNotes">
+                                Notes (optional)
+                            </label>
 
                             <div class="rule-notes-voice-row mb-2">
                                 <div class="rule-notes-textarea-wrap">
-                                    <textarea id="ruleNotes" class="form-ctrl resize-none rule-notes-textarea"
-                                        maxlength="150"
+                                    <textarea id="ruleNotes" name="notes"
+                                        class="form-ctrl resize-none rule-notes-textarea" maxlength="150"
                                         placeholder="e.g. Reduced operations due to holiday program..."></textarea>
+
                                     <button type="button" id="ruleNotesClearBtn" class="rule-notes-clear-btn hidden"
                                         aria-label="Clear notes" title="Clear notes">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
+
                                 <div class="rule-notes-voice-toggle" id="ruleNotesVoiceToggle"></div>
                             </div>
 
                             <div class="form-help flex items-center justify-between gap-2 mt-auto">
                                 <span>Maximum of 150 characters.</span>
-                                <span id="ruleNotesCount" class="notes-counter">0/150</span>
+                                <span id="ruleNotesCount" class="notes-counter">
+                                    0/150
+                                </span>
                             </div>
-                            <div id="ruleNotesError" class="field-error"></div>
                         </div>
                     </div>
 
@@ -704,82 +824,111 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                 <div class="modal-section-icon">
                                     <i class="fa-solid fa-hospital-user"></i>
                                 </div>
+
                                 <div>
-                                    <div class="modal-section-title">Clinic Availability</div>
-                                    <div class="modal-section-sub">Define whether the clinic is open, closed, or
-                                        limited.</div>
+                                    <div class="modal-section-title">
+                                        Clinic Availability
+                                    </div>
+
+                                    <div class="modal-section-sub">
+                                        Define whether the clinic is open, closed, or limited.
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="mb-5">
-                                <label class="form-label" for="ruleStatus">Clinic Status</label>
+                            <div class="mb-5" data-global-field>
+                                <label class="form-label" for="ruleStatus">
+                                    Clinic Status
+                                </label>
+
                                 <select id="ruleStatus" class="form-ctrl form-sel"
                                     onchange="toggleStatusFields(this.value)">
                                     <option value="open">Open</option>
                                     <option value="closed">Closed</option>
                                     <option value="limited">Limited Hours</option>
                                 </select>
-                                <div id="ruleStatusError" class="field-error"></div>
                             </div>
 
                             <div id="ruleTimeFields" class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-5">
+
                                 <div class="space-y-5">
                                     <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="form-label" for="ruleOpenTime">Opening Time</label>
+
+                                        <div data-global-field>
+                                            <label class="form-label" for="ruleOpenTime">
+                                                Opening Time
+                                            </label>
+
                                             <select id="ruleOpenTime" class="form-ctrl form-sel">
                                                 <option value="07:00">7:00 AM</option>
                                                 <option value="08:00">8:00 AM</option>
                                                 <option value="09:00" selected>9:00 AM</option>
                                                 <option value="10:00">10:00 AM</option>
                                             </select>
-                                            <div id="ruleOpenTimeError" class="field-error"></div>
                                         </div>
 
-                                        <div>
-                                            <label class="form-label" for="ruleCloseTime">Closing Time</label>
+                                        <div data-global-field>
+                                            <label class="form-label" for="ruleCloseTime">
+                                                Closing Time
+                                            </label>
+
                                             <select id="ruleCloseTime" class="form-ctrl form-sel">
                                                 <option value="15:00">3:00 PM</option>
                                                 <option value="16:00">4:00 PM</option>
                                                 <option value="17:00" selected>5:00 PM</option>
                                                 <option value="18:00">6:00 PM</option>
                                             </select>
-                                            <div id="ruleCloseTimeError" class="field-error"></div>
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label class="form-label" for="ruleMaxSlots">Max Appointments / Day</label>
+                                    <div data-global-field>
+                                        <label class="form-label" for="ruleMaxSlots">
+                                            Max Appointments / Day
+                                        </label>
+
                                         <div class="slot-stepper mt-1">
-                                            <button type="button" onclick="adjSlots(-1)"
-                                                class="slot-stepper-btn">−</button>
+                                            <button type="button" onclick="adjSlots(-1)" class="slot-stepper-btn">
+                                                −
+                                            </button>
+
                                             <input type="text" id="ruleMaxSlots"
                                                 class="form-ctrl slot-stepper-input no-native-spinner" value="5"
                                                 inputmode="numeric" pattern="[0-9]*" autocomplete="off">
-                                            <button type="button" onclick="adjSlots(1)"
-                                                class="slot-stepper-btn">+</button>
+
+                                            <button type="button" onclick="adjSlots(1)" class="slot-stepper-btn">
+                                                +
+                                            </button>
                                         </div>
-                                        <div class="form-help">Set how many appointments may be accepted.</div>
-                                        <div id="ruleMaxSlotsError" class="field-error"></div>
+
+                                        <div class="form-help">
+                                            Set how many appointments may be accepted.
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="form-label">Lunch Break</label>
-                                    <div id="ruleBreakGroup"
-                                        style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.25rem;">
-                                        <div class="break-chip selected" data-val="12:00-13:00"
+                                <div data-global-field>
+                                    <label class="form-label">
+                                        Lunch Break
+                                    </label>
+
+                                    <div id="ruleBreakGroup" class="break-chip-group break-chip-stack">
+
+                                        <button type="button" class="break-chip selected" data-val="12:00-13:00"
                                             onclick="selectBreak(this)">
                                             12:00 – 1:00 PM
-                                        </div>
-                                        <div class="break-chip" data-val="13:00-14:00" onclick="selectBreak(this)">
+                                        </button>
+
+                                        <button type="button" class="break-chip" data-val="13:00-14:00"
+                                            onclick="selectBreak(this)">
                                             1:00 – 2:00 PM
-                                        </div>
-                                        <div class="break-chip" data-val="none" onclick="selectBreak(this)">
-                                            <i class="fa-solid fa-ban text-[10px]"></i> No Break
-                                        </div>
+                                        </button>
+
+                                        <button type="button" class="break-chip" data-val="none"
+                                            onclick="selectBreak(this)">
+                                            <i class="fa-solid fa-ban text-[10px]"></i>
+                                            No Break
+                                        </button>
                                     </div>
-                                    <div id="ruleBreakError" class="field-error"></div>
                                 </div>
                             </div>
                         </div>
@@ -787,9 +936,13 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                 </div>
 
                 <div class="modal-footer rule-modal-footer">
-                    <button type="button" onclick="closeRuleModal()" class="btn-soft">Cancel</button>
-                    <button type="button" onclick="submitRule()" class="rule-save-btn">
-                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Rule
+                    <button type="button" onclick="closeRuleModal()" class="ui-btn ui-btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button type="button" onclick="submitRule()" id="ruleSubmitBtn" class="ui-btn ui-btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span id="ruleSubmitText">Save Rule</span>
                     </button>
                 </div>
             </form>
@@ -797,14 +950,20 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
     </div>
 </div>
 
-<div id="blockModalBackdrop" class="ui-modal cs-modal cs-block-modal">
+<div id="blockModalBackdrop" class="ui-modal cs-modal cs-block-modal modal-theme-danger">
     <div class="ui-modal-card cs-modal-card cs-block-modal-card" onclick="event.stopPropagation()">
-        <div class="modal-hdr modal-form-hdr">
+        <div class="modal-hdr modal-form-hdr modal-themed-header">
 
             <div class="modal-title-row">
-                <div class="modal-title-block">
-                    <h3 class="text-xl font-extrabold">Block Date</h3>
-                    <p class="modal-title-sub">Prevent appointments from being booked on a specific date.</p>
+                <div class="modal-title-main">
+                    <div class="modal-title-icon modal-themed-icon">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
+
+                    <div class="modal-title-block">
+                        <h3 class="text-xl font-extrabold">Block Date</h3>
+                        <p class="modal-title-sub">Prevent appointments from being booked on a specific date.</p>
+                    </div>
                 </div>
 
                 <button type="button" onclick="closeBlockModal()" class="modal-close-btn">
@@ -814,8 +973,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         </div>
 
         <div class="modal-body modal-form-body">
-            <form action="{{ route('admin.clinic_schedule.block') }}" method="POST"
-                onsubmit="return validateBlockDateBeforeSubmit(event)">
+            <form action="{{ route($clinicScheduleRouteNames['block']) }}" method="POST" id="blockDateForm"
+                data-global-validation data-discard-changes novalidate>
                 @csrf
 
                 <div class="modal-section">
@@ -829,43 +988,46 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         </div>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-4" data-global-field>
                         <label class="form-label" for="blockDate">Date <span class="text-red-400">*</span></label>
                         <div class="fp-date-input-wrap">
                             <input type="text" id="blockDate" name="date"
                                 class="form-ctrl fp-date-input js-flatpickr-date-min-today" required readonly
-                                min="{{ date('Y-m-d') }}" placeholder="Select blocked date">
-
+                                min="{{ date('Y-m-d') }}" data-field-label="Date"
+                                data-required-message="Please select a date." data-validation-rule="clinicFutureOrToday"
+                                placeholder="Select blocked date">
                             <i class="fa-solid fa-calendar-days fp-date-icon"></i>
                         </div>
-                        <div id="blockDateError" class="field-error"></div>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-4" data-global-field>
                         <label class="form-label" for="blockReason">Reason <span class="text-red-400">*</span></label>
-                        <select id="blockReason" name="reason" class="form-ctrl form-sel">
+                        <select id="blockReason" name="reason" class="form-ctrl form-sel" required
+                            data-field-label="Reason">
                             <option value="Holiday">Holiday</option>
                             <option value="Dentist Unavailable">Dentist Unavailable</option>
                             <option value="Clinic Maintenance">Clinic Maintenance</option>
                             <option value="Special Event">Special Event</option>
                             <option value="Other">Other</option>
                         </select>
-                        <div id="blockReasonError" class="field-error"></div>
                     </div>
 
-                    <div>
+                    <div data-global-field>
                         <label class="form-label" for="blockNote">Note (optional)</label>
                         <input type="text" id="blockNote" name="note" class="form-ctrl"
                             placeholder="e.g. National holiday, maintenance, outreach event...">
                         <div class="form-help">Add extra context for admins viewing blocked dates later.</div>
-                        <div id="blockNoteError" class="field-error"></div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" onclick="closeBlockModal()" class="btn-soft">Cancel</button>
-                    <button type="submit" class="btn-primary">
-                        <i class="fa-solid fa-ban mr-1.5"></i> Block Date
+                    <button type="button" onclick="closeBlockModal()" class="ui-btn ui-btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="ui-btn ui-btn-danger">
+                        <i class="fa-solid fa-ban"></i>
+                        <span>Block Date</span>
                     </button>
                 </div>
             </form>
@@ -910,7 +1072,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             </div>
 
             <div class="cs-delete-actions">
-                <button type="button" class="modal-btn-ghost" onclick="closeScheduleDeleteModal()">
+                <button type="button" class="ui-btn ui-btn-secondary" onclick="closeScheduleDeleteModal()">
                     Cancel
                 </button>
 
@@ -918,9 +1080,9 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                     @csrf
                     @method('DELETE')
 
-                    <button type="submit" class="cs-delete-confirm">
+                    <button type="submit" class="ui-btn ui-btn-danger">
                         <i class="fa-solid fa-trash"></i>
-                        Delete
+                        <span>Delete</span>
                     </button>
                 </form>
             </div>
@@ -930,7 +1092,24 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 @endsection
 
 @section('scripts')
+
+@php
+$clinicScheduleStoreUrl = route(
+$clinicScheduleRouteNames['store']
+);
+
+$clinicScheduleUpdateUrlTemplate = route(
+$clinicScheduleRouteNames['update'],
+['clinicSchedule' => '__RULE_ID__']
+);
+@endphp
+
 <script>
+    const clinicScheduleRoutes = {
+        store: @json($clinicScheduleStoreUrl),
+        update: @json($clinicScheduleUpdateUrlTemplate),
+    };
+
     const scheduleRules = @json($schedules);
     const weeklyAppointments = @json($weeklyAppointments ?? []);
 
@@ -1007,11 +1186,34 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 
     const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const TIME_ROWS = [
-        { h: 9, l: '9:00 AM' }, { h: 10, l: '10:00 AM' },
-        { h: 11, l: '11:00 AM' }, { h: 12, l: '12:00 PM' },
-        { h: 13, l: '1:00 PM' }, { h: 14, l: '2:00 PM' },
-        { h: 15, l: '3:00 PM' }, { h: 16, l: '4:00 PM' }
+    const TIME_ROWS = [{
+        h: 9,
+        l: '9:00 AM'
+    }, {
+        h: 10,
+        l: '10:00 AM'
+    },
+    {
+        h: 11,
+        l: '11:00 AM'
+    }, {
+        h: 12,
+        l: '12:00 PM'
+    },
+    {
+        h: 13,
+        l: '1:00 PM'
+    }, {
+        h: 14,
+        l: '2:00 PM'
+    },
+    {
+        h: 15,
+        l: '3:00 PM'
+    }, {
+        h: 16,
+        l: '4:00 PM'
+    }
     ];
 
     let weekOffset = 0;
@@ -1063,16 +1265,33 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 
     function getServiceColor(serviceType) {
         const s = (serviceType || '').toLowerCase();
-        if (s.includes('oral check')) return { box: 'background:#dbeafe;border-left:3px solid #3b82f6;color:#1e3a8a;', badge: 'Check-up' };
-        if (s.includes('cleaning')) return { box: 'background:#dcfce7;border-left:3px solid #22c55e;color:#166534;', badge: 'Cleaning' };
-        if (s.includes('surgery')) return { box: 'background:#fef3c7;border-left:3px solid #f59e0b;color:#92400e;', badge: 'Surgery' };
-        if (s.includes('restoration') || s.includes('prosthesis')) return { box: 'background:#f3e8ff;border-left:3px solid #a855f7;color:#6b21a8;', badge: 'Prosthesis' };
-        return { box: 'background:#f3f4f6;border-left:3px solid #6b7280;color:#374151;', badge: 'Other' };
+        if (s.includes('oral check')) return {
+            box: 'background:#dbeafe;border-left:3px solid #3b82f6;color:#1e3a8a;',
+            badge: 'Check-up'
+        };
+        if (s.includes('cleaning')) return {
+            box: 'background:#dcfce7;border-left:3px solid #22c55e;color:#166534;',
+            badge: 'Cleaning'
+        };
+        if (s.includes('surgery')) return {
+            box: 'background:#fef3c7;border-left:3px solid #f59e0b;color:#92400e;',
+            badge: 'Surgery'
+        };
+        if (s.includes('restoration') || s.includes('prosthesis')) return {
+            box: 'background:#f3e8ff;border-left:3px solid #a855f7;color:#6b21a8;',
+            badge: 'Prosthesis'
+        };
+        return {
+            box: 'background:#f3f4f6;border-left:3px solid #6b7280;color:#374151;',
+            badge: 'Other'
+        };
     }
 
     function buildWeekGrid() {
         const ws = weekStart(weekOffset);
-        const days = Array.from({ length: 7 }, (_, i) => {
+        const days = Array.from({
+            length: 7
+        }, (_, i) => {
             const d = new Date(ws);
             d.setDate(d.getDate() + i);
             return d;
@@ -1094,23 +1313,31 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                 </div>`;
         });
 
-        TIME_ROWS.forEach(({ h, l }) => {
+        TIME_ROWS.forEach(({
+            h,
+            l
+        }) => {
             html += `<div class="time-lbl">${l}</div>`;
             days.forEach((d, i) => {
-                const isoDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                const abbr = d.toLocaleDateString('en-US', { weekday: 'short' }).replace('.', '');
+                const isoDate =
+                    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const abbr = d.toLocaleDateString('en-US', {
+                    weekday: 'short'
+                }).replace('.', '');
                 const state = i >= 5 ? 'wk-weekend' :
                     slotState(abbr, h) === 'break' ? 'wk-break' :
                         slotState(abbr, h) === 'closed' ? 'wk-closed' : '';
 
                 let inner = '';
                 if (state === 'wk-break') inner = '<span class="slot-label">BREAK</span>';
-                else if (state === 'wk-closed' || state === 'wk-weekend') inner = '<span class="slot-label">CLOSED</span>';
+                else if (state === 'wk-closed' || state === 'wk-weekend') inner =
+                    '<span class="slot-label">CLOSED</span>';
                 else {
                     const slotAppointments = getAppointmentsForSlot(isoDate, h);
                     if (slotAppointments.length > 0) {
                         inner = slotAppointments.map(appt => {
-                            const service = appt.service_type === 'Others' ? (appt.other_services || 'Other Service') : appt.service_type;
+                            const service = appt.service_type === 'Others' ? (appt
+                                .other_services || 'Other Service') : appt.service_type;
                             const style = getServiceColor(service);
                             return `<button type="button" onclick='openAppointmentDetailModal(${JSON.stringify(appt)})'
                                     style="${style.box}margin:4px;border-radius:8px;padding:6px 7px;font-size:.62rem;line-height:1.25;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06);width:calc(100% - 8px);text-align:left;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;"
@@ -1130,15 +1357,29 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         document.getElementById('weekGrid').innerHTML = html;
     }
 
-    document.getElementById('prevWeek').addEventListener('click', () => { weekOffset--; buildWeekGrid(); });
-    document.getElementById('nextWeek').addEventListener('click', () => { weekOffset++; buildWeekGrid(); });
-    document.getElementById('todayBtn').addEventListener('click', () => { weekOffset = 0; buildWeekGrid(); });
+    document.getElementById('prevWeek').addEventListener('click', () => {
+        weekOffset--;
+        buildWeekGrid();
+    });
+    document.getElementById('nextWeek').addEventListener('click', () => {
+        weekOffset++;
+        buildWeekGrid();
+    });
+    document.getElementById('todayBtn').addEventListener('click', () => {
+        weekOffset = 0;
+        buildWeekGrid();
+    });
 
     let selectedBreak = '12:00-13:00';
     let editingId = null;
 
     function openRuleModal(mode = 'create', ruleId = null, rule = null) {
         editingId = null;
+
+        const submitBtn = document.getElementById('ruleSubmitBtn');
+        const submitText = document.getElementById('ruleSubmitText');
+        const subtitle = document.getElementById('ruleModalSubtitle');
+        const icon = document.getElementById('ruleModalIcon');
 
         const backdrop = document.getElementById('ruleModalBackdrop');
         const form = document.getElementById('ruleForm');
@@ -1152,15 +1393,55 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         const timeFields = document.getElementById('ruleTimeFields');
         const defaultBreak = document.querySelector('.break-chip[data-val="12:00-13:00"]');
 
-        if (!backdrop || !form || !methodField || !title || !status || !openTime || !closeTime || !maxSlots || !notes || !timeFields) {
+        if (!backdrop || !form || !methodField || !title || !status || !openTime || !closeTime || !maxSlots || !notes ||
+            !timeFields) {
             console.error('Rule modal elements not found.');
             return;
         }
 
-        clearRuleErrors();
+        document
+            .querySelectorAll(
+                '#ruleForm .global-field-error'
+            )
+            .forEach(error => {
+                error.innerHTML = '';
+                error.classList.remove('show');
+            });
+
+        document
+            .querySelectorAll(
+                '#ruleForm .is-invalid'
+            )
+            .forEach(element => {
+                element.classList.remove('is-invalid');
+            });
+
+        backdrop.classList.remove(
+            'modal-theme-primary',
+            'modal-theme-edit'
+        );
+
+        backdrop.classList.add('modal-theme-primary');
 
         title.textContent = 'Add Schedule Rule';
-        form.action = '{{ route('admin.clinic_schedule.store') }}';
+
+        if (subtitle) {
+            subtitle.textContent =
+                'Choose clinic days, set operating hours, and control booking capacity.';
+        }
+
+        if (icon) {
+            icon.className = 'fa-solid fa-calendar-plus';
+        }
+
+        if (submitBtn) {
+            submitBtn.className = 'ui-btn ui-btn-primary';
+        }
+
+        if (submitText) {
+            submitText.textContent = 'Save Rule';
+        }
+        form.action = clinicScheduleRoutes.store;
         methodField.innerHTML = '';
 
         document.querySelectorAll('#ruleModalBackdrop .day-toggle').forEach(d => d.classList.remove('active'));
@@ -1180,9 +1461,30 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         if (ruleNotesCount) ruleNotesCount.textContent = '0/150';
 
         if (mode === 'edit' && rule) {
-            editingId = ruleId;
+            backdrop.classList.remove('modal-theme-primary');
+            backdrop.classList.add('modal-theme-edit');
+
             title.textContent = 'Edit Schedule Rule';
-            form.action = `/admin/clinic-schedule/rules/${ruleId}`;
+
+            if (subtitle) {
+                subtitle.textContent =
+                    'Update clinic days, operating hours, and booking capacity.';
+            }
+
+            if (icon) {
+                icon.className = 'fa-solid fa-calendar-pen';
+            }
+
+            if (submitBtn) {
+                submitBtn.className = 'ui-btn ui-btn-edit';
+            }
+
+            if (submitText) {
+                submitText.textContent = 'Update Rule';
+            }
+
+            editingId = ruleId;
+            form.action = clinicScheduleRoutes.update.replace('__RULE_ID__', ruleId);
             methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
             (rule.days || []).forEach(day => {
@@ -1215,9 +1517,19 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         window.closeModal('ruleModalBackdrop');
     }
 
-    function toggleDay(el) {
-        el.classList.toggle('active');
-        clearFieldError('ruleDaysError', null, 'ruleDaysGroup');
+    function toggleDay(button) {
+        const isActive = button.classList.toggle('active');
+
+        button.setAttribute(
+            'aria-pressed',
+            isActive ? 'true' : 'false'
+        );
+
+        clearFieldError?.(
+            'ruleDaysError',
+            null,
+            'ruleDaysGroup'
+        );
     }
 
     function toggleStatusFields(val) {
@@ -1257,78 +1569,225 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         return sortScheduleDays(conflicts);
     }
 
+    function registerClinicScheduleValidation() {
+        if (
+            typeof window.registerGlobalFormValidationRule !==
+            'function'
+        ) {
+            return false;
+        }
+
+        window.registerGlobalFormValidationRule(
+            'clinicScheduleRule',
+            form => {
+                const daysGroup =
+                    document.getElementById('ruleDaysGroup');
+
+                const activeDays = Array.from(
+                    form.querySelectorAll('.day-toggle.active')
+                ).map(day => day.dataset.day);
+
+                const status =
+                    document.getElementById('ruleStatus')?.value || '';
+
+                const openTimeField =
+                    document.getElementById('ruleOpenTime');
+
+                const closeTimeField =
+                    document.getElementById('ruleCloseTime');
+
+                const maxSlotsField =
+                    document.getElementById('ruleMaxSlots');
+
+                const openTime = openTimeField?.value || '';
+                const closeTime = closeTimeField?.value || '';
+                const maxSlots = Number(maxSlotsField?.value || 0);
+
+                let valid = true;
+                let firstInvalid = null;
+
+                window.clearGlobalGroupError?.(
+                    daysGroup,
+                    'rule-days'
+                );
+
+                window.showFormInputValidationMessage?.(
+                    closeTimeField,
+                    ''
+                );
+
+                window.showFormInputValidationMessage?.(
+                    maxSlotsField,
+                    ''
+                );
+
+                if (!activeDays.length) {
+                    window.showGlobalGroupError?.(
+                        daysGroup,
+                        'rule-days',
+                        'Please select at least one day.'
+                    );
+
+                    valid = false;
+                    firstInvalid = daysGroup;
+                }
+
+                const conflicts =
+                    findConflictingScheduleDays(activeDays);
+
+                if (conflicts.length) {
+                    window.showGlobalGroupError?.(
+                        daysGroup,
+                        'rule-days',
+                        `A schedule already exists for ${conflicts.join(', ')}.`
+                    );
+
+                    valid = false;
+                    firstInvalid ||= daysGroup;
+                }
+
+                if (status !== 'closed') {
+                    if (
+                        !openTime ||
+                        !closeTime
+                    ) {
+                        if (!openTime) {
+                            window.showFormInputValidationMessage?.(
+                                openTimeField,
+                                'Please select an opening time.'
+                            );
+
+                            firstInvalid ||= openTimeField;
+                        }
+
+                        if (!closeTime) {
+                            window.showFormInputValidationMessage?.(
+                                closeTimeField,
+                                'Please select a closing time.'
+                            );
+
+                            firstInvalid ||= closeTimeField;
+                        }
+
+                        valid = false;
+                    } else if (openTime >= closeTime) {
+                        window.showFormInputValidationMessage?.(
+                            closeTimeField,
+                            'Closing time must be later than opening time.'
+                        );
+
+                        valid = false;
+                        firstInvalid ||= closeTimeField;
+                    }
+
+                    if (
+                        !Number.isFinite(maxSlots) ||
+                        maxSlots < 1 ||
+                        maxSlots > 30
+                    ) {
+                        window.showFormInputValidationMessage?.(
+                            maxSlotsField,
+                            'Max appointments must be between 1 and 30.'
+                        );
+
+                        valid = false;
+                        firstInvalid ||= maxSlotsField;
+                    }
+                }
+
+                return {
+                    valid,
+                    firstInvalid
+                };
+            }
+        );
+
+        return true;
+    }
+
+    window.addEventListener(
+        'global-validation-ready',
+        () => {
+            registerClinicScheduleValidation();
+            registerClinicDateValidation();
+        }
+    );
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        () => {
+            registerClinicScheduleValidation();
+            registerClinicDateValidation();
+        }
+    );
+
     function submitRule() {
-        clearRuleErrors();
-
-        const activeDays = [...document.querySelectorAll('.day-toggle.active')].map(d => d.dataset.day);
-        const status = document.getElementById('ruleStatus').value;
-        const openTime = document.getElementById('ruleOpenTime').value;
-        const closeTime = document.getElementById('ruleCloseTime').value;
-        const maxSlots = parseInt(document.getElementById('ruleMaxSlots').value || '0', 10);
-
-        let hasError = false;
-
-        if (!activeDays.length) {
-            setFieldError('ruleDaysError', 'Please select at least one day.', null, 'ruleDaysGroup');
-            hasError = true;
-        }
-
-        const conflictingDays = findConflictingScheduleDays(activeDays);
-        if (conflictingDays.length) {
-            setFieldError(
-                'ruleDaysError',
-                `A schedule already exists for ${conflictingDays.join(', ')}. Edit the existing schedule instead of adding another rule for the same day.`,
-                null,
-                'ruleDaysGroup'
-            );
-            hasError = true;
-        }
-
-        if (!status) {
-            setFieldError('ruleStatusError', 'Please select a clinic status.', 'ruleStatus');
-            hasError = true;
-        }
-        if (status !== 'closed') {
-            if (!openTime) {
-                setFieldError('ruleOpenTimeError', 'Please select an opening time.', 'ruleOpenTime');
-                hasError = true;
-            }
-            if (!closeTime) {
-                setFieldError('ruleCloseTimeError', 'Please select a closing time.', 'ruleCloseTime');
-                hasError = true;
-            }
-            if (openTime && closeTime && openTime >= closeTime) {
-                setFieldError('ruleCloseTimeError', 'Closing time must be later than opening time.', 'ruleCloseTime');
-                hasError = true;
-            }
-            if (!maxSlots || maxSlots < 1) {
-                setFieldError('ruleMaxSlotsError', 'Max appointments must be at least 1.', 'ruleMaxSlots');
-                hasError = true;
-            }
-        }
-        if (hasError) return;
-
         const form = document.getElementById('ruleForm');
-        form.querySelectorAll('.injected-hidden').forEach(el => el.remove());
 
-        const inject = (name, val) => {
-            const inp = document.createElement('input');
-            inp.type = 'hidden'; inp.name = name; inp.value = val; inp.className = 'injected-hidden';
-            form.appendChild(inp);
+        if (!form) return;
+
+        const validation =
+            window.validateGlobalForm?.(form);
+
+        if (!validation || !validation.valid) {
+            return;
+        }
+
+        const activeDays = Array.from(
+            document.querySelectorAll(
+                '#ruleModalBackdrop .day-toggle.active'
+            )
+        ).map(day => day.dataset.day);
+
+        const status =
+            document.getElementById('ruleStatus').value;
+
+        const openTime =
+            document.getElementById('ruleOpenTime').value;
+
+        const closeTime =
+            document.getElementById('ruleCloseTime').value;
+
+        const maxSlots =
+            document.getElementById('ruleMaxSlots').value;
+
+        form
+            .querySelectorAll('.injected-hidden')
+            .forEach(element => element.remove());
+
+        const inject = (name, value) => {
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            input.className = 'injected-hidden';
+
+            form.appendChild(input);
         };
 
-        activeDays.forEach(d => inject('days[]', d));
+        activeDays.forEach(day => {
+            inject('days[]', day);
+        });
+
         inject('status', status);
 
         if (status !== 'closed') {
             inject('open_time', openTime);
             inject('close_time', closeTime);
             inject('max_slots', maxSlots);
-            inject('break_time', selectedBreak || 'none');
+            inject(
+                'break_time',
+                selectedBreak || 'none'
+            );
         }
-        inject('notes', document.getElementById('ruleNotes').value);
 
-        form.submit();
+        inject(
+            'notes',
+            document.getElementById('ruleNotes').value
+        );
+
+        form.requestSubmit();
     }
 
     function getLocalDateString(date = new Date()) {
@@ -1348,7 +1807,22 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             return;
         }
 
-        clearBlockErrors();
+        document
+            .querySelectorAll(
+                '#blockDateForm .global-field-error'
+            )
+            .forEach(error => {
+                error.innerHTML = '';
+                error.classList.remove('show');
+            });
+
+        document
+            .querySelectorAll(
+                '#blockDateForm .is-invalid'
+            )
+            .forEach(element => {
+                element.classList.remove('is-invalid');
+            });
 
         const today = getLocalDateString();
 
@@ -1368,33 +1842,41 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         window.openModal('blockModalBackdrop');
     }
 
-    function validateBlockDateBeforeSubmit(event) {
-        const blockDate = document.getElementById('blockDate');
-        if (!blockDate) return true;
-
-        const today = getLocalDateString();
-        const selectedDate = blockDate.value;
-
-        clearFieldError('blockDateError', 'blockDate');
-
-        if (!selectedDate) {
-            event.preventDefault();
-            setFieldError('blockDateError', 'Please select a date.', 'blockDate');
+    function registerClinicDateValidation() {
+        if (
+            typeof window.registerGlobalValidationRule !==
+            'function'
+        ) {
             return false;
         }
 
-        if (selectedDate < today) {
-            event.preventDefault();
+        window.registerGlobalValidationRule(
+            'clinicFutureOrToday',
+            field => {
+                const value =
+                    String(field.value || '').trim();
 
-            blockDate.value = '';
-            blockDate._flatpickr?.clear();
+                if (!value) {
+                    return 'Please select a date.';
+                }
 
-            setFieldError('blockDateError', 'Previous dates are not allowed.', 'blockDate');
-            return false;
-        }
+                const today = getLocalDateString();
+
+                if (value < today) {
+                    return 'Previous dates are not allowed.';
+                }
+
+                return '';
+            }
+        );
 
         return true;
     }
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        registerClinicDateValidation
+    );
 
     function closeBlockModal() {
         window.closeModal('blockModalBackdrop');
@@ -1450,8 +1932,12 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         ruleNotesClearBtn?.addEventListener('click', function () {
             if (!ruleNotes) return;
             ruleNotes.value = '';
-            ruleNotes.dispatchEvent(new Event('input', { bubbles: true }));
-            ruleNotes.dispatchEvent(new Event('change', { bubbles: true }));
+            ruleNotes.dispatchEvent(new Event('input', {
+                bubbles: true
+            }));
+            ruleNotes.dispatchEvent(new Event('change', {
+                bubbles: true
+            }));
             syncRuleNotesClear();
             ruleNotes.focus();
         });
@@ -1478,7 +1964,10 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             status.setAttribute('aria-live', 'polite');
             toggleWrapper.appendChild(status);
 
-            let recognition = null, listening = false, manualStop = false, capturedText = false;
+            let recognition = null,
+                listening = false,
+                manualStop = false,
+                capturedText = false;
 
             const setStatus = (text, state) => {
                 status.textContent = text || '';
@@ -1490,13 +1979,15 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             const setMicState = (active) => {
                 micBtn.classList.toggle('mic-active', !!active);
                 micBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-                micBtn.innerHTML = active
-                    ? '<i class="fa-solid fa-stop"></i>'
-                    : '<i class="fa-solid fa-microphone"></i>';
+                micBtn.innerHTML = active ?
+                    '<i class="fa-solid fa-stop"></i>' :
+                    '<i class="fa-solid fa-microphone"></i>';
             };
 
             const stopNow = () => {
-                manualStop = true; listening = false; setMicState(false);
+                manualStop = true;
+                listening = false;
+                setMicState(false);
                 if (capturedText) {
                     setStatus('Voice captured.', 'success');
                     setTimeout(() => setStatus('', null), 1200);
@@ -1504,24 +1995,50 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                     setStatus("Didn't catch that. Try again.", 'error');
                     setTimeout(() => setStatus('', null), 2500);
                 }
-                if (recognition) { try { recognition.abort(); } catch (e) { try { recognition.stop(); } catch (_) { } } }
+                if (recognition) {
+                    try {
+                        recognition.abort();
+                    } catch (e) {
+                        try {
+                            recognition.stop();
+                        } catch (_) { }
+                    }
+                }
             };
 
             const createRecognition = () => {
                 capturedText = false;
                 const r = new SpeechRecognition();
-                r.lang = 'en-US'; r.continuous = false; r.interimResults = true; r.maxAlternatives = 1;
+                r.lang = 'en-US';
+                r.continuous = false;
+                r.interimResults = true;
+                r.maxAlternatives = 1;
 
-                let sawSpeech = false, timeoutId = null;
-                const clear_ = () => { if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; } };
+                let sawSpeech = false,
+                    timeoutId = null;
+                const clear_ = () => {
+                    if (timeoutId) {
+                        clearTimeout(timeoutId);
+                        timeoutId = null;
+                    }
+                };
 
                 r.onstart = () => {
                     timeoutId = setTimeout(() => {
-                        if (listening && !sawSpeech) { try { r.stop(); } catch (e) { } }
+                        if (listening && !sawSpeech) {
+                            try {
+                                r.stop();
+                            } catch (e) { }
+                        }
                     }, 6000);
                 };
 
-                r.onspeechend = () => { clear_(); try { r.stop(); } catch (e) { } };
+                r.onspeechend = () => {
+                    clear_();
+                    try {
+                        r.stop();
+                    } catch (e) { }
+                };
 
                 r.onresult = (event) => {
                     let transcript = '';
@@ -1538,15 +2055,23 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         clear_();
                         capturedText = true;
                         input.value = transcript;
-                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        input.dispatchEvent(new Event('input', {
+                            bubbles: true
+                        }));
+                        input.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
                         setStatus('Listening...', 'listening');
                     }
                 };
 
                 r.onerror = () => {
-                    clear_(); listening = false;
-                    if (manualStop) { manualStop = false; return; }
+                    clear_();
+                    listening = false;
+                    if (manualStop) {
+                        manualStop = false;
+                        return;
+                    }
                     setMicState(false);
                     setStatus("Didn't catch that. Try again.", 'error');
                     setTimeout(() => setStatus('', null), 2500);
@@ -1554,9 +2079,15 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 
                 r.onend = () => {
                     clear_();
-                    if (manualStop) { manualStop = false; listening = false; setMicState(false); return; }
+                    if (manualStop) {
+                        manualStop = false;
+                        listening = false;
+                        setMicState(false);
+                        return;
+                    }
                     const had = sawSpeech || capturedText;
-                    listening = false; setMicState(false);
+                    listening = false;
+                    setMicState(false);
                     if (had) {
                         setStatus('Voice captured.', 'success');
                         setTimeout(() => setStatus('', null), 2200);
@@ -1570,30 +2101,47 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             };
 
             micBtn.addEventListener('click', () => {
-                if (listening && recognition) { stopNow(); return; }
+                if (listening && recognition) {
+                    stopNow();
+                    return;
+                }
                 recognition = createRecognition();
-                try { recognition.start(); } catch (e) {
+                try {
+                    recognition.start();
+                } catch (e) {
                     setStatus('Unable to start voice input.', 'error');
                     setTimeout(() => setStatus('', null), 2500);
-                    setMicState(false); listening = false; return;
+                    setMicState(false);
+                    listening = false;
+                    return;
                 }
-                listening = true; setMicState(true); setStatus('Listening...', 'listening');
+                listening = true;
+                setMicState(true);
+                setStatus('Listening...', 'listening');
             });
 
             micBtn.addEventListener('pointerdown', (ev) => {
                 if (listening && recognition) {
-                    ev.preventDefault(); ev.stopPropagation();
+                    ev.preventDefault();
+                    ev.stopPropagation();
                     manualStop = true;
-                    try { recognition.stop(); } catch (e) { }
+                    try {
+                        recognition.stop();
+                    } catch (e) { }
                 }
-            }, { passive: false });
+            }, {
+                passive: false
+            });
         })();
 
         buildWeekGrid();
 
-        document.getElementById('ruleStatus')?.addEventListener('change', () => clearFieldError('ruleStatusError', 'ruleStatus'));
-        document.getElementById('ruleOpenTime')?.addEventListener('change', () => clearFieldError('ruleOpenTimeError', 'ruleOpenTime'));
-        document.getElementById('ruleCloseTime')?.addEventListener('change', () => clearFieldError('ruleCloseTimeError', 'ruleCloseTime'));
+        document.getElementById('ruleStatus')?.addEventListener('change', () => clearFieldError(
+            'ruleStatusError', 'ruleStatus'));
+        document.getElementById('ruleOpenTime')?.addEventListener('change', () => clearFieldError(
+            'ruleOpenTimeError', 'ruleOpenTime'));
+        document.getElementById('ruleCloseTime')?.addEventListener('change', () => clearFieldError(
+            'ruleCloseTimeError', 'ruleCloseTime'));
         document.getElementById('ruleMaxSlots')?.addEventListener('input', function () {
             this.value = this.value.replace(/\D/g, '').slice(0, 2);
 
@@ -1605,9 +2153,12 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             clearFieldError('ruleMaxSlotsError', 'ruleMaxSlots');
         });
 
-        document.getElementById('blockDate')?.addEventListener('input', () => clearFieldError('blockDateError', 'blockDate'));
-        document.getElementById('blockReason')?.addEventListener('change', () => clearFieldError('blockReasonError', 'blockReason'));
-        document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError', 'blockNote'));
+        document.getElementById('blockDate')?.addEventListener('input', () => clearFieldError('blockDateError',
+            'blockDate'));
+        document.getElementById('blockReason')?.addEventListener('change', () => clearFieldError(
+            'blockReasonError', 'blockReason'));
+        document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError',
+            'blockNote'));
 
         function getPreferredScheduleRulesView() {
             if (window.innerWidth <= 767) return 'list';
@@ -1652,8 +2203,16 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
         const listViewBtn = document.getElementById('scheduleRulesListViewBtn');
         const gridViewBtn = document.getElementById('scheduleRulesGridViewBtn');
 
-        listViewBtn?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); applyScheduleRulesView('list', true); });
-        gridViewBtn?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); applyScheduleRulesView('grid', true); });
+        listViewBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyScheduleRulesView('list', true);
+        });
+        gridViewBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyScheduleRulesView('grid', true);
+        });
 
         applyScheduleRulesView(getPreferredScheduleRulesView(), false);
         window.addEventListener('resize', () => applyScheduleRulesView(getPreferredScheduleRulesView(), false));
