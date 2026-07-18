@@ -19,6 +19,9 @@ class User extends Authenticatable implements JWTSubject
         'suffix_name',
         'code',
         'email',
+        'phone',
+        'birthdate',
+        'gender',
         'password',
         'role_id',
         'status',
@@ -31,6 +34,9 @@ class User extends Authenticatable implements JWTSubject
         'deactivation_reason',
         'sso_user_id',
         'last_login_at',
+        'last_failed_login_at',
+        'failed_login_attempts',
+        'locked_until',
         'access_token',
         'refresh_token',
     ];
@@ -44,6 +50,9 @@ class User extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'last_login_at' => 'datetime',
+        'last_failed_login_at' => 'datetime',
+        'locked_until' => 'datetime',
+        'birthdate' => 'date',
         'last_working_date' => 'date',
         'access_ends_at' => 'datetime',
         'deactivated_at' => 'datetime',

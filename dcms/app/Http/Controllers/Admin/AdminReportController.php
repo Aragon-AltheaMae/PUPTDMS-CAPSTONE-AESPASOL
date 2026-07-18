@@ -545,12 +545,17 @@ class AdminReportController extends Controller
         ];
 
         $aiContent = $openAIReportService->generate($reportData);
+        $usedAi = is_array($aiContent);
 
         $aiReport = array_merge([
             'period' => $period,
             'generated_at' => $now->format('M d, Y h:i A'),
             'risk_level' => $riskLevel,
             'risk_explanation' => $riskExplanation,
+            'generation_source' => $usedAi ? 'ai' : 'fallback',
+            'generation_note' => $usedAi
+                ? 'The narrative insights were generated using the AI reporting service.'
+                : 'The AI reporting service was unavailable, so the system used the built-in fallback report narrative.',
             'document_request_analysis' => [
                 "The system recorded {$docTotal} document request/s for {$period}.",
                 "{$docApproved} request/s were approved, resulting in a {$docApprovalRate}% approval rate.",
