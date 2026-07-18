@@ -17,9 +17,22 @@ class AdminInventoryController extends Controller
             'Admin viewed inventory page'
         );
 
-        $notifications = collect([]);
+        return view('admin.admin-inventory', [
+            'notifications' => collect([]),
 
-        return view('admin.admin-inventory', compact('notifications'));
+            'layoutRole' => 'admin',
+            'pageShellClass' => 'admin-page-shell',
+            'isDentistView' => false,
+
+            'inventoryRouteNames' => [
+                'data' => 'admin.inventory.data',
+                'store' => 'admin.inventory.store',
+                'update' => 'admin.inventory.update',
+                'destroy' => 'admin.inventory.destroy',
+            ],
+
+            'inventoryWatcherKey' => 'admin-inventory',
+        ]);
     }
 
     public function fetch()

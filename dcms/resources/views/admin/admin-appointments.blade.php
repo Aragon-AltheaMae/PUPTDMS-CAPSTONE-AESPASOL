@@ -64,15 +64,15 @@ $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
 $allAppointments = $upcomingAppointments->merge($pastAppointments);
 $normalizeAppointmentStatus = function ($status) {
-  $normalized = strtolower(trim((string) ($status ?? '')));
+$normalized = strtolower(trim((string) ($status ?? '')));
 
-  return match ($normalized) {
-    'pending', 'confirmed', 'upcoming' => 'upcoming',
-    'reschedule', 'rescheduled' => 'rescheduled',
-    'canceled', 'cancelled' => 'cancelled',
-    'completed' => 'completed',
-    default => $normalized ?: 'upcoming',
-  };
+return match ($normalized) {
+'pending', 'confirmed', 'upcoming' => 'upcoming',
+'reschedule', 'rescheduled' => 'rescheduled',
+'canceled', 'cancelled' => 'cancelled',
+'completed' => 'completed',
+default => $normalized ?: 'upcoming',
+};
 };
 
 $statusCounts = [
@@ -1101,29 +1101,40 @@ $notifCount = $notifications->count();
 </main>
 
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-  <div class="filter-drawer-overlay" onclick="document.getElementById('closeFilterModalBtn').click()"></div>
 
-  <div class="filter-drawer-panel flex flex-col bg-white">
-    <div class="px-6 py-5 flex items-center justify-between flex-shrink-0 bg-white border-b border-gray-100">
-      <div class="filter-drawer-title flex items-center gap-2">
-        <i class="fa-solid fa-sliders text-xl"></i>
-        <h2 class="text-xl font-extrabold">Filters</h2>
+  <div class="filter-drawer-overlay" onclick="document.getElementById('closeFilterModalBtn')?.click()">
+  </div>
+
+  <div class="filter-drawer-panel">
+    <div class="filter-drawer-header">
+      <div class="filter-drawer-title">
+        <i class="fa-solid fa-sliders"></i>
+        <h2>Filters</h2>
       </div>
 
-      <button id="closeFilterModalBtn" type="button" class="text-gray-400 hover:text-gray-700 transition-colors">
-        <i class="fa-solid fa-xmark text-xl"></i>
+      <button id="closeFilterModalBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
+
+        <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="px-6 py-5 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
-      <div id="activeFiltersSection" class="hidden">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
-          <button id="clearAllChipsBtn" type="button" class="text-xs font-bold text-[#8B0000] hover:underline">
-            Clear All
+    <div class="filter-drawer-body">
+      <div id="activeFiltersSection" class="filter-active-section hidden">
+
+        <div class="filter-active-header">
+          <span class="filter-active-title">
+            Active Filters
+          </span>
+
+          <button id="clearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Clear All</span>
           </button>
         </div>
-        <div id="activeChipsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+
+        <div id="activeChipsContainer" class="active-filters-container">
+        </div>
       </div>
 
       <div>
@@ -1165,24 +1176,28 @@ $notifCount = $notifications->count();
       </div>
     </div>
 
-    <div
-      class="px-6 py-5 bg-white flex flex-col sm:flex-row items-center justify-between flex-shrink-0 border-t border-gray-100 gap-4 sm:gap-0 relative z-20">
-      <button id="clearFiltersModal" type="button"
-        class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-        <i class="fa-regular fa-trash-can text-lg"></i>
-        <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+    <div class="filter-drawer-footer">
+      <button type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm"
+        onclick="clearAppointmentFilterDraft()">
+
+        <i class="fa-regular fa-trash-can"></i>
+        <span>Clear Filters</span>
       </button>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <button id="cancelFilterBtn" type="button"
-          class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors">
-          Cancel
+      <div class="filter-footer-actions">
+        <button type="button" class="filter-cancel-btn ui-btn ui-btn-secondary" onclick="closeAppointmentFilterPanel()">
+
+          <i class="fa-solid fa-xmark"></i>
+          <span>Cancel</span>
         </button>
 
-        <button id="applyFilters" type="button"
-          class="filter-show-results-btn filter-apply-btn flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+        <button type="button" class="filter-apply-btn ui-btn ui-btn-primary" onclick="applyAppointmentFilters()">
+
           <i class="fa-solid fa-check"></i>
-          <span id="showResultsText">Show 0 results</span>
+
+          <span class="filter-results-text" id="appointmentShowResultsText">
+            Show 0 results
+          </span>
         </button>
       </div>
     </div>
@@ -1337,11 +1352,11 @@ $notifCount = $notifications->count();
     appointmentStatusFilterSource = source === 'panel' ? 'panel' : 'dropdown';
 
     if (source === 'dropdown') {
-      appointmentPeriodFilter = nextValue === 'all'
-        ? 'all'
-        : ['completed', 'cancelled'].includes(nextValue)
-          ? 'past'
-          : 'upcoming';
+      appointmentPeriodFilter = nextValue === 'all' ?
+        'all' :
+        ['completed', 'cancelled'].includes(nextValue) ?
+          'past' :
+          'upcoming';
     }
 
     if (apptStatusFilter) {
@@ -1402,34 +1417,15 @@ $notifCount = $notifications->count();
   }
 
   function openAppointmentFilterPanel() {
-    const modal = getAppointmentFilterModal();
-    if (!modal) return;
-
     syncAppointmentFilterInputs();
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.documentElement.classList.add('filter-lock');
-    document.body.classList.add('filter-lock');
     renderAppointmentFilterChips();
     updateAppointmentShowResultsButton();
+
+    window.openFilterDrawer?.('filterModal');
   }
 
   function closeAppointmentFilterPanel() {
-    const modal = getAppointmentFilterModal();
-    if (!modal || modal.classList.contains('closing')) return;
-
-    modal.classList.remove('open');
-    modal.classList.add('closing');
-    modal.setAttribute('aria-hidden', 'true');
-
-    setTimeout(() => {
-      modal.classList.remove('closing');
-
-      if (!document.querySelector('#filterModal.open, #filterModal.closing')) {
-        document.documentElement.classList.remove('filter-lock');
-        document.body.classList.remove('filter-lock');
-      }
-    }, 300);
+    window.closeFilterDrawer?.('filterModal');
   }
 
   function setAppointmentPeriodFilter(period = 'upcoming') {

@@ -33,18 +33,19 @@
 @import './pages/patient/patient-shared.css';
 @import './pages/admin/admin-shared.css';
 
+@import './pages/shared/patient-list.css';
+
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
 @import './pages/dentist/dentist-document-requests.css';
 @import './pages/dentist/dentist-appointments.css';
-@import './pages/dentist/dentist-inventory.css';
-@import './pages/dentist/patient-directory.css';
 @import './pages/dentist/dentist-reports.css';
 @import './pages/dentist/dental-services.css';
 @import './pages/dentist/daily-treatment.css';
 @import './pages/dentist/dentist-book-appointment.css';
 @import './pages/dentist/odontogram.css';
 @import './pages/dentist/dentist-walk-in.css';
+
 /* Patient pages */
 @import './pages/patient/dashboard.css';
 @import './pages/patient/book-appointment.css';
@@ -56,7 +57,6 @@
 /* Admin pages */
 @import './pages/admin/admin-dashboard.css';
 @import './pages/admin/admin-appointments.css';
-@import './pages/admin/admin-patient.css';
 @import './pages/admin/admin-inventory.css';
 @import './pages/admin/admin-dental-records.css';
 @import './pages/admin/admin-document-requests.css';

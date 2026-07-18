@@ -204,8 +204,17 @@
 }
 
 .voice-search-mic.external i {
-    font-size: 12px;
-    line-height: 1;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    color: currentColor !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
 }
 
 .voice-search-mic.external.mic-active {

@@ -18,7 +18,6 @@ class ClinicScheduleController extends Controller
         $schedules    = ClinicSchedule::active()->orderBy('id')->get();
         $blockedDates = BlockedDate::orderBy('date')->get();
 
-        // Load a wider range so weekly navigation can still see appointments
         $startDate = Carbon::now()->startOfMonth()->subMonth();
         $endDate   = Carbon::now()->endOfMonth()->addMonths(3);
 
@@ -55,20 +54,31 @@ class ClinicScheduleController extends Controller
             })
             ->values();
 
-            $philippineHolidays = PhilippineHolidays::range(0, 1);
-            $notifications      = [];
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $notifications      = [];
 
-        return view('admin.clinic-schedule', compact(
-            'schedules',
-            'blockedDates',
-            'appointmentCountsPerDay',
-            'weeklyAppointments',
-            'philippineHolidays',
-            'notifications',
-        ));
+        return view('admin.clinic-schedule', [
+            'schedules' => $schedules,
+            'blockedDates' => $blockedDates,
+            'appointmentCountsPerDay' => $appointmentCountsPerDay,
+            'weeklyAppointments' => $weeklyAppointments,
+            'philippineHolidays' => $philippineHolidays,
+            'notifications' => $notifications,
+
+            'layoutRole' => 'admin',
+            'pageShellClass' => 'admin-page-shell',
+            'isDentistView' => false,
+
+            'clinicScheduleRouteNames' => [
+                'store' => 'admin.clinic_schedule.store',
+                'update' => 'admin.clinic_schedule.update',
+                'destroy' => 'admin.clinic_schedule.destroy',
+                'block' => 'admin.clinic_schedule.block',
+                'unblock' => 'admin.clinic_schedule.unblock',
+            ],
+        ]);
     }
 
-    // ════ ADMIN — CRUD: Schedule Rules ══════════
     public function store(Request $request)
     {
         $validated = $this->validateRule($request);
@@ -155,80 +165,80 @@ class ClinicScheduleController extends Controller
         return response()->json(array_values(array_unique($unavailable)));
     }
 
-        public function slotsForDate(Request $request)
-        {
-            $request->validate(['date' => 'required|date|after_or_equal:today']);
+    public function slotsForDate(Request $request)
+    {
+        $request->validate(['date' => 'required|date|after_or_equal:today']);
 
-            $iso    = $request->date;
-            $carbon = Carbon::parse($iso);
-            $abbr   = $carbon->format('D');
+        $iso    = $request->date;
+        $carbon = Carbon::parse($iso);
+        $abbr   = $carbon->format('D');
 
-            if (BlockedDate::where('date', $iso)->exists()) {
-                return response()->json([
-                    'slots'   => [],
-                    'message' => 'This date is blocked and unavailable for booking.',
-                ]);
-            }
-
-            $philippineHolidays = PhilippineHolidays::range(0, 1);
-            if (isset($philippineHolidays[$iso])) {
-                return response()->json([
-                    'slots'   => [],
-                    'message' => 'The clinic is closed on holidays.',
-                ]);
-            }
-
-            $schedule = ClinicSchedule::active()
-                ->get()
-                ->first(fn($s) => in_array($abbr, $s->days ?? []));
-
-            if (! $schedule || $schedule->status === 'closed') {
-                return response()->json([
-                    'slots'   => [],
-                    'message' => 'The clinic is closed on this day.',
-                ]);
-            }
-
-            $bookedSlotCounts = Appointment::where('appointment_date', $iso)
-                ->whereIn('status', ['upcoming', 'rescheduled'])
-                ->selectRaw('appointment_time, COUNT(*) as cnt')
-                ->groupBy('appointment_time')
-                ->pluck('cnt', 'appointment_time')
-                ->toArray();
-
-            $totalBooked = array_sum($bookedSlotCounts);
-
-            if ($totalBooked >= $schedule->max_slots) {
-                return response()->json([
-                    'slots'   => [],
-                    'message' => 'All slots for this day are fully booked.',
-                ]);
-            }
-
+        if (BlockedDate::where('date', $iso)->exists()) {
             return response()->json([
-                'slots'      => $schedule->availableSlots($iso, $bookedSlotCounts),
-                'max_slots'  => $schedule->max_slots,
-                'booked'     => $totalBooked,
-                'remaining'  => max(0, $schedule->max_slots - $totalBooked),
-                'open_time'  => $schedule->open_time,
-                'close_time' => $schedule->close_time,
-                'break_time' => $schedule->break_time,
+                'slots'   => [],
+                'message' => 'This date is blocked and unavailable for booking.',
             ]);
         }
 
-        private function validateRule(Request $request): array
-        {
-            return $request->validate([
-                'days'       => 'required|array|min:1',
-                'days.*'     => 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
-                'status'     => 'required|in:open,closed,limited',
-                'open_time'  => 'required_unless:status,closed|nullable|date_format:H:i',
-                'close_time' => 'required_unless:status,closed|nullable|date_format:H:i|after:open_time',
-                'break_time' => 'nullable|string',
-                'max_slots'  => 'required_unless:status,closed|nullable|integer|min:1|max:50',
-                'notes'      => 'nullable|string|max:500',
+        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        if (isset($philippineHolidays[$iso])) {
+            return response()->json([
+                'slots'   => [],
+                'message' => 'The clinic is closed on holidays.',
             ]);
         }
+
+        $schedule = ClinicSchedule::active()
+            ->get()
+            ->first(fn($s) => in_array($abbr, $s->days ?? []));
+
+        if (! $schedule || $schedule->status === 'closed') {
+            return response()->json([
+                'slots'   => [],
+                'message' => 'The clinic is closed on this day.',
+            ]);
+        }
+
+        $bookedSlotCounts = Appointment::where('appointment_date', $iso)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->selectRaw('appointment_time, COUNT(*) as cnt')
+            ->groupBy('appointment_time')
+            ->pluck('cnt', 'appointment_time')
+            ->toArray();
+
+        $totalBooked = array_sum($bookedSlotCounts);
+
+        if ($totalBooked >= $schedule->max_slots) {
+            return response()->json([
+                'slots'   => [],
+                'message' => 'All slots for this day are fully booked.',
+            ]);
+        }
+
+        return response()->json([
+            'slots'      => $schedule->availableSlots($iso, $bookedSlotCounts),
+            'max_slots'  => $schedule->max_slots,
+            'booked'     => $totalBooked,
+            'remaining'  => max(0, $schedule->max_slots - $totalBooked),
+            'open_time'  => $schedule->open_time,
+            'close_time' => $schedule->close_time,
+            'break_time' => $schedule->break_time,
+        ]);
+    }
+
+    private function validateRule(Request $request): array
+    {
+        return $request->validate([
+            'days'       => 'required|array|min:1',
+            'days.*'     => 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'status'     => 'required|in:open,closed,limited',
+            'open_time'  => 'required_unless:status,closed|nullable|date_format:H:i',
+            'close_time' => 'required_unless:status,closed|nullable|date_format:H:i|after:open_time',
+            'break_time' => 'nullable|string',
+            'max_slots'  => 'required_unless:status,closed|nullable|integer|min:1|max:50',
+            'notes'      => 'nullable|string|max:500',
+        ]);
+    }
 
     private function ensureDaysAreAvailable(Request $request, array $days, ?int $ignoreId = null): void
     {

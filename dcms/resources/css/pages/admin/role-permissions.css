@@ -1916,8 +1916,8 @@ body .floating-save-bar .btn-save-float:disabled {
 
 .role-modal .modal-icon.primary:hover {
     box-shadow:
-        0 0 0 1px rgba(59, 130, 246, .22),
-        0 14px 28px rgba(59, 130, 246, .18) !important;
+        0 0 0 1px rgba(139, 0, 0, .22),
+        0 14px 28px rgba(139, 0, 0, .18) !important;
 }
 
 .role-modal .modal-icon.warning:hover {
