@@ -131,7 +131,6 @@
     text-align: center;
 }
 
-.service-inline-actions,
 .service-visibility-actions,
 .service-card-actions {
     display: flex;
@@ -141,8 +140,7 @@
 }
 
 .service-inline-actions {
-    justify-content: center;
-    gap: .4rem;
+    overflow: visible;
 }
 
 .service-visibility-actions {
@@ -508,10 +506,8 @@
 }
 
 .service-type-card-actions {
-    display: flex;
-    align-items: center;
-    gap: .35rem;
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    overflow: visible;
 }
 
 [data-theme="dark"] .service-type-card {
@@ -950,39 +946,6 @@
     color: currentColor !important;
 }
 
-.btn-manage-sm,
-.btn-delete-sm {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    border-radius: 12px !important;
-    border: 1px solid transparent !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    background: transparent !important;
-    color: #111827 !important;
-    transition: all .18s ease !important;
-}
-
-.btn-manage-sm:hover {
-    color: #8B0000 !important;
-    background: rgba(139, 0, 0, .08) !important;
-    border-color: rgba(139, 0, 0, .14) !important;
-}
-
-.btn-delete-sm:hover {
-    color: #DC2626 !important;
-    background: rgba(239, 68, 68, .10) !important;
-    border-color: rgba(239, 68, 68, .18) !important;
-}
-
-.btn-manage-sm i,
-.btn-delete-sm i {
-    color: currentColor !important;
-}
-
 .st-delete-modal-card {
     width: min(475px, calc(100vw - 32px)) !important;
     border-radius: 24px !important;
@@ -1038,10 +1001,6 @@
     align-items: center !important;
     justify-content: space-between !important;
     gap: 1rem !important;
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, .08), transparent 38%),
-        linear-gradient(180deg, #FFFFFF 0%, #FFF7F7 100%) !important;
-    border-bottom: 1px solid rgba(139, 0, 0, .10) !important;
 }
 
 .st-modal-header-left {
@@ -1059,11 +1018,6 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, .34), transparent 42%),
-        linear-gradient(135deg, #8B0000, #6B0000) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 12px 28px rgba(139, 0, 0, .22) !important;
 }
 
 .st-modal-header-icon i {
@@ -1248,27 +1202,6 @@
     background: rgba(239, 68, 68, .14) !important;
     border-color: rgba(252, 165, 165, .22) !important;
     color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] .btn-manage-sm,
-[data-theme="dark"] .btn-delete-sm,
-.dark .btn-manage-sm,
-.dark .btn-delete-sm {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] .btn-manage-sm:hover,
-.dark .btn-manage-sm:hover {
-    color: #FCA5A5 !important;
-    background: rgba(139, 0, 0, .18) !important;
-    border-color: rgba(252, 165, 165, .20) !important;
-}
-
-[data-theme="dark"] .btn-delete-sm:hover,
-.dark .btn-delete-sm:hover {
-    color: #FCA5A5 !important;
-    background: rgba(239, 68, 68, .14) !important;
-    border-color: rgba(252, 165, 165, .22) !important;
 }
 
 [data-theme="dark"] .service-type-card,
@@ -1565,117 +1498,16 @@
     overflow: visible !important;
 }
 
-.service-inline-actions,
-.service-type-card-actions {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .45rem !important;
-    flex-wrap: nowrap !important;
+.service-inline-actions.ui-action-group {
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow: visible;
 }
 
-#mainContent.admin-page-shell .action-btn {
-    --action-bg: #F3F4F6;
-    --action-color: #4B5563;
-    --action-hover-bg: var(--action-bg);
-    --action-hover-color: var(--action-color);
-    --action-tooltip-bg: var(--action-color);
-
-    position: relative !important;
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease,
-        color .18s ease,
-        filter .18s ease !important;
-    isolation: isolate !important;
-}
-
-#mainContent.admin-page-shell .action-btn:hover,
-#mainContent.admin-page-shell .action-btn:focus-visible {
-    background: var(--action-hover-bg) !important;
-    color: var(--action-hover-color) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--action-hover-color) 18%, transparent) !important;
-    outline: none !important;
-}
-
-#mainContent.admin-page-shell .action-btn i {
-    color: currentColor !important;
-    font-size: 12px !important;
-}
-
-#mainContent.admin-page-shell .action-btn.btn-edit {
-    --action-bg: #EFF6FF;
-    --action-color: #2563EB;
-    --action-hover-bg: #DBEAFE;
-    --action-hover-color: #1D4ED8;
-    --action-tooltip-bg: #2563EB;
-}
-
-#mainContent.admin-page-shell .action-btn.btn-delete-service {
-    --action-bg: #FEE2E2;
-    --action-color: #DC2626;
-    --action-hover-bg: #FECACA;
-    --action-hover-color: #B91C1C;
-    --action-tooltip-bg: #DC2626;
-}
-
-#mainContent.admin-page-shell .action-btn::after {
-    content: attr(title);
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 9px);
-    transform: translateX(-50%) translateY(4px);
-    padding: .42rem .58rem;
-    border-radius: 9px;
-    background: var(--action-tooltip-bg);
-    color: #ffffff;
-    font-size: .68rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: 0 10px 22px color-mix(in srgb, var(--action-tooltip-bg) 24%, transparent);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 50;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.admin-page-shell .action-btn::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 4px);
-    transform: translateX(-50%) translateY(4px);
-    border: 5px solid transparent;
-    border-top-color: var(--action-tooltip-bg);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 51;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.admin-page-shell .action-btn:hover::after,
-#mainContent.admin-page-shell .action-btn:hover::before,
-#mainContent.admin-page-shell .action-btn:focus-visible::after,
-#mainContent.admin-page-shell .action-btn:focus-visible::before {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
+.service-type-card-actions.ui-action-group {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    overflow: visible;
 }
 
 #deleteServiceModal.ui-modal {
@@ -1748,24 +1580,6 @@
     box-shadow:
         0 12px 26px rgba(139, 0, 0, .36),
         inset 0 1px 0 rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] #mainContent.admin-page-shell .action-btn.btn-edit,
-.dark #mainContent.admin-page-shell .action-btn.btn-edit {
-    --action-bg: rgba(37, 99, 235, .16);
-    --action-color: #60A5FA;
-    --action-hover-bg: rgba(37, 99, 235, .24);
-    --action-hover-color: #93C5FD;
-    --action-tooltip-bg: #2563EB;
-}
-
-[data-theme="dark"] #mainContent.admin-page-shell .action-btn.btn-delete-service,
-.dark #mainContent.admin-page-shell .action-btn.btn-delete-service {
-    --action-bg: rgba(220, 38, 38, .17);
-    --action-color: #FCA5A5;
-    --action-hover-bg: rgba(220, 38, 38, .26);
-    --action-hover-color: #FECACA;
-    --action-tooltip-bg: #DC2626;
 }
 
 [data-theme="dark"] #deleteServiceModal .st-delete-modal-card,
@@ -2007,28 +1821,8 @@
 }
 
 .service-col-action,
-.service-center-cell,
-.service-inline-actions {
+.service-center-cell {
     overflow: visible !important;
-}
-
-#mainContent.admin-page-shell .action-btn.btn-delete-service::after {
-    left: auto !important;
-    right: 0 !important;
-    transform: translateY(4px) !important;
-}
-
-#mainContent.admin-page-shell .action-btn.btn-delete-service::before {
-    left: auto !important;
-    right: 14px !important;
-    transform: translateY(4px) !important;
-}
-
-#mainContent.admin-page-shell .action-btn.btn-delete-service:hover::after,
-#mainContent.admin-page-shell .action-btn.btn-delete-service:hover::before,
-#mainContent.admin-page-shell .action-btn.btn-delete-service:focus-visible::after,
-#mainContent.admin-page-shell .action-btn.btn-delete-service:focus-visible::before {
-    transform: translateY(0) !important;
 }
 
 .st-label-row {
@@ -2813,15 +2607,6 @@ body>#deleteServiceModal.st-delete-confirm-modal .st-delete-user-modal {
         flex-wrap: nowrap !important;
         justify-content: center !important;
         gap: .35rem !important;
-    }
-
-    .btn-manage-sm,
-    .btn-delete-sm,
-    #mainContent.admin-page-shell .action-btn {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        border-radius: 11px !important;
     }
 
     .service-types-grid {

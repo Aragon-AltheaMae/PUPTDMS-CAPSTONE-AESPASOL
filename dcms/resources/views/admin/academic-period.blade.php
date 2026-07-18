@@ -92,540 +92,547 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="admin-page-body">
-            
-        <div class="active-banner mb-6" id="activeBannerWrap">
-            <div class="active-banner-inner">
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <i class="fa-solid fa-calendar text-[#8B0000] text-sm"></i>
-                            <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current
-                                Semester</p>
-                        </div>
-                        <p class="text-xl font-bold text-gray-800" id="bannerSem">
-                            {{ $activePeriod?->semester ?? 'No Active Period' }}
-                        </p>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="inline-flex h-4 w-4 items-center justify-center leading-none shrink-0">
-                                <i class="fa-solid fa-graduation-cap text-[#8B0000] text-sm"></i>
-                            </span>
-                            <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Academic Year
+
+            <div class="active-banner mb-6" id="activeBannerWrap">
+                <div class="active-banner-inner">
+                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid fa-calendar text-[#8B0000] text-sm"></i>
+                                <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Current
+                                    Semester</p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800" id="bannerSem">
+                                {{ $activePeriod?->semester ?? 'No Active Period' }}
                             </p>
                         </div>
-                        <p class="text-xl font-bold text-gray-800" id="bannerYear">
-                            {{ $activePeriod?->academic_year ?? '—' }}
-                        </p>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <i class="fa-solid fa-clock text-[#8B0000] text-sm"></i>
-                            <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Period Ends</p>
-                        </div>
-                        <p class="text-xl font-bold text-gray-800" id="bannerEnd">
-                            {{ $activePeriod ? $activePeriod->end_date->format('F d, Y') : '—' }}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-3 lg:flex-shrink-0 lg:w-64">
-                    <div>
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Semester
-                                Progress</span>
-                            <span class="text-[11px] font-bold text-[#8B0000]" id="bannerPct">
-                                {{ $activePeriod?->progress_percent ?? 0 }}%
-                            </span>
-                        </div>
-                        <div class="progress-track">
-                            <div class="progress-fill" id="bannerFill"
-                                style="width:{{ $activePeriod?->progress_percent ?? 0 }}%;">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="inline-flex h-4 w-4 items-center justify-center leading-none shrink-0">
+                                    <i class="fa-solid fa-graduation-cap text-[#8B0000] text-sm"></i>
+                                </span>
+                                <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Academic
+                                    Year
+                                </p>
                             </div>
+                            <p class="text-xl font-bold text-gray-800" id="bannerYear">
+                                {{ $activePeriod?->academic_year ?? '—' }}
+                            </p>
                         </div>
-                        <p class="text-[10px] text-gray-400 mt-1" id="bannerDaysLeft">
-                            {{ $activePeriod
-                            ? $activePeriod->days_remaining . ' day' . ($activePeriod->days_remaining !== 1 ? 's' : '')
-                            . ' remaining'
-                            : 'No active period' }}
-                        </p>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid fa-clock text-[#8B0000] text-sm"></i>
+                                <p class="text-[10px] tracking-widest text-gray-500 uppercase font-semibold">Period Ends
+                                </p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-800" id="bannerEnd">
+                                {{ $activePeriod ? $activePeriod->end_date->format('F d, Y') : '—' }}
+                            </p>
+                        </div>
                     </div>
 
-                    <button type="button"
-                        onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
-                        class="bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-gear"></i> Manage Period
-                    </button>
+                    <div class="flex flex-col gap-3 lg:flex-shrink-0 lg:w-64">
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Semester
+                                    Progress</span>
+                                <span class="text-[11px] font-bold text-[#8B0000]" id="bannerPct">
+                                    {{ $activePeriod?->progress_percent ?? 0 }}%
+                                </span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="bannerFill"
+                                    style="width:{{ $activePeriod?->progress_percent ?? 0 }}%;">
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1" id="bannerDaysLeft">
+                                {{ $activePeriod
+                                ? $activePeriod->days_remaining . ' day' . ($activePeriod->days_remaining !== 1 ? 's' :
+                                '')
+                                . ' remaining'
+                                : 'No active period' }}
+                            </p>
+                        </div>
+
+                        <button type="button"
+                            onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
+                            class="bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-gear"></i> Manage Period
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="ap-content-layout grid grid-cols-1 gap-6 mb-6">
-            <div class="ap-periods-column">
-                <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="ap-content-layout grid grid-cols-1 gap-6 mb-6">
+                <div class="ap-periods-column">
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
 
-                    <div class="px-5 py-4 border-b bg-gray-50 ap-toolbar">
-                        <div class="ap-toolbar-left">
-                            <i class="fa-solid fa-school text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">All Academic Periods</h2>
-                            <span id="periodCount"
-                                class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">
-                                {{ $academicPeriods->total() }}
-                            </span>
-                        </div>
-
-                        <form method="GET" action="{{ route('admin.academic_periods') }}" id="filterForm"
-                            class="ap-toolbar-right">
-
-                            <input type="hidden" name="semester" id="semesterFilter" value="{{ request('semester') }}">
-                            <input type="hidden" name="status" id="statusFilter" value="{{ request('status') }}">
-
-                            <div class="voice-search-row ap-search-row">
-                                <div class="search-wrap global-search" data-search-wrapper>
-                                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
-                                    <input id="searchInput" name="search" type="text" placeholder="Search periods…"
-                                        value="{{ request('search') }}" autocomplete="off" class="search-input"
-                                        data-search-input>
-
-                                    <button type="button" id="clearSearch"
-                                        class="search-clear {{ request('search') ? 'show' : '' }}" data-search-clear
-                                        aria-label="Clear search">
-                                        <i class="fa-solid fa-xmark text-xs"></i>
-                                    </button>
-                                </div>
-
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="apMicToggleBtn" class="voice-search-mic external"
-                                        data-global-voice-trigger data-voice-target="#searchInput"
-                                        data-voice-status="#apVoiceStatus" aria-label="Toggle voice search"
-                                        aria-pressed="false">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="apVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                        data-voice-status></span>
-                                </div>
-                            </div>
-
-                            <button id="filterBtn" type="button" class="global-filter-btn"
-                                onclick="openAcademicFilterModal()">
-                                <i class="fa-solid fa-sliders"></i>
-                                <span>Filter</span>
-                                <span id="filterBadge" class="filter-badge" style="display:none;"></span>
-                            </button>
-
-                            <div class="view-toggle-container hidden md:flex" id="academicViewToggle">
-                                <div class="view-slider"></div>
-                                <button type="button" class="btn-view-mode active" id="academicListBtn"
-                                    title="List view" aria-label="List view">
-                                    <i class="fa-solid fa-list text-sm"></i>
-                                </button>
-                                <button type="button" class="btn-view-mode" id="academicGridBtn" title="Grid view"
-                                    aria-label="Grid view">
-                                    <i class="fa-solid fa-grip"></i>
-                                </button>
-                            </div>
-
-                            <button id="externalClearFilterBtn" type="button" onclick="resetAcademicFilters()"
-                                class="global-filter-reset-btn hidden" title="Reset filters">
-                                <i class="fa-solid fa-rotate-left"></i>
-                            </button>
-                        </form>
-                    </div>
-
-                    <div id="academicListView" class="ap-table-wrap scrollbar-thin">
-                        <table class="ap-table text-sm">
-                            <thead class="bg-gray-50 border-b border-gray-100">
-                                <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
-                                    <th class="py-3 px-4 text-left">#</th>
-                                    <th class="py-3 px-4 text-left">Year</th>
-                                    <th class="py-3 px-4 text-left">Semester</th>
-                                    <th class="py-3 px-4 text-left">Start</th>
-                                    <th class="py-3 px-4 text-left">End</th>
-                                    <th class="py-3 px-4 text-center">Status</th>
-                                    <th class="py-3 px-4 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="academicTableBody">
-                                @forelse($academicPeriods as $index => $period)
-                                @php
-                                $statusClass = match ($period->status) {
-                                'Active' => 's-active',
-                                'Upcoming' => 's-upcoming',
-                                'Ended' => 's-ended',
-                                default => 's-inactive',
-                                };
-
-                                $semStyle = match ($period->semester) {
-                                'First Semester', '1st Semester' => [
-                                'bg' => '#fee2e2',
-                                'color' => '#8B0000',
-                                ],
-                                'Second Semester', '2nd Semester' => [
-                                'bg' => '#dbeafe',
-                                'color' => '#1d4ed8',
-                                ],
-                                'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
-                                default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
-                                };
-
-                                $semesterLabel = match ($period->semester) {
-                                '1st Semester' => 'First Semester',
-                                '2nd Semester' => 'Second Semester',
-                                default => $period->semester,
-                                };
-
-                                $periodPayload = [
-                                'id' => $period->id,
-                                'academic_year' => $period->academic_year,
-                                'semester' => $period->semester,
-                                'start_date' => optional($period->start_date)->format('Y-m-d'),
-                                'end_date' => optional($period->end_date)->format('Y-m-d'),
-                                'description' => $period->description,
-                                'is_active' => (bool) $period->is_active,
-                                ];
-                                @endphp
-
-                                <tr class="tbl-row academic-item {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
-                                    data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
-                                    data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
-                                    <td class="py-3 px-4 text-sm">{{ $academicPeriods->firstItem() + $index }}
-                                    </td>
-
-                                    <td class="py-3 px-4 col-year">
-                                        <div class="flex items-center">
-                                            @if ($period->is_active)
-                                            <span class="dot-pulse"
-                                                style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px;"></span>
-                                            @else
-                                            <span
-                                                style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e5e7eb;margin-right:6px;"></span>
-                                            @endif
-                                            <span class="font-bold text-sm">{{ $period->academic_year }}</span>
-                                        </div>
-                                    </td>
-
-                                    <td class="py-3 px-4 col-semester">
-                                        <span class="sem-pill"
-                                            style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
-                                            <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
-                                                style="font-size:9px;"></i>
-                                            {{ $semesterLabel }}
-                                        </span>
-                                    </td>
-
-                                    <td class="py-3 px-4 text-xs text-gray-600">
-                                        {{ optional($period->start_date)->format('M d, Y') }}
-                                    </td>
-                                    <td class="py-3 px-4 text-xs text-gray-600">
-                                        {{ optional($period->end_date)->format('M d, Y') }}
-                                    </td>
-
-                                    <td class="py-3 px-4 text-center">
-                                        <span class="status-badge {{ $statusClass }}"
-                                            style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;">
-                                            {{ $period->status }}
-                                        </span>
-                                    </td>
-
-                                    <td class="py-3 px-4">
-                                        <div class="ap-actions">
-                                            <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
-                                                onclick='openEditModal(@json($periodPayload))'>
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-
-                                            @if (!$period->is_active)
-                                            <form method="POST"
-                                                action="{{ route('admin.academic_periods.set_active', $period) }}"
-                                                class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="ap-action-btn ap-action-active"
-                                                    title="Set as active">
-                                                    <i class="fa-solid fa-circle-check"></i>
-                                                </button>
-                                            </form>
-                                            @else
-                                            <span class="ap-action-btn ap-action-pinned" title="Active period"><i
-                                                    class="fa-solid fa-star" style="font-size:10px;"></i></span>
-                                            @endif
-
-                                            @php
-                                            $label =
-                                            $period->academic_year .
-                                            ' — ' .
-                                            str_replace(
-                                            ['1st', '2nd'],
-                                            ['First', 'Second'],
-                                            $period->semester,
-                                            );
-                                            @endphp
-
-                                            <button type="button" class="ap-action-btn ap-action-delete" title="Delete"
-                                                data-delete-url="{{ route('admin.academic_periods.destroy', $period) }}"
-                                                data-delete-label="{{ $label }}"
-                                                onclick="openDeleteModalFromButton(this)">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr id="serverEmptyState">
-                                    <td colspan="7" class="text-center text-gray-400 ap-empty">
-                                        <div class="flex flex-col items-center justify-center text-center">
-                                            <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
-                                            <p class="text-sm font-medium">No academic periods found.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="academicGridView" class="academic-grid-view">
-                        @forelse($academicPeriods as $index => $period)
-                        @php
-                        $statusClass = match ($period->status) {
-                        'Active' => 's-active',
-                        'Upcoming' => 's-upcoming',
-                        'Ended' => 's-ended',
-                        default => 's-inactive',
-                        };
-
-                        $semStyle = match ($period->semester) {
-                        'First Semester', '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
-                        'Second Semester', '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
-                        'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
-                        default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
-                        };
-
-                        $semesterLabel = match ($period->semester) {
-                        '1st Semester' => 'First Semester',
-                        '2nd Semester' => 'Second Semester',
-                        default => $period->semester,
-                        };
-
-                        $periodPayload = [
-                        'id' => $period->id,
-                        'academic_year' => $period->academic_year,
-                        'semester' => $period->semester,
-                        'start_date' => optional($period->start_date)->format('Y-m-d'),
-                        'end_date' => optional($period->end_date)->format('Y-m-d'),
-                        'description' => $period->description,
-                        'is_active' => (bool) $period->is_active,
-                        ];
-
-                        $label =
-                        $period->academic_year .
-                        ' — ' .
-                        str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester);
-                        @endphp
-
-                        <div class="academic-card academic-item {{ $period->is_active ? 'is-active' : '' }}"
-                            data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
-                            data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
-
-                            <div class="academic-card-top">
-                                <div class="academic-card-year">
-                                    @if ($period->is_active)
-                                    <span class="dot-pulse"
-                                        style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
-                                    @else
-                                    <span
-                                        style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e5e7eb;"></span>
-                                    @endif
-                                    <div class="academic-card-year-text">{{ $period->academic_year }}</div>
-                                </div>
-
-                                <span class="status-badge {{ $statusClass }}"
-                                    style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;">
-                                    {{ $period->status }}
+                        <div class="px-5 py-4 border-b bg-gray-50 ap-toolbar">
+                            <div class="ap-toolbar-left">
+                                <i class="fa-solid fa-school text-[#8B0000]"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">All Academic Periods</h2>
+                                <span id="periodCount"
+                                    class="text-[10px] font-bold bg-[#8B0000] text-white px-2 py-0.5 rounded-full">
+                                    {{ $academicPeriods->total() }}
                                 </span>
                             </div>
 
-                            <div class="academic-card-meta">
-                                <div class="academic-card-row">
-                                    <div class="academic-card-label">Semester</div>
-                                    <div class="academic-card-value">
-                                        <span class="sem-pill"
-                                            style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
-                                            <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
-                                                style="font-size:9px;"></i>
-                                            {{ $semesterLabel }}
-                                        </span>
+                            <form method="GET" action="{{ route('admin.academic_periods') }}" id="filterForm"
+                                class="ap-toolbar-right">
+
+                                <input type="hidden" name="semester" id="semesterFilter"
+                                    value="{{ request('semester') }}">
+                                <input type="hidden" name="status" id="statusFilter" value="{{ request('status') }}">
+
+                                <div class="voice-search-row ap-search-row">
+                                    <div class="search-wrap global-search" data-search-wrapper>
+                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+                                        <input id="searchInput" name="search" type="text" placeholder="Search periods…"
+                                            value="{{ request('search') }}" autocomplete="off" class="search-input"
+                                            data-search-input>
+
+                                        <button type="button" id="clearSearch"
+                                            class="search-clear {{ request('search') ? 'show' : '' }}" data-search-clear
+                                            aria-label="Clear search">
+                                            <i class="fa-solid fa-xmark text-xs"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="voice-input-toggle">
+                                        <button type="button" id="apMicToggleBtn" class="voice-search-mic external"
+                                            data-global-voice-trigger data-voice-target="#searchInput"
+                                            data-voice-status="#apVoiceStatus" aria-label="Toggle voice search"
+                                            aria-pressed="false">
+                                            <i class="fa-solid fa-microphone"></i>
+                                        </button>
+
+                                        <span id="apVoiceStatus" class="voice-status hidden" aria-live="polite"
+                                            data-voice-status></span>
                                     </div>
                                 </div>
 
-                                <div class="academic-card-row">
-                                    <div class="academic-card-label">Start</div>
-                                    <div class="academic-card-value">
-                                        {{ optional($period->start_date)->format('M d, Y') }}</div>
-                                </div>
-
-                                <div class="academic-card-row">
-                                    <div class="academic-card-label">End</div>
-                                    <div class="academic-card-value">
-                                        {{ optional($period->end_date)->format('M d, Y') }}</div>
-                                </div>
-                            </div>
-
-                            <div class="academic-card-actions">
-                                <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
-                                    onclick='openEditModal(@json($periodPayload))'>
-                                    <i class="fa-solid fa-pen"></i>
+                                <button id="filterBtn" type="button" class="global-filter-btn"
+                                    onclick="openAcademicFilterModal()">
+                                    <i class="fa-solid fa-sliders"></i>
+                                    <span>Filter</span>
+                                    <span id="filterBadge" class="filter-badge" style="display:none;"></span>
                                 </button>
 
-                                @if (!$period->is_active)
-                                <form method="POST" action="{{ route('admin.academic_periods.set_active', $period) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="ap-action-btn ap-action-active" title="Set as active">
-                                        <i class="fa-solid fa-circle-check" style="font-size:10px;"></i>
+                                <div class="view-toggle-container hidden md:flex" id="academicViewToggle">
+                                    <div class="view-slider"></div>
+                                    <button type="button" class="btn-view-mode active" id="academicListBtn"
+                                        title="List view" aria-label="List view">
+                                        <i class="fa-solid fa-list text-sm"></i>
                                     </button>
-                                </form>
-                                @else
-                                <span class="ap-action-btn ap-action-pinned" title="Active period"><i
-                                        class="fa-solid fa-star" style="font-size:10px;"></i></span>
-                                @endif
+                                    <button type="button" class="btn-view-mode" id="academicGridBtn" title="Grid view"
+                                        aria-label="Grid view">
+                                        <i class="fa-solid fa-grip"></i>
+                                    </button>
+                                </div>
 
-                                <button type="button" class="ap-action-btn ap-action-delete" title="Delete"
-                                    data-delete-url="{{ url('/admin/academic-periods/' . $period->id) }}"
-                                    data-delete-label="{{ $label }}" onclick="openDeleteModalFromButton(this)">
-                                    <i class="fa-solid fa-trash" style="font-size:10px;"></i>
+                                <button id="externalClearFilterBtn" type="button" onclick="resetAcademicFilters()"
+                                    class="global-filter-reset-btn hidden" title="Reset filters">
+                                    <i class="fa-solid fa-rotate-left"></i>
                                 </button>
+                            </form>
+                        </div>
+
+                        <div id="academicListView" class="ap-table-wrap scrollbar-thin">
+                            <table class="ap-table text-sm">
+                                <thead class="bg-gray-50 border-b border-gray-100">
+                                    <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
+                                        <th class="py-3 px-4 text-left">#</th>
+                                        <th class="py-3 px-4 text-left">Year</th>
+                                        <th class="py-3 px-4 text-left">Semester</th>
+                                        <th class="py-3 px-4 text-left">Start</th>
+                                        <th class="py-3 px-4 text-left">End</th>
+                                        <th class="py-3 px-4 text-center">Status</th>
+                                        <th class="py-3 px-4 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="academicTableBody">
+                                    @forelse($academicPeriods as $index => $period)
+                                    @php
+                                    $statusClass = match ($period->status) {
+                                    'Active' => 's-active',
+                                    'Upcoming' => 's-upcoming',
+                                    'Ended' => 's-ended',
+                                    default => 's-inactive',
+                                    };
+
+                                    $semStyle = match ($period->semester) {
+                                    'First Semester', '1st Semester' => [
+                                    'bg' => '#fee2e2',
+                                    'color' => '#8B0000',
+                                    ],
+                                    'Second Semester', '2nd Semester' => [
+                                    'bg' => '#dbeafe',
+                                    'color' => '#1d4ed8',
+                                    ],
+                                    'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
+                                    default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                                    };
+
+                                    $semesterLabel = match ($period->semester) {
+                                    '1st Semester' => 'First Semester',
+                                    '2nd Semester' => 'Second Semester',
+                                    default => $period->semester,
+                                    };
+
+                                    $periodPayload = [
+                                    'id' => $period->id,
+                                    'academic_year' => $period->academic_year,
+                                    'semester' => $period->semester,
+                                    'start_date' => optional($period->start_date)->format('Y-m-d'),
+                                    'end_date' => optional($period->end_date)->format('Y-m-d'),
+                                    'description' => $period->description,
+                                    'is_active' => (bool) $period->is_active,
+                                    ];
+                                    @endphp
+
+                                    <tr class="tbl-row academic-item {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
+                                        data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
+                                        data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
+                                        <td class="py-3 px-4 text-sm">{{ $academicPeriods->firstItem() + $index }}
+                                        </td>
+
+                                        <td class="py-3 px-4 col-year">
+                                            <div class="flex items-center">
+                                                @if ($period->is_active)
+                                                <span class="dot-pulse"
+                                                    style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px;"></span>
+                                                @else
+                                                <span
+                                                    style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e5e7eb;margin-right:6px;"></span>
+                                                @endif
+                                                <span class="font-bold text-sm">{{ $period->academic_year }}</span>
+                                            </div>
+                                        </td>
+
+                                        <td class="py-3 px-4 col-semester">
+                                            <span class="sem-pill"
+                                                style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
+                                                <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
+                                                    style="font-size:9px;"></i>
+                                                {{ $semesterLabel }}
+                                            </span>
+                                        </td>
+
+                                        <td class="py-3 px-4 text-xs text-gray-600">
+                                            {{ optional($period->start_date)->format('M d, Y') }}
+                                        </td>
+                                        <td class="py-3 px-4 text-xs text-gray-600">
+                                            {{ optional($period->end_date)->format('M d, Y') }}
+                                        </td>
+
+                                        <td class="py-3 px-4 text-center">
+                                            <span class="status-badge {{ $statusClass }}"
+                                                style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;">
+                                                {{ $period->status }}
+                                            </span>
+                                        </td>
+
+                                        <td class="py-3 px-4">
+                                            <div class="ap-actions">
+                                                <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
+                                                    onclick='openEditModal(@json($periodPayload))'>
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+
+                                                @if (!$period->is_active)
+                                                <form method="POST"
+                                                    action="{{ route('admin.academic_periods.set_active', $period) }}"
+                                                    class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="ap-action-btn ap-action-active"
+                                                        title="Set as active">
+                                                        <i class="fa-solid fa-circle-check"></i>
+                                                    </button>
+                                                </form>
+                                                @else
+                                                <span class="ap-action-btn ap-action-pinned" title="Active period"><i
+                                                        class="fa-solid fa-star" style="font-size:10px;"></i></span>
+                                                @endif
+
+                                                @php
+                                                $label =
+                                                $period->academic_year .
+                                                ' — ' .
+                                                str_replace(
+                                                ['1st', '2nd'],
+                                                ['First', 'Second'],
+                                                $period->semester,
+                                                );
+                                                @endphp
+
+                                                <button type="button" class="ap-action-btn ap-action-delete"
+                                                    title="Delete"
+                                                    data-delete-url="{{ route('admin.academic_periods.destroy', $period) }}"
+                                                    data-delete-label="{{ $label }}"
+                                                    onclick="openDeleteModalFromButton(this)">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr id="serverEmptyState">
+                                        <td colspan="7" class="text-center text-gray-400 ap-empty">
+                                            <div class="flex flex-col items-center justify-center text-center">
+                                                <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
+                                                <p class="text-sm font-medium">No academic periods found.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="academicGridView" class="academic-grid-view">
+                            @forelse($academicPeriods as $index => $period)
+                            @php
+                            $statusClass = match ($period->status) {
+                            'Active' => 's-active',
+                            'Upcoming' => 's-upcoming',
+                            'Ended' => 's-ended',
+                            default => 's-inactive',
+                            };
+
+                            $semStyle = match ($period->semester) {
+                            'First Semester', '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
+                            'Second Semester', '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
+                            'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
+                            default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                            };
+
+                            $semesterLabel = match ($period->semester) {
+                            '1st Semester' => 'First Semester',
+                            '2nd Semester' => 'Second Semester',
+                            default => $period->semester,
+                            };
+
+                            $periodPayload = [
+                            'id' => $period->id,
+                            'academic_year' => $period->academic_year,
+                            'semester' => $period->semester,
+                            'start_date' => optional($period->start_date)->format('Y-m-d'),
+                            'end_date' => optional($period->end_date)->format('Y-m-d'),
+                            'description' => $period->description,
+                            'is_active' => (bool) $period->is_active,
+                            ];
+
+                            $label =
+                            $period->academic_year .
+                            ' — ' .
+                            str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester);
+                            @endphp
+
+                            <div class="academic-card academic-item {{ $period->is_active ? 'is-active' : '' }}"
+                                data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
+                                data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
+
+                                <div class="academic-card-top">
+                                    <div class="academic-card-year">
+                                        @if ($period->is_active)
+                                        <span class="dot-pulse"
+                                            style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
+                                        @else
+                                        <span
+                                            style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e5e7eb;"></span>
+                                        @endif
+                                        <div class="academic-card-year-text">{{ $period->academic_year }}</div>
+                                    </div>
+
+                                    <span class="status-badge {{ $statusClass }}"
+                                        style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;">
+                                        {{ $period->status }}
+                                    </span>
+                                </div>
+
+                                <div class="academic-card-meta">
+                                    <div class="academic-card-row">
+                                        <div class="academic-card-label">Semester</div>
+                                        <div class="academic-card-value">
+                                            <span class="sem-pill"
+                                                style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
+                                                <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
+                                                    style="font-size:9px;"></i>
+                                                {{ $semesterLabel }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="academic-card-row">
+                                        <div class="academic-card-label">Start</div>
+                                        <div class="academic-card-value">
+                                            {{ optional($period->start_date)->format('M d, Y') }}</div>
+                                    </div>
+
+                                    <div class="academic-card-row">
+                                        <div class="academic-card-label">End</div>
+                                        <div class="academic-card-value">
+                                            {{ optional($period->end_date)->format('M d, Y') }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="academic-card-actions">
+                                    <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
+                                        onclick='openEditModal(@json($periodPayload))'>
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+
+                                    @if (!$period->is_active)
+                                    <form method="POST"
+                                        action="{{ route('admin.academic_periods.set_active', $period) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="ap-action-btn ap-action-active"
+                                            title="Set as active">
+                                            <i class="fa-solid fa-circle-check" style="font-size:10px;"></i>
+                                        </button>
+                                    </form>
+                                    @else
+                                    <span class="ap-action-btn ap-action-pinned" title="Active period"><i
+                                            class="fa-solid fa-star" style="font-size:10px;"></i></span>
+                                    @endif
+
+                                    <button type="button" class="ap-action-btn ap-action-delete" title="Delete"
+                                        data-delete-url="{{ url('/admin/academic-periods/' . $period->id) }}"
+                                        data-delete-label="{{ $label }}" onclick="openDeleteModalFromButton(this)">
+                                        <i class="fa-solid fa-trash" style="font-size:10px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            @empty
+                            <div id="serverEmptyStateGrid" class="text-center text-gray-400 ap-empty">
+                                <div class="flex flex-col items-center justify-center text-center">
+                                    <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
+                                    <p class="text-sm font-medium">No academic periods found.</p>
+                                </div>
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <div
+                            class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <p class="text-xs text-gray-500">
+                                Showing
+                                <strong>{{ $academicPeriods->firstItem() ?? 0 }}–{{ $academicPeriods->lastItem() ?? 0
+                                    }}</strong>
+                                of <strong>{{ $academicPeriods->total() }}</strong> periods
+                            </p>
+
+                            <div class="overflow-x-auto scrollbar-thin w-full md:w-auto">
+                                {{ $academicPeriods->onEachSide(2)->links('vendor.pagination.tailwind') }}
                             </div>
                         </div>
-                        @empty
-                        <div id="serverEmptyStateGrid" class="text-center text-gray-400 ap-empty">
-                            <div class="flex flex-col items-center justify-center text-center">
-                                <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
-                                <p class="text-sm font-medium">No academic periods found.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-[#8B0000]"></i>
+                            <h2 class="font-bold text-gray-800 text-sm">Quick Actions</h2>
+                        </div>
+                        <div class="quick-actions-list">
+                            <button id="openAddPeriodQuickBtn" type="button" data-open-modal="addModal"
+                                onclick="openModal('addModal')" class="quick-action quick-action-card">
+                                <span class="quick-action-icon">
+                                    <i class="fa-solid fa-plus"></i>
+                                </span>
+
+                                <span class="quick-action-copy">
+                                    <span class="quick-action-title">Add Period</span>
+                                    <span class="quick-action-sub">Create a new academic term</span>
+                                </span>
+
+                                <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                <i class="fa-solid fa-plus quick-action-bg-icon"></i>
+                            </button>
+
+                            <button id="openEditPeriodQuickBtn" type="button"
+                                onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
+                                class="quick-action quick-action-card">
+                                <span class="quick-action-icon">
+                                    <i class="fa-solid fa-pen"></i>
+                                </span>
+
+                                <span class="quick-action-copy">
+                                    <span class="quick-action-title">Edit Active Period</span>
+                                    <span class="quick-action-sub">Modify current semester</span>
+                                </span>
+
+                                <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                <i class="fa-solid fa-pen quick-action-bg-icon"></i>
+                            </button>
+
+                            <button type="button" class="quick-action quick-action-card" data-sync-flss-trigger>
+                                <span class="quick-action-icon">
+                                    <i class="fa-solid fa-rotate"></i>
+                                </span>
+
+                                <span class="quick-action-copy">
+                                    <span class="quick-action-title">Sync from FLSS</span>
+                                    <span class="quick-action-sub">Fetch active academic year automatically</span>
+                                </span>
+
+                                <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                <i class="fa-solid fa-cloud-arrow-down quick-action-bg-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-[#8B0000]"></i>
+                            <h2 class="font-bold text-gray-800 text-sm">Date &amp; Time</h2>
+                            <span class="ml-auto text-[10px] text-gray-400 font-semibold">Philippine Time</span>
+                        </div>
+                        <div class="p-5 text-center">
+                            <div id="liveClock"
+                                class="text-4xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1">
+                                00:00:00
                             </div>
-                        </div>
-                        @endforelse
-                    </div>
-
-                    <div
-                        class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                        <p class="text-xs text-gray-500">
-                            Showing
-                            <strong>{{ $academicPeriods->firstItem() ?? 0 }}–{{ $academicPeriods->lastItem() ?? 0
-                                }}</strong>
-                            of <strong>{{ $academicPeriods->total() }}</strong> periods
-                        </p>
-
-                        <div class="overflow-x-auto scrollbar-thin w-full md:w-auto">
-                            {{ $academicPeriods->onEachSide(2)->links('vendor.pagination.tailwind') }}
+                            <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">AM
+                            </div>
+                            <div id="liveDate" class="text-sm font-semibold text-gray-700 mb-1"></div>
+                            <div id="liveDay" class="text-xs text-gray-400"></div>
                         </div>
                     </div>
+
+                    <div class="bg-white rounded-xl shadow overflow-hidden cal-card">
+                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="ap-calendar-title-icon fa-solid fa-calendar-days"></i>
+                                <h2 class="font-bold text-gray-800 text-sm">PUP Academic Calendar</h2>
+                            </div>
+                            <span id="calYear"
+                                class="text-[9px] font-bold text-[#8B0000] bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                Academic Periods
+                            </span>
+                        </div>
+                        <div id="calendarList" class="p-4 space-y-1 overflow-y-auto scrollbar-thin"
+                            style="max-height:485px;"></div>
+                        <div class="px-4 pb-4">
+                            <a href="https://www.pup.edu.ph/calendar/" target="_blank"
+                                class="ap-pup-calendar-link flex items-center justify-center gap-2 w-full py-2 rounded-lg border text-xs font-semibold transition-all mt-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                View Full PUP Calendar
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-
-            <div class="space-y-5">
-
-                <div class="bg-white rounded-xl shadow overflow-hidden">
-                    <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
-                        <i class="fa-solid fa-bolt text-[#8B0000]"></i>
-                        <h2 class="font-bold text-gray-800 text-sm">Quick Actions</h2>
-                    </div>
-                    <div class="quick-actions-list">
-                        <button id="openAddPeriodQuickBtn" type="button" data-open-modal="addModal"
-                            onclick="openModal('addModal')" class="quick-action quick-action-card">
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-plus"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Add Period</span>
-                                <span class="quick-action-sub">Create a new academic term</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-plus quick-action-bg-icon"></i>
-                        </button>
-
-                        <button id="openEditPeriodQuickBtn" type="button"
-                            onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
-                            class="quick-action quick-action-card">
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-pen"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Edit Active Period</span>
-                                <span class="quick-action-sub">Modify current semester</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-pen quick-action-bg-icon"></i>
-                        </button>
-
-                        <button type="button" class="quick-action quick-action-card" data-sync-flss-trigger>
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-rotate"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Sync from FLSS</span>
-                                <span class="quick-action-sub">Fetch active academic year automatically</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-cloud-arrow-down quick-action-bg-icon"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow overflow-hidden">
-                    <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
-                        <i class="fa-solid fa-clock text-[#8B0000]"></i>
-                        <h2 class="font-bold text-gray-800 text-sm">Date &amp; Time</h2>
-                        <span class="ml-auto text-[10px] text-gray-400 font-semibold">Philippine Time</span>
-                    </div>
-                    <div class="p-5 text-center">
-                        <div id="liveClock"
-                            class="text-4xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1">
-                            00:00:00
-                        </div>
-                        <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">AM
-                        </div>
-                        <div id="liveDate" class="text-sm font-semibold text-gray-700 mb-1"></div>
-                        <div id="liveDay" class="text-xs text-gray-400"></div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow overflow-hidden cal-card">
-                    <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="ap-calendar-title-icon fa-solid fa-calendar-days"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">PUP Academic Calendar</h2>
-                        </div>
-                        <span id="calYear"
-                            class="text-[9px] font-bold text-[#8B0000] bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                            Academic Periods
-                        </span>
-                    </div>
-                    <div id="calendarList" class="p-4 space-y-1 overflow-y-auto scrollbar-thin"
-                        style="max-height:485px;"></div>
-                    <div class="px-4 pb-4">
-                        <a href="https://www.pup.edu.ph/calendar/" target="_blank"
-                            class="ap-pup-calendar-link flex items-center justify-center gap-2 w-full py-2 rounded-lg border text-xs font-semibold transition-all mt-2">
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                            View Full PUP Calendar
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
-    </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper academic-filter-modal">
+<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
     <div class="filter-drawer-overlay" data-ap-close-filter></div>
 
     <div class="filter-drawer-panel flex flex-col bg-white">
@@ -636,22 +643,31 @@ $activePeriodPayload = $activePeriod
                 <h2 class="text-xl font-extrabold">Filters</h2>
             </div>
 
-            <button id="closeFilterModalBtn" type="button" class="text-gray-400 hover:text-gray-700 transition-colors"
-                onclick="closeAcademicFilterModal()">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <button id="closeFilterModalBtn" type="button" class="filter-drawer-close"
+                onclick="closeAcademicFilterModal()" aria-label="Close filters">
+
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
-            <div id="activeFiltersSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
+            <div id="activeFiltersSection" class="filter-active-section hidden">
+
+                <div class="filter-active-header">
+                    <span class="filter-active-title">
+                        Active Filters
+                    </span>
+
                     <button id="clearAllChipsBtn" type="button"
-                        class="text-xs font-bold text-[#8B0000] hover:underline">
-                        Clear All
+                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Clear All</span>
                     </button>
                 </div>
-                <div id="activeChipsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+
+                <div id="activeChipsContainer" class="active-filters-container">
+                </div>
             </div>
 
             <div>
@@ -710,25 +726,28 @@ $activePeriodPayload = $activePeriod
             </div>
         </div>
 
-        <div
-            class="filter-drawer-footer px-6 py-5 bg-white flex flex-col sm:flex-row items-center justify-between flex-shrink-0 border-t border-gray-100 gap-4 sm:gap-0 relative z-20">
-            <button id="clearFiltersModal" type="button"
-                class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                <i class="fa-regular fa-trash-can text-lg"></i>
-                <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+        <div class="filter-drawer-footer">
+            <button id="clearFiltersModal" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
+
+                <i class="fa-regular fa-trash-can"></i>
+                <span>Clear Filters</span>
             </button>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <button id="cancelFilterBtn" type="button"
-                    class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors"
+            <div class="filter-footer-actions">
+                <button id="cancelFilterBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary"
                     onclick="closeAcademicFilterModal()">
-                    Cancel
+
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </button>
 
-                <button id="applyFilters" type="button"
-                    class="filter-show-results-btn filter-apply-btn flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+                <button id="applyFilters" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
+
                     <i class="fa-solid fa-check"></i>
-                    <span id="showResultsText">Show {{ $academicPeriods->total() }} results</span>
+
+                    <span id="showResultsText" class="filter-results-text">
+                        Show {{ $academicPeriods->total() }} results
+                    </span>
                 </button>
             </div>
         </div>

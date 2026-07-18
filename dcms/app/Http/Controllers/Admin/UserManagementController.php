@@ -30,8 +30,13 @@ class UserManagementController extends Controller
         $search = trim((string) $request->get('search', ''));
         $roleFilter = trim((string) $request->get('role', ''));
         $statusFilter = trim((string) $request->get('status', ''));
-        $perPage = (int) $request->get('per_page', 10);
-        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+        $perPageInput = (int) $request->input('per_page', 10);
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        ) ? $perPageInput : 10;
 
         $query = User::with(['role', 'patient']);
 

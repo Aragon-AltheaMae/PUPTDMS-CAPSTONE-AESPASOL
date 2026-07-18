@@ -240,12 +240,6 @@
     padding-bottom: 1rem;
 }
 
-.um-grid-card {
-    border-radius: 18px;
-    border-color: #ece5dd;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, .04);
-}
-
 @media (max-width: 767px) {
     .um-hero {
         border-radius: 20px;
@@ -337,12 +331,15 @@
     background: #fff;
     border: 1px solid #f0eaea;
     border-radius: 16px;
-    padding: 1rem;
+    padding: .95rem;
     display: flex;
     flex-direction: column;
-    gap: .85rem;
+    gap: .7rem;
     transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     min-width: 0;
+    border-radius: 18px;
+    border-color: #ece5dd;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .04);
 }
 
 .um-grid-card:hover {
@@ -367,7 +364,9 @@
 
 .um-grid-meta {
     display: grid;
-    gap: .65rem;
+    grid-template-columns: minmax(0, .75fr) minmax(118px, 1.25fr);
+    align-items: end;
+    gap: .6rem;
 }
 
 .um-grid-field {
@@ -391,10 +390,72 @@
     word-break: break-word;
 }
 
-body,
-main,
-footer {
-    transition: background-color .3s ease, color .3s ease;
+.um-registered-date {
+    min-height: 28px;
+    width: 100%;
+    max-width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .35rem;
+
+    padding: .25rem .45rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 9px;
+
+    background: #F8FAFC;
+    color: #475569;
+
+    font-size: .64rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.um-registered-icon {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    border-radius: 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #FEF2F2;
+    color: #8B0000;
+}
+
+.um-registered-icon i {
+    color: currentColor;
+    font-size: .65rem;
+    line-height: 1;
+}
+
+.um-registered-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#mainContent.user-management-page .um-grid-card>.ui-action-group {
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+    margin-top: .1rem;
+}
+
+[data-theme="dark"] .um-registered-date,
+.dark .um-registered-date {
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .10);
+    color: #CBD5E1;
+}
+
+[data-theme="dark"] .um-registered-icon,
+.dark .um-registered-icon {
+    background: rgba(252, 165, 165, .12);
+    color: #FCA5A5;
 }
 
 [data-theme="dark"] #mainContent.user-management-page {
@@ -439,11 +500,6 @@ footer {
 [data-theme="dark"] #mainContent.user-management-page .sl-username,
 [data-theme="dark"] #mainContent.user-management-page .sl-date-day {
     color: #e5e7eb;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .sl-pagebar {
-    background: #0d1117;
-    border-color: #21262d;
 }
 
 .animate-slide-in {
@@ -537,16 +593,6 @@ footer {
     color: #d1d5db;
 }
 
-[data-theme="dark"] #mainContent.user-management-page .sl-username,
-[data-theme="dark"] #mainContent.user-management-page .sl-date-day {
-    color: #e5e7eb;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .sl-pagebar {
-    background: #0d1117;
-    border-color: #21262d;
-}
-
 @media (min-width: 1024px) {
     .um-user-modal .lg\:grid-cols-2 {
         align-items: start;
@@ -596,74 +642,12 @@ footer {
     border-radius: 99px;
 }
 
-.btn-edit {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.btn-edit:hover {
-    background: #dbeafe;
-}
-
-.btn-toggle-on {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.btn-toggle-on:hover {
-    background: #fde68a;
-}
-
-.btn-toggle-off {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.btn-toggle-off:hover {
-    background: #a7f3d0;
-}
-
 body.modal-open {
     overflow: hidden !important;
 }
 
 .modal-sm {
     max-width: 420px;
-}
-
-.page-btn {
-    min-width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    cursor: pointer;
-    font-size: .78rem;
-    font-weight: 600;
-    color: #6b7280;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 8px;
-    transition: all .15s;
-}
-
-.page-btn:hover {
-    background: #fef2f2;
-    border-color: #8B0000;
-    color: #8B0000;
-}
-
-.page-btn.active {
-    background: #8B0000;
-    border-color: #8B0000;
-    color: #fff;
-}
-
-.page-btn:disabled {
-    opacity: .4;
-    cursor: not-allowed;
-    pointer-events: none;
 }
 
 .flash-alert {
@@ -703,18 +687,6 @@ body.modal-open {
 
 [data-theme="dark"] #mainContent.user-management-page table thead tr {
     background: #0d1117 !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .page-btn {
-    background: #161b22;
-    border-color: #21262d;
-    color: #9ca3af;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .page-btn:hover {
-    background: rgba(139, 0, 0, .2);
-    border-color: #8B0000;
-    color: #f87171;
 }
 
 [data-theme="dark"] #mainContent.user-management-page .border-gray-200 {
@@ -908,16 +880,6 @@ body.modal-open {
         font-size: .68rem !important;
         padding: .22rem .55rem !important;
     }
-
-    .um-grid-card .action-btn {
-        width: 32px !important;
-        height: 32px !important;
-        border-radius: 10px !important;
-    }
-
-    .um-grid-card .action-btn i {
-        font-size: 10px !important;
-    }
 }
 
 .um-user-modal .um-user-modal-header {
@@ -1033,11 +995,21 @@ body.modal-open {
     background: linear-gradient(180deg, rgba(255, 255, 255, .92), #fff);
     position: sticky;
     bottom: 0;
-    z-index: 5;
+    z-index: 20;
 }
 
 .um-user-modal .field-input {
-    min-height: 52px;
+    min-height: 46px;
+    height: 46px;
+    font-size: .82rem !important;
+    line-height: 1.25;
+}
+
+.um-user-modal input.field-input::placeholder {
+    color: #9CA3AF;
+    font-size: .82rem;
+    font-weight: 400;
+    opacity: 1;
 }
 
 .um-user-modal .field-input,
@@ -1147,20 +1119,6 @@ body.modal-open {
 
 [data-theme="dark"] #mainContent.user-management-page input::placeholder {
     color: #6b7280 !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .page-btn,
-[data-theme="dark"] #mainContent.user-management-page .um-pagination-wrap button,
-[data-theme="dark"] #mainContent.user-management-page .um-pagination-wrap span {
-    background: #161b22 !important;
-    border-color: #21262d !important;
-    color: #d1d5db !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .um-pagination-wrap span {
-    background: linear-gradient(135deg, #8B0000, #6b0000) !important;
-    border-color: #8B0000 !important;
-    color: #fff !important;
 }
 
 #mainContent.user-management-page {
@@ -1522,11 +1480,11 @@ body.modal-open {
     background: #ffffff !important;
     border-left: 1px solid #f0eaea !important;
     border-right: 1px solid #f0eaea !important;
-    border-bottom: 1px solid #f0eaea !important;
-    border-radius: 0 0 18px 18px !important;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, .05) !important;
+    border-bottom: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     overflow: hidden !important;
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 0 !important;
 }
 
 #mainContent.user-management-page #umGridView {
@@ -1589,11 +1547,6 @@ body.modal-open {
     gap: 1rem !important;
 }
 
-#mainContent.user-management-page .um-grid-card {
-    min-width: 0 !important;
-    overflow: visible !important;
-}
-
 #mainContent.user-management-page .um-grid-card .min-w-0 {
     min-width: 0 !important;
 }
@@ -1609,261 +1562,9 @@ body.modal-open {
     white-space: nowrap !important;
 }
 
-#mainContent.user-management-page .um-action-group,
+#mainContent.user-management-page .ui-action-group,
 #mainContent.user-management-page td:last-child {
     overflow: visible !important;
-}
-
-#mainContent.user-management-page .action-btn {
-    position: relative !important;
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
-    isolation: isolate !important;
-}
-
-#mainContent.user-management-page .action-btn:hover {
-    transform: translateY(-1px) !important;
-    filter: brightness(.98) !important;
-}
-
-#mainContent.user-management-page .action-btn i {
-    color: currentColor !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-edit,
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-edit,
-.dark #mainContent.user-management-page .action-btn.btn-edit {
-    background: #EFF6FF !important;
-    color: #2563EB !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-toggle-on,
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-on,
-.dark #mainContent.user-management-page .action-btn.btn-toggle-on {
-    background: #FEF3C7 !important;
-    color: #B45309 !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-toggle-off,
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-off,
-.dark #mainContent.user-management-page .action-btn.btn-toggle-off {
-    background: #D1FAE5 !important;
-    color: #065F46 !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-reset,
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-reset,
-.dark #mainContent.user-management-page .action-btn.btn-reset {
-    background: #F3F4F6 !important;
-    color: #4B5563 !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-view-details,
-#mainContent.user-management-page .action-btn[title="View details"],
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-view-details,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="View details"],
-.dark #mainContent.user-management-page .action-btn.btn-view-details,
-.dark #mainContent.user-management-page .action-btn[title="View details"] {
-    background: #F3F4F6 !important;
-    color: #374151 !important;
-}
-
-#mainContent.user-management-page .action-btn::after {
-    content: attr(title);
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 9px);
-    transform: translateX(-50%) translateY(4px);
-    padding: .42rem .58rem;
-    border-radius: 9px;
-    background: #0c111b;
-    color: #ffffff;
-    font-size: .68rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, .18);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 50;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.user-management-page .action-btn::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 4px);
-    transform: translateX(-50%) translateY(4px);
-    border: 5px solid transparent;
-    border-top-color: #0c111b;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 51;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.user-management-page .um-action-group,
-#mainContent.user-management-page td:last-child {
-    overflow: visible !important;
-}
-
-#mainContent.user-management-page .action-btn {
-    --action-bg: #F3F4F6;
-    --action-color: #4B5563;
-    --action-hover-bg: var(--action-bg);
-    --action-hover-color: var(--action-color);
-    --action-tooltip-bg: var(--action-color);
-
-    position: relative !important;
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease,
-        color .18s ease,
-        filter .18s ease !important;
-    isolation: isolate !important;
-}
-
-#mainContent.user-management-page .action-btn:hover,
-#mainContent.user-management-page .action-btn:focus-visible {
-    background: var(--action-hover-bg) !important;
-    color: var(--action-hover-color) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--action-hover-color) 18%, transparent) !important;
-}
-
-#mainContent.user-management-page .action-btn i {
-    color: currentColor !important;
-}
-
-#mainContent.user-management-page .action-btn.btn-edit,
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-edit,
-.dark #mainContent.user-management-page .action-btn.btn-edit {
-    --action-bg: #EFF6FF;
-    --action-color: #2563EB;
-    --action-hover-bg: #DBEAFE;
-    --action-hover-color: #1D4ED8;
-    --action-tooltip-bg: #2563EB;
-}
-
-#mainContent.user-management-page .action-btn.btn-toggle-on,
-#mainContent.user-management-page .action-btn[title="Deactivate"],
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-on,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Deactivate"],
-.dark #mainContent.user-management-page .action-btn.btn-toggle-on,
-.dark #mainContent.user-management-page .action-btn[title="Deactivate"] {
-    --action-bg: #FEF3C7;
-    --action-color: #B45309;
-    --action-hover-bg: #FDE68A;
-    --action-hover-color: #92400E;
-    --action-tooltip-bg: #B45309;
-}
-
-#mainContent.user-management-page .action-btn.btn-toggle-off,
-#mainContent.user-management-page .action-btn[title="Activate"],
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-off,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Activate"],
-.dark #mainContent.user-management-page .action-btn.btn-toggle-off,
-.dark #mainContent.user-management-page .action-btn[title="Activate"] {
-    --action-bg: #D1FAE5;
-    --action-color: #047857;
-    --action-hover-bg: #A7F3D0;
-    --action-hover-color: #065F46;
-    --action-tooltip-bg: #047857;
-}
-
-#mainContent.user-management-page .action-btn.btn-reset,
-#mainContent.user-management-page .action-btn[title="Reset password"],
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-reset,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Reset password"],
-.dark #mainContent.user-management-page .action-btn.btn-reset,
-.dark #mainContent.user-management-page .action-btn[title="Reset password"] {
-    --action-bg: #F3E8FF;
-    --action-color: #7C3AED;
-    --action-hover-bg: #E9D5FF;
-    --action-hover-color: #6D28D9;
-    --action-tooltip-bg: #7C3AED;
-}
-
-#mainContent.user-management-page .action-btn.btn-view-details,
-#mainContent.user-management-page .action-btn[title="View details"],
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-view-details,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="View details"],
-.dark #mainContent.user-management-page .action-btn.btn-view-details,
-.dark #mainContent.user-management-page .action-btn[title="View details"] {
-    --action-bg: #F3F4F6;
-    --action-color: #374151;
-    --action-hover-bg: #FEF2F2;
-    --action-hover-color: #8B0000;
-    --action-tooltip-bg: #8B0000;
-}
-
-#mainContent.user-management-page .action-btn::after {
-    content: attr(title);
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 9px);
-    transform: translateX(-50%) translateY(4px);
-    padding: .42rem .58rem;
-    border-radius: 9px;
-    background: var(--action-tooltip-bg);
-    color: #ffffff;
-    font-size: .68rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: 0 10px 22px color-mix(in srgb, var(--action-tooltip-bg) 24%, transparent);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 50;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.user-management-page .action-btn::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 4px);
-    transform: translateX(-50%) translateY(4px);
-    border: 5px solid transparent;
-    border-top-color: var(--action-tooltip-bg);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 51;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.user-management-page .action-btn:hover::after,
-#mainContent.user-management-page .action-btn:hover::before,
-#mainContent.user-management-page .action-btn:focus-visible::after,
-#mainContent.user-management-page .action-btn:focus-visible::before {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
 }
 
 [data-theme="dark"] #mainContent.user-management-page .um-users-card>div,
@@ -1984,179 +1685,6 @@ body.modal-open {
     #mainContent.user-management-page #statCards.admin-dashboard-stat-grid.user-management-stat-grid .stat-num {
         font-size: 26px !important;
     }
-}
-
-#mainContent.user-management-page .um-action-group .action-btn,
-#mainContent.user-management-page td:last-child .action-btn {
-    border: 0 !important;
-}
-
-#mainContent.user-management-page .um-action-group .action-btn:nth-child(1),
-#mainContent.user-management-page td:last-child .action-btn:nth-child(1),
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(1),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(1),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(1),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(1) {
-    --action-bg: #EFF6FF;
-    --action-color: #2563EB;
-    --action-hover-bg: #DBEAFE;
-    --action-hover-color: #1D4ED8;
-    --action-tooltip-bg: #2563EB;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-#mainContent.user-management-page .um-action-group .action-btn:nth-child(2),
-#mainContent.user-management-page td:last-child .action-btn:nth-child(2),
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(2),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(2),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(2),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(2) {
-    --action-bg: #FEF3C7;
-    --action-color: #B45309;
-    --action-hover-bg: #FDE68A;
-    --action-hover-color: #92400E;
-    --action-tooltip-bg: #B45309;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-#mainContent.user-management-page .um-action-group .action-btn:nth-child(3),
-#mainContent.user-management-page td:last-child .action-btn:nth-child(3),
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(3),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(3),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(3),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(3) {
-    --action-bg: #F3E8FF;
-    --action-color: #7C3AED;
-    --action-hover-bg: #E9D5FF;
-    --action-hover-color: #6D28D9;
-    --action-tooltip-bg: #7C3AED;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-#mainContent.user-management-page .um-action-group .action-btn:nth-child(4),
-#mainContent.user-management-page td:last-child .action-btn:nth-child(4),
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(4),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(4),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(4),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(4) {
-    --action-bg: #F3F4F6;
-    --action-color: #374151;
-    --action-hover-bg: #FEF2F2;
-    --action-hover-color: #8B0000;
-    --action-tooltip-bg: #8B0000;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-#mainContent.user-management-page .action-btn:hover,
-#mainContent.user-management-page .action-btn:focus-visible {
-    background: var(--action-hover-bg) !important;
-    color: var(--action-hover-color) !important;
-}
-
-#mainContent.user-management-page .action-btn i {
-    color: currentColor !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(1),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(1),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(1),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(1),
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-edit,
-.dark #mainContent.user-management-page .action-btn.btn-edit {
-    --action-bg: rgba(37, 99, 235, .16);
-    --action-color: #60A5FA;
-    --action-hover-bg: rgba(37, 99, 235, .24);
-    --action-hover-color: #93C5FD;
-    --action-tooltip-bg: #2563EB;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(2),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(2),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(2),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(2),
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-on,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Deactivate"],
-.dark #mainContent.user-management-page .action-btn.btn-toggle-on,
-.dark #mainContent.user-management-page .action-btn[title="Deactivate"] {
-    --action-bg: rgba(245, 158, 11, .17);
-    --action-color: #FBBF24;
-    --action-hover-bg: rgba(245, 158, 11, .26);
-    --action-hover-color: #FCD34D;
-    --action-tooltip-bg: #B45309;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-toggle-off,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Activate"],
-.dark #mainContent.user-management-page .action-btn.btn-toggle-off,
-.dark #mainContent.user-management-page .action-btn[title="Activate"] {
-    --action-bg: rgba(16, 185, 129, .17);
-    --action-color: #34D399;
-    --action-hover-bg: rgba(16, 185, 129, .26);
-    --action-hover-color: #6EE7B7;
-    --action-tooltip-bg: #047857;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(3),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(3),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(3),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(3),
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-reset,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="Reset password"],
-.dark #mainContent.user-management-page .action-btn.btn-reset,
-.dark #mainContent.user-management-page .action-btn[title="Reset password"] {
-    --action-bg: rgba(124, 58, 237, .17);
-    --action-color: #A78BFA;
-    --action-hover-bg: rgba(124, 58, 237, .26);
-    --action-hover-color: #C4B5FD;
-    --action-tooltip-bg: #7C3AED;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .um-action-group .action-btn:nth-child(4),
-[data-theme="dark"] #mainContent.user-management-page td:last-child .action-btn:nth-child(4),
-.dark #mainContent.user-management-page .um-action-group .action-btn:nth-child(4),
-.dark #mainContent.user-management-page td:last-child .action-btn:nth-child(4),
-[data-theme="dark"] #mainContent.user-management-page .action-btn.btn-view-details,
-[data-theme="dark"] #mainContent.user-management-page .action-btn[title="View details"],
-.dark #mainContent.user-management-page .action-btn.btn-view-details,
-.dark #mainContent.user-management-page .action-btn[title="View details"] {
-    --action-bg: rgba(255, 255, 255, .055);
-    --action-color: #9CA3AF;
-    --action-hover-bg: rgba(139, 0, 0, .20);
-    --action-hover-color: #FCA5A5;
-    --action-tooltip-bg: #8B0000;
-
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-    border: 1px solid rgba(255, 255, 255, .075) !important;
-}
-
-[data-theme="dark"] #mainContent.user-management-page .action-btn:hover,
-[data-theme="dark"] #mainContent.user-management-page .action-btn:focus-visible,
-.dark #mainContent.user-management-page .action-btn:hover,
-.dark #mainContent.user-management-page .action-btn:focus-visible {
-    background: var(--action-hover-bg) !important;
-    color: var(--action-hover-color) !important;
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--action-hover-color) 20%, transparent) !important;
 }
 
 #mainContent.user-management-page .badge-active,
@@ -2297,8 +1825,9 @@ body.modal-open {
     margin-inline: auto !important;
 }
 
-#mainContent.user-management-page .um-table tbody td:nth-child(6) .um-action-group {
+#mainContent.user-management-page .um-table tbody td:nth-child(6) .ui-action-group {
     justify-content: center !important;
+    flex-wrap: nowrap !important;
 }
 
 #mainContent.user-management-page .um-table-scroll {
@@ -4092,6 +3621,17 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     border-color: rgba(255, 255, 255, .085) !important;
 }
 
+@media (max-width: 480px) {
+    .um-grid-meta {
+        grid-template-columns: 1fr;
+        gap: .55rem;
+    }
+
+    .um-registered-date {
+        width: fit-content;
+    }
+}
+
 @media (max-width: 767px) {
     #addModal.modal-overlay {
         align-items: flex-end !important;
@@ -4634,24 +4174,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
         flex-wrap: wrap !important;
     }
 
-    #mainContent.user-management-page .action-btn {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        border-radius: 11px !important;
-    }
-
-    #mainContent.user-management-page .action-btn i {
-        font-size: .78rem !important;
-    }
-
-    #mainContent.user-management-page .sl-pagebar,
-    #mainContent.user-management-page .um-pagebar {
-        gap: .65rem !important;
-        padding: .85rem 1rem !important;
-        flex-wrap: wrap !important;
-    }
-
     #mainContent.user-management-page .page-btn {
         min-width: 30px !important;
         height: 30px !important;
@@ -4823,24 +4345,8 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     table-layout: fixed !important;
 }
 
-#mainContent.user-management-page .pagebar.um-pagebar {
-    border-radius: 0 0 18px 18px !important;
-    border-left: 1px solid #f0eaea !important;
-    border-right: 1px solid #f0eaea !important;
-    border-bottom: 1px solid #f0eaea !important;
-}
-
-#mainContent.user-management-page .um-pagination-wrap nav {
-    display: flex !important;
-    align-items: center !important;
-    gap: .35rem !important;
-    flex-wrap: nowrap !important;
-}
-
 [data-theme="dark"] #mainContent.user-management-page .um-users-content,
-.dark #mainContent.user-management-page .um-users-content,
-[data-theme="dark"] #mainContent.user-management-page .pagebar.um-pagebar,
-.dark #mainContent.user-management-page .pagebar.um-pagebar {
+.dark #mainContent.user-management-page .um-users-content {
     background: #161B22 !important;
     border-color: #21262D !important;
 }

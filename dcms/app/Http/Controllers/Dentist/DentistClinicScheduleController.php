@@ -58,14 +58,26 @@ class DentistClinicScheduleController extends Controller
         $philippineHolidays = PhilippineHolidays::range(0, 1);
         $notifications = [];
 
-        return view('dentist.dentist-clinic-schedule', compact(
-            'schedules',
-            'blockedDates',
-            'appointmentCountsPerDay',
-            'weeklyAppointments',
-            'philippineHolidays',
-            'notifications',
-        ));
+        return view('admin.clinic-schedule', [
+            'schedules' => $schedules,
+            'blockedDates' => $blockedDates,
+            'appointmentCountsPerDay' => $appointmentCountsPerDay,
+            'weeklyAppointments' => $weeklyAppointments,
+            'philippineHolidays' => $philippineHolidays,
+            'notifications' => $notifications,
+
+            'layoutRole' => 'dentist',
+            'pageShellClass' => 'dentist-page-shell',
+            'isDentistView' => true,
+
+            'clinicScheduleRouteNames' => [
+                'store' => 'dentist.dentist.clinic_schedule.store',
+                'update' => 'dentist.dentist.clinic_schedule.update',
+                'destroy' => 'dentist.dentist.clinic_schedule.destroy',
+                'block' => 'dentist.dentist.clinic_schedule.block',
+                'unblock' => 'dentist.dentist.clinic_schedule.unblock',
+            ],
+        ]);
     }
 
     public function store(Request $request)

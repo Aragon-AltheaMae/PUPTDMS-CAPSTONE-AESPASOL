@@ -299,6 +299,49 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 </div>
             </div>
 
+            <div class="global-pagebar global-pagebar-top docreq-pagebar docreq-pagebar-top">
+                <div class="global-pagebar-left">
+                    <span class="global-pagebar-info docreq-page-info" id="pageInfoTop"></span>
+
+                    <div class="global-page-size-control docreq-page-size-control">
+                        <label for="docreqPerPageSelect">Show</label>
+
+                        <div class="global-page-size-select" data-global-page-size
+                            data-page-size-input="#docreqPerPageSelect" data-page-size-callback="selectDocreqPerPage">
+
+                            <input type="hidden" id="docreqPerPageSelect" class="global-page-size-native"
+                                value="{{ (int) $perPage }}">
+
+                            <button type="button" class="global-page-size-trigger" data-page-size-trigger
+                                aria-haspopup="listbox" aria-expanded="false">
+
+                                <span data-page-size-value>{{ (int) $perPage }}</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+
+                            <div class="global-page-size-menu" role="listbox">
+                                @foreach ([10, 20, 50, 100] as $size)
+                                <button type="button"
+                                    class="global-page-size-option {{ (int) $perPage === $size ? 'is-selected' : '' }}"
+                                    data-page-size-option data-value="{{ $size }}" role="option"
+                                    aria-selected="{{ (int) $perPage === $size ? 'true' : 'false' }}">
+
+                                    <span>{{ $size }}</span>
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <span>per page</span>
+                    </div>
+                </div>
+
+                <div class="global-pagination-wrap docreq-pagination-wrap">
+                    <div id="pagControlsTop" class="global-pagination docreq-page-controls"></div>
+                </div>
+            </div>
+
             <div id="docreqTableHead"
                 class="hidden md:grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border-b border-gray-200"
                 style="grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1fr) 145px;">
@@ -311,66 +354,14 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 <div class="text-right">Actions</div>
             </div>
 
-            <div class="sl-pagebar sl-pagebar-top docreq-pagebar docreq-pagebar-top">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <span class="sl-pagebar-info docreq-page-info" id="pageInfoTop"></span>
-
-                    <div class="sl-page-size-control global-page-size-control docreq-page-size-control">
-                        <label for="docreqPerPageSelect">Show</label>
-
-                        <div class="global-page-size-select" data-global-page-size
-                            data-page-size-input="#docreqPerPageSelect" data-page-size-callback="selectDocreqPerPage">
-                            <input type="hidden" id="docreqPerPageSelect" class="global-page-size-native" value="10">
-
-                            <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                aria-haspopup="listbox" aria-expanded="false">
-                                <span data-page-size-value>10</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </button>
-
-                            <div class="global-page-size-menu" role="listbox">
-                                <button type="button" class="global-page-size-option is-selected" data-page-size-option
-                                    data-value="10" role="option" aria-selected="true">
-                                    <span>10</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                <button type="button" class="global-page-size-option" data-page-size-option
-                                    data-value="20" role="option" aria-selected="false">
-                                    <span>20</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                <button type="button" class="global-page-size-option" data-page-size-option
-                                    data-value="50" role="option" aria-selected="false">
-                                    <span>50</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                <button type="button" class="global-page-size-option" data-page-size-option
-                                    data-value="100" role="option" aria-selected="false">
-                                    <span>100</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <span>per page</span>
-                    </div>
-                </div>
-
-                <div class="sl-pagination-wrap docreq-pagination-wrap">
-                    <div id="pagControlsTop" class="sl-pagination docreq-page-controls"></div>
-                </div>
-            </div>
-
             <div id="requestListContainer" class="docreq-list-container"></div>
             <div id="requestGridContainer" class="docreq-grid"></div>
 
-            <div class="sl-pagebar docreq-pagebar docreq-pagebar-bottom">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <span class="sl-pagebar-info docreq-page-info" id="pageInfo"></span>
-                </div>
+            <div class="global-pagebar global-pagebar-bottom">
+                <span class="global-pagebar-info" id="pageInfo"></span>
 
-                <div class="sl-pagination-wrap docreq-pagination-wrap">
-                    <div id="pagControls" class="sl-pagination docreq-page-controls"></div>
+                <div class="global-pagination-wrap">
+                    <div id="pagControls" class="global-pagination"></div>
                 </div>
             </div>
 
@@ -378,34 +369,42 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper">
+<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
     <div class="filter-drawer-overlay" onclick="document.getElementById('filterCancelBtn')?.click()"></div>
 
-    <div class="filter-drawer-panel docreq-filter-sheet flex flex-col bg-white">
+    <div class="filter-drawer-panel docreq-filter-sheet">
 
-        <div
-            class="filter-drawer-header px-6 py-5 flex items-center justify-between flex-shrink-0 bg-white border-b border-gray-100">
-            <div class="filter-drawer-title flex items-center gap-2">
+        <div class="filter-drawer-header">
+            <div class="filter-drawer-title">
                 <i class="fa-solid fa-sliders text-xl"></i>
                 <h2 class="text-xl font-extrabold">Filters</h2>
             </div>
 
-            <button id="filterCancelBtn" type="button" class="text-gray-400 hover:text-gray-700 transition-colors">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <button id="filterCancelBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
+
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
+        <div class="filter-drawer-body">
 
-            <div id="activeFiltersSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
+            <div id="activeFiltersSection" class="filter-active-section hidden">
+
+                <div class="filter-active-header">
+                    <span class="filter-active-title">
+                        Active Filters
+                    </span>
+
                     <button id="clearAllChipsBtn" type="button"
-                        class="text-xs font-bold text-[#8B0000] hover:underline">
-                        Clear All
+                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Clear All</span>
                     </button>
                 </div>
-                <div id="activeChipsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+
+                <div id="activeChipsContainer" class="active-filters-container">
+                </div>
             </div>
 
             <div>
@@ -481,24 +480,27 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             </div>
         </div>
 
-        <div
-            class="filter-drawer-footer px-6 py-5 bg-white flex flex-col sm:flex-row items-center justify-between flex-shrink-0 border-t border-gray-100 gap-4 sm:gap-0 relative z-20">
-            <button id="filterResetBtn" type="button"
-                class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                <i class="fa-regular fa-trash-can text-lg"></i>
-                <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+        <div class="filter-drawer-footer">
+            <button id="filterResetBtn" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
+
+                <i class="fa-regular fa-trash-can"></i>
+                <span>Clear Filters</span>
             </button>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <button id="filterCloseBtn" type="button"
-                    class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors">
-                    Cancel
+            <div class="filter-footer-actions">
+                <button id="filterCloseBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary">
+
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </button>
 
-                <button id="filterApplyBtn" type="button"
-                    class="filter-show-results-btn filter-apply-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+                <button id="filterApplyBtn" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
+
                     <i class="fa-solid fa-check"></i>
-                    <span id="showResultsText">Show results</span>
+
+                    <span id="filterResultsText" class="filter-results-text">
+                        Show results
+                    </span>
                 </button>
             </div>
         </div>
@@ -893,12 +895,14 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function loadData() {
-        allRequests = Array.isArray(ADMIN_DOC_REQUESTS) ? ADMIN_DOC_REQUESTS : [];
+        allRequests = Array.isArray(ADMIN_DOC_REQUESTS)
+            ? ADMIN_DOC_REQUESTS.map(normalizeDocreqRequest)
+            : [];
 
         documentTypeOptions = normalizeDocTypes(
-            Array.isArray(ADMIN_DOC_TYPES) && ADMIN_DOC_TYPES.length ?
-                ADMIN_DOC_TYPES :
-                allRequests.map(r => r.document_type)
+            Array.isArray(ADMIN_DOC_TYPES) && ADMIN_DOC_TYPES.length
+                ? ADMIN_DOC_TYPES
+                : allRequests.map(request => request.document_type)
         );
 
         if (filterDocType && !documentTypeOptions.includes(filterDocType)) {
@@ -907,7 +911,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
         renderDocTypeOptions(documentTypeOptions);
         updateStats(ADMIN_DOC_STATS || {});
-        renderDocreqPagebar(docreqPagination);
+        renderDocreqPagebars(docreqPagination);
         renderList();
     }
 
@@ -1237,9 +1241,17 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             }
 
             if (data.pagination) {
-                currentPage = Number(data.pagination.current_page || 1);
-                docreqPerPage = Number(data.pagination.per_page || docreqPerPage || 10);
-                renderDocreqPagebar(data.pagination);
+                docreqPagination = data.pagination;
+
+                currentPage = Number(
+                    docreqPagination.current_page || 1
+                );
+
+                docreqPerPage = Number(
+                    docreqPagination.per_page || docreqPerPage || 10
+                );
+
+                renderDocreqPagebars(docreqPagination);
             }
 
             renderList();
@@ -1264,7 +1276,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         const tableHead = document.getElementById('docreqTableHead');
         const isMobile = window.innerWidth <= 767;
 
-        renderDocreqPagebar(docreqPagination);
+        renderDocreqPagebars(docreqPagination);
 
         const listContainer = document.getElementById('requestListContainer');
         const gridContainer = document.getElementById('requestGridContainer');
@@ -1327,7 +1339,9 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 gridContainer.innerHTML = page.map(r => buildGridCard(r)).join('');
             }
         } else {
-            if (tableHead) tableHead.style.display = 'none';
+            if (tableHead) {
+                tableHead.style.display = '';
+            }
 
             if (gridContainer) {
                 gridContainer.style.display = 'none';
@@ -1336,7 +1350,9 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
             if (listContainer) {
                 listContainer.style.display = 'flex';
-                listContainer.innerHTML = page.map(r => buildDesktopRow(r)).join('');
+                listContainer.innerHTML = page
+                    .map(request => buildDesktopRow(request))
+                    .join('');
             }
         }
     }
@@ -1836,79 +1852,155 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     window.initGlobalPageSizeSelects?.();
 
-    function renderDocreqPagebar(p) {
-        if (!p) return;
+    function renderDocreqPagebars(pagination) {
+        if (!pagination) return;
 
-        docreqPagination = p;
+        const from = Number(pagination.from || 0);
+        const to = Number(pagination.to || 0);
+        const total = Number(pagination.total || 0);
 
-        const from = Number(p.from || 0);
-        const to = Number(p.to || 0);
-        const total = Number(p.total || 0);
+        const infoHtml = total > 0
+            ? `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> entries`
+            : 'Showing <strong>0</strong> entries';
 
-        const infoHtml = total > 0 ?
-            `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> requests` :
-            'Showing <strong>0</strong> requests';
+        const topInfo = document.getElementById('pageInfoTop');
+        const bottomInfo = document.getElementById('pageInfo');
 
-        document.querySelectorAll('.docreq-pagebar .sl-pagebar-info').forEach((el) => {
-            el.innerHTML = infoHtml;
-        });
+        if (topInfo) topInfo.innerHTML = infoHtml;
+        if (bottomInfo) bottomInfo.innerHTML = infoHtml;
 
-        const navHtml = buildDocreqPagination(p);
+        const paginationHtml = buildDocreqPagination(pagination);
 
-        document.querySelectorAll('.docreq-pagination-wrap').forEach((el) => {
-            el.innerHTML = navHtml;
-        });
+        const topPagination = document.getElementById('pagControlsTop');
+        const bottomPagination = document.getElementById('pagControls');
 
-        if (p.per_page) {
-            updateDocreqPerPageUI(p.per_page);
-        }
-
-        const rowCountEl = document.getElementById('rowCount');
-        if (rowCountEl) {
-            rowCountEl.textContent = `${total} ${total === 1 ? 'request' : 'requests'}`;
-        }
+        if (topPagination) topPagination.innerHTML = paginationHtml;
+        if (bottomPagination) bottomPagination.innerHTML = paginationHtml;
     }
 
     function buildDocreqPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) return '';
+        if (!p || Number(p.last_page || 1) <= 1) {
+            return '';
+        }
 
         const current = Number(p.current_page || 1);
         const last = Number(p.last_page || 1);
-        const winSize = 5;
-        const half = Math.floor(winSize / 2);
+        const windowSize = 5;
+        const half = Math.floor(windowSize / 2);
 
         let start = Math.max(1, current - half);
-        let end = Math.min(last, start + winSize - 1);
+        let end = Math.min(last, start + windowSize - 1);
 
-        if (end - start + 1 < winSize) {
-            start = Math.max(1, end - winSize + 1);
+        if (end - start + 1 < windowSize) {
+            start = Math.max(1, end - windowSize + 1);
         }
 
-        let html = '<nav class="sl-pagination" aria-label="Document requests pagination">';
+        let html = `
+        <nav
+            class="global-pagination"
+            aria-label="Document requests pagination">
+    `;
 
-        html += current <= 1 ?
-            '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>' :
-            `<button type="button" onclick="docreqGoPage(${current - 1})" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>`;
+        html += current <= 1
+            ? `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Previous page"
+                disabled>
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        `
+            : `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="docreqGoPage(${current - 1})"
+                aria-label="Previous page">
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        `;
 
         if (start > 1) {
-            html += '<button type="button" onclick="docreqGoPage(1)" class="sl-page-btn">1</button>';
-            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="docreqGoPage(1)">
+                1
+            </button>
+        `;
+
+            if (start > 2) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
         }
 
-        for (let i = start; i <= end; i++) {
-            html += i === current ?
-                `<span class="sl-page-current" aria-current="page">${i}</span>` :
-                `<button type="button" onclick="docreqGoPage(${i})" class="sl-page-btn">${i}</button>`;
+        for (let page = start; page <= end; page++) {
+            html += page === current
+                ? `
+                <span
+                    class="global-page-current"
+                    aria-current="page">
+                    ${page}
+                </span>
+            `
+                : `
+                <button
+                    type="button"
+                    class="global-page-btn"
+                    onclick="docreqGoPage(${page})">
+                    ${page}
+                </button>
+            `;
         }
 
         if (end < last) {
-            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += `<button type="button" onclick="docreqGoPage(${last})" class="sl-page-btn">${last}</button>`;
+            if (end < last - 1) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
+
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="docreqGoPage(${last})">
+                ${last}
+            </button>
+        `;
         }
 
-        html += current >= last ?
-            '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>' :
-            `<button type="button" onclick="docreqGoPage(${current + 1})" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>`;
+        html += current >= last
+            ? `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Next page"
+                disabled>
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        `
+            : `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="docreqGoPage(${current + 1})"
+                aria-label="Next page">
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        `;
 
         html += '</nav>';
 
