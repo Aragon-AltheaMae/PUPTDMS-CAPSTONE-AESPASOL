@@ -1709,13 +1709,6 @@ $notifCount = $notifications->count();
         applyAppointmentFilters();
     }
 
-    function setAppointmentPeriodFilter(period = 'upcoming') {
-        appointmentPeriodFilter = ['upcoming', 'past', 'all'].includes(period) ? period : 'upcoming';
-
-        document.getElementById('upcomingSection')?.classList.toggle('hidden', appointmentPeriodFilter === 'past');
-        document.getElementById('pastSection')?.classList.toggle('hidden', appointmentPeriodFilter === 'upcoming');
-    }
-
     function applyAppointmentFilters() {
         setAppointmentPeriodFilter(appointmentPeriodFilter);
 

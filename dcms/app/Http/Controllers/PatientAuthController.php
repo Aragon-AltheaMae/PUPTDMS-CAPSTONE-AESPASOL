@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\ConcurrentSessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,10 @@ use App\Helpers\AuditLogger;
 
 class PatientAuthController extends Controller
 {
+    public function __construct(
+        private readonly ConcurrentSessionService $concurrentSessionService
+    ) {}
+
     public function showRegister()
     {
         return view('auth.register');
@@ -118,6 +123,11 @@ class PatientAuthController extends Controller
             'role' => 'patient',
         ]);
 
+        $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
+            $user,
+            $request->session()->getId()
+        );
+
         AuditLogger::log(
             'login',
             'patient_auth',
@@ -126,7 +136,16 @@ class PatientAuthController extends Controller
 
         session()->flash('show_terms_modal', true);
 
-        return redirect()->route('patient.dashboard');
+        $redirect = redirect()->route('patient.dashboard');
+
+        if (($sessionResult['terminated_sessions'] ?? 0) > 0) {
+            $redirect->with(
+                'success',
+                'Logged in successfully. Older active session(s) were closed for your account.'
+            );
+        }
+
+        return $redirect;
     }
 
     public function logout(Request $request)

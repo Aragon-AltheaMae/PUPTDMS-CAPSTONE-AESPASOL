@@ -15,10 +15,39 @@ use App\Notifications\AppointmentCancelledNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use App\Models\ServiceType;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 
 class DentistAppointmentController extends Controller
 {
+    private function syncOverdueAppointmentsToCancelled(): void
+    {
+        $now = Carbon::now();
+
+        $updatePayload = [
+            'status' => 'cancelled',
+            'updated_at' => $now,
+        ];
+
+        if (Schema::hasColumn('appointments', 'cancellation_reason')) {
+            $updatePayload['cancellation_reason'] = DB::raw(
+                "COALESCE(NULLIF(cancellation_reason, ''), 'Appointment was not started or processed on the scheduled time.')"
+            );
+        }
+
+        Appointment::query()
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->where(function ($query) use ($now) {
+                $query->whereDate('appointment_date', '<', $now->toDateString())
+                    ->orWhere(function ($sameDay) use ($now) {
+                        $sameDay->whereDate('appointment_date', $now->toDateString())
+                            ->whereTime('appointment_time', '<', $now->format('H:i:s'));
+                    });
+            })
+            ->update($updatePayload);
+    }
+
     public function index()
     {
 
@@ -27,6 +56,8 @@ class DentistAppointmentController extends Controller
         if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
+
+        $this->syncOverdueAppointmentsToCancelled();
 
         $today = Carbon::today()->toDateString();
 
@@ -133,6 +164,8 @@ class DentistAppointmentController extends Controller
             return redirect('/login');
         }
 
+        $this->syncOverdueAppointmentsToCancelled();
+
         $appointment->load('patient');
         $patient = $appointment->patient;
 
@@ -192,6 +225,8 @@ class DentistAppointmentController extends Controller
         if ($activeRole !== 'dentist') {
             return redirect('/login');
         }
+
+        $this->syncOverdueAppointmentsToCancelled();
 
         $appointment = Appointment::with('patient')->findOrFail($id);
 
@@ -432,6 +467,7 @@ class DentistAppointmentController extends Controller
             'follow_up_reason' => $request->followup_reason,
             'follow_up_reminder_sent_at' => null,
             'follow_up_today_reminder_sent_at' => null,
+            'follow_up_one_day_reminder_sent_at' => null,
         ]);
 
         AuditLogger::log(

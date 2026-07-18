@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ConcurrentSessionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Hash;
 
 class BackupLoginController extends Controller
 {
+    public function __construct(
+        private readonly ConcurrentSessionService $concurrentSessionService
+    ) {}
+
     public function show()
     {
         return view('auth.backup-login');
@@ -68,6 +73,11 @@ class BackupLoginController extends Controller
         $request->session()->put('admin_id', $user->id);
         $request->session()->put('admin_email', $user->email);
 
+        $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
+            $user,
+            $request->session()->getId()
+        );
+
         $user->forceFill([
             'last_login_at' => now(),
         ])->save();
@@ -78,7 +88,16 @@ class BackupLoginController extends Controller
             'Admin logged in via backup login'
         );
 
-        return redirect()->route('admin.admin.dashboard')
+        $redirect = redirect()->route('admin.admin.dashboard')
             ->with('login_as', $user->name ?: $user->email);
+
+        if (($sessionResult['terminated_sessions'] ?? 0) > 0) {
+            $redirect->with(
+                'success',
+                'Logged in successfully. Older active session(s) were closed for your account.'
+            );
+        }
+
+        return $redirect;
     }
 }

@@ -77,6 +77,12 @@ $sidebarGroups = [
 'label' => 'User Management',
 ],
 [
+'route' => 'admin.dentist-transitions.index',
+'active' => ['admin.dentist-transitions*'],
+'icon' => 'fa-people-arrows',
+'label' => 'Dentist Continuity',
+],
+[
 'route' => 'admin.role_permissions',
 'active' => ['admin.role_permissions'],
 'icon' => 'fa-user-shield',
@@ -143,6 +149,12 @@ $sidebarGroups = [
 'active' => ['admin.system_logs'],
 'icon' => 'fa-clipboard-list',
 'label' => 'System Logs',
+],
+[
+'route' => 'admin.session_management.index',
+'active' => ['admin.session_management.*'],
+'icon' => 'fa-shield-halved',
+'label' => 'Session Dashboard',
 ],
 ],
 ],
