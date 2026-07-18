@@ -13,6 +13,9 @@ class SystemSettingsController extends Controller
     private const BOOLEAN_KEYS = [
         'maintenance_mode',
         'debug_mode',
+        'ai_chatbot_enabled',
+        'ai_signature_enabled',
+        'ai_reports_enabled',
 
         'notif_new_appointment',
         'notif_cancellation',
@@ -36,6 +39,10 @@ class SystemSettingsController extends Controller
             'language',
             'maintenance_mode',
             'debug_mode',
+            'ai_mode',
+            'ai_chatbot_enabled',
+            'ai_signature_enabled',
+            'ai_reports_enabled',
         ],
 
         'clinic' => [
@@ -147,6 +154,10 @@ class SystemSettingsController extends Controller
 
             'maintenance_mode' => ['nullable', 'boolean'],
             'debug_mode' => ['nullable', 'boolean'],
+            'ai_mode' => ['nullable', Rule::in(['normal', 'degraded', 'offline'])],
+            'ai_chatbot_enabled' => ['nullable', 'boolean'],
+            'ai_signature_enabled' => ['nullable', 'boolean'],
+            'ai_reports_enabled' => ['nullable', 'boolean'],
 
             'clinic_name' => ['nullable', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:50'],

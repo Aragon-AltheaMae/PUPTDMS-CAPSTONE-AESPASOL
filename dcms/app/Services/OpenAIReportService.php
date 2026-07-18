@@ -8,12 +8,24 @@ use Throwable;
 
 class OpenAIReportService
 {
+    public function __construct(
+        private readonly AiServiceManager $aiServiceManager
+    ) {}
+
     public function generate(array $reportData): ?array
     {
+        if (!$this->aiServiceManager->shouldUse('reports')) {
+            $this->aiServiceManager->recordFallback('reports', 'AI report generation is disabled or offline.');
+
+            return null;
+        }
+
         $apiKey = config('services.openai.api_key');
         $model = config('services.openai.report_model', 'gpt-5.4-mini');
 
         if (!$apiKey) {
+            $this->aiServiceManager->recordFallback('reports', 'OpenAI API key is not configured.');
+
             return null;
         }
 
@@ -95,6 +107,10 @@ class OpenAIReportService
                     'body' => $response->body(),
                 ]);
 
+                $this->aiServiceManager->recordFailure('reports', 'OpenAI report generation failed.', [
+                    'status' => $response->status(),
+                ]);
+
                 return null;
             }
 
@@ -105,14 +121,24 @@ class OpenAIReportService
                     'response' => $response->json(),
                 ]);
 
+                $this->aiServiceManager->recordFailure('reports', 'OpenAI report generation returned empty output.');
+
                 return null;
             }
 
             $decoded = json_decode($text, true);
 
+            if (is_array($decoded)) {
+                $this->aiServiceManager->recordSuccess('reports', 'OpenAI report generation completed.');
+            }
+
             return is_array($decoded) ? $decoded : null;
         } catch (Throwable $e) {
             Log::error('OpenAI report generation exception.', [
+                'message' => $e->getMessage(),
+            ]);
+
+            $this->aiServiceManager->recordFailure('reports', 'OpenAI report generation exception.', [
                 'message' => $e->getMessage(),
             ]);
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 use App\Models\Appointment;
@@ -28,6 +29,7 @@ use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
 use App\Notifications\AppointmentBookedNotification;
 use App\Notifications\AppointmentRescheduledNotification;
+use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
 
 
@@ -492,10 +494,17 @@ class AppointmentController extends Controller
             ]);
         }
 
+        $signatureReviewStatus = ($aiResult['review_status'] ?? null) === 'pending_manual_review'
+            ? 'pending_manual_review'
+            : 'verified';
+        $signatureReviewNotes = $aiResult['review_required'] ?? false
+            ? ($aiResult['reason'] ?? 'Accepted for manual review.')
+            : null;
+
         $signaturePath = $signatureFile->store('signatures', 'public');
         $appointment = null;
 
-        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, &$appointment) {
+        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, $signatureReviewStatus, $signatureReviewNotes, $aiResult, &$appointment) {
 
             // 1) APPOINTMENT
             $appointment = Appointment::create([
@@ -602,6 +611,10 @@ class AppointmentController extends Controller
                     'emergency_number'   => $request->emergency_number,
                     'emergency_relation' => $request->emergency_relation,
                     'patient_signature'  => $signaturePath,
+                    'signature_review_status' => $signatureReviewStatus,
+                    'signature_review_notes' => $signatureReviewNotes,
+                    'signature_ai_provider' => 'openai',
+                    'signature_ai_confidence' => $aiResult['confidence'] ?? null,
                 ]
             );
 
@@ -758,8 +771,11 @@ class AppointmentController extends Controller
                 "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
             );
         }
+        $successMessage = $signatureReviewStatus === 'pending_manual_review'
+            ? 'Appointment booked successfully! The signature was accepted and flagged for manual review.'
+            : 'Appointment booked successfully!';
 
-        return redirect()->route('homepage')->with('success', 'Appointment booked successfully!');
+        return redirect()->route('homepage')->with('success', $successMessage);
     }
 
     public function slotsForDate(Request $request)
@@ -881,12 +897,152 @@ class AppointmentController extends Controller
         return response()->json([
             'valid' => true,
             'accepted' => true,
-            'message' => 'Signature verified and accepted',
+            'message' => $aiResult['review_required'] ?? false
+                ? 'Signature accepted for manual review.'
+                : 'Signature verified and accepted',
             'detected_type' => $aiResult['detected_type'] ?? 'signature',
             'confidence' => $aiResult['confidence'] ?? 0,
             'reason' => $aiResult['reason'] ?? '',
+            'review_required' => (bool) ($aiResult['review_required'] ?? false),
+            'review_status' => $aiResult['review_status'] ?? 'verified',
         ]);
     }
+
+    public function showSignatureReview()
+    {
+        $patient = $this->resolveAuthenticatedPatient();
+
+        if (!$patient) {
+            return redirect()->route('login')->with('error', 'Please login first!');
+        }
+
+        $patient->load('medicalHistory');
+        $medicalHistory = $patient->medicalHistory;
+
+        if (!$medicalHistory || $medicalHistory->signature_review_status !== 'invalid_reupload_required') {
+            return redirect()->route('homepage')->with('info', 'There is no pending signature re-upload request for your account.');
+        }
+
+        return view('patient.signature-review', compact('patient', 'medicalHistory'));
+    }
+
+    public function updateSignatureReview(Request $request, SignatureAiVerifier $signatureVerifier)
+    {
+        $patient = $this->resolveAuthenticatedPatient();
+
+        if (!$patient) {
+            return redirect()->route('login')->with('error', 'Please login first!');
+        }
+
+        $patient->load('medicalHistory');
+        $medicalHistory = $patient->medicalHistory;
+
+        if (!$medicalHistory || $medicalHistory->signature_review_status !== 'invalid_reupload_required') {
+            return redirect()->route('homepage')->with('error', 'There is no signature re-upload request to update.');
+        }
+
+        $request->validate([
+            'patient_signature' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png',
+                'max:25600',
+            ],
+        ]);
+
+        $signatureFile = $request->file('patient_signature');
+        $isDrawnSignature = $this->isDrawnSignatureSubmission($request);
+
+        if (! $isDrawnSignature) {
+            $aiResult = $signatureVerifier->verify($signatureFile);
+
+            \Log::info('Signature Reupload Verification Result', $aiResult);
+
+            if (!($aiResult['accepted'] ?? false)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'patient_signature' => $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.',
+                    ]);
+            }
+        } else {
+            $aiResult = [
+                'accepted' => true,
+                'reason' => 'Drawn signature accepted.',
+                'confidence' => 1,
+                'review_required' => false,
+                'review_status' => 'verified',
+            ];
+        }
+
+        $oldSignaturePath = $medicalHistory->patient_signature;
+        $newSignaturePath = $signatureFile->store('signatures', 'public');
+        $signatureReviewStatus = ($aiResult['review_status'] ?? null) === 'pending_manual_review'
+            ? 'pending_manual_review'
+            : 'verified';
+        $signatureReviewNotes = $aiResult['review_required'] ?? false
+            ? ($aiResult['reason'] ?? 'Accepted for manual review.')
+            : null;
+
+        $medicalHistory->update([
+            'patient_signature' => $newSignaturePath,
+            'signature_review_status' => $signatureReviewStatus,
+            'signature_review_notes' => $signatureReviewNotes,
+            'signature_ai_provider' => 'openai',
+            'signature_ai_confidence' => $aiResult['confidence'] ?? null,
+        ]);
+
+        if ($oldSignaturePath && $oldSignaturePath !== $newSignaturePath) {
+            Storage::disk('public')->delete($oldSignaturePath);
+        }
+
+        AuditLogger::log(
+            'update',
+            'medical_histories',
+            "Patient re-uploaded signature for manual review follow-up (patient_id: {$patient->id})"
+        );
+
+        $successMessage = $signatureReviewStatus === 'pending_manual_review'
+            ? 'Your new signature was uploaded successfully and is pending manual review.'
+            : 'Your new signature was uploaded and verified successfully.';
+
+        return redirect()->route('homepage')->with('success', $successMessage);
+    }
+
+    public function markSignatureInvalid(Request $request, Patient $patient)
+    {
+        $patient->load('medicalHistory', 'user');
+
+        $medicalHistory = $patient->medicalHistory;
+
+        if (!$medicalHistory || !$medicalHistory->patient_signature) {
+            return redirect()->back()->with('error', 'No uploaded signature was found for this patient.');
+        }
+
+        if ($medicalHistory->signature_review_status !== 'pending_manual_review') {
+            return redirect()->back()->with('error', 'Only signatures awaiting manual review can be marked invalid.');
+        }
+
+        $reason = 'The uploaded image is not a valid patient signature. Please upload a clearer or correct signature image.';
+
+        $medicalHistory->update([
+            'signature_review_status' => 'invalid_reupload_required',
+            'signature_review_notes' => $reason,
+        ]);
+
+        if ($patient->user) {
+            $patient->user->notify(new SignatureReuploadRequiredNotification($patient, $reason));
+        }
+
+        AuditLogger::log(
+            'update',
+            'medical_histories',
+            "Signature marked invalid during manual review (patient_id: {$patient->id})"
+        );
+
+        return redirect()->back()->with('success', 'The signature was marked invalid and the patient was notified to upload a new one.');
+    }
+
     /* =======================
        HELPERS
     ======================= */
@@ -904,6 +1060,17 @@ class AppointmentController extends Controller
         if (in_array($v, ['YES', 'Y', 'TRUE', '1', 'ON'], true)) return 'YES';
 
         return 'NO';
+    }
+
+    private function resolveAuthenticatedPatient(): ?Patient
+    {
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
+
+        if ($patientId) {
+            return Patient::find($patientId);
+        }
+
+        return auth()->user()?->patient;
     }
 
     public function reschedule($id)
