@@ -102,7 +102,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div class="um-users-card card bg-white rounded-xl shadow border border-gray-100 overflow-visible mb-6">
+            <div class="um-users-card card bg-white rounded-xl shadow border border-gray-100 overflow-visible">
                 <div class="um-users-toolbar px-4 sm:px-5 py-4 border-b bg-gray-50">
                     <div class="um-users-heading">
                         <div class="card-header-icon">
@@ -160,6 +160,61 @@ $inactiveCount = $inactiveCount ?? 0;
                     </form>
                 </div>
 
+                <div class="global-pagebar global-pagebar-top">
+                    <div class="global-pagebar-left">
+                        <span class="global-pagebar-info">
+                            Showing
+                            <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
+                            of <strong>{{ $users->total() }}</strong> users
+                        </span>
+
+                        <div class="global-page-size-control">
+                            <label for="umPerPageSelect">Show</label>
+
+                            <div class="global-page-size-select" data-global-page-size
+                                data-page-size-input="#umPerPageSelect">
+
+                                <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
+                                    aria-hidden="true">
+
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
+                                        {{ $size }}
+                                    </option>
+                                    @endforeach
+                                </select>
+
+                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
+                                    aria-haspopup="listbox" aria-expanded="false">
+
+                                    <span data-page-size-value>
+                                        {{ (int) ($perPage ?? 10) }}
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+
+                                <div class="global-page-size-menu" role="listbox">
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <button type="button"
+                                        class="global-page-size-option {{ (int) ($perPage ?? 10) === $size ? 'is-selected' : '' }}"
+                                        data-page-size-option data-value="{{ $size }}" role="option"
+                                        aria-selected="{{ (int) ($perPage ?? 10) === $size ? 'true' : 'false' }}">
+
+                                        <span>{{ $size }}</span>
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <span>per page</span>
+                        </div>
+                    </div>
+
+                    <div class="global-pagination-wrap"></div>
+                </div>
+
                 <div class="um-users-content">
                     <div class="um-view um-list-view" id="umListView">
                         <div class="um-table-scroll overflow-x-auto">
@@ -182,8 +237,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
                                         <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
                                             <span class="text-xs text-gray-400 font-medium">{{ $users->firstItem() +
-                                                $loop->index
-                                                }}</span>
+                                                $loop->index }}</span>
                                         </td>
 
                                         <td class="py-3.5 px-2 sm:px-4">
@@ -229,46 +283,67 @@ $inactiveCount = $inactiveCount ?? 0;
                                             'id' => $user->id,
                                             'name' => $user->name,
                                             'email' => $user->email,
-                                            'role' => optional($user->role)->display_name ?? optional($user->role)->name ?? 'No Role',
+                                            'role' => optional($user->role)->display_name ?? optional($user->role)->name
+                                            ?? 'No Role',
                                             'status' => ucfirst($user->status),
                                             'source' => 'Users',
-                                            'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A',
-                                            'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') : 'N/A',
+                                            'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i
+                                            A') : 'N/A',
+                                            'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i
+                                            A') : 'N/A',
                                             'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
-                                            'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                            'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d,
+                                            Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
                                             'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
                                             'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
-                                            'birthdate_raw' => optional(optional($user->patient)->birthdate)?->format('Y-m-d') ?? optional($user->birthdate)?->format('Y-m-d') ?? '',
+                                            'birthdate_raw' =>
+                                            optional(optional($user->patient)->birthdate)?->format('Y-m-d') ??
+                                            optional($user->birthdate)?->format('Y-m-d') ?? '',
                                             'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
                                             'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
-                                            'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
+                                            'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A')
+                                            ?? 'Never',
                                             ];
                                             @endphp
                                             <div class="um-action-group flex items-center justify-center gap-1">
-                                                <button type="button"
-                                                    data-user-details='@json($userDetails)'
+                                                <button type="button" data-user-details='@json($userDetails)'
                                                     onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
-                                                    class="action-btn btn-edit" title="Edit account">
+                                                    class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
+                                                    aria-label="Edit account">
                                                     <i class="fa-solid fa-pen text-[11px]"></i>
                                                 </button>
 
-                                                <button type="button"
-                                                    onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
-                                                    class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                                    title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                                    <i
-                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                                <button type="button" onclick="openToggleConfirm(
+        {{ $user->id }},
+        @js($user->status),
+        @js($user->name)
+    )" class="ui-action-btn {{ $user->status === 'active'
+        ? 'ui-action-warning'
+        : 'ui-action-success' }}" data-tooltip="{{ $user->status === 'active'
+        ? 'Deactivate account'
+        : 'Activate account' }}" aria-label="{{ $user->status === 'active'
+        ? 'Deactivate account'
+        : 'Activate account' }}">
+
+                                                    <i class="fa-solid {{ $user->status === 'active'
+        ? 'fa-toggle-on'
+        : 'fa-toggle-off' }}">
+                                                    </i>
                                                 </button>
 
-                                                <button type="button"
-                                                    onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                                    class="action-btn btn-reset" title="Reset password">
-                                                    <i class="fa-solid fa-key text-[11px]"></i>
+                                                <button type="button" onclick="openResetModal(
+        'users',
+        {{ $user->id }},
+        @js($user->name)
+    )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password" aria-label="Reset password">
+
+                                                    <i class="fa-solid fa-key"></i>
                                                 </button>
 
                                                 <button type="button" data-user-details='@json($userDetails)'
                                                     onclick="openViewModalFromButton(this)"
-                                                    class="action-btn btn-view-details" title="View details">
+                                                    class="ui-action-btn ui-action-view" data-tooltip="View details"
+                                                    aria-label="View details">
                                                     <i class="fa-solid fa-eye text-[11px]"></i>
                                                 </button>
                                             </div>
@@ -320,7 +395,8 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                 <div class="um-grid-card">
                                     <div class="um-grid-top">
-                                        <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}</div>
+                                        <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}
+                                        </div>
                                         <span
                                             class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
                                             {{ ucfirst($user->status) }}
@@ -344,7 +420,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                     <div class="um-grid-meta">
                                         <div class="um-grid-field">
-                                            <div class="um-grid-label">Role</div>
+                                            <div class="um-grid-label">
+                                                Role
+                                            </div>
+
                                             <div class="um-grid-value">
                                                 <span class="badge-role role-{{ $roleSlug ?? 'none' }}">
                                                     {{ $roleName }}
@@ -353,56 +432,88 @@ $inactiveCount = $inactiveCount ?? 0;
                                         </div>
 
                                         <div class="um-grid-field">
-                                            <div class="um-grid-label">Registered</div>
-                                            <div class="um-grid-value">{{ $user->created_at->format('M d, Y') }}</div>
+                                            <div class="um-grid-label">
+                                                Registered
+                                            </div>
+
+                                            <div class="um-registered-date">
+                                                <span class="um-registered-icon">
+                                                    <i class="fa-solid fa-calendar-day"></i>
+                                                </span>
+
+                                                <span class="um-registered-text">
+                                                    {{ $user->created_at->format('M d, Y') }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="um-action-group flex items-center justify-end gap-1 flex-wrap">
+                                    <div class="ui-action-group">
                                         @php
                                         $userDetails = [
                                         'id' => $user->id,
                                         'name' => $user->name,
                                         'email' => $user->email,
-                                        'role' => optional($user->role)->display_name ?? optional($user->role)->name ?? 'No Role',
+                                        'role' => optional($user->role)->display_name ?? optional($user->role)->name ??
+                                        'No Role',
                                         'status' => ucfirst($user->status),
                                         'source' => 'Users',
-                                        'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A',
-                                        'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') : 'N/A',
+                                        'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') :
+                                        'N/A',
+                                        'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') :
+                                        'N/A',
                                         'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
-                                        'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                        'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y')
+                                        ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
                                         'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
                                         'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
-                                        'birthdate_raw' => optional(optional($user->patient)->birthdate)?->format('Y-m-d') ?? optional($user->birthdate)?->format('Y-m-d') ?? '',
+                                        'birthdate_raw' =>
+                                        optional(optional($user->patient)->birthdate)?->format('Y-m-d') ??
+                                        optional($user->birthdate)?->format('Y-m-d') ?? '',
                                         'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
                                         'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
-                                        'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
+                                        'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ??
+                                        'Never',
                                         ];
                                         @endphp
-                                        <button type="button"
-                                            data-user-details='@json($userDetails)'
+                                        <button type="button" data-user-details='@json($userDetails)'
                                             onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
-                                            class="action-btn btn-edit" title="Edit account">
+                                            class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
+                                            aria-label="Edit account">
                                             <i class="fa-solid fa-pen text-[11px]"></i>
                                         </button>
 
-                                        <button type="button"
-                                            onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
-                                            class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                            title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
-                                            <i
-                                                class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                        <button type="button" onclick="openToggleConfirm(
+        {{ $user->id }},
+        @js($user->status),
+        @js($user->name)
+    )" class="ui-action-btn {{ $user->status === 'active'
+        ? 'ui-action-warning'
+        : 'ui-action-success' }}" data-tooltip="{{ $user->status === 'active'
+        ? 'Deactivate account'
+        : 'Activate account' }}" aria-label="{{ $user->status === 'active'
+        ? 'Deactivate account'
+        : 'Activate account' }}">
+
+                                            <i class="fa-solid {{ $user->status === 'active'
+        ? 'fa-toggle-on'
+        : 'fa-toggle-off' }}">
+                                            </i>
                                         </button>
 
-                                        <button type="button"
-                                            onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                            class="action-btn btn-reset" title="Reset password">
-                                            <i class="fa-solid fa-key text-[11px]"></i>
+                                        <button type="button" onclick="openResetModal(
+                                        'users',
+                                        {{ $user->id }},
+                                        @js($user->name)
+                                        )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password"
+                                            aria-label="Reset password">
+
+                                            <i class="fa-solid fa-key"></i>
                                         </button>
 
                                         <button type="button" data-user-details='@json($userDetails)'
-                                            onclick="openViewModalFromButton(this)"
-                                            class="action-btn btn-view-details" title="View details">
+                                            onclick="openViewModalFromButton(this)" class="ui-action-btn ui-action-view"
+                                            data-tooltip="View details" aria-label="View details">
                                             <i class="fa-solid fa-eye text-[11px]"></i>
                                         </button>
                                     </div>
@@ -414,54 +525,14 @@ $inactiveCount = $inactiveCount ?? 0;
                     </div>
                 </div>
 
-                <div class="sl-pagebar um-pagebar">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <span class="sl-pagebar-info um-pagebar-info">
-                            Showing
-                            <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0
-                                }}</strong>
-                            of <strong>{{ $users->total() }}</strong> users
-                        </span>
+                <div class="global-pagebar global-pagebar-bottom">
+                    <span class="global-pagebar-info">
+                        Showing
+                        <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
+                        of <strong>{{ $users->total() }}</strong> users
+                    </span>
 
-                        <div class="sl-page-size-control global-page-size-control um-page-size-control">
-                            <label for="umPerPageSelect">Show</label>
-
-                            <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#umPerPageSelect" data-page-size-callback="umSelectPerPage">
-                                <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
-                                    aria-hidden="true">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
-                                        {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-
-                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                    aria-haspopup="listbox" aria-expanded="false">
-                                    <span data-page-size-value>{{ (int) ($perPage ?? 10) }}</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-
-                                <div class="global-page-size-menu" role="listbox">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <button type="button"
-                                        class="global-page-size-option {{ (int) ($perPage ?? 10) === $size ? 'is-selected' : '' }}"
-                                        data-page-size-option data-value="{{ $size }}" role="option"
-                                        aria-selected="{{ (int) ($perPage ?? 10) === $size ? 'true' : 'false' }}">
-                                        <span>{{ $size }}</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <span>per page</span>
-                        </div>
-                    </div>
-
-                    <div class="sl-pagination-wrap um-pagination-wrap">
-                    </div>
+                    <div class="global-pagination-wrap"></div>
                 </div>
             </div>
         </div>
@@ -482,8 +553,60 @@ $inactiveCount = $inactiveCount ?? 0;
                     <p class="text-[12px] text-gray-500">Share this with the new user before closing.</p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('generatedPasswordModal')" data-close-modal="generatedPasswordModal"
-                class="um-modal-x" aria-label="Close generated password modal">
+            <button type="button" onclick="closeModal('generatedPasswordModal')"
+                data-close-modal="generatedPasswordModal" class="um-modal-x"
+                aria-label="Close generated password modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <strong>{{ session('generated_user_password.name') }}</strong><br>
+                <span class="text-xs">{{ session('generated_user_password.email') }}</span>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Temporary Password
+                </label>
+                <div class="relative">
+                    <input type="text" id="generatedUserPasswordValue"
+                        value="{{ session('generated_user_password.password') }}"
+                        class="field-input w-full border border-gray-200 px-3.5 py-3 pr-24 text-sm bg-white font-mono"
+                        readonly>
+                    <button type="button" onclick="copyGeneratedPassword()"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-xs font-bold">
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="sl-pagination-wrap um-pagination-wrap">
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</main>
+
+<div class="modal-overlay" id="generatedPasswordModal" aria-hidden="true">
+    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
+        <div
+            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow">
+                    <i class="fa-solid fa-key text-white text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-800 text-base">Generated Password</h3>
+                    <p class="text-[12px] text-gray-500">Share this with the new user before closing.</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeModal('generatedPasswordModal')"
+                data-close-modal="generatedPasswordModal" class="um-modal-x"
+                aria-label="Close generated password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -517,13 +640,12 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay" id="addModal" aria-hidden="true">
+<div class="modal-overlay modal-theme-primary" id="addModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-lg" onclick="event.stopPropagation()">
         <div
-            class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+            class="um-user-modal-header modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
             <div class="flex items-center gap-3 min-w-0">
-                <div
-                    class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl modal-themed-icon flex-shrink-0">
                     <i class="fa-solid fa-user-plus text-white text-sm"></i>
                 </div>
                 <div class="min-w-0">
@@ -539,7 +661,7 @@ $inactiveCount = $inactiveCount ?? 0;
         </div>
 
         <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm"
-            class="flex-1 flex flex-col min-h-0">
+            class="flex-1 flex flex-col min-h-0" data-global-validation data-discard-changes novalidate>
             @csrf
 
             <div class="um-user-modal-body">
@@ -568,13 +690,13 @@ $inactiveCount = $inactiveCount ?? 0;
                         </div>
 
                         <div class="um-field-grid">
-                            <div class="um-field-full">
+                            <div class="um-field-full" data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Full Name <span class="text-red-500">*</span>
                                 </label>
                                 <div class="voice-search-row" data-voice-field>
                                     <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white"
+                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 bg-white"
                                         placeholder="e.g. Juan dela Cruz" required>
                                     <div class="voice-input-toggle">
                                         <button type="button" id="addNameMicBtn" class="voice-search-mic external"
@@ -589,14 +711,14 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </div>
                             </div>
 
-                            <div class="um-field-full">
+                            <div class="um-field-full" data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Email Address <span class="text-red-500">*</span>
                                 </label>
                                 <div class="voice-search-row" data-voice-field>
                                     <i class="fa-solid fa-envelope text-gray-400 text-xs flex-shrink-0 pl-1"></i>
                                     <input type="email" id="addEmailInput" name="email" value="{{ old('email') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white"
+                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 bg-white"
                                         placeholder="user@pup.edu.ph" required>
                                     <div class="voice-input-toggle">
                                         <button type="button" id="addEmailMicBtn" class="voice-search-mic external"
@@ -614,9 +736,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Role
                                 </label>
-                                <select name="role_id"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                                <select name="role_id" id="addRoleSelect" class="field-input js-custom-select">
                                     <option value="">No Role</option>
+
                                     @foreach ($roles as $role)
                                     <option value="{{ $role->id }}" {{ old('role_id')==$role->id ? 'selected' : '' }}>
                                         {{ $role->display_name }}
@@ -641,9 +763,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </label>
                                 <input type="text" id="addPhoneInput" name="phone" value="{{ old('phone') }}"
                                     class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white"
-                                    placeholder="09xx xxx xxxx" inputmode="numeric" autocomplete="tel"
-                                    maxlength="13">
-                                <p id="addPhoneInputFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
+                                    placeholder="09xx xxx xxxx" inputmode="numeric" autocomplete="tel" maxlength="13">
+                                <p id="addPhoneInputFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx
+                                </p>
                             </div>
 
                             <div>
@@ -662,8 +784,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <select id="addGenderInput" name="gender"
                                     class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
                                     <option value="">Select gender</option>
-                                    <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Male" {{ old('gender')==='Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ old('gender')==='Female' ? 'selected' : '' }}>Female
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -678,7 +801,7 @@ $inactiveCount = $inactiveCount ?? 0;
                             <div class="um-status-grid">
                                 <label class="um-status-card um-status-card--active">
                                     <input type="radio" name="status" value="active" {{ old('status', 'active'
-                                        )==='active' ? 'checked' : '' }}
+                                        )==='active' ? 'checked' : '' }} required
                                         style="accent-color:#8B0000; margin-top:.22rem;">
                                     <div class="min-w-0">
                                         <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
@@ -707,19 +830,20 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                             <div>
                                 <h4 class="text-base font-extrabold text-gray-800 leading-tight">Security Setup</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">A secure password will be generated automatically.</p>
+                                <p class="text-xs text-gray-500 mt-0.5">A secure password will be generated
+                                    automatically.</p>
                             </div>
                         </div>
 
                         <div class="space-y-4">
-                            <div>
+                            <div data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Generated Password
                                 </label>
                                 <div class="relative">
                                     <i
                                         class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                    <input type="password" name="password" id="addPassword"
+                                    <input type="password" name="password" id="addPassword" minlength="8"
                                         placeholder="Auto-generated password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
                                         readonly>
@@ -746,7 +870,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </div>
                             </div>
 
-                            <div>
+                            <div data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Confirm Password
                                 </label>
@@ -754,7 +878,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                     <i
                                         class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                                     <input type="password" name="password_confirmation" id="addPasswordConf"
-                                        placeholder="Matches generated password"
+                                        placeholder="Repeat password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
                                         readonly>
                                     <button type="button" onclick="togglePassVis('addPasswordConf','addEye2')"
@@ -773,14 +897,12 @@ $inactiveCount = $inactiveCount ?? 0;
             </div>
 
             <div class="modal-ft um-user-modal-footer">
-                <button type="button" onclick="closeModal('addModal')" class="modal-btn-ghost">
+                <button type="button" onclick="closeModal('addModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
-                <button type="submit" class="modal-btn-confirm-reject um-save-user-btn">
-                    <span class="btn-confirm-icon">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                    </span>
+                <button type="submit" class="ui-btn ui-btn-primary um-save-user-btn">
+                    <i class="fa-solid fa-floppy-disk"></i>
                     <span>Save User</span>
                 </button>
             </div>
@@ -788,13 +910,12 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay" id="editModal" aria-hidden="true">
+<div class="modal-overlay modal-theme-edit" id="editModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-md" onclick="event.stopPropagation()">
         <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+            class="modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
             <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow">
+                <div class="w-10 h-10 rounded-xl modal-themed-icon">
                     <i class="fa-solid fa-user-pen text-white text-sm"></i>
                 </div>
                 <div>
@@ -808,12 +929,12 @@ $inactiveCount = $inactiveCount ?? 0;
             </button>
         </div>
 
-        <form method="POST" id="editForm" class="p-6 space-y-4">
+        <form method="POST" id="editForm" class="p-6 space-y-4" data-global-validation datanovalidate>
             @csrf
             @method('PUT')
             <input type="hidden" id="editOriginalRole" value="">
 
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Full Name <span class="text-red-500">*</span>
                 </label>
@@ -836,7 +957,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Email Address <span class="text-red-500">*</span>
                 </label>
@@ -864,7 +985,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
                 <div class="um-custom-select" id="editRoleSelect" data-custom-select>
                     <input type="hidden" name="role_id" id="editRole" value="">
@@ -904,12 +1025,12 @@ $inactiveCount = $inactiveCount ?? 0;
                     autocomplete="current-password">
             </div>
 
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Status
                     <span class="text-red-500">*</span></label>
                 <div class="flex gap-4">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" id="editStatusActive" value="active"
+                        <input type="radio" name="status" id="editStatusActive" value="active" required
                             style="accent-color:#8B0000;">
                         <span class="text-sm text-gray-700 font-medium">Active</span>
                     </label>
@@ -958,26 +1079,25 @@ $inactiveCount = $inactiveCount ?? 0;
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('editModal')" class="modal-btn-ghost">
+                <button type="button" onclick="closeModal('editModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
-                <button type="submit"
-                    class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i> Update User
+
+                <button type="submit" class="ui-btn ui-btn-edit">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Update User</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Reset Password Modal -->
-<div class="modal-overlay" id="resetModal" aria-hidden="true">
+<div class="modal-overlay modal-theme-reset" id="resetModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
         <div
             class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
             <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow">
+                <div class="w-10 h-10 rounded-xl modal-themed-icon">
                     <i class="fa-solid fa-key text-white text-sm"></i>
                 </div>
                 <div>
@@ -991,9 +1111,9 @@ $inactiveCount = $inactiveCount ?? 0;
             </button>
         </div>
 
-        <form method="POST" id="resetForm" class="p-6 space-y-4">
+        <form method="POST" id="resetForm" class="p-6 space-y-4" data-global-validation data-discard-changes novalidate>
             @csrf
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
                     Password <span class="text-red-500">*</span></label>
                 <div class="relative">
@@ -1018,7 +1138,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div>
+            <div data-global-field>
                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
                     Password <span class="text-red-500">*</span></label>
 
@@ -1040,12 +1160,13 @@ $inactiveCount = $inactiveCount ?? 0;
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('resetModal')" class="modal-btn-ghost">
+                <button type="button" onclick="closeModal('resetModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
-                <button type="submit"
-                    class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold shadow transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-key"></i> Reset Password
+
+                <button type="submit" class="ui-btn ui-btn-reset-password">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Reset Password</span>
                 </button>
             </div>
         </form>
@@ -1207,7 +1328,7 @@ $inactiveCount = $inactiveCount ?? 0;
         </div>
 
         <div class="modal-ft um-view-details-foot">
-            <button type="button" onclick="closeModal('viewModal')" class="modal-btn-ghost">
+            <button type="button" onclick="closeModal('viewModal')" class="ui-btn ui-btn-secondary">
                 Close
             </button>
         </div>
@@ -1217,9 +1338,10 @@ $inactiveCount = $inactiveCount ?? 0;
 <div class="modal-overlay" id="toggleConfirmModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
         <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+            class="modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
             <div class="flex items-center gap-3">
-                <div id="toggleModalIcon" class="w-10 h-10 rounded-xl flex items-center justify-center shadow">
+                <div id="toggleModalIcon" class="w-10 h-10 rounded-xl modal-themed-icon">
+                    <i class="fa-solid fa-question-circle text-white text-sm"></i>
                 </div>
                 <div>
                     <h3 class="font-extrabold text-gray-800 text-base" id="toggleModalTitle">Confirm Action</h3>
@@ -1236,13 +1358,12 @@ $inactiveCount = $inactiveCount ?? 0;
             <div id="toggleModalBody" class="rounded-xl p-4 mb-5 flex items-start gap-3 text-sm"></div>
 
             <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-btn-ghost">
+                <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
                 <form id="toggleConfirmForm" method="POST">
                     @csrf
-                    <button type="submit" id="toggleConfirmBtn"
-                        class="px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2">
+                    <button type="submit" id="toggleConfirmBtn" class="ui-btn ui-btn-primary">
                     </button>
                 </form>
             </div>
@@ -1472,8 +1593,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 '<i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-amber-800">' +
                 userName +
                 '</strong><span class="text-amber-700"> will be <strong>deactivated</strong>. They will no longer be able to log in until reactivated.</span></div>';
-            btn.className =
-                'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-amber-500 hover:bg-amber-600';
+            btn.className = 'ui-btn ui-btn-warning';
             btn.innerHTML = '<i class="fa-solid fa-user-slash"></i> Deactivate';
         } else {
             icon.className =
@@ -1487,8 +1607,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 '<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-emerald-800">' +
                 userName +
                 '</strong><span class="text-emerald-700"> will be <strong>activated</strong>. They will regain full access to the system.</span></div>';
-            btn.className =
-                'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700';
+            btn.className = 'ui-btn ui-btn-success';
             btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Activate';
         }
 
@@ -2145,6 +2264,40 @@ $inactiveCount = $inactiveCount ?? 0;
             .replace(/'/g, '&#039;');
     }
 
+    function normalizeUmRole(user) {
+        const rawName = String(
+            user.role_name ??
+            user.role?.display_name ??
+            user.role?.name ??
+            ''
+        ).trim();
+
+        const rawSlug = String(
+            user.role_slug ??
+            user.role?.slug ??
+            ''
+        ).trim().toLowerCase();
+
+        const invalidValues = [
+            '',
+            '-',
+            '—',
+            'null',
+            'undefined',
+            'none',
+            'no-role'
+        ];
+
+        const hasNoRole =
+            invalidValues.includes(rawName.toLowerCase()) ||
+            !user.role_id;
+
+        return {
+            label: hasNoRole ? 'No Role' : rawName,
+            slug: hasNoRole ? 'none' : rawSlug || 'none'
+        };
+    }
+
     function umRenderRows(users) {
         function jsAttr(value) {
             return JSON.stringify(value ?? '').replace(/"/g, '&quot;');
@@ -2200,8 +2353,14 @@ $inactiveCount = $inactiveCount ?? 0;
 
         users.forEach(function (user, index) {
             var rowNumber = startNumber + index;
-            var roleSlug = (user.role_slug || '').toLowerCase();
-            var roleLabel = user.role_name || 'No Role';
+            var normalizedRole =
+                normalizeUmRole(user);
+
+            var roleSlug =
+                normalizedRole.slug;
+
+            var roleLabel =
+                normalizedRole.label;
             var registeredDay = user.created_at_day || '—';
 
             var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
@@ -2250,15 +2409,15 @@ $inactiveCount = $inactiveCount ?? 0;
                     </td>
 
                     <td class="py-3.5 px-4">
-                        <div class="um-action-group flex items-center justify-center gap-1">
+                        <div class="ui-action-group">
                             <button type="button"
                                 data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                                    phone_raw: '',
-                                    birthdate_raw: '',
-                                    gender_raw: ''
-                                }))}"
+                phone_raw: '',
+                birthdate_raw: '',
+                gender_raw: ''
+            }))}"
                                 onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                                class="action-btn btn-edit" title="Edit account">
+                                class="ui-action-btn ui-action-edit" title="Edit account">
                                 <i class="fa-solid fa-pen text-[11px]"></i>
                             </button>
 
@@ -2271,20 +2430,20 @@ $inactiveCount = $inactiveCount ?? 0;
 
                             <button type="button"
                                 onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                                class="action-btn btn-reset" title="Reset password">
+                                class="ui-action-btn ui-action-reset" title="Reset password">
                                 <i class="fa-solid fa-key text-[11px]"></i>
                             </button>
 
                             <button type="button"
                                 data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                                    id: user.id,
-                                    name: user.name,
-                                    email: user.email,
-                                    role: roleLabel,
-                                    status: statusLabel,
-                                    source: 'Users',
-                                    created_at: createdFull
-                                }))}"
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: roleLabel,
+                status: statusLabel,
+                source: 'Users',
+                created_at: createdFull
+            }))}"
                                 onclick="openViewModalFromButton(this)"
                                 class="action-btn btn-view-details"
                                 title="View details">
@@ -2316,30 +2475,44 @@ $inactiveCount = $inactiveCount ?? 0;
                     </div>
 
                     <div class="um-grid-meta">
-                        <div class="um-grid-field">
-                            <div class="um-grid-label">Role</div>
-                            <div class="um-grid-value">
-                                <span class="badge-role role-${roleSlug || 'none'}">
-    ${roleLabel}
-</span>
-                            </div>
-                        </div>
+    <div class="um-grid-field">
+        <div class="um-grid-label">
+            Role
+        </div>
 
-                        <div class="um-grid-field">
-                            <div class="um-grid-label">Registered</div>
-                            <div class="um-grid-value">${registeredDay}</div>
-                        </div>
-                    </div>
+        <div class="um-grid-value">
+            <span class="badge-role role-${roleSlug || 'none'}">
+                ${roleLabel}
+            </span>
+        </div>
+    </div>
+
+    <div class="um-grid-field">
+        <div class="um-grid-label">
+            Registered
+        </div>
+
+        <div class="um-registered-date">
+            <span class="um-registered-icon">
+                <i class="fa-solid fa-calendar-day"></i>
+            </span>
+
+            <span class="um-registered-text">
+                ${registeredDay}
+            </span>
+        </div>
+    </div>
+</div>
 
                     <div class="flex items-center justify-end gap-1 flex-wrap">
                         <button type="button"
                             data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                                phone_raw: '',
-                                birthdate_raw: '',
-                                gender_raw: ''
-                            }))}"
+                phone_raw: '',
+                birthdate_raw: '',
+                gender_raw: ''
+            }))}"
                             onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                            class="action-btn btn-edit" title="Edit account">
+                            class="ui-action-btn ui-action-edit" title="Edit account">
                             <i class="fa-solid fa-pen text-[11px]"></i>
                         </button>
 
@@ -2352,23 +2525,22 @@ $inactiveCount = $inactiveCount ?? 0;
 
                         <button type="button"
                             onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                            class="action-btn btn-reset" title="Reset password">
+                            class="ui-action-btn ui-action-reset" title="Reset password">
                             <i class="fa-solid fa-key text-[11px]"></i>
                         </button>
 
                         <button type="button"
                             data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                                id: user.id,
-                                name: user.name,
-                                email: user.email,
-                                role: roleLabel,
-                                status: statusLabel,
-                                source: 'Users',
-                                created_at: createdFull
-                            }))}"
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: roleLabel,
+                status: statusLabel,
+                source: 'Users',
+                created_at: createdFull
+            }))}"
                             onclick="openViewModalFromButton(this)"
-                            class="action-btn btn-view-details"
-                            title="View details">
+                            class="ui-action-btn ui-action-view" title="View details">
                             <i class="fa-solid fa-eye text-[11px]"></i>
                         </button>
                     </div>
@@ -2389,13 +2561,17 @@ $inactiveCount = $inactiveCount ?? 0;
     function umRenderPagebar(p) {
         if (!p) return;
 
-        document.querySelectorAll('.um-pagebar-info').forEach(function (el) {
+        document.querySelectorAll(
+            '.user-management-page .global-pagebar-info'
+        ).forEach(function (el) {
             el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total +
                 '</strong> users';
         });
 
         var html = umBuildPagination(p);
-        document.querySelectorAll('.um-pagination-wrap').forEach(function (el) {
+        document.querySelectorAll(
+            '.user-management-page .global-pagination-wrap'
+        ).forEach(function (el) {
             el.innerHTML = html;
         });
 
@@ -2421,45 +2597,126 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function umBuildPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) return '';
-
-        var current = Number(p.current_page || 1);
-        var last = Number(p.last_page || 1);
-        var winSize = 5;
-        var half = Math.floor(winSize / 2);
-
-        var start = Math.max(1, current - half);
-        var end = Math.min(last, start + winSize - 1);
-
-        if (end - start + 1 < winSize) {
-            start = Math.max(1, end - winSize + 1);
+        if (!p || Number(p.last_page || 1) <= 1) {
+            return '';
         }
 
-        var html = '<nav class="sl-pagination" aria-label="User pagination">';
+        const current = Number(p.current_page || 1);
+        const last = Number(p.last_page || 1);
+        const windowSize = 5;
+        const half = Math.floor(windowSize / 2);
 
-        html += current <= 1
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
-            : '<button type="button" onclick="umGoPage(' + (current - 1) + ')" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>';
+        let start = Math.max(1, current - half);
+        let end = Math.min(last, start + windowSize - 1);
+
+        if (end - start + 1 < windowSize) {
+            start = Math.max(1, end - windowSize + 1);
+        }
+
+        let html = `
+        <nav class="global-pagination" aria-label="User pagination">
+    `;
+
+        html += current <= 1 ?
+            `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Previous page"
+                disabled>
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        ` :
+            `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${current - 1})"
+                aria-label="Previous page">
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        `;
 
         if (start > 1) {
-            html += '<button type="button" onclick="umGoPage(1)" class="sl-page-btn">1</button>';
-            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(1)">
+                1
+            </button>
+        `;
+
+            if (start > 2) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
         }
 
-        for (var i = start; i <= end; i++) {
-            html += i === current
-                ? '<span class="sl-page-current" aria-current="page">' + i + '</span>'
-                : '<button type="button" onclick="umGoPage(' + i + ')" class="sl-page-btn">' + i + '</button>';
+        for (let page = start; page <= end; page++) {
+            html += page === current ?
+                `
+                <span
+                    class="global-page-current"
+                    aria-current="page">
+                    ${page}
+                </span>
+            ` :
+                `
+                <button
+                    type="button"
+                    class="global-page-btn"
+                    onclick="umGoPage(${page})">
+                    ${page}
+                </button>
+            `;
         }
 
         if (end < last) {
-            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += '<button type="button" onclick="umGoPage(' + last + ')" class="sl-page-btn">' + last + '</button>';
+            if (end < last - 1) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
+
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${last})">
+                ${last}
+            </button>
+        `;
         }
 
-        html += current >= last
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
-            : '<button type="button" onclick="umGoPage(' + (current + 1) + ')" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>';
+        html += current >= last ?
+            `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Next page"
+                disabled>
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        ` :
+            `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${current + 1})"
+                aria-label="Next page">
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        `;
 
         html += '</nav>';
 
@@ -2624,9 +2881,16 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     var editForm = document.getElementById('editForm');
+
     if (editForm) {
         editForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const validation = window.validateGlobalForm?.(this);
+
+            if (validation && !validation.valid) {
+                return;
+            }
 
             var form = this;
             var url = form.action;
@@ -2655,9 +2919,11 @@ $inactiveCount = $inactiveCount ?? 0;
             params.append('status', form.querySelector('input[name="status"]:checked')?.value ??
                 '');
 
-            if (String(document.getElementById('editRole').value || '') !== String(document.getElementById(
-                'editOriginalRole').value || '')) {
-                params.append('admin_current_password', document.getElementById('editAdminCurrentPassword')
+            if (String(document.getElementById('editRole').value || '') !== String(document
+                .getElementById(
+                    'editOriginalRole').value || '')) {
+                params.append('admin_current_password', document.getElementById(
+                    'editAdminCurrentPassword')
                     .value);
             }
 
@@ -2724,6 +2990,12 @@ $inactiveCount = $inactiveCount ?? 0;
     if (resetForm) {
         resetForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const validation = window.validateGlobalForm?.(this);
+
+            if (validation && !validation.valid) {
+                return;
+            }
 
             var form = this;
             var url = form.action;

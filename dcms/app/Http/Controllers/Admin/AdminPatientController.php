@@ -54,18 +54,24 @@ class AdminPatientController extends Controller
 
         $allCount = $appointments->count();
 
-        $notifications = []; // palitan later if meron kang notifications query
+        $notifications = [];
 
-        return view('admin.admin-patient', compact(
-            'appointments',
-            'todayCount',
-            'upcomingCount',
-            'rescheduledCount',
-            'cancelledCount',
-            'completedCount',
-            'allCount',
-            'notifications'
-        ));
+        return view('shared.patient-list', [
+            'layoutRole' => 'admin',
+            'pageTitle' => 'Patient List',
+            'pageShellClass' => 'admin-page-shell',
+            'isDentistView' => false,
+            'patientProfileRouteName' => 'admin.admin.patient.profile',
+
+            'appointments' => $appointments,
+            'todayCount' => $todayCount,
+            'upcomingCount' => $upcomingCount,
+            'rescheduledCount' => $rescheduledCount,
+            'cancelledCount' => $cancelledCount,
+            'completedCount' => $completedCount,
+            'allCount' => $allCount,
+            'notifications' => $notifications,
+        ]);
     }
 
     public function show(Patient $patient)

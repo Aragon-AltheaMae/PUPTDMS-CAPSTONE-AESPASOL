@@ -1870,48 +1870,54 @@ window.openInventoryModal = openModal;
 window.closeInventoryModal = closeModal;
 window.closeOnBackdrop = closeModalOnBackdrop;
 
-function openFilterDrawer(panelId = 'filterPanel', overlayId = 'filterOverlay') {
+function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
-    const overlay = document.getElementById(overlayId);
+
+    if (!panel) return;
+
+    const overlay = overlayId
+        ? document.getElementById(overlayId)
+        : panel.querySelector('.filter-drawer-overlay');
 
     document.documentElement.classList.add('filter-lock');
     document.body.classList.add('filter-lock');
 
-    if (panel) {
-        panel.classList.remove('closing');
-        panel.classList.add('open');
-        panel.setAttribute('aria-hidden', 'false');
-    }
+    panel.classList.remove('closing');
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
 
     overlay?.classList.add('open');
 }
 
-function closeFilterDrawer(panelId = 'filterPanel', overlayId = 'filterOverlay') {
+function closeFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
-    const overlay = document.getElementById(overlayId);
+
+    if (!panel) return;
+
+    const overlay = overlayId
+        ? document.getElementById(overlayId)
+        : panel.querySelector('.filter-drawer-overlay');
 
     overlay?.classList.remove('open');
 
-    if (panel) {
-        panel.classList.remove('open');
-        panel.classList.add('closing');
-        panel.setAttribute('aria-hidden', 'true');
+    panel.classList.remove('open');
+    panel.classList.add('closing');
+    panel.setAttribute('aria-hidden', 'true');
 
-        window.clearTimeout(panel.__filterCloseTimer);
-        panel.__filterCloseTimer = window.setTimeout(() => {
-            panel.classList.remove('closing');
+    window.clearTimeout(panel.__filterCloseTimer);
 
-            if (!document.querySelector('.filter-drawer-wrapper.open, .filter-drawer-wrapper.closing')) {
-                document.documentElement.classList.remove('filter-lock');
-                document.body.classList.remove('filter-lock');
-            }
-        }, 300);
+    panel.__filterCloseTimer = window.setTimeout(() => {
+        panel.classList.remove('closing');
 
-        return;
-    }
+        const anotherDrawerIsActive = document.querySelector(
+            '.filter-drawer-wrapper.open, .filter-drawer-wrapper.closing'
+        );
 
-    document.documentElement.classList.remove('filter-lock');
-    document.body.classList.remove('filter-lock');
+        if (!anotherDrawerIsActive) {
+            document.documentElement.classList.remove('filter-lock');
+            document.body.classList.remove('filter-lock');
+        }
+    }, 300);
 }
 
 window.openFilterDrawer = openFilterDrawer;
@@ -2019,17 +2025,145 @@ function isContactInput(field) {
     return /(^|[\s._-])(phone|mobile|contact[-_]?number|contact[-_]?no|emergency[-_]?number|emergency[-_]?contact[-_]?no)($|[\s._-])/.test(key);
 }
 
+function getGlobalFieldLabel(field) {
+    if (!field) return 'This field';
+
+    const explicitLabel = field.id
+        ? document.querySelector(`label[for="${CSS.escape(field.id)}"]`)
+        : null;
+
+    const friendlyNames = {
+        name: 'Full Name',
+        email: 'Email Address',
+        password: 'Password',
+        password_confirmation: 'Confirm Password',
+        role_id: 'Role',
+        status: 'Status',
+    };
+
+    const fallbackName =
+        friendlyNames[field.name] ||
+        field.name ||
+        'This field';
+
+    const labelText =
+        explicitLabel?.textContent ||
+        field.closest('[data-global-field]')
+            ?.querySelector('label')
+            ?.textContent ||
+        field.closest(
+            '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
+        )?.querySelector('label')?.textContent ||
+        field.closest(
+            '.field-group, .form-group, .st-form-group'
+        )?.querySelector('label')?.textContent ||
+        field.dataset.fieldLabel ||
+        fallbackName;
+
+    return String(labelText)
+        .replace(/\*/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function getFormInputValidationMessage(field) {
-    if (!field || field.disabled || field.readOnly) return '';
+    if (!field || field.disabled) return '';
+
+    if (
+        field.readOnly &&
+        !field.required &&
+        !field.hasAttribute('data-validation-rule')
+    ) {
+        return '';
+    }
 
     const type = String(field.type || '').toLowerCase();
-    const ignoredTypes = ['hidden', 'password', 'file', 'submit', 'button', 'reset', 'checkbox', 'radio'];
-
-    if (ignoredTypes.includes(type)) return '';
-
     const value = String(field.value || '').trim();
+    const label = getGlobalFieldLabel(field);
+
+    if (type === 'radio') {
+        if (!field.required) return '';
+
+        const form = field.form || document;
+        const radioGroup = form.querySelectorAll(
+            `input[type="radio"][name="${CSS.escape(field.name)}"]`
+        );
+
+        const hasChecked = Array.from(radioGroup)
+            .some(radio => radio.checked);
+
+        return hasChecked
+            ? ''
+            : `Please select a ${label.toLowerCase()}.`;
+    }
+
+    if (type === 'checkbox') {
+        return field.required && !field.checked
+            ? `Please check ${label.toLowerCase()}.`
+            : '';
+    }
+
+    if (field.required && !value) {
+        if (field.dataset.requiredMessage) {
+            return field.dataset.requiredMessage;
+        }
+
+        if (field instanceof HTMLSelectElement) {
+            return `Please select a ${label.toLowerCase()}.`;
+        }
+
+        if (type === 'email') {
+            return 'Please enter an email address.';
+        }
+
+        if (type === 'password') {
+            if (field.name === 'password_confirmation') {
+                return 'Please confirm the password.';
+            }
+
+            return 'Please enter a password.';
+        }
+
+        return `Please enter ${label.toLowerCase()}.`;
+    }
 
     if (!value) return '';
+
+    if (type === 'email' && !field.validity.valid) {
+        return 'Please enter a valid email address.';
+    }
+
+    if (
+        field.hasAttribute('minlength') &&
+        value.length < Number(field.getAttribute('minlength'))
+    ) {
+        return `${label} must contain at least ${field.getAttribute('minlength')} characters.`;
+    }
+    if (
+        field.name === 'password_confirmation' &&
+        field.form
+    ) {
+        const passwordField =
+            field.form.querySelector('[name="password"]');
+
+        if (
+            passwordField &&
+            value !== String(passwordField.value || '')
+        ) {
+            return 'Passwords do not match.';
+        }
+    }
+    if (
+        field.hasAttribute('maxlength') &&
+        value.length > Number(field.getAttribute('maxlength'))
+    ) {
+        return `${label} must not exceed ${field.getAttribute('maxlength')} characters.`;
+    }
+
+    if (field.validity.patternMismatch) {
+        return field.dataset.patternMessage ||
+            `Please enter a valid ${label.toLowerCase()}.`;
+    }
 
     if (isContactInput(field) && !/^\d{11}$/.test(value)) {
         return 'Contact number must be exactly 11 digits.';
@@ -2038,60 +2172,403 @@ function getFormInputValidationMessage(field) {
     if (isUnsafeFormText(value)) {
         return 'Please enter readable text only. Scripts and SQL-like input are not allowed.';
     }
+    const customRuleMessage = runGlobalValidationRule(field);
 
+    if (customRuleMessage) {
+        return customRuleMessage;
+    }
     return '';
 }
 
-function showFormInputValidationMessage(field, message) {
-    field.setCustomValidity(message);
-    field.classList.toggle('is-invalid', Boolean(message));
+const globalValidationRules = new Map();
 
-    const errorId = field.dataset.errorTarget || field.dataset.charError || `err-${field.id || field.name}`;
-    const error = errorId ? document.getElementById(String(errorId).replace('#', '')) : null;
+function registerGlobalValidationRule(name, validator) {
+    if (!name || typeof validator !== 'function') return;
+
+    globalValidationRules.set(name, validator);
+}
+
+function runGlobalValidationRule(field) {
+    const ruleName = field?.dataset?.validationRule;
+
+    if (!ruleName) return '';
+
+    const validator = globalValidationRules.get(ruleName);
+
+    if (typeof validator !== 'function') return '';
+
+    return validator(field) || '';
+}
+
+window.registerGlobalValidationRule = registerGlobalValidationRule;
+
+registerGlobalValidationRule(
+    'notFutureDate',
+    function (field) {
+        if (!field.value) return '';
+
+        const picked = new Date(
+            `${field.value}T00:00:00`
+        );
+
+        if (Number.isNaN(picked.getTime())) {
+            return 'Please enter a valid date.';
+        }
+
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+
+        return picked > today
+            ? 'Date cannot be in the future.'
+            : '';
+    }
+);
+
+registerGlobalValidationRule(
+    'wholeNumber',
+    function (field) {
+        if (!field.value) return '';
+
+        const value = Number(field.value);
+
+        if (
+            !Number.isInteger(value) ||
+            value < 0
+        ) {
+            return 'Please enter a whole number greater than or equal to 0.';
+        }
+
+        return '';
+    }
+);
+
+registerGlobalValidationRule(
+    'inventoryConsumed',
+    function (field) {
+        if (!field.value) return '';
+
+        const consumed = Number(field.value);
+
+        if (
+            !Number.isInteger(consumed) ||
+            consumed < 0
+        ) {
+            return 'Consumed must be a whole number greater than or equal to 0.';
+        }
+
+        const form = field.form;
+
+        const quantityField =
+            form?.querySelector(
+                '[name="qty"]'
+            );
+
+        const quantity = Number(
+            quantityField?.value || 0
+        );
+
+        return consumed > quantity
+            ? 'Consumed cannot exceed quantity.'
+            : '';
+    }
+);
+
+const globalFormValidationRules = new Map();
+
+function registerGlobalFormValidationRule(name, validator) {
+    if (!name || typeof validator !== 'function') return;
+
+    globalFormValidationRules.set(name, validator);
+}
+
+function runGlobalFormValidationRule(form) {
+    const ruleName = form?.dataset?.formValidationRule;
+
+    if (!ruleName) {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    const validator = globalFormValidationRules.get(ruleName);
+
+    if (typeof validator !== 'function') {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    return validator(form) || {
+        valid: true,
+        firstInvalid: null
+    };
+}
+
+function ensureGlobalGroupError(group, key) {
+    if (!group) return null;
+
+    const container =
+        group.closest('[data-global-field]') ||
+        group.parentElement;
+
+    if (!container) return null;
+
+    let error = container.querySelector(
+        `.global-field-error[data-error-for="${CSS.escape(key)}"]`
+    );
+
+    if (!error) {
+        error = document.createElement('div');
+        error.className = 'global-field-error';
+        error.dataset.errorFor = key;
+        container.appendChild(error);
+    }
+
+    return error;
+}
+
+function showGlobalGroupError(group, key, message) {
+    if (!group) return;
+
+    const error = ensureGlobalGroupError(group, key);
+
+    group.classList.toggle('is-invalid', Boolean(message));
+
+    if (!error) return;
+
+    error.innerHTML = message
+        ? `
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>${escapeHtml(message)}</span>
+          `
+        : '';
+
+    error.classList.toggle('show', Boolean(message));
+}
+
+function clearGlobalGroupError(group, key) {
+    showGlobalGroupError(group, key, '');
+}
+
+window.showGlobalGroupError = showGlobalGroupError;
+window.clearGlobalGroupError = clearGlobalGroupError;
+
+window.registerGlobalFormValidationRule = registerGlobalFormValidationRule;
+
+window.dispatchEvent(
+    new CustomEvent('global-validation-ready')
+);
+
+function getGlobalFieldContainer(field) {
+    if (!field) return null;
+
+    const explicitContainer = field.closest('[data-global-field]');
+
+    if (explicitContainer) {
+        return explicitContainer;
+    }
+
+    const userManagementContainer = field.closest(
+        '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
+    );
+
+    if (userManagementContainer) {
+        return userManagementContainer;
+    }
+
+    return field.closest(
+        '.field-group, .form-group, .st-form-group, [data-field-wrapper]'
+    ) || field.parentElement;
+}
+
+function getGlobalFieldControlHost(field) {
+    if (!field) return null;
+
+    if (field instanceof HTMLSelectElement) {
+        return field.closest('.custom-select') || field;
+    }
+
+    if (field.type === 'radio' || field.type === 'checkbox') {
+        return field.closest(
+            '.um-status-grid, .radio-group, .checkbox-group'
+        ) || field;
+    }
+
+    return field;
+}
+
+function ensureGlobalFieldError(field) {
+    const container = getGlobalFieldContainer(field);
+
+    if (!container) return null;
+
+    const fieldKey = field.id || field.name;
+
+    if (!fieldKey) return null;
+
+    let error = container.querySelector(
+        `.global-field-error[data-error-for="${CSS.escape(fieldKey)}"]`
+    );
 
     if (error) {
-        error.innerHTML = message
-            ? `<i class="fa-solid fa-circle-exclamation" style="font-size:9px;"></i> ${escapeHtml(message)}`
+        return error;
+    }
+
+    error = document.createElement('div');
+    error.className = 'global-field-error';
+    error.dataset.errorFor = fieldKey;
+
+    container.appendChild(error);
+
+    return error;
+}
+
+function showFormInputValidationMessage(field, message) {
+    if (!field) return;
+
+    field.setCustomValidity('');
+
+    const hasError = Boolean(message);
+    const controlHost = getGlobalFieldControlHost(field);
+    const customSelect = field.closest?.('.custom-select');
+
+    field.classList.toggle('is-invalid', hasError);
+
+    if (
+        controlHost &&
+        controlHost !== field &&
+        !customSelect
+    ) {
+        controlHost.classList.toggle('is-invalid', hasError);
+    }
+
+    customSelect?.classList.toggle('is-invalid', hasError);
+
+    const error = ensureGlobalFieldError(field);
+
+    if (error) {
+        error.innerHTML = hasError
+            ? `
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${escapeHtml(message)}</span>
+              `
             : '';
+
+        error.classList.toggle('show', hasError);
+        error.setAttribute(
+            'aria-hidden',
+            hasError ? 'false' : 'true'
+        );
+    }
+
+    if (field.id && error) {
+        error.id = `${field.id}-global-error`;
+
+        if (hasError) {
+            field.setAttribute('aria-invalid', 'true');
+            field.setAttribute(
+                'aria-describedby',
+                error.id
+            );
+        } else {
+            field.removeAttribute('aria-invalid');
+
+            if (
+                field.getAttribute('aria-describedby') === error.id
+            ) {
+                field.removeAttribute('aria-describedby');
+            }
+        }
     }
 }
 
 function validateFormInputField(field) {
     const message = getFormInputValidationMessage(field);
+
     showFormInputValidationMessage(field, message);
 
     return !message;
 }
 
-function bindFormInputValidation(root = document) {
-    root.querySelectorAll('form').forEach(form => {
-        if (form.dataset.formInputValidationInitialized === 'true') return;
+function focusGlobalInvalidField(field) {
+    if (!field) return;
 
-        form.dataset.formInputValidationInitialized = 'true';
+    const customSelect = field.closest?.('.custom-select');
 
-        form.addEventListener('input', event => {
-            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-                validateFormInputField(event.target);
-            }
-        });
+    const target =
+        customSelect?.querySelector('.custom-select-button') ||
+        field;
 
-        form.addEventListener('change', event => {
-            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-                validateFormInputField(event.target);
-            }
-        });
-
-        form.addEventListener('submit', event => {
-            const fields = Array.from(form.querySelectorAll('input, textarea'));
-            const invalidField = fields.find(field => !validateFormInputField(field));
-
-            if (!invalidField) return;
-
-            event.preventDefault();
-            invalidField.reportValidity();
-            invalidField.focus({ preventScroll: false });
-        });
+    target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
     });
+
+    window.setTimeout(() => {
+        target.focus({
+            preventScroll: true
+        });
+    }, 280);
+}
+
+function bindFormInputValidation(root = document) {
+    const scope =
+        root && typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll('form[data-global-validation]')
+        .forEach(form => {
+            if (
+                form.dataset.formInputValidationInitialized === 'true'
+            ) {
+                return;
+            }
+
+            form.dataset.formInputValidationInitialized = 'true';
+
+            form.setAttribute('novalidate', '');
+
+            const validateEventField = event => {
+                const field = event.target;
+
+                if (
+                    field instanceof HTMLInputElement ||
+                    field instanceof HTMLTextAreaElement ||
+                    field instanceof HTMLSelectElement
+                ) {
+                    validateFormInputField(field);
+                }
+            };
+
+            form.addEventListener('input', validateEventField);
+            form.addEventListener('change', validateEventField);
+            form.addEventListener('blur', validateEventField, true);
+
+            form.addEventListener('submit', event => {
+                const result = validateGlobalForm(form);
+
+                if (result.valid) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+            const passwordField =
+                form.querySelector('[name="password"]');
+
+            const confirmationField =
+                form.querySelector('[name="password_confirmation"]');
+
+            passwordField?.addEventListener('input', () => {
+                if (confirmationField?.value) {
+                    validateFormInputField(confirmationField);
+                }
+            });
+        });
 }
 
 function bindCharLimitField(field) {
@@ -2134,10 +2611,69 @@ document.addEventListener('DOMContentLoaded', () => {
     bindFormInputValidation();
 });
 
+function validateGlobalForm(form, options = {}) {
+    if (!form) {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    const fields = Array.from(
+        form.querySelectorAll(
+            'input:not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select'
+        )
+    );
+
+    const processedRadioGroups = new Set();
+    let firstInvalid = null;
+
+    fields.forEach(field => {
+        if (
+            field.type === 'radio' &&
+            processedRadioGroups.has(field.name)
+        ) {
+            return;
+        }
+
+        if (field.type === 'radio') {
+            processedRadioGroups.add(field.name);
+        }
+
+        const valid = validateFormInputField(field);
+
+        if (!valid && !firstInvalid) {
+            firstInvalid = field;
+        }
+    });
+
+    if (
+        firstInvalid &&
+        options.focus !== false
+    ) {
+        focusGlobalInvalidField(firstInvalid);
+    }
+
+    const customResult = runGlobalFormValidationRule(form);
+
+    if (!customResult.valid && !firstInvalid) {
+        firstInvalid = customResult.firstInvalid || null;
+    }
+
+    return {
+        valid: !firstInvalid && customResult.valid,
+        firstInvalid: firstInvalid || customResult.firstInvalid || null
+    };
+}
+
+window.validateGlobalForm = validateGlobalForm;
+
 window.validateCharLimit = validateCharLimit;
 window.initCharLimitFields = initCharLimitFields;
 window.bindFormInputValidation = bindFormInputValidation;
 window.validateFormInputField = validateFormInputField;
+window.focusGlobalInvalidField = focusGlobalInvalidField;
+window.showFormInputValidationMessage = showFormInputValidationMessage;
 
 function formatStockNo(input) {
     if (!input) return;
@@ -3540,3 +4076,252 @@ window.initGlobalVoiceInputs = initGlobalVoiceInputs;
 
 document.addEventListener('DOMContentLoaded', initDashboardLogsViewToggle);
 window.initDashboardLogsViewToggle = initDashboardLogsViewToggle;
+
+function closeCustomSelects(except = null) {
+    document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {
+        if (wrapper === except) return;
+
+        wrapper.classList.remove('is-open', 'drop-up');
+
+        wrapper
+            .querySelector('.custom-select-button')
+            ?.setAttribute('aria-expanded', 'false');
+    });
+}
+
+function syncCustomSelect(wrapper) {
+    const select = wrapper.querySelector('select');
+    const valueText = wrapper.querySelector('[data-custom-select-value]');
+    const button = wrapper.querySelector('.custom-select-button');
+
+    if (!select || !valueText || !button) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    valueText.textContent =
+        selectedOption?.textContent?.trim() ||
+        select.dataset.placeholder ||
+        'Select option';
+
+    wrapper.classList.toggle('is-disabled', select.disabled);
+    wrapper.classList.toggle('has-value', Boolean(select.value));
+
+    button.disabled = select.disabled;
+
+    wrapper
+        .querySelectorAll('.custom-select-option')
+        .forEach(option => {
+            const isActive =
+                Number(option.dataset.index) === select.selectedIndex;
+
+            option.classList.toggle('is-active', isActive);
+            option.setAttribute(
+                'aria-selected',
+                isActive ? 'true' : 'false'
+            );
+        });
+}
+
+function positionCustomSelectMenu(wrapper) {
+    if (!wrapper) return;
+
+    const button = wrapper.querySelector('.custom-select-button');
+    const menu = wrapper.querySelector('.custom-select-menu');
+
+    if (!button || !menu) return;
+
+    wrapper.classList.remove('drop-up');
+
+    menu.style.removeProperty('--custom-select-max-height');
+
+    const buttonRect = button.getBoundingClientRect();
+
+    const scrollContainer = wrapper.closest(
+        '.um-user-modal-body, .modal-body, [data-modal-scroll], dialog'
+    );
+
+    const boundaryRect = scrollContainer?.getBoundingClientRect();
+
+    const boundaryTop = boundaryRect
+        ? Math.max(boundaryRect.top, 8)
+        : 8;
+
+    const boundaryBottom = boundaryRect
+        ? Math.min(boundaryRect.bottom, window.innerHeight - 8)
+        : window.innerHeight - 8;
+
+    const spaceBelow = boundaryBottom - buttonRect.bottom - 10;
+    const spaceAbove = buttonRect.top - boundaryTop - 10;
+
+    const previousDisplay = menu.style.display;
+    const previousVisibility = menu.style.visibility;
+    const previousPointerEvents = menu.style.pointerEvents;
+
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    menu.style.pointerEvents = 'none';
+
+    const preferredHeight = Math.min(
+        Math.max(menu.scrollHeight, 96),
+        260
+    );
+
+    menu.style.display = previousDisplay;
+    menu.style.visibility = previousVisibility;
+    menu.style.pointerEvents = previousPointerEvents;
+
+    const shouldOpenUp =
+        spaceBelow < preferredHeight &&
+        spaceAbove > spaceBelow;
+
+    wrapper.classList.toggle('drop-up', shouldOpenUp);
+
+    const availableSpace = shouldOpenUp
+        ? spaceAbove
+        : spaceBelow;
+
+    const maxHeight = Math.max(
+        96,
+        Math.min(260, availableSpace)
+    );
+
+    menu.style.setProperty(
+        '--custom-select-max-height',
+        `${maxHeight}px`
+    );
+}
+
+function initCustomSelects(root = document) {
+    const scope =
+        root && typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
+
+    scope.querySelectorAll('select.js-custom-select').forEach(select => {
+        if (select.dataset.customSelectReady === 'true') return;
+
+        select.dataset.customSelectReady = 'true';
+        select.classList.add('custom-select-native');
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'custom-select-button';
+        button.setAttribute('aria-haspopup', 'listbox');
+        button.setAttribute('aria-expanded', 'false');
+
+        const value = document.createElement('span');
+        value.dataset.customSelectValue = '';
+
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-chevron-down';
+        icon.setAttribute('aria-hidden', 'true');
+
+        button.append(value, icon);
+
+        const menu = document.createElement('div');
+        menu.className = 'custom-select-menu';
+        menu.setAttribute('role', 'listbox');
+
+        Array.from(select.options).forEach(option => {
+            if (option.hidden) return;
+
+            const item = document.createElement('button');
+
+            item.type = 'button';
+            item.className = 'custom-select-option';
+            item.dataset.index = String(option.index);
+            item.dataset.value = option.value;
+            item.setAttribute('role', 'option');
+
+            const label = document.createElement('span');
+            label.textContent = option.textContent.trim();
+
+            const check = document.createElement('i');
+            check.className =
+                'fa-solid fa-check custom-select-check';
+            check.setAttribute('aria-hidden', 'true');
+
+            item.append(label, check);
+
+            item.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (select.disabled) return;
+
+                select.selectedIndex = option.index;
+
+                select.dispatchEvent(
+                    new Event('input', { bubbles: true })
+                );
+
+                select.dispatchEvent(
+                    new Event('change', { bubbles: true })
+                );
+
+                wrapper.classList.remove('is-open', 'drop-up');
+                button.setAttribute('aria-expanded', 'false');
+
+                syncCustomSelect(wrapper);
+            });
+
+            menu.appendChild(item);
+        });
+
+        select.parentNode.insertBefore(wrapper, select);
+
+        wrapper.append(select, button, menu);
+
+        button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (select.disabled) return;
+
+            const willOpen =
+                !wrapper.classList.contains('is-open');
+
+            closeCustomSelects(wrapper);
+
+            if (willOpen) {
+                positionCustomSelectMenu(wrapper);
+                wrapper.classList.add('is-open');
+            } else {
+                wrapper.classList.remove('is-open', 'drop-up');
+            }
+
+            button.setAttribute(
+                'aria-expanded',
+                willOpen ? 'true' : 'false'
+            );
+        });
+
+        select.addEventListener('change', () => {
+            syncCustomSelect(wrapper);
+        });
+
+        syncCustomSelect(wrapper);
+    });
+}
+
+document.addEventListener('click', event => {
+    if (event.target.closest('.custom-select')) return;
+
+    closeCustomSelects();
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        closeCustomSelects();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCustomSelects();
+});
+
+window.initCustomSelects = initCustomSelects;
+window.syncCustomSelect = syncCustomSelect;

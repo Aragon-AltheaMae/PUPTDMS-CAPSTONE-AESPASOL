@@ -845,9 +845,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     Relation to Patient <span class="required-star">*</span>
                                                 </label>
                                                 <div class="relative w-full">
-                                                    <select id="emergency_relation" name="emergency_relation"
-                                                        class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
-                                                        required>
+                                                    <select name="emergency_relation" id="emergency_relation"
+                                                        class="form-input js-custom-select" required>
                                                         <option value="" disabled selected>Select relation
                                                         </option>
                                                         <option value="Mother">Mother</option>

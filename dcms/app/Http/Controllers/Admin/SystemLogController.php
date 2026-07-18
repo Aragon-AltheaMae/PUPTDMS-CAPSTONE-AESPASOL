@@ -16,9 +16,13 @@ class SystemLogController extends Controller
             return redirect('/admin/login');
         }
 
-        $perPage = in_array($request->input('per_page'), [10, 20, 50, 100], true)
-            ? (int) $request->input('per_page')
-            : 10;
+        $perPageInput = (int) $request->input('per_page', 10);
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        ) ? $perPageInput : 10;
 
         $role = $request->input('role', 'all');
         $search = $request->input('search');
