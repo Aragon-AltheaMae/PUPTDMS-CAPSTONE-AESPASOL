@@ -10,6 +10,7 @@ use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FacultyApiService;
+use App\Services\ConcurrentSessionService;
 use App\Services\StudentApiService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
@@ -28,7 +29,8 @@ class OIDCController extends Controller
 
     public function __construct(
         FacultyApiService $facultyApiService,
-        StudentApiService $studentApiService
+        StudentApiService $studentApiService,
+        private readonly ConcurrentSessionService $concurrentSessionService
     ) {
         $this->facultyApiService = $facultyApiService;
         $this->studentApiService = $studentApiService;
@@ -412,6 +414,11 @@ class OIDCController extends Controller
         $request->session()->put('oidc_id_token', $idToken);
         session()->save();
 
+        $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
+            $user,
+            $request->session()->getId()
+        );
+
         if ($actualRoleSlug === 'patient') {
             session([
                 'role'         => 'patient',
@@ -424,9 +431,18 @@ class OIDCController extends Controller
 
             AuditLogger::log('login', 'authentication', 'Patient logged in via OIDC');
 
-            return redirect()->route('homepage')
+            $redirect = redirect()->route('homepage')
                 ->with('login_as', $patient?->name)
                 ->with('show_terms_modal', true);
+
+            if (($sessionResult['terminated_sessions'] ?? 0) > 0) {
+                $redirect->with(
+                    'success',
+                    'Logged in successfully. Older active session(s) were closed for your account.'
+                );
+            }
+
+            return $redirect;
         }
 
         if (in_array($actualRoleSlug, ['admin', 'super_admin'], true)) {
@@ -442,9 +458,18 @@ class OIDCController extends Controller
 
             AuditLogger::log('login', 'authentication', 'Admin logged in via OIDC');
 
-            return redirect()->route('admin.admin.dashboard')
+            $redirect = redirect()->route('admin.admin.dashboard')
                 ->with('login_as', $user->name ?: $name ?: $email)
                 ->with('show_terms_modal', true);
+
+            if (($sessionResult['terminated_sessions'] ?? 0) > 0) {
+                $redirect->with(
+                    'success',
+                    'Logged in successfully. Older active session(s) were closed for your account.'
+                );
+            }
+
+            return $redirect;
         }
 
         if ($actualRoleSlug === 'dentist') {
@@ -459,9 +484,18 @@ class OIDCController extends Controller
 
             AuditLogger::log('login', 'authentication', 'Dentist logged in via OIDC');
 
-            return redirect()->route('dentist.dentist.dashboard')
+            $redirect = redirect()->route('dentist.dentist.dashboard')
                 ->with('login_as', $user->name ?: $name ?: $email)
                 ->with('show_terms_modal', true);
+
+            if (($sessionResult['terminated_sessions'] ?? 0) > 0) {
+                $redirect->with(
+                    'success',
+                    'Logged in successfully. Older active session(s) were closed for your account.'
+                );
+            }
+
+            return $redirect;
         }
 
         Auth::logout();

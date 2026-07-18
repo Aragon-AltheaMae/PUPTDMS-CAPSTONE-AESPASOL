@@ -12,10 +12,15 @@ class Appointment extends Model
     protected $fillable = [
         'patient_id',
         'dentist_id',
+        'original_dentist_id',
         'service_type',
         'appointment_date',
         'appointment_time',
         'status',
+        'cancellation_reason',
+        'transferred_by',
+        'transferred_at',
+        'transfer_reason',
         'is_follow_up',
         'follow_up_for_appointment_id',
         'follow_up_reason',
@@ -31,6 +36,7 @@ class Appointment extends Model
         'follow_up_today_reminder_sent_at' => 'datetime',
         'follow_up_one_day_reminder_sent_at' => 'datetime',
         'is_walk_in' => 'boolean',
+        'transferred_at' => 'datetime',
     ];
 
     public function dentalHistory()
@@ -50,6 +56,16 @@ class Appointment extends Model
     public function dentist()
     {
         return $this->belongsTo(User::class, 'dentist_id');
+    }
+
+    public function originalDentist()
+    {
+        return $this->belongsTo(User::class, 'original_dentist_id');
+    }
+
+    public function transferActor()
+    {
+        return $this->belongsTo(User::class, 'transferred_by');
     }
 
     public function originalAppointment()
