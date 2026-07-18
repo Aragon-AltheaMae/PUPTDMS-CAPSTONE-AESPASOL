@@ -854,7 +854,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 Person to contact in case of emergency
                                             </label>
                                             <input type="text" id="emergency_person" name="emergency_person"
-                                                maxlength="50" pattern="[A-Za-zÃ‘Ã±\s.'-]+"
+                                                maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
                                                 title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
                                                 class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                                 placeholder="Full name" required>
@@ -1079,7 +1079,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         <div class="intro-booking-modal-panel">
             <div class="intro-booking-modal-hero">
                 <p class="intro-booking-modal-eyebrow">PUP Taguig Dental Clinic</p>
-                <h2 class="intro-booking-modal-title">Letâ€™s get your dental appointment ready.</h2>
+                <h2 class="intro-booking-modal-title">Let's get your dental appointment ready.</h2>
                 <p class="intro-booking-modal-subtitle">
                     This form will help the clinic prepare safe and proper care for your visit.
                 </p>
@@ -1314,7 +1314,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         if (selectedPatientMeta) {
             selectedPatientMeta.textContent =
-                `${patient.type || "Patient"}${patient.email ? " â€¢ " + patient.email : ""}`;
+                `${patient.type || "Patient"}${patient.email ? " - " + patient.email : ""}`;
         }
 
         selectedPatientBox?.removeAttribute("hidden");
@@ -1369,7 +1369,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         if (selectedPatientMeta) {
             const metaParts = ["Guest Patient", email, phone].filter(Boolean);
-            selectedPatientMeta.textContent = metaParts.join(" â€¢ ");
+            selectedPatientMeta.textContent = metaParts.join(" - ");
         }
 
         selectedPatientBox?.removeAttribute("hidden");
@@ -1435,7 +1435,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     data.patient.email || guestEmail?.value?.trim(),
                     guestPhone?.value?.trim(),
                 ].filter(Boolean);
-                selectedPatientMeta.textContent = metaParts.join(" â€¢ ");
+                selectedPatientMeta.textContent = metaParts.join(" - ");
             }
 
             selectedPatientBox?.removeAttribute("hidden");
@@ -1537,7 +1537,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             <span class="patient-result-main">
                 <strong class="patient-result-name">${safePatientText(patientName)}</strong>
-                <small class="patient-result-meta">${safePatientText(metaParts.join(" â€¢ "))}</small>
+                <small class="patient-result-meta">${safePatientText(metaParts.join(" - "))}</small>
             </span>
 
             <span class="patient-select-pill">
@@ -2789,7 +2789,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (!emergencyPerson) return false;
 
         const value = emergencyPerson.value.trim();
-        const validNamePattern = /^[A-Za-zÃ‘Ã±\s.'-]+$/;
+        const validNamePattern = /^[A-Za-zÑñ\s.'-]+$/;
 
         emergencyPerson.classList.remove("input-invalid", "input-valid");
 
@@ -2813,7 +2813,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return true;
     }
 
-    emergencyPerson?.addEventListener("input", () => {
+    emergencyPerson?.addEventListener("input", (e) => {
+        const sanitizedValue = e.target.value.replace(/[^A-Za-zÑñ\s.'-]/g, "");
+        const hadInvalidChars = sanitizedValue !== e.target.value;
+
+        if (hadInvalidChars) {
+            e.target.value = sanitizedValue;
+            showMiniTab("Emergency contact name must contain letters only.");
+        }
+
         validateEmergencyPerson(true);
         markFormDirty();
     });

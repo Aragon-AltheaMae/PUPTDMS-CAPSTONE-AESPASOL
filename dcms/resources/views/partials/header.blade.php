@@ -328,6 +328,16 @@
                         </div>
                     </label>
 
+                    @if (Route::has('security.sessions.index'))
+                        <a href="{{ route('security.sessions.index') }}" class="dropdown-menu-item">
+                            <div class="dropdown-item-content">
+                                <i class="fa-solid fa-shield-halved text-gray-400 text-base"></i>
+                                <span class="dropdown-item-text">Active Sessions</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+                        </a>
+                    @endif
+
                     <form method="POST" action="{{ $logoutRoute }}" style="margin: 0;">
                         @csrf
                         <button type="submit" class="dropdown-menu-item dropdown-logout-item">

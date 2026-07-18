@@ -18,10 +18,12 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\Dentist\DentistPatientController;
 use App\Http\Controllers\Dentist\DentistAppointmentController;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminSessionManagementController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\DentistTransitionController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
 use App\Http\Controllers\Admin\AdminPatientController;
 use App\Http\Controllers\Admin\ServiceTypeController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\Auth\BackupLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Security\SessionManagementController;
 use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
 use App\Http\Controllers\Admin\AdminInventoryController;
@@ -199,6 +202,23 @@ Route::middleware('auth')->prefix('notifications')->name('notifications.')->grou
         ->name('mark-all-read');
 });
 
+Route::middleware('auth')->prefix('security')->name('security.')->group(function () {
+    Route::get('/sessions', [SessionManagementController::class, 'index'])
+        ->name('sessions.index');
+
+    Route::delete('/sessions/current', [SessionManagementController::class, 'destroyCurrent'])
+        ->name('sessions.destroy-current');
+
+    Route::delete('/sessions/all', [SessionManagementController::class, 'destroyAll'])
+        ->name('sessions.destroy-all');
+
+    Route::delete('/sessions/{reference}', [SessionManagementController::class, 'destroy'])
+        ->name('sessions.destroy');
+
+    Route::delete('/sessions', [SessionManagementController::class, 'destroyOthers'])
+        ->name('sessions.destroy-others');
+});
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN / SUPER ADMIN ROUTES
@@ -296,6 +316,15 @@ Route::prefix('admin')
         */
         Route::get('/system-logs', [SystemLogController::class, 'index'])
             ->name('admin.system_logs');
+
+        Route::get('/session-management', [AdminSessionManagementController::class, 'index'])
+            ->name('admin.session_management.index');
+
+        Route::delete('/session-management/sessions/{reference}', [AdminSessionManagementController::class, 'destroySession'])
+            ->name('admin.session_management.destroy_session');
+
+        Route::delete('/session-management/users/{user}', [AdminSessionManagementController::class, 'destroyUserSessions'])
+            ->name('admin.session_management.destroy_user_sessions');
 
         Route::get('/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
             ->name('admin.system_logs.fetch');
@@ -523,6 +552,47 @@ Route::prefix('admin')
 
         Route::post('/user-management/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
             ->name('admin.user_management.toggle_status');
+
+        /*
+        |--------------------------------------------------------------------------
+        | DENTIST CONTINUITY MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/dentist-transitions', [DentistTransitionController::class, 'index'])
+            ->name('admin.dentist-transitions.index');
+
+        Route::get('/dentist-transitions/create', [DentistTransitionController::class, 'create'])
+            ->name('admin.dentist-transitions.create');
+
+        Route::post('/dentist-transitions', [DentistTransitionController::class, 'store'])
+            ->name('admin.dentist-transitions.store');
+
+        Route::get('/dentist-transitions/{transition}', [DentistTransitionController::class, 'show'])
+            ->name('admin.dentist-transitions.show');
+
+        Route::get('/dentist-transitions/{transition}/edit', [DentistTransitionController::class, 'edit'])
+            ->name('admin.dentist-transitions.edit');
+
+        Route::put('/dentist-transitions/{transition}', [DentistTransitionController::class, 'update'])
+            ->name('admin.dentist-transitions.update');
+
+        Route::post('/dentist-transitions/{transition}/generate-items', [DentistTransitionController::class, 'generateItems'])
+            ->name('admin.dentist-transitions.generate-items');
+
+        Route::put('/dentist-transitions/{transition}/assignments', [DentistTransitionController::class, 'assignments'])
+            ->name('admin.dentist-transitions.assignments');
+
+        Route::put('/dentist-transitions/{transition}/checklist', [DentistTransitionController::class, 'checklist'])
+            ->name('admin.dentist-transitions.checklist');
+
+        Route::post('/dentist-transitions/{transition}/finalize', [DentistTransitionController::class, 'finalize'])
+            ->name('admin.dentist-transitions.finalize');
+
+        Route::post('/dentist-transitions/{transition}/cancel', [DentistTransitionController::class, 'cancel'])
+            ->name('admin.dentist-transitions.cancel');
+
+        Route::post('/dentist-transitions/{transition}/extend-access', [DentistTransitionController::class, 'extendAccess'])
+            ->name('admin.dentist-transitions.extend-access');
     });
 
 Route::prefix('admin')

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Patient;
+use App\Services\ConcurrentSessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +16,10 @@ use App\Helpers\AuditLogger;
 
 class UserManagementController extends Controller
 {
+    public function __construct(
+        private readonly ConcurrentSessionService $concurrentSessionService
+    ) {}
+
     public function index(Request $request)
     {
         $roles = Role::withCount('users')->orderBy('name')->get();
@@ -236,6 +241,8 @@ class UserManagementController extends Controller
         });
 
         if ($roleChanged) {
+            $this->concurrentSessionService->revokeAllSessions($user, null, 'role_changed');
+
             AuditLogger::log(
                 'security',
                 'user',
@@ -315,6 +322,8 @@ class UserManagementController extends Controller
             }
         });
 
+        $this->concurrentSessionService->revokeAllSessions($user, null, 'password_reset');
+
         AuditLogger::log('reset_password', 'user', "Reset password for user #{$user->id}");
 
         if ($request->ajax() || $request->wantsJson()) {
@@ -332,6 +341,10 @@ class UserManagementController extends Controller
     {
         $user->status = $user->status === 'active' ? 'inactive' : 'active';
         $user->save();
+
+        if ($user->status === 'inactive') {
+            $this->concurrentSessionService->revokeAllSessions($user, null, 'account_deactivated');
+        }
 
         $label = $user->status === 'active' ? 'activated' : 'deactivated';
 
@@ -383,6 +396,7 @@ class UserManagementController extends Controller
             ]);
 
             $user = $patient->user;
+            $this->concurrentSessionService->revokeAllSessions($user, null, 'password_reset');
 
             AuditLogger::log(
                 'reset_password',
@@ -405,6 +419,8 @@ class UserManagementController extends Controller
     public function destroy(User $user)
     {
         $email = $user->email;
+
+        $this->concurrentSessionService->revokeAllSessions($user, null, 'account_deleted');
 
         DB::transaction(function () use ($user) {
             Patient::where('user_id', $user->id)->delete();

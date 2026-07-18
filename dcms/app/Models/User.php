@@ -22,6 +22,13 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role_id',
         'status',
+        'employment_status',
+        'account_status',
+        'last_working_date',
+        'access_ends_at',
+        'deactivated_at',
+        'deactivated_by',
+        'deactivation_reason',
         'sso_user_id',
         'last_login_at',
         'access_token',
@@ -37,6 +44,9 @@ class User extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'last_login_at' => 'datetime',
+        'last_working_date' => 'date',
+        'access_ends_at' => 'datetime',
+        'deactivated_at' => 'datetime',
     ];
 
     /*
@@ -58,6 +68,21 @@ class User extends Authenticatable implements JWTSubject
     public function faculty()
     {
         return $this->hasOne(Faculty::class);
+    }
+
+    public function dentistTransitions()
+    {
+        return $this->hasMany(DentistTransition::class, 'dentist_id');
+    }
+
+    public function initiatedDentistTransitions()
+    {
+        return $this->hasMany(DentistTransition::class, 'initiated_by');
+    }
+
+    public function successorDentistTransitions()
+    {
+        return $this->hasMany(DentistTransition::class, 'default_successor_dentist_id');
     }
 
     /*
