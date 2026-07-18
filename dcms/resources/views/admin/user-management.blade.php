@@ -37,6 +37,14 @@ $inactiveCount = $inactiveCount ?? 0;
         </script>
         @endif
 
+        @if (session('generated_user_password'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                openModal('generatedPasswordModal');
+            });
+        </script>
+        @endif
+
         @if (session('error'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -216,15 +224,31 @@ $inactiveCount = $inactiveCount ?? 0;
                                         </td>
 
                                         <td class="py-3.5 px-4">
+                                            @php
+                                            $userDetails = [
+                                            'id' => $user->id,
+                                            'name' => $user->name,
+                                            'email' => $user->email,
+                                            'role' => optional($user->role)->display_name ?? optional($user->role)->name ?? 'No Role',
+                                            'status' => ucfirst($user->status),
+                                            'source' => 'Users',
+                                            'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A',
+                                            'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') : 'N/A',
+                                            'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
+                                            'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                            'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
+                                            'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
+                                            'birthdate_raw' => optional(optional($user->patient)->birthdate)?->format('Y-m-d') ?? optional($user->birthdate)?->format('Y-m-d') ?? '',
+                                            'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
+                                            'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
+                                            'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
+                                            ];
+                                            @endphp
                                             <div class="um-action-group flex items-center justify-center gap-1">
-                                                <button type="button" onclick="openEditModal(
-                                                    'users',
-                                                    {{ $user->id }},
-                                                    @js($user->name),
-                                                    @js($user->email),
-                                                    @js($user->role_id),
-                                                    @js($user->status)
-                                                  )" class="action-btn btn-edit" title="Edit account">
+                                                <button type="button"
+                                                    data-user-details='@json($userDetails)'
+                                                    onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                                    class="action-btn btn-edit" title="Edit account">
                                                     <i class="fa-solid fa-pen text-[11px]"></i>
                                                 </button>
 
@@ -242,14 +266,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                                     <i class="fa-solid fa-key text-[11px]"></i>
                                                 </button>
 
-                                                <button type="button" onclick="openViewModal(
-                                                    @js($user->name),
-                                                    @js($user->email),
-                                                    @js(optional($user->role)->name ?? 'No Role'),
-                                                    @js(ucfirst($user->status)),
-                                                    'Users',
-                                                    @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                                  )" class="action-btn btn-view-details" title="View details">
+                                                <button type="button" data-user-details='@json($userDetails)'
+                                                    onclick="openViewModalFromButton(this)"
+                                                    class="action-btn btn-view-details" title="View details">
                                                     <i class="fa-solid fa-eye text-[11px]"></i>
                                                 </button>
                                             </div>
@@ -340,14 +359,30 @@ $inactiveCount = $inactiveCount ?? 0;
                                     </div>
 
                                     <div class="um-action-group flex items-center justify-end gap-1 flex-wrap">
-                                        <button type="button" onclick="openEditModal(
-                                                'users',
-                                                {{ $user->id }},
-                                                @js($user->name),
-                                                @js($user->email),
-                                                @js($user->role_id),
-                                                @js($user->status)
-                                            )" class="action-btn btn-edit" title="Edit account">
+                                        @php
+                                        $userDetails = [
+                                        'id' => $user->id,
+                                        'name' => $user->name,
+                                        'email' => $user->email,
+                                        'role' => optional($user->role)->display_name ?? optional($user->role)->name ?? 'No Role',
+                                        'status' => ucfirst($user->status),
+                                        'source' => 'Users',
+                                        'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A',
+                                        'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') : 'N/A',
+                                        'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
+                                        'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                        'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
+                                        'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
+                                        'birthdate_raw' => optional(optional($user->patient)->birthdate)?->format('Y-m-d') ?? optional($user->birthdate)?->format('Y-m-d') ?? '',
+                                        'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
+                                        'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
+                                        'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
+                                        ];
+                                        @endphp
+                                        <button type="button"
+                                            data-user-details='@json($userDetails)'
+                                            onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                            class="action-btn btn-edit" title="Edit account">
                                             <i class="fa-solid fa-pen text-[11px]"></i>
                                         </button>
 
@@ -365,14 +400,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                             <i class="fa-solid fa-key text-[11px]"></i>
                                         </button>
 
-                                        <button type="button" onclick="openViewModal(
-                                                @js($user->name),
-                                                @js($user->email),
-                                                @js($roleName),
-                                                @js(ucfirst($user->status)),
-                                                'Users',
-                                                @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                            )" class="action-btn btn-view-details" title="View details">
+                                        <button type="button" data-user-details='@json($userDetails)'
+                                            onclick="openViewModalFromButton(this)"
+                                            class="action-btn btn-view-details" title="View details">
                                             <i class="fa-solid fa-eye text-[11px]"></i>
                                         </button>
                                     </div>
@@ -437,6 +467,55 @@ $inactiveCount = $inactiveCount ?? 0;
         </div>
     </div>
 </main>
+
+<div class="modal-overlay" id="generatedPasswordModal" aria-hidden="true">
+    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
+        <div
+            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow">
+                    <i class="fa-solid fa-key text-white text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-800 text-base">Generated Password</h3>
+                    <p class="text-[12px] text-gray-500">Share this with the new user before closing.</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeModal('generatedPasswordModal')" data-close-modal="generatedPasswordModal"
+                class="um-modal-x" aria-label="Close generated password modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <strong>{{ session('generated_user_password.name') }}</strong><br>
+                <span class="text-xs">{{ session('generated_user_password.email') }}</span>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Temporary Password
+                </label>
+                <div class="relative">
+                    <input type="text" id="generatedUserPasswordValue"
+                        value="{{ session('generated_user_password.password') }}"
+                        class="field-input w-full border border-gray-200 px-3.5 py-3 pr-24 text-sm bg-white font-mono"
+                        readonly>
+                    <button type="button" onclick="copyGeneratedPassword()"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-xs font-bold">
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="um-password-note">
+                This password is shown only once. Ask the user to change it after first login.
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal-overlay" id="addModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-lg" onclick="event.stopPropagation()">
@@ -555,6 +634,38 @@ $inactiveCount = $inactiveCount ?? 0;
                                     System-managed user account
                                 </div>
                             </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                    Phone Number
+                                </label>
+                                <input type="text" id="addPhoneInput" name="phone" value="{{ old('phone') }}"
+                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white"
+                                    placeholder="09xx xxx xxxx" inputmode="numeric" autocomplete="tel"
+                                    maxlength="13">
+                                <p id="addPhoneInputFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                    Birthdate
+                                </label>
+                                <input type="date" id="addBirthdateInput" name="birthdate"
+                                    value="{{ old('birthdate') }}"
+                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                    Gender
+                                </label>
+                                <select id="addGenderInput" name="gender"
+                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                                    <option value="">Select gender</option>
+                                    <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="um-divider"></div>
@@ -596,42 +707,56 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                             <div>
                                 <h4 class="text-base font-extrabold text-gray-800 leading-tight">Security Setup</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">Set the initial login credentials.</p>
+                                <p class="text-xs text-gray-500 mt-0.5">A secure password will be generated automatically.</p>
                             </div>
                         </div>
 
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Password <span class="text-red-500">*</span>
+                                    Generated Password
                                 </label>
                                 <div class="relative">
                                     <i
                                         class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                                     <input type="password" name="password" id="addPassword"
-                                        placeholder="Min. 8 characters"
+                                        placeholder="Auto-generated password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
-                                        required>
+                                        readonly>
                                     <button type="button" onclick="togglePassVis('addPassword','addEye')"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="fa-regular fa-eye text-sm" id="addEye"></i>
                                     </button>
                                 </div>
-                                <p class="text-[11px] text-gray-400 mt-1.5">Use at least 8 characters for better
-                                    security.</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" onclick="refreshGeneratedPassword()"
+                                        class="modal-btn-confirm-reject um-save-user-btn um-inline-action-btn">
+                                        <span class="btn-confirm-icon">
+                                            <i class="fa-solid fa-rotate"></i>
+                                        </span>
+                                        <span>Generate New</span>
+                                    </button>
+                                    <button type="button" onclick="copyFieldValue('addPassword')"
+                                        class="modal-btn-confirm-reject um-save-user-btn um-inline-action-btn">
+                                        <span class="btn-confirm-icon">
+                                            <i class="fa-regular fa-copy"></i>
+                                        </span>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Confirm Password <span class="text-red-500">*</span>
+                                    Confirm Password
                                 </label>
                                 <div class="relative">
                                     <i
                                         class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                                     <input type="password" name="password_confirmation" id="addPasswordConf"
-                                        placeholder="Repeat password"
+                                        placeholder="Matches generated password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
-                                        required>
+                                        readonly>
                                     <button type="button" onclick="togglePassVis('addPasswordConf','addEye2')"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="fa-regular fa-eye text-sm" id="addEye2"></i>
@@ -640,8 +765,7 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
 
                             <div class="um-password-note">
-                                The user can update their password after first sign-in depending on your account
-                                workflow.
+                                The same generated password is saved for the account and shown again after creation.
                             </div>
                         </div>
                     </div>
@@ -797,6 +921,42 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
+            <div class="rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-4 space-y-4">
+                <div>
+                    <h4 class="text-sm font-bold text-gray-800">Backup Information</h4>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Phone Number
+                    </label>
+                    <input type="text" name="phone" id="editPhone" placeholder="09xx xxx xxxx"
+                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                        inputmode="numeric" autocomplete="tel" maxlength="13">
+                    <p id="editPhoneFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Birthdate
+                    </label>
+                    <input type="date" name="birthdate" id="editBirthdate"
+                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Gender
+                    </label>
+                    <select name="gender" id="editGender"
+                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="flex items-center justify-end gap-3 pt-2">
                 <button type="button" onclick="closeModal('editModal')" class="modal-btn-ghost">
                     Cancel
@@ -924,6 +1084,17 @@ $inactiveCount = $inactiveCount ?? 0;
 
             <div class="um-view-info-grid">
                 <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-hashtag"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">User ID</span>
+                        <strong id="viewId" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
                     <div class="um-view-info-icon role">
                         <i class="fa-solid fa-user-shield"></i>
                     </div>
@@ -964,6 +1135,72 @@ $inactiveCount = $inactiveCount ?? 0;
                     <div>
                         <span class="um-view-label">Created At</span>
                         <strong id="viewCreatedAt" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Phone</span>
+                        <strong id="viewPhone" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon date">
+                        <i class="fa-solid fa-cake-candles"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Birthdate</span>
+                        <strong id="viewBirthdate" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon status">
+                        <i class="fa-solid fa-venus-mars"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Gender</span>
+                        <strong id="viewGender" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon role">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Patient Profile</span>
+                        <strong id="viewPatientProfile" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Last Login</span>
+                        <strong id="viewLastLoginAt" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon date">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Updated At</span>
+                        <strong id="viewUpdatedAt" class="um-view-value"></strong>
                     </div>
                 </div>
             </div>
@@ -1365,8 +1602,9 @@ $inactiveCount = $inactiveCount ?? 0;
         });
     })();
 
-    function openEditModal(source, id, name, email, roleId, status) {
+    function openEditModal(source, id, name, email, roleId, status, details = null) {
         const form = document.getElementById('editForm');
+        const payload = details && typeof details === 'object' ? details : {};
 
         if (source === 'patients') {
             form.action = `/admin/user-management/patient/${id}`;
@@ -1395,6 +1633,17 @@ $inactiveCount = $inactiveCount ?? 0;
         document.getElementById('editModalSubtitle').textContent = 'Editing: ' + name;
         document.getElementById('editOriginalRole').value = roleId || '';
         document.getElementById('editAdminCurrentPassword').value = '';
+        document.getElementById('editPhone').value = payload.phone_raw || payload.phone || '';
+        document.getElementById('editBirthdate').value = payload.birthdate_raw || '';
+        document.getElementById('editGender').value = payload.gender_raw || payload.gender || '';
+        document.getElementById('editPhone').value = formatUserPhoneDisplay(
+            getNormalizedUserPhoneValue(document.getElementById('editPhone'))
+        );
+        validateUserPhoneInput(
+            document.getElementById('editPhone'),
+            document.getElementById('editPhoneFeedback'),
+            true
+        );
 
         setEditRoleValue(roleId || '');
         syncEditRoleConfirmation();
@@ -1419,29 +1668,248 @@ $inactiveCount = $inactiveCount ?? 0;
         openModal('resetModal');
     }
 
-    function openViewModal(name, email, role, status, source, createdAt) {
+    function buildGeneratedPassword(length = 12) {
+        const lower = 'abcdefghijkmnopqrstuvwxyz';
+        const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        const numbers = '23456789';
+        const symbols = '@#$%*!?';
+        const all = lower + upper + numbers + symbols;
+
+        const pick = (chars) => chars.charAt(Math.floor(Math.random() * chars.length));
+        const chars = [
+            pick(lower),
+            pick(upper),
+            pick(numbers),
+            pick(symbols),
+        ];
+
+        while (chars.length < length) {
+            chars.push(pick(all));
+        }
+
+        for (let i = chars.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [chars[i], chars[j]] = [chars[j], chars[i]];
+        }
+
+        return chars.join('');
+    }
+
+    function refreshGeneratedPassword() {
+        const password = buildGeneratedPassword();
+        const passwordInput = document.getElementById('addPassword');
+        const confirmInput = document.getElementById('addPasswordConf');
+
+        if (passwordInput) passwordInput.value = password;
+        if (confirmInput) confirmInput.value = password;
+    }
+
+    async function copyFieldValue(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input || !input.value) return;
+
+        try {
+            await navigator.clipboard.writeText(input.value);
+            showSuccessToast('Password copied to clipboard.');
+        } catch (error) {
+            input.removeAttribute('readonly');
+            input.select();
+            document.execCommand('copy');
+            input.setAttribute('readonly', 'readonly');
+            showSuccessToast('Password copied to clipboard.');
+        }
+    }
+
+    function copyGeneratedPassword() {
+        copyFieldValue('generatedUserPasswordValue');
+    }
+
+    let userPhoneFeedbackTimer = null;
+
+    function formatUserPhoneDisplay(rawDigits) {
+        const digits = String(rawDigits || '').slice(0, 11);
+        let out = '';
+
+        if (digits.length > 0) out += digits.slice(0, 4);
+        if (digits.length > 4) out += ' ' + digits.slice(4, 7);
+        if (digits.length > 7) out += ' ' + digits.slice(7, 11);
+
+        return out;
+    }
+
+    function getNormalizedUserPhoneValue(input) {
+        return String(input?.value || '').replace(/\D/g, '');
+    }
+
+    function setUserPhoneFeedback(feedbackEl, message, type = '') {
+        if (!feedbackEl) return;
+
+        if (userPhoneFeedbackTimer) {
+            clearTimeout(userPhoneFeedbackTimer);
+            userPhoneFeedbackTimer = null;
+        }
+
+        feedbackEl.textContent = message;
+        feedbackEl.classList.remove('text-gray-500', 'text-red-600', 'text-green-600');
+
+        if (type === 'error') {
+            feedbackEl.classList.add('text-red-600');
+            return;
+        }
+
+        if (type === 'success') {
+            feedbackEl.classList.add('text-green-600');
+            userPhoneFeedbackTimer = setTimeout(function () {
+                feedbackEl.textContent = '';
+                feedbackEl.classList.remove('text-green-600');
+                feedbackEl.classList.add('text-gray-500');
+                userPhoneFeedbackTimer = null;
+            }, 2000);
+            return;
+        }
+
+        feedbackEl.classList.add('text-gray-500');
+    }
+
+    function validateUserPhoneInput(input, feedbackEl, showNeutral = false) {
+        if (!input) return true;
+
+        const digits = getNormalizedUserPhoneValue(input);
+
+        input.classList.remove('input-invalid', 'input-valid', 'border-red-500', 'border-green-600');
+
+        if (!digits.length) {
+            setUserPhoneFeedback(feedbackEl, showNeutral ? 'Format: 09xx xxx xxxx' : '');
+            return true;
+        }
+
+        if (!digits.startsWith('09')) {
+            input.classList.add('input-invalid');
+            setUserPhoneFeedback(feedbackEl, 'Contact number must start with 09.', 'error');
+            return false;
+        }
+
+        if (digits.length < 11) {
+            input.classList.add('input-invalid');
+            setUserPhoneFeedback(feedbackEl, 'Contact number must be 11 digits.', 'error');
+            return false;
+        }
+
+        if (digits.length === 11) {
+            input.classList.add('input-valid');
+            setUserPhoneFeedback(feedbackEl, 'Valid contact number.', 'success');
+            return true;
+        }
+
+        input.classList.add('input-invalid');
+        setUserPhoneFeedback(feedbackEl, 'Contact number must be 11 digits only.', 'error');
+        return false;
+    }
+
+    function bindUserPhoneValidation(inputId, feedbackId) {
+        const input = document.getElementById(inputId);
+        const feedbackEl = document.getElementById(feedbackId);
+
+        if (!input) return;
+
+        input.addEventListener('input', function (event) {
+            const hadNonDigit = /[^\d\s]/.test(event.target.value);
+
+            let digits = event.target.value.replace(/\D/g, '');
+
+            if (digits.startsWith('9')) digits = '0' + digits;
+            if (digits.length > 11) digits = digits.slice(0, 11);
+
+            event.target.value = formatUserPhoneDisplay(digits);
+
+            if (hadNonDigit) {
+                showErrorToast('Contact number must contain digits only.');
+            }
+
+            validateUserPhoneInput(event.target, feedbackEl, true);
+        });
+
+        input.addEventListener('focus', function () {
+            validateUserPhoneInput(input, feedbackEl, true);
+        });
+
+        input.addEventListener('blur', function () {
+            validateUserPhoneInput(input, feedbackEl, true);
+        });
+    }
+
+    function parseUserDetailsFromButton(button) {
+        if (!button) return {};
+
+        const raw = button.getAttribute('data-user-details');
+
+        if (!raw) return {};
+
+        try {
+            return JSON.parse(raw);
+        } catch (error) {
+            console.warn('Unable to parse user details payload.', error);
+            return {};
+        }
+    }
+
+    function openEditModalFromButton(button, source, id, name, email, roleId, status) {
+        openEditModal(source, id, name, email, roleId, status, parseUserDetailsFromButton(button));
+    }
+
+    function openViewModalFromButton(button) {
+        openViewModal(parseUserDetailsFromButton(button));
+    }
+
+    function openViewModal(payloadOrName, email, role, status, source, createdAt, details) {
+        const payload = typeof payloadOrName === 'object' && payloadOrName !== null
+            ? payloadOrName
+            : {
+                name: payloadOrName,
+                email,
+                role,
+                status,
+                source,
+                created_at: createdAt,
+                ...(details || {}),
+            };
+
         const viewName = document.getElementById('viewName');
         const viewEmail = document.getElementById('viewEmail');
+        const viewId = document.getElementById('viewId');
         const viewRole = document.getElementById('viewRole');
         const viewStatus = document.getElementById('viewStatus');
         const viewSource = document.getElementById('viewSource');
         const viewCreatedAt = document.getElementById('viewCreatedAt');
+        const viewUpdatedAt = document.getElementById('viewUpdatedAt');
+        const viewPhone = document.getElementById('viewPhone');
+        const viewBirthdate = document.getElementById('viewBirthdate');
+        const viewGender = document.getElementById('viewGender');
+        const viewPatientProfile = document.getElementById('viewPatientProfile');
+        const viewLastLoginAt = document.getElementById('viewLastLoginAt');
         const viewInitial = document.getElementById('viewInitial');
 
-        if (viewName) viewName.textContent = name || 'Unknown User';
-        if (viewEmail) viewEmail.textContent = email || 'No email available';
-        if (viewRole) viewRole.textContent = role || 'No Role';
-        if (viewSource) viewSource.textContent = source || 'Users';
-        if (viewCreatedAt) viewCreatedAt.textContent = createdAt || 'N/A';
+        if (viewName) viewName.textContent = payload.name || 'Unknown User';
+        if (viewEmail) viewEmail.textContent = payload.email || 'No email available';
+        if (viewId) viewId.textContent = payload.id || 'N/A';
+        if (viewRole) viewRole.textContent = payload.role || 'No Role';
+        if (viewSource) viewSource.textContent = payload.source || 'Users';
+        if (viewCreatedAt) viewCreatedAt.textContent = payload.created_at || 'N/A';
+        if (viewUpdatedAt) viewUpdatedAt.textContent = payload.updated_at || 'N/A';
+        if (viewPhone) viewPhone.textContent = payload.phone || 'N/A';
+        if (viewBirthdate) viewBirthdate.textContent = payload.birthdate || 'N/A';
+        if (viewGender) viewGender.textContent = payload.gender || 'N/A';
+        if (viewPatientProfile) viewPatientProfile.textContent = payload.patient_profile || 'Not linked';
+        if (viewLastLoginAt) viewLastLoginAt.textContent = payload.last_login_at || 'Never';
 
         if (viewInitial) {
-            viewInitial.textContent = String(name || '?').trim().charAt(0).toUpperCase() || '?';
+            viewInitial.textContent = String(payload.name || '?').trim().charAt(0).toUpperCase() || '?';
         }
 
         if (viewStatus) {
-            const normalizedStatus = String(status || '').toLowerCase();
+            const normalizedStatus = String(payload.status || '').toLowerCase();
 
-            viewStatus.textContent = status || 'Unknown';
+            viewStatus.textContent = payload.status || 'Unknown';
             viewStatus.classList.remove('is-active', 'is-inactive');
 
             if (normalizedStatus === 'active') {
@@ -1576,9 +2044,14 @@ $inactiveCount = $inactiveCount ?? 0;
 
     window.openToggleConfirm = openToggleConfirm;
     window.openEditModal = openEditModal;
+    window.openEditModalFromButton = openEditModalFromButton;
     window.openResetModal = openResetModal;
     window.openViewModal = openViewModal;
+    window.openViewModalFromButton = openViewModalFromButton;
     window.togglePassVis = togglePassVis;
+    window.refreshGeneratedPassword = refreshGeneratedPassword;
+    window.copyGeneratedPassword = copyGeneratedPassword;
+    window.copyFieldValue = copyFieldValue;
 
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof applyTheme === 'function') applyTheme(localStorage.getItem('theme') || 'light');
@@ -1587,6 +2060,15 @@ $inactiveCount = $inactiveCount ?? 0;
                 e.stopPropagation();
                 if (typeof applyTheme === 'function') applyTheme(o.getAttribute('data-theme'));
             })
+        );
+
+        refreshGeneratedPassword();
+        bindUserPhoneValidation('addPhoneInput', 'addPhoneInputFeedback');
+        bindUserPhoneValidation('editPhone', 'editPhoneFeedback');
+        validateUserPhoneInput(
+            document.getElementById('addPhoneInput'),
+            document.getElementById('addPhoneInputFeedback'),
+            true
         );
 
         document.querySelectorAll('.flash-alert').forEach(el => {
@@ -1770,14 +2252,12 @@ $inactiveCount = $inactiveCount ?? 0;
                     <td class="py-3.5 px-4">
                         <div class="um-action-group flex items-center justify-center gap-1">
                             <button type="button"
-                                onclick="openEditModal(
-                                    'users',
-                                    ${user.id},
-                                    ${jsAttr(user.name)},
-                                    ${jsAttr(user.email)},
-                                    ${jsAttr(user.role_id)},
-                                    ${jsAttr(user.status)}
-                                )"
+                                data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                                    phone_raw: '',
+                                    birthdate_raw: '',
+                                    gender_raw: ''
+                                }))}"
+                                onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
                                 class="action-btn btn-edit" title="Edit account">
                                 <i class="fa-solid fa-pen text-[11px]"></i>
                             </button>
@@ -1796,14 +2276,16 @@ $inactiveCount = $inactiveCount ?? 0;
                             </button>
 
                             <button type="button"
-                                onclick="openViewModal(
-                                    ${jsAttr(user.name)},
-                                    ${jsAttr(user.email)},
-                                    ${jsAttr(roleLabel)},
-                                    ${jsAttr(statusLabel)},
-                                    'Users',
-                                    ${jsAttr(createdFull)}
-                                )"
+                                data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                                    id: user.id,
+                                    name: user.name,
+                                    email: user.email,
+                                    role: roleLabel,
+                                    status: statusLabel,
+                                    source: 'Users',
+                                    created_at: createdFull
+                                }))}"
+                                onclick="openViewModalFromButton(this)"
                                 class="action-btn btn-view-details"
                                 title="View details">
                                 <i class="fa-solid fa-eye text-[11px]"></i>
@@ -1851,14 +2333,12 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <div class="flex items-center justify-end gap-1 flex-wrap">
                         <button type="button"
-                            onclick="openEditModal(
-                                'users',
-                                ${user.id},
-                                ${jsAttr(user.name)},
-                                ${jsAttr(user.email)},
-                                ${jsAttr(user.role_id)},
-                                ${jsAttr(user.status)}
-                            )"
+                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                                phone_raw: '',
+                                birthdate_raw: '',
+                                gender_raw: ''
+                            }))}"
+                            onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
                             class="action-btn btn-edit" title="Edit account">
                             <i class="fa-solid fa-pen text-[11px]"></i>
                         </button>
@@ -1877,14 +2357,16 @@ $inactiveCount = $inactiveCount ?? 0;
                         </button>
 
                         <button type="button"
-                            onclick="openViewModal(
-                                ${jsAttr(user.name)},
-                                ${jsAttr(user.email)},
-                                ${jsAttr(roleLabel)},
-                                ${jsAttr(statusLabel)},
-                                'Users',
-                                ${jsAttr(createdFull)}
-                            )"
+                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                                id: user.id,
+                                name: user.name,
+                                email: user.email,
+                                role: roleLabel,
+                                status: statusLabel,
+                                source: 'Users',
+                                created_at: createdFull
+                            }))}"
+                            onclick="openViewModalFromButton(this)"
                             class="action-btn btn-view-details"
                             title="View details">
                             <i class="fa-solid fa-eye text-[11px]"></i>
@@ -2150,6 +2632,13 @@ $inactiveCount = $inactiveCount ?? 0;
             var url = form.action;
             var submitBtn = form.querySelector('button[type="submit"]');
             var originalHtml = submitBtn.innerHTML;
+            var editPhoneInput = document.getElementById('editPhone');
+            var editPhoneFeedback = document.getElementById('editPhoneFeedback');
+
+            if (!validateUserPhoneInput(editPhoneInput, editPhoneFeedback, true)) {
+                showErrorToast('Please enter a valid phone number.');
+                return;
+            }
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
@@ -2159,6 +2648,9 @@ $inactiveCount = $inactiveCount ?? 0;
             params.append('_method', 'PUT');
             params.append('name', document.getElementById('editName').value);
             params.append('email', document.getElementById('editEmail').value);
+            params.append('phone', getNormalizedUserPhoneValue(editPhoneInput));
+            params.append('birthdate', document.getElementById('editBirthdate').value);
+            params.append('gender', document.getElementById('editGender').value);
             params.append('role_id', document.getElementById('editRole').value);
             params.append('status', form.querySelector('input[name="status"]:checked')?.value ??
                 '');
@@ -2207,6 +2699,24 @@ $inactiveCount = $inactiveCount ?? 0;
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalHtml;
                 });
+        });
+    }
+
+    var addUserForm = document.getElementById('addUserForm');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', function (e) {
+            var addPhoneInput = document.getElementById('addPhoneInput');
+            var addPhoneFeedback = document.getElementById('addPhoneInputFeedback');
+
+            if (!validateUserPhoneInput(addPhoneInput, addPhoneFeedback, true)) {
+                e.preventDefault();
+                showErrorToast('Please enter a valid phone number.');
+                return;
+            }
+
+            if (addPhoneInput) {
+                addPhoneInput.value = getNormalizedUserPhoneValue(addPhoneInput);
+            }
         });
     }
 

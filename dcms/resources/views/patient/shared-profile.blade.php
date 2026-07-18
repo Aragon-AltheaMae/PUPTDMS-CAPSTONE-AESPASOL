@@ -31,6 +31,15 @@ $pastCount = isset($pastVisits) ? $pastVisits->count() : 0;
 
 $medicalAnswers = optional($patient->medicalHistory)->answers ?? collect();
 $dentalDates = optional($patient->dentalHistoryDates);
+$signatureReviewStatus = optional($patient->medicalHistory)->signature_review_status;
+$signatureReviewNotes = optional($patient->medicalHistory)->signature_review_notes;
+$signaturePath = optional($patient->medicalHistory)->patient_signature;
+$signatureUrl = $signaturePath ? asset('storage/' . $signaturePath) : null;
+$isPendingManualReview = $signatureReviewStatus === 'pending_manual_review';
+$isInvalidSignature = $signatureReviewStatus === 'invalid_reupload_required';
+$showManualSignatureReview = in_array($profileMode, ['admin', 'dentist'], true)
+&& in_array($signatureReviewStatus, ['pending_manual_review', 'invalid_reupload_required'], true)
+&& !empty($signaturePath);
 
 $from = request('from');
 
@@ -212,6 +221,59 @@ $procedureAppointment = $nextAppointment ?? collect($futureVisits ?? [])->first(
                             </div>
                             @endif
                         </div>
+
+                        @if ($showManualSignatureReview)
+                        <div class="{{ $isInvalidSignature ? 'bg-red-50/70 border-red-100' : 'bg-amber-50/70 border-amber-100' }} px-5 py-4 border-t">
+                            <p
+                                class="text-[10px] font-bold {{ $isInvalidSignature ? 'text-red-800' : 'text-amber-800' }} uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-signature"></i>
+                                {{ $isInvalidSignature ? 'Signature Re-upload Requested' : 'Signature Review Required' }}
+                            </p>
+
+                            <div class="rounded-xl border {{ $isInvalidSignature ? 'border-red-200' : 'border-amber-200' }} bg-white p-3 shadow-sm">
+                                <a href="{{ $signatureUrl }}" target="_blank" rel="noopener noreferrer"
+                                    class="block overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                                    <img src="{{ $signatureUrl }}" alt="Patient signature for manual review"
+                                        class="w-full h-auto object-contain max-h-56">
+                                </a>
+
+                                <div class="mt-3 space-y-2">
+                                    <div
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border {{ $isInvalidSignature ? 'bg-red-100 text-red-800 border-red-200' : 'bg-amber-100 text-amber-800 border-amber-200' }}">
+                                        <i class="fa-solid {{ $isInvalidSignature ? 'fa-circle-xmark' : 'fa-triangle-exclamation' }} text-[10px]"></i>
+                                        {{ $isInvalidSignature ? 'Invalid Signature' : 'Pending Manual Review' }}
+                                    </div>
+
+                                    <p class="text-xs text-gray-600 leading-relaxed">
+                                        {{ $signatureReviewNotes ?: 'The AI signature checker was unavailable during submission, so this uploaded signature needs manual review.' }}
+                                    </p>
+
+                                    <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                                        <a href="{{ $signatureUrl }}" target="_blank" rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-2 text-xs font-bold text-[#8B0000] hover:text-[#6b0000] transition">
+                                            <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+                                            Open Full Signature
+                                        </a>
+
+                                        @if ($isPendingManualReview)
+                                        <form method="POST"
+                                            action="{{ $profileMode === 'admin' ? route('admin.patient.signature.invalid', $patient) : route('dentist.patient.signature.invalid', $patient) }}"
+                                            onsubmit="return confirm('Mark this uploaded signature as invalid and notify the patient to upload a new one?');"
+                                            class="ml-auto">
+                                            @csrf
+                                            <button type="submit"
+                                                class="inline-flex items-center gap-1 rounded-full bg-[#8B0000] px-2.5 py-1 text-[7px] font-extrabold leading-none text-white shadow-sm transition hover:bg-[#6b0000]"
+                                                style="font-family: inherit;">
+                                                <i class="fa-solid fa-ban text-[8px]"></i>
+                                                Invalid Signature
+                                            </button>
+                                        </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

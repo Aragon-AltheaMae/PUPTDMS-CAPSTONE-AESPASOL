@@ -11,8 +11,18 @@ class SignatureAiVerifier
     private const ACCEPTED_MESSAGE = 'Signature verified and accepted';
     private const DECLINED_MESSAGE = 'Signature could not be processed. Please try again.';
 
+    public function __construct(
+        private readonly AiServiceManager $aiServiceManager
+    ) {}
+
     public function verify(UploadedFile $file): array
     {
+        if (!$this->aiServiceManager->shouldUse('signature')) {
+            return $this->manualReviewResult(
+                'AI signature verification is currently unavailable. Signature accepted for manual review.'
+            );
+        }
+
         $apiKey = config('services.openai.api_key');
 
         $model = trim((string) (
@@ -24,8 +34,7 @@ class SignatureAiVerifier
         $threshold = (float) config('services.signature_ai.threshold', 0.75);
 
         if (empty($apiKey)) {
-            return $this->failResult(
-                'system_error',
+            return $this->manualReviewResult(
                 'OpenAI API key is not configured.'
             );
         }
@@ -201,9 +210,12 @@ PROMPT;
                     'body' => $response->body(),
                 ]);
 
-                return $this->failResult(
-                    'api_error',
-                    'AI verification failed.'
+                $this->aiServiceManager->recordFailure('signature', 'OpenAI signature verification failed.', [
+                    'status' => $response->status(),
+                ]);
+
+                return $this->manualReviewResult(
+                    'AI verification failed. Signature accepted for manual review.'
                 );
             }
 
@@ -304,6 +316,12 @@ PROMPT;
                 'reason' => $reason,
             ]);
 
+            $this->aiServiceManager->recordSuccess('signature', 'Signature AI verification completed.', [
+                'accepted' => $accepted,
+                'detected_type' => $detectedType,
+                'confidence' => $confidence,
+            ]);
+
             return [
                 /*
                  * These three are intentionally the same.
@@ -333,9 +351,12 @@ PROMPT;
                 'line' => $e->getLine(),
             ]);
 
-            return $this->failResult(
-                'exception',
-                'Unable to verify signature image.'
+            $this->aiServiceManager->recordFailure('signature', 'OpenAI signature verification exception.', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->manualReviewResult(
+                'Unable to verify signature image. Signature accepted for manual review.'
             );
         }
     }
@@ -508,6 +529,24 @@ PROMPT;
             'detected_type' => $detectedType,
             'reason' => $reason,
             'message' => self::DECLINED_MESSAGE,
+        ];
+    }
+
+    private function manualReviewResult(string $reason): array
+    {
+        $this->aiServiceManager->recordFallback('signature', $reason);
+
+        return [
+            'accepted' => true,
+            'valid' => true,
+            'is_signature' => true,
+            'ai_is_signature' => false,
+            'confidence' => 0.0,
+            'detected_type' => 'manual_review_required',
+            'reason' => $reason,
+            'message' => 'Signature accepted for manual review.',
+            'review_required' => true,
+            'review_status' => 'pending_manual_review',
         ];
     }
 }

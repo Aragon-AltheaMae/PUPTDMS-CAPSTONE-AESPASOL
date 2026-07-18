@@ -9,6 +9,7 @@
 @php
 $logs = $logs ?? collect([]);
 $perPage = $perPage ?? 10;
+$status = $status ?? 'active';
 @endphp
 
 <main id="mainContent" class="admin-page-shell system-logs-page page-enter mode-list">
@@ -112,6 +113,18 @@ $perPage = $perPage ?? 10;
                             <span>Filter</span>
                             <span id="slFilterBadge" class="filter-badge hidden"></span>
                         </button>
+
+                        <button type="button" id="slArchiveBtn" class="sl-toolbar-btn sl-toolbar-btn-archive"
+                            title="Archive old active logs">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Archive Old Logs</span>
+                        </button>
+
+                        <button type="button" id="slExportBtn" class="sl-toolbar-btn sl-toolbar-btn-export"
+                            title="Export current logs view to PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Export PDF</span>
+                        </button>
                     </div>
 
                     <div class="view-toggle-container sl-view-toggle" id="slViewToggle" aria-label="View toggle">
@@ -134,6 +147,21 @@ $perPage = $perPage ?? 10;
             </div>
 
             @php $activeRole = $role ?? 'all'; @endphp
+            <div class="sl-status-tabs">
+                @foreach ([
+                ['key' => 'active', 'label' => 'Active', 'count' => $activeCount ?? 0, 'icon' => 'fa-wave-square'],
+                ['key' => 'archived', 'label' => 'Archived', 'count' => $archivedCount ?? 0, 'icon' => 'fa-box-archive'],
+                ['key' => 'all', 'label' => 'All Logs', 'count' => ($activeCount ?? 0) + ($archivedCount ?? 0), 'icon' => 'fa-layer-group'],
+                ] as $statusTab)
+                <button type="button" class="sl-status-tab {{ $status === $statusTab['key'] ? 'active' : '' }}"
+                    onclick="slSetStatus(this, '{{ $statusTab['key'] }}')">
+                    <i class="fa-solid {{ $statusTab['icon'] }}"></i>
+                    <span>{{ $statusTab['label'] }}</span>
+                    <span class="sl-status-count">{{ $statusTab['count'] }}</span>
+                </button>
+                @endforeach
+            </div>
+
             <div class="sl-role-tabs">
                 @foreach ([
                 ['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
@@ -270,6 +298,11 @@ $perPage = $perPage ?? 10;
                                             class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
                                         {{ ucwords(str_replace('_', ' ', $log->action)) }}
                                     </span>
+                                    @if($log->is_archived)
+                                    <span class="sl-archive-badge" title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                        <i class="fa-solid fa-box-archive"></i> Archived
+                                    </span>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="sl-module">
@@ -329,6 +362,11 @@ $perPage = $perPage ?? 10;
                                     class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
                                 {{ ucwords(str_replace('_', ' ', $log->action)) }}
                             </span>
+                            @if($log->is_archived)
+                            <span class="sl-archive-badge" title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                <i class="fa-solid fa-box-archive"></i> Archived
+                            </span>
+                            @endif
                         </div>
 
                         <div class="sl-user">
@@ -561,6 +599,56 @@ $perPage = $perPage ?? 10;
     </div>
 </div>
 
+<div id="slArchiveModal" class="ui-modal modal-overlay sl-archive-modal" aria-hidden="true"
+    onclick="closeModalOnBackdrop(event, 'slArchiveModal')">
+    <div class="modal-box-inner sl-archive-modal-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true"
+        aria-labelledby="slArchiveModalTitle">
+        <div class="sl-archive-modal-hero">
+            <button type="button" class="sl-archive-modal-close" onclick="closeSlArchiveModal()"
+                aria-label="Close archive modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="sl-archive-icon-ring">
+                <div class="sl-archive-icon-core">
+                    <i class="fa-solid fa-box-archive"></i>
+                </div>
+            </div>
+
+            <h3 id="slArchiveModalTitle" class="sl-archive-modal-title">Archive System Logs</h3>
+            <p class="sl-archive-modal-sub">Move older log records out of the active view without affecting other dashboards.</p>
+        </div>
+
+        <div class="sl-archive-modal-body">
+            <div class="sl-archive-modal-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Only active logs older than the selected number of days will be archived.</span>
+            </div>
+
+            <div class="sl-archive-field">
+                <label for="slArchiveDaysInput" class="sl-archive-label">Archive logs older than</label>
+                <div class="sl-archive-input-wrap">
+                    <input type="number" id="slArchiveDaysInput" class="sl-archive-input" min="1" max="3650"
+                        step="1" value="90" placeholder="Enter number of days">
+                    <span class="sl-archive-suffix">days</span>
+                </div>
+                <div id="slArchiveError" class="sl-archive-error hidden">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Please enter a valid number from 1 to 3650.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sl-archive-modal-actions">
+            <button type="button" class="modal-btn-ghost" onclick="closeSlArchiveModal()">Cancel</button>
+            <button type="button" id="slArchiveConfirmBtn" class="sl-archive-confirm-btn" onclick="submitSlArchiveModal()">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Archive Logs</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -568,9 +656,10 @@ $perPage = $perPage ?? 10;
     var slState = {
         role: @json($role ?? 'all'),
         search: @json($search ?? ''),
+        status: @json($status ?? 'active'),
         perPage: {{ (int)($perPage ?? 10) }},
     page: @json((int) request('page', 1)),
-    sort: @json($sort ?? 'desc'),
+        sort: @json($sort ?? 'desc'),
     dateFrom: @json($dateFrom ?? ''),
     dateTo: @json($dateTo ?? ''),
     actionType: @json($actionType ?? ''),
@@ -676,6 +765,11 @@ $perPage = $perPage ?? 10;
     @endif
 
     var searchInput = document.getElementById('slSearch');
+    var slArchiveBtn = document.getElementById('slArchiveBtn');
+    var slExportBtn = document.getElementById('slExportBtn');
+    var slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
+    var slArchiveError = document.getElementById('slArchiveError');
+    var slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
     if (searchInput) {
         searchInput.addEventListener('keydown', function (event) {
             if (event.key !== 'Enter') return;
@@ -710,13 +804,52 @@ $perPage = $perPage ?? 10;
         window.initGlobalPageSizeSelects?.();
     }
 
+    if (slExportBtn) {
+        slExportBtn.addEventListener('click', function () {
+            var params = new URLSearchParams({
+                role: slState.role || 'all',
+                search: slState.search || '',
+                status: slState.status || 'active',
+                sort: slState.sort || 'desc',
+                date_from: slState.dateFrom || '',
+                date_to: slState.dateTo || '',
+                action_type: slState.actionType || '',
+                module: slState.module || '',
+            });
+
+            window.location.href = '{{ route('admin.system_logs.export') }}?' + params.toString();
+        });
+    }
+
+    if (slArchiveBtn) {
+        slArchiveBtn.addEventListener('click', function () {
+            if (slState.status === 'archived') {
+                window.showToast?.('Switch to active or all logs before archiving.', 'warning');
+                return;
+            }
+            openSlArchiveModal();
+        });
+    }
+
+    if (slArchiveDaysInput) {
+        slArchiveDaysInput.addEventListener('input', clearSlArchiveError);
+        slArchiveDaysInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitSlArchiveModal();
+            }
+        });
+    }
+
     @php $latestLogId = optional(($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs -> getCollection() : $logs) -> first()) -> id ?? 0; @endphp
 
     var lastKnownId = {{ (int) $latestLogId }};
     var notifBanner = null;
 
     function checkForNewLogs() {
-        fetch("{{ route('admin.system_logs.check') }}", {
+        if (slState.status === 'archived') return;
+
+        fetch("{{ route('admin.system_logs.check') }}?status=" + encodeURIComponent(slState.status || 'active'), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
@@ -866,6 +999,122 @@ $perPage = $perPage ?? 10;
 
         el?.classList.add('active');
         el?.querySelector('.tab-count')?.classList.add('active');
+
+        slFetch();
+    }
+
+    function openSlArchiveModal() {
+        clearSlArchiveError();
+
+        if (slArchiveDaysInput) {
+            slArchiveDaysInput.value = slArchiveDaysInput.value || '90';
+        }
+
+        if (typeof window.openModal === 'function') {
+            window.openModal('slArchiveModal');
+        } else {
+            document.getElementById('slArchiveModal')?.classList.add('open');
+        }
+
+        setTimeout(function () {
+            slArchiveDaysInput?.focus();
+            slArchiveDaysInput?.select();
+        }, 80);
+    }
+
+    function closeSlArchiveModal() {
+        clearSlArchiveError();
+
+        if (typeof window.closeModal === 'function') {
+            window.closeModal('slArchiveModal');
+        } else {
+            document.getElementById('slArchiveModal')?.classList.remove('open');
+        }
+    }
+
+    function clearSlArchiveError() {
+        slArchiveError?.classList.add('hidden');
+    }
+
+    function submitSlArchiveModal() {
+        var olderThanDays = Number(slArchiveDaysInput?.value || '');
+
+        if (!Number.isFinite(olderThanDays) || olderThanDays < 1 || olderThanDays > 3650) {
+            slArchiveError?.classList.remove('hidden');
+            slArchiveDaysInput?.focus();
+            return;
+        }
+
+        var body = new URLSearchParams({
+            older_than_days: String(Math.floor(olderThanDays)),
+            role: slState.role || 'all',
+            search: slState.search || '',
+            sort: slState.sort || 'desc',
+            date_from: slState.dateFrom || '',
+            date_to: slState.dateTo || '',
+            action_type: slState.actionType || '',
+            module: slState.module || '',
+        });
+
+        if (slArchiveConfirmBtn) {
+            slArchiveConfirmBtn.disabled = true;
+            slArchiveConfirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Archiving...</span>';
+        }
+
+        fetch('{{ route('admin.system_logs.archive') }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept': 'application/json'
+            },
+            body: body.toString()
+        })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                if (!result.ok) {
+                    throw new Error(result.data?.message || 'Archive request failed');
+                }
+
+                closeSlArchiveModal();
+                window.showToast?.(result.data?.message || 'Logs archived successfully.', 'success');
+                slState.page = 1;
+                slFetch();
+            })
+            .catch(function (error) {
+                window.showToast?.(error.message || 'Unable to archive logs right now.', 'error');
+            })
+            .finally(function () {
+                if (slArchiveConfirmBtn) {
+                    slArchiveConfirmBtn.disabled = false;
+                    slArchiveConfirmBtn.innerHTML = '<i class="fa-solid fa-box-archive"></i><span>Archive Logs</span>';
+                }
+            });
+    }
+
+    window.openSlArchiveModal = openSlArchiveModal;
+    window.closeSlArchiveModal = closeSlArchiveModal;
+    window.submitSlArchiveModal = submitSlArchiveModal;
+
+    function slSetStatus(el, status) {
+        slState.status = status || 'active';
+        slState.page = 1;
+
+        document.querySelectorAll('.sl-status-tab').forEach(function (button) {
+            button.classList.remove('active');
+        });
+
+        el?.classList.add('active');
+
+        if (slState.status === 'archived' && notifBanner) {
+            notifBanner.remove();
+            notifBanner = null;
+        }
 
         slFetch();
     }
@@ -1277,6 +1526,7 @@ $perPage = $perPage ?? 10;
         return new URLSearchParams({
             role: slState.role || 'all',
             search: slState.search || '',
+            status: slState.status || 'active',
             per_page: 1,
             page: 1,
             sort: document.getElementById('slSortOrder')?.value || 'desc',
@@ -1351,6 +1601,7 @@ $perPage = $perPage ?? 10;
         var params = new URLSearchParams({
             role: slState.role || 'all',
             search: slState.search || '',
+            status: slState.status || 'active',
             per_page: slState.perPage || 10,
             page: slState.page || 1,
             sort: slState.sort || 'desc',
@@ -1482,6 +1733,9 @@ $perPage = $perPage ?? 10;
             var moduleLabel = escapeSlHtml((log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) {
                 return c.toUpperCase();
             }));
+            var archiveBadge = log.is_archived
+                ? '<span class="sl-archive-badge" title="' + escapeSlHtml(log.archived_at || 'Archived') + '"><i class="fa-solid fa-box-archive"></i> Archived</span>'
+                : '';
             var actorName = escapeSlHtml(log.actor_name ?? log.actor_identifier ?? 'Unknown User');
             var description = escapeSlHtml(log.description || 'No description provided.');
             var createdDay = escapeSlHtml(log.created_at_day || '');
@@ -1495,7 +1749,7 @@ $perPage = $perPage ?? 10;
                 escapeSlHtml(role.charAt(0).toUpperCase() + role.slice(1)) + '</span></td>';
             tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) + '">' + letter +
                 '</div><span class="sl-username">' + actorName + '</span></div></td>';
-            tableHtml += '<td><span class="sl-action ' + escapeSlHtml(actionClass) + '">' + actionIconHtml + ' ' + actionLabel + '</span ></td > ';
+            tableHtml += '<td><span class="sl-action ' + escapeSlHtml(actionClass) + '">' + actionIconHtml + ' ' + actionLabel + '</span> ' + archiveBadge + '</td>';
             tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel +
                 '</span></td>';
             tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description +
@@ -1505,7 +1759,7 @@ $perPage = $perPage ?? 10;
             gridHtml += '<div class="sl-grid-card" data-role="' + escapeSlHtml(role) + '" data-action="' + escapeSlHtml(actionClass) + '">';
             gridHtml += '<div class="sl-grid-top">';
             gridHtml += '<div class="sl-grid-id">' + idPadded + '</div>';
-            gridHtml += '<span class="sl-action ' + escapeSlHtml(actionClass) + '"> ' + actionIconHtml + ' ' + actionLabel + '</span > ';
+            gridHtml += '<div class="sl-grid-top-badges"><span class="sl-action ' + escapeSlHtml(actionClass) + '"> ' + actionIconHtml + ' ' + actionLabel + '</span>' + archiveBadge + '</div>';
             gridHtml += '</div>';
 
             gridHtml += '<div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) + '">' + letter +
@@ -1631,6 +1885,9 @@ $perPage = $perPage ?? 10;
         updateTabCount('patient', counts.patient);
         updateTabCount('login', counts.login);
         updateTabCount('error', counts.error);
+        updateStatusCount('active', counts.active);
+        updateStatusCount('archived', counts.archived);
+        updateStatusCount('all', Number(counts.active || 0) + Number(counts.archived || 0));
     }
 
     function updateTabCount(role, value) {
@@ -1640,6 +1897,17 @@ $perPage = $perPage ?? 10;
             if (!button.getAttribute('onclick')?.includes("'" + role + "'")) return;
 
             var count = button.querySelector('.tab-count');
+            if (count && value !== undefined && value !== null) {
+                count.textContent = value;
+            }
+        });
+    }
+
+    function updateStatusCount(status, value) {
+        document.querySelectorAll('.sl-status-tab').forEach(function (button) {
+            if (!button.getAttribute('onclick')?.includes("'" + status + "'")) return;
+
+            var count = button.querySelector('.sl-status-count');
             if (count && value !== undefined && value !== null) {
                 count.textContent = value;
             }
@@ -1662,6 +1930,12 @@ $perPage = $perPage ?? 10;
         var title = 'No system logs yet';
         var sub = 'Activity will appear here once users interact with the system.';
         var actionHtml = '';
+
+        if (slState.status === 'archived' && !query && !hasActiveSlFilters() && slState.role === 'all') {
+            icon = 'fa-box-archive';
+            title = 'No archived logs yet';
+            sub = 'Archive older records to keep the active log view easier to manage.';
+        }
 
         if (query) {
             icon = 'fa-magnifying-glass';
