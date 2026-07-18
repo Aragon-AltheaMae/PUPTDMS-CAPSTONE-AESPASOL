@@ -455,6 +455,11 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         Are you sure you want to permanently delete
         <span class="modal-highlight" id="deleteRoleName"></span>?
 
+        <div class="modal-warning-note" style="margin-top:14px;">
+            <i class="fa-solid fa-shuffle"></i>
+            <span id="deleteRoleFallbackNote">Affected users will be reassigned to a default role.</span>
+        </div>
+
         <span class="modal-danger-note">
             <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
             <span>This action cannot be undone.</span>
@@ -1360,6 +1365,28 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
     const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
 
+    function getFallbackRoleName(roleName, roleSlug) {
+        const normalizedName = String(roleName || '').toLowerCase();
+        const normalizedSlug = String(roleSlug || '').toLowerCase();
+
+        if (normalizedSlug.includes('dentist') || normalizedName.includes('dentist')) {
+            return 'Dentist';
+        }
+
+        if (
+            normalizedSlug.includes('admin') ||
+            normalizedName.includes('admin') ||
+            normalizedSlug.includes('staff') ||
+            normalizedName.includes('staff') ||
+            normalizedSlug.includes('clinic') ||
+            normalizedName.includes('clinic')
+        ) {
+            return 'Admin';
+        }
+
+        return 'Patient';
+    }
+
     function openDeleteModal(roleId, roleName) {
         const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
         const slug = (card?.dataset.slug || '').toLowerCase().trim();
@@ -1374,6 +1401,8 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
 
         document.getElementById('deleteRoleName').textContent = roleName;
+        document.getElementById('deleteRoleFallbackNote').textContent =
+            `Affected users will be reassigned to the default ${getFallbackRoleName(roleName, slug)} role.`;
         document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
         const deleteModal = document.getElementById('deleteRoleModal');
         openRoleDialog(deleteModal);
@@ -1397,20 +1426,21 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             method: 'POST',
             body: new FormData(form),
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         })
             .then(async res => {
+                const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
-                    const data = await res.json().catch(() => ({}));
                     throw new Error(data.message || 'Could not delete role.');
                 }
-                return res;
+                return data;
             })
-            .then(() => {
+            .then((data) => {
                 closeDeleteModal();
                 if (typeof showToast === 'function') {
-                    showToast('Success', 'Role deleted successfully.', 'success');
+                    showToast('Success', data.message || 'Role deleted successfully.', 'success');
                 }
 
                 fetch(window.location.href)

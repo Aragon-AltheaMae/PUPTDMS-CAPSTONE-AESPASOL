@@ -3197,6 +3197,9 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 
 .um-view-details-modal {
     overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: calc(100dvh - 2rem) !important;
 }
 
 .um-view-details-head {
@@ -3210,6 +3213,7 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     background:
         radial-gradient(circle at top right, rgba(139, 0, 0, .10), transparent 36%),
         linear-gradient(180deg, #FFFFFF 0%, #FFFDFD 100%);
+    flex-shrink: 0;
 }
 
 .um-view-head-left {
@@ -3271,6 +3275,11 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 }
 
 .um-view-details-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding: 1.35rem 1.45rem 1.15rem;
     background: #FFFFFF;
 }
@@ -3417,6 +3426,10 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 .um-view-details-foot {
     border-top: 1px solid #EEF2F7 !important;
     background: #FFFFFF !important;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
 }
 
 [data-theme="dark"] .um-view-details-head,
@@ -3803,11 +3816,17 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 }
 
 #editModal .modal-box-inner.um-user-modal-md {
-    overflow: visible !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 #editModal #editForm {
-    overflow: visible !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 #editModal .um-custom-select {

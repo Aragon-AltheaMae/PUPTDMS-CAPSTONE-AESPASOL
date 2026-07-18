@@ -335,6 +335,9 @@ Route::prefix('admin')
         Route::get('/system-logs/export', [SystemLogController::class, 'export'])
             ->name('admin.system_logs.export');
 
+        Route::post('/system-logs/archive', [SystemLogController::class, 'archive'])
+            ->name('admin.system_logs.archive');
+
 
         /*
         |--------------------------------------------------------------------------
@@ -818,6 +821,14 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
     Route::post('/book-appointment/validate-signature', [AppointmentController::class, 'validateSignature'])
         ->name('book.appointment.validate-signature');
 
+    Route::get('/signature-review', [AppointmentController::class, 'showSignatureReview'])
+        ->middleware('permission:book_appointments')
+        ->name('patient.signature-review.show');
+
+    Route::post('/signature-review', [AppointmentController::class, 'updateSignatureReview'])
+        ->middleware('permission:book_appointments')
+        ->name('patient.signature-review.update');
+
     Route::get('/appointments', [AppointmentController::class, 'index'])
         ->middleware('permission:view_own_appointments')
         ->name('book.appointment.index');
@@ -827,6 +838,11 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
     })->name('patient.appointment.cancelled.view');
 });
 
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
+        ->name('admin.patient.signature.invalid');
+});
+
 /*
 |--------------------------------------------------------------------------
 | DENTIST ROUTES
@@ -834,6 +850,9 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
 */
 
 Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
+    Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
+        ->middleware('permission:manage_patient_profiles')
+        ->name('dentist.patient.signature.invalid');
 
     Route::get('/dashboard', function () {
         $now   = \Carbon\Carbon::now();
