@@ -492,7 +492,7 @@ $notifCount = $notifications->count();
                                         aria-disabled="{{ $isToday ? 'false' : 'true' }}"
                                         onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                         data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
-                                        data-start-url="{{ route('dentist.odontogram', $appt->patient_id) }}?from=appointments&appointment_id={{ $appt->id }}&start_procedure=1">
+                                        data-start-url="{{ route('dentist.odontogram', ['appointment' => $appt->id]) }}?from=appointments&start_procedure=1">
                                         <i class="fa-solid fa-play"></i>
                                     </button>
 
@@ -652,7 +652,7 @@ $notifCount = $notifications->count();
                                 aria-disabled="{{ $isToday ? 'false' : 'true' }}"
                                 onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                 data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
-                                data-start-url="{{ route('dentist.odontogram', $appt->patient_id) }}?from=appointments&appointment_id={{ $appt->id }}&start_procedure=1">
+                                data-start-url="{{ route('dentist.odontogram', ['appointment' => $appt->id]) }}?from=appointments&start_procedure=1">
                                 <i class="fa-solid fa-play text-[10px]"></i> Start
                             </button>
 

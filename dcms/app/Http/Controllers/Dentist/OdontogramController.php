@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dentist;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\AppointmentProcedure;
+use App\Models\PatientOdontogram;
 use App\Models\Tooth;
 use App\Models\ToothLegend;
 use App\Models\ToothSurface;
@@ -61,12 +62,23 @@ class OdontogramController extends Controller
 
         $patient = $appointment->patient;
 
-        $procedure = AppointmentProcedure::where('patient_id', $patient->id)
-            ->whereNotNull('odontogram_data')
-            ->latest('updated_at')
-            ->first();
+        $procedure = AppointmentProcedure::where('appointment_id', $appointment->id)->first();
 
-        $savedOdontogramData = $procedure?->odontogram_data ?? [];
+        $patientOdontogram = PatientOdontogram::where('patient_id', $patient->id)->first();
+
+        // Backward-compatible fallback for patients whose existing procedure
+        // data has not yet been migrated to the patient-level odontogram.
+        $latestProcedureWithOdontogram = $patientOdontogram
+            ? null
+            : AppointmentProcedure::where('patient_id', $patient->id)
+                ->whereNotNull('odontogram_data')
+                ->latest('updated_at')
+                ->latest('id')
+                ->first();
+
+        $savedOdontogramData = $patientOdontogram?->odontogram_data
+            ?? $latestProcedureWithOdontogram?->odontogram_data
+            ?? [];
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
@@ -223,13 +235,14 @@ class OdontogramController extends Controller
                 }
 
                 foreach (['top', 'left', 'center', 'right', 'bottom'] as $surfaceKey) {
-                    $surfaceCode = trim((string) data_get($entry, "surfaces.$surfaceKey.code", ''));
+                    $surfaceData = data_get($entry, "surfaces.$surfaceKey");
+                    $surfaceCode = trim((string) data_get($surfaceData, 'code', ''));
 
                     if ($surfaceCode !== '') {
                         $cleanEntry['surfaces'][$surfaceKey] = [
-                            'code' => $surface['code'] ?? null,
-                            'label' => $surface['label'] ?? null,
-                            'colorHex' => '#2563eb',
+                            'code' => $surfaceCode,
+                            'label' => data_get($surfaceData, 'label', $surfaceCode),
+                            'colorHex' => data_get($surfaceData, 'colorHex'),
                         ];
                     }
                 }
@@ -305,6 +318,15 @@ class OdontogramController extends Controller
             $surfaceMap,
             &$savedTeeth
         ) {
+            $submittedToothNumbers = collect($cleanOdontogramData)
+                ->pluck('tooth')
+                ->map(fn ($toothNumber) => (int) $toothNumber)
+                ->all();
+
+            Tooth::where('patient_id', $patient->id)
+                ->whereNotIn('tooth_number', $submittedToothNumbers)
+                ->delete();
+
             foreach ($cleanOdontogramData as $entry) {
                 $toothNumber = (int) $entry['tooth'];
 
@@ -337,13 +359,25 @@ class OdontogramController extends Controller
                 }
             }
 
-            AppointmentProcedure::updateOrCreate(
+            PatientOdontogram::updateOrCreate(
                 [
                     'patient_id' => $patient->id,
                 ],
                 [
-                    'patient_id' => $patient->id,
+                    'odontogram_data' => $cleanOdontogramData,
+                    'last_appointment_id' => $appointment->id,
+                    'last_updated_by' => auth()->id(),
+                ]
+            );
+
+            // Keep one clinical snapshot per appointment for reports/history,
+            // while the patient_odontograms row remains the single live chart.
+            AppointmentProcedure::updateOrCreate(
+                [
                     'appointment_id' => $appointment->id,
+                ],
+                [
+                    'patient_id' => $patient->id,
                     'odontogram_data' => $cleanOdontogramData,
                     'oral_examination' => $validated['oral_examination'] ?? null,
                     'diagnosis' => $validated['diagnosis'] ?? null,

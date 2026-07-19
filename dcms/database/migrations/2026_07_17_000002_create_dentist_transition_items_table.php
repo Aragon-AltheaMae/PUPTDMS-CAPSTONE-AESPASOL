@@ -29,7 +29,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['dentist_transition_id', 'item_type', 'record_id'], 'dentist_transition_items_unique_record');
-            $table->index(['dentist_transition_id', 'transfer_status']);
+            $table->index(['dentist_transition_id', 'transfer_status'],
+                            'dti_transition_status_idx'
+                        );
             $table->index(['item_type', 'record_id']);
         });
     }
