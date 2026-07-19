@@ -2,7 +2,7 @@
 
 @section('layout-role', 'dentist')
 
-@section('title', 'Odontogram Procedure')
+@section('title', 'Patient Odontogram')
 
 @section('content')
 
@@ -29,7 +29,7 @@ $today = Carbon::now()->format('F d, Y');
                         </div>
                         <div>
                             <p class="hero-eyebrow">Dental Procedure Workspace</p>
-                            <h1 class="hero-title">Dentist Odontogram</h1>
+                            <h1 class="hero-title">Patient Odontogram</h1>
                             <p class="hero-subtitle">2D / 3D Treatment &amp; Condition Mapping</p>
                         </div>
                     </div>
@@ -135,6 +135,21 @@ $today = Carbon::now()->format('F d, Y');
                                 class="absolute inset-0 bg-white flex flex-col gap-3 items-center justify-center z-10 rounded-xl transition-opacity duration-500">
                                 <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#8B0000]"></i>
                                 <p class="text-sm font-semibold text-gray-600">Generating 3D Model...</p>
+                            </div>
+
+                            <div class="three-mouse-guide" aria-label="3D model mouse controls">
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key">L</span>
+                                    <span><strong>Left mouse:</strong> Navigate and select a tooth</span>
+                                </div>
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key">R</span>
+                                    <span><strong>Right mouse:</strong> Move the model</span>
+                                </div>
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key mouse-wheel-key"><i class="fa-solid fa-arrows-up-down"></i></span>
+                                    <span><strong>Scroll:</strong> Zoom in/out</span>
+                                </div>
                             </div>
 
                             <div id="toothTooltip" class="tooth-tooltip">
@@ -487,6 +502,43 @@ $today = Carbon::now()->format('F d, Y');
     </div>
 </div>
 
+<div id="finishProcedureModal"
+    class="procedure-confirm-modal fixed inset-0 z-[90] hidden items-center justify-center p-4"
+    role="dialog" aria-modal="true" aria-labelledby="finishProcedureModalTitle">
+    <div class="procedure-confirm-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <div
+        class="procedure-confirm-card relative w-[calc(100vw-2rem)] max-w-[480px] overflow-hidden rounded-2xl bg-[#8B0000] px-8 py-10 text-center shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
+        <div
+            class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+            <i id="finishProcedureModalIcon" class="fa-solid fa-clipboard-check text-white text-2xl"></i>
+        </div>
+
+        <h2 id="finishProcedureModalTitle" class="text-2xl font-extrabold text-white mb-4">
+            Procedure Completed!
+        </h2>
+
+        <p id="finishProcedureModalMessage" class="text-white/85 text-sm leading-7 mb-6"></p>
+
+        <div id="finishProcedureConfirmActions" class="hidden flex-col sm:flex-row justify-center gap-3">
+            <button type="button" id="confirmFinishProcedureBtn"
+                class="bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
+                Yes, Finish Procedure
+            </button>
+
+            <button type="button" id="dismissFinishProcedureBtn"
+                class="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition">
+                No, Review
+            </button>
+        </div>
+
+        <button type="button" id="finishProcedureModalActionBtn"
+            class="hidden bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
+            Back to Appointments
+        </button>
+    </div>
+</div>
+
 <div id="followUpModal"
     class="fixed inset-0 bg-black/50 hidden items-end sm:items-center justify-center backdrop-blur-sm z-[9999] p-0 sm:p-4">
 
@@ -686,7 +738,17 @@ $today = Carbon::now()->format('F d, Y');
         const cancelProcedureModal = document.getElementById('cancelProcedureModal');
         const confirmCancelProcedureBtn = document.getElementById('confirmCancelProcedureBtn');
         const dismissCancelProcedureBtn = document.getElementById('dismissCancelProcedureBtn');
+        const finishProcedureModal = document.getElementById('finishProcedureModal');
+        const finishProcedureModalTitle = document.getElementById('finishProcedureModalTitle');
+        const finishProcedureModalMessage = document.getElementById('finishProcedureModalMessage');
+        const finishProcedureModalIcon = document.getElementById('finishProcedureModalIcon');
+        const finishProcedureConfirmActions = document.getElementById('finishProcedureConfirmActions');
+        const confirmFinishProcedureBtn = document.getElementById('confirmFinishProcedureBtn');
+        const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
+        const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
+        let finishProcedureModalRedirectUrl = null;
+        let finishProcedureModalCloseTimer = null;
 
         const legendSearchInput = document.getElementById('legendSearchInput');
         const clearLegendSearchBtn = document.getElementById('clearLegendSearchBtn');
@@ -767,7 +829,7 @@ $today = Carbon::now()->format('F d, Y');
 
         const legends = [{
             code: 'D',
-            label: 'Decayed'
+            label: 'Decayed (Caries indicated for Filling)'
         },
         {
             code: 'M',
@@ -779,7 +841,7 @@ $today = Carbon::now()->format('F d, Y');
         },
         {
             code: 'I',
-            label: 'Indicated for Extraction'
+            label: 'Caries Indicated for Extraction'
         },
         {
             code: 'RF',
@@ -791,6 +853,7 @@ $today = Carbon::now()->format('F d, Y');
         },
         {
             code: 'IM',
+            displayCode: 'Im',
             label: 'Impacted Tooth'
         },
         {
@@ -811,6 +874,7 @@ $today = Carbon::now()->format('F d, Y');
         },
         {
             code: 'IN',
+            displayCode: 'In',
             label: 'Inlay'
         },
         {
@@ -819,6 +883,7 @@ $today = Carbon::now()->format('F d, Y');
         },
         {
             code: 'RM',
+            displayCode: 'Rm',
             label: 'Removable Denture'
         },
         {
@@ -830,39 +895,41 @@ $today = Carbon::now()->format('F d, Y');
             label: 'Extraction due to Other Causes'
         },
         {
-            code: 'PT',
-            label: 'Present Tooth'
+            code: '✓',
+            label: 'Present Teeth'
         },
         {
             code: 'CM',
+            displayCode: 'Cm',
             label: 'Congenitally Missing'
         },
         {
             code: 'SP',
+            displayCode: 'Sp',
             label: 'Supernumerary'
         }
         ];
 
         const legendColors = {
             D: '#ef4444',
-            M: '#9ca3af',
-            F: '#22c55e',
-            I: '#f97316',
-            RF: '#7c2d12',
-            MO: '#6b7280',
-            IM: '#9333ea',
+            M: '#111827',
+            F: '#2563eb',
+            I: '#ef4444',
+            RF: '#ef4444',
+            MO: '#111827',
+            IM: '#111827',
             J: '#2563eb',
-            A: '#0f766e',
-            AB: '#14b8a6',
-            P: '#6366f1',
-            IN: '#10b981',
-            LC: '#22d3ee',
-            RM: '#94a3b8',
-            X: '#b91c1c',
-            XO: '#7f1d1d',
-            PT: '#111111',
-            CM: '#a1a1aa',
-            SP: '#c084fc'
+            A: '#2563eb',
+            AB: '#2563eb',
+            P: '#2563eb',
+            IN: '#2563eb',
+            LC: '#2563eb',
+            RM: '#2563eb',
+            X: '#2563eb',
+            XO: '#2563eb',
+            '✓': '#111827',
+            CM: '#111827',
+            SP: '#111827'
         };
 
         const legendIcons = {
@@ -882,34 +949,28 @@ $today = Carbon::now()->format('F d, Y');
             RM: 'fa-solid fa-teeth',
             X: 'fa-solid fa-xmark',
             XO: 'fa-solid fa-skull-crossbones',
-            PT: 'fa-solid fa-check',
+            '✓': 'fa-solid fa-check',
             CM: 'fa-solid fa-question',
             SP: 'fa-solid fa-plus'
         };
 
         const legendCategories = [{
             key: 'conditions',
-            title: 'Conditions & Findings',
+            title: 'Legend Condition',
             icon: 'fa-solid fa-heart-pulse',
-            items: ['D', 'RF', 'IM', 'CM', 'SP', 'PT']
+            items: ['D', 'M', 'F', 'I', 'RF', 'MO', 'IM']
         },
         {
-            key: 'missing',
-            title: 'Missing / Extraction',
-            icon: 'fa-solid fa-ban',
-            items: ['M', 'MO', 'X', 'XO', 'I']
-        },
-        {
-            key: 'restorations',
-            title: 'Restorations',
+            key: 'restoration-prosthetics',
+            title: 'Restoration and Prosthetics',
             icon: 'fa-solid fa-screwdriver-wrench',
-            items: ['F', 'A', 'LC', 'IN', 'J']
+            items: ['J', 'A', 'AB', 'P', 'IN', 'LC', 'RM']
         },
         {
-            key: 'prosthetics',
-            title: 'Prosthetics & Support',
-            icon: 'fa-solid fa-link',
-            items: ['AB', 'P', 'RM']
+            key: 'surgery',
+            title: 'Surgery',
+            icon: 'fa-solid fa-user-doctor',
+            items: ['X', 'XO', '✓', 'CM', 'SP']
         }
         ];
 
@@ -952,21 +1013,41 @@ $today = Carbon::now()->format('F d, Y');
                     !Array.isArray(entry.surfaces) ?
                     entry.surfaces : {};
 
+            const normalizeLegendRecord = function (record) {
+                if (!record || !record.code) return null;
+
+                const rawCode = String(record.code).trim();
+                const normalizedCode = ['PT', '+'].includes(rawCode.toUpperCase())
+                    ? '✓'
+                    : rawCode.toUpperCase();
+                const currentLegend = getLegendByCode(normalizedCode);
+
+                return {
+                    ...record,
+                    code: normalizedCode,
+                    label: currentLegend?.label || record.label || normalizedCode,
+                    colorHex: legendColors[normalizedCode] || record.colorHex || '#111827'
+                };
+            };
+
             return {
                 ...defaultState,
                 ...entry,
                 tooth: toothNumber,
                 toothName: entry.toothName || entry.tooth_name || defaultState.toothName,
-                status: entry.status || null,
-                threeD: entry.threeD || entry.three_d || null,
+                status: normalizeLegendRecord(entry.status),
+                threeD: normalizeLegendRecord(entry.threeD || entry.three_d),
                 lastSelectedSurface: ['top', 'left', 'center', 'right', 'bottom'].includes(
                     entry.lastSelectedSurface || entry.last_selected_surface
                 )
                     ? (entry.lastSelectedSurface || entry.last_selected_surface)
                     : null,
                 surfaces: {
-                    ...defaultState.surfaces,
-                    ...surfaces
+                    top: normalizeLegendRecord(surfaces.top),
+                    left: normalizeLegendRecord(surfaces.left),
+                    center: normalizeLegendRecord(surfaces.center),
+                    right: normalizeLegendRecord(surfaces.right),
+                    bottom: normalizeLegendRecord(surfaces.bottom)
                 }
             };
         }
@@ -996,6 +1077,11 @@ $today = Carbon::now()->format('F d, Y');
 
         function getLegendByCode(code) {
             return legends.find(item => item.code === code) || null;
+        }
+
+        function getLegendDisplayCode(code) {
+            const legend = getLegendByCode(code);
+            return legend?.displayCode || legend?.code || code;
         }
 
         function getToothName(toothNumber) {
@@ -1069,6 +1155,57 @@ $today = Carbon::now()->format('F d, Y');
             cancelProcedureModal.classList.remove('flex');
         }
 
+        function openFinishProcedureModal({
+            title,
+            message,
+            icon = 'fa-clipboard-check',
+            buttonText = 'Back to Appointments',
+            redirectUrl = null,
+            confirmation = false,
+        }) {
+            if (finishProcedureModalCloseTimer) {
+                clearTimeout(finishProcedureModalCloseTimer);
+                finishProcedureModalCloseTimer = null;
+            }
+
+            finishProcedureModalTitle.textContent = title;
+            finishProcedureModalMessage.textContent = message;
+            finishProcedureModalIcon.className = `fa-solid ${icon} text-white text-2xl`;
+            finishProcedureModalActionBtn.textContent = buttonText;
+            finishProcedureModalRedirectUrl = redirectUrl;
+
+            finishProcedureConfirmActions.classList.toggle('hidden', !confirmation);
+            finishProcedureConfirmActions.classList.toggle('flex', confirmation);
+            finishProcedureModalActionBtn.classList.toggle('hidden', confirmation);
+
+            finishProcedureModal.classList.remove('hidden');
+            finishProcedureModal.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                finishProcedureModal.classList.add('is-open');
+                (confirmation ? confirmFinishProcedureBtn : finishProcedureModalActionBtn).focus();
+            });
+        }
+
+        function closeFinishProcedureModal() {
+            finishProcedureModal.classList.remove('is-open');
+            const redirectUrl = finishProcedureModalRedirectUrl;
+            finishProcedureModalRedirectUrl = null;
+
+            finishProcedureModalCloseTimer = setTimeout(() => {
+                finishProcedureModal.classList.add('hidden');
+                finishProcedureModal.classList.remove('flex');
+                finishProcedureModalCloseTimer = null;
+
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                finishProcedureBtn?.focus();
+            }, 220);
+        }
+
         function getSurfaceLabel(surface) {
             const map = {
                 top: 'Top Surface',
@@ -1093,7 +1230,7 @@ $today = Carbon::now()->format('F d, Y');
             }
 
             if (selectedTooth) {
-                surfacePickerToothLabel.textContent = `Tooth #${selectedTooth} Â· ${getToothName(selectedTooth)}`;
+                surfacePickerToothLabel.textContent = `Tooth #${selectedTooth} - ${getToothName(selectedTooth)}`;
                 surfacePickerHelperText.textContent = selectedTargetType === 'surface'
                     ? `${getSurfaceLabel(selectedSurfaceKey)} selected.`
                     : 'Camera focused on the selected tooth. Now choose one large surface button below.';
@@ -1286,7 +1423,7 @@ $today = Carbon::now()->format('F d, Y');
             selectedToothLegendList.innerHTML = `
                     <span class="treatment-chip inline-flex items-center gap-2">
                         <span class="legend-color-dot" style="background:${selectedRecord.colorHex};"></span>
-                        ${selectedRecord.code} - ${selectedRecord.label}
+                        ${getLegendDisplayCode(selectedRecord.code)} - ${selectedRecord.label}
                     </span>
                 `;
         }
@@ -1325,7 +1462,7 @@ $today = Carbon::now()->format('F d, Y');
             }
 
             if (currentView === '3d' && !selectedTargetType) {
-                selectedToothDisplay.textContent = `Tooth #${selectedTooth} â€¢ Choose a surface below`;
+                selectedToothDisplay.textContent = `Tooth #${selectedTooth} - Choose a surface below`;
                 selectedToothName.textContent = getToothName(selectedTooth);
                 toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
                 selectedViewBadge.textContent = '3D View';
@@ -1346,7 +1483,7 @@ $today = Carbon::now()->format('F d, Y');
                     getSurfaceLabel('status') :
                     getSurfaceLabel('whole');
 
-            selectedToothDisplay.textContent = `Tooth #${selectedTooth} â€¢ ${surfaceText}`;
+            selectedToothDisplay.textContent = `Tooth #${selectedTooth} - ${surfaceText}`;
             selectedToothName.textContent = getToothName(selectedTooth);
             toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
             selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
@@ -1447,7 +1584,7 @@ $today = Carbon::now()->format('F d, Y');
                             <span class="legend-color-dot" style="background:${legendColors[legend.code]};"></span>
                             <i class="${legendIcons[legend.code]} text-[#8B0000] w-4 text-center"></i>
                             <span class="legend-meta">
-                                <span class="legend-code">${legend.code}</span>
+                                <span class="legend-code">${legend.displayCode || legend.code}</span>
                                 <span class="legend-label">${legend.label}</span>
                             </span>
                         `;
@@ -1460,9 +1597,9 @@ $today = Carbon::now()->format('F d, Y');
 
                         selectedLegend = legend.code;
                         selectedLegendPreview.textContent =
-                            `${legend.code} - ${legend.label}`;
+                            `${legend.displayCode || legend.code} - ${legend.label}`;
                         drawerSelectedLegendPreview.textContent =
-                            `${legend.code} - ${legend.label}`;
+                            `${legend.displayCode || legend.code} - ${legend.label}`;
                         updateLegendActiveState();
                         updateActionButtons();
                     });
@@ -1782,8 +1919,8 @@ $today = Carbon::now()->format('F d, Y');
             renderSelectedToothLegendList();
             updateLegendActiveState();
             updateActionButtons();
-            selectedLegendPreview.textContent = `${payload.code} - ${payload.label}`;
-            drawerSelectedLegendPreview.textContent = `${payload.code} - ${payload.label}`;
+            selectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
+            drawerSelectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
             closeLegendDrawer();
 
             if (currentView === '3d') {
@@ -2011,6 +2148,7 @@ $today = Carbon::now()->format('F d, Y');
         }
 
         function switchView(view) {
+            const previousView = currentView;
             currentView = view;
 
             if (view === '2d') {
@@ -2027,6 +2165,16 @@ $today = Carbon::now()->format('F d, Y');
                 view2dBtn.classList.remove('active');
                 view3dBtn.classList.add('active');
                 viewInstructionText.textContent = 'Click a tooth in the 3D model, then choose a surface below';
+
+                if (previousView !== '3d') {
+                    // Keep odontogramState unchanged so all saved markings
+                    // render in 3D, but do not carry the active 2D selection.
+                    selectedTooth = null;
+                    selectedTargetType = null;
+                    selectedSurfaceKey = null;
+                    selectedMesh = null;
+                    selectedLegend = null;
+                }
 
                 if (!threeSceneInitialized) {
                     initThreeScene();
@@ -2697,7 +2845,7 @@ $today = Carbon::now()->format('F d, Y');
                     <div class="text-sm font-bold leading-tight">${toothName}</div>
                     <div class="mt-1 text-[11px] text-gray-300">Click to choose this tooth, then select a surface.</div>
                     <div class="mt-2 text-xs ${treatment ? 'text-emerald-200' : 'text-gray-300'}">
-                        ${treatment ? `Current visual: ${treatment.code} - ${treatment.label}` : 'No treatment assigned'}
+                        ${treatment ? `Current visual: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}` : 'No treatment assigned'}
                     </div>
                 `;
 
@@ -3300,12 +3448,22 @@ $today = Carbon::now()->format('F d, Y');
                     return;
                 }
 
-                showProcedureToast(result.message || 'Procedure completed successfully.', 'success');
+                if (completionAction === 'finished') {
+                    openFinishProcedureModal({
+                        title: 'Procedure Completed!',
+                        message: 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
+                        icon: 'fa-clipboard-check',
+                        buttonText: 'Back to Appointments',
+                        redirectUrl: result.redirect_url || null,
+                    });
+                } else {
+                    showProcedureToast(result.message || 'Procedure completed successfully.', 'success');
 
-                if (result.redirect_url) {
-                    setTimeout(() => {
-                        window.location.href = result.redirect_url;
-                    }, 900);
+                    if (result.redirect_url) {
+                        setTimeout(() => {
+                            window.location.href = result.redirect_url;
+                        }, 900);
+                    }
                 }
 
             } catch (error) {
@@ -3319,7 +3477,38 @@ $today = Carbon::now()->format('F d, Y');
         }
 
         finishProcedureBtn.addEventListener('click', function () {
-            saveProcedure('finished', this, 'Saving Procedure...');
+            updateHiddenInput();
+
+            if (!hasAppliedTreatmentThisSession || getCleanOdontogramDataForSave().length === 0) {
+                openFinishProcedureModal({
+                    title: 'Treatment Required',
+                    message: 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+                    icon: 'fa-tooth',
+                    buttonText: 'Review Procedure',
+                });
+                return;
+            }
+
+            openFinishProcedureModal({
+                title: 'Finish Procedure?',
+                message: 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+                icon: 'fa-circle-question',
+                confirmation: true,
+            });
+        });
+
+        confirmFinishProcedureBtn.addEventListener('click', function () {
+            closeFinishProcedureModal();
+            saveProcedure('finished', finishProcedureBtn, 'Saving Procedure...');
+        });
+
+        dismissFinishProcedureBtn.addEventListener('click', closeFinishProcedureModal);
+        finishProcedureModalActionBtn.addEventListener('click', closeFinishProcedureModal);
+
+        finishProcedureModal.addEventListener('click', function (event) {
+            if (event.target === finishProcedureModal || event.target.classList.contains('procedure-confirm-backdrop')) {
+                closeFinishProcedureModal();
+            }
         });
 
         followUpBtn.addEventListener('click', function () {
@@ -3458,6 +3647,7 @@ $today = Carbon::now()->format('F d, Y');
             if (event.key === 'Escape') {
                 closeResetModal();
                 closeCancelProcedureModal();
+                closeFinishProcedureModal();
 
                 if (currentView === '3d' && selectedTooth) {
                     clear3DSurfacePickerSelection(false);

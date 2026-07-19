@@ -368,6 +368,51 @@
     cursor: grabbing;
 }
 
+.three-mouse-guide {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.three-mouse-guide-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #475569;
+    font-size: 11px;
+    line-height: 1.2;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.07);
+    backdrop-filter: blur(8px);
+}
+
+.three-mouse-guide-item strong {
+    color: #8b0000;
+}
+
+.mouse-button-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 24px;
+    flex: 0 0 22px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px 10px 8px 8px;
+    background: #f8fafc;
+    color: #8b0000;
+    font-size: 10px;
+    font-weight: 900;
+}
+
 .odontogram2d-shell {
     width: 100%;
     overflow-x: auto;
@@ -554,6 +599,18 @@
         height: 340px;
     }
 
+    .three-mouse-guide {
+        right: 10px;
+        top: 10px;
+        left: 10px;
+        gap: 6px;
+    }
+
+    .three-mouse-guide-item {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
     .odontogram2d-shell {
         padding: 12px;
     }
@@ -725,11 +782,13 @@
     margin-bottom: 4px;
 }
 
-.hero-title {
+#mainContent.odontogram-page .hero-title {
     font-size: 2rem;
     line-height: 1;
     font-weight: 900;
     color: #8b0000;
+    -webkit-text-fill-color: #8b0000;
+    background: none;
     margin: 0 0 0.35rem;
 }
 
@@ -961,7 +1020,7 @@
         padding: 1.1rem 1rem 1.1rem 4.1rem;
     }
 
-    .hero-title {
+    #mainContent.odontogram-page .hero-title {
         font-size: 1.5rem;
     }
 
@@ -1079,6 +1138,12 @@
 .dark #mainContent.odontogram-page .text-gray-800,
 .dark #mainContent.odontogram-page .text-gray-700 {
     color: var(--odo-text) !important;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .hero-title,
+.dark #mainContent.odontogram-page .hero-title {
+    -webkit-text-fill-color: var(--odo-text) !important;
+    background: none !important;
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .hero-subtitle,
@@ -1327,6 +1392,26 @@
     border-radius: 16px;
 }
 
+[data-theme="dark"] #mainContent.odontogram-page .three-mouse-guide-item,
+.dark #mainContent.odontogram-page .three-mouse-guide-item {
+    background: rgba(17, 24, 39, 0.88);
+    border-color: rgba(148, 163, 184, 0.24);
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .three-mouse-guide-item strong,
+[data-theme="dark"] #mainContent.odontogram-page .mouse-button-key,
+.dark #mainContent.odontogram-page .three-mouse-guide-item strong,
+.dark #mainContent.odontogram-page .mouse-button-key {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .mouse-button-key,
+.dark #mainContent.odontogram-page .mouse-button-key {
+    background: #111827;
+    border-color: #374151;
+}
+
 [data-theme="dark"] #mainContent.odontogram-page #loadingOverlay,
 .dark #mainContent.odontogram-page #loadingOverlay {
     background:
@@ -1546,6 +1631,46 @@
         inset 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
+.procedure-confirm-modal {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .22s ease, visibility .22s ease;
+}
+
+.procedure-confirm-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.procedure-confirm-backdrop {
+    opacity: 0;
+    transition: opacity .22s ease;
+}
+
+.procedure-confirm-modal.is-open .procedure-confirm-backdrop {
+    opacity: 1;
+}
+
+.procedure-confirm-card {
+    opacity: 0;
+    transform: translateY(18px) scale(.94);
+    transition: opacity .22s ease, transform .28s cubic-bezier(.2, .9, .3, 1.15);
+    will-change: transform, opacity;
+}
+
+.procedure-confirm-modal.is-open .procedure-confirm-card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .procedure-confirm-modal,
+    .procedure-confirm-backdrop,
+    .procedure-confirm-card {
+        transition-duration: .01ms !important;
+    }
+}
+
 #followUpModal {
     align-items: center;
     padding: 1rem;
@@ -1577,7 +1702,7 @@
     display: grid !important;
     grid-template-columns: minmax(0, 1.15fr) minmax(250px, .85fr) !important;
     gap: 1rem !important;
-    align-items: stretch !important;
+    align-items: start !important;
 }
 
 #followUpModal .follow-up-cal-wrap,
@@ -1684,7 +1809,7 @@
 #followUpModal .two-col {
     grid-template-columns: minmax(0, 1.06fr) minmax(285px, .94fr) !important;
     gap: 1.15rem !important;
-    align-items: stretch !important;
+    align-items: start !important;
     margin-bottom: 1rem !important;
 }
 
@@ -1695,7 +1820,14 @@
     box-shadow: 0 10px 26px rgba(15, 23, 42, .05) !important;
 }
 
+#followUpModal .follow-up-cal-wrap {
+    align-self: start !important;
+    height: fit-content !important;
+    padding-bottom: 1.25rem !important;
+}
+
 #followUpModal .follow-up-slots-wrap {
+    align-self: start !important;
     min-height: 374px !important;
     display: flex !important;
     flex-direction: column !important;
