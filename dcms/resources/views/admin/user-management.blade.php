@@ -144,19 +144,8 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                         </div>
 
-                        <div class="view-toggle-container um-view-toggle" id="umViewToggle" aria-label="View options">
-                            <span class="view-slider" aria-hidden="true"></span>
-
-                            <button type="button" class="btn-view-mode um-view-toggle-btn active" id="umListViewBtn"
-                                title="List view" aria-label="List view" aria-pressed="true">
-                                <i class="fa-solid fa-table-list"></i>
-                            </button>
-
-                            <button type="button" class="btn-view-mode um-view-toggle-btn" id="umGridViewBtn"
-                                title="Grid view" aria-label="Grid view" aria-pressed="false">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                        </div>
+                        <x-view-toggle id="umViewToggle" class="um-view-toggle" storage-key="userManagementView"
+                            list-view="#umListView" grid-view="#umGridView" />
                     </form>
                 </div>
 
@@ -283,29 +272,53 @@ $inactiveCount = $inactiveCount ?? 0;
                                             'id' => $user->id,
                                             'name' => $user->name,
                                             'email' => $user->email,
-                                            'role' => optional($user->role)->display_name ?? optional($user->role)->name
-                                            ?? 'No Role',
+                                            'role' =>
+                                            optional($user->role)->display_name ??
+                                            (optional($user->role)->name ?? 'No Role'),
                                             'status' => ucfirst($user->status),
                                             'source' => 'Users',
-                                            'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i
-                                            A') : 'N/A',
-                                            'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i
-                                            A') : 'N/A',
-                                            'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
-                                            'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d,
-                                            Y') ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
-                                            'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
-                                            'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
+                                            'created_at' => $user->created_at
+                                            ? $user->created_at->format('M d, Y h:i
+                                            A')
+                                            : 'N/A',
+                                            'updated_at' => $user->updated_at
+                                            ? $user->updated_at->format('M d, Y h:i
+                                            A')
+                                            : 'N/A',
+                                            'phone' =>
+                                            optional($user->patient)->phone ?:
+                                            ($user->phone ?:
+                                            'N/A'),
+                                            'birthdate' =>
+                                            optional(optional($user->patient)->birthdate)
+                                            ?->format('M d,
+                                            Y') ??
+                                            (optional($user->birthdate)?->format('M d, Y') ??
+                                            'N/A'),
+                                            'gender' =>
+                                            optional($user->patient)->gender ?:
+                                            ($user->gender ?:
+                                            'N/A'),
+                                            'phone_raw' =>
+                                            optional($user->patient)->phone ?? ($user->phone ?? ''),
                                             'birthdate_raw' =>
-                                            optional(optional($user->patient)->birthdate)?->format('Y-m-d') ??
-                                            optional($user->birthdate)?->format('Y-m-d') ?? '',
-                                            'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
-                                            'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
-                                            'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A')
-                                            ?? 'Never',
+                                            optional(optional($user->patient)->birthdate)?->format(
+                                            'Y-m-d',
+                                            ) ??
+                                            (optional($user->birthdate)?->format('Y-m-d') ?? ''),
+                                            'gender_raw' =>
+                                            optional($user->patient)->gender ??
+                                            ($user->gender ?? ''),
+                                            'patient_profile' => $user->patient
+                                            ? 'Linked'
+                                            : 'Not linked',
+                                            'last_login_at' =>
+                                            optional($user->last_login_at)?->format(
+                                            'M d, Y h:i A',
+                                            ) ?? 'Never',
                                             ];
                                             @endphp
-                                            <div class="um-action-group flex items-center justify-center gap-1">
+                                            <div class="ui-action-group um-action-group">
                                                 <button type="button" data-user-details='@json($userDetails)'
                                                     onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
                                                     class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
@@ -317,17 +330,12 @@ $inactiveCount = $inactiveCount ?? 0;
         {{ $user->id }},
         @js($user->status),
         @js($user->name)
-    )" class="ui-action-btn {{ $user->status === 'active'
-        ? 'ui-action-warning'
-        : 'ui-action-success' }}" data-tooltip="{{ $user->status === 'active'
-        ? 'Deactivate account'
-        : 'Activate account' }}" aria-label="{{ $user->status === 'active'
-        ? 'Deactivate account'
-        : 'Activate account' }}">
+    )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
+                                                    data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
+                                                    aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
 
-                                                    <i class="fa-solid {{ $user->status === 'active'
-        ? 'fa-toggle-on'
-        : 'fa-toggle-off' }}">
+                                                    <i
+                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
                                                     </i>
                                                 </button>
 
@@ -379,18 +387,6 @@ $inactiveCount = $inactiveCount ?? 0;
                                 @php
                                 $roleSlug = optional($user->role)->slug;
                                 $roleName = optional($user->role)->name ?? 'No Role';
-                                $roleBg =
-                                $roleSlug === 'patient'
-                                ? '#dbeafe'
-                                : ($roleSlug === 'dentist'
-                                ? '#d1fae5'
-                                : '#fee2e2');
-                                $roleColor =
-                                $roleSlug === 'patient'
-                                ? '#1d4ed8'
-                                : ($roleSlug === 'dentist'
-                                ? '#065f46'
-                                : '#8B0000');
                                 @endphp
 
                                 <div class="um-grid-card">
@@ -454,25 +450,40 @@ $inactiveCount = $inactiveCount ?? 0;
                                         'id' => $user->id,
                                         'name' => $user->name,
                                         'email' => $user->email,
-                                        'role' => optional($user->role)->display_name ?? optional($user->role)->name ??
-                                        'No Role',
+                                        'role' =>
+                                        optional($user->role)->display_name ??
+                                        (optional($user->role)->name ?? 'No Role'),
                                         'status' => ucfirst($user->status),
                                         'source' => 'Users',
-                                        'created_at' => $user->created_at ? $user->created_at->format('M d, Y h:i A') :
-                                        'N/A',
-                                        'updated_at' => $user->updated_at ? $user->updated_at->format('M d, Y h:i A') :
-                                        'N/A',
-                                        'phone' => optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
-                                        'birthdate' => optional(optional($user->patient)->birthdate)?->format('M d, Y')
-                                        ?? (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
-                                        'gender' => optional($user->patient)->gender ?: ($user->gender ?: 'N/A'),
-                                        'phone_raw' => optional($user->patient)->phone ?? $user->phone ?? '',
+                                        'created_at' => $user->created_at
+                                        ? $user->created_at->format('M d, Y h:i A')
+                                        : 'N/A',
+                                        'updated_at' => $user->updated_at
+                                        ? $user->updated_at->format('M d, Y h:i A')
+                                        : 'N/A',
+                                        'phone' =>
+                                        optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
+                                        'birthdate' =>
+                                        optional(optional($user->patient)->birthdate)?->format(
+                                        'M d, Y',
+                                        ) ??
+                                        (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                        'gender' =>
+                                        optional($user->patient)->gender ?:
+                                        ($user->gender ?:
+                                        'N/A'),
+                                        'phone_raw' =>
+                                        optional($user->patient)->phone ?? ($user->phone ?? ''),
                                         'birthdate_raw' =>
-                                        optional(optional($user->patient)->birthdate)?->format('Y-m-d') ??
-                                        optional($user->birthdate)?->format('Y-m-d') ?? '',
-                                        'gender_raw' => optional($user->patient)->gender ?? $user->gender ?? '',
+                                        optional(optional($user->patient)->birthdate)?->format(
+                                        'Y-m-d',
+                                        ) ??
+                                        (optional($user->birthdate)?->format('Y-m-d') ?? ''),
+                                        'gender_raw' =>
+                                        optional($user->patient)->gender ?? ($user->gender ?? ''),
                                         'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
-                                        'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ??
+                                        'last_login_at' =>
+                                        optional($user->last_login_at)?->format('M d, Y h:i A') ??
                                         'Never',
                                         ];
                                         @endphp
@@ -487,17 +498,12 @@ $inactiveCount = $inactiveCount ?? 0;
         {{ $user->id }},
         @js($user->status),
         @js($user->name)
-    )" class="ui-action-btn {{ $user->status === 'active'
-        ? 'ui-action-warning'
-        : 'ui-action-success' }}" data-tooltip="{{ $user->status === 'active'
-        ? 'Deactivate account'
-        : 'Activate account' }}" aria-label="{{ $user->status === 'active'
-        ? 'Deactivate account'
-        : 'Activate account' }}">
+    )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
+                                            data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
+                                            aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
 
-                                            <i class="fa-solid {{ $user->status === 'active'
-        ? 'fa-toggle-on'
-        : 'fa-toggle-off' }}">
+                                            <i
+                                                class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
                                             </i>
                                         </button>
 
@@ -541,8 +547,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
 <div class="modal-overlay" id="generatedPasswordModal" aria-hidden="true">
     <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+        <div class="modal-themed-header
+           px-6 py-5 border-b
+           flex items-center justify-between
+           sticky top-0 rounded-t-2xl z-10">
             <div class="flex items-center gap-3">
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow">
@@ -554,59 +562,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
             <button type="button" onclick="closeModal('generatedPasswordModal')"
-                data-close-modal="generatedPasswordModal" class="um-modal-x"
-                aria-label="Close generated password modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="p-6 space-y-4">
-            <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                <strong>{{ session('generated_user_password.name') }}</strong><br>
-                <span class="text-xs">{{ session('generated_user_password.email') }}</span>
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                    Temporary Password
-                </label>
-                <div class="relative">
-                    <input type="text" id="generatedUserPasswordValue"
-                        value="{{ session('generated_user_password.password') }}"
-                        class="field-input w-full border border-gray-200 px-3.5 py-3 pr-24 text-sm bg-white font-mono"
-                        readonly>
-                    <button type="button" onclick="copyGeneratedPassword()"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-xs font-bold">
-                        Copy
-                    </button>
-                </div>
-            </div>
-
-            <div class="sl-pagination-wrap um-pagination-wrap">
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-</main>
-
-<div class="modal-overlay" id="generatedPasswordModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow">
-                    <i class="fa-solid fa-key text-white text-sm"></i>
-                </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Generated Password</h3>
-                    <p class="text-[12px] text-gray-500">Share this with the new user before closing.</p>
-                </div>
-            </div>
-            <button type="button" onclick="closeModal('generatedPasswordModal')"
-                data-close-modal="generatedPasswordModal" class="um-modal-x"
-                aria-label="Close generated password modal">
+                data-close-modal="generatedPasswordModal" class="modal-x" aria-label="Close generated password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -654,14 +610,16 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <button type="button" onclick="closeModal('addModal')" data-close-modal="addModal" class="um-modal-x"
-                aria-label="Close add user modal">
+            <button type="button" data-discard-close="addModal" class="modal-x" aria-label="Close add user modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm"
-            class="flex-1 flex flex-col min-h-0" data-global-validation data-discard-changes novalidate>
+            class="flex-1 flex flex-col min-h-0" data-global-validation data-global-selects data-discard-form
+            data-discard-title="Discard new user?" data-discard-subtitle="You have unsaved account details."
+            data-discard-message="Closing this modal will remove the user information you entered. Do you want to discard your changes?"
+            novalidate>
             @csrf
 
             <div class="um-user-modal-body">
@@ -768,59 +726,37 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </p>
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            <div data-global-field>
+                                <label for="addBirthdateInput"
+                                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Birthdate
                                 </label>
-                                <input type="date" id="addBirthdateInput" name="birthdate"
-                                    value="{{ old('birthdate') }}"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+
+                                <div class="fp-date-input-wrap">
+                                    <input type="text" id="addBirthdateInput" name="birthdate"
+                                        value="{{ old('birthdate') }}"
+                                        class="field-input fp-date-input js-flatpickr-date-max-today"
+                                        placeholder="Select birthdate" autocomplete="off"
+                                        data-validation-rule="notFutureDate" readonly>
+
+                                    <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                </div>
                             </div>
 
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Gender
                                 </label>
-                                <select id="addGenderInput" name="gender"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
-                                    <option value="">Select gender</option>
-                                    <option value="Male" {{ old('gender')==='Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ old('gender')==='Female' ? 'selected' : '' }}>Female
-                                    </option>
+                                <select name="gender" id="addGenderInput" class="field-input js-custom-select"
+                                    data-placeholder="Select gender">
+                                    <option value="" disabled>Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="um-divider"></div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-2">
-                                Status <span class="text-red-500">*</span>
-                            </label>
-
-                            <div class="um-status-grid">
-                                <label class="um-status-card um-status-card--active">
-                                    <input type="radio" name="status" value="active" {{ old('status', 'active'
-                                        )==='active' ? 'checked' : '' }} required
-                                        style="accent-color:#8B0000; margin-top:.22rem;">
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
-                                        <div class="text-[11px] text-emerald-700 mt-0.5">Can access the system
-                                            immediately</div>
-                                    </div>
-                                </label>
-
-                                <label class="um-status-card um-status-card--inactive">
-                                    <input type="radio" name="status" value="inactive" {{ old('status')==='inactive'
-                                        ? 'checked' : '' }} style="accent-color:#8B0000; margin-top:.22rem;">
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-bold text-gray-700 leading-tight">Inactive</div>
-                                        <div class="text-[11px] text-gray-500 mt-0.5">Account exists but login is
-                                            disabled</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="um-user-side-card">
@@ -891,13 +827,42 @@ $inactiveCount = $inactiveCount ?? 0;
                             <div class="um-password-note">
                                 The same generated password is saved for the account and shown again after creation.
                             </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-2">
+                                    Status <span class="text-red-500">*</span>
+                                </label>
+
+                                <div class="um-status-grid">
+                                    <label class="um-status-card um-status-card--active">
+                                        <input type="radio" name="status" value="active" {{ old('status', 'active'
+                                            )==='active' ? 'checked' : '' }} required
+                                            style="accent-color:#8B0000; margin-top:.22rem;">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
+                                            <div class="text-[11px] text-emerald-700 mt-0.5">Can access the system
+                                                immediately</div>
+                                        </div>
+                                    </label>
+
+                                    <label class="um-status-card um-status-card--inactive">
+                                        <input type="radio" name="status" value="inactive" {{ old('status')==='inactive'
+                                            ? 'checked' : '' }} style="accent-color:#8B0000; margin-top:.22rem;">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-gray-700 leading-tight">Inactive</div>
+                                            <div class="text-[11px] text-gray-500 mt-0.5">Account exists but login is
+                                                disabled</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="modal-ft um-user-modal-footer">
-                <button type="button" onclick="closeModal('addModal')" class="ui-btn ui-btn-secondary">
+                <button type="button" data-discard-close="addModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
@@ -910,176 +875,205 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay modal-theme-edit" id="editModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-md" onclick="event.stopPropagation()">
-        <div
-            class="modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl modal-themed-icon">
-                    <i class="fa-solid fa-user-pen text-white text-sm"></i>
+<div class="ui-modal modal-theme-edit" id="editModal" aria-hidden="true">
+    <div class="ui-modal-card modal-md modal-split-card">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-pen"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Edit User</h3>
-                    <p class="text-[12px] text-gray-500" id="editModalSubtitle">Updating user details</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Edit User</h3>
+                    <p class="modal-subtitle" id="editModalSubtitle">
+                        Updating user details
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('editModal')" data-close-modal="editModal" class="um-modal-x"
-                aria-label="Close edit user modal">
+
+            <button type="button" data-discard-close="editModal" class="modal-x">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" id="editForm" class="p-6 space-y-4" data-global-validation datanovalidate>
+        <form method="POST" id="editForm" class="modal-card-form" data-global-validation data-global-selects
+            data-discard-form data-discard-title="Discard user changes?"
+            data-discard-subtitle="You have unsaved account updates."
+            data-discard-message="Closing this modal will remove the changes made to this user. Do you want to discard them?"
+            novalidate>
             @csrf
             @method('PUT')
             <input type="hidden" id="editOriginalRole" value="">
+            <div class="modal-bd modal-scroll-body space-y-4">
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Full Name <span class="text-red-500">*</span>
+                    </label>
 
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                    Full Name <span class="text-red-500">*</span>
-                </label>
-
-                <div class="voice-search-row" data-voice-field>
-                    <input type="text" name="name" id="editName" placeholder="Full name"
-                        class="field-input flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
-                        required>
-
-                    <div class="voice-input-toggle">
-                        <button type="button" id="editNameMicBtn" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
-                            aria-label="Voice input for edit full name">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                    Email Address <span class="text-red-500">*</span>
-                </label>
-
-                <div class="voice-search-row" data-voice-field>
-                    <div class="relative flex-1 min-w-0">
-                        <i
-                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-
-                        <input type="email" name="email" id="editEmail" placeholder="user@pup.edu.ph"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
+                    <div class="voice-search-row" data-voice-field>
+                        <input type="text" name="name" id="editName" placeholder="Full name"
+                            class="field-input flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
                             required>
-                    </div>
 
-                    <div class="voice-input-toggle">
-                        <button type="button" id="editEmailMicBtn" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#editEmail" data-voice-status="#editEmailVoiceStatus"
-                            aria-label="Voice input for edit email">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
+                        <div class="voice-input-toggle">
+                            <button type="button" id="editNameMicBtn" class="voice-search-mic external"
+                                data-voice-trigger data-voice-target="#editName"
+                                data-voice-status="#editNameVoiceStatus" aria-label="Voice input for edit full name">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
 
-                        <span id="editEmailVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
+                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
-                <div class="um-custom-select" id="editRoleSelect" data-custom-select>
-                    <input type="hidden" name="role_id" id="editRole" value="">
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Email Address <span class="text-red-500">*</span>
+                    </label>
 
-                    <button type="button" class="um-custom-select-btn" id="editRoleBtn" aria-haspopup="listbox"
-                        aria-expanded="false">
-                        <span id="editRoleText">No Role</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
+                    <div class="voice-search-row" data-voice-field>
+                        <div class="relative flex-1 min-w-0">
+                            <i
+                                class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
 
-                    <div class="um-custom-select-menu" id="editRoleMenu" role="listbox">
-                        <button type="button" class="um-custom-select-option" data-value="">
-                            <span>No Role</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
+                            <input type="email" name="email" id="editEmail" placeholder="user@pup.edu.ph"
+                                class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
+                                required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" id="editEmailMicBtn" class="voice-search-mic external"
+                                data-voice-trigger data-voice-target="#editEmail"
+                                data-voice-status="#editEmailVoiceStatus" aria-label="Voice input for edit email">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editEmailVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-global-field>
+                    <label for="editRole"
+                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Role
+                    </label>
+
+                    <select name="role_id" id="editRole" class="field-input js-custom-select"
+                        data-placeholder="No Role">
+                        <option value="">No Role</option>
 
                         @foreach ($roles as $role)
-                        <button type="button" class="um-custom-select-option" data-value="{{ $role->id }}">
-                            <span>{{ $role->display_name }}</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
+                        <option value="{{ $role->id }}">
+                            {{ $role->display_name }}
+                        </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
+                        Confirm Role Change
+                    </label>
+                    <p class="text-[12px] text-amber-700 mb-2">
+                        Enter your current admin password to continue changing this user's role.
+                    </p>
+                    <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
+                        placeholder="Current admin password"
+                        class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                        autocomplete="current-password">
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-4 space-y-4">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800">Backup Information</h4>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            Phone Number
+                        </label>
+                        <input type="text" name="phone" id="editPhone" placeholder="09xx xxx xxxx"
+                            class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                            inputmode="numeric" autocomplete="tel" maxlength="13">
+                        <p id="editPhoneFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
+                    </div>
+
+                    <div data-global-field>
+                        <label for="editBirthdate"
+                            class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            Birthdate
+                        </label>
+
+                        <div class="fp-date-input-wrap">
+                            <input type="text" id="editBirthdate" name="birthdate"
+                                class="field-input fp-date-input js-flatpickr-date-max-today"
+                                placeholder="Select birthdate" autocomplete="off" data-validation-rule="notFutureDate"
+                                readonly>
+
+                            <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            Gender
+                        </label>
+                        <select name="gender" id="editGender" class="field-input js-custom-select"
+                            data-placeholder="Select gender">
+                            <option value="" disabled>Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+
+                    <div class="global-choice-group" role="radiogroup" aria-label="Account status">
+
+                        <label class="global-choice-card">
+                            <input type="radio" name="status" id="editStatusActive" value="active"
+                                class="global-choice-input" required>
+
+                            <span class="global-choice-indicator">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+
+                            <span class="global-choice-copy">
+                                <strong class="global-choice-title">Active</strong>
+                                <small class="global-choice-description">
+                                    User can access the system
+                                </small>
+                            </span>
+                        </label>
+
+                        <label class="global-choice-card">
+                            <input type="radio" name="status" id="editStatusInactive" value="inactive"
+                                class="global-choice-input">
+
+                            <span class="global-choice-indicator">
+                                <i class="fa-solid fa-ban"></i>
+                            </span>
+
+                            <span class="global-choice-copy">
+                                <strong class="global-choice-title">Inactive</strong>
+                                <small class="global-choice-description">
+                                    User login will be disabled
+                                </small>
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>
-
-            <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
-                    Confirm Role Change
-                </label>
-                <p class="text-[12px] text-amber-700 mb-2">
-                    Enter your current admin password to continue changing this user's role.
-                </p>
-                <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
-                    placeholder="Current admin password"
-                    class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-                    autocomplete="current-password">
-            </div>
-
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Status
-                    <span class="text-red-500">*</span></label>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" id="editStatusActive" value="active" required
-                            style="accent-color:#8B0000;">
-                        <span class="text-sm text-gray-700 font-medium">Active</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" id="editStatusInactive" value="inactive"
-                            style="accent-color:#8B0000;">
-                        <span class="text-sm text-gray-700 font-medium">Inactive</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-4 space-y-4">
-                <div>
-                    <h4 class="text-sm font-bold text-gray-800">Backup Information</h4>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                        Phone Number
-                    </label>
-                    <input type="text" name="phone" id="editPhone" placeholder="09xx xxx xxxx"
-                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-                        inputmode="numeric" autocomplete="tel" maxlength="13">
-                    <p id="editPhoneFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                        Birthdate
-                    </label>
-                    <input type="date" name="birthdate" id="editBirthdate"
-                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                        Gender
-                    </label>
-                    <select name="gender" id="editGender"
-                        class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white">
-                        <option value="">Select gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('editModal')" class="ui-btn ui-btn-secondary">
+            <div class="modal-ft modal-sticky-footer">
+                <button type="button" data-discard-close="editModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
@@ -1093,74 +1087,87 @@ $inactiveCount = $inactiveCount ?? 0;
 </div>
 
 <div class="modal-overlay modal-theme-reset" id="resetModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+    <div class="modal-box-inner
+           um-user-modal
+           um-user-modal-sm
+           modal-split-card" onclick="event.stopPropagation()">
+        <div class="modal-themed-header
+           px-6 py-5 border-b
+           flex items-center justify-between
+           sticky top-0 rounded-t-2xl z-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl modal-themed-icon">
                     <i class="fa-solid fa-key text-white text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Reset Password</h3>
+                    <h3 class="modal-themed-title font-extrabold text-base">
+                        Reset Password
+                    </h3>
                     <p class="text-[10px] text-gray-500" id="resetModalSubtitle">Set a new password</p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('resetModal')" data-close-modal="resetModal" class="um-modal-x"
+            <button type="button" data-discard-close="resetModal" class="modal-x"
                 aria-label="Close reset password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" id="resetForm" class="p-6 space-y-4" data-global-validation data-discard-changes novalidate>
+        <form method="POST" id="resetForm" class="modal-card-form" data-global-validation data-discard-form
+            data-discard-title="Discard password reset?" data-discard-subtitle="A new password has not been saved."
+            data-discard-message="Closing this modal will remove the password you entered. Do you want to discard it?"
+            novalidate>
             @csrf
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
-                    Password <span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="password" name="password" id="resetPassword" placeholder="Min. 8 characters"
-                        class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm" required>
-                    <button type="button" onclick="togglePassVis('resetPassword','resetEye')"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <i class="fa-regular fa-eye text-xs" id="resetEye"></i>
-                    </button>
-                </div>
-
-                <div class="password-strength" id="resetPasswordStrength" data-strength="empty">
-                    <div class="password-strength-track">
-                        <span class="password-strength-fill"></span>
+            <div class="modal-bd modal-scroll-body space-y-4">
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
+                        Password <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="password" name="password" id="resetPassword" placeholder="Min. 8 characters"
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
+                            required>
+                        <button type="button" onclick="togglePassVis('resetPassword','resetEye')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-regular fa-eye text-xs" id="resetEye"></i>
+                        </button>
                     </div>
 
-                    <div class="password-strength-meta">
-                        <span id="resetPasswordStrengthLabel">Enter a password</span>
-                        <span id="resetPasswordStrengthHint">Use 8+ chars, number, uppercase, and symbol.</span>
+                    <div class="password-strength" id="resetPasswordStrength" data-strength="empty">
+                        <div class="password-strength-track">
+                            <span class="password-strength-fill"></span>
+                        </div>
+
+                        <div class="password-strength-meta">
+                            <span id="resetPasswordStrengthLabel">Enter a password</span>
+                            <span id="resetPasswordStrengthHint">Use 8+ chars, number, uppercase, and symbol.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
+                        Password <span class="text-red-500">*</span></label>
+
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="password" name="password_confirmation" id="resetPasswordConf"
+                            placeholder="Repeat password"
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
+                            required>
+                        <button type="button" onclick="togglePassVis('resetPasswordConf','resetEye2')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-regular fa-eye text-xs" id="resetEye2"></i>
+                        </button>
+                    </div>
+
+                    <div class="password-match" id="resetPasswordMatch" data-match="empty">
+                        <span class="password-match-dot"></span>
+                        <span id="resetPasswordMatchText">Confirm your password.</span>
                     </div>
                 </div>
             </div>
-
-            <div data-global-field>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
-                    Password <span class="text-red-500">*</span></label>
-
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="password" name="password_confirmation" id="resetPasswordConf"
-                        placeholder="Repeat password"
-                        class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm" required>
-                    <button type="button" onclick="togglePassVis('resetPasswordConf','resetEye2')"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <i class="fa-regular fa-eye text-xs" id="resetEye2"></i>
-                    </button>
-                </div>
-
-                <div class="password-match" id="resetPasswordMatch" data-match="empty">
-                    <span class="password-match-dot"></span>
-                    <span id="resetPasswordMatchText">Confirm your password.</span>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('resetModal')" class="ui-btn ui-btn-secondary">
+            <div class="modal-ft modal-sticky-footer">
+                <button type="button" data-discard-close="resetModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
@@ -1187,7 +1194,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <button type="button" onclick="closeModal('viewModal')" data-close-modal="viewModal" class="um-modal-x"
+            <button type="button" onclick="closeModal('viewModal')" data-close-modal="viewModal" class="modal-x"
                 aria-label="Close account details modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -1349,7 +1356,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
             <button type="button" onclick="closeModal('toggleConfirmModal')" data-close-modal="toggleConfirmModal"
-                class="um-modal-x" aria-label="Close confirm action modal">
+                class="modal-x" aria-label="Close confirm action modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -1374,16 +1381,6 @@ $inactiveCount = $inactiveCount ?? 0;
 
 @section('scripts')
 <script>
-    const currentDateEl = document.getElementById('currentDate');
-    if (currentDateEl) {
-        currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
     var umState = {
         search: @js($search ?? ''),
         role: @js($roleFilter ?? ''),
@@ -1395,168 +1392,17 @@ $inactiveCount = $inactiveCount ?? 0;
     var umSearchTimer = null;
     var umController = null;
 
-    function getPreferredUmView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem('userManagementView') || 'list';
-    }
-
-    function applyUmView(view, save = true) {
-        var listView = document.getElementById('umListView');
-        var gridView = document.getElementById('umGridView');
-        var listBtn = document.getElementById('umListViewBtn');
-        var gridBtn = document.getElementById('umGridViewBtn');
-
-        if (!listView || !gridView) return;
-
-        var finalView = window.innerWidth <= 767 ? 'grid' : view;
-
-        if (finalView === 'grid') {
-            listView.hidden = true;
-            gridView.hidden = false;
-        } else {
-            listView.hidden = false;
-            gridView.hidden = true;
-        }
-
-        document.getElementById('mainContent')?.classList.toggle('mode-grid', finalView === 'grid');
-        document.getElementById('mainContent')?.classList.toggle('mode-list', finalView === 'list');
-
-        if (listBtn) {
-            listBtn.classList.toggle('active', finalView === 'list');
-            listBtn.setAttribute('aria-pressed', finalView === 'list' ? 'true' : 'false');
-        }
-
-        if (gridBtn) {
-            gridBtn.classList.toggle('active', finalView === 'grid');
-            gridBtn.setAttribute('aria-pressed', finalView === 'grid' ? 'true' : 'false');
-        }
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem('userManagementView', finalView);
-        }
-    }
-
-    function initUmViewToggle() {
-        var listBtn = document.getElementById('umListViewBtn');
-        var gridBtn = document.getElementById('umGridViewBtn');
-
-        applyUmView(getPreferredUmView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', function () {
-                applyUmView('list', true);
-            });
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', function () {
-                applyUmView('grid', true);
-            });
-        }
-    }
-
-    const UM_MODAL_ANIMATION_MS = 220;
-
-    function forceCloseModal(modal) {
-        if (!modal) return;
-
-        clearTimeout(modal._closeTimer);
-
-        modal.classList.remove('open', 'closing', 'is-open', 'is-closing');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.pointerEvents = '';
-    }
-
     window.closeAllModals = function () {
-        document.querySelectorAll('.modal-overlay.open').forEach(function (modal) {
-            window.closeModal(modal.id);
-        });
+        document
+            .querySelectorAll(
+                '.modal-overlay.open, .ui-modal.open'
+            )
+            .forEach(function (modal) {
+                if (modal.id) {
+                    window.closeModal?.(modal.id);
+                }
+            });
     };
-
-    window.openModal = function (id, trigger = null) {
-        var modal = document.getElementById(id);
-        if (!modal) return;
-
-        window.lastModalTrigger = trigger || document.activeElement;
-
-        document.querySelectorAll('.modal-overlay.open').forEach(function (m) {
-            if (m.id !== id) {
-                forceCloseModal(m);
-            }
-        });
-
-        clearTimeout(modal._closeTimer);
-
-        modal.classList.remove('closing', 'is-closing');
-        modal.classList.add('open', 'is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.pointerEvents = 'auto';
-
-        document.body.classList.add('modal-open', 'modal-lock');
-
-        var firstField = modal.querySelector('input, select, textarea, button');
-        if (firstField) {
-            setTimeout(function () {
-                firstField.focus();
-            }, 80);
-        }
-    };
-
-    window.closeModal = function (id) {
-        var modal = document.getElementById(id);
-        if (!modal || modal.classList.contains('closing')) return;
-
-        var activeEl = document.activeElement;
-        if (activeEl && modal.contains(activeEl)) {
-            activeEl.blur();
-        }
-
-        modal.classList.remove('is-open');
-        modal.classList.add('closing', 'is-closing');
-        modal.style.pointerEvents = 'none';
-
-        clearTimeout(modal._closeTimer);
-
-        modal._closeTimer = setTimeout(function () {
-            modal.classList.remove('open', 'closing', 'is-closing');
-            modal.setAttribute('aria-hidden', 'true');
-            modal.style.pointerEvents = '';
-
-            if (!document.querySelector('.modal-overlay.open')) {
-                document.body.classList.remove('modal-open', 'modal-lock');
-            }
-
-            if (window.lastModalTrigger && typeof window.lastModalTrigger.focus === 'function') {
-                setTimeout(function () {
-                    window.lastModalTrigger.focus();
-                }, 30);
-            }
-        }, UM_MODAL_ANIMATION_MS);
-    };
-
-    window.closeModalOutside = function (e, id) {
-        if (e.target && e.target.id === id) {
-            window.closeModal(id);
-        }
-    };
-
-    document.addEventListener('click', function (e) {
-        var closeBtn = e.target.closest('[data-close-modal]');
-        if (!closeBtn) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        window.closeModal(closeBtn.getAttribute('data-close-modal'));
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            closeAllModals();
-        }
-    });
 
     @if ($errors -> any() && old('_method') !== 'PUT')
         document.addEventListener('DOMContentLoaded', () => openModal('addModal'));
@@ -1616,40 +1462,6 @@ $inactiveCount = $inactiveCount ?? 0;
         openModal('toggleConfirmModal');
     }
 
-    function closeEditRoleDropdown() {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-
-        if (!wrapper || !button) return;
-
-        wrapper.classList.remove('is-open');
-        button.setAttribute('aria-expanded', 'false');
-    }
-
-    function setEditRoleValue(value) {
-        const hiddenInput = document.getElementById('editRole');
-        const label = document.getElementById('editRoleText');
-        const menu = document.getElementById('editRoleMenu');
-
-        if (!hiddenInput || !label || !menu) return;
-
-        const normalizedValue = value ? String(value) : '';
-        hiddenInput.value = normalizedValue;
-
-        const options = Array.from(menu.querySelectorAll('.um-custom-select-option'));
-        const selected = options.find(function (option) {
-            return String(option.dataset.value || '') === normalizedValue;
-        }) || options[0];
-
-        options.forEach(function (option) {
-            option.classList.toggle('active', option === selected);
-            option.setAttribute('aria-selected', option === selected ? 'true' : 'false');
-        });
-
-        label.textContent = selected ? selected.querySelector('span').textContent.trim() : '— No Role —';
-        syncEditRoleConfirmation();
-    }
-
     function syncEditRoleConfirmation() {
         const form = document.getElementById('editForm');
         const roleInput = document.getElementById('editRole');
@@ -1672,54 +1484,19 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function setEditRoleDisabled(isDisabled) {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-        const hiddenInput = document.getElementById('editRole');
+        const select = document.getElementById('editRole');
 
-        if (!wrapper || !button || !hiddenInput) return;
+        if (!select) return;
 
-        wrapper.classList.toggle('is-disabled', isDisabled);
-        button.disabled = isDisabled;
-        hiddenInput.disabled = isDisabled;
+        select.disabled = isDisabled;
 
-        if (isDisabled) {
-            closeEditRoleDropdown();
+        const wrapper = select.closest('.custom-select');
+
+        if (wrapper) {
+            wrapper.classList.toggle('is-disabled', isDisabled);
+            window.syncCustomSelect?.(wrapper);
         }
     }
-
-    (function initEditRoleDropdown() {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-        const menu = document.getElementById('editRoleMenu');
-
-        if (!wrapper || !button || !menu) return;
-
-        button.addEventListener('click', function () {
-            if (button.disabled) return;
-
-            const isOpen = wrapper.classList.toggle('is-open');
-            button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        menu.querySelectorAll('.um-custom-select-option').forEach(function (option) {
-            option.addEventListener('click', function () {
-                setEditRoleValue(option.dataset.value || '');
-                closeEditRoleDropdown();
-            });
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!wrapper.contains(event.target)) {
-                closeEditRoleDropdown();
-            }
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeEditRoleDropdown();
-            }
-        });
-    })();
 
     function openEditModal(source, id, name, email, roleId, status, details = null) {
         const form = document.getElementById('editForm');
@@ -1743,6 +1520,20 @@ $inactiveCount = $inactiveCount ?? 0;
             setEditRoleDisabled(false);
             document.getElementById('editStatusActive').disabled = false;
             document.getElementById('editStatusInactive').disabled = false;
+
+            const editGender =
+                document.getElementById('editGender');
+
+            if (editGender) {
+                editGender.value =
+                    payload.gender_raw ||
+                    payload.gender ||
+                    '';
+
+                window.syncCustomSelect?.(
+                    editGender.closest('.custom-select')
+                );
+            }
         }
 
         form.dataset.source = source;
@@ -1753,18 +1544,27 @@ $inactiveCount = $inactiveCount ?? 0;
         document.getElementById('editOriginalRole').value = roleId || '';
         document.getElementById('editAdminCurrentPassword').value = '';
         document.getElementById('editPhone').value = payload.phone_raw || payload.phone || '';
-        document.getElementById('editBirthdate').value = payload.birthdate_raw || '';
+
+        const editBirthdate =
+            document.getElementById('editBirthdate');
+
+        const birthdateValue =
+            payload.birthdate_raw || '';
+
+        if (editBirthdate?._flatpickr) {
+            editBirthdate._flatpickr.setDate(
+                birthdateValue,
+                false
+            );
+        } else if (editBirthdate) {
+            editBirthdate.value = birthdateValue;
+        }
+
         document.getElementById('editGender').value = payload.gender_raw || payload.gender || '';
         document.getElementById('editPhone').value = formatUserPhoneDisplay(
             getNormalizedUserPhoneValue(document.getElementById('editPhone'))
         );
-        validateUserPhoneInput(
-            document.getElementById('editPhone'),
-            document.getElementById('editPhoneFeedback'),
-            true
-        );
 
-        setEditRoleValue(roleId || '');
         syncEditRoleConfirmation();
 
         document.getElementById('editStatusActive').checked = (status === 'active');
@@ -1860,101 +1660,36 @@ $inactiveCount = $inactiveCount ?? 0;
         return String(input?.value || '').replace(/\D/g, '');
     }
 
-    function setUserPhoneFeedback(feedbackEl, message, type = '') {
-        if (!feedbackEl) return;
-
-        if (userPhoneFeedbackTimer) {
-            clearTimeout(userPhoneFeedbackTimer);
-            userPhoneFeedbackTimer = null;
-        }
-
-        feedbackEl.textContent = message;
-        feedbackEl.classList.remove('text-gray-500', 'text-red-600', 'text-green-600');
-
-        if (type === 'error') {
-            feedbackEl.classList.add('text-red-600');
-            return;
-        }
-
-        if (type === 'success') {
-            feedbackEl.classList.add('text-green-600');
-            userPhoneFeedbackTimer = setTimeout(function () {
-                feedbackEl.textContent = '';
-                feedbackEl.classList.remove('text-green-600');
-                feedbackEl.classList.add('text-gray-500');
-                userPhoneFeedbackTimer = null;
-            }, 2000);
-            return;
-        }
-
-        feedbackEl.classList.add('text-gray-500');
-    }
-
-    function validateUserPhoneInput(input, feedbackEl, showNeutral = false) {
-        if (!input) return true;
-
-        const digits = getNormalizedUserPhoneValue(input);
-
-        input.classList.remove('input-invalid', 'input-valid', 'border-red-500', 'border-green-600');
-
-        if (!digits.length) {
-            setUserPhoneFeedback(feedbackEl, showNeutral ? 'Format: 09xx xxx xxxx' : '');
-            return true;
-        }
-
-        if (!digits.startsWith('09')) {
-            input.classList.add('input-invalid');
-            setUserPhoneFeedback(feedbackEl, 'Contact number must start with 09.', 'error');
-            return false;
-        }
-
-        if (digits.length < 11) {
-            input.classList.add('input-invalid');
-            setUserPhoneFeedback(feedbackEl, 'Contact number must be 11 digits.', 'error');
-            return false;
-        }
-
-        if (digits.length === 11) {
-            input.classList.add('input-valid');
-            setUserPhoneFeedback(feedbackEl, 'Valid contact number.', 'success');
-            return true;
-        }
-
-        input.classList.add('input-invalid');
-        setUserPhoneFeedback(feedbackEl, 'Contact number must be 11 digits only.', 'error');
-        return false;
-    }
-
-    function bindUserPhoneValidation(inputId, feedbackId) {
+    function bindUserPhoneValidation(inputId) {
         const input = document.getElementById(inputId);
-        const feedbackEl = document.getElementById(feedbackId);
 
-        if (!input) return;
+        if (
+            !input ||
+            input.dataset.phoneFormattingReady === 'true'
+        ) {
+            return;
+        }
 
-        input.addEventListener('input', function (event) {
-            const hadNonDigit = /[^\d\s]/.test(event.target.value);
+        input.dataset.phoneFormattingReady = 'true';
 
-            let digits = event.target.value.replace(/\D/g, '');
+        const syncPhone = () => {
+            let digits =
+                getNormalizedUserPhoneValue(input);
 
-            if (digits.startsWith('9')) digits = '0' + digits;
-            if (digits.length > 11) digits = digits.slice(0, 11);
-
-            event.target.value = formatUserPhoneDisplay(digits);
-
-            if (hadNonDigit) {
-                showErrorToast('Contact number must contain digits only.');
+            if (digits.startsWith('9')) {
+                digits = `0${digits}`;
             }
 
-            validateUserPhoneInput(event.target, feedbackEl, true);
-        });
+            input.value =
+                formatUserPhoneDisplay(
+                    digits.slice(0, 11)
+                );
 
-        input.addEventListener('focus', function () {
-            validateUserPhoneInput(input, feedbackEl, true);
-        });
+            window.validateFormInputField?.(input);
+        };
 
-        input.addEventListener('blur', function () {
-            validateUserPhoneInput(input, feedbackEl, true);
-        });
+        input.addEventListener('input', syncPhone);
+        input.addEventListener('blur', syncPhone);
     }
 
     function parseUserDetailsFromButton(button) {
@@ -1981,9 +1716,9 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function openViewModal(payloadOrName, email, role, status, source, createdAt, details) {
-        const payload = typeof payloadOrName === 'object' && payloadOrName !== null
-            ? payloadOrName
-            : {
+        const payload = typeof payloadOrName === 'object' && payloadOrName !== null ?
+            payloadOrName :
+            {
                 name: payloadOrName,
                 email,
                 role,
@@ -2174,21 +1909,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof applyTheme === 'function') applyTheme(localStorage.getItem('theme') || 'light');
-        document.querySelectorAll('.theme-option').forEach(o =>
-            o.addEventListener('click', e => {
-                e.stopPropagation();
-                if (typeof applyTheme === 'function') applyTheme(o.getAttribute('data-theme'));
-            })
-        );
 
         refreshGeneratedPassword();
-        bindUserPhoneValidation('addPhoneInput', 'addPhoneInputFeedback');
-        bindUserPhoneValidation('editPhone', 'editPhoneFeedback');
-        validateUserPhoneInput(
-            document.getElementById('addPhoneInput'),
-            document.getElementById('addPhoneInputFeedback'),
-            true
-        );
+        bindUserPhoneValidation('addPhoneInput');
+        bindUserPhoneValidation('editPhone');
 
         document.querySelectorAll('.flash-alert').forEach(el => {
             setTimeout(() => {
@@ -2198,25 +1922,6 @@ $inactiveCount = $inactiveCount ?? 0;
             }, 4000);
         });
     });
-
-    function clearSearch() {
-        var input = document.getElementById('umSearch');
-
-        if (!input) return;
-
-        if (window.clearSearchInput) {
-            window.clearSearchInput(input);
-        } else {
-            input.value = '';
-            input.dispatchEvent(new Event('input', {
-                bubbles: true
-            }));
-            input.dispatchEvent(new Event('change', {
-                bubbles: true
-            }));
-            input.focus();
-        }
-    }
 
     function umFetch(silent) {
         if (umController) umController.abort();
@@ -2409,7 +2114,7 @@ $inactiveCount = $inactiveCount ?? 0;
                     </td>
 
                     <td class="py-3.5 px-4">
-                        <div class="ui-action-group">
+                        <div class="ui-action-group um-action-group">
                             <button type="button"
                                 data-user-details="${escapeHtml(JSON.stringify(user.details || {
                 phone_raw: '',
@@ -2422,11 +2127,20 @@ $inactiveCount = $inactiveCount ?? 0;
                             </button>
 
                             <button type="button"
-                                onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
-                                class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
-                                title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
-                                <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
-                            </button>
+    onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
+    class="ui-action-btn ${user.status === 'active'
+                    ? 'ui-action-warning'
+                    : 'ui-action-success'}"
+    data-tooltip="${user.status === 'active'
+                    ? 'Deactivate account'
+                    : 'Activate account'}"
+    aria-label="${user.status === 'active'
+                    ? 'Deactivate account'
+                    : 'Activate account'}">
+    <i class="fa-solid ${user.status === 'active'
+                    ? 'fa-toggle-on'
+                    : 'fa-toggle-off'}"></i>
+</button>
 
                             <button type="button"
                                 onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
@@ -2435,20 +2149,21 @@ $inactiveCount = $inactiveCount ?? 0;
                             </button>
 
                             <button type="button"
-                                data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: roleLabel,
-                status: statusLabel,
-                source: 'Users',
-                created_at: createdFull
-            }))}"
-                                onclick="openViewModalFromButton(this)"
-                                class="action-btn btn-view-details"
-                                title="View details">
-                                <i class="fa-solid fa-eye text-[11px]"></i>
-                            </button>
+    data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: roleLabel,
+                        status: statusLabel,
+                        source: 'Users',
+                        created_at: createdFull
+                    }))}"
+    onclick="openViewModalFromButton(this)"
+    class="ui-action-btn ui-action-view"
+    data-tooltip="View details"
+    aria-label="View details">
+    <i class="fa-solid fa-eye"></i>
+</button>
                         </div>
                     </td>
                 </tr>
@@ -2504,7 +2219,7 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-                    <div class="flex items-center justify-end gap-1 flex-wrap">
+                    <div class="ui-action-group">
                         <button type="button"
                             data-user-details="${escapeHtml(JSON.stringify(user.details || {
                 phone_raw: '',
@@ -2550,7 +2265,6 @@ $inactiveCount = $inactiveCount ?? 0;
 
         tbody.innerHTML = tableHtml;
         gridBody.innerHTML = gridHtml;
-        applyUmView(getPreferredUmView(), false);
     }
 
     function umGoPage(page) {
@@ -2597,12 +2311,15 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function umBuildPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) {
+        if (!p) {
             return '';
         }
 
         const current = Number(p.current_page || 1);
-        const last = Number(p.last_page || 1);
+        const last = Math.max(
+            1,
+            Number(p.last_page || 1)
+        );
         const windowSize = 5;
         const half = Math.floor(windowSize / 2);
 
@@ -2762,26 +2479,8 @@ $inactiveCount = $inactiveCount ?? 0;
         showUserManagementToast('error', message);
     }
 
-    function setRoleFilter(el, role) {
-        document.querySelectorAll('#umFilterForm [data-role]').forEach(function (b) {
-            b.classList.remove('active');
-        });
-        el.classList.add('active');
-
-        umState.role = (role === 'all' || role === '') ? '' : role;
-        umState.page = 1;
-        umFetch();
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof applyTheme === 'function') applyTheme(localStorage.getItem('theme') || 'light');
-        initUmViewToggle();
-        document.querySelectorAll('.theme-option').forEach(function (o) {
-            o.addEventListener('click', function (e) {
-                e.stopPropagation();
-                if (typeof applyTheme === 'function') applyTheme(o.getAttribute('data-theme'));
-            });
-        });
 
         umRenderPagebar({
             total: {{ $users-> total() }},
@@ -2821,7 +2520,6 @@ $inactiveCount = $inactiveCount ?? 0;
         });
     }
 
-    var statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
         statusFilter.addEventListener('change', function () {
             umState.status = this.value;
@@ -2897,12 +2595,6 @@ $inactiveCount = $inactiveCount ?? 0;
             var submitBtn = form.querySelector('button[type="submit"]');
             var originalHtml = submitBtn.innerHTML;
             var editPhoneInput = document.getElementById('editPhone');
-            var editPhoneFeedback = document.getElementById('editPhoneFeedback');
-
-            if (!validateUserPhoneInput(editPhoneInput, editPhoneFeedback, true)) {
-                showErrorToast('Please enter a valid phone number.');
-                return;
-            }
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
@@ -2947,16 +2639,57 @@ $inactiveCount = $inactiveCount ?? 0;
                     });
                 })
                 .then(function (result) {
-                    if (result.status === 422 && result.data.errors) {
-                        var msgs = Object.values(result.data.errors).flat().join(' ');
-                        showErrorToast(msgs);
-                    } else if (result.ok && result.data.success) {
-                        closeAllModals();
-                        showSuccessToast(result.data.message || 'User updated successfully.');
-                        umFetch(true);
-                    } else {
-                        showErrorToast(result.data.message || 'Something went wrong.');
+                    if (
+                        result.status === 422 &&
+                        result.data?.errors
+                    ) {
+                        Object.entries(
+                            result.data.errors
+                        ).forEach(([name, messages]) => {
+                            const field =
+                                form.querySelector(
+                                    `[name="${CSS.escape(name)}"]`
+                                );
+
+                            const message =
+                                Array.isArray(messages) ?
+                                    messages[0] :
+                                    messages;
+
+                            if (field) {
+                                window
+                                    .showFormInputValidationMessage
+                                    ?.(field, message);
+                            }
+                        });
+
+                        showErrorToast(
+                            result.data.message ||
+                            'Please review the highlighted fields.'
+                        );
+
+                        return;
                     }
+
+                    if (
+                        result.ok &&
+                        result.data?.success
+                    ) {
+                        closeAllModals();
+
+                        showSuccessToast(
+                            result.data.message ||
+                            'User updated successfully.'
+                        );
+
+                        umFetch(true);
+                        return;
+                    }
+
+                    showErrorToast(
+                        result.data?.message ||
+                        'Something went wrong.'
+                    );
                 })
                 .catch(function () {
                     showErrorToast('Something went wrong. Please try again.');
@@ -2973,12 +2706,6 @@ $inactiveCount = $inactiveCount ?? 0;
         addUserForm.addEventListener('submit', function (e) {
             var addPhoneInput = document.getElementById('addPhoneInput');
             var addPhoneFeedback = document.getElementById('addPhoneInputFeedback');
-
-            if (!validateUserPhoneInput(addPhoneInput, addPhoneFeedback, true)) {
-                e.preventDefault();
-                showErrorToast('Please enter a valid phone number.');
-                return;
-            }
 
             if (addPhoneInput) {
                 addPhoneInput.value = getNormalizedUserPhoneValue(addPhoneInput);
@@ -3047,11 +2774,6 @@ $inactiveCount = $inactiveCount ?? 0;
                 });
         });
     }
-
         });
-
-    window.addEventListener('resize', function () {
-        applyUmView(getPreferredUmView(), false);
-    });
 </script>
 @endsection

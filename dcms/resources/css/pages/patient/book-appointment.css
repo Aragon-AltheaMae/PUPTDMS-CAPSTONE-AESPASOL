@@ -328,6 +328,8 @@
 }
 
 .section-card {
+    position: relative;
+    overflow: visible;
     background: linear-gradient(180deg, #fffefe 0%, #fff8f7 100%);
     border: 1px solid #e8e2dd;
     border-radius: 22px;

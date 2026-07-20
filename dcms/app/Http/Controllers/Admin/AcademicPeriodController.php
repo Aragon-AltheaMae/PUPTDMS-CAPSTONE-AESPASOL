@@ -73,7 +73,6 @@ class AcademicPeriodController extends Controller
             ->orderByDesc('start_date')
             ->first();
 
-        $periods = AcademicPeriod::all();
         AuditLogger::log(
             'view',
             'academic_periods',
