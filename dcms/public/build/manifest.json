@@ -1,11 +1,24 @@
 {
+  "public/images/PUP-TAGUIG-CAMPUS.jpg": {
+    "file": "assets/PUP-TAGUIG-CAMPUS-BDkSDBAE.jpg",
+    "src": "public/images/PUP-TAGUIG-CAMPUS.jpg"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CuMasGIv.css",
+    "file": "assets/app-DnhwsRPv.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
     "names": [
       "app.css"
+    ]
+  },
+  "resources/css/pages/auth/login.css": {
+    "file": "assets/login-AgYURyY2.css",
+    "src": "resources/css/pages/auth/login.css",
+    "isEntry": true,
+    "name": "login",
+    "names": [
+      "login.css"
     ]
   },
   "resources/js/app.js": {
