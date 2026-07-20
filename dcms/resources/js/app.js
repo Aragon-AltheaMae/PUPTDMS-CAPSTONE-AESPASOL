@@ -60,11 +60,33 @@ function decorateFlatpickrDays(instance) {
 function syncFlatpickrHeader(instance) {
     if (!instance?.calendarContainer) return;
 
-    const monthSelect = instance.calendarContainer.querySelector('.custom-flatpickr-month');
-    const yearSelect = instance.calendarContainer.querySelector('.custom-flatpickr-year');
+    const monthSelect = instance.calendarContainer.querySelector(
+        '.custom-flatpickr-month'
+    );
 
-    if (monthSelect) monthSelect.value = String(instance.currentMonth);
-    if (yearSelect) yearSelect.value = String(instance.currentYear);
+    const yearSelect = instance.calendarContainer.querySelector(
+        '.custom-flatpickr-year'
+    );
+
+    if (monthSelect) {
+        monthSelect.value = String(instance.currentMonth);
+
+        const monthWrapper = monthSelect.closest('.custom-select');
+
+        if (monthWrapper) {
+            syncCustomSelect(monthWrapper);
+        }
+    }
+
+    if (yearSelect) {
+        yearSelect.value = String(instance.currentYear);
+
+        const yearWrapper = yearSelect.closest('.custom-select');
+
+        if (yearWrapper) {
+            syncCustomSelect(yearWrapper);
+        }
+    }
 }
 
 function updateMonthOnlyInput(instance, options = {}) {
@@ -89,10 +111,15 @@ function updateMonthOnlyInput(instance, options = {}) {
 function buildFlatpickrHeader(instance) {
     if (!instance?.calendarContainer) return;
 
-    const currentMonth = instance.calendarContainer.querySelector('.flatpickr-current-month');
+    const currentMonth = instance.calendarContainer.querySelector(
+        '.flatpickr-current-month'
+    );
+
     if (!currentMonth) return;
 
-    const existing = currentMonth.querySelector('.custom-flatpickr-selects');
+    const existing = currentMonth.querySelector(
+        '.custom-flatpickr-selects'
+    );
 
     if (existing) {
         syncFlatpickrHeader(instance);
@@ -100,46 +127,79 @@ function buildFlatpickrHeader(instance) {
     }
 
     const monthSelect = document.createElement('select');
-    monthSelect.className = 'custom-flatpickr-select custom-flatpickr-month';
+
+    monthSelect.className = [
+        'js-custom-select',
+        'custom-flatpickr-select',
+        'custom-flatpickr-month'
+    ].join(' ');
+
+    monthSelect.setAttribute('aria-label', 'Select month');
 
     instance.l10n.months.longhand.forEach((month, index) => {
         const option = document.createElement('option');
-        option.value = index;
+
+        option.value = String(index);
         option.textContent = month;
+
         monthSelect.appendChild(option);
     });
 
     const yearSelect = document.createElement('select');
-    yearSelect.className = 'custom-flatpickr-select custom-flatpickr-year';
 
-    const currentYear = instance.currentYear;
+    yearSelect.className = [
+        'js-custom-select',
+        'custom-flatpickr-select',
+        'custom-flatpickr-year'
+    ].join(' ');
 
-    for (let year = currentYear - 80; year <= currentYear + 10; year++) {
+    yearSelect.setAttribute('aria-label', 'Select year');
+
+    const minimumYear =
+        instance.config.minDate instanceof Date
+            ? instance.config.minDate.getFullYear()
+            : instance.currentYear - 80;
+
+    const maximumYear =
+        instance.config.maxDate instanceof Date
+            ? instance.config.maxDate.getFullYear()
+            : instance.currentYear + 10;
+
+    for (let year = minimumYear; year <= maximumYear; year++) {
         const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
+
+        option.value = String(year);
+        option.textContent = String(year);
+
         yearSelect.appendChild(option);
     }
 
     const wrapper = document.createElement('div');
     wrapper.className = 'custom-flatpickr-selects';
-    wrapper.appendChild(monthSelect);
-    wrapper.appendChild(yearSelect);
 
-    currentMonth.innerHTML = '';
-    currentMonth.appendChild(wrapper);
+    wrapper.append(monthSelect, yearSelect);
+
+    currentMonth.replaceChildren(wrapper);
 
     monthSelect.addEventListener('change', () => {
-        instance.changeMonth(Number(monthSelect.value) - instance.currentMonth);
+        const selectedMonth = Number(monthSelect.value);
+
+        instance.changeMonth(
+            selectedMonth - instance.currentMonth
+        );
+
         syncFlatpickrHeader(instance);
         updateMonthOnlyInput(instance);
     });
 
     yearSelect.addEventListener('change', () => {
         instance.changeYear(Number(yearSelect.value));
+
         syncFlatpickrHeader(instance);
         updateMonthOnlyInput(instance);
     });
+
+    initCustomSelects(currentMonth);
 
     syncFlatpickrHeader(instance);
 }
@@ -184,7 +244,9 @@ function initGlobalFlatpickr() {
     dateInputs.forEach(el => {
         let options = { ...baseOptions };
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
 
         options.appendTo = parentPopup || document.body;
 
@@ -220,7 +282,9 @@ function initGlobalFlatpickr() {
     timeInputs.forEach(el => {
         if (el._flatpickr) return;
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
 
         const options = {
             enableTime: true,
@@ -261,7 +325,9 @@ function initMonthOnlyFlatpickr(root = document) {
     scope.querySelectorAll('[data-month-only-picker]').forEach(el => {
         if (el._flatpickr) return;
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
         const rawDefault = el.value || el.dataset.defaultMonth || '';
         const defaultDate = /^\d{4}-\d{2}$/.test(rawDefault)
             ? `${rawDefault}-01`
@@ -720,32 +786,134 @@ function clearSearchInput(input, options = {}) {
     }
 }
 
-function initSearchClearButtons() {
-    document.querySelectorAll('[data-search-input]').forEach((input) => {
-        if (input.dataset.searchClearInitialized === 'true') return;
+function getInputClearButton(input) {
+    if (!input) return null;
 
-        const wrapper = input.closest('[data-search-wrapper]');
-        const clearButton = wrapper?.querySelector('[data-search-clear]');
+    if (input.matches('[data-search-input]')) {
+        return input
+            .closest('[data-search-wrapper]')
+            ?.querySelector(
+                '[data-search-clear]'
+            ) || null;
+    }
 
-        if (!wrapper || !clearButton) return;
-
-        input.dataset.searchClearInitialized = 'true';
-
-        const updateClearButton = () => {
-            clearButton.classList.toggle('show', input.value.trim() !== '');
-        };
-
-        clearButton.addEventListener('click', () => {
-            clearSearchInput(input);
-            updateClearButton();
-        });
-
-        input.addEventListener('input', updateClearButton);
-        input.addEventListener('change', updateClearButton);
-
-        updateClearButton();
-    });
+    return input
+        .closest('[data-clearable-field]')
+        ?.querySelector(
+            '[data-field-clear]'
+        ) || null;
 }
+
+function syncInputClearButton(input) {
+    const clearButton =
+        getInputClearButton(input);
+
+    if (!input || !clearButton) return;
+
+    clearButton.classList.toggle(
+        'show',
+        String(input.value || '')
+            .trim()
+            .length > 0
+    );
+}
+
+function bindInputClearButton(input) {
+    if (
+        !input ||
+        input.dataset.clearButtonInitialized ===
+        'true'
+    ) {
+        return;
+    }
+
+    const clearButton =
+        getInputClearButton(input);
+
+    if (!clearButton) return;
+
+    input.dataset.clearButtonInitialized =
+        'true';
+
+    const sync = () => {
+        syncInputClearButton(input);
+    };
+
+    input.addEventListener('input', sync);
+    input.addEventListener('change', sync);
+
+    clearButton.addEventListener(
+        'click',
+        event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            clearSearchInput(input);
+            sync();
+        }
+    );
+
+    sync();
+}
+
+function initSearchClearButtons(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll(
+            [
+                '[data-search-input]',
+                '[data-clearable-input]'
+            ].join(',')
+        )
+        .forEach(bindInputClearButton);
+}
+
+document.addEventListener(
+    'reset',
+    event => {
+        requestAnimationFrame(() => {
+            event.target
+                ?.querySelectorAll?.(
+                    [
+                        '[data-search-input]',
+                        '[data-clearable-input]'
+                    ].join(',')
+                )
+                .forEach(
+                    syncInputClearButton
+                );
+        });
+    }
+);
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initSearchClearButtons();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    function (event) {
+        const modal = event.detail?.modal || document;
+
+        initCharLimitFields(modal);
+        initSearchClearButtons(modal);
+        initGlobalVoiceInputs(modal);
+    }
+);
+
+window.syncInputClearButton =
+    syncInputClearButton;
 
 document.addEventListener('click', function (event) {
     const clearButton = event.target.closest('[data-clear-search]');
@@ -758,8 +926,6 @@ document.addEventListener('click', function (event) {
 
     clearSearchInput(input);
 });
-
-document.addEventListener('DOMContentLoaded', initSearchClearButtons);
 
 window.clearSearchInput = clearSearchInput;
 window.initSearchClearButtons = initSearchClearButtons;
@@ -1692,7 +1858,6 @@ function initSessionStorageToasts() {
                 duration: toast.duration || 4000,
             });
         } catch (_) {
-            // Ignore invalid toast payloads
         }
 
         sessionStorage.removeItem(key);
@@ -1817,7 +1982,9 @@ window.initFlashToasts = initFlashToasts;
 const modalTimers = {};
 
 function openModal(id) {
-    const modal = document.getElementById(id);
+    const modal =
+        document.getElementById(id);
+
     if (!modal) return;
 
     if (modalTimers[id]) {
@@ -1827,26 +1994,76 @@ function openModal(id) {
 
     modal.classList.remove('closing');
     modal.classList.add('open');
-    document.body.classList.add('modal-lock');
+    modal.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    document.body.classList.add(
+        'modal-lock'
+    );
+
+    document.dispatchEvent(
+        new CustomEvent(
+            'ui-modal:opened',
+            {
+                detail: {
+                    modal
+                }
+            }
+        )
+    );
 }
 
 function closeModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal || (!modal.classList.contains('open') && !modal.classList.contains('closing'))) return;
+    const modal =
+        document.getElementById(id);
+
+    if (
+        !modal ||
+        (
+            !modal.classList.contains('open') &&
+            !modal.classList.contains('closing')
+        )
+    ) {
+        return;
+    }
 
     modal.classList.remove('open');
     modal.classList.add('closing');
+    modal.setAttribute(
+        'aria-hidden',
+        'true'
+    );
 
-    if (modalTimers[id]) clearTimeout(modalTimers[id]);
+    if (modalTimers[id]) {
+        clearTimeout(modalTimers[id]);
+    }
 
-    modalTimers[id] = setTimeout(() => {
-        modal.classList.remove('closing');
-        modalTimers[id] = null;
+    modalTimers[id] =
+        setTimeout(() => {
+            modal.classList.remove(
+                'closing'
+            );
 
-        if (!document.querySelector('.ui-modal.open, .ui-modal.closing')) {
-            document.body.classList.remove('modal-lock');
-        }
-    }, 180);
+            modalTimers[id] = null;
+
+            const activeModal =
+                document.querySelector(
+                    [
+                        '.ui-modal.open',
+                        '.ui-modal.closing',
+                        '.modal-overlay.open',
+                        '.modal-overlay.closing'
+                    ].join(',')
+                );
+
+            if (!activeModal) {
+                document.body.classList.remove(
+                    'modal-lock'
+                );
+            }
+        }, 180);
 }
 
 function closeModalOnBackdrop(event, id) {
@@ -1856,10 +2073,41 @@ function closeModalOnBackdrop(event, id) {
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
 
-    const openModalEl = document.querySelector('.ui-modal.open');
-    if (openModalEl && openModalEl.id) {
-        closeModal(openModalEl.id);
+    const openModalEl =
+        document.querySelector(
+            [
+                '.ui-modal.open',
+                '.modal-overlay.open'
+            ].join(',')
+        );
+
+    if (!openModalEl?.id) return;
+
+    const hasDiscardForm =
+        Boolean(
+            openModalEl.querySelector(
+                'form[data-discard-form]'
+            )
+        );
+
+    if (
+        hasDiscardForm &&
+        window.DiscardChanges
+    ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        window.DiscardChanges.confirmClose(
+            openModalEl,
+            function () {
+                closeModal(openModalEl.id);
+            }
+        );
+
+        return;
     }
+
+    closeModal(openModalEl.id);
 });
 
 window.openModal = openModal;
@@ -1869,6 +2117,54 @@ window.closeModalOnBackdrop = closeModalOnBackdrop;
 window.openInventoryModal = openModal;
 window.closeInventoryModal = closeModal;
 window.closeOnBackdrop = closeModalOnBackdrop;
+
+function openDeleteConfirmModal({
+    modalId,
+    formId,
+    nameId,
+    action,
+    itemName,
+    recordId = null,
+} = {}) {
+    const modal =
+        document.getElementById(modalId);
+
+    const form =
+        document.getElementById(formId);
+
+    const name =
+        document.getElementById(nameId);
+
+    if (!modal || !form || !name) {
+        console.error(
+            'Global delete modal elements not found.',
+            {
+                modalId,
+                formId,
+                nameId,
+            }
+        );
+
+        return null;
+    }
+
+    form.action =
+        String(action || '');
+
+    name.textContent =
+        String(itemName || '');
+
+    if (recordId !== null) {
+        form.dataset.recordId =
+            String(recordId);
+    }
+
+    openModal(modalId);
+
+    return form;
+}
+
+window.openDeleteConfirmModal = openDeleteConfirmModal;
 
 function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
@@ -2165,8 +2461,16 @@ function getFormInputValidationMessage(field) {
             `Please enter a valid ${label.toLowerCase()}.`;
     }
 
-    if (isContactInput(field) && !/^\d{11}$/.test(value)) {
-        return 'Contact number must be exactly 11 digits.';
+    if (isContactInput(field)) {
+        const digits = value.replace(/\D/g, '');
+
+        if (digits && !digits.startsWith('09')) {
+            return 'Contact number must start with 09.';
+        }
+
+        if (digits && digits.length !== 11) {
+            return 'Contact number must contain exactly 11 digits.';
+        }
     }
 
     if (isUnsafeFormText(value)) {
@@ -2392,7 +2696,7 @@ function getGlobalFieldControlHost(field) {
 
     if (field.type === 'radio' || field.type === 'checkbox') {
         return field.closest(
-            '.um-status-grid, .radio-group, .checkbox-group'
+            '.global-choice-group, .um-status-grid, .radio-group, .checkbox-group'
         ) || field;
     }
 
@@ -2610,6 +2914,289 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharLimitFields();
     bindFormInputValidation();
 });
+
+function getGlobalNumberStepperConfig(
+    stepper,
+    input
+) {
+    const readNumber = (
+        value,
+        fallback
+    ) => {
+        const parsed = Number(value);
+
+        return Number.isFinite(parsed)
+            ? parsed
+            : fallback;
+    };
+
+    return {
+        min: readNumber(
+            input.min ||
+            stepper.dataset.min,
+            Number.NEGATIVE_INFINITY
+        ),
+
+        max: readNumber(
+            input.max ||
+            stepper.dataset.max,
+            Number.POSITIVE_INFINITY
+        ),
+
+        step: Math.abs(
+            readNumber(
+                input.step ||
+                stepper.dataset.step,
+                1
+            )
+        ) || 1
+    };
+}
+
+function syncGlobalNumberStepper(
+    stepper
+) {
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    const {
+        min,
+        max
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
+
+    const value =
+        Number(input.value);
+
+    const hasValue =
+        input.value !== '' &&
+        Number.isFinite(value);
+
+    stepper
+        .querySelectorAll(
+            '[data-number-step]'
+        )
+        .forEach(button => {
+            const direction =
+                Number(
+                    button.dataset.numberStep
+                );
+
+            button.disabled =
+                hasValue &&
+                (
+                    direction < 0 &&
+                    value <= min ||
+                    direction > 0 &&
+                    value >= max
+                );
+        });
+}
+
+function setGlobalNumberStepperValue(
+    stepper,
+    nextValue
+) {
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    const {
+        min,
+        max
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
+
+    const value = Math.max(
+        min,
+        Math.min(
+            max,
+            Number(nextValue)
+        )
+    );
+
+    input.value =
+        Number.isFinite(value)
+            ? String(value)
+            : '';
+
+    input.dispatchEvent(
+        new Event('input', {
+            bubbles: true
+        })
+    );
+
+    input.dispatchEvent(
+        new Event('change', {
+            bubbles: true
+        })
+    );
+
+    syncGlobalNumberStepper(stepper);
+}
+
+function bindGlobalNumberStepper(
+    stepper
+) {
+    if (
+        !stepper ||
+        stepper.dataset.numberStepperInitialized ===
+        'true'
+    ) {
+        return;
+    }
+
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    stepper.dataset.numberStepperInitialized =
+        'true';
+
+    stepper.addEventListener(
+        'click',
+        event => {
+            const button =
+                event.target.closest(
+                    '[data-number-step]'
+                );
+
+            if (
+                !button ||
+                !stepper.contains(button)
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const {
+                min,
+                step
+            } = getGlobalNumberStepperConfig(
+                stepper,
+                input
+            );
+
+            const current =
+                input.value === ''
+                    ? Number.isFinite(min)
+                        ? min
+                        : 0
+                    : Number(input.value);
+
+            const direction =
+                Number(
+                    button.dataset.numberStep
+                );
+
+            setGlobalNumberStepperValue(
+                stepper,
+                current +
+                direction * step
+            );
+        }
+    );
+
+    input.addEventListener(
+        'input',
+        () => {
+            syncGlobalNumberStepper(
+                stepper
+            );
+        }
+    );
+
+    input.addEventListener(
+        'blur',
+        () => {
+            if (input.value === '') return;
+
+            setGlobalNumberStepperValue(
+                stepper,
+                Number(input.value)
+            );
+        }
+    );
+
+    input.addEventListener(
+        'keydown',
+        event => {
+            if (
+                event.key !== 'ArrowUp' &&
+                event.key !== 'ArrowDown'
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const button =
+                stepper.querySelector(
+                    event.key === 'ArrowUp'
+                        ? '[data-number-step="1"]'
+                        : '[data-number-step="-1"]'
+                );
+
+            button?.click();
+        }
+    );
+
+    syncGlobalNumberStepper(stepper);
+}
+
+function initGlobalNumberSteppers(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll(
+            '[data-global-number-stepper]'
+        )
+        .forEach(
+            bindGlobalNumberStepper
+        );
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalNumberSteppers();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        initGlobalNumberSteppers(
+            event.detail?.modal ||
+            document
+        );
+    }
+);
+
+window.initGlobalNumberSteppers =
+    initGlobalNumberSteppers;
 
 function validateGlobalForm(form, options = {}) {
     if (!form) {
@@ -3099,323 +3686,223 @@ window.syncGlobalRefreshWatcher = syncGlobalRefreshWatcher;
 window.removeGlobalRefreshNotice = removeGlobalRefreshNotice;
 
 function initGlobalViewToggles(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-    const toggles = scope.querySelectorAll('[data-global-view-toggle]');
+    const scope =
+        root &&
+            typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
 
-    const closeAllViewMenus = (except = null) => {
-        document.querySelectorAll('[data-global-view-toggle].open').forEach(toggle => {
-            if (toggle === except) return;
-
-            toggle.classList.remove('open');
-            toggle.querySelector('[data-view-mobile-trigger]')?.setAttribute('aria-expanded', 'false');
-        });
-    };
-
-    const getModeLabel = (mode, buttons) => {
-        const button = buttons.find(btn => btn.dataset.viewMode === mode);
-
-        return button?.querySelector('.view-mode-label')?.textContent?.trim()
-            || button?.getAttribute('title')
-            || (mode === 'grid' ? 'Grid View' : 'List View');
-    };
-
-    const getModeIcon = (mode) => {
-        return mode === 'grid' ? 'fa-solid fa-grip' : 'fa-solid fa-list';
-    };
-
-    const setMobileTriggerContent = (trigger, mode, buttons) => {
-        if (!trigger) return;
-
-        trigger.innerHTML = `
-            <span class="global-view-mobile-main">
-                <i class="${getModeIcon(mode)}"></i>
-                <span class="global-view-mobile-label">${getModeLabel(mode, buttons)}</span>
-            </span>
-            <i class="fa-solid fa-chevron-down global-view-mobile-chevron"></i>
-        `;
-
-        trigger.setAttribute('aria-label', `Current view: ${getModeLabel(mode, buttons)}`);
-        trigger.setAttribute('title', getModeLabel(mode, buttons));
-    };
-
-    const ensureMobileDropdown = (toggle, buttons) => {
-        if (toggle.querySelector('[data-view-mobile-trigger]')) return;
-
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'global-view-mobile-trigger';
-        trigger.dataset.viewMobileTrigger = 'true';
-        trigger.setAttribute('aria-label', 'Change view');
-        trigger.setAttribute('aria-expanded', 'false');
-
-        const menu = document.createElement('div');
-        menu.className = 'global-view-mobile-menu';
-        menu.dataset.viewMobileMenu = 'true';
-
-        buttons.forEach(button => {
-            const mode = button.dataset.viewMode;
-            const option = document.createElement('button');
-
-            option.type = 'button';
-            option.className = 'global-view-mobile-option';
-            option.dataset.viewMobileOption = mode;
-
-            option.innerHTML = `
-                <i class="${getModeIcon(mode)}"></i>
-                <span>${getModeLabel(mode, buttons)}</span>
-            `;
-
-            menu.appendChild(option);
-        });
-
-        toggle.appendChild(trigger);
-        toggle.appendChild(menu);
-
-        trigger.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const willOpen = !toggle.classList.contains('open');
-
-            closeAllViewMenus(toggle);
-
-            toggle.classList.toggle('open', willOpen);
-            trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
-    };
-
-    toggles.forEach((toggle) => {
-        if (toggle.dataset.globalViewInitialized === 'true') return;
-
-        toggle.dataset.globalViewInitialized = 'true';
-
-        const rootSelector = toggle.dataset.viewRoot || '#mainContent';
-        const listSelector = toggle.dataset.listView;
-        const gridSelector = toggle.dataset.gridView;
-        const storageKey = toggle.dataset.storageKey || 'ViewToggleMode';
-
-        const pageRoot = document.querySelector(rootSelector);
-        const listView = listSelector ? document.querySelector(listSelector) : null;
-        const gridView = gridSelector ? document.querySelector(gridSelector) : null;
-        const buttons = Array.from(toggle.querySelectorAll('[data-view-mode]'));
-
-        if (!buttons.length) return;
-
-        ensureMobileDropdown(toggle, buttons);
-
-        const mobileTrigger = toggle.querySelector('[data-view-mobile-trigger]');
-        const mobileOptions = Array.from(toggle.querySelectorAll('[data-view-mobile-option]'));
-
-        const setMode = (mode, options = {}) => {
-            const nextMode = mode === 'grid' ? 'grid' : 'list';
-            const isGrid = nextMode === 'grid';
-
-            if (listView) listView.hidden = isGrid;
-            if (gridView) gridView.hidden = !isGrid;
-
-            pageRoot?.classList.toggle('mode-grid', isGrid);
-            pageRoot?.classList.toggle('mode-list', !isGrid);
-
-            buttons.forEach((button) => {
-                const active = button.dataset.viewMode === nextMode;
-
-                button.classList.toggle('active', active);
-                button.classList.toggle('is-active', active);
-                button.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-
-            mobileOptions.forEach((option) => {
-                const active = option.dataset.viewMobileOption === nextMode;
-
-                option.classList.toggle('active', active);
-                option.classList.toggle('is-active', active);
-                option.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-
-            setMobileTriggerContent(mobileTrigger, nextMode, buttons);
-
-            toggle.dataset.currentView = nextMode;
-
-            if (options.persist !== false) {
-                localStorage.setItem(storageKey, nextMode);
+    scope
+        .querySelectorAll('[data-global-view-toggle]')
+        .forEach(toggle => {
+            if (
+                toggle.dataset.globalViewInitialized ===
+                'true'
+            ) {
+                return;
             }
 
-            toggle.dispatchEvent(new CustomEvent('global-view-change', {
-                bubbles: true,
-                detail: { mode: nextMode }
-            }));
-        };
+            const buttons = Array.from(
+                toggle.querySelectorAll(
+                    '[data-view-mode]'
+                )
+            );
 
-        toggle.__setGlobalViewMode = setMode;
-        toggle.__getGlobalViewMode = () => toggle.dataset.currentView || localStorage.getItem(storageKey) || 'list';
+            if (!buttons.length) return;
 
-        buttons.forEach((button) => {
-            button.addEventListener('click', () => {
-                setMode(button.dataset.viewMode);
+            toggle.dataset.globalViewInitialized =
+                'true';
+
+            const pageRoot =
+                document.querySelector(
+                    toggle.dataset.viewRoot ||
+                    '#mainContent'
+                );
+
+            const listView =
+                toggle.dataset.listView
+                    ? document.querySelector(
+                        toggle.dataset.listView
+                    )
+                    : null;
+
+            const gridView =
+                toggle.dataset.gridView
+                    ? document.querySelector(
+                        toggle.dataset.gridView
+                    )
+                    : null;
+
+            const storageKey =
+                toggle.dataset.storageKey ||
+                'ViewToggleMode';
+
+            const setMode = (
+                mode,
+                options = {}
+            ) => {
+                const nextMode =
+                    mode === 'grid'
+                        ? 'grid'
+                        : 'list';
+
+                const isGrid =
+                    nextMode === 'grid';
+
+                if (listView) {
+                    listView.hidden = isGrid;
+                }
+
+                if (gridView) {
+                    gridView.hidden = !isGrid;
+                }
+
+                pageRoot?.classList.toggle(
+                    'mode-grid',
+                    isGrid
+                );
+
+                pageRoot?.classList.toggle(
+                    'mode-list',
+                    !isGrid
+                );
+
+                buttons.forEach(button => {
+                    const active =
+                        button.dataset.viewMode ===
+                        nextMode;
+
+                    button.classList.toggle(
+                        'active',
+                        active
+                    );
+
+                    button.classList.toggle(
+                        'is-active',
+                        active
+                    );
+
+                    button.setAttribute(
+                        'aria-pressed',
+                        active ? 'true' : 'false'
+                    );
+                });
+
+                toggle.dataset.currentView =
+                    nextMode;
+
+                if (
+                    options.persist !== false
+                ) {
+                    localStorage.setItem(
+                        storageKey,
+                        nextMode
+                    );
+                }
+
+                toggle.dispatchEvent(
+                    new CustomEvent(
+                        'global-view-change',
+                        {
+                            bubbles: true,
+                            detail: {
+                                mode: nextMode
+                            }
+                        }
+                    )
+                );
+            };
+
+            toggle.__setGlobalViewMode =
+                setMode;
+
+            toggle.__getGlobalViewMode =
+                () =>
+                    toggle.dataset.currentView ||
+                    localStorage.getItem(
+                        storageKey
+                    ) ||
+                    'list';
+
+            buttons.forEach(button => {
+                button.addEventListener(
+                    'click',
+                    () => {
+                        setMode(
+                            button.dataset.viewMode
+                        );
+                    }
+                );
             });
+
+            const savedMode =
+                localStorage.getItem(
+                    storageKey
+                );
+
+            setMode(
+                savedMode || 'list',
+                {
+                    persist: false
+                }
+            );
         });
-
-        mobileOptions.forEach((option) => {
-            option.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                setMode(option.dataset.viewMobileOption);
-
-                toggle.classList.remove('open');
-                mobileTrigger?.setAttribute('aria-expanded', 'false');
-            });
-        });
-
-        const savedMode = localStorage.getItem(storageKey);
-        setMode(savedMode || 'list', { persist: false });
-    });
-
-    if (document.documentElement.dataset.globalViewCloseBound !== 'true') {
-        document.documentElement.dataset.globalViewCloseBound = 'true';
-
-        document.addEventListener('click', () => closeAllViewMenus());
-
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-                closeAllViewMenus();
-            }
-        });
-    }
 }
 
-function setGlobalViewMode(toggleOrId, mode, options = {}) {
-    const toggle = typeof toggleOrId === 'string'
-        ? document.getElementById(toggleOrId) || document.querySelector(toggleOrId)
-        : toggleOrId;
+function setGlobalViewMode(
+    toggleOrId,
+    mode,
+    options = {}
+) {
+    const toggle =
+        typeof toggleOrId === 'string'
+            ? document.getElementById(
+                toggleOrId
+            ) ||
+            document.querySelector(
+                toggleOrId
+            )
+            : toggleOrId;
 
     if (!toggle) return;
 
-    if (typeof toggle.__setGlobalViewMode !== 'function') {
+    if (
+        typeof toggle.__setGlobalViewMode !==
+        'function'
+    ) {
         initGlobalViewToggles(document);
     }
 
-    toggle.__setGlobalViewMode?.(mode, options);
+    toggle.__setGlobalViewMode?.(
+        mode,
+        options
+    );
 }
 
 function getGlobalViewMode(toggleOrId) {
-    const toggle = typeof toggleOrId === 'string'
-        ? document.getElementById(toggleOrId) || document.querySelector(toggleOrId)
-        : toggleOrId;
+    const toggle =
+        typeof toggleOrId === 'string'
+            ? document.getElementById(
+                toggleOrId
+            ) ||
+            document.querySelector(
+                toggleOrId
+            )
+            : toggleOrId;
 
-    if (!toggle) return 'list';
-
-    return toggle.__getGlobalViewMode?.() || toggle.dataset.currentView || 'list';
+    return (
+        toggle?.__getGlobalViewMode?.() ||
+        toggle?.dataset.currentView ||
+        'list'
+    );
 }
 
-function initGlobalViewMobileDropdowns(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-    const toggles = scope.querySelectorAll('[data-global-view-toggle]');
-
-    const getButtonLabel = (button) => {
-        return button?.querySelector('.view-mode-label')?.textContent?.trim()
-            || button?.getAttribute('aria-label')
-            || (button?.dataset.viewMode === 'grid' ? 'Grid View' : 'List View');
-    };
-
-    const getButtonIcon = (mode) => {
-        return mode === 'grid' ? 'fa-solid fa-grip' : 'fa-solid fa-list';
-    };
-
-    const closeAllMenus = (except = null) => {
-        document.querySelectorAll('[data-global-view-toggle].open').forEach(toggle => {
-            if (toggle === except) return;
-
-            toggle.classList.remove('open');
-            toggle.querySelector('[data-view-mobile-trigger]')?.setAttribute('aria-expanded', 'false');
-        });
-    };
-
-    toggles.forEach(toggle => {
-        if (toggle.dataset.mobileDropdownInitialized === 'true') return;
-
-        toggle.dataset.mobileDropdownInitialized = 'true';
-
-        const buttons = Array.from(toggle.querySelectorAll('[data-view-mode]'));
-        if (!buttons.length) return;
-
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'global-view-mobile-trigger';
-        trigger.dataset.viewMobileTrigger = 'true';
-        trigger.setAttribute('aria-expanded', 'false');
-
-        const menu = document.createElement('div');
-        menu.className = 'global-view-mobile-menu';
-
-        buttons.forEach(button => {
-            const mode = button.dataset.viewMode;
-            const option = document.createElement('button');
-
-            option.type = 'button';
-            option.className = 'global-view-mobile-option';
-            option.dataset.viewMobileOption = mode;
-
-            option.innerHTML = `
-                <i class="${getButtonIcon(mode)}"></i>
-                <span>${getButtonLabel(button)}</span>
-            `;
-
-            option.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                button.click();
-                closeAllMenus();
-            });
-
-            menu.appendChild(option);
-        });
-
-        const syncMobileTrigger = () => {
-            const current = toggle.dataset.currentView || 'list';
-            const activeButton = buttons.find(button => button.dataset.viewMode === current) || buttons[0];
-
-            trigger.innerHTML = `
-                <span class="global-view-mobile-main">
-                    <i class="${getButtonIcon(current)}"></i>
-                    <span class="global-view-mobile-label">${getButtonLabel(activeButton)}</span>
-                </span>
-                <i class="fa-solid fa-chevron-down global-view-mobile-chevron"></i>
-            `;
-
-            menu.querySelectorAll('[data-view-mobile-option]').forEach(option => {
-                option.classList.toggle('active', option.dataset.viewMobileOption === current);
-            });
-        };
-
-        trigger.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const willOpen = !toggle.classList.contains('open');
-
-            closeAllMenus(toggle);
-
-            toggle.classList.toggle('open', willOpen);
-            trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
-
-        toggle.addEventListener('global-view-change', syncMobileTrigger);
-
-        toggle.appendChild(trigger);
-        toggle.appendChild(menu);
-
-        syncMobileTrigger();
-    });
-
-    document.addEventListener('click', () => closeAllMenus());
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initGlobalViewToggles();
-    initGlobalViewMobileDropdowns();
-});
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalViewToggles();
+    }
+);
 
 window.initGlobalViewToggles = initGlobalViewToggles;
 window.setGlobalViewMode = setGlobalViewMode;
@@ -4134,6 +4621,19 @@ function positionCustomSelectMenu(wrapper) {
 
     menu.style.removeProperty('--custom-select-max-height');
 
+    if (wrapper.closest('.flatpickr-calendar')) {
+        const isYearSelect = Boolean(
+            wrapper.querySelector('.custom-flatpickr-year')
+        );
+
+        menu.style.setProperty(
+            '--custom-select-max-height',
+            isYearSelect ? '220px' : '210px'
+        );
+
+        return;
+    }
+
     const buttonRect = button.getBoundingClientRect();
 
     const scrollContainer = wrapper.closest(
@@ -4197,7 +4697,15 @@ function initCustomSelects(root = document) {
             ? root
             : document;
 
-    scope.querySelectorAll('select.js-custom-select').forEach(select => {
+    const customSelectSelector = [
+        'select.js-custom-select',
+
+        '[data-global-selects] select:not([data-native-select])' +
+        ':not(.global-page-size-native)' +
+        ':not(.flatpickr-monthDropdown-months)'
+    ].join(',');
+
+    scope.querySelectorAll(customSelectSelector).forEach(select => {
         if (select.dataset.customSelectReady === 'true') return;
 
         select.dataset.customSelectReady = 'true';
@@ -4226,7 +4734,7 @@ function initCustomSelects(root = document) {
         menu.setAttribute('role', 'listbox');
 
         Array.from(select.options).forEach(option => {
-            if (option.hidden) return;
+            if (option.hidden || option.disabled) return;
 
             const item = document.createElement('button');
 
@@ -4274,6 +4782,14 @@ function initCustomSelects(root = document) {
         select.parentNode.insertBefore(wrapper, select);
 
         wrapper.append(select, button, menu);
+
+        button.addEventListener('pointerdown', event => {
+            event.stopPropagation();
+        });
+
+        menu.addEventListener('pointerdown', event => {
+            event.stopPropagation();
+        });
 
         button.addEventListener('click', event => {
             event.preventDefault();

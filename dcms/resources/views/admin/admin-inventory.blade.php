@@ -93,9 +93,9 @@
                 </div>
             </div>
 
-            <div class="inventory-table-card bg-white rounded-xl shadow-sm border border-[#EDE9E4] overflow-hidden">
+            <div class="table-card inventory-table-card">
 
-                <div class="px-4 sm:px-5 py-4 border-b border-[#EDE9E4] flex flex-col gap-4">
+                <div class="table-toolbar inventory-table-toolbar">
                     <div
                         class="inventory-toolbar-shell flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
 
@@ -154,20 +154,8 @@
                                     <span id="filterBadge" class="filter-badge"></span>
                                 </button>
 
-                                <div class="view-toggle-container" data-global-view-toggle data-view-root="#mainContent"
-                                    data-storage-key="ViewToggleMode" aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" title="List view"
-                                        aria-label="List view" aria-pressed="true" data-view-mode="list">
-                                        <i class="fa-solid fa-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                                        aria-pressed="false" data-view-mode="grid">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="inventoryViewToggle" root="#mainContent"
+                                    storage-key="inventoryViewMode" />
 
                                 <button id="externalClearFilterBtn" type="button" onclick="clearFilterPanel()"
                                     class="global-filter-reset-btn hidden" title="Reset filters">
@@ -185,8 +173,8 @@
                     </div>
                 </div>
 
-                <div id="tableWrapper" class="inventory-table-wrap overflow-x-auto">
-                    <table class="inv-table d-inv-table">
+                <div id="tableWrapper" class="inventory-table-wrap">
+                    <table class="data-table inventory-data-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -331,531 +319,580 @@
     </div>
 </div>
 
-<div id="addModal" class="modal-overlay modal-theme-primary inventory-form-modal" aria-hidden="true"
-    onclick="closeModalOnBackdrop(event, 'addModal')">
+<div id="addModal" class="ui-modal modal-theme-primary inventory-form-modal" aria-hidden="true">
 
-    <div class="modal-box-inner inventory-user-modal inventory-user-modal-lg" onclick="event.stopPropagation()">
+    <form id="addInventoryForm" class="ui-modal-card modal-xl modal-card-form" data-global-validation
+        data-form-validation-rule="inventoryAdd" data-discard-form data-discard-title="Discard new inventory item?"
+        data-discard-subtitle="You have unsaved item details."
+        data-discard-message="Closing this modal will remove the inventory draft you entered. Do you want to discard your changes?"
+        novalidate>
 
-        <div class="inventory-user-modal-header modal-themed-header">
-            <div class="inventory-modal-head-left">
-                <div class="inventory-modal-icon modal-themed-icon">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-plus"></i>
                 </div>
 
-                <div class="min-w-0">
-                    <h3 class="inventory-modal-title">
+                <div class="modal-copy">
+                    <h3 class="modal-title">
                         Add Inventory Item
                     </h3>
 
-                    <p class="inventory-modal-subtitle">
+                    <p class="modal-subtitle">
                         A new row will be appended every time you save
                     </p>
                 </div>
             </div>
 
-            <button type="button" class="inventory-modal-x" data-discard-close="addModal"
-                aria-label="Close add inventory modal">
-
+            <button type="button" class="modal-x" data-discard-close="addModal" aria-label="Close add inventory modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form id="addInventoryForm" class="inventory-user-modal-form" data-global-validation
-            data-form-validation-rule="inventoryAdd" data-discard-form data-discard-title="Discard new inventory item?"
-            data-discard-subtitle="You have unsaved item details."
-            data-discard-message="Closing this modal will remove the inventory draft you entered. Do you want to discard your changes?"
-            novalidate>
+        <div class="modal-bd">
+            <div class="modal-form-grid-2">
 
-            <div class="inventory-user-modal-body">
-                <div class="inventory-form-grid">
-                    <div class="form-grid-2">
-                        <div class="inventory-field" data-global-field>
-                            <label for="addCategory" class="inventory-field-label">
-                                Category <span class="required-mark">*</span>
-                            </label>
-                            <select id="addCategory" name="category" class="js-custom-select"
-                                data-placeholder="Select category" data-field-label="Category"
-                                data-required-message="Please select a category." required>
+                <div class="inventory-field" data-global-field>
+                    <label for="addCategory" class="inventory-field-label">
+                        Category <span class="required-mark">*</span>
+                    </label>
+                    <select id="addCategory" name="category" class="js-custom-select" data-placeholder="Select category"
+                        data-field-label="Category" data-required-message="Please select a category." required>
 
-                                <option value="">Select category</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Supplies">Supplies</option>
-                            </select>
+                        <option value="">Select category</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Supplies">Supplies</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addDate" class="inventory-field-label">
+                        Date Received <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="inventory-date-control">
+                        <input id="addDate" name="date_received" type="text"
+                            class="field-input form-input-custom js-flatpickr-date-max-today"
+                            data-field-label="Date Received" data-required-message="Please select a date."
+                            data-validation-rule="notFutureDate" placeholder="Select date" required readonly>
+
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addStock" class="inventory-field-label">
+                        Stock Number
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+                        <div class="global-voice-control">
+                            <input id="addStock" name="stock_no"
+                                class="field-input form-input-custom inventory-stock-input" placeholder="00-000"
+                                maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
+                                data-required-message="Please enter a stock number."
+                                data-pattern-message="Stock number must use the format 00-000."
+                                oninput="formatStockNo(this)" required>
                         </div>
 
-                        <div class="inventory-field" data-global-field>
-                            <label for="addDate" class="inventory-field-label">
-                                Date Received <span class="required-mark">*</span>
-                            </label>
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addStock" data-voice-status="#addStockVoiceStatus"
+                                aria-label="Voice input for stock number">
 
-                            <div class="inventory-date-control">
-                                <input id="addDate" name="date_received" type="text"
-                                    class="field-input form-input-custom js-flatpickr-date-max-today"
-                                    data-field-label="Date Received" data-required-message="Please select a date."
-                                    data-validation-rule="notFutureDate" placeholder="Select date" required readonly>
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
 
-                                <i class="fa-regular fa-calendar inventory-date-icon"></i>
-                            </div>
+                            <span id="addStockVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addUnit" class="inventory-field-label">
+                        Unit <span class="required-mark">*</span>
+                    </label>
+
+                    <select id="addUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
+                        data-field-label="Unit" data-required-message="Please select a unit." required>
+
+                        <option value="">Select unit</option>
+                        <option value="Box">Box</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Bottle">Bottle</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Set">Set</option>
+                        <option value="Tube">Tube</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Roll">Roll</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field inventory-field-full" data-global-field>
+
+                    <div class="global-label-row">
+                        <label for="addName" class="inventory-field-label">
+
+                            Supply / Medicine Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <span class="char-counter" id="charCounter-addName">
+                            0 / 100 characters
+                        </span>
+                    </div>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="addName" name="name" class="form-input-custom"
+                                placeholder="e.g. Nitrile Gloves Large" minlength="2" maxlength="100"
+                                data-field-label="Supply / Medicine Name"
+                                data-required-message="Please enter an item name." data-char-limit="100"
+                                data-char-counter="#charCounter-addName" required>
                         </div>
 
-                        <div class="inventory-field" data-global-field>
-                            <label for="addStock" class="inventory-field-label">
-                                Stock Number <span class="required-mark">*</span>
-                            </label>
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addName" data-voice-status="#addNameVoiceStatus"
+                                aria-label="Voice input for item name">
 
-                            <div class="voice-search-row inventory-voice-row" data-voice-field>
-                                <div class="inventory-control-main">
-                                    <input id="addStock" name="stock_no"
-                                        class="field-input form-input-custom inventory-stock-input" placeholder="00-000"
-                                        maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
-                                        data-required-message="Please enter a stock number."
-                                        data-pattern-message="Stock number must use the format 00-000."
-                                        oninput="formatStockNo(this)" required>
-                                </div>
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#addStock" data-voice-status="#addStockVoiceStatus"
-                                        aria-label="Voice input for stock number">
+                            <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
+                <div class="inventory-field" data-global-field>
 
-                                    <span id="addStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
-                            </div>
+                    <label for="addQty" class="inventory-field-label">
+
+                        Quantity
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="addQty" name="qty" type="number" class="global-number-stepper-input" value="0"
+                                min="0" max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Quantity" data-required-message="Please enter a quantity."
+                                data-validation-rule="wholeNumber" oninput="computeAddBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
                         </div>
 
-                        <div class="inventory-field" data-global-field>
-                            <label for="addUnit" class="inventory-field-label">
-                                Unit <span class="required-mark">*</span>
-                            </label>
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addQty" data-voice-status="#addQtyVoiceStatus"
+                                aria-label="Voice input for quantity">
 
-                            <div class="voice-search-row inventory-voice-row" data-voice-field>
-                                <div class="inventory-control-main">
-                                    <select id="addUnit" name="unit" class="js-custom-select"
-                                        data-placeholder="Select unit" data-field-label="Unit"
-                                        data-required-message="Please select a unit." required>
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
 
-                                        <option value="">Select unit</option>
-                                        <option value="Box">Box</option>
-                                        <option value="Pack">Pack</option>
-                                        <option value="Bottle">Bottle</option>
-                                        <option value="Piece">Piece</option>
-                                        <option value="Set">Set</option>
-                                        <option value="Tube">Tube</option>
-                                        <option value="Vial">Vial</option>
-                                        <option value="Roll">Roll</option>
-                                    </select>
+                            <span id="addQtyVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                                    <div class="inventory-field inventory-field-full" data-global-field>
-                                        <label for="addName" class="inventory-field-label">
-                                            Supply / Medicine Name <span class="required-mark">*</span>
-                                        </label>
-                                        <div class="flex justify-between items-center">
-                                            <div class="char-counter" id="charCounter-addName">
-                                                0 / 100 characters
-                                            </div>
-                                        </div>
-                                        <div class="st-voice-row" data-voice-field>
-                                            <input id="addName" name="name" class="form-input-custom"
-                                                placeholder="e.g. Nitrile Gloves Large" minlength="2" maxlength="100"
-                                                data-field-label="Supply / Medicine Name"
-                                                data-required-message="Please enter an item name." data-char-limit="100"
-                                                data-char-counter="#charCounter-addName" required>
-                                            <div class="voice-input-toggle">
-                                                <button type="button" class="voice-search-mic external"
-                                                    data-voice-trigger data-voice-target="#addName"
-                                                    data-voice-status="#addNameVoiceStatus"
-                                                    aria-label="Voice input for item name">
-                                                    <i class="fa-solid fa-microphone"></i>
-                                                </button>
-                                                <span id="addNameVoiceStatus" class="voice-status hidden"
-                                                    data-voice-status aria-live="polite"></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div class="inventory-field" data-global-field>
 
-                                    <div class="inventory-field" data-global-field>
-                                        <label for="addQty" class="inventory-field-label">
-                                            Quantity <span class="required-mark">*</span>
-                                        </label>
-                                        <div class="st-voice-row" data-voice-field>
-                                            <input id="addQty" name="qty" type="number" class="form-input-custom"
-                                                placeholder="0" min="0" max="99999" step="1" data-field-label="Quantity"
-                                                data-required-message="Please enter a quantity."
-                                                data-validation-rule="wholeNumber" oninput="computeAddBalance()"
-                                                required>
-                                            <div class="voice-input-toggle">
-                                                <button type="button" class="voice-search-mic external"
-                                                    data-voice-trigger data-voice-target="#addQty"
-                                                    data-voice-status="#addQtyVoiceStatus"
-                                                    aria-label="Voice input for quantity">
-                                                    <i class="fa-solid fa-microphone"></i>
-                                                </button>
-                                                <span id="addQtyVoiceStatus" class="voice-status hidden"
-                                                    data-voice-status aria-live="polite"></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <label for="addUsed" class="inventory-field-label">
 
-                                    <div class="inventory-field" data-global-field>
-                                        <label for="addUsed" class="inventory-field-label">
-                                            Consumed <span class="required-mark">*</span>
-                                        </label>
-                                        <div class="st-voice-row" data-voice-field>
-                                            <input id="addUsed" name="used" type="number" class="form-input-custom"
-                                                placeholder="0" min="0" max="99999" step="1" data-field-label="Consumed"
-                                                data-validation-rule="inventoryConsumed" oninput="computeAddBalance()">
-                                            <div class="voice-input-toggle">
-                                                <button type="button" class="voice-search-mic external"
-                                                    data-voice-trigger data-voice-target="#addUsed"
-                                                    data-voice-status="#addUsedVoiceStatus"
-                                                    aria-label="Voice input for consumed quantity">
-                                                    <i class="fa-solid fa-microphone"></i>
-                                                </button>
-                                                <span id="addUsedVoiceStatus" class="voice-status hidden"
-                                                    data-voice-status aria-live="polite"></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                        Consumed
+                        <span class="required-mark">*</span>
+                    </label>
 
-                                    <div class="inventory-field inventory-field-full" data-global-field>
-                                        <label for="addBalance" class="inventory-field-label">
-                                            Balance (auto-calculated)
-                                        </label>
-                                        <input id="addBalance" class="form-input-custom" readonly placeholder="—">
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="global-voice-row" data-voice-field>
 
-                            <div class="modal-ft inventory-user-modal-footer">
-                                <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="addModal">
+                        <div class="global-number-stepper" data-global-number-stepper>
 
-                                    Cancel
-                                </button>
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease consumed quantity">
 
-                                <button type="submit" id="btnSaveAdd" class="ui-btn ui-btn-primary">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
 
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                    <span>Save Item</span>
-                                </button>
-                            </div>
-        </form>
-    </div>
+                            <input id="addUsed" name="used" type="number" class="global-number-stepper-input" value="0"
+                                min="0" max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Consumed" data-required-message="Please enter the consumed quantity."
+                                data-validation-rule="inventoryConsumed" oninput="computeAddBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase consumed quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addUsed" data-voice-status="#addUsedVoiceStatus"
+                                aria-label="Voice input for consumed quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="addUsedVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field inventory-field-full" data-global-field>
+                    <label for="addBalance" class="inventory-field-label">
+                        Balance (auto-calculated)
+                    </label>
+                    <input id="addBalance" class="form-input-custom" readonly placeholder="—">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="addModal">
+                Cancel
+            </button>
+
+            <button type="submit" id="btnSaveAdd" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Item</span>
+            </button>
+        </div>
+    </form>
 </div>
 
-<div id="editModal" class="modal-overlay modal-theme-edit inventory-form-modal" aria-hidden="true"
-    onclick="closeModalOnBackdrop(event, 'editModal')">
+<div id="editModal" class="ui-modal modal-theme-edit inventory-form-modal" aria-hidden="true">
 
-    <div class="modal-box-inner inventory-user-modal inventory-user-modal-lg" onclick="event.stopPropagation()">
+    <form id="editInventoryForm" class="ui-modal-card modal-xl modal-card-form" data-global-validation
+        data-form-validation-rule="inventoryEdit" data-discard-form data-discard-title="Discard inventory changes?"
+        data-discard-subtitle="You have unsaved edits for this item."
+        data-discard-message="Closing this modal will remove the edits you entered. Do you want to discard your changes?"
+        novalidate>
 
-        <div class="inventory-user-modal-header modal-themed-header">
-            <div class="inventory-modal-head-left">
-                <div class="inventory-modal-icon modal-themed-icon">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-pen"></i>
                 </div>
 
-                <div class="min-w-0">
-                    <h3 class="inventory-modal-title">
+                <div class="modal-copy">
+                    <h3 class="modal-title">
                         Edit Inventory Item
                     </h3>
 
-                    <p class="inventory-modal-subtitle">
+                    <p class="modal-subtitle">
                         Update the details for this item
                     </p>
                 </div>
             </div>
 
-            <button type="button" class="inventory-modal-x" data-discard-close="editModal"
+            <button type="button" class="modal-x" data-discard-close="editModal"
                 aria-label="Close edit inventory modal">
-
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form id="editInventoryForm" class="inventory-user-modal-form" data-global-validation
-            data-form-validation-rule="inventoryEdit" data-discard-form data-discard-title="Discard inventory changes?"
-            data-discard-subtitle="You have unsaved edits for this item."
-            data-discard-message="Closing this modal will remove the edits you entered. Do you want to discard your changes?"
-            novalidate>
+        <div class="modal-bd">
+            <div class="modal-form-grid-2">
 
-            <div class="inventory-user-modal-body">
-                <div class="inventory-form-grid">
-                    <div class="form-grid-2">
-                        <div class="inventory-field" data-global-field>
-                            <label for="addCategory" class="inventory-field-label">
-                                Category <span class="required-mark">*</span>
-                            </label>
+                <div class="inventory-field" data-global-field>
+                    <label for="editCategory" class="inventory-field-label">
+                        Category <span class="required-mark">*</span>
+                    </label>
 
-                            <select id="addCategory" name="category" class="js-custom-select"
-                                data-placeholder="Select category" data-field-label="Category"
-                                data-required-message="Please select a category." required>
+                    <select id="editCategory" name="category" class="js-custom-select"
+                        data-placeholder="Select category" data-field-label="Category"
+                        data-required-message="Please select a category." required>
 
-                                <option value="">Select category</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Supplies">Supplies</option>
-                            </select>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editDate" class="inventory-field-label">
-                                Date Received <span class="required-mark">*</span>
-                            </label>
+                        <option value="">Select category</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Supplies">Supplies</option>
+                    </select>
+                </div>
 
-                            <div class="inventory-date-control">
-                                <input id="editDate" name="date_received" type="text"
-                                    class="field-input form-input-custom js-flatpickr-date"
-                                    data-field-label="Date Received" data-required-message="Please select a date."
-                                    data-validation-rule="notFutureDate" required readonly>
+                <div class="inventory-field" data-global-field>
+                    <label for="editDate" class="inventory-field-label">
+                        Date Received <span class="required-mark">*</span>
+                    </label>
 
-                                <i class="fa-regular fa-calendar inventory-date-icon"></i>
-                            </div>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editStock" class="inventory-field-label">
-                                Stock Number <span class="required-mark">*</span>
-                            </label>
-                            <div class="st-voice-row" data-voice-field>
-                                <input id="editStock" name="stock_no" class="form-input-custom inventory-stock-input"
-                                    maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
-                                    data-pattern-message="Stock number must use the format 00-000."
-                                    oninput="formatStockNo(this)" required>
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#editStock" data-voice-status="#editStockVoiceStatus"
-                                        aria-label="Voice input for stock number">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                    <span id="editStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="addUnit" class="inventory-field-label">
-                                Unit <span class="required-mark">*</span>
-                            </label>
+                    <div class="inventory-date-control">
+                        <input id="editDate" name="date_received" type="text"
+                            class="field-input form-input-custom js-flatpickr-date" data-field-label="Date Received"
+                            data-required-message="Please select a date." data-validation-rule="notFutureDate" required
+                            readonly>
 
-                            <select id="addUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
-                                data-field-label="Unit" data-required-message="Please select a unit." required>
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
 
-                                <option value="">Select unit</option>
-                                <option value="Box">Box</option>
-                                <option value="Pack">Pack</option>
-                                <option value="Bottle">Bottle</option>
-                                <option value="Piece">Piece</option>
-                                <option value="Set">Set</option>
-                                <option value="Tube">Tube</option>
-                                <option value="Vial">Vial</option>
-                                <option value="Roll">Roll</option>
-                            </select>
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editStock" class="inventory-field-label">
+
+                        Stock Number
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="editStock" name="stock_no"
+                                class="field-input form-input-custom inventory-stock-input" placeholder="00-000"
+                                maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
+                                data-required-message="Please enter a stock number."
+                                data-pattern-message="Stock number must use the format 00-000."
+                                oninput="formatStockNo(this)" required>
                         </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editName" class="inventory-field-label">
-                                Supply / Medicine Name <span class="required-mark">*</span>
-                            </label>
-                            <div class="st-voice-row" data-voice-field>
-                                <input id="editName" name="name" class="form-input-custom" minlength="2" maxlength="100"
-                                    data-field-label="Supply / Medicine Name" required>
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
-                                        aria-label="Voice input for item name">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                    <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editQty" class="inventory-field-label">
-                                Quantity <span class="required-mark">*</span>
-                            </label>
-                            <div class="st-voice-row" data-voice-field>
-                                <input id="editQty" name="qty" type="number" class="form-input-custom" min="0"
-                                    max="99999" step="1" data-field-label="Quantity" data-validation-rule="wholeNumber"
-                                    oninput="computeEditBalance()" required>
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#editQty" data-voice-status="#editQtyVoiceStatus"
-                                        aria-label="Voice input for quantity">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                    <span id="editQtyVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editUsed" class="inventory-field-label">
-                                Consumed <span class="required-mark">*</span>
-                            </label>
-                            <div class="st-voice-row" data-voice-field>
-                                <input id="editUsed" name="used" type="number" class="form-input-custom" min="0"
-                                    max="99999" step="1" data-field-label="Consumed"
-                                    data-validation-rule="inventoryConsumed" oninput="computeEditBalance()">
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#editUsed" data-voice-status="#editUsedVoiceStatus"
-                                        aria-label="Voice input for consumed quantity">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                    <span id="editUsedVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="inventory-field" data-global-field>
-                            <label for="editBalance" class="inventory-field-label">
-                                Balance (auto-calculated)
-                            </label>
-                            <input id="editBalance" class="form-input-custom" readonly>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editStock" data-voice-status="#editStockVoiceStatus"
+                                aria-label="Voice input for stock number">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editStockVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-ft inventory-user-modal-footer">
-                    <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="editModal">
+                <div class="inventory-field" data-global-field>
+                    <label for="editUnit" class="inventory-field-label">
+                        Unit <span class="required-mark">*</span>
+                    </label>
 
-                        Cancel
-                    </button>
+                    <select id="editUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
+                        data-field-label="Unit" data-required-message="Please select a unit." required>
 
-                    <button type="submit" class="ui-btn ui-btn-edit">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Save Changes</span>
-                    </button>
-                </div>
-        </form>
-    </div>
-</div>
-
-<div id="deleteModal" class="modal-overlay modal-theme-danger" aria-hidden="true">
-
-    <div class="modal-box-inner inventory-user-modal inventory-user-modal-sm" onclick="event.stopPropagation()"
-        role="dialog" aria-modal="true" aria-labelledby="inventoryDeleteTitle">
-
-        <div class="inventory-user-modal-header modal-themed-header">
-            <div class="inventory-modal-head-left">
-                <div class="inventory-modal-icon modal-themed-icon">
-                    <i class="fa-solid fa-trash"></i>
+                        <option value="">Select unit</option>
+                        <option value="Box">Box</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Bottle">Bottle</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Set">Set</option>
+                        <option value="Tube">Tube</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Roll">Roll</option>
+                    </select>
                 </div>
 
-                <div class="min-w-0">
-                    <h3 id="inventoryDeleteTitle" class="inventory-modal-title">
-                        Delete Inventory Item
-                    </h3>
+                <div class="inventory-field inventory-field-full" data-global-field>
 
-                    <p class="inventory-modal-subtitle">
-                        This action requires confirmation
-                    </p>
+                    <div class="global-label-row">
+                        <label for="editName" class="inventory-field-label">
+
+                            Supply / Medicine Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <span class="char-counter" id="charCounter-editName">
+                            0 / 100 characters
+                        </span>
+                    </div>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="editName" name="name" class="form-input-custom" minlength="2" maxlength="100"
+                                data-field-label="Supply / Medicine Name"
+                                data-required-message="Please enter an item name." data-char-limit="100"
+                                data-char-counter="#charCounter-editName" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
+                                aria-label="Voice input for item name">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editQty" class="inventory-field-label">
+
+                        Quantity
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="editQty" name="qty" type="number" class="global-number-stepper-input" min="0"
+                                max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Quantity" data-required-message="Please enter a quantity."
+                                data-validation-rule="wholeNumber" oninput="computeEditBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editQty" data-voice-status="#editQtyVoiceStatus"
+                                aria-label="Voice input for quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editQtyVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editUsed" class="inventory-field-label">
+
+                        Consumed
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease consumed quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="editUsed" name="used" type="number" class="global-number-stepper-input" min="0"
+                                max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Consumed" data-required-message="Please enter the consumed quantity."
+                                data-validation-rule="inventoryConsumed" oninput="computeEditBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase consumed quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editUsed" data-voice-status="#editUsedVoiceStatus"
+                                aria-label="Voice input for consumed quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editUsedVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editBalance" class="inventory-field-label">
+                        Balance (auto-calculated)
+                    </label>
+                    <input id="editBalance" class="form-input-custom" readonly>
                 </div>
             </div>
-
-            <button type="button" class="inventory-modal-x" onclick="forceCloseModal('deleteModal')"
-                aria-label="Close delete modal">
-
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
-        <div class="inventory-delete-body">
-            <div class="inventory-delete-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <div>
-                    <strong>
-                        Delete <span id="inventoryDeleteName"></span>?
-                    </strong>
-
-                    <p>
-                        This inventory item will be permanently removed.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-ft inventory-user-modal-footer">
-            <button type="button" class="ui-btn ui-btn-secondary" onclick="forceCloseModal('deleteModal')">
-
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="editModal">
                 Cancel
             </button>
 
-            <button type="button" id="confirmDeleteBtn" class="ui-btn ui-btn-danger">
-
-                <i class="fa-solid fa-trash"></i>
-                <span>Delete</span>
+            <button type="submit" class="ui-btn ui-btn-edit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Changes</span>
             </button>
         </div>
-    </div>
+    </form>
 </div>
+
+<x-delete-confirm-modal id="deleteModal" form-id="inventoryDeleteForm" name-id="inventoryDeleteName"
+    title="Delete Inventory Item" helper="This inventory item will be permanently removed." />
 
 @endsection
 
 @section('scripts')
 
 @php
-$inventoryDataUrl = route(
-$inventoryRouteNames['data']
-);
+$inventoryDataUrl = route($inventoryRouteNames['data']);
 
-$inventoryStoreUrl = route(
-$inventoryRouteNames['store']
-);
+$inventoryStoreUrl = route($inventoryRouteNames['store']);
 
-$inventoryUpdateUrlTemplate = route(
-$inventoryRouteNames['update'],
-['inventory' => '__ID__']
-);
+$inventoryUpdateUrlTemplate = route($inventoryRouteNames['update'], ['inventory' => '__ID__']);
 
-$inventoryDestroyUrlTemplate = route(
-$inventoryRouteNames['destroy'],
-['inventory' => '__ID__']
-);
+$inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventory' => '__ID__']);
 @endphp
 
 <script>
-    var currentViewMode = localStorage.getItem('ViewToggleMode') === 'grid' ? 'grid' : 'list';
+    var currentViewMode = 'list';
 
     function bindInventoryGlobalViewToggle() {
-        const toggle = document.querySelector('#mainContent.inventory-page [data-global-view-toggle]');
+        const toggle =
+            document.getElementById('inventoryViewToggle');
+
+        if (!toggle) return;
 
         window.initGlobalViewToggles?.(document);
 
-        currentViewMode = window.getGlobalViewMode?.(toggle)
-            || localStorage.getItem('ViewToggleMode')
-            || currentViewMode;
+        currentViewMode =
+            window.getGlobalViewMode?.(toggle) || 'list';
 
-        currentViewMode = currentViewMode === 'grid' ? 'grid' : 'list';
+        toggle.addEventListener(
+            'global-view-change',
+            function (event) {
+                currentViewMode =
+                    event.detail?.mode === 'grid'
+                        ? 'grid'
+                        : 'list';
 
-        window.setGlobalViewMode?.(toggle, currentViewMode, {
-            persist: false
-        });
-
-        toggle?.addEventListener('global-view-change', function (event) {
-            currentViewMode = event.detail?.mode === 'grid' ? 'grid' : 'list';
-            renderTable();
-        });
-    }
-
-    function setViewMode(mode) {
-        const toggle = document.querySelector('#mainContent.inventory-page [data-global-view-toggle]');
-        currentViewMode = mode === 'grid' ? 'grid' : 'list';
-
-        if (window.setGlobalViewMode && toggle) {
-            window.setGlobalViewMode(toggle, currentViewMode);
-        } else {
-            const mainContent = document.getElementById('mainContent');
-
-            if (mainContent) {
-                mainContent.classList.toggle('mode-list', currentViewMode === 'list');
-                mainContent.classList.toggle('mode-grid', currentViewMode === 'grid');
+                renderTable();
             }
-
-            localStorage.setItem('ViewToggleMode', currentViewMode);
-            renderTable();
-        }
+        );
     }
 
     var inventory = [];
@@ -1050,55 +1087,6 @@ $inventoryRouteNames['destroy'],
         }
     }
 
-    function captureDiscardForModal(id) {
-        window.setTimeout(function () {
-            var modal = document.getElementById(id);
-            if (window.DiscardChanges && modal) {
-                window.DiscardChanges.captureModal(modal);
-            }
-        }, 0);
-    }
-
-    var baseInventoryCloseModal = window.closeModal ? window.closeModal.bind(window) : null;
-
-    function forceCloseModal(id) {
-        if (baseInventoryCloseModal) {
-            baseInventoryCloseModal(id);
-            return;
-        }
-
-        var modal = document.getElementById(id);
-        if (!modal) return;
-        modal.classList.remove('open', 'closing');
-        document.body.classList.remove('modal-lock');
-    }
-
-    window.forceCloseModal = forceCloseModal;
-
-    function requestCloseInventoryModal(id) {
-        var modal = document.getElementById(id);
-
-        if (window.DiscardChanges && modal) {
-            window.DiscardChanges.confirmClose(modal, function () {
-                forceCloseModal(id);
-            });
-            return;
-        }
-
-        forceCloseModal(id);
-    }
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key !== 'Escape') return;
-
-        var openInventoryModal = document.querySelector('#addModal.open, #editModal.open');
-        if (!openInventoryModal) return;
-
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        requestCloseInventoryModal(openInventoryModal.id);
-    }, true);
-
     function openAddModal() {
         resetAddForm();
 
@@ -1123,8 +1111,6 @@ $inventoryRouteNames['destroy'],
                 }
             })
         );
-
-        captureDiscardForModal('addModal');
     }
 
     function openFilterPanel() {
@@ -1799,7 +1785,7 @@ $inventoryRouteNames['destroy'],
             if (currentViewMode === 'grid') {
                 grid.innerHTML += `
     <div class="inventory-card ${cardStockClass} ${catClass}">
-        <div class="inventory-card-head">
+        <div class="inventory-card-top">
             <div class="min-w-0">
                 <div class="inventory-card-name">${item.name || ''}</div>
 
@@ -1840,22 +1826,56 @@ $inventoryRouteNames['destroy'],
     </div>
 `;
             } else {
-                tbody.innerHTML +=
-                    '<tr>' +
-                    '<td style="color:#9A9490;font-size:12px;white-space:nowrap;">' + (item.formatted_date ||
-                        '') + '</td>' +
-                    '<td><span class="stock-no">' + (item.stock_no || '') + '</span></td>' +
-                    '<td><div class="supply-name">' + (item.name || '') + '</div><span class="supply-cat ' +
-                    catClass + '">' + (item.category || '') + '</span></td>' +
-                    '<td style="color:#9A9490;">' + (item.unit || '') + '</td>' +
-                    '<td style="font-weight:700;">' + (item.qty || 0) + '</td>' +
-                    '<td style="color:#9A9490;">' + (item.used || 0) + '</td>' +
-                    '<td><span class="bal-chip ' + balClass + '">' + balance +
-                    ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span></span></td>' +
-                    '<td><div class="ui-action-group inventory-row-actions">' +
-                    inventoryActionButtons(item.id) +
-                    '</div></td>' +
-                    '</tr>';
+                tbody.innerHTML += `
+    <tr>
+        <td class="inventory-date-cell">
+            ${item.formatted_date || ''}
+        </td>
+
+        <td>
+            <span class="stock-no">
+                ${item.stock_no || ''}
+            </span>
+        </td>
+
+        <td>
+            <div class="supply-name">
+                ${item.name || ''}
+            </div>
+
+            <span class="supply-cat ${catClass}">
+                ${item.category || ''}
+            </span>
+        </td>
+
+        <td class="inventory-muted-cell">
+            ${item.unit || ''}
+        </td>
+
+        <td class="inventory-strong-cell">
+            ${item.qty || 0}
+        </td>
+
+        <td class="inventory-muted-cell">
+            ${item.used || 0}
+        </td>
+
+        <td>
+            <span class="bal-chip ${balClass}">
+                ${balance}
+                <span class="inventory-balance-label">
+                    ${balLabel}
+                </span>
+            </span>
+        </td>
+
+        <td>
+            <div class="ui-action-group inventory-row-actions">
+                ${inventoryActionButtons(item.id)}
+            </div>
+        </td>
+    </tr>
+`;
             }
         });
     }
@@ -1941,11 +1961,6 @@ $inventoryRouteNames['destroy'],
             .forEach(function (error) {
                 error.remove();
             });
-        var counter = document.getElementById('charCounter-addName');
-        if (counter) {
-            counter.textContent = '0 / 100';
-            counter.className = 'char-counter';
-        }
 
         document.querySelectorAll('#addModal [data-voice-status]').forEach(function (status) {
             status.classList.add('hidden');
@@ -1959,24 +1974,23 @@ $inventoryRouteNames['destroy'],
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
         var res = await fetch(
-            @json($inventoryStoreUrl),
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    category: document.getElementById('addCategory').value,
-                    date_received: document.getElementById('addDate').value,
-                    stock_no: document.getElementById('addStock').value.trim(),
-                    name: document.getElementById('addName').value.trim(),
-                    unit: document.getElementById('addUnit').value.trim(),
-                    qty: Number(document.getElementById('addQty').value),
-                    used: Number(document.getElementById('addUsed').value || 0)
-                })
-            });
+            @json($inventoryStoreUrl), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                category: document.getElementById('addCategory').value,
+                date_received: document.getElementById('addDate').value,
+                stock_no: document.getElementById('addStock').value.trim(),
+                name: document.getElementById('addName').value.trim(),
+                unit: document.getElementById('addUnit').value.trim(),
+                qty: Number(document.getElementById('addQty').value),
+                used: Number(document.getElementById('addUsed').value || 0)
+            })
+        });
         btnSave.disabled = false;
         btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Item';
         if (!res.ok) {
@@ -2001,9 +2015,9 @@ $inventoryRouteNames['destroy'],
                     if (!fieldId) return;
 
                     const field = document.getElementById(fieldId);
-                    const message = Array.isArray(messages)
-                        ? messages[0]
-                        : messages;
+                    const message = Array.isArray(messages) ?
+                        messages[0] :
+                        messages;
 
                     window.showFormInputValidationMessage?.(
                         field,
@@ -2021,61 +2035,66 @@ $inventoryRouteNames['destroy'],
             return;
         }
 
-        forceCloseModal('addModal');
+        window.closeModal?.('addModal');
         resetAddForm();
         await loadInventory();
         showToast('success', 'Item added successfully!');
     }
 
-    var deleteId = null;
-
     function deleteItem(id) {
-        deleteId = id;
+        const item = inventory.find(row =>
+            Number(row.id) === Number(id)
+        );
 
-        const item = inventory.find(function (row) {
-            return Number(row.id) === Number(id);
+        window.openDeleteConfirmModal({
+            modalId: 'deleteModal',
+            formId: 'inventoryDeleteForm',
+            nameId: 'inventoryDeleteName',
+            action: inventoryUrl('destroy', id),
+            itemName: item?.name || item?.stock_no || 'this item',
+            recordId: id,
         });
-
-        const nameTarget = document.getElementById('inventoryDeleteName');
-        if (nameTarget) {
-            nameTarget.textContent = item?.name || item?.stock_no || 'this item';
-        }
-
-        openModal('deleteModal');
     }
 
-    document.getElementById('confirmDeleteBtn').onclick = async function () {
-        if (!deleteId) return;
+    document
+        .getElementById('inventoryDeleteForm')
+        ?.addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-        const res = await fetch(inventoryUrl('destroy', deleteId), {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                    'content'),
-                'Accept': 'application/json'
+            const id = this.dataset.recordId;
+
+            if (!id) return;
+
+            const response = await fetch(
+                inventoryUrl('destroy', id),
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                .content,
+                        Accept: 'application/json',
+                    },
+                }
+            );
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                showToast(
+                    'error',
+                    result.message || 'Delete failed.'
+                );
+                return;
             }
+
+            window.closeModal('deleteModal');
+
+            await loadInventory();
+
+            showToast('success', 'Item deleted.');
         });
-
-        const result = await res.json().catch(function () {
-            return {};
-        });
-
-        if (!res.ok) {
-            console.error('Inventory delete failed:', res.status, result);
-            showToast('error', result.message || 'Delete failed — please try again.');
-            return;
-        }
-
-        if (window.closeModal) {
-            closeModal('deleteModal');
-        } else {
-            document.getElementById('deleteModal')?.close();
-        }
-
-        deleteId = null;
-        await loadInventory();
-        showToast('success', 'Item deleted.');
-    };
 
     var editId = null;
 
@@ -2117,19 +2136,54 @@ $inventoryRouteNames['destroy'],
         document.getElementById('editStock').value =
             item.stock_no || '';
 
-        document.getElementById('editName').value =
-            item.name || '';
+        const editName =
+            document.getElementById('editName');
 
-        document.getElementById('editQty').value =
-            item.qty ?? '';
+        if (editName) {
+            editName.value =
+                item.name || '';
 
-        document.getElementById('editUsed').value =
-            item.used ?? '';
+            window.initCharLimitFields?.(
+                document.getElementById('editModal')
+            );
+
+            editName.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
+
+        const editQty =
+            document.getElementById('editQty');
+
+        const editUsed =
+            document.getElementById('editUsed');
+
+        if (editQty) {
+            editQty.value = item.qty ?? 0;
+
+            editQty.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
+
+        if (editUsed) {
+            editUsed.value = item.used ?? 0;
+
+            editUsed.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
 
         document.getElementById('editDate').value =
-            item.date_received
-                ? String(item.date_received).slice(0, 10)
-                : '';
+            item.date_received ?
+                String(item.date_received).slice(0, 10) :
+                '';
 
         document.querySelectorAll(
             '#editModal .custom-select'
@@ -2138,7 +2192,7 @@ $inventoryRouteNames['destroy'],
         });
 
         computeEditBalance();
-        openModal('editModal');
+        window.openModal?.('editModal');
 
         window.initGlobalVoiceInputs?.(
             document.getElementById('editModal')
@@ -2151,8 +2205,6 @@ $inventoryRouteNames['destroy'],
                 }
             })
         );
-
-        captureDiscardForModal('editModal');
     }
 
     async function saveEdit() {

@@ -126,6 +126,7 @@
         @include('partials.impersonation-banner')
         @include('components.reschedule-modal')
         @include('components.cancel-modal')
+        @include('components.patient-record-modal')
     @endif
 
     @if ($isAdmin)
@@ -185,11 +186,6 @@
             'useDynamicScheduleRules' => true,
             'renderStyle' => 'dentist',
         ])
-    @endif
-
-    @if ($isDentist)
-        @include('components.reschedule-modal-script')
-        @include('components.cancel-modal-script')
     @endif
 
     @if ($isPatient && !$hideMobileNav && !$hidePatientModals)

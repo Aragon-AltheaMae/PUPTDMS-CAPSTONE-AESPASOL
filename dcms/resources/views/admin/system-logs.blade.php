@@ -127,17 +127,8 @@ $status = $status ?? 'active';
                         </button>
                     </div>
 
-                    <div class="view-toggle-container sl-view-toggle" id="slViewToggle" aria-label="View toggle">
-                        <div class="view-slider"></div>
-                        <button type="button" class="btn-view-mode active" id="slListViewBtn" title="List view"
-                            aria-label="List view">
-                            <i class="fa-solid fa-table-list"></i>
-                        </button>
-                        <button type="button" class="btn-view-mode" id="slGridViewBtn" title="Grid view"
-                            aria-label="Grid view">
-                            <i class="fa-solid fa-grip"></i>
-                        </button>
-                    </div>
+                    <x-view-toggle id="slViewToggle" class="sl-view-toggle" storage-key="systemLogsView"
+                        list-view="#slListView" grid-view="#slGridView" />
 
                     <button id="slClearFilterBtn" type="button" onclick="clearOnlySlFilters()"
                         class="global-filter-reset-btn hidden" title="Reset filters" aria-label="Reset filters">
@@ -700,7 +691,6 @@ $status = $status ?? 'active';
     document.addEventListener('DOMContentLoaded', function () {
         syncSlFilterInputs();
         updateSlClearFilterButton();
-        initSlViewToggle();
 
         window.initSearchClearButtons?.();
         window.initGlobalVoiceInputs?.();
@@ -921,73 +911,6 @@ $status = $status ?? 'active';
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
-    }
-
-    function getPreferredSlView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem('systemLogsView') || 'list';
-    }
-
-    function applySlView(view, save = true) {
-        var listView = document.getElementById('slListView');
-        var gridView = document.getElementById('slGridView');
-        var listBtn = document.getElementById('slListViewBtn');
-        var gridBtn = document.getElementById('slGridViewBtn');
-        var mainContent = document.getElementById('mainContent');
-
-        if (!listView || !gridView) return;
-
-        var finalView = window.innerWidth <= 767 ? 'grid' : view;
-
-        listView.hidden = finalView !== 'list';
-        gridView.hidden = finalView !== 'grid';
-
-        if (mainContent) {
-            mainContent.classList.toggle('mode-list', finalView === 'list');
-            mainContent.classList.toggle('mode-grid', finalView === 'grid');
-        }
-
-        if (listBtn) {
-            listBtn.classList.toggle('active', finalView === 'list');
-            listBtn.setAttribute('aria-pressed', finalView === 'list' ? 'true' : 'false');
-        }
-
-        if (gridBtn) {
-            gridBtn.classList.toggle('active', finalView === 'grid');
-            gridBtn.setAttribute('aria-pressed', finalView === 'grid' ? 'true' : 'false');
-        }
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem('systemLogsView', finalView);
-        }
-    }
-
-    function initSlViewToggle() {
-        var listBtn = document.getElementById('slListViewBtn');
-        var gridBtn = document.getElementById('slGridViewBtn');
-
-        applySlView(getPreferredSlView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', function () {
-                applySlView('list', true);
-            });
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', function () {
-                applySlView('grid', true);
-            });
-        }
-
-        if (!window.__systemLogsResizeBound) {
-            window.__systemLogsResizeBound = true;
-            window.addEventListener('resize', function () {
-                applySlView(getPreferredSlView(), false);
-            });
-        }
     }
 
     function clearSearch() {
@@ -1652,8 +1575,6 @@ $status = $status ?? 'active';
             emptyState.innerHTML = '';
         }
 
-        applySlView(getPreferredSlView(), false);
-
         fetch('{{ route('admin.system_logs') }}?' + params.toString(), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -1824,8 +1745,6 @@ $status = $status ?? 'active';
             emptyState.className = 'empty-state-host';
             emptyState.innerHTML = '';
         }
-
-        applySlView(getPreferredSlView(), false);
     }
 
     function slRenderPagebar(p) {

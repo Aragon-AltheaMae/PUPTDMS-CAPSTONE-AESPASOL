@@ -154,15 +154,14 @@ $notifCount = $notifications->count();
                                                 </span>
 
                                                 <span class="patient-stats-trigger-text">
-                                                    <span class="patient-stats-trigger-label">Sort by</span>
+                                                    <span class="patient-stats-trigger-label">Status</span>
                                                     <strong id="patientStatsSelectedLabel">Today</strong>
                                                 </span>
                                             </span>
 
                                             <span class="patient-stats-trigger-right">
                                                 <span class="patient-stats-count-badge"
-                                                    id="patientStatsSelectedCount">{{ $todayCount ?? 0
-                                                    }}</span>
+                                                    id="patientStatsSelectedCount">{{ $todayCount ?? 0 }}</span>
                                                 <i class="fa-solid fa-chevron-down patient-stats-chevron"></i>
                                             </span>
                                         </button>
@@ -198,8 +197,7 @@ $notifCount = $notifications->count();
                                                     </span>
                                                     <span class="patient-stat-option-label">Rescheduled</span>
                                                     <span class="patient-stat-option-count" id="statRescheduled">{{
-                                                        $rescheduledCount ?? 0
-                                                        }}</span>
+                                                        $rescheduledCount ?? 0 }}</span>
                                                 </button>
 
                                                 <button type="button" class="patient-stat-option filter-btn s-completed"
@@ -372,13 +370,12 @@ $notifCount = $notifications->count();
                                         <div class="flex-1 min-w-0 space-y-2">
                                             <div class="skeleton-line h-4 w-4/5"></div>
                                             <div class="skeleton-line h-4 w-3/5"></div>
+
                                             <div class="flex gap-2 pt-1">
-                                                <div class="skeleton-pill h-5 w-24"></div>
-                                                <div class="skeleton-pill h-5 w-20"></div>
+                                                <div class="skeleton-pill h-6 w-28"></div>
+                                                <div class="skeleton-pill h-6 w-24"></div>
                                             </div>
                                         </div>
-
-                                        <div class="skeleton-circle w-9 h-9 flex-shrink-0"></div>
                                     </div>
 
                                     <div class="space-y-2 mt-4">
@@ -392,16 +389,6 @@ $notifCount = $notifications->count();
                                     </div>
                             </div>
                             @endfor
-                        </div>
-
-                    </div>
-
-                    <div class="global-pagebar global-pagebar-bottom patient-pagebar">
-                        <span id="patientPageInfoBottom" class="global-pagebar-info">
-                            Showing <strong>0</strong> patients
-                        </span>
-
-                        <div id="patientPaginationBottom" class="global-pagination-wrap">
                         </div>
                     </div>
 
@@ -439,16 +426,41 @@ $notifCount = $notifications->count();
 
                         $patientId = $patient?->id ?? $appt->patient_id;
                         $patientName = $patient?->name ?? 'Unknown Patient';
-                        $patientCourse = $patient?->course ?: 'No Program';
+                        $patientStudentNo = filled($patient?->student_no)
+                        ? $patient->student_no
+                        : (filled($patient?->faculty_code)
+                        ? 'Faculty: ' . $patient->faculty_code
+                        : 'No identity number');
+
+                        $patientCourseCode = trim((string) ($patient?->course_code ?? ''));
+                        $patientCourseName = trim((string) ($patient?->course_name ?? ''));
+
+                        $patientCourse =
+                        $patientCourseCode !== ''
+                        ? $patientCourseCode
+                        : ($patientCourseName !== ''
+                        ? $patientCourseName
+                        : 'No program');
+
+                        $patientCourseFull = collect([
+                        $patientCourseCode,
+                        $patientCourseName !== $patientCourseCode ? $patientCourseName : null,
+                        ])
+                        ->filter()
+                        ->implode(' — ');
+
+                        if ($patientCourseFull === '') {
+                        $patientCourseFull = 'No program';
+                        }
+
                         $patientYearLevel = $patient?->year_level ?? '';
                         $patientSection = $patient?->section ?? '';
-                        $patientDepartment = $patient?->department ?? '';
 
                         $patientImage = $patient?->profile_image
                         ? asset('storage/' . $patient->profile_image)
-                        : 'https://ui-avatars.com/api/?name='
-                        . urlencode($patientName)
-                        . '&background=660000&color=FFFFFF&rounded=true&size=128';
+                        : 'https://ui-avatars.com/api/?name=' .
+                        urlencode($patientName) .
+                        '&background=660000&color=FFFFFF&rounded=true&size=128';
                         $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
                         $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                         $serviceLabel =
@@ -457,39 +469,17 @@ $notifCount = $notifications->count();
                         'Others')
                         : $appt->service_type;
 
-                        $accentClass = $isCancelled
-                        ? 'accent-cancelled'
+                        $statusToneClass = $isCancelled
+                        ? 'status-cancelled'
                         : ($isCompleted
-                        ? 'accent-completed'
+                        ? 'status-completed'
                         : ($isRescheduled
-                        ? 'accent-rescheduled'
+                        ? 'status-rescheduled'
                         : ($isToday
-                        ? 'accent-today'
+                        ? 'status-today'
                         : ($isUpcoming
-                        ? 'accent-upcoming'
-                        : 'accent-default'))));
-                        $iconBg = $isCancelled
-                        ? 'bg-red-100'
-                        : ($isCompleted
-                        ? 'bg-green-100'
-                        : ($isRescheduled
-                        ? 'bg-yellow-100'
-                        : ($isToday
-                        ? 'bg-blue-50'
-                        : ($isUpcoming
-                        ? 'bg-orange-100'
-                        : 'bg-gray-100'))));
-                        $iconColor = $isCancelled
-                        ? 'text-red-600'
-                        : ($isCompleted
-                        ? 'text-green-600'
-                        : ($isRescheduled
-                        ? 'text-yellow-600'
-                        : ($isToday
-                        ? 'text-blue-600'
-                        : ($isUpcoming
-                        ? 'text-orange-600'
-                        : 'text-gray-500'))));
+                        ? 'status-upcoming'
+                        : 'status-default'))));
                         $pillClass = $isCancelled
                         ? 'pill-cancelled'
                         : ($isCompleted
@@ -531,11 +521,13 @@ $notifCount = $notifications->count();
                         : '';
 
                         $urgencyClass = $showDateUrgency
-                        ? ($daysDiff === 0
+                        ? ($isRescheduled
+                        ? 'status-rescheduled'
+                        : ($daysDiff === 0
                         ? 'urgency-today'
                         : ($daysDiff === 1
                         ? 'urgency-tomorrow'
-                        : 'urgency-upcoming'))
+                        : 'urgency-upcoming')))
                         : '';
                         @endphp
 
@@ -551,7 +543,7 @@ $notifCount = $notifications->count();
                             <div class="patient-card patient-item all {{ $tabClass }} block" data-patient-id="">
                                 @endif
 
-                                <div class="accent-bar {{ $accentClass }}"></div>
+                                <div class="accent-bar {{ $statusToneClass }}"></div>
 
                                 <div class="card-body-desktop items-center gap-5 px-8 py-4 pl-10">
                                     <div class="relative flex-shrink-0">
@@ -559,36 +551,52 @@ $notifCount = $notifications->count();
                                             class="patient-avatar w-14 h-14 rounded-full object-cover shadow-sm"
                                             alt="{{ $patientName }}" />
                                     </div>
-                                    <div class="w-44 flex-shrink-0">
-                                        <p class="font-semibold text-[#1a1a1a] text-sm leading-tight">
-                                            {{ $patientName }}</p>
-                                        <span
-                                            class="inline-flex px-2.5 py-0.5 rounded-md bg-gray-200 text-gray-600 text-[10px] font-bold tracking-wide w-max">
-                                            {{ $patientCourse }}
-                                        </span>
+                                    <div class="patient-list-identity">
+                                        <p class="patient-list-name">
+                                            {{ $patientName }}
+                                        </p>
+
+                                        <div class="global-info-group">
+                                            <span class="global-info-pill">
+                                                <i class="fa-regular fa-id-card"></i>
+                                                {{ $patientStudentNo }}
+                                            </span>
+
+                                            <span class="global-info-pill" title="{{ $patientCourseFull }}">
+                                                <i class="fa-solid fa-graduation-cap"></i>
+                                                {{ $patientCourse }}
+                                            </span>
+                                        </div>
+
                                         <span class="patient-info hidden">
-                                            {{ $patientCourse }}|
+                                            {{ $patientCourseCode }}|
                                             {{ $patientYearLevel }}|
                                             {{ $patientSection }}|
                                             {{ $appt->appointment_date }}|
-                                            {{ $patientDepartment }}|
+                                            {{ $patient?->department ?? '' }}|
                                             {{ optional($appt->created_at)->toDateTimeString() }}
                                         </span>
                                     </div>
+
                                     <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
-                                    <div
-                                        class="patient-meta-block patient-date-block flex items-start gap-3 w-44 flex-shrink-0">
-                                        <div class="icon-box {{ $iconBg }} flex-shrink-0">
-                                            <i class="fa-regular fa-calendar {{ $iconColor }} text-base"></i>
+                                    <div class="global-info-item global-info-item-inline">
+                                        <div class="global-info-icon {{ $statusToneClass }}">
+                                            <i class="fa-regular fa-calendar"></i>
                                         </div>
-                                        <div>
-                                            <p
-                                                class="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-semibold">
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
                                                 Date &amp; Time
-                                            </p>
-                                            <p class="font-semibold text-[#1a1a1a] text-sm">
-                                                {{ $dateLabel }}</p>
-                                            <p class="text-gray-500 text-xs mt-0.5">{{ $timeLabel }}</p>
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $dateLabel }}
+                                            </strong>
+
+                                            <small class="global-info-subvalue">
+                                                {{ $timeLabel }}
+                                            </small>
+
                                             @if ($showDateUrgency)
                                             <span class="urgency-chip {{ $urgencyClass }}">
                                                 {{ $urgencyLabel }}
@@ -597,29 +605,30 @@ $notifCount = $notifications->count();
                                         </div>
                                     </div>
                                     <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
-                                    <div
-                                        class="patient-meta-block patient-service-block flex items-start gap-3 flex-1 min-w-0">
-                                        <div class="icon-box {{ $iconBg }} flex-shrink-0">
-                                            <i class="fa-solid fa-tooth {{ $iconColor }} text-base"></i>
+                                    <div class="global-info-item global-info-item-inline">
+                                        <div class="global-info-icon {{ $statusToneClass }}">
+                                            <i class="fa-solid fa-tooth"></i>
                                         </div>
-                                        <div class="min-w-0">
-                                            <p
-                                                class="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-semibold">
-                                                Service</p>
-                                            <p class="font-semibold text-[#1a1a1a] text-sm">
-                                                {{ $serviceLabel }}</p>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Service
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $serviceLabel }}
+                                            </strong>
+
                                             <span class="status-pill {{ $pillClass }}">
-                                                <span class="pill-dot"></span>{{ $pillText }}
+                                                <span class="pill-dot"></span>
+                                                {{ $pillText }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="patient-actions">
                                         <span class="patient-action-chip">
                                             <i class="fa-regular fa-user"></i>
-                                            View
-                                        </span>
-                                        <span class="patient-action-chip patient-action-primary">
-                                            <i class="fa-solid fa-arrow-right"></i>
+                                            View Profile
                                         </span>
                                     </div>
                                 </div>
@@ -633,56 +642,61 @@ $notifCount = $notifications->count();
                                                     class="patient-avatar grid-patient-avatar object-cover shadow-sm"
                                                     alt="{{ $patientName }}" />
                                             </div>
-
-                                            <div class="card-arrow-btn grid-arrow-btn">
-                                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                                            </div>
                                         </div>
 
                                         <div class="grid-patient-main">
                                             <h3 class="patient-grid-name">
                                                 {{ $patientName }}
                                             </h3>
+                                            <div class="global-info-group">
+                                                <span class="global-info-pill">
+                                                    <i class="fa-regular fa-id-card"></i>
+                                                    {{ $patientStudentNo }}
+                                                </span>
 
+                                                <span class="global-info-pill" title="{{ $patientCourseFull }}">
+                                                    <i class="fa-solid fa-graduation-cap"></i>
+                                                    {{ $patientCourse }}
+                                                </span>
+                                            </div>
                                             <div class="grid-badge-row">
                                                 <span class="status-pill {{ $pillClass }} grid-status-pill">
                                                     <span class="pill-dot"></span>{{ $pillText }}
                                                 </span>
-
-                                                <span class="grid-program-pill">
-                                                    {{ $patientCourse }}
-                                                </span>
                                             </div>
-
-                                            <span class="patient-info hidden">
-                                                {{ $patientCourse }}|
-                                                {{ $patientYearLevel }}|
-                                                {{ $patientSection }}|
-                                                {{ $appt->appointment_date }}|
-                                                {{ $patientDepartment }}|
-                                                {{ optional($appt->created_at)->toDateTimeString() }}
-                                            </span>
                                         </div>
                                     </div>
 
-                                    <div class="grid-info-stack">
-                                        <div class="grid-info-item">
-                                            <div class="grid-info-icon {{ $iconBg }}">
-                                                <i class="fa-regular fa-calendar {{ $iconColor }}"></i>
+                                    <div class="global-info-grid">
+                                        <div class="global-info-item">
+                                            <div class="global-info-icon {{ $statusToneClass }}">
+                                                <i class="fa-regular fa-calendar"></i>
                                             </div>
-                                            <div class="grid-info-text">
-                                                <span class="grid-info-label">Date &amp; Time</span>
-                                                <strong>{{ $dateLabel }} · {{ $timeLabel }}</strong>
+
+                                            <div class="global-info-copy">
+                                                <span class="global-info-label">
+                                                    Date &amp; Time
+                                                </span>
+
+                                                <strong class="global-info-value">
+                                                    {{ $dateLabel }} · {{ $timeLabel }}
+                                                </strong>
                                             </div>
                                         </div>
 
-                                        <div class="grid-info-item">
-                                            <div class="grid-info-icon {{ $iconBg }}">
-                                                <i class="fa-solid fa-tooth {{ $iconColor }}"></i>
+                                        <div class="global-info-item">
+                                            <div class="global-info-icon {{ $statusToneClass }}">
+                                                <i class="fa-solid fa-tooth"></i>
                                             </div>
-                                            <div class="grid-info-text">
-                                                <span class="grid-info-label">Service</span>
-                                                <strong>{{ $serviceLabel }}</strong>
+
+                                            <div class="global-info-copy">
+                                                <span class="global-info-label">
+                                                    Service
+                                                </span>
+
+                                                <strong class="global-info-value">
+                                                    {{ $serviceLabel }}
+                                                </strong>
                                             </div>
                                         </div>
                                     </div>
@@ -711,15 +725,64 @@ $notifCount = $notifications->count();
                             <i class="fa-solid fa-tooth"></i>
                         </div>
 
-                        <p class="empty-state-title">No appointments found</p>
-                        <p class="empty-state-sub">There are no appointments in the system yet.</p>
+                        <p class="empty-state-title">No patients found</p>
+                        <p class="empty-state-sub">
+                            There are no patient appointments in the system yet.
+                        </p>
                     </div>
                     @endforelse
+
+                    <div id="patientSearchEmptyState" class="empty-state empty-state-controlled col-span-full w-full">
+
+                        <div class="empty-state-icon patient-empty-icon">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+
+                        <p id="patientSearchEmptyTitle" class="empty-state-title">
+                            No results found
+                        </p>
+
+                        <p class="empty-state-sub">
+                            Try a different patient name, student number, program, or service.
+                        </p>
+
+                        <button type="button" id="clearPatientSearchBtn" class="empty-state-btn">
+
+                            <i class="fa-solid fa-xmark"></i>
+                            Clear search
+                        </button>
+                    </div>
+
+                    <div id="patientStatusEmptyState" class="empty-state empty-state-controlled col-span-full w-full">
+
+                        <div class="empty-state-icon patient-empty-icon">
+                            <i id="patientStatusEmptyIcon" class="fa-regular fa-calendar-xmark"></i>
+                        </div>
+
+                        <p id="patientStatusEmptyTitle" class="empty-state-title">
+                            No patients found
+                        </p>
+
+                        <p id="patientStatusEmptyText" class="empty-state-sub">
+                            There are currently no patients under this appointment status.
+                        </p>
+
+                        <button type="button" id="resetPatientFiltersBtn" class="empty-state-btn hidden" hidden>
+
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Clear filters
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="global-pagebar global-pagebar-bottom patient-pagebar">
+            <span id="patientPageInfoBottom" class="global-pagebar-info">
+                Showing <strong>0</strong> patients
+            </span>
 
-
-
+            <div id="patientPaginationBottom" class="global-pagination-wrap">
+            </div>
         </div>
     </div>
     </div>
@@ -814,7 +877,8 @@ $notifCount = $notifications->count();
                     'BSPSYCH',
                     'DIT',
                     'BSME',
-                    'BSBA - MM',
+                    'BSBA -
+                    MM',
                     'BSED - MATH',
                     'DOMT',
                     ] as $course)
@@ -915,8 +979,8 @@ $notifCount = $notifications->count();
 
                     <i class="fa-solid fa-check"></i>
 
-                    <span class="filter-results-text">
-                        Show results
+                    <span id="showResultsText" class="filter-results-text">
+                        Show 0 results
                     </span>
                 </button>
             </div>
@@ -996,7 +1060,23 @@ $notifCount = $notifications->count();
             leadingIcon.className = `patient-stats-trigger-icon ${meta.tone}`;
             leadingIcon.innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
         }
+        var trigger =
+            document.getElementById(
+                "patientStatsToggle"
+            );
 
+        if (trigger) {
+            trigger.classList.remove(
+                "s-today",
+                "s-upcoming",
+                "s-rescheduled",
+                "s-completed",
+                "s-cancelled",
+                "s-all"
+            );
+
+            trigger.classList.add(meta.tone);
+        }
         document.querySelectorAll('#tabsGrid .filter-btn').forEach(function (btn) {
             btn.classList.toggle('tab-active', btn.getAttribute('data-filter') === status);
         });
@@ -1024,18 +1104,6 @@ $notifCount = $notifications->count();
 
         panel.addEventListener('click', function (e) {
             e.stopPropagation();
-        });
-
-        document.querySelectorAll('#tabsGrid .filter-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('#tabsGrid .filter-btn').forEach(function (b) {
-                    b.classList.remove('tab-active');
-                });
-
-                btn.classList.add('tab-active');
-                updatePatientStatsDropdownLabel();
-                closePatientStatsDropdown();
-            });
         });
 
         document.addEventListener('click', closePatientStatsDropdown);
@@ -1067,39 +1135,43 @@ $notifCount = $notifications->count();
             input.dispatchEvent(new Event('input'));
         }
 
-        function resetAllFilters() {
+        function resetPatientPanelFilters(
+            shouldApply = true
+        ) {
             clearFormState();
 
             selectedDepartment = null;
             selectedProgram = null;
             selectedYearLevel = null;
             selectedSection = null;
+
             activeFromDate = "";
             activeToDate = "";
-            dateSort = 'desc';
+            activeDatePreset = "";
+
+            dateSort = "desc";
             nameSort = null;
+
+            renderFilterChips();
+            syncMutualExclusion();
+            updateFilterButtonState();
+
+            if (shouldApply) {
+                applyFilters();
+            }
+        }
+
+        function resetAllFilters() {
+            resetPatientPanelFilters(false);
+
             searchKeyword = "";
 
             if (patientSearchInput) {
                 patientSearchInput.value = "";
-                patientSearchInput.dispatchEvent(new Event("input", {
-                    bubbles: true
-                }));
             }
 
-            activeTab = "today";
-            document.querySelectorAll('.filter-btn').forEach(function (b) {
-                b.classList.remove('tab-active');
-            });
-            var todayBtn = document.querySelector('.filter-btn[data-filter="today"]');
-            if (todayBtn) {
-                todayBtn.classList.add('tab-active');
-            }
-
-            renderFilterChips();
-            syncMutualExclusion();
+            selectPatientStatus("all");
             applyFilters();
-            updateFilterButtonState();
         }
 
         try {
@@ -1129,6 +1201,29 @@ $notifCount = $notifications->count();
             var searchInput = document.getElementById("searchInput");
             var externalClearFilterBtn = document.getElementById("externalClearFilterBtn");
             var colHeader = document.querySelector(".card-col-header");
+            var patientSearchEmptyState =
+                document.getElementById("patientSearchEmptyState");
+
+            var patientSearchEmptyTitle =
+                document.getElementById("patientSearchEmptyTitle");
+
+            var patientStatusEmptyState =
+                document.getElementById("patientStatusEmptyState");
+
+            var patientStatusEmptyIcon =
+                document.getElementById("patientStatusEmptyIcon");
+
+            var patientStatusEmptyTitle =
+                document.getElementById("patientStatusEmptyTitle");
+
+            var patientStatusEmptyText =
+                document.getElementById("patientStatusEmptyText");
+
+            var clearPatientSearchBtn =
+                document.getElementById("clearPatientSearchBtn");
+
+            var resetPatientFiltersBtn =
+                document.getElementById("resetPatientFiltersBtn");
 
             patientFilterModal = filterModal;
             patientSearchInput = searchInput;
@@ -1138,6 +1233,23 @@ $notifCount = $notifications->count();
 
             var activeTab = "today";
             var searchKeyword = "";
+
+            function selectPatientStatus(status) {
+                var nextStatus = status || "all";
+
+                document.querySelectorAll(
+                    "#tabsGrid .filter-btn"
+                ).forEach(function (button) {
+                    button.classList.toggle(
+                        "tab-active",
+                        button.getAttribute("data-filter") === nextStatus
+                    );
+                });
+
+                activeTab = nextStatus;
+                updatePatientStatsDropdownLabel();
+            }
+
             var selectedProgram = null,
                 selectedYearLevel = null,
                 selectedSection = null,
@@ -1154,6 +1266,38 @@ $notifCount = $notifications->count();
             var yearRadios = Array.from(document.querySelectorAll('input[name="year"]'));
             var sectionRadios = Array.from(document.querySelectorAll('input[name="section"]'));
             var otherRadios = courseRadios.concat(yearRadios, sectionRadios);
+
+            if (clearPatientSearchBtn) {
+                clearPatientSearchBtn.addEventListener(
+                    "click",
+                    function () {
+                        searchKeyword = "";
+
+                        if (searchInput) {
+                            searchInput.value = "";
+
+                            searchInput.dispatchEvent(
+                                new Event("input", {
+                                    bubbles: true
+                                })
+                            );
+
+                            searchInput.focus();
+                        }
+
+                        applyFilters();
+                    }
+                );
+            }
+
+            if (resetPatientFiltersBtn) {
+                resetPatientFiltersBtn.addEventListener(
+                    "click",
+                    function () {
+                        resetPatientPanelFilters();
+                    }
+                );
+            }
 
             if (filterBtn) {
                 filterBtn.onclick = function (e) {
@@ -1273,44 +1417,81 @@ $notifCount = $notifications->count();
                 var data = allPatients.slice();
 
                 if (searchKeyword) {
-                    data = data.filter(function (p) {
-                        return matchesSearch(p, searchKeyword);
+                    data = data.filter(function (patient) {
+                        return matchesSearch(
+                            patient,
+                            searchKeyword
+                        );
                     });
-                } else {
+                }
 
-                    if (draft.program) {
-                        data = data.filter(function (p) {
-                            return ilike(getInfo(p).program, draft.program);
-                        });
-                    }
+                if (draft.program) {
+                    data = data.filter(function (patient) {
+                        return ilike(
+                            getInfo(patient).program,
+                            draft.program
+                        );
+                    });
+                }
 
-                    if (draft.year || draft.section) {
-                        data = data.filter(function (p) {
-                            var i = getInfo(p);
+                if (draft.year || draft.section) {
+                    data = data.filter(function (patient) {
+                        var info = getInfo(patient);
 
-                            if (draft.year && !ilike(i.year, draft.year)) return false;
-                            if (draft.section && String(i.section).trim() !== String(draft.section)
-                                .trim()) return false;
+                        if (
+                            draft.year &&
+                            !ilike(info.year, draft.year)
+                        ) {
+                            return false;
+                        }
 
-                            return true;
-                        });
-                    }
+                        if (
+                            draft.section &&
+                            String(info.section).trim() !==
+                            String(draft.section).trim()
+                        ) {
+                            return false;
+                        }
 
-                    if (draft.department) {
-                        data = data.filter(function (p) {
-                            return ilike(getInfo(p).department, draft.department);
-                        });
-                    }
+                        return true;
+                    });
+                }
 
-                    if (draft.fromDate || draft.toDate) {
-                        data = data.filter(function (p) {
-                            var d = new Date(getInfo(p).dateStr);
-                            if (isNaN(d.getTime())) return false;
-                            if (draft.fromDate && d < new Date(draft.fromDate)) return false;
-                            if (draft.toDate && d > new Date(draft.toDate)) return false;
-                            return true;
-                        });
-                    }
+                if (draft.department) {
+                    data = data.filter(function (patient) {
+                        return ilike(
+                            getInfo(patient).department,
+                            draft.department
+                        );
+                    });
+                }
+
+                if (draft.fromDate || draft.toDate) {
+                    data = data.filter(function (patient) {
+                        var date = new Date(
+                            getInfo(patient).dateStr
+                        );
+
+                        if (isNaN(date.getTime())) {
+                            return false;
+                        }
+
+                        if (
+                            draft.fromDate &&
+                            date < new Date(draft.fromDate)
+                        ) {
+                            return false;
+                        }
+
+                        if (
+                            draft.toDate &&
+                            date > new Date(draft.toDate)
+                        ) {
+                            return false;
+                        }
+
+                        return true;
+                    });
                 }
 
                 return data.length;
@@ -1518,28 +1699,85 @@ $notifCount = $notifications->count();
                 };
             }
 
-            function getName(p) {
-                var el = p.querySelector(".font-semibold");
-                return (el ? el.textContent : "").trim();
+            function getName(patient) {
+                var element = patient.querySelector(
+                    ".patient-list-name, .patient-grid-name"
+                );
+
+                return element ?
+                    element.textContent.trim() :
+                    "";
             }
 
-            function getService(p) {
-                var el = p.querySelector(".truncate");
-                return (el ? el.textContent : "").trim();
+            function getService(patient) {
+                var serviceBlock = patient.querySelector(
+                    ".patient-service-block"
+                );
+
+                if (!serviceBlock) {
+                    var gridItems = patient.querySelectorAll(
+                        ".global-info-item"
+                    );
+
+                    for (var index = 0; index < gridItems.length; index++) {
+                        var label = gridItems[index].querySelector(
+                            ".global-info-label"
+                        );
+
+                        if (
+                            label &&
+                            label.textContent.trim().toLowerCase() ===
+                            "service"
+                        ) {
+                            return gridItems[index]
+                                .querySelector("strong")
+                                ?.textContent
+                                ?.trim() || "";
+                        }
+                    }
+
+                    return "";
+                }
+
+                var serviceName =
+                    serviceBlock.querySelector(".font-semibold");
+
+                return serviceName ?
+                    serviceName.textContent.trim() :
+                    "";
             }
 
-            function getIdText(p) {
-                var el = p.querySelector(".text-gray-500.text-\\[11px\\]");
-                return el ? el.textContent.trim() : "";
+            function getIdText(patient) {
+                var element = patient.querySelector(
+                    ".global-info-pill"
+                );
+
+                return element ?
+                    element.textContent.trim() :
+                    "";
             }
 
-            function matchesSearch(p, kw) {
-                if (!kw) return true;
-                var info = getInfo(p);
-                var haystack = [getName(p), getService(p), getIdText(p), info.program, info.department, info
-                    .dateStr
-                ].join(" ").toLowerCase();
-                return haystack.includes(kw);
+            function matchesSearch(patient, keyword) {
+                if (!keyword) return true;
+
+                var info = getInfo(patient);
+
+                var searchableText = [
+                    getName(patient),
+                    getService(patient),
+                    getIdText(patient),
+                    info.program,
+                    info.year,
+                    info.section,
+                    info.department,
+                    info.dateStr
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+                return searchableText.includes(
+                    keyword.toLowerCase()
+                );
             }
 
             function updateFilterButtonState() {
@@ -1603,10 +1841,33 @@ $notifCount = $notifications->count();
                 }
             });
 
-            var tabButtons = document.querySelectorAll('.filter-btn');
+            var tabButtons = document.querySelectorAll(
+                "#tabsGrid .filter-btn"
+            );
+
             tabButtons.forEach(function (btn) {
                 btn.addEventListener("click", function () {
-                    activeTab = btn.getAttribute("data-filter");
+                    selectPatientStatus(
+                        btn.getAttribute("data-filter") || "all"
+                    );
+
+                    var dropdown =
+                        document.getElementById("patientStatsDropdown");
+
+                    var toggle =
+                        document.getElementById("patientStatsToggle");
+
+                    if (dropdown) {
+                        dropdown.classList.remove("open");
+                    }
+
+                    if (toggle) {
+                        toggle.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+                    }
+
                     applyFilters();
                 });
             });
@@ -1643,6 +1904,7 @@ $notifCount = $notifications->count();
                         nameSort = null;
                     }
 
+                    selectPatientStatus("all");
                     if (filterModal) closeFilterModal();
 
                     syncMutualExclusion();
@@ -1653,19 +1915,9 @@ $notifCount = $notifications->count();
 
             if (clearFiltersModalBtn) {
                 clearFiltersModalBtn.onclick = function () {
-                    clearFormState();
+                    resetPatientPanelFilters();
                     renderFilterChips();
-
-                    selectedDepartment = null;
-                    selectedProgram = null;
-                    selectedYearLevel = null;
-                    selectedSection = null;
-                    activeFromDate = "";
-                    activeToDate = "";
-                    dateSort = 'desc';
-                    nameSort = null;
-
-                    applyFilters();
+                    updateShowResultsButton();
                 };
             }
 
@@ -1793,19 +2045,19 @@ $notifCount = $notifications->count();
                     currentPage = 1;
                 }
 
-                var from = totalItems > 0
-                    ? ((currentPage - 1) * PER_PAGE) + 1
-                    : 0;
+                var from = totalItems > 0 ?
+                    ((currentPage - 1) * PER_PAGE) + 1 :
+                    0;
 
-                var to = totalItems > 0
-                    ? Math.min(currentPage * PER_PAGE, totalItems)
-                    : 0;
+                var to = totalItems > 0 ?
+                    Math.min(currentPage * PER_PAGE, totalItems) :
+                    0;
 
-                var infoHtml = totalItems > 0
-                    ? 'Showing <strong>' + from + '–' + to +
+                var infoHtml = totalItems > 0 ?
+                    'Showing <strong>' + from + '–' + to +
                     '</strong> of <strong>' + totalItems +
-                    '</strong> ' + (totalItems === 1 ? 'patient' : 'patients')
-                    : 'Showing <strong>0</strong> patients';
+                    '</strong> ' + (totalItems === 1 ? 'patient' : 'patients') :
+                    'Showing <strong>0</strong> patients';
 
                 if (pageInfoTop) {
                     pageInfoTop.innerHTML = infoHtml;
@@ -1833,6 +2085,172 @@ $notifCount = $notifications->count();
                         PER_PAGE
                     );
                 }
+            }
+
+            function setPatientEmptyVisible(element, visible) {
+                if (!element) return;
+
+                element.classList.toggle("show", visible);
+                element.classList.toggle("is-visible", visible);
+            }
+
+            function getCurrentPatientStatus() {
+                var activeButton = document.querySelector(
+                    "#tabsGrid .filter-btn.tab-active"
+                );
+
+                return activeButton ?
+                    activeButton.getAttribute("data-filter") || "all" :
+                    activeTab || "all";
+            }
+
+            function getPatientStatusEmptyMeta(status) {
+                var map = {
+                    today: {
+                        icon: "fa-solid fa-clock",
+                        title: "No patients today",
+                        text: "There are currently no patient appointments scheduled for today."
+                    },
+
+                    upcoming: {
+                        icon: "fa-regular fa-calendar-check",
+                        title: "No upcoming patients",
+                        text: "There are currently no upcoming patient appointments."
+                    },
+
+                    rescheduled: {
+                        icon: "fa-solid fa-rotate-right",
+                        title: "No rescheduled patients",
+                        text: "There are currently no rescheduled patient appointments."
+                    },
+
+                    completed: {
+                        icon: "fa-solid fa-circle-check",
+                        title: "No completed patients",
+                        text: "Completed patient appointments will appear here."
+                    },
+
+                    cancelled: {
+                        icon: "fa-regular fa-calendar-xmark",
+                        title: "No cancelled patients",
+                        text: "Cancelled patient appointments will appear here."
+                    },
+
+                    all: {
+                        icon: "fa-solid fa-sliders",
+                        title: "No patients match your filters",
+                        text: "Try removing or changing the selected filter criteria."
+                    }
+                };
+
+                return map[status] || map.all;
+            }
+
+            function updateFilteredEmptyState() {
+                var hasResults = currentItems.length > 0;
+                var hasSearch = searchKeyword.trim().length > 0;
+
+                var hasAdvancedFilters = Boolean(
+                    selectedProgram ||
+                    selectedYearLevel ||
+                    selectedSection ||
+                    selectedDepartment ||
+                    activeFromDate ||
+                    activeToDate ||
+                    activeDatePreset ||
+                    nameSort ||
+                    dateSort !== "desc"
+                );
+
+                var currentStatus = getCurrentPatientStatus();
+
+                var isStatusOnlyEmptyState = !hasSearch &&
+                    !hasAdvancedFilters &&
+                    currentStatus !== "all";
+                setPatientEmptyVisible(patientSearchEmptyState, false);
+                setPatientEmptyVisible(patientStatusEmptyState, false);
+
+                if (resetPatientFiltersBtn) {
+                    var showClearFiltersButton =
+                        hasAdvancedFilters &&
+                        !isStatusOnlyEmptyState;
+
+                    resetPatientFiltersBtn.hidden = !showClearFiltersButton;
+
+                    resetPatientFiltersBtn.classList.toggle(
+                        "hidden",
+                        !showClearFiltersButton
+                    );
+
+                    resetPatientFiltersBtn.classList.toggle(
+                        "is-hidden",
+                        !showClearFiltersButton
+                    );
+
+                    resetPatientFiltersBtn.style.display =
+                        showClearFiltersButton ?
+                            "inline-flex" :
+                            "none";
+                }
+                if (hasResults) {
+                    return;
+                }
+
+                if (hasSearch) {
+                    if (patientSearchEmptyTitle) {
+                        patientSearchEmptyTitle.textContent =
+                            'No results for "' + searchKeyword + '"';
+                    }
+
+                    setPatientEmptyVisible(patientSearchEmptyState, true);
+                    return;
+                }
+
+                var meta = getPatientStatusEmptyMeta(
+                    hasAdvancedFilters ? "all" : currentStatus
+                );
+
+                if (patientStatusEmptyIcon) {
+                    patientStatusEmptyIcon.className = meta.icon;
+                }
+
+                if (patientStatusEmptyTitle) {
+                    patientStatusEmptyTitle.textContent = meta.title;
+                }
+
+                if (patientStatusEmptyText) {
+                    patientStatusEmptyText.textContent = meta.text;
+                }
+
+                setPatientEmptyVisible(patientStatusEmptyState, true);
+            }
+
+            function updatePage() {
+                var totalItems = currentItems.length;
+                var startIndex = (currentPage - 1) * PER_PAGE;
+                var endIndex = startIndex + PER_PAGE;
+
+                allPatients.forEach(function (patient) {
+                    patient.classList.add("hidden");
+                });
+
+                currentItems
+                    .slice(startIndex, endIndex)
+                    .forEach(function (patient) {
+                        patient.classList.remove("hidden");
+                    });
+
+                var hasVisiblePatients = currentItems.length > 0;
+
+                if (colHeader) {
+                    colHeader.classList.toggle(
+                        "hidden",
+                        !hasVisiblePatients
+                    );
+                }
+
+                updateFilteredEmptyState();
+                renderPatientPagebars();
             }
 
             window.patientGoPage = function (page) {
@@ -1881,78 +2299,143 @@ $notifCount = $notifications->count();
 
                 window.clearTimeout(window.patientDirectoryFilterTimer);
                 window.patientDirectoryFilterTimer = window.setTimeout(function () {
+                    try {
+                        var data = allPatients.slice();
 
-                    var data = allPatients.slice();
+                        if (activeTab !== "all") {
+                            data = data.filter(function (patient) {
+                                return patient.classList.contains(activeTab);
+                            });
+                        }
 
-                    if (searchKeyword) {
-                        data = data.filter(function (p) {
-                            return matchesSearch(p, searchKeyword);
+                        if (searchKeyword) {
+                            data = data.filter(function (patient) {
+                                return matchesSearch(patient, searchKeyword);
+                            });
+                        }
+
+                        if (selectedProgram) {
+                            data = data.filter(function (patient) {
+                                return ilike(
+                                    getInfo(patient).program,
+                                    selectedProgram
+                                );
+                            });
+                        }
+
+                        if (selectedYearLevel || selectedSection) {
+                            data = data.filter(function (patient) {
+                                var info = getInfo(patient);
+
+                                if (
+                                    selectedYearLevel &&
+                                    !ilike(info.year, selectedYearLevel)
+                                ) {
+                                    return false;
+                                }
+
+                                if (
+                                    selectedSection &&
+                                    String(info.section).trim() !==
+                                    String(selectedSection).trim()
+                                ) {
+                                    return false;
+                                }
+
+                                return true;
+                            });
+                        }
+
+                        if (selectedDepartment) {
+                            data = data.filter(function (patient) {
+                                return ilike(
+                                    getInfo(patient).department,
+                                    selectedDepartment
+                                );
+                            });
+                        }
+
+                        if (activeFromDate || activeToDate) {
+                            data = data.filter(function (patient) {
+                                var date = new Date(
+                                    getInfo(patient).dateStr
+                                );
+
+                                if (isNaN(date.getTime())) {
+                                    return false;
+                                }
+
+                                if (
+                                    activeFromDate &&
+                                    date < new Date(activeFromDate)
+                                ) {
+                                    return false;
+                                }
+
+                                if (
+                                    activeToDate &&
+                                    date > new Date(activeToDate)
+                                ) {
+                                    return false;
+                                }
+
+                                return true;
+                            });
+                        }
+
+                        if (nameSort === "az") data.sort(function (a, b) {
+                            return getName(a).localeCompare(getName(b));
                         });
-                    } else {
-                        if (activeTab !== "all") data = data.filter(function (p) {
-                            return p.classList.contains(activeTab);
+                        if (nameSort === "za") data.sort(function (a, b) {
+                            return getName(b).localeCompare(getName(a));
+                        });
+                        if (dateSort === "asc") data.sort(function (a, b) {
+                            return new Date(getInfo(a).createdAt || getInfo(a).dateStr) -
+                                new Date(
+                                    getInfo(b).createdAt || getInfo(b).dateStr);
                         });
 
-                        if (selectedProgram) data = data.filter(function (p) {
-                            return ilike(getInfo(p).program, selectedProgram);
+                        if (dateSort === "desc") data.sort(function (a, b) {
+                            return new Date(getInfo(b).createdAt || getInfo(b).dateStr) -
+                                new Date(
+                                    getInfo(a).createdAt || getInfo(a).dateStr);
                         });
-                        if (selectedYearLevel || selectedSection) data = data.filter(function (p) {
-                            var i = getInfo(p);
-                            if (selectedYearLevel && !ilike(i.year, selectedYearLevel))
-                                return false;
-                            if (selectedSection && String(i.section).trim() !== String(
-                                selectedSection)
-                                .trim()) return false;
-                            return true;
-                        });
-                        if (selectedDepartment) data = data.filter(function (p) {
-                            return ilike(getInfo(p).department, selectedDepartment);
-                        });
-                        if (activeFromDate || activeToDate) data = data.filter(function (p) {
-                            var d = new Date(getInfo(p).dateStr);
-                            if (isNaN(d.getTime())) return false;
-                            if (activeFromDate && d < new Date(activeFromDate)) return false;
-                            if (activeToDate && d > new Date(activeToDate)) return false;
-                            return true;
-                        });
+
+                        var rowCountEl = document.getElementById("rowCount");
+                        if (rowCountEl) {
+                            rowCountEl.textContent = data.length + " " + (data.length === 1 ?
+                                "patient" :
+                                "patients");
+                        }
+
+                        currentItems = data;
+                        currentPage = 1;
+
+                        updatePage();
+                        updateFilterButtonState();
+                    } catch (error) {
+                        console.error("Patient list filtering error:", error);
+                    } finally {
+                        hidePatientSkeleton();
                     }
-
-                    if (nameSort === "az") data.sort(function (a, b) {
-                        return getName(a).localeCompare(getName(b));
-                    });
-                    if (nameSort === "za") data.sort(function (a, b) {
-                        return getName(b).localeCompare(getName(a));
-                    });
-                    if (dateSort === "asc") data.sort(function (a, b) {
-                        return new Date(getInfo(a).createdAt || getInfo(a).dateStr) - new Date(
-                            getInfo(b).createdAt || getInfo(b).dateStr);
-                    });
-
-                    if (dateSort === "desc") data.sort(function (a, b) {
-                        return new Date(getInfo(b).createdAt || getInfo(b).dateStr) - new Date(
-                            getInfo(a).createdAt || getInfo(a).dateStr);
-                    });
-
-                    var rowCountEl = document.getElementById("rowCount");
-                    if (rowCountEl) {
-                        rowCountEl.textContent = data.length + " " + (data.length === 1 ? "patient" :
-                            "patients");
-                    }
-
-                    currentItems = data;
-                    currentPage = 1;
-                    updatePage();
-                    updateFilterButtonState();
-                    hidePatientSkeleton();
-                }, 600);
+                }, 300);
             }
 
             syncMutualExclusion();
+
             document.querySelectorAll('.filter-btn').forEach(function (b) {
                 b.classList.remove('tab-active');
             });
-            var todayBtn = document.querySelector('.filter-btn[data-filter="today"]');
-            if (todayBtn) todayBtn.classList.add('tab-active');
+
+            var todayBtn = document.querySelector(
+                '.filter-btn[data-filter="today"]'
+            );
+
+            if (todayBtn) {
+                todayBtn.classList.add('tab-active');
+            }
+
+            updatePatientStatsDropdownLabel();
             window.initGlobalPageSizeSelects?.(document);
 
             applyFilters();

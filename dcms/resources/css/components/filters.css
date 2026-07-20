@@ -249,6 +249,19 @@ body.filter-lock {
     background: var(--filter-panel-divider);
 }
 
+.filter-date-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .filter-date-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .filter-date-input-wrap input,
 .filter-date-input-wrap select {
     width: 100%;
