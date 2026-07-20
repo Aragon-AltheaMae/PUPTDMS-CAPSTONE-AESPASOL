@@ -140,20 +140,36 @@ class DentistAppointmentController extends Controller
             "Dentist viewed appointments page"
         );
 
-        return view('dentist.dentist-appointments', compact(
-            'appointments',
-            'upcomingAppointments',
-            'pastAppointments',
-            'today',
-            'appointmentCountsPerDay',
-            'appointmentCountsPerSlot',
-            'calendarAppointmentDetails',
-            'schedules',
-            'blockedDates',
-            'philippineHolidays',
-            'notifications',
-            'defaultServiceTypes'
-        ));
+        return view('shared.appointments', [
+            'layoutRole' => 'dentist',
+            'pageTitle' => 'Appointments',
+            'pageShellClass' => 'dentist-page-shell',
+
+            'isDentistView' => true,
+
+            'canStartProcedure' => true,
+            'canRescheduleAppointment' => true,
+            'canCancelAppointment' => true,
+            'canViewTreatmentRecord' => true,
+            'canScheduleFollowUp' => true,
+
+            'patientProfileRouteName' => 'dentist.dentist.patient.profile',
+
+            'appointments' => $appointments,
+            'upcomingAppointments' => $upcomingAppointments,
+            'pastAppointments' => $pastAppointments,
+
+            'today' => $today,
+
+            'appointmentCountsPerDay' => $appointmentCountsPerDay,
+            'appointmentCountsPerSlot' => $appointmentCountsPerSlot,
+            'calendarAppointmentDetails' => $calendarAppointmentDetails,
+            'schedules' => $schedules,
+            'blockedDates' => $blockedDates,
+            'philippineHolidays' => $philippineHolidays,
+            'defaultServiceTypes' => $defaultServiceTypes,
+            'notifications' => $notifications,
+        ]);
     }
 
     public function patientProfile(Appointment $appointment)
@@ -167,8 +183,6 @@ class DentistAppointmentController extends Controller
         $this->syncOverdueAppointmentsToCancelled();
 
         $appointment->load('patient');
-        $patient = $appointment->patient;
-
         $patient = $appointment->patient;
 
         if (!$patient) {
@@ -281,81 +295,6 @@ class DentistAppointmentController extends Controller
             );
         }
         return response()->json(['success' => true]);
-    }
-
-    public function reschedule($id)
-    {
-        $activeRole = session('impersonated_role') ?: session('role');
-
-        if ($activeRole !== 'dentist') {
-            return redirect('/login');
-        }
-
-        $appointment = Appointment::with('patient')->findOrFail($id);
-
-        $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->selectRaw('appointment_date, COUNT(*) as count')
-            ->groupBy('appointment_date')
-            ->pluck('count', 'appointment_date')
-            ->toArray();
-
-        $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
-            ->groupBy('appointment_date', 'appointment_time')
-            ->get()
-            ->groupBy('appointment_date')
-            ->map(function ($rows) {
-                return $rows->pluck('count', 'appointment_time')->toArray();
-            })
-            ->toArray();
-
-        $calendarAppointmentDetails = Appointment::with('patient')
-            ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->get()
-            ->groupBy(function ($appointment) {
-                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
-            })
-            ->map(function ($items) {
-                return $items->map(function ($appointment) {
-                    return [
-                        'name' => $appointment->patient->name ?? 'Unknown',
-                        'time' => \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A'),
-                        'service' => $appointment->service_type,
-                    ];
-                })->toArray();
-            })
-            ->toArray();
-
-        $schedules = ClinicSchedule::active()->orderBy('id')->get()
-            ->map(function ($s) {
-                $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
-                return $s;
-            });
-
-        $blockedDates = BlockedDate::pluck('date')
-            ->map(fn($d) => Carbon::parse($d)->toDateString())
-            ->toArray();
-
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-
-        $notifications = collect([]);
-
-        AuditLogger::log(
-            'view',
-            'dentist_appointments',
-            "Dentist opened reschedule appointment page"
-        );
-
-        return view('dentist.dentist-appointments', compact(
-            'appointment',
-            'appointmentCountsPerDay',
-            'appointmentCountsPerSlot',
-            'calendarAppointmentDetails',
-            'schedules',
-            'blockedDates',
-            'philippineHolidays',
-            'notifications'
-        ));
     }
 
     public function updateReschedule(Request $request, $id)

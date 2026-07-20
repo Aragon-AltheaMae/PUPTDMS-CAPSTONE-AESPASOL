@@ -2306,7 +2306,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 }
 
 #addModal .modal-box-inner,
-#editModal .modal-box-inner,
 #resetModal .modal-box-inner,
 #toggleConfirmModal .modal-box-inner,
 #viewModal .modal-box-inner {
@@ -2335,8 +2334,7 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     max-height: calc(100dvh - 2rem) !important;
 }
 
-#addModal .um-user-modal-body,
-#editModal .um-user-modal-body {
+#addModal .um-user-modal-body {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow-y: auto !important;
@@ -2381,12 +2379,10 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 }
 
 [data-theme="dark"] #addModal.modal-overlay,
-[data-theme="dark"] #editModal.modal-overlay,
 [data-theme="dark"] #resetModal.modal-overlay,
 [data-theme="dark"] #toggleConfirmModal.modal-overlay,
 [data-theme="dark"] #viewModal.modal-overlay,
 .dark #addModal.modal-overlay,
-.dark #editModal.modal-overlay,
 .dark #resetModal.modal-overlay,
 .dark #toggleConfirmModal.modal-overlay,
 .dark #viewModal.modal-overlay {
@@ -3342,12 +3338,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, .10),
         0 14px 28px rgba(0, 0, 0, .30) !important;
-}
-
-#editModal .modal-box-inner.um-user-modal-md {
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
 }
 
 #editModal #editForm {
@@ -4358,4 +4348,37 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
 
 .um-table-scroll {
     overflow-x: auto !important;
+}
+
+#mainContent.user-management-page .um-table tbody td:nth-child(6) .ui-action-group.um-action-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+
+    gap: .25rem !important;
+    width: auto !important;
+    min-width: max-content !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+.user-management-page .um-view,
+.user-management-page .um-grid-wrap,
+.user-management-page .um-grid,
+.user-management-page .um-grid-card,
+.user-management-page .um-action-group,
+.user-management-page .ui-action-group,
+.user-management-page .um-table td:last-child {
+    overflow: visible !important;
+}
+
+.user-management-page .um-grid-card {
+    position: relative;
+}
+
+.user-management-page .um-grid-card:hover,
+.user-management-page .um-grid-card:focus-within {
+    z-index: 20;
 }

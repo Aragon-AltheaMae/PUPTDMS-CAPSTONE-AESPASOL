@@ -38,78 +38,104 @@
 
                         <div class="admin-card-pad">
                             <form id="addServiceForm" method="POST" action="{{ route('admin.service-types.store') }}"
-                                novalidate>
+                                data-global-validation novalidate>
                                 @csrf
 
-                                <div class="st-form-group">
-                                    <label class="st-label">Service Name</label>
-                                    <div class="st-voice-row">
-                                        <div class="st-input-wrap">
-                                            <i class="fa-solid fa-tag st-input-icon"></i>
+                                <div class="global-form-group" data-global-field>
+                                    <label for="serviceNameInput" class="global-form-label">
+                                        Service Name
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <div class="voice-search-row" data-voice-field>
+                                        <div class="global-control-wrap" data-clearable-field>
+                                            <i class="fa-solid fa-tag global-control-icon"></i>
+
                                             <input type="text" id="serviceNameInput" name="name"
-                                                placeholder="e.g. Tooth Extraction" autocomplete="off"
-                                                value="{{ old('name') }}" class="st-input with-icon no-voice">
+                                                value="{{ old('name') }}"
+                                                class="form-input-custom global-control-with-icon no-voice"
+                                                placeholder="e.g. Tooth Extraction" autocomplete="off" required
+                                                data-clearable-input>
+
                                             <button type="button" id="serviceNameClearBtn"
-                                                class="st-voice-clear-btn hidden" aria-label="Clear service name"
-                                                title="Clear">
+                                                class="search-clear field-clear-btn" data-field-clear
+                                                aria-label="Clear service name" title="Clear service name">
                                                 <i class="fa-solid fa-xmark"></i>
                                             </button>
                                         </div>
-                                        {{-- Mic toggle is a sibling of st-input-wrap, not inside it --}}
-                                        <div class="service-voice-toggle" id="serviceNameVoiceToggle"></div>
-                                    </div>
 
-                                    <div id="nameClientError" class="st-field-error admin-hidden">
-                                        <i class="fa-solid fa-circle-exclamation"></i> Please provide a service name.
-                                    </div>
+                                        <div class="voice-input-toggle">
+                                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                                data-voice-target="#serviceNameInput"
+                                                data-voice-status="#serviceNameVoiceStatus"
+                                                aria-label="Voice input for service name">
+                                                <i class="fa-solid fa-microphone"></i>
+                                            </button>
 
-                                    @error('name')
-                                    <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{
-                                        $message }}
+                                            <span id="serviceNameVoiceStatus" class="voice-status hidden"
+                                                data-voice-status aria-live="polite"></span>
+                                        </div>
                                     </div>
-                                    @enderror
                                 </div>
 
-                                <div class="st-form-group">
-                                    <div class="st-label-row">
-                                        <label class="st-label">Description (Optional)</label>
+                                <div class="global-form-group" data-global-field>
+                                    <div class="global-label-row">
+                                        <label for="serviceDescInput" class="global-form-label">
+                                            Description (Optional)
+                                        </label>
 
-                                        <button type="button" class="st-copy-bullet-box" data-copy-bullet
-                                            data-copy-target="#serviceDescInput" title="Copy bullet">
-                                            <span class="st-copy-bullet-symbol">•</span>
-                                            <span class="st-copy-bullet-label">Copy this bullet</span>
-                                        </button>
+                                        <div class="global-label-meta">
+                                            <button type="button" class="service-copy-bullet-box" data-copy-bullet>
+
+                                                <span class="service-copy-bullet-symbol">
+                                                    •
+                                                </span>
+
+                                                <span class="service-copy-bullet-label">
+                                                    Copy this bullet
+                                                </span>
+                                            </button>
+
+                                            <span id="serviceDescCount" class="char-counter">
+                                                0 / 255 characters
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <div class="st-voice-row is-textarea">
-                                        <div class="st-input-wrap st-textarea-wrap">
+                                    <div class="voice-search-row" data-voice-field>
+                                        <div class="global-control-wrap global-form-textarea-wrap" data-clearable-field>
                                             <textarea id="serviceDescInput" name="description"
-                                                placeholder="Brief details about the service..."
-                                                class="st-input st-textarea no-voice"
-                                                maxlength="255">{{ old('description') }}</textarea>
+                                                class="form-input-custom global-form-textarea no-voice"
+                                                placeholder="Brief details about the service..." maxlength="255"
+                                                data-char-limit="255" data-char-counter="#serviceDescCount"
+                                                data-clearable-input>{{ old('description') }}</textarea>
 
-                                            <div id="serviceDescCount" class="st-char-count">0 / 255</div>
                                             <button type="button" id="serviceDescClearBtn"
-                                                class="st-voice-clear-btn hidden" aria-label="Clear description"
-                                                title="Clear">
+                                                class="search-clear field-clear-btn field-clear-btn--textarea"
+                                                data-field-clear aria-label="Clear description"
+                                                title="Clear description">
                                                 <i class="fa-solid fa-xmark"></i>
                                             </button>
                                         </div>
-                                        <div class="service-voice-toggle" id="serviceDescVoiceToggle"></div>
-                                    </div>
 
-                                    @error('description')
-                                    <div class="st-field-error"><i class="fa-solid fa-circle-exclamation"></i>{{
-                                        $message }}
+                                        <div class="voice-input-toggle">
+                                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                                data-voice-target="#serviceDescInput"
+                                                data-voice-status="#serviceDescVoiceStatus"
+                                                aria-label="Voice input for service description">
+                                                <i class="fa-solid fa-microphone"></i>
+                                            </button>
+
+                                            <span id="serviceDescVoiceStatus" class="voice-status hidden"
+                                                data-voice-status aria-live="polite"></span>
+                                        </div>
                                     </div>
-                                    @enderror
                                 </div>
 
-                                <button type="submit" class="st-btn st-btn-primary st-save-service-btn">
-                                    <span class="btn-confirm-icon">
-                                        <i class="fa-solid fa-floppy-disk"></i>
-                                    </span>
-                                    Save Service
+                                <button type="submit" class="ui-btn ui-btn-primary">
+
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span>Save Service</span>
                                 </button>
                             </form>
                         </div>
@@ -129,20 +155,9 @@
                                     {{ $services->count() }} {{ Str::plural('Item', $services->count()) }}
                                 </span>
 
-                                <div class="view-toggle-container service-type-view-toggle" id="serviceTypeViewToggle"
-                                    aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" id="serviceTypeListBtn"
-                                        title="List view" aria-label="List view" aria-pressed="true">
-                                        <i class="fa-solid fa-table-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" id="serviceTypeGridBtn"
-                                        title="Grid view" aria-label="Grid view" aria-pressed="false">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="serviceTypeViewToggle" class="service-type-view-toggle"
+                                    storage-key="serviceTypeView" list-view="#serviceTypeListView"
+                                    grid-view="#serviceTypeGridView" />
                             </div>
                         </div>
 
@@ -333,172 +348,168 @@
                 </div>
             </div>
         </div>
+    </div>
+</main>
 
-        <div class="ui-modal modal-overlay st-delete-confirm-modal" id="deleteServiceModal"
-            onclick="closeModalOnBackdrop(event, 'deleteServiceModal')" aria-hidden="true">
+<x-delete-confirm-modal id="deleteServiceModal" form-id="deleteServiceForm" name-id="deleteServiceName"
+    title="Delete Service Type" helper="This service type will be permanently removed." />
 
-            <div class="modal-box-inner um-user-modal um-user-modal-sm st-delete-user-modal"
-                onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="deleteServiceTitle">
+<div class="ui-modal modal-theme-edit" id="manageServiceModal" aria-hidden="true">
+    <form id="manageServiceForm" method="POST" class="ui-modal-card modal-lg" role="dialog" aria-modal="true"
+        aria-labelledby="manageServiceTitle" data-global-validation data-discard-form
+        data-discard-title="Discard service changes?" data-discard-subtitle="You have unsaved service updates."
+        data-discard-message="Closing this modal will remove your changes to this service. Do you want to discard them?"
+        novalidate onclick="event.stopPropagation()">
+        @csrf
+        @method('PUT')
 
-                <div class="st-delete-head">
-                    <div class="st-delete-head-left">
-                        <div class="st-delete-head-icon">
-                            <i class="fa-solid fa-trash"></i>
-                        </div>
-
-                        <div>
-                            <h3 id="deleteServiceTitle" class="st-delete-title">Delete Service Type</h3>
-                            <p class="st-delete-subtitle">This action requires confirmation</p>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="closeDeleteModal()" class="um-modal-x"
-                        aria-label="Close delete modal">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-pen"></i>
                 </div>
 
-                <div class="st-delete-body">
-                    <div class="st-delete-alert">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                <div class="modal-copy">
+                    <h3 class="modal-title" id="manageServiceTitle">
+                        Manage Service Type
+                    </h3>
 
-                        <div>
-                            <p>
-                                Are you sure you want to delete
-                                <strong id="deleteServiceName" class="st-delete-name"></strong>?
-                            </p>
-                            <span>This action cannot be undone.</span>
-                        </div>
-                    </div>
-
-                    <div class="st-delete-actions">
-                        <button type="button" onclick="closeDeleteModal()" class="ui-btn ui-btn-secondary">
-                            Cancel
-                        </button>
-
-                        <form id="deleteServiceForm" method="POST" action="" class="service-delete-form">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="ui-btn ui-btn-danger">
-                                <i class="fa-solid fa-trash"></i>
-                                Delete
-                            </button>
-                        </form>
-                    </div>
+                    <p class="modal-subtitle">
+                        Update service details and booking visibility
+                    </p>
                 </div>
             </div>
+
+            <button type="button" class="modal-x" data-discard-close="manageServiceModal" aria-label="Close modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
-        <div class="ui-modal st-manage-modal modal-theme-edit" id="manageServiceModal"
-            onclick="closeModalOnBackdrop(event, 'manageServiceModal')">
-            <div class="ui-modal-card st-modal-box" role="dialog" aria-modal="true"
-                aria-labelledby="manageServiceTitle">
-                <form id="manageServiceForm" method="POST" class="st-manage-form">
-                    @csrf
-                    @method('PUT')
+        <div class="modal-bd">
+            <div class="modal-form-grid-2">
 
-                    <div class="st-modal-header modal-themed-header">
-                        <div class="st-modal-header-left">
-                            <div class="st-modal-header-icon modal-themed-icon">
-                                <i class="fa-solid fa-pen"></i>
+                <div class="global-form-group" data-global-field>
+                    <label for="manageServiceName" class="global-form-label">
+                        Service Name
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="voice-search-row" data-voice-field>
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-tag global-control-icon"></i>
+
+                            <input type="text" id="manageServiceName" name="name"
+                                class="form-input-custom global-control-with-icon no-voice" maxlength="255"
+                                autocomplete="off" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#manageServiceName" data-voice-status="#manageServiceNameVoiceStatus"
+                                aria-label="Voice input for service name">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="manageServiceNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="global-form-group" data-global-field>
+                    <div class="global-label-row">
+                        <label for="manageServiceDescription" class="global-form-label">
+                            Description
+                        </label>
+
+                        <div class="global-label-meta">
+                            <button type="button" class="service-copy-bullet-box" data-copy-bullet>
+
+                                <span class="service-copy-bullet-symbol">
+                                    •
+                                </span>
+
+                                <span class="service-copy-bullet-label">
+                                    Copy this bullet
+                                </span>
+                            </button>
+
+                            <span id="manageServiceDescCount" class="char-counter">
+                                0 / 255 characters
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="voice-search-row" data-voice-field>
+                        <div class="global-form-textarea-wrap">
+                            <textarea id="manageServiceDescription" name="description"
+                                class="form-input-custom global-form-textarea no-voice" maxlength="255"
+                                data-char-limit="255" data-char-counter="#manageServiceDescCount"
+                                placeholder="Brief details about the service..."></textarea>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#manageServiceDescription"
+                                data-voice-status="#manageServiceDescVoiceStatus"
+                                aria-label="Voice input for service description">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="manageServiceDescVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group full">
+                    <div class="service-booking-row">
+                        <div class="service-booking-copy">
+                            <div class="service-booking-icon">
+                                <i class="fa-solid fa-thumbtack"></i>
                             </div>
 
                             <div>
-                                <h3 class="st-modal-title" id="manageServiceTitle">Manage Service Type</h3>
-                                <p class="st-modal-subtitle">Update service details and booking visibility</p>
+                                <p class="service-booking-title">
+                                    Show in Book Appointment
+                                </p>
+
+                                <p class="service-booking-description">
+                                    Turn this off to hide the service from booking
+                                    while keeping it in Service Types.
+                                </p>
                             </div>
                         </div>
 
-                        <button type="button" class="st-modal-close" onclick="closeModal('manageServiceModal')"
-                            aria-label="Close modal">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                        <label class="global-switch">
+                            <input type="checkbox" id="manageServiceBookingToggle" name="is_active_for_booking"
+                                value="1" class="global-switch-input" aria-label="Show service in Book Appointment">
+
+                            <span class="global-switch-track" aria-hidden="true"></span>
+                        </label>
                     </div>
 
-                    <div class="st-modal-body">
-                        <div class="st-panel">
-                            <label class="st-modal-label">Service Name <span class="text-red-500">*</span></label>
-
-                            <div class="st-modal-voice-row">
-                                <div class="st-modal-field-wrap">
-                                    <span class="st-modal-field-icon"><i class="fa-solid fa-tag"></i></span>
-                                    <input type="text" id="manageServiceName" name="name"
-                                        class="st-modal-input no-voice" maxlength="255" required>
-                                </div>
-
-                                <div class="service-voice-toggle" id="manageServiceNameVoiceToggle"></div>
-                            </div>
-                        </div>
-
-                        <div class="st-panel">
-                            <div class="st-label-row">
-                                <label class="st-modal-label">Description</label>
-
-                                <button type="button" class="st-copy-bullet-box" data-copy-bullet
-                                    data-copy-target="#manageServiceDescription" title="Copy bullet">
-                                    <span class="st-copy-bullet-symbol">•</span>
-                                    <span class="st-copy-bullet-label">Copy this bullet</span>
-                                </button>
-                            </div>
-
-                            <div class="st-modal-voice-row st-modal-voice-row--textarea">
-                                <div class="st-modal-textarea-wrap">
-                                    <textarea id="manageServiceDescription" name="description"
-                                        class="st-modal-textarea no-voice" maxlength="255"
-                                        placeholder="Brief details about the service..."></textarea>
-                                </div>
-
-                                <div class="service-voice-toggle" id="manageServiceDescVoiceToggle"></div>
-                            </div>
-                        </div>
-
-                        <div class="st-panel st-col-span-2">
-                            <div class="st-active-card">
-                                <div class="st-active-card-left">
-                                    <div class="st-active-badge">
-                                        <i class="fa-solid fa-thumbtack"></i>
-                                    </div>
-
-                                    <div>
-                                        <p class="st-active-title">Show in Book Appointment</p>
-                                        <p class="st-active-desc">Turn this off if you want the service hidden from
-                                            booking
-                                            but still kept in Service Types.</p>
-                                    </div>
-                                </div>
-
-                                <label class="st-switch">
-                                    <input type="checkbox" id="manageServiceBookingToggle" name="is_active_for_booking"
-                                        value="1">
-                                    <span class="st-switch-slider"></span>
-                                </label>
-                            </div>
-
-                            <div id="manageDefaultNote" class="st-default-note admin-hidden">
-                                This is a default service type. It can be edited and hidden from booking, but it cannot
-                                be
-                                deleted.
-                            </div>
-                        </div>
+                    <div id="manageDefaultNote" class="service-default-note admin-hidden">
+                        This is a default service type. It can be edited
+                        and hidden from booking, but it cannot be deleted.
                     </div>
+                </div>
 
-                    <div class="st-modal-footer">
-                        <button type="button" class="ui-btn ui-btn-secondary"
-                            onclick="closeModal('manageServiceModal')">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="ui-btn ui-btn-edit">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Save Changes</span>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
 
-</main>
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="manageServiceModal">
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-edit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Changes</span>
+            </button>
+        </div>
+    </form>
+</div>
 @endsection
 
 @php
@@ -519,7 +530,6 @@ $serviceTypeUpdateRoute = route('admin.service-types.update', 0);
 $serviceTypeDestroyRoute = route('admin.service-types.destroy', 0);
 
 $serviceTypeRoutes = [
-'store' => route('admin.service-types.store'),
 'update' => preg_replace('/0$/', '__SERVICE_ID__', $serviceTypeUpdateRoute),
 'destroy' => preg_replace('/0$/', '__SERVICE_ID__', $serviceTypeDestroyRoute),
 ];
@@ -527,156 +537,6 @@ $serviceTypeRoutes = [
 
 @section('scripts')
 <script>
-    const addServiceForm = document.getElementById('addServiceForm');
-    const serviceNameInput = document.getElementById('serviceNameInput');
-    const nameClientError = document.getElementById('nameClientError');
-
-    function setAddServiceNameError(message = '') {
-        if (!serviceNameInput || !nameClientError) return;
-
-        if (message) {
-            nameClientError.classList.remove('admin-hidden');
-
-            if (typeof window.setFieldState === 'function') {
-                window.setFieldState('serviceNameInput', 'nameClientError', message);
-            } else {
-                serviceNameInput.classList.add('is-invalid');
-                serviceNameInput.classList.remove('is-valid');
-                nameClientError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
-            }
-
-            return;
-        }
-
-        nameClientError.classList.add('admin-hidden');
-
-        if (typeof window.setFieldState === 'function') {
-            window.setFieldState('serviceNameInput', 'nameClientError', '');
-        } else {
-            serviceNameInput.classList.remove('is-invalid');
-            serviceNameInput.classList.add('is-valid');
-            nameClientError.innerHTML = '';
-        }
-    }
-
-    addServiceForm?.addEventListener('submit', function (e) {
-        const value = serviceNameInput?.value.trim() || '';
-
-        if (!value) {
-            e.preventDefault();
-            setAddServiceNameError('Please provide a service name.');
-            serviceNameInput?.focus();
-        }
-    });
-
-    serviceNameInput?.addEventListener('input', function () {
-        if (this.value.trim()) {
-            setAddServiceNameError('');
-        } else {
-            this.classList.remove('is-valid');
-        }
-    });
-
-    function openDeleteModal(actionUrl, serviceName) {
-        const form = document.getElementById('deleteServiceForm');
-        const name = document.getElementById('deleteServiceName');
-
-        if (!form || !name) return;
-
-        name.textContent = serviceName;
-        form.action = actionUrl;
-
-        window.openModal('deleteServiceModal');
-    }
-
-    function closeDeleteModal() {
-        window.closeModal('deleteServiceModal');
-    }
-
-    function openManageServiceModal(actionUrl, serviceName, serviceDescription, isActiveForBooking, isDefault) {
-        const form = document.getElementById('manageServiceForm');
-        const nameInput = document.getElementById('manageServiceName');
-        const descInput = document.getElementById('manageServiceDescription');
-        const bookingToggle = document.getElementById('manageServiceBookingToggle');
-        const defaultNote = document.getElementById('manageDefaultNote');
-
-        if (!form || !nameInput || !descInput || !bookingToggle || !defaultNote) {
-            console.error('Manage modal elements not found.');
-            return;
-        }
-
-        form.action = actionUrl;
-        nameInput.value = serviceName ?? '';
-        descInput.value = serviceDescription ?? '';
-        bookingToggle.checked = Boolean(isActiveForBooking);
-
-        defaultNote.classList.toggle('admin-hidden', !isDefault);
-        defaultNote.style.display = isDefault ? 'block' : 'none';
-
-        window.openModal('manageServiceModal');
-
-        setTimeout(() => {
-            nameInput.focus();
-        }, 180);
-    }
-
-    const SERVICE_TYPE_VIEW_KEY = 'serviceTypeView';
-
-    function getPreferredServiceTypeView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem(SERVICE_TYPE_VIEW_KEY) || 'list';
-    }
-
-    function applyServiceTypeView(view, save = true) {
-        const root = document.getElementById('mainContent');
-        const listView = document.getElementById('serviceTypeListView');
-        const gridView = document.getElementById('serviceTypeGridView');
-        const listBtn = document.getElementById('serviceTypeListBtn');
-        const gridBtn = document.getElementById('serviceTypeGridBtn');
-
-        if (!listView || !gridView) return;
-
-        const finalView = window.innerWidth <= 767 ? 'grid' : (view === 'grid' ? 'grid' : 'list');
-        const isGrid = finalView === 'grid';
-
-        listView.hidden = isGrid;
-        gridView.hidden = !isGrid;
-
-        root?.classList.toggle('mode-grid', isGrid);
-        root?.classList.toggle('mode-list', !isGrid);
-
-        if (listBtn) {
-            listBtn.classList.toggle('active', !isGrid);
-            listBtn.setAttribute('aria-pressed', !isGrid ? 'true' : 'false');
-        }
-
-        if (gridBtn) {
-            gridBtn.classList.toggle('active', isGrid);
-            gridBtn.setAttribute('aria-pressed', isGrid ? 'true' : 'false');
-        }
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem(SERVICE_TYPE_VIEW_KEY, finalView);
-        }
-    }
-
-    function initServiceTypeViewToggle() {
-        const listBtn = document.getElementById('serviceTypeListBtn');
-        const gridBtn = document.getElementById('serviceTypeGridBtn');
-
-        applyServiceTypeView(getPreferredServiceTypeView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', () => applyServiceTypeView('list', true));
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', () => applyServiceTypeView('grid', true));
-        }
-    }
-
     function copyTextToClipboard(text) {
         if (navigator.clipboard && window.isSecureContext) {
             return navigator.clipboard.writeText(text);
@@ -704,13 +564,39 @@ $serviceTypeRoutes = [
         });
     }
 
+    function showServiceToast(
+        type,
+        title,
+        message
+    ) {
+        if (
+            typeof window.showToast ===
+            'function'
+        ) {
+            window.showToast({
+                type,
+                title,
+                message
+            });
+
+            return;
+        }
+
+        console[
+            type === 'error'
+                ? 'error'
+                : 'log'
+        ](`${title}: ${message}`);
+    }
+
     function initServiceBulletCopy() {
         document.querySelectorAll('[data-copy-bullet]').forEach((button) => {
             if (button.dataset.copyInitialized === 'true') return;
 
             button.dataset.copyInitialized = 'true';
 
-            const label = button.querySelector('.st-copy-bullet-label');
+            const label =
+                button.querySelector('.service-copy-bullet-label');
             const originalText = label?.textContent || 'Copy this bullet';
 
             button.addEventListener('click', async () => {
@@ -750,299 +636,6 @@ $serviceTypeRoutes = [
 
     document.addEventListener('DOMContentLoaded', initServiceBulletCopy);
 
-    document.addEventListener('DOMContentLoaded', () => {
-        initServiceTypeViewToggle();
-
-        function bindVoiceClear(fieldId, clearBtnId) {
-            const field = document.getElementById(fieldId);
-            const clearBtn = document.getElementById(clearBtnId);
-            if (!field || !clearBtn) return;
-
-            const toggleClear = () => {
-                if ((field.value || '').trim().length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
-            };
-
-            field.addEventListener('input', toggleClear);
-
-            clearBtn.addEventListener('click', () => {
-                field.value = '';
-                field.dispatchEvent(new Event('input', {
-                    bubbles: true
-                }));
-                field.dispatchEvent(new Event('change', {
-                    bubbles: true
-                }));
-                toggleClear();
-                field.focus();
-            });
-
-            toggleClear();
-        }
-
-        bindVoiceClear('serviceNameInput', 'serviceNameClearBtn');
-        bindVoiceClear('serviceDescInput', 'serviceDescClearBtn');
-
-        (function initServiceVoice() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return;
-
-            const voiceInputs = [{
-                inputId: 'serviceNameInput',
-                toggleWrapperId: 'serviceNameVoiceToggle',
-                micId: 'serviceNameMicBtn'
-            },
-            {
-                inputId: 'serviceDescInput',
-                toggleWrapperId: 'serviceDescVoiceToggle',
-                micId: 'serviceDescMicBtn'
-            },
-            {
-                inputId: 'manageServiceName',
-                toggleWrapperId: 'manageServiceNameVoiceToggle',
-                micId: 'manageServiceNameMicBtn'
-            },
-            {
-                inputId: 'manageServiceDescription',
-                toggleWrapperId: 'manageServiceDescVoiceToggle',
-                micId: 'manageServiceDescMicBtn'
-            }
-            ];
-
-            voiceInputs.forEach(config => {
-                const input = document.getElementById(config.inputId);
-                const toggleWrapper = document.getElementById(config.toggleWrapperId);
-                if (!input || !toggleWrapper) return;
-
-                const micBtn = document.createElement('button');
-                micBtn.type = 'button';
-                micBtn.id = config.micId;
-                micBtn.className = 'voice-search-mic external';
-                micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
-                micBtn.title = 'Toggle voice input';
-                toggleWrapper.appendChild(micBtn);
-
-                const status = document.createElement('span');
-                status.className = 'voice-status hidden';
-                status.setAttribute('aria-hidden', 'true');
-                status.setAttribute('aria-live', 'polite');
-                toggleWrapper.appendChild(status);
-
-                let recognition = null;
-                let listening = false;
-                let manualStop = false;
-                let capturedText = false;
-
-                const setStatus = (text, state) => {
-                    status.textContent = text || '';
-                    status.className = state ? `voice-status is-${state}` : 'voice-status';
-                    if (!text) status.classList.add('hidden');
-                    else status.classList.remove('hidden');
-                };
-
-                const setMicState = (active) => {
-                    micBtn.classList.toggle('mic-active', !!active);
-                    micBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-                    micBtn.innerHTML = active ?
-                        '<i class="fa-solid fa-stop"></i>' :
-                        '<i class="fa-solid fa-microphone"></i>';
-                };
-
-                const stopNow = () => {
-                    manualStop = true;
-                    listening = false;
-                    setMicState(false);
-
-                    if (capturedText) {
-                        setStatus('Voice captured.', 'success');
-                        setTimeout(() => setStatus('', null), 1200);
-                    } else {
-                        setStatus("Didn't catch that. Try again.", 'error');
-                        setTimeout(() => setStatus('', null), 2500);
-                    }
-
-                    if (recognition) {
-                        try {
-                            recognition.abort();
-                        } catch (e) {
-                            try {
-                                recognition.stop();
-                            } catch (_) { }
-                        }
-                    }
-                };
-
-                const createRecognition = () => {
-                    capturedText = false;
-
-                    const r = new SpeechRecognition();
-                    r.lang = 'en-US';
-                    r.continuous = false;
-                    r.interimResults = true;
-                    r.maxAlternatives = 1;
-
-                    let sawSpeech = false;
-                    let timeoutId = null;
-                    const LISTEN_TIMEOUT = 6000;
-
-                    const clearTimeout_ = () => {
-                        if (timeoutId) {
-                            clearTimeout(timeoutId);
-                            timeoutId = null;
-                        }
-                    };
-
-                    r.onstart = () => {
-                        timeoutId = setTimeout(() => {
-                            if (listening && !sawSpeech) {
-                                try {
-                                    r.stop();
-                                } catch (e) { }
-                            }
-                        }, LISTEN_TIMEOUT);
-                    };
-
-                    r.onspeechend = () => {
-                        clearTimeout_();
-                        try {
-                            r.stop();
-                        } catch (e) { }
-                    };
-
-                    r.onresult = (event) => {
-                        let transcript = '';
-                        for (let i = event.resultIndex; i < event.results.length; i++) {
-                            const result = event.results[i];
-                            const chunk = (result?.[0]?.transcript ?? '').trim();
-                            if (!chunk) continue;
-                            sawSpeech = true;
-                            if (result.isFinal) {
-                                transcript = (transcript + ' ' + chunk).trim();
-                            } else if (!transcript) {
-                                transcript = chunk;
-                            }
-                        }
-                        transcript = transcript.trim();
-                        if (transcript) {
-                            clearTimeout_();
-                            capturedText = true;
-                            input.value = transcript;
-                            input.dispatchEvent(new Event('input', {
-                                bubbles: true
-                            }));
-                            input.dispatchEvent(new Event('change', {
-                                bubbles: true
-                            }));
-                            setStatus('Listening...', 'listening');
-                        }
-                    };
-
-                    r.onerror = () => {
-                        clearTimeout_();
-                        listening = false;
-                        if (manualStop) {
-                            manualStop = false;
-                            return;
-                        }
-                        setMicState(false);
-                        setStatus("Didn't catch that. Try again.", 'error');
-                        setTimeout(() => setStatus('', null), 2500);
-                    };
-
-                    r.onend = () => {
-                        clearTimeout_();
-                        if (manualStop) {
-                            manualStop = false;
-                            listening = false;
-                            setMicState(false);
-                            return;
-                        }
-                        const hadSpeech = sawSpeech || capturedText;
-                        listening = false;
-                        setMicState(false);
-                        if (hadSpeech) {
-                            setStatus('Voice captured.', 'success');
-                            setTimeout(() => setStatus('', null), 2200);
-                        } else {
-                            setStatus("Didn't catch that. Try again.", 'error');
-                            setTimeout(() => setStatus('', null), 2500);
-                        }
-                    };
-
-                    return r;
-                };
-
-                micBtn.addEventListener('click', () => {
-                    if (listening && recognition) {
-                        stopNow();
-                        return;
-                    }
-                    recognition = createRecognition();
-                    try {
-                        recognition.start();
-                    } catch (e) {
-                        setStatus('Unable to start voice input.', 'error');
-                        setTimeout(() => setStatus('', null), 2500);
-                        setMicState(false);
-                        listening = false;
-                        return;
-                    }
-                    listening = true;
-                    setMicState(true);
-                    setStatus('Listening...', 'listening');
-                });
-
-                micBtn.addEventListener('pointerdown', (ev) => {
-                    if (listening && recognition) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        manualStop = true;
-                        try {
-                            recognition.stop();
-                        } catch (e) { }
-                    }
-                }, {
-                    passive: false
-                });
-            });
-        })();
-
-        const descInput = document.getElementById('serviceDescInput');
-        const charCount = document.getElementById('serviceDescCount');
-        const maxChars = 255;
-
-        if (descInput && charCount) {
-            function updateCharCount() {
-                if (descInput.value.length > maxChars) {
-                    descInput.value = descInput.value.slice(0, maxChars);
-                }
-
-                const currentLength = descInput.value.length;
-                charCount.textContent = `${currentLength} / ${maxChars}`;
-
-                charCount.classList.toggle('near-limit', currentLength >= maxChars * 0.8 && currentLength <
-                    maxChars);
-                charCount.classList.toggle('at-limit', currentLength >= maxChars);
-            }
-
-            updateCharCount();
-            descInput.addEventListener('input', updateCharCount);
-            descInput.addEventListener('change', updateCharCount);
-            descInput.addEventListener('paste', () => requestAnimationFrame(updateCharCount));
-        }
-    });
-
-    window.addEventListener('resize', () => {
-        applyServiceTypeView(getPreferredServiceTypeView(), false);
-    });
-
-    /* ─────────────────────────────────────────────────────────────
-       Service Types AJAX + viewport-centered modals
-       Keeps add/edit/delete from reloading the page.
-    ───────────────────────────────────────────────────────────── */
     (() => {
         const initialServices = @json($serviceTypePayload);
 
@@ -1069,8 +662,10 @@ $serviceTypeRoutes = [
             is_default: Boolean(service.is_default),
         });
 
-        const serviceUpdateUrl = (id) => routes.update.replace('__SERVICE_ID__', encodeURIComponent(id));
-        const serviceDestroyUrl = (id) => routes.destroy.replace('__SERVICE_ID__', encodeURIComponent(id));
+        const serviceUpdateUrl = (id) => routes.update.replace('__SERVICE_ID__', encodeURIComponent(
+            id));
+        const serviceDestroyUrl = (id) => routes.destroy.replace('__SERVICE_ID__', encodeURIComponent(
+            id));
 
         function sortServices() {
             serviceTypeServices.sort((a, b) => String(a.name).localeCompare(String(b.name)));
@@ -1191,37 +786,37 @@ $serviceTypeRoutes = [
             gridView.innerHTML = `
             <div class="service-types-grid" id="serviceTypeGridContainer">
                 ${serviceTypeServices.map((service) => `
-                                <div class="service-type-card" data-service-id="${service.id}">
-                                    <div class="service-type-card-top">
-                                        <span class="service-badge service-type-card-id">#${service.id}</span>
-                                        ${defaultBadge(service)}
-                                    </div>
+                                                        <div class="service-type-card" data-service-id="${service.id}">
+                                                            <div class="service-type-card-top">
+                                                                <span class="service-badge service-type-card-id">#${service.id}</span>
+                                                                ${defaultBadge(service)}
+                                                            </div>
 
-                                    <div class="service-type-card-name-wrap">
-                                        <div class="service-type-card-icon">
-                                            <i class="fa-solid fa-tooth"></i>
-                                        </div>
-                                        <div class="service-type-card-name">${escapeHtml(service.name)}</div>
-                                    </div>
+                                                            <div class="service-type-card-name-wrap">
+                                                                <div class="service-type-card-icon">
+                                                                    <i class="fa-solid fa-tooth"></i>
+                                                                </div>
+                                                                <div class="service-type-card-name">${escapeHtml(service.name)}</div>
+                                                            </div>
 
-                                    <div class="service-type-card-desc-wrap">
-                                        <div class="service-type-card-label">Description</div>
-                                        <div class="service-type-card-desc">
-                                            ${service.description ? escapeHtml(service.description) : '—'}
-                                        </div>
-                                    </div>
+                                                            <div class="service-type-card-desc-wrap">
+                                                                <div class="service-type-card-label">Description</div>
+                                                                <div class="service-type-card-desc">
+                                                                    ${service.description ? escapeHtml(service.description) : '—'}
+                                                                </div>
+                                                            </div>
 
-                                    <div class="service-type-card-footer">
-                                        <div class="service-card-actions">
-                                            ${visibilityBadge(service)}
-                                        </div>
+                                                            <div class="service-type-card-footer">
+                                                                <div class="service-card-actions">
+                                                                    ${visibilityBadge(service)}
+                                                                </div>
 
-                                        <div class="service-type-card-actions ui-action-group">
-                                            ${actionButtons(service)}
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
+                                                                <div class="service-type-card-actions ui-action-group">
+                                                                    ${actionButtons(service)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `).join('')}
             </div>`;
         }
 
@@ -1230,23 +825,6 @@ $serviceTypeRoutes = [
             updateServiceCounts();
             renderServiceTable();
             renderServiceGrid();
-
-            if (typeof applyServiceTypeView === 'function') {
-                applyServiceTypeView(getPreferredServiceTypeView(), false);
-            }
-        }
-
-        function showServiceToast(type, title, message) {
-            if (typeof window.showToast === 'function') {
-                window.showToast({
-                    type,
-                    title,
-                    message
-                });
-                return;
-            }
-
-            console[type === 'error' ? 'error' : 'log'](`${title}: ${message}`);
         }
 
         function firstValidationMessage(data, fallback = 'Please check the form and try again.') {
@@ -1321,8 +899,9 @@ $serviceTypeRoutes = [
 
         function addOrUpdateService(service) {
             const normalized = normalizeService(service);
-            const existingIndex = serviceTypeServices.findIndex((item) => Number(item.id) === Number(normalized
-                .id));
+            const existingIndex = serviceTypeServices.findIndex((item) => Number(item.id) ===
+                Number(normalized
+                    .id));
 
             if (existingIndex >= 0) {
                 serviceTypeServices[existingIndex] = normalized;
@@ -1334,63 +913,17 @@ $serviceTypeRoutes = [
         }
 
         function removeService(id) {
-            serviceTypeServices = serviceTypeServices.filter((service) => Number(service.id) !== Number(id));
+            serviceTypeServices = serviceTypeServices.filter((service) => Number(service.id) !==
+                Number(id));
             renderServices();
         }
-
-        function closeServiceModal(id) {
-            if (typeof window.closeModal === 'function') {
-                window.closeModal(id);
-                return;
-            }
-
-            const modal = document.getElementById(id);
-            if (!modal) return;
-
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('modal-lock');
-        }
-
-        function openServiceModal(id) {
-            const modal = document.getElementById(id);
-            if (!modal) return;
-
-            modal.classList.remove('closing');
-            modal.classList.add('open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-lock');
-
-            if (typeof window.openModal === 'function') {
-                window.openModal(id);
-            }
-        }
-
-        function relocateServiceModals() {
-            ['deleteServiceModal', 'manageServiceModal'].forEach((id) => {
-                const modal = document.getElementById(id);
-
-                if (modal && modal.parentElement !== document.body) {
-                    document.body.appendChild(modal);
-                }
-            });
-        }
-
-        window.closeModalOnBackdrop = window.closeModalOnBackdrop || function (event, modalId) {
-            if (event.target?.id === modalId) {
-                closeServiceModal(modalId);
-            }
-        };
-
-        window.closeDeleteModal = function () {
-            closeServiceModal('deleteServiceModal');
-        };
 
         window.openManageServiceById = function (id) {
             const service = serviceTypeServices.find((item) => Number(item.id) === Number(id));
 
             if (!service) {
-                showServiceToast('error', 'Service not found', 'Unable to find the selected service.');
+                showServiceToast('error', 'Service not found',
+                    'Unable to find the selected service.');
                 return;
             }
 
@@ -1408,31 +941,54 @@ $serviceTypeRoutes = [
             const service = serviceTypeServices.find((item) => Number(item.id) === Number(id));
 
             if (!service) {
-                showServiceToast('error', 'Service not found', 'Unable to find the selected service.');
+                showServiceToast('error', 'Service not found',
+                    'Unable to find the selected service.');
                 return;
             }
 
             window.openDeleteModal(serviceDestroyUrl(service.id), service.name, service.id);
         };
 
-        window.openDeleteModal = function (actionUrl, serviceName, serviceId = null) {
-            relocateServiceModals();
+        window.openDeleteModal = function (
+            actionUrl,
+            serviceName,
+            serviceId = null
+        ) {
+            const form =
+                window.openDeleteConfirmModal?.({
+                    modalId:
+                        'deleteServiceModal',
 
-            const form = document.getElementById('deleteServiceForm');
-            const name = document.getElementById('deleteServiceName');
+                    formId:
+                        'deleteServiceForm',
 
-            if (!form || !name) return;
+                    nameId:
+                        'deleteServiceName',
 
-            name.textContent = serviceName || '';
-            form.action = actionUrl;
-            form.dataset.serviceId = serviceId || String(actionUrl).split('/').filter(Boolean).pop() || '';
+                    action:
+                        actionUrl,
 
-            openServiceModal('deleteServiceModal');
+                    itemName:
+                        serviceName,
+
+                    recordId:
+                        serviceId,
+                });
+
+            if (!form) return;
+
+            form.dataset.serviceId =
+                serviceId ||
+                String(actionUrl)
+                    .split('/')
+                    .filter(Boolean)
+                    .pop() ||
+                '';
         };
 
-        window.openManageServiceModal = function (actionUrl, serviceName, serviceDescription, isActiveForBooking,
+        window.openManageServiceModal = function (actionUrl, serviceName, serviceDescription,
+            isActiveForBooking,
             isDefault, serviceId = null) {
-            relocateServiceModals();
 
             const form = document.getElementById('manageServiceForm');
             const nameInput = document.getElementById('manageServiceName');
@@ -1446,91 +1002,172 @@ $serviceTypeRoutes = [
             }
 
             form.action = actionUrl;
-            form.dataset.serviceId = serviceId || String(actionUrl).split('/').filter(Boolean).pop() || '';
+            form.dataset.serviceId = serviceId || String(actionUrl).split('/').filter(Boolean)
+                .pop() || '';
 
             nameInput.value = serviceName ?? '';
             descInput.value = serviceDescription ?? '';
+
+            window.initCharLimitFields?.(
+                document.getElementById(
+                    'manageServiceModal'
+                )
+            );
+
+            descInput.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+
             bookingToggle.checked = Boolean(isActiveForBooking);
 
             defaultNote.classList.toggle('admin-hidden', !isDefault);
             defaultNote.style.display = isDefault ? 'block' : 'none';
 
-            openServiceModal('manageServiceModal');
+            window.openModal('manageServiceModal');
 
             setTimeout(() => {
                 nameInput.focus();
             }, 180);
         };
 
+        function showServiceFormErrors(
+            form,
+            response
+        ) {
+            const errors =
+                response?.errors || {};
+
+            Object.entries(errors)
+                .forEach(([name, messages]) => {
+                    const field =
+                        form.querySelector(
+                            `[name="${CSS.escape(name)}"]`
+                        );
+
+                    if (!field) return;
+
+                    const message =
+                        Array.isArray(messages) ?
+                            messages[0] :
+                            messages;
+
+                    window
+                        .showFormInputValidationMessage
+                        ?.(field, String(message || ''));
+                });
+        }
+
         function bindAjaxForms() {
             const addForm = document.getElementById('addServiceForm');
             const manageForm = document.getElementById('manageServiceForm');
             const deleteForm = document.getElementById('deleteServiceForm');
 
-            addForm?.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                event.stopImmediatePropagation();
+            addForm?.addEventListener(
+                'submit',
+                async event => {
+                    event.preventDefault();
 
-                const nameInput = document.getElementById('serviceNameInput');
-                const submitButton = addForm.querySelector('[type="submit"]');
-                const value = nameInput?.value.trim() || '';
+                    const validation =
+                        window.validateGlobalForm?.(addForm);
 
-                if (!value) {
-                    if (typeof setAddServiceNameError === 'function') {
-                        setAddServiceNameError('Please provide a service name.');
+                    if (
+                        validation &&
+                        !validation.valid
+                    ) {
+                        return;
                     }
 
-                    nameInput?.focus();
-                    return;
-                }
+                    const submitButton =
+                        addForm.querySelector(
+                            '[type="submit"]'
+                        );
 
-                try {
-                    const data = await submitJson(addForm, submitButton, 'Saving...');
-                    addOrUpdateService(data.service);
+                    try {
+                        const data = await submitJson(
+                            addForm,
+                            submitButton,
+                            'Saving...'
+                        );
 
-                    addForm.reset();
-                    document.getElementById('serviceDescCount') && (document.getElementById(
-                        'serviceDescCount').textContent = '0 / 255');
-                    document.getElementById('serviceNameClearBtn')?.classList.add('hidden');
-                    document.getElementById('serviceDescClearBtn')?.classList.add('hidden');
+                        addOrUpdateService(data.service);
 
-                    if (typeof setAddServiceNameError === 'function') {
-                        setAddServiceNameError('');
+                        addForm.reset();
+
+                        requestAnimationFrame(() => {
+                            addForm
+                                .querySelectorAll(
+                                    '[data-clearable-input]'
+                                )
+                                .forEach(field => {
+                                    field.dispatchEvent(
+                                        new Event('input', {
+                                            bubbles: true
+                                        })
+                                    );
+                                });
+                        });
+
+                        document
+                            .getElementById(
+                                'serviceNameInput'
+                            )
+                            ?.classList.remove(
+                                'is-valid',
+                                'is-invalid'
+                            );
+
+                        document
+                            .getElementById(
+                                'serviceDescInput'
+                            )
+                            ?.classList.remove(
+                                'is-valid',
+                                'is-invalid'
+                            );
+
+                        showServiceToast(
+                            'success',
+                            'Service added',
+                            data.service
+                                ?.is_active_for_booking ?
+                                'Patients can now select it when booking.' :
+                                'Saved in Service Types and hidden from booking.'
+                        );
+                    } catch (error) {
+                        showServiceFormErrors(
+                            addForm,
+                            error
+                        );
+
+                        showServiceToast(
+                            'error',
+                            'Add failed',
+                            firstValidationMessage(
+                                error,
+                                'Unable to add service type.'
+                            )
+                        );
                     }
-
-                    document.getElementById('serviceNameInput')?.classList.remove('is-valid',
-                        'is-invalid');
-                    document.getElementById('serviceDescInput')?.classList.remove('is-valid',
-                        'is-invalid');
-
-                    showServiceToast(
-                        'success',
-                        'Service added',
-                        data.service?.is_active_for_booking ?
-                            'Patients can now select it when booking.' :
-                            'Saved in Service Types and hidden from booking.'
-                    );
-                } catch (error) {
-                    const message = firstValidationMessage(error, 'Unable to add service type.');
-
-                    if (error?.errors?.name && typeof setAddServiceNameError === 'function') {
-                        setAddServiceNameError(message);
-                        nameInput?.focus();
-                    } else {
-                        showServiceToast('error', 'Add failed', message);
-                    }
-                }
-            }, true);
+                },
+                true
+            );
 
             manageForm?.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                const validation =
+                    window.validateGlobalForm?.(manageForm);
 
+                if (validation && !validation.valid) {
+                    return;
+                }
                 const submitButton = manageForm.querySelector('[type="submit"]');
 
                 try {
                     const data = await submitJson(manageForm, submitButton, 'Saving...');
                     addOrUpdateService(data.service);
-                    closeServiceModal('manageServiceModal');
+                    window.closeModal('manageServiceModal');
                     showServiceToast(
                         'success',
                         'Changes saved',
@@ -1550,7 +1187,7 @@ $serviceTypeRoutes = [
                 try {
                     const data = await submitJson(deleteForm, submitButton, 'Deleting...');
                     removeService(data.deleted_id || deleteForm.dataset.serviceId);
-                    closeServiceModal('deleteServiceModal');
+                    window.closeModal('deleteServiceModal');
                     showServiceToast(
                         'success',
                         'Service deleted',
@@ -1578,11 +1215,26 @@ $serviceTypeRoutes = [
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            relocateServiceModals();
+        function initServiceTypesPage() {
             renderServices();
             bindAjaxForms();
-        });
+        }
+
+        if (
+            document.readyState ===
+            'loading'
+        ) {
+            document.addEventListener(
+                'DOMContentLoaded',
+                initServiceTypesPage,
+                {
+                    once: true
+                }
+            );
+        } else {
+            initServiceTypesPage();
+        }
+
     })();
 </script>
 @endsection

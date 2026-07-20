@@ -34,11 +34,12 @@
 @import './pages/admin/admin-shared.css';
 
 @import './pages/shared/patient-list.css';
+@import "./pages/shared/document-requests.css";
+@import './pages/shared/appointments.css';
+@import './pages/shared/clinic-schedule.css';
 
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
-@import './pages/dentist/dentist-document-requests.css';
-@import './pages/dentist/dentist-appointments.css';
 @import './pages/dentist/dentist-reports.css';
 @import './pages/dentist/dental-services.css';
 @import './pages/dentist/daily-treatment.css';
@@ -56,14 +57,11 @@
 
 /* Admin pages */
 @import './pages/admin/admin-dashboard.css';
-@import './pages/admin/admin-appointments.css';
 @import './pages/admin/admin-inventory.css';
 @import './pages/admin/admin-dental-records.css';
-@import './pages/admin/admin-document-requests.css';
 @import './pages/admin/admin-document-templates.css';
 @import './pages/admin/admin-reports.css';
 @import './pages/admin/academic-period.css';
-@import './pages/admin/clinic-schedule.css';
 @import './pages/admin/cms-access.css';
 @import './pages/admin/faculty-integration.css';
 @import './pages/admin/role-permissions.css';

@@ -85,17 +85,51 @@ class DocumentRequestController extends Controller
             ]);
         }
 
-        return view('admin.document-request', compact(
-            'requests',
-            'stats',
-            'search',
-            'status',
-            'type',
-            'dateFrom',
-            'dateTo',
-            'sort',
-            'perPage'
-        ));
+        return view('shared.document-requests', [
+            'role' => 'admin',
+
+            'requests' => $requests,
+            'stats' => $stats,
+
+            'search' => $search,
+            'status' => $status,
+            'type' => $type,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'sort' => $sort,
+            'perPage' => $perPage,
+
+            'routes' => [
+                'index' => route(
+                    'admin.document-requests.index'
+                ),
+
+                'data' => null,
+
+                'approve' => url('/admin/document-requests/__ID__/approve'),
+                'reject' => url('/admin/document-requests/__ID__/reject'),
+
+                'export' => route(
+                    'admin.document-requests.export'
+                ),
+
+                'print_queue' => route(
+                    'admin.document-requests.print-queue'
+                ),
+            ],
+
+            'methods' => [
+                'approve' => 'PATCH',
+                'reject' => 'PATCH',
+            ],
+
+            'permissions' => [
+                'can_approve' => true,
+                'can_reject' => true,
+                'can_export' => true,
+                'can_print' => true,
+            ],
+        ]);
     }
 
     public function data(Request $request)
@@ -326,9 +360,28 @@ class DocumentRequestController extends Controller
                 $query->orderBy('created_at', 'asc');
                 break;
 
+            case 'az':
             case 'alpha':
-                $query->leftJoin('patients', 'document_requests.patient_id', '=', 'patients.id')
+                $query
+                    ->leftJoin(
+                        'patients',
+                        'document_requests.patient_id',
+                        '=',
+                        'patients.id'
+                    )
                     ->orderBy('patients.name', 'asc')
+                    ->select('document_requests.*');
+                break;
+
+            case 'za':
+                $query
+                    ->leftJoin(
+                        'patients',
+                        'document_requests.patient_id',
+                        '=',
+                        'patients.id'
+                    )
+                    ->orderBy('patients.name', 'desc')
                     ->select('document_requests.*');
                 break;
 

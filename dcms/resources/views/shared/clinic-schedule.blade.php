@@ -1,11 +1,27 @@
 @extends('layouts.app')
 
-@section('layout-role', $layoutRole)
+@section('layout-role', $layoutRole ?? 'admin')
 
-@section('title', 'Clinic Schedule')
+@section('title', $pageTitle ?? 'Clinic Schedule')
 
 @section('content')
 @php
+$layoutRole = $layoutRole ?? 'admin';
+
+$isDentistView = $isDentistView ?? false;
+
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+
+$pageTitle = $pageTitle ?? 'Clinic Schedule';
+
+$clinicScheduleRouteNames = $clinicScheduleRouteNames ?? [
+'store' => 'admin.clinic_schedule.store',
+'update' => 'admin.clinic_schedule.update',
+'destroy' => 'admin.clinic_schedule.destroy',
+'block' => 'admin.clinic_schedule.block',
+'unblock' => 'admin.clinic_schedule.unblock',
+];
+
 $openRules = $schedules->where('status', '!=', 'closed');
 $openDays = $openRules->sum(fn($s) => count($s->days ?? []));
 $maxSlots = $openRules->max('max_slots') ?? 0;
@@ -36,11 +52,11 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 
 <main id="mainContent" class="{{ $pageShellClass }}
         clinic-schedule-page
-        {{ $isDentistView ? 'dentist-clinic-schedule-page' : '' }}
+        {{ $isDentistView ? 'dentist-clinic-schedule-page' : 'admin-clinic-schedule-page' }}
         page-enter
         mode-list">
 
-    <div class="{{ $isDentistView ? 'w-full' : 'full' }}">
+    <div class="w-full">
 
         @if ($errors->any())
         <script>
@@ -117,13 +133,14 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
             </div>
 
             <div class="dentist-hero-actions cs-hero-actions">
-                <button type="button" onclick="openRuleModal()" class="btn-primary-global cs-hero-action-btn">
+                <button type="button" onclick="openRuleModal()" class="ui-btn ui-btn-primary">
+
                     <i class="fa-solid fa-plus"></i>
                     <span>Add Schedule Rule</span>
                 </button>
 
-                <button type="button" onclick="openBlockModal()"
-                    class="btn-secondary-global cs-hero-action-btn cs-hero-danger-btn">
+                <button type="button" onclick="openBlockModal()" class="ui-btn ui-btn-danger">
+
                     <i class="fa-solid fa-ban"></i>
                     <span>Block Date</span>
                 </button>
@@ -139,13 +156,14 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                 </div>
 
                 <div class="flex items-center gap-3 flex-wrap page-actions">
-                    <button type="button" onclick="openRuleModal()" class="cs-banner-action-btn">
+                    <button type="button" onclick="openRuleModal()" class="ui-btn ui-btn-primary">
+
                         <i class="fa-solid fa-plus"></i>
                         <span>Add Schedule Rule</span>
                     </button>
 
-                    <button type="button" onclick="openBlockModal()"
-                        class="cs-banner-action-btn cs-banner-action-danger">
+                    <button type="button" onclick="openBlockModal()" class="ui-btn ui-btn-danger">
+
                         <i class="fa-solid fa-ban"></i>
                         <span>Block Date</span>
                     </button>
@@ -264,20 +282,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                             <div class="cs-rules-header-actions">
                                 <span class="cs-rules-count">{{ $schedules->count() }} rules</span>
 
-                                <div class="view-toggle-container" id="scheduleRulesViewToggle"
-                                    aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" id="scheduleRulesListViewBtn"
-                                        title="List view" aria-label="List view" aria-pressed="true">
-                                        <i class="fa-solid fa-table-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" id="scheduleRulesGridViewBtn"
-                                        title="Grid view" aria-label="Grid view" aria-pressed="false">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="scheduleRulesViewToggle" storage-key="scheduleRulesView"
+                                    list-view="#scheduleRulesListView" grid-view="#scheduleRulesGridView" />
                             </div>
                         </div>
 
@@ -353,9 +359,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                                     <button type="button" class="ui-action-btn ui-action-delete"
                                                         data-tooltip="Delete schedule" aria-label="Delete schedule"
                                                         onclick='openScheduleDeleteModal(
-        @json(route($clinicScheduleRouteNames["destroy"], $rule)),
-        @json($rule->days_label)
-    )'>
+        @json(route($clinicScheduleRouteNames['destroy'], $rule)), @json($rule->days_label)
+                                                        )'>
 
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
@@ -445,9 +450,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 
                                         <button type="button" class="ui-action-btn ui-action-delete"
                                             data-tooltip="Delete schedule" aria-label="Delete schedule" onclick='openScheduleDeleteModal(
-        @json(route($clinicScheduleRouteNames["destroy"], $rule)),
-        @json($rule->days_label)
-    )'>
+        @json(route($clinicScheduleRouteNames['destroy'], $rule)), @json($rule->days_label)
+                                            )'>
 
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
@@ -639,6 +643,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                 </div>
             </div>
         </div>
+    </div>
 </main>
 
 <div id="appointmentDetailModal" class="ui-modal cs-modal">
@@ -686,34 +691,32 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
 <div id="ruleModalBackdrop" class="ui-modal cs-modal cs-rule-modal modal-theme-primary">
     <div class="ui-modal-card cs-modal-card cs-rule-modal-card" onclick="event.stopPropagation()">
 
-        <div class="modal-hdr modal-form-hdr modal-themed-header">
-            <div class="modal-title-row">
-                <div class="modal-title-main">
-                    <div class="modal-title-icon modal-themed-icon">
-                        <i class="fa-solid fa-calendar-plus" id="ruleModalIcon"></i>
-                    </div>
-
-                    <div class="modal-title-block">
-                        <h3 class="text-xl font-extrabold" id="ruleModalTitle">
-                            Add Schedule Rule
-                        </h3>
-
-                        <p class="modal-title-sub" id="ruleModalSubtitle">
-                            Choose clinic days, set operating hours,
-                            and control booking capacity.
-                        </p>
-                    </div>
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-calendar-plus" id="ruleModalIcon"></i>
                 </div>
 
-                <button type="button" onclick="closeRuleModal()" class="modal-close-btn">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <div class="modal-copy">
+                    <h3 class="modal-title" id="ruleModalTitle">
+                        Add Schedule Rule
+                    </h3>
+
+                    <p class="modal-subtitle" id="ruleModalSubtitle">
+                        Choose clinic days, set operating hours,
+                        and control booking capacity.
+                    </p>
+                </div>
             </div>
+
+            <button type="button" class="modal-x" data-discard-close="ruleModalBackdrop" aria-label="Close rule modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
-        <div class="modal-body modal-form-body">
+        <div class="modal-bd modal-form-body">
             <form id="ruleForm" method="POST" action="{{ route($clinicScheduleRouteNames['store']) }}"
-                data-global-validation data-discard-changes data-form-validation-rule="clinicScheduleRule" novalidate>
+                data-global-validation data-discard-form data-form-validation-rule="clinicScheduleRule" novalidate>
                 @csrf
                 <div id="ruleMethodField"></div>
                 <div class="rule-modal-layout">
@@ -752,7 +755,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     'Sat' => 'S',
                                     'Sun' => 'Su',
                                     ] as $abbr => $lbl)
-                                    <button type="button" class="day-toggle" data-day="{{ $abbr }}"
+                                    <button type="button" class="day-toggle" data-day="{{ $abbr }}" data-discard-track
+                                        data-discard-key="schedule-day-{{ $abbr }}" data-discard-value="false"
                                         onclick="toggleDay(this)" aria-pressed="false">
 
                                         <span class="day-toggle-label">
@@ -790,30 +794,46 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                 </div>
                             </div>
 
-                            <label class="form-label" for="ruleNotes">
-                                Notes (optional)
-                            </label>
+                            <div class="global-label-row">
+                                <label class="form-label" for="ruleNotes">
+                                    Notes (optional)
+                                </label>
 
-                            <div class="rule-notes-voice-row mb-2">
-                                <div class="rule-notes-textarea-wrap">
+                                <span id="ruleNotesCount" class="char-counter">
+                                    0 / 150 characters
+                                </span>
+                            </div>
+
+                            <div class="voice-search-row rule-notes-field mb-2" data-voice-field>
+
+                                <div class="global-control-wrap global-form-textarea-wrap rule-notes-textarea-wrap"
+                                    data-clearable-field>
+
                                     <textarea id="ruleNotes" name="notes"
-                                        class="form-ctrl resize-none rule-notes-textarea" maxlength="150"
-                                        placeholder="e.g. Reduced operations due to holiday program..."></textarea>
+                                        class="form-ctrl resize-none rule-notes-textarea no-voice" maxlength="150"
+                                        data-char-limit="150" data-char-counter="#ruleNotesCount"
+                                        placeholder="e.g. Reduced operations due to holiday program."
+                                        data-clearable-input></textarea>
 
-                                    <button type="button" id="ruleNotesClearBtn" class="rule-notes-clear-btn hidden"
+                                    <button type="button" id="ruleNotesClearBtn"
+                                        class="search-clear field-clear-btn field-clear-btn--textarea" data-field-clear
                                         aria-label="Clear notes" title="Clear notes">
+
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
 
-                                <div class="rule-notes-voice-toggle" id="ruleNotesVoiceToggle"></div>
-                            </div>
+                                <div class="voice-input-toggle">
+                                    <button type="button" class="voice-search-mic external" data-voice-trigger
+                                        data-voice-target="#ruleNotes" data-voice-status="#ruleNotesVoiceStatus"
+                                        aria-label="Voice input for schedule notes" aria-pressed="false">
 
-                            <div class="form-help flex items-center justify-between gap-2 mt-auto">
-                                <span>Maximum of 150 characters.</span>
-                                <span id="ruleNotesCount" class="notes-counter">
-                                    0/150
-                                </span>
+                                        <i class="fa-solid fa-microphone"></i>
+                                    </button>
+
+                                    <span id="ruleNotesVoiceStatus" class="voice-status hidden" data-voice-status
+                                        aria-live="polite"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -841,25 +861,26 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     Clinic Status
                                 </label>
 
-                                <select id="ruleStatus" class="form-ctrl form-sel"
-                                    onchange="toggleStatusFields(this.value)">
+                                <select id="ruleStatus" class="form-ctrl form-sel js-custom-select"
+                                    data-placeholder="Select clinic status" onchange="toggleStatusFields(this.value)">
                                     <option value="open">Open</option>
                                     <option value="closed">Closed</option>
                                     <option value="limited">Limited Hours</option>
                                 </select>
                             </div>
 
-                            <div id="ruleTimeFields" class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-5">
+                            <div id="ruleTimeFields" class="rule-availability-grid">
 
                                 <div class="space-y-5">
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="rule-time-select-grid">
 
                                         <div data-global-field>
                                             <label class="form-label" for="ruleOpenTime">
                                                 Opening Time
                                             </label>
 
-                                            <select id="ruleOpenTime" class="form-ctrl form-sel">
+                                            <select id="ruleOpenTime" class="form-ctrl form-sel js-custom-select"
+                                                data-placeholder="Select opening time">
                                                 <option value="07:00">7:00 AM</option>
                                                 <option value="08:00">8:00 AM</option>
                                                 <option value="09:00" selected>9:00 AM</option>
@@ -867,12 +888,13 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                             </select>
                                         </div>
 
-                                        <div data-global-field>
+                                        <div class="rule-closing-time-field" data-global-field>
                                             <label class="form-label" for="ruleCloseTime">
                                                 Closing Time
                                             </label>
 
-                                            <select id="ruleCloseTime" class="form-ctrl form-sel">
+                                            <select id="ruleCloseTime" class="form-ctrl form-sel js-custom-select"
+                                                data-placeholder="Select closing time">
                                                 <option value="15:00">3:00 PM</option>
                                                 <option value="16:00">4:00 PM</option>
                                                 <option value="17:00" selected>5:00 PM</option>
@@ -886,17 +908,23 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                             Max Appointments / Day
                                         </label>
 
-                                        <div class="slot-stepper mt-1">
-                                            <button type="button" onclick="adjSlots(-1)" class="slot-stepper-btn">
-                                                −
+                                        <div class="global-number-stepper mt-1" data-global-number-stepper>
+
+                                            <button type="button" class="global-number-stepper-btn"
+                                                data-number-step="-1" aria-label="Decrease maximum appointments">
+
+                                                <i class="fa-solid fa-minus"></i>
                                             </button>
 
-                                            <input type="text" id="ruleMaxSlots"
-                                                class="form-ctrl slot-stepper-input no-native-spinner" value="5"
-                                                inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                            <input type="number" id="ruleMaxSlots" class="global-number-stepper-input"
+                                                value="5" min="1" max="30" step="1" inputmode="numeric"
+                                                autocomplete="off" data-number-stepper-input
+                                                data-field-label="Max Appointments" data-validation-rule="wholeNumber">
 
-                                            <button type="button" onclick="adjSlots(1)" class="slot-stepper-btn">
-                                                +
+                                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                                aria-label="Increase maximum appointments">
+
+                                                <i class="fa-solid fa-plus"></i>
                                             </button>
                                         </div>
 
@@ -914,16 +942,19 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     <div id="ruleBreakGroup" class="break-chip-group break-chip-stack">
 
                                         <button type="button" class="break-chip selected" data-val="12:00-13:00"
-                                            onclick="selectBreak(this)">
+                                            data-discard-track data-discard-key="schedule-break-12-13"
+                                            data-discard-value="true" onclick="selectBreak(this)">
                                             12:00 – 1:00 PM
                                         </button>
 
                                         <button type="button" class="break-chip" data-val="13:00-14:00"
-                                            onclick="selectBreak(this)">
+                                            data-discard-track data-discard-key="schedule-break-13-14"
+                                            data-discard-value="false" onclick="selectBreak(this)">
                                             1:00 – 2:00 PM
                                         </button>
 
-                                        <button type="button" class="break-chip" data-val="none"
+                                        <button type="button" class="break-chip" data-val="none" data-discard-track
+                                            data-discard-key="schedule-break-none" data-discard-value="false"
                                             onclick="selectBreak(this)">
                                             <i class="fa-solid fa-ban text-[10px]"></i>
                                             No Break
@@ -935,8 +966,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                     </div>
                 </div>
 
-                <div class="modal-footer rule-modal-footer">
-                    <button type="button" onclick="closeRuleModal()" class="ui-btn ui-btn-secondary">
+                <div class="modal-ft rule-modal-footer">
+                    <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="ruleModalBackdrop">
                         Cancel
                     </button>
 
@@ -950,158 +981,151 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
     </div>
 </div>
 
-<div id="blockModalBackdrop" class="ui-modal cs-modal cs-block-modal modal-theme-danger">
-    <div class="ui-modal-card cs-modal-card cs-block-modal-card" onclick="event.stopPropagation()">
-        <div class="modal-hdr modal-form-hdr modal-themed-header">
+<div id="blockModalBackdrop" class="ui-modal modal-theme-danger cs-modal cs-block-modal" aria-hidden="true">
 
-            <div class="modal-title-row">
-                <div class="modal-title-main">
-                    <div class="modal-title-icon modal-themed-icon">
-                        <i class="fa-solid fa-calendar-xmark"></i>
-                    </div>
+    <form id="blockDateForm" action="{{ route($clinicScheduleRouteNames['block']) }}" method="POST"
+        class="ui-modal-card modal-lg modal-card-form cs-modal-card cs-block-modal-card" role="dialog" aria-modal="true"
+        aria-labelledby="blockDateModalTitle" data-global-validation data-discard-form
+        data-discard-title="Discard blocked date?" data-discard-subtitle="You have unsaved blocked-date details."
+        data-discard-message="Closing this modal will remove the blocked-date details you entered." novalidate>
 
-                    <div class="modal-title-block">
-                        <h3 class="text-xl font-extrabold">Block Date</h3>
-                        <p class="modal-title-sub">Prevent appointments from being booked on a specific date.</p>
-                    </div>
+        @csrf
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-calendar-xmark"></i>
                 </div>
 
-                <button type="button" onclick="closeBlockModal()" class="modal-close-btn">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
+                <div class="modal-copy">
+                    <h3 class="modal-title" id="blockDateModalTitle">
+                        Block Date
+                    </h3>
 
-        <div class="modal-body modal-form-body">
-            <form action="{{ route($clinicScheduleRouteNames['block']) }}" method="POST" id="blockDateForm"
-                data-global-validation data-discard-changes novalidate>
-                @csrf
-
-                <div class="modal-section">
-                    <div class="modal-section-head">
-                        <div class="modal-section-icon">
-                            <i class="fa-solid fa-calendar-xmark"></i>
-                        </div>
-                        <div>
-                            <div class="modal-section-title">Date Details</div>
-                            <div class="modal-section-sub">Choose the blocked date and specify the reason.</div>
-                        </div>
-                    </div>
-
-                    <div class="mb-4" data-global-field>
-                        <label class="form-label" for="blockDate">Date <span class="text-red-400">*</span></label>
-                        <div class="fp-date-input-wrap">
-                            <input type="text" id="blockDate" name="date"
-                                class="form-ctrl fp-date-input js-flatpickr-date-min-today" required readonly
-                                min="{{ date('Y-m-d') }}" data-field-label="Date"
-                                data-required-message="Please select a date." data-validation-rule="clinicFutureOrToday"
-                                placeholder="Select blocked date">
-                            <i class="fa-solid fa-calendar-days fp-date-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="mb-4" data-global-field>
-                        <label class="form-label" for="blockReason">Reason <span class="text-red-400">*</span></label>
-                        <select id="blockReason" name="reason" class="form-ctrl form-sel" required
-                            data-field-label="Reason">
-                            <option value="Holiday">Holiday</option>
-                            <option value="Dentist Unavailable">Dentist Unavailable</option>
-                            <option value="Clinic Maintenance">Clinic Maintenance</option>
-                            <option value="Special Event">Special Event</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div data-global-field>
-                        <label class="form-label" for="blockNote">Note (optional)</label>
-                        <input type="text" id="blockNote" name="note" class="form-ctrl"
-                            placeholder="e.g. National holiday, maintenance, outreach event...">
-                        <div class="form-help">Add extra context for admins viewing blocked dates later.</div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" onclick="closeBlockModal()" class="ui-btn ui-btn-secondary">
-                        Cancel
-                    </button>
-
-                    <button type="submit" class="ui-btn ui-btn-danger">
-                        <i class="fa-solid fa-ban"></i>
-                        <span>Block Date</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div id="scheduleDeleteModal" class="ui-modal modal-overlay cs-delete-modal" aria-hidden="true">
-
-    <div class="modal-box-inner cs-delete-modal-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true"
-        aria-labelledby="scheduleDeleteTitle">
-
-        <div class="cs-delete-head">
-            <div class="cs-delete-head-left">
-                <div class="cs-delete-icon">
-                    <i class="fa-solid fa-trash"></i>
-                </div>
-
-                <div>
-                    <h3 id="scheduleDeleteTitle">Delete Schedule Rule</h3>
-                    <p>This action requires confirmation</p>
+                    <p class="modal-subtitle">
+                        Prevent appointments from being booked on a specific date.
+                    </p>
                 </div>
             </div>
 
-            <button type="button" class="cs-delete-x" onclick="closeScheduleDeleteModal()"
-                aria-label="Close delete modal">
+            <button type="button" class="modal-x" data-discard-close="blockModalBackdrop"
+                aria-label="Close block date modal">
+
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="cs-delete-body">
-            <div class="cs-delete-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+        <div class="modal-bd">
+            <div class="modal-section">
+                <div class="modal-section-head">
+                    <div class="modal-section-icon">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
 
-                <div>
-                    <p>
-                        Are you sure you want to delete
-                        <strong id="scheduleDeleteName"></strong>?
-                    </p>
-                    <span>This schedule rule will be permanently removed.</span>
+                    <div>
+                        <div class="modal-section-title">
+                            Date Details
+                        </div>
+
+                        <div class="modal-section-sub">
+                            Choose the blocked date and specify the reason.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4" data-global-field>
+
+                    <label class="form-label" for="blockDate">
+
+                        Date
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="fp-date-input-wrap">
+                        <input type="text" id="blockDate" name="date"
+                            class="form-ctrl fp-date-input js-flatpickr-date-min-today" min="{{ date('Y-m-d') }}"
+                            data-field-label="Date" data-required-message="Please select a date."
+                            data-validation-rule="clinicFutureOrToday" placeholder="Select blocked date" required
+                            readonly>
+
+                        <i class="fa-solid fa-calendar-days fp-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4" data-global-field>
+
+                    <label class="form-label" for="blockReason">
+
+                        Reason
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <select id="blockReason" name="reason" class="form-ctrl form-sel js-custom-select"
+                        data-placeholder="Select reason" data-field-label="Reason" required>
+
+                        <option value="Holiday">Holiday</option>
+                        <option value="Dentist Unavailable">
+                            Dentist Unavailable
+                        </option>
+                        <option value="Clinic Maintenance">
+                            Clinic Maintenance
+                        </option>
+                        <option value="Special Event">
+                            Special Event
+                        </option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div data-global-field>
+                    <div class="global-label-row">
+                        <label class="form-label" for="blockNote">
+                            Note (optional)
+                        </label>
+
+                        <span id="blockNoteCount" class="char-counter">
+                            0 / 150 characters
+                        </span>
+                    </div>
+
+                    <input type="text" id="blockNote" name="note" class="form-ctrl" maxlength="150"
+                        data-char-limit="150" data-char-counter="#blockNoteCount"
+                        placeholder="e.g. National holiday, maintenance, outreach event...">
+
+                    <div class="form-help">
+                        Add extra context for admins viewing blocked dates later.
+                    </div>
                 </div>
             </div>
-
-            <div class="cs-delete-actions">
-                <button type="button" class="ui-btn ui-btn-secondary" onclick="closeScheduleDeleteModal()">
-                    Cancel
-                </button>
-
-                <form id="scheduleDeleteForm" method="POST" action="">
-                    @csrf
-                    @method('DELETE')
-
-                    <button type="submit" class="ui-btn ui-btn-danger">
-                        <i class="fa-solid fa-trash"></i>
-                        <span>Delete</span>
-                    </button>
-                </form>
-            </div>
         </div>
-    </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="blockModalBackdrop">
+
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-danger">
+
+                <i class="fa-solid fa-ban"></i>
+                <span>Block Date</span>
+            </button>
+        </div>
+    </form>
 </div>
+
+<x-delete-confirm-modal id="scheduleDeleteModal" form-id="scheduleDeleteForm" name-id="scheduleDeleteName"
+    title="Delete Schedule Rule" helper="This schedule rule will be permanently removed." />
 @endsection
 
 @section('scripts')
 
 @php
-$clinicScheduleStoreUrl = route(
-$clinicScheduleRouteNames['store']
-);
+$clinicScheduleStoreUrl = route($clinicScheduleRouteNames['store']);
 
-$clinicScheduleUpdateUrlTemplate = route(
-$clinicScheduleRouteNames['update'],
-['clinicSchedule' => '__RULE_ID__']
-);
+$clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
+'clinicSchedule' => '__RULE_ID__',
+]);
 @endphp
 
 <script>
@@ -1112,24 +1136,6 @@ $clinicScheduleRouteNames['update'],
 
     const scheduleRules = @json($schedules);
     const weeklyAppointments = @json($weeklyAppointments ?? []);
-
-    const showClinicScheduleToast = (title, message = '', type = 'info') => {
-        if (typeof window.showToast === 'function') {
-            window.showToast({
-                type,
-                title,
-                message,
-            });
-        }
-    };
-
-    const dateEl = document.getElementById('currentDate');
-    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
 
     function clearFieldError(errorId, inputId = null, groupId = null) {
         const errorEl = document.getElementById(errorId);
@@ -1149,22 +1155,6 @@ $clinicScheduleRouteNames['update'],
         }
         if (inputId) document.getElementById(inputId)?.classList.add('is-invalid');
         if (groupId) document.getElementById(groupId)?.classList.add('is-invalid');
-    }
-
-    function clearRuleErrors() {
-        clearFieldError('ruleDaysError', null, 'ruleDaysGroup');
-        clearFieldError('ruleStatusError', 'ruleStatus');
-        clearFieldError('ruleOpenTimeError', 'ruleOpenTime');
-        clearFieldError('ruleCloseTimeError', 'ruleCloseTime');
-        clearFieldError('ruleBreakError', null, 'ruleBreakGroup');
-        clearFieldError('ruleMaxSlotsError', 'ruleMaxSlots');
-        clearFieldError('ruleNotesError', 'ruleNotes');
-    }
-
-    function clearBlockErrors() {
-        clearFieldError('blockDateError', 'blockDate');
-        clearFieldError('blockReasonError', 'blockReason');
-        clearFieldError('blockNoteError', 'blockNote');
     }
 
     function openAppointmentDetailModal(appt) {
@@ -1264,27 +1254,28 @@ $clinicScheduleRouteNames['update'],
     }
 
     function getServiceColor(serviceType) {
-        const s = (serviceType || '').toLowerCase();
-        if (s.includes('oral check')) return {
-            box: 'background:#dbeafe;border-left:3px solid #3b82f6;color:#1e3a8a;',
-            badge: 'Check-up'
-        };
-        if (s.includes('cleaning')) return {
-            box: 'background:#dcfce7;border-left:3px solid #22c55e;color:#166534;',
-            badge: 'Cleaning'
-        };
-        if (s.includes('surgery')) return {
-            box: 'background:#fef3c7;border-left:3px solid #f59e0b;color:#92400e;',
-            badge: 'Surgery'
-        };
-        if (s.includes('restoration') || s.includes('prosthesis')) return {
-            box: 'background:#f3e8ff;border-left:3px solid #a855f7;color:#6b21a8;',
-            badge: 'Prosthesis'
-        };
-        return {
-            box: 'background:#f3f4f6;border-left:3px solid #6b7280;color:#374151;',
-            badge: 'Other'
-        };
+        const service = (serviceType || '').toLowerCase();
+
+        if (service.includes('oral check')) {
+            return 'background:#dbeafe;border-left:3px solid #3b82f6;color:#1e3a8a;';
+        }
+
+        if (service.includes('cleaning')) {
+            return 'background:#dcfce7;border-left:3px solid #22c55e;color:#166534;';
+        }
+
+        if (service.includes('surgery')) {
+            return 'background:#fef3c7;border-left:3px solid #f59e0b;color:#92400e;';
+        }
+
+        if (
+            service.includes('restoration') ||
+            service.includes('prosthesis')
+        ) {
+            return 'background:#f3e8ff;border-left:3px solid #a855f7;color:#6b21a8;';
+        }
+
+        return 'background:#f3f4f6;border-left:3px solid #6b7280;color:#374151;';
     }
 
     function buildWeekGrid() {
@@ -1338,9 +1329,9 @@ $clinicScheduleRouteNames['update'],
                         inner = slotAppointments.map(appt => {
                             const service = appt.service_type === 'Others' ? (appt
                                 .other_services || 'Other Service') : appt.service_type;
-                            const style = getServiceColor(service);
+                            const serviceStyle = getServiceColor(service);
                             return `<button type="button" onclick='openAppointmentDetailModal(${JSON.stringify(appt)})'
-                                    style="${style.box}margin:4px;border-radius:8px;padding:6px 7px;font-size:.62rem;line-height:1.25;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06);width:calc(100% - 8px);text-align:left;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;"
+                                    style="${serviceStyle}margin:4px;border-radius:8px;padding:6px 7px;font-size:.62rem;line-height:1.25;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06);width:calc(100% - 8px);text-align:left;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;"
                                     onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 10px rgba(0,0,0,.10)'"
                                     onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06)'"
                                     title="Click to view details">
@@ -1370,8 +1361,51 @@ $clinicScheduleRouteNames['update'],
         buildWeekGrid();
     });
 
+    function initWeeklyAppointmentView() {
+        const weekGrid =
+            document.getElementById('weekGrid');
+
+        if (!weekGrid) return;
+
+        buildWeekGrid();
+    }
+
+    initWeeklyAppointmentView();
+
     let selectedBreak = '12:00-13:00';
     let editingId = null;
+
+    function setCustomSelectValue(
+        select,
+        value,
+        options = {}
+    ) {
+        if (!select) return;
+
+        const {
+            dispatch = false
+        } = options;
+
+        select.value = value;
+
+        const wrapper =
+            select.closest('.custom-select');
+
+        if (
+            wrapper &&
+            typeof window.syncCustomSelect === 'function'
+        ) {
+            window.syncCustomSelect(wrapper);
+        }
+
+        if (dispatch) {
+            select.dispatchEvent(
+                new Event('change', {
+                    bubbles: true
+                })
+            );
+        }
+    }
 
     function openRuleModal(mode = 'create', ruleId = null, rule = null) {
         editingId = null;
@@ -1444,21 +1478,51 @@ $clinicScheduleRouteNames['update'],
         form.action = clinicScheduleRoutes.store;
         methodField.innerHTML = '';
 
-        document.querySelectorAll('#ruleModalBackdrop .day-toggle').forEach(d => d.classList.remove('active'));
-        document.querySelectorAll('#ruleModalBackdrop .break-chip').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll(
+            '#ruleModalBackdrop .day-toggle'
+        ).forEach(button => {
+            button.classList.remove('active');
+            button.setAttribute(
+                'aria-pressed',
+                'false'
+            );
+            button.dataset.discardValue = 'false';
+        });
 
-        if (defaultBreak) defaultBreak.classList.add('selected');
+        document.querySelectorAll(
+            '#ruleModalBackdrop .break-chip'
+        ).forEach(button => {
+            const selected =
+                button === defaultBreak;
+
+            button.classList.toggle(
+                'selected',
+                selected
+            );
+
+            button.dataset.discardValue =
+                selected ? 'true' : 'false';
+        });
 
         selectedBreak = '12:00-13:00';
-        status.value = 'open';
-        openTime.value = '09:00';
-        closeTime.value = '17:00';
+        setCustomSelectValue(status, 'open');
+        setCustomSelectValue(openTime, '09:00');
+        setCustomSelectValue(closeTime, '17:00');
+        toggleStatusFields('open');
         maxSlots.value = '5';
         notes.value = '';
-        timeFields.style.display = '';
 
-        const ruleNotesCount = document.getElementById('ruleNotesCount');
-        if (ruleNotesCount) ruleNotesCount.textContent = '0/150';
+        window.initCharLimitFields?.(
+            backdrop
+        );
+
+        notes.dispatchEvent(
+            new Event('input', {
+                bubbles: true
+            })
+        );
+
+        timeFields.style.display = '';
 
         if (mode === 'edit' && rule) {
             backdrop.classList.remove('modal-theme-primary');
@@ -1472,7 +1536,7 @@ $clinicScheduleRouteNames['update'],
             }
 
             if (icon) {
-                icon.className = 'fa-solid fa-calendar-pen';
+                icon.className = 'fa-solid fa-pen-to-square';
             }
 
             if (submitBtn) {
@@ -1489,43 +1553,85 @@ $clinicScheduleRouteNames['update'],
 
             (rule.days || []).forEach(day => {
                 const el = document.querySelector(`#ruleModalBackdrop .day-toggle[data-day="${day}"]`);
-                if (el) el.classList.add('active');
+                if (el) {
+                    el.classList.add('active');
+                    el.setAttribute(
+                        'aria-pressed',
+                        'true'
+                    );
+                    el.dataset.discardValue = 'true';
+                }
             });
 
-            status.value = rule.status || 'open';
-            toggleStatusFields(rule.status || 'open');
+            const selectedStatus = rule.status || 'open';
 
-            if (rule.open_time) openTime.value = String(rule.open_time).substring(0, 5);
-            if (rule.close_time) closeTime.value = String(rule.close_time).substring(0, 5);
+            setCustomSelectValue(status, selectedStatus);
+            toggleStatusFields(selectedStatus);
+
+            if (rule.open_time) {
+                setCustomSelectValue(
+                    openTime,
+                    String(rule.open_time).substring(0, 5)
+                );
+            }
+
+            if (rule.close_time) {
+                setCustomSelectValue(
+                    closeTime,
+                    String(rule.close_time).substring(0, 5)
+                );
+            }
 
             maxSlots.value = rule.max_slots || 5;
-            notes.value = rule.notes || '';
-            if (ruleNotesCount) ruleNotesCount.textContent = `${notes.value.length}/150`;
+            notes.value =
+                rule.notes || '';
+
+            notes.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
 
             selectedBreak = rule.break_time || 'none';
-            document.querySelectorAll('#ruleModalBackdrop .break-chip').forEach(c => {
-                c.classList.toggle('selected', c.dataset.val === selectedBreak);
+            document.querySelectorAll(
+                '#ruleModalBackdrop .break-chip'
+            ).forEach(button => {
+                const selected =
+                    button.dataset.val === selectedBreak;
+
+                button.classList.toggle(
+                    'selected',
+                    selected
+                );
+
+                button.dataset.discardValue =
+                    selected ? 'true' : 'false';
             });
         }
 
-        if (typeof window.syncRuleNotesClear === 'function') window.syncRuleNotesClear();
-
+        notes.dispatchEvent(
+            new Event('input', {
+                bubbles: true
+            })
+        );
         window.openModal('ruleModalBackdrop');
     }
 
-    function closeRuleModal() {
-        window.closeModal('ruleModalBackdrop');
-    }
-
     function toggleDay(button) {
-        const isActive = button.classList.toggle('active');
+        const isActive =
+            button.classList.toggle('active');
+
+        const value =
+            isActive ? 'true' : 'false';
 
         button.setAttribute(
             'aria-pressed',
-            isActive ? 'true' : 'false'
+            value
         );
 
-        clearFieldError?.(
+        button.dataset.discardValue = value;
+
+        clearFieldError(
             'ruleDaysError',
             null,
             'ruleDaysGroup'
@@ -1536,16 +1642,32 @@ $clinicScheduleRouteNames['update'],
         document.getElementById('ruleTimeFields').style.display = val === 'closed' ? 'none' : '';
     }
 
-    function selectBreak(el) {
-        document.querySelectorAll('.break-chip').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedBreak = el.dataset.val;
-        clearFieldError('ruleBreakError', null, 'ruleBreakGroup');
-    }
+    function selectBreak(selectedButton) {
+        document
+            .querySelectorAll(
+                '#ruleBreakGroup .break-chip'
+            )
+            .forEach(button => {
+                const selected =
+                    button === selectedButton;
 
-    function adjSlots(delta) {
-        const inp = document.getElementById('ruleMaxSlots');
-        inp.value = Math.max(1, Math.min(30, parseInt(inp.value || 5) + delta));
+                button.classList.toggle(
+                    'selected',
+                    selected
+                );
+
+                button.dataset.discardValue =
+                    selected ? 'true' : 'false';
+            });
+
+        selectedBreak =
+            selectedButton.dataset.val;
+
+        clearFieldError(
+            'ruleBreakError',
+            null,
+            'ruleBreakGroup'
+        );
     }
 
     function sortScheduleDays(days) {
@@ -1786,7 +1908,7 @@ $clinicScheduleRouteNames['update'],
             'notes',
             document.getElementById('ruleNotes').value
         );
-
+        window.DiscardChanges?.markSubmitting(form);
         form.requestSubmit();
     }
 
@@ -1839,6 +1961,11 @@ $clinicScheduleRouteNames['update'],
             blockDate.value = '';
         }
 
+        setCustomSelectValue(
+            document.getElementById('blockReason'),
+            'Holiday'
+        );
+
         window.openModal('blockModalBackdrop');
     }
 
@@ -1873,268 +2000,43 @@ $clinicScheduleRouteNames['update'],
         return true;
     }
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        registerClinicDateValidation
-    );
+    function openScheduleDeleteModal(
+        actionUrl,
+        scheduleName
+    ) {
+        window.openDeleteConfirmModal?.({
+            modalId:
+                'scheduleDeleteModal',
 
-    function closeBlockModal() {
-        window.closeModal('blockModalBackdrop');
-    }
+            formId:
+                'scheduleDeleteForm',
 
-    function openScheduleDeleteModal(actionUrl, ruleName = 'this schedule rule') {
-        const form = document.getElementById('scheduleDeleteForm');
-        const name = document.getElementById('scheduleDeleteName');
+            nameId:
+                'scheduleDeleteName',
 
-        if (!form || !name) {
-            console.error('Delete modal elements not found.');
-            return;
-        }
+            action:
+                actionUrl,
 
-        form.action = actionUrl;
-        name.textContent = ruleName || 'this schedule rule';
-
-        window.openModal('scheduleDeleteModal');
-    }
-
-    function closeScheduleDeleteModal() {
-        window.closeModal('scheduleDeleteModal');
+            itemName:
+                scheduleName,
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
 
         const ruleNotes = document.getElementById('ruleNotes');
-        const ruleNotesCount = document.getElementById('ruleNotesCount');
-        const ruleNotesClearBtn = document.getElementById('ruleNotesClearBtn');
 
-        function syncRuleNotesClear() {
-            if (!ruleNotes || !ruleNotesClearBtn) return;
-            ruleNotesClearBtn.classList.toggle('hidden', !(ruleNotes.value || '').trim().length);
-        }
-        window.syncRuleNotesClear = syncRuleNotesClear;
+        ruleNotes?.addEventListener(
+            'input',
+            function () {
+                clearFieldError(
+                    'ruleNotesError',
+                    'ruleNotes'
+                );
+            }
+        );
 
-        function updateRuleNotesCount() {
-            if (!ruleNotes || !ruleNotesCount) return;
-            const len = ruleNotes.value.length;
-            ruleNotesCount.textContent = `${len}/150`;
-            ruleNotesCount.classList.remove('is-warning', 'is-danger');
-            if (len >= 140) ruleNotesCount.classList.add('is-danger');
-            else if (len >= 110) ruleNotesCount.classList.add('is-warning');
-        }
-
-        ruleNotes?.addEventListener('input', function () {
-            if (this.value.length > 150) this.value = this.value.slice(0, 150);
-            updateRuleNotesCount();
-            syncRuleNotesClear();
-            clearFieldError('ruleNotesError', 'ruleNotes');
-        });
-
-        ruleNotesClearBtn?.addEventListener('click', function () {
-            if (!ruleNotes) return;
-            ruleNotes.value = '';
-            ruleNotes.dispatchEvent(new Event('input', {
-                bubbles: true
-            }));
-            ruleNotes.dispatchEvent(new Event('change', {
-                bubbles: true
-            }));
-            syncRuleNotesClear();
-            ruleNotes.focus();
-        });
-
-        updateRuleNotesCount();
-        syncRuleNotesClear();
-
-        (function initRuleNotesVoice() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const toggleWrapper = document.getElementById('ruleNotesVoiceToggle');
-            const input = document.getElementById('ruleNotes');
-            if (!SpeechRecognition || !toggleWrapper || !input) return;
-
-            const micBtn = document.createElement('button');
-            micBtn.type = 'button';
-            micBtn.className = 'voice-search-mic external';
-            micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
-            micBtn.title = 'Toggle voice input';
-            toggleWrapper.appendChild(micBtn);
-
-            const status = document.createElement('span');
-            status.className = 'voice-status hidden';
-            status.setAttribute('aria-hidden', 'true');
-            status.setAttribute('aria-live', 'polite');
-            toggleWrapper.appendChild(status);
-
-            let recognition = null,
-                listening = false,
-                manualStop = false,
-                capturedText = false;
-
-            const setStatus = (text, state) => {
-                status.textContent = text || '';
-                status.className = state ? `voice-status is-${state}` : 'voice-status';
-                if (!text) status.classList.add('hidden');
-                else status.classList.remove('hidden');
-            };
-
-            const setMicState = (active) => {
-                micBtn.classList.toggle('mic-active', !!active);
-                micBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-                micBtn.innerHTML = active ?
-                    '<i class="fa-solid fa-stop"></i>' :
-                    '<i class="fa-solid fa-microphone"></i>';
-            };
-
-            const stopNow = () => {
-                manualStop = true;
-                listening = false;
-                setMicState(false);
-                if (capturedText) {
-                    setStatus('Voice captured.', 'success');
-                    setTimeout(() => setStatus('', null), 1200);
-                } else {
-                    setStatus("Didn't catch that. Try again.", 'error');
-                    setTimeout(() => setStatus('', null), 2500);
-                }
-                if (recognition) {
-                    try {
-                        recognition.abort();
-                    } catch (e) {
-                        try {
-                            recognition.stop();
-                        } catch (_) { }
-                    }
-                }
-            };
-
-            const createRecognition = () => {
-                capturedText = false;
-                const r = new SpeechRecognition();
-                r.lang = 'en-US';
-                r.continuous = false;
-                r.interimResults = true;
-                r.maxAlternatives = 1;
-
-                let sawSpeech = false,
-                    timeoutId = null;
-                const clear_ = () => {
-                    if (timeoutId) {
-                        clearTimeout(timeoutId);
-                        timeoutId = null;
-                    }
-                };
-
-                r.onstart = () => {
-                    timeoutId = setTimeout(() => {
-                        if (listening && !sawSpeech) {
-                            try {
-                                r.stop();
-                            } catch (e) { }
-                        }
-                    }, 6000);
-                };
-
-                r.onspeechend = () => {
-                    clear_();
-                    try {
-                        r.stop();
-                    } catch (e) { }
-                };
-
-                r.onresult = (event) => {
-                    let transcript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const res = event.results[i];
-                        const chunk = (res?.[0]?.transcript ?? '').trim();
-                        if (!chunk) continue;
-                        sawSpeech = true;
-                        if (res.isFinal) transcript = (transcript + ' ' + chunk).trim();
-                        else if (!transcript) transcript = chunk;
-                    }
-                    transcript = transcript.trim();
-                    if (transcript) {
-                        clear_();
-                        capturedText = true;
-                        input.value = transcript;
-                        input.dispatchEvent(new Event('input', {
-                            bubbles: true
-                        }));
-                        input.dispatchEvent(new Event('change', {
-                            bubbles: true
-                        }));
-                        setStatus('Listening...', 'listening');
-                    }
-                };
-
-                r.onerror = () => {
-                    clear_();
-                    listening = false;
-                    if (manualStop) {
-                        manualStop = false;
-                        return;
-                    }
-                    setMicState(false);
-                    setStatus("Didn't catch that. Try again.", 'error');
-                    setTimeout(() => setStatus('', null), 2500);
-                };
-
-                r.onend = () => {
-                    clear_();
-                    if (manualStop) {
-                        manualStop = false;
-                        listening = false;
-                        setMicState(false);
-                        return;
-                    }
-                    const had = sawSpeech || capturedText;
-                    listening = false;
-                    setMicState(false);
-                    if (had) {
-                        setStatus('Voice captured.', 'success');
-                        setTimeout(() => setStatus('', null), 2200);
-                    } else {
-                        setStatus("Didn't catch that. Try again.", 'error');
-                        setTimeout(() => setStatus('', null), 2500);
-                    }
-                };
-
-                return r;
-            };
-
-            micBtn.addEventListener('click', () => {
-                if (listening && recognition) {
-                    stopNow();
-                    return;
-                }
-                recognition = createRecognition();
-                try {
-                    recognition.start();
-                } catch (e) {
-                    setStatus('Unable to start voice input.', 'error');
-                    setTimeout(() => setStatus('', null), 2500);
-                    setMicState(false);
-                    listening = false;
-                    return;
-                }
-                listening = true;
-                setMicState(true);
-                setStatus('Listening...', 'listening');
-            });
-
-            micBtn.addEventListener('pointerdown', (ev) => {
-                if (listening && recognition) {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    manualStop = true;
-                    try {
-                        recognition.stop();
-                    } catch (e) { }
-                }
-            }, {
-                passive: false
-            });
-        })();
-
-        buildWeekGrid();
+        window.syncInputClearButton?.(ruleNotes);
 
         document.getElementById('ruleStatus')?.addEventListener('change', () => clearFieldError(
             'ruleStatusError', 'ruleStatus'));
@@ -2159,63 +2061,6 @@ $clinicScheduleRouteNames['update'],
             'blockReasonError', 'blockReason'));
         document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError',
             'blockNote'));
-
-        function getPreferredScheduleRulesView() {
-            if (window.innerWidth <= 767) return 'list';
-            return localStorage.getItem('scheduleRulesView') || 'list';
-        }
-
-        function applyScheduleRulesView(view, save = true) {
-            const listView = document.getElementById('scheduleRulesListView');
-            const gridView = document.getElementById('scheduleRulesGridView');
-            const listBtn = document.getElementById('scheduleRulesListViewBtn');
-            const gridBtn = document.getElementById('scheduleRulesGridViewBtn');
-            if (!listView || !gridView) return;
-
-            const finalView = window.innerWidth <= 767 ? 'list' : view;
-
-            if (finalView === 'grid') {
-                listView.setAttribute('hidden', 'hidden');
-                gridView.removeAttribute('hidden');
-            } else {
-                gridView.setAttribute('hidden', 'hidden');
-                listView.removeAttribute('hidden');
-            }
-
-            const root = document.getElementById('mainContent');
-
-            root?.classList.toggle('mode-list', finalView === 'list');
-            root?.classList.toggle('mode-grid', finalView === 'grid');
-
-            if (listBtn) {
-                listBtn.classList.toggle('active', finalView === 'list');
-                listBtn.setAttribute('aria-pressed', finalView === 'list' ? 'true' : 'false');
-            }
-
-            if (gridBtn) {
-                gridBtn.classList.toggle('active', finalView === 'grid');
-                gridBtn.setAttribute('aria-pressed', finalView === 'grid' ? 'true' : 'false');
-            }
-
-            if (save && window.innerWidth > 767) localStorage.setItem('scheduleRulesView', finalView);
-        }
-
-        const listViewBtn = document.getElementById('scheduleRulesListViewBtn');
-        const gridViewBtn = document.getElementById('scheduleRulesGridViewBtn');
-
-        listViewBtn?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            applyScheduleRulesView('list', true);
-        });
-        gridViewBtn?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            applyScheduleRulesView('grid', true);
-        });
-
-        applyScheduleRulesView(getPreferredScheduleRulesView(), false);
-        window.addEventListener('resize', () => applyScheduleRulesView(getPreferredScheduleRulesView(), false));
     });
 </script>
 @endsection
