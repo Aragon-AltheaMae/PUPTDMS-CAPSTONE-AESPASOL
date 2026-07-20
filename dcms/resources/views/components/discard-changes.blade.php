@@ -42,268 +42,355 @@
 </div>
 
 <script>
-(() => {
-    if (window.DiscardChanges) return;
+    (() => {
+        if (window.DiscardChanges) return;
 
-    const formState = new WeakMap();
-    let pendingDiscardCallback = null;
-    let lastFocusedElement = null;
+        const formState = new WeakMap();
+        let pendingDiscardCallback = null;
+        let lastFocusedElement = null;
 
-    function getDiscardModal() {
-        return document.getElementById('globalDiscardModal');
-    }
-
-    function getWatchedForms(root = document) {
-        const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-        const forms = [];
-
-        if (scope.matches?.('form[data-discard-form]')) {
-            forms.push(scope);
+        function getDiscardModal() {
+            return document.getElementById('globalDiscardModal');
         }
 
-        scope.querySelectorAll?.('form[data-discard-form]').forEach(form => forms.push(form));
+        function getWatchedForms(root = document) {
+            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+            const forms = [];
 
-        return [...new Set(forms)];
-    }
+            if (scope.matches?.('form[data-discard-form]')) {
+                forms.push(scope);
+            }
 
-    function getControlKey(control, index) {
-        return control.name || control.id || `control-${index}`;
-    }
+            scope.querySelectorAll?.('form[data-discard-form]').forEach(form => forms.push(form));
 
-    function serializeForm(form) {
-        const controls = Array.from(form.querySelectorAll('input, textarea, select'))
-            .filter(control => {
+            return [...new Set(forms)];
+        }
+
+        function getControlKey(control, index) {
+            return control.name || control.id || `control-${index}`;
+        }
+
+        function serializeForm(form) {
+            const controls = Array.from(
+                form.querySelectorAll(
+                    'input, textarea, select, [data-discard-track]'
+                )
+            ).filter(control => {
                 if (control.disabled) return false;
-                if (control.dataset.discardIgnore === 'true') return false;
-                if (control.name === '_token' || control.name === '_method') return false;
+
+                if (
+                    control.dataset.discardIgnore === 'true'
+                ) {
+                    return false;
+                }
+
+                if (
+                    control.name === '_token' ||
+                    control.name === '_method'
+                ) {
+                    return false;
+                }
+
                 return true;
             });
 
-        return JSON.stringify(controls.map((control, index) => {
-            const type = (control.type || '').toLowerCase();
+            return JSON.stringify(
+                controls.map((control, index) => {
+                    const type =
+                        (control.type || '').toLowerCase();
 
-            if (type === 'checkbox' || type === 'radio') {
-                return [getControlKey(control, index), type, control.value, control.checked];
+                    const key =
+                        control.dataset.discardKey ||
+                        getControlKey(control, index);
+
+                    if (
+                        control.matches(
+                            '[data-discard-track]'
+                        )
+                    ) {
+                        return [
+                            key,
+                            'custom',
+                            control.dataset.discardValue ??
+                            control.getAttribute(
+                                'aria-pressed'
+                            ) ??
+                            control.classList.contains(
+                                'active'
+                            ) ??
+                            control.classList.contains(
+                                'selected'
+                            )
+                        ];
+                    }
+
+                    if (
+                        type === 'checkbox' ||
+                        type === 'radio'
+                    ) {
+                        return [
+                            key,
+                            type,
+                            control.value,
+                            control.checked
+                        ];
+                    }
+
+                    if (
+                        control.tagName.toLowerCase() ===
+                        'select' &&
+                        control.multiple
+                    ) {
+                        return [
+                            key,
+                            'select-multiple',
+                            Array.from(
+                                control.selectedOptions
+                            ).map(option => option.value)
+                        ];
+                    }
+
+                    return [
+                        key,
+                        type ||
+                        control.tagName.toLowerCase(),
+                        control.value ?? ''
+                    ];
+                })
+            );
+        }
+
+        function captureForm(form) {
+            if (!form) return;
+
+            formState.set(form, {
+                initial: serializeForm(form),
+                submitting: false,
+            });
+
+            form.dataset.discardReady = 'true';
+        }
+
+        function captureModal(modal) {
+            if (!modal) return;
+            getWatchedForms(modal).forEach(captureForm);
+        }
+
+        function captureAll(root = document) {
+            getWatchedForms(root).forEach(captureForm);
+        }
+
+        function isFormDirty(form) {
+            if (!form) return false;
+
+            const state = formState.get(form);
+
+            if (!state) {
+                captureForm(form);
+                return false;
             }
 
-            if (control.tagName.toLowerCase() === 'select' && control.multiple) {
-                return [getControlKey(control, index), 'select-multiple', Array.from(control.selectedOptions).map(option => option.value)];
+            if (state.submitting) return false;
+
+            return serializeForm(form) !== state.initial;
+        }
+
+        function isModalDirty(modal) {
+            if (!modal) return false;
+            return getWatchedForms(modal).some(isFormDirty);
+        }
+
+        function getModalText(modal) {
+            const form = getWatchedForms(modal)[0];
+
+            return {
+                title: form?.dataset.discardTitle || modal?.dataset.discardTitle || 'Discard changes?',
+                subtitle: form?.dataset.discardSubtitle || modal?.dataset.discardSubtitle ||
+                    'You have unsaved changes in this form.',
+                message: form?.dataset.discardMessage || modal?.dataset.discardMessage ||
+                    'Closing this modal will remove the draft you entered. Do you want to discard your changes?',
+            };
+        }
+
+        function openDiscardModal(modal, onDiscard) {
+            const discardModal = getDiscardModal();
+
+            if (!discardModal) {
+                onDiscard?.();
+                return;
             }
 
-            return [getControlKey(control, index), type || control.tagName.toLowerCase(), control.value ?? ''];
-        }));
-    }
+            pendingDiscardCallback = onDiscard;
+            lastFocusedElement = document.activeElement;
 
-    function captureForm(form) {
-        if (!form) return;
+            const text = getModalText(modal);
+            const title = discardModal.querySelector('#globalDiscardTitle');
+            const subtitle = discardModal.querySelector('#globalDiscardSubtitle');
+            const message = discardModal.querySelector('#globalDiscardMessage');
 
-        formState.set(form, {
-            initial: serializeForm(form),
-            submitting: false,
-        });
+            if (title) title.textContent = text.title;
+            if (subtitle) subtitle.textContent = text.subtitle;
+            if (message) message.textContent = text.message;
 
-        form.dataset.discardReady = 'true';
-    }
+            discardModal.classList.add('open');
+            discardModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-lock', 'discard-lock');
 
-    function captureModal(modal) {
-        if (!modal) return;
-        getWatchedForms(modal).forEach(captureForm);
-    }
+            requestAnimationFrame(() => {
+                discardModal.querySelector('[data-discard-keep]')?.focus();
+            });
+        }
 
-    function captureAll(root = document) {
-        getWatchedForms(root).forEach(captureForm);
-    }
+        function closeDiscardModal() {
+            const discardModal = getDiscardModal();
 
-    function isFormDirty(form) {
-        if (!form) return false;
+            if (!discardModal) return;
 
-        const state = formState.get(form);
+            discardModal.classList.remove('open');
+            discardModal.setAttribute('aria-hidden', 'true');
+            pendingDiscardCallback = null;
+            document.body.classList.remove('discard-lock');
 
-        if (!state) {
-            captureForm(form);
+            if (!document.querySelector('.ui-modal.open, .modal-overlay.open')) {
+                document.body.classList.remove('modal-lock');
+            }
+
+            if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                lastFocusedElement.focus();
+            }
+
+            lastFocusedElement = null;
+        }
+
+        function discardNow() {
+            const callback = pendingDiscardCallback;
+            closeDiscardModal();
+            callback?.();
+        }
+
+        function confirmClose(modalOrId, onDiscard) {
+            const modal = typeof modalOrId === 'string' ?
+                document.getElementById(modalOrId) :
+                modalOrId;
+
+            if (!modal || !isModalDirty(modal)) {
+                onDiscard?.();
+                return true;
+            }
+
+            openDiscardModal(modal, onDiscard);
             return false;
         }
 
-        if (state.submitting) return false;
+        function shouldPrompt(modalOrId) {
+            const modal = typeof modalOrId === 'string' ?
+                document.getElementById(modalOrId) :
+                modalOrId;
 
-        return serializeForm(form) !== state.initial;
-    }
-
-    function isModalDirty(modal) {
-        if (!modal) return false;
-        return getWatchedForms(modal).some(isFormDirty);
-    }
-
-    function getModalText(modal) {
-        const form = getWatchedForms(modal)[0];
-
-        return {
-            title: form?.dataset.discardTitle || modal?.dataset.discardTitle || 'Discard changes?',
-            subtitle: form?.dataset.discardSubtitle || modal?.dataset.discardSubtitle || 'You have unsaved changes in this form.',
-            message: form?.dataset.discardMessage || modal?.dataset.discardMessage || 'Closing this modal will remove the draft you entered. Do you want to discard your changes?',
-        };
-    }
-
-    function openDiscardModal(modal, onDiscard) {
-        const discardModal = getDiscardModal();
-
-        if (!discardModal) {
-            onDiscard?.();
-            return;
+            return isModalDirty(modal);
         }
 
-        pendingDiscardCallback = onDiscard;
-        lastFocusedElement = document.activeElement;
-
-        const text = getModalText(modal);
-        const title = discardModal.querySelector('#globalDiscardTitle');
-        const subtitle = discardModal.querySelector('#globalDiscardSubtitle');
-        const message = discardModal.querySelector('#globalDiscardMessage');
-
-        if (title) title.textContent = text.title;
-        if (subtitle) subtitle.textContent = text.subtitle;
-        if (message) message.textContent = text.message;
-
-        discardModal.classList.add('open');
-        discardModal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-lock', 'discard-lock');
-
-        requestAnimationFrame(() => {
-            discardModal.querySelector('[data-discard-keep]')?.focus();
-        });
-    }
-
-    function closeDiscardModal() {
-        const discardModal = getDiscardModal();
-
-        if (!discardModal) return;
-
-        discardModal.classList.remove('open');
-        discardModal.setAttribute('aria-hidden', 'true');
-        pendingDiscardCallback = null;
-        document.body.classList.remove('discard-lock');
-
-        if (!document.querySelector('.ui-modal.open, .modal-overlay.open')) {
-            document.body.classList.remove('modal-lock');
+        function markSubmitting(form) {
+            const state = formState.get(form) || {};
+            state.submitting = true;
+            formState.set(form, state);
         }
 
-        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-            lastFocusedElement.focus();
-        }
+        function markNotSubmitting(form) {
+            if (!form) return;
 
-        lastFocusedElement = null;
-    }
+            const state = formState.get(form);
 
-    function discardNow() {
-        const callback = pendingDiscardCallback;
-        closeDiscardModal();
-        callback?.();
-    }
-
-    function confirmClose(modalOrId, onDiscard) {
-        const modal = typeof modalOrId === 'string'
-            ? document.getElementById(modalOrId)
-            : modalOrId;
-
-        if (!modal || !isModalDirty(modal)) {
-            onDiscard?.();
-            return true;
-        }
-
-        openDiscardModal(modal, onDiscard);
-        return false;
-    }
-
-    function shouldPrompt(modalOrId) {
-        const modal = typeof modalOrId === 'string'
-            ? document.getElementById(modalOrId)
-            : modalOrId;
-
-        return isModalDirty(modal);
-    }
-
-    function markSubmitting(form) {
-        const state = formState.get(form) || {};
-        state.submitting = true;
-        formState.set(form, state);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        captureAll(document);
-
-        document.addEventListener('submit', event => {
-            const form = event.target.closest?.('form[data-discard-form]');
-            if (form) markSubmitting(form);
-        }, true);
-
-        document.addEventListener('input', event => {
-            const form = event.target.closest?.('form[data-discard-form]');
-            if (form && form.dataset.discardReady !== 'true') captureForm(form);
-        }, true);
-
-        document.addEventListener('change', event => {
-            const form = event.target.closest?.('form[data-discard-form]');
-            if (form && form.dataset.discardReady !== 'true') captureForm(form);
-        }, true);
-    });
-
-    document.addEventListener('ui-modal:opened', event => {
-        captureModal(event.detail?.modal);
-    });
-
-    document.addEventListener('click', event => {
-        const closeButton = event.target.closest('[data-discard-close]');
-        if (!closeButton) return;
-
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        const modalId = closeButton.dataset.discardClose || closeButton.closest('.ui-modal, .modal-overlay')?.id;
-        const modal = document.getElementById(modalId);
-
-        confirmClose(modal, () => {
-            if (typeof window.forceCloseModal === 'function') {
-                window.forceCloseModal(modalId);
-            } else if (typeof window.closeModal === 'function') {
-                window.closeModal(modalId, { force: true });
-            } else {
-                modal?.classList.remove('open');
+            if (!state) {
+                captureForm(form);
+                return;
             }
+
+            state.submitting = false;
+            formState.set(form, state);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            captureAll(document);
+
+            document.addEventListener('submit', event => {
+                const form = event.target.closest?.('form[data-discard-form]');
+                if (form) markSubmitting(form);
+            }, true);
+
+            document.addEventListener('input', event => {
+                const form = event.target.closest?.('form[data-discard-form]');
+                if (form && form.dataset.discardReady !== 'true') captureForm(form);
+            }, true);
+
+            document.addEventListener('change', event => {
+                const form = event.target.closest?.('form[data-discard-form]');
+                if (form && form.dataset.discardReady !== 'true') captureForm(form);
+            }, true);
         });
-    }, true);
 
-    document.addEventListener('click', event => {
-        if (event.target.closest('[data-discard-keep]')) {
-            event.preventDefault();
-            closeDiscardModal();
-        }
+        document.addEventListener('ui-modal:opened', event => {
+            captureModal(event.detail?.modal);
+        });
 
-        if (event.target.closest('[data-discard-confirm]')) {
-            event.preventDefault();
-            discardNow();
-        }
-    });
+        document.addEventListener('click', event => {
+            const closeButton = event.target.closest('[data-discard-close]');
+            if (!closeButton) return;
 
-    document.addEventListener('keydown', event => {
-        const discardModal = getDiscardModal();
-        if (!discardModal?.classList.contains('open')) return;
-
-        if (event.key === 'Escape') {
             event.preventDefault();
             event.stopImmediatePropagation();
-            closeDiscardModal();
-        }
-    });
 
-    window.DiscardChanges = {
-        captureForm,
-        captureModal,
-        captureAll,
-        isFormDirty,
-        isModalDirty,
-        shouldPrompt,
-        confirmClose,
-        closeDiscardModal,
-    };
-})();
+            const modalId = closeButton.dataset.discardClose || closeButton.closest(
+                '.ui-modal, .modal-overlay')?.id;
+            const modal = document.getElementById(modalId);
+
+            confirmClose(modal, () => {
+                if (typeof window.forceCloseModal === 'function') {
+                    window.forceCloseModal(modalId);
+                } else if (typeof window.closeModal === 'function') {
+                    window.closeModal(modalId, {
+                        force: true
+                    });
+                } else {
+                    modal?.classList.remove('open');
+                }
+            });
+        }, true);
+
+        document.addEventListener('click', event => {
+            if (event.target.closest('[data-discard-keep]')) {
+                event.preventDefault();
+                closeDiscardModal();
+            }
+
+            if (event.target.closest('[data-discard-confirm]')) {
+                event.preventDefault();
+                discardNow();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            const discardModal = getDiscardModal();
+            if (!discardModal?.classList.contains('open')) return;
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeDiscardModal();
+            }
+        });
+
+        window.DiscardChanges = {
+            captureForm,
+            captureModal,
+            captureAll,
+            isFormDirty,
+            isModalDirty,
+            shouldPrompt,
+            confirmClose,
+            closeDiscardModal,
+            markSubmitting,
+            markNotSubmitting,
+        };
+    })();
 </script>

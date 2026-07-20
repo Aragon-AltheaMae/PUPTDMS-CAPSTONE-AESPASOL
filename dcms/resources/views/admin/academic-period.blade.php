@@ -148,8 +148,7 @@ $activePeriodPayload = $activePeriod
                             <p class="text-[10px] text-gray-400 mt-1" id="bannerDaysLeft">
                                 {{ $activePeriod
                                 ? $activePeriod->days_remaining . ' day' . ($activePeriod->days_remaining !== 1 ? 's' :
-                                '')
-                                . ' remaining'
+                                '') . ' remaining'
                                 : 'No active period' }}
                             </p>
                         </div>
@@ -165,10 +164,10 @@ $activePeriodPayload = $activePeriod
 
             <div class="ap-content-layout grid grid-cols-1 gap-6 mb-6">
                 <div class="ap-periods-column">
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <div class="table-card">
 
-                        <div class="px-5 py-4 border-b bg-gray-50 ap-toolbar">
-                            <div class="ap-toolbar-left">
+                        <div class="table-toolbar">
+                            <div class="table-toolbar-title">
                                 <i class="fa-solid fa-school text-[#8B0000]"></i>
                                 <h2 class="font-bold text-gray-800 text-sm">All Academic Periods</h2>
                                 <span id="periodCount"
@@ -178,13 +177,13 @@ $activePeriodPayload = $activePeriod
                             </div>
 
                             <form method="GET" action="{{ route('admin.academic_periods') }}" id="filterForm"
-                                class="ap-toolbar-right">
+                                class="table-toolbar-actions">
 
                                 <input type="hidden" name="semester" id="semesterFilter"
                                     value="{{ request('semester') }}">
                                 <input type="hidden" name="status" id="statusFilter" value="{{ request('status') }}">
 
-                                <div class="voice-search-row ap-search-row">
+                                <div class="voice-search-row table-toolbar-search">
                                     <div class="search-wrap global-search" data-search-wrapper>
                                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
@@ -219,17 +218,8 @@ $activePeriodPayload = $activePeriod
                                     <span id="filterBadge" class="filter-badge" style="display:none;"></span>
                                 </button>
 
-                                <div class="view-toggle-container hidden md:flex" id="academicViewToggle">
-                                    <div class="view-slider"></div>
-                                    <button type="button" class="btn-view-mode active" id="academicListBtn"
-                                        title="List view" aria-label="List view">
-                                        <i class="fa-solid fa-list text-sm"></i>
-                                    </button>
-                                    <button type="button" class="btn-view-mode" id="academicGridBtn" title="Grid view"
-                                        aria-label="Grid view">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="academicViewToggle" storage-key="academicView"
+                                    list-view="#academicListView" grid-view="#academicGridView" />
 
                                 <button id="externalClearFilterBtn" type="button" onclick="resetAcademicFilters()"
                                     class="global-filter-reset-btn hidden" title="Reset filters">
@@ -238,40 +228,43 @@ $activePeriodPayload = $activePeriod
                             </form>
                         </div>
 
-                        <div id="academicListView" class="ap-table-wrap scrollbar-thin">
-                            <table class="ap-table text-sm">
-                                <thead class="bg-gray-50 border-b border-gray-100">
-                                    <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
-                                        <th class="py-3 px-4 text-left">#</th>
-                                        <th class="py-3 px-4 text-left">Year</th>
-                                        <th class="py-3 px-4 text-left">Semester</th>
-                                        <th class="py-3 px-4 text-left">Start</th>
-                                        <th class="py-3 px-4 text-left">End</th>
-                                        <th class="py-3 px-4 text-center">Status</th>
-                                        <th class="py-3 px-4 text-center">Actions</th>
+                        <div id="academicListView"
+                            class="table-body-surface table-list-view table-scroll scrollbar-thin">
+
+                            <table class="data-table">
+                                <thead class="table-column-header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Year</th>
+                                        <th>Semester</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th class="table-cell-center">Status</th>
+                                        <th class="table-cell-center table-action-cell">
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="academicTableBody">
                                     @forelse($academicPeriods as $index => $period)
                                     @php
                                     $statusClass = match ($period->status) {
-                                    'Active' => 's-active',
-                                    'Upcoming' => 's-upcoming',
-                                    'Ended' => 's-ended',
-                                    default => 's-inactive',
+                                    'Active' => 'status-active',
+                                    'Upcoming' => 'status-upcoming',
+                                    'Ended' => 'status-cancelled',
+                                    default => 'status-pending',
                                     };
 
-                                    $semStyle = match ($period->semester) {
-                                    'First Semester', '1st Semester' => [
-                                    'bg' => '#fee2e2',
-                                    'color' => '#8B0000',
-                                    ],
-                                    'Second Semester', '2nd Semester' => [
-                                    'bg' => '#dbeafe',
-                                    'color' => '#1d4ed8',
-                                    ],
-                                    'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
-                                    default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                                    $semesterClass = match ($period->semester) {
+                                    'First Semester',
+                                    '1st Semester' => 'table-tag-danger',
+
+                                    'Second Semester',
+                                    '2nd Semester' => 'table-tag-info',
+
+                                    'Summer' => 'table-tag-warning',
+
+                                    default => 'table-tag-neutral',
                                     };
 
                                     $semesterLabel = match ($period->semester) {
@@ -291,51 +284,57 @@ $activePeriodPayload = $activePeriod
                                     ];
                                     @endphp
 
-                                    <tr class="tbl-row academic-item {{ $period->is_active ? 'is-active' : '' }} border-b border-gray-50 last:border-0"
+                                    <tr data-record-row class="{{ $period->is_active ? 'is-active' : '' }}"
                                         data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
                                         data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
-                                        <td class="py-3 px-4 text-sm">{{ $academicPeriods->firstItem() + $index }}
+                                        <td>
+                                            {{ $academicPeriods->firstItem() + $index }}
                                         </td>
 
-                                        <td class="py-3 px-4 col-year">
-                                            <div class="flex items-center">
-                                                @if ($period->is_active)
-                                                <span class="dot-pulse"
-                                                    style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px;"></span>
-                                                @else
-                                                <span
-                                                    style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e5e7eb;margin-right:6px;"></span>
-                                                @endif
-                                                <span class="font-bold text-sm">{{ $period->academic_year }}</span>
+                                        <td class="table-cell-main">
+                                            <div class="table-primary">
+                                                <span class="table-dot
+            {{ $period->is_active
+                ? 'table-dot-success'
+                : 'table-dot-muted' }}">
+                                                </span>
+
+                                                <strong>
+                                                    {{ $period->academic_year }}
+                                                </strong>
                                             </div>
                                         </td>
 
-                                        <td class="py-3 px-4 col-semester">
-                                            <span class="sem-pill"
-                                                style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
-                                                <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
-                                                    style="font-size:9px;"></i>
+                                        <td class="table-cell-main">
+                                            <span class="table-tag {{ $semesterClass }}">
+                                                <i class="fa-solid
+            {{ $period->semester === 'Summer'
+                ? 'fa-sun'
+                : 'fa-book' }}">
+                                                </i>
+
                                                 {{ $semesterLabel }}
                                             </span>
                                         </td>
 
-                                        <td class="py-3 px-4 text-xs text-gray-600">
+                                        <td class="text-xs text-gray-600">
                                             {{ optional($period->start_date)->format('M d, Y') }}
                                         </td>
-                                        <td class="py-3 px-4 text-xs text-gray-600">
+
+                                        <td class="text-xs text-gray-600">
                                             {{ optional($period->end_date)->format('M d, Y') }}
                                         </td>
 
-                                        <td class="py-3 px-4 text-center">
-                                            <span class="status-badge {{ $statusClass }}"
-                                                style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;">
+                                        <td class="table-cell-center">
+                                            <span class="status-badge {{ $statusClass }}">
                                                 {{ $period->status }}
                                             </span>
                                         </td>
 
-                                        <td class="py-3 px-4">
-                                            <div class="ap-actions">
-                                                <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
+                                        <td class="table-cell-center table-action-cell">
+                                            <div class="ui-action-group">
+                                                <button type="button" class="ui-action-btn ui-action-edit"
+                                                    data-tooltip="Edit period" aria-label="Edit period"
                                                     onclick='openEditModal(@json($periodPayload))'>
                                                     <i class="fa-solid fa-pen"></i>
                                                 </button>
@@ -346,14 +345,21 @@ $activePeriodPayload = $activePeriod
                                                     class="inline">
                                                     @csrf
                                                     @method('PATCH')
-                                                    <button type="submit" class="ap-action-btn ap-action-active"
-                                                        title="Set as active">
+                                                    <button type="button" class="ui-action-btn ui-action-success"
+                                                        data-tooltip="Set as active" aria-label="Set as active" onclick="openSetActiveModal(
+        @js(route('admin.academic_periods.set_active', $period)),
+        @js($period->academic_year . ' — ' . str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester))
+    )">
+
                                                         <i class="fa-solid fa-circle-check"></i>
                                                     </button>
                                                 </form>
                                                 @else
-                                                <span class="ap-action-btn ap-action-pinned" title="Active period"><i
-                                                        class="fa-solid fa-star" style="font-size:10px;"></i></span>
+                                                <button type="button" class="ui-action-btn ui-action-warning"
+                                                    data-tooltip="Active period" aria-label="Active period" disabled>
+
+                                                    <i class="fa-solid fa-star"></i>
+                                                </button>
                                                 @endif
 
                                                 @php
@@ -367,11 +373,12 @@ $activePeriodPayload = $activePeriod
                                                 );
                                                 @endphp
 
-                                                <button type="button" class="ap-action-btn ap-action-delete"
-                                                    title="Delete"
+                                                <button type="button" class="ui-action-btn ui-action-delete"
+                                                    data-tooltip="Delete period" aria-label="Delete period"
                                                     data-delete-url="{{ route('admin.academic_periods.destroy', $period) }}"
                                                     data-delete-label="{{ $label }}"
                                                     onclick="openDeleteModalFromButton(this)">
+
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </div>
@@ -379,10 +386,16 @@ $activePeriodPayload = $activePeriod
                                     </tr>
                                     @empty
                                     <tr id="serverEmptyState">
-                                        <td colspan="7" class="text-center text-gray-400 ap-empty">
-                                            <div class="flex flex-col items-center justify-center text-center">
-                                                <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
-                                                <p class="text-sm font-medium">No academic periods found.</p>
+                                        <td colspan="7" class="table-empty-state-cell">
+
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">
+                                                    <i class="fa-solid fa-school"></i>
+                                                </div>
+
+                                                <p class="empty-state-title">
+                                                    No academic periods found.
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
@@ -391,142 +404,203 @@ $activePeriodPayload = $activePeriod
                             </table>
                         </div>
 
-                        <div id="academicGridView" class="academic-grid-view">
-                            @forelse($academicPeriods as $index => $period)
-                            @php
-                            $statusClass = match ($period->status) {
-                            'Active' => 's-active',
-                            'Upcoming' => 's-upcoming',
-                            'Ended' => 's-ended',
-                            default => 's-inactive',
-                            };
+                        <div id="academicGridView" class="table-body-surface table-grid-view" hidden>
 
-                            $semStyle = match ($period->semester) {
-                            'First Semester', '1st Semester' => ['bg' => '#fee2e2', 'color' => '#8B0000'],
-                            'Second Semester', '2nd Semester' => ['bg' => '#dbeafe', 'color' => '#1d4ed8'],
-                            'Summer' => ['bg' => '#fef3c7', 'color' => '#92400e'],
-                            default => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
-                            };
+                            <div class="table-record-grid">
+                                @forelse($academicPeriods as $index => $period)
+                                @php
+                                $statusClass = match ($period->status) {
+                                'Active' => 'status-active',
+                                'Upcoming' => 'status-upcoming',
+                                'Ended' => 'status-cancelled',
+                                default => 'status-pending',
+                                };
 
-                            $semesterLabel = match ($period->semester) {
-                            '1st Semester' => 'First Semester',
-                            '2nd Semester' => 'Second Semester',
-                            default => $period->semester,
-                            };
+                                $semesterClass = match ($period->semester) {
+                                'First Semester',
+                                '1st Semester' => 'table-tag-danger',
 
-                            $periodPayload = [
-                            'id' => $period->id,
-                            'academic_year' => $period->academic_year,
-                            'semester' => $period->semester,
-                            'start_date' => optional($period->start_date)->format('Y-m-d'),
-                            'end_date' => optional($period->end_date)->format('Y-m-d'),
-                            'description' => $period->description,
-                            'is_active' => (bool) $period->is_active,
-                            ];
+                                'Second Semester',
+                                '2nd Semester' => 'table-tag-info',
 
-                            $label =
-                            $period->academic_year .
-                            ' — ' .
-                            str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester);
-                            @endphp
+                                'Summer' => 'table-tag-warning',
 
-                            <div class="academic-card academic-item {{ $period->is_active ? 'is-active' : '' }}"
-                                data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
-                                data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
+                                default => 'table-tag-neutral',
+                                };
 
-                                <div class="academic-card-top">
-                                    <div class="academic-card-year">
-                                        @if ($period->is_active)
-                                        <span class="dot-pulse"
-                                            style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
-                                        @else
-                                        <span
-                                            style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e5e7eb;"></span>
-                                        @endif
-                                        <div class="academic-card-year-text">{{ $period->academic_year }}</div>
-                                    </div>
+                                $semesterLabel = match ($period->semester) {
+                                '1st Semester' => 'First Semester',
+                                '2nd Semester' => 'Second Semester',
+                                default => $period->semester,
+                                };
 
-                                    <span class="status-badge {{ $statusClass }}"
-                                        style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;">
-                                        {{ $period->status }}
-                                    </span>
-                                </div>
+                                $periodPayload = [
+                                'id' => $period->id,
+                                'academic_year' => $period->academic_year,
+                                'semester' => $period->semester,
+                                'start_date' => optional($period->start_date)->format('Y-m-d'),
+                                'end_date' => optional($period->end_date)->format('Y-m-d'),
+                                'description' => $period->description,
+                                'is_active' => (bool) $period->is_active,
+                                ];
 
-                                <div class="academic-card-meta">
-                                    <div class="academic-card-row">
-                                        <div class="academic-card-label">Semester</div>
-                                        <div class="academic-card-value">
-                                            <span class="sem-pill"
-                                                style="background:{{ $semStyle['bg'] }};color:{{ $semStyle['color'] }};">
-                                                <i class="fa-solid {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}"
-                                                    style="font-size:9px;"></i>
-                                                {{ $semesterLabel }}
+                                $label =
+                                $period->academic_year .
+                                ' — ' .
+                                str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester);
+                                @endphp
+
+                                <article class="table-record-card table-record-card-layout
+        {{ $period->is_active ? 'is-active' : '' }}" data-record-card data-semester="{{ $period->semester }}"
+                                    data-status="{{ $period->status }}" data-search="{{ strtolower(
+        $period->academic_year . ' ' .
+        $period->semester . ' ' .
+        $period->status . ' ' .
+        optional($period->start_date)->format('M d, Y') . ' ' .
+        optional($period->end_date)->format('M d, Y')
+    ) }}">
+
+                                    <div class="table-record-content">
+
+                                        <div class="table-record-header">
+                                            <div class="table-primary">
+                                                <span class="table-dot
+                {{ $period->is_active
+                    ? 'table-dot-success'
+                    : 'table-dot-muted' }}">
+                                                </span>
+
+                                                <h3 class="table-record-title">
+                                                    {{ $period->academic_year }}
+                                                </h3>
+                                            </div>
+
+                                            <span class="status-badge {{ $statusClass }}">
+                                                {{ $period->status }}
                                             </span>
+                                        </div>
+
+                                        <div class="table-record-meta">
+
+                                            <div class="table-record-row">
+                                                <span class="table-record-label">
+                                                    Semester
+                                                </span>
+
+                                                <span class="table-record-value">
+                                                    <span class="table-tag {{ $semesterClass }}">
+                                                        <i class="fa-solid
+                        {{ $period->semester === 'Summer'
+                            ? 'fa-sun'
+                            : 'fa-book' }}">
+                                                        </i>
+
+                                                        {{ $semesterLabel }}
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            <div class="table-record-row">
+                                                <span class="table-record-label">
+                                                    Start
+                                                </span>
+
+                                                <span class="table-record-value">
+                                                    {{ optional($period->start_date)->format('M d, Y') }}
+                                                </span>
+                                            </div>
+
+                                            <div class="table-record-row">
+                                                <span class="table-record-label">
+                                                    End
+                                                </span>
+
+                                                <span class="table-record-value">
+                                                    {{ optional($period->end_date)->format('M d, Y') }}
+                                                </span>
+                                            </div>
+
                                         </div>
                                     </div>
 
-                                    <div class="academic-card-row">
-                                        <div class="academic-card-label">Start</div>
-                                        <div class="academic-card-value">
-                                            {{ optional($period->start_date)->format('M d, Y') }}</div>
-                                    </div>
+                                    <div class="table-record-actions ui-action-group">
+                                        <button type="button" class="ui-action-btn ui-action-edit"
+                                            data-tooltip="Edit period" aria-label="Edit period"
+                                            onclick='openEditModal(@json($periodPayload))'>
 
-                                    <div class="academic-card-row">
-                                        <div class="academic-card-label">End</div>
-                                        <div class="academic-card-value">
-                                            {{ optional($period->end_date)->format('M d, Y') }}</div>
-                                    </div>
-                                </div>
-
-                                <div class="academic-card-actions">
-                                    <button type="button" class="ap-action-btn ap-action-edit" title="Edit"
-                                        onclick='openEditModal(@json($periodPayload))'>
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-
-                                    @if (!$period->is_active)
-                                    <form method="POST"
-                                        action="{{ route('admin.academic_periods.set_active', $period) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="ap-action-btn ap-action-active"
-                                            title="Set as active">
-                                            <i class="fa-solid fa-circle-check" style="font-size:10px;"></i>
+                                            <i class="fa-solid fa-pen"></i>
                                         </button>
-                                    </form>
-                                    @else
-                                    <span class="ap-action-btn ap-action-pinned" title="Active period"><i
-                                            class="fa-solid fa-star" style="font-size:10px;"></i></span>
-                                    @endif
 
-                                    <button type="button" class="ap-action-btn ap-action-delete" title="Delete"
-                                        data-delete-url="{{ url('/admin/academic-periods/' . $period->id) }}"
-                                        data-delete-label="{{ $label }}" onclick="openDeleteModalFromButton(this)">
-                                        <i class="fa-solid fa-trash" style="font-size:10px;"></i>
-                                    </button>
+                                        @if (!$period->is_active)
+                                        <form method="POST"
+                                            action="{{ route('admin.academic_periods.set_active', $period) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="button" class="ui-action-btn ui-action-success"
+                                                data-tooltip="Set as active" aria-label="Set as active" onclick="openSetActiveModal(
+        @js(route('admin.academic_periods.set_active', $period)),
+        @js($period->academic_year . ' — ' . str_replace(
+            ['1st', '2nd'],
+            ['First', 'Second'],
+            $period->semester
+        ))
+    )">
+
+                                                <i class="fa-solid fa-circle-check"></i>
+                                            </button>
+                                        </form>
+                                        @else
+                                        <button type="button" class="ui-action-btn ui-action-warning"
+                                            data-tooltip="Active period" aria-label="Active period" disabled>
+
+                                            <i class="fa-solid fa-star"></i>
+                                        </button>
+                                        @endif
+
+                                        <button type="button" class="ui-action-btn ui-action-delete"
+                                            data-tooltip="Delete period" aria-label="Delete period"
+                                            data-delete-url="{{ url('/admin/academic-periods/' . $period->id) }}"
+                                            data-delete-label="{{ $label }}" onclick="openDeleteModalFromButton(this)">
+
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </article>
+                                @empty
+
+                                <div id="serverEmptyStateGrid" class="empty-state table-grid-empty">
+
+                                    <i class="fa-solid fa-school"></i>
+
+                                    <p>
+                                        No academic periods found.
+                                    </p>
                                 </div>
+
+                                @endforelse
                             </div>
-                            @empty
-                            <div id="serverEmptyStateGrid" class="text-center text-gray-400 ap-empty">
-                                <div class="flex flex-col items-center justify-center text-center">
-                                    <i class="fa-solid fa-school text-3xl mb-3 opacity-30 block"></i>
-                                    <p class="text-sm font-medium">No academic periods found.</p>
-                                </div>
-                            </div>
-                            @endforelse
                         </div>
 
-                        <div
-                            class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                            <p class="text-xs text-gray-500">
-                                Showing
-                                <strong>{{ $academicPeriods->firstItem() ?? 0 }}–{{ $academicPeriods->lastItem() ?? 0
-                                    }}</strong>
-                                of <strong>{{ $academicPeriods->total() }}</strong> periods
-                            </p>
+                        <div class="global-pagebar global-pagebar-bottom">
 
-                            <div class="overflow-x-auto scrollbar-thin w-full md:w-auto">
-                                {{ $academicPeriods->onEachSide(2)->links('vendor.pagination.tailwind') }}
+                            <div class="global-pagebar-left">
+                                <p class="global-pagebar-info">
+                                    Showing
+                                    <strong>
+                                        {{ $academicPeriods->firstItem() ?? 0 }}–{{ $academicPeriods->lastItem() ?? 0 }}
+                                    </strong>
+                                    of
+                                    <strong>
+                                        {{ $academicPeriods->total() }}
+                                    </strong>
+                                    periods
+                                </p>
+                            </div>
+
+                            <div class="global-pagination-wrap">
+                                {{ $academicPeriods
+                                ->onEachSide(2)
+                                ->links('vendor.pagination.tailwind') }}
                             </div>
                         </div>
                     </div>
@@ -534,7 +608,7 @@ $activePeriodPayload = $activePeriod
 
                 <div class="space-y-5">
 
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <div class="table-card">
                         <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
                             <i class="fa-solid fa-bolt text-[#8B0000]"></i>
                             <h2 class="font-bold text-gray-800 text-sm">Quick Actions</h2>
@@ -587,7 +661,7 @@ $activePeriodPayload = $activePeriod
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <div class="table-card">
                         <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
                             <i class="fa-solid fa-clock text-[#8B0000]"></i>
                             <h2 class="font-bold text-gray-800 text-sm">Date &amp; Time</h2>
@@ -626,10 +700,10 @@ $activePeriodPayload = $activePeriod
                             </a>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
+    </div>
 </main>
 
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
@@ -754,444 +828,516 @@ $activePeriodPayload = $activePeriod
     </div>
 </div>
 
-<div class="ui-modal modal-overlay ap-add-modal" id="addModal" onclick="closeModalOutside(event,'addModal')">
-    <div class="modal-box modal-box-inner ap-academic-modal ap-academic-modal-lg">
-        <form method="POST" action="{{ route('admin.academic_periods.store') }}" class="ap-add-form" data-discard-form
-            data-discard-title="Discard new academic period?"
-            data-discard-subtitle="You have unsaved academic period details."
-            data-discard-message="Closing this modal will remove the academic period draft you entered. Do you want to discard your changes?">
-            @csrf
+<div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
-            <div class="ap-add-header-left">
-                <div class="ap-add-header-icon">
-                    <i class="fa-solid fa-calendar-plus text-xl"></i>
+    <form method="POST" action="{{ route('admin.academic_periods.store') }}"
+        class="ui-modal-card modal-lg modal-card-form ap-add-form" data-discard-form
+        data-discard-title="Discard new academic period?"
+        data-discard-subtitle="You have unsaved academic period details."
+        data-discard-message="Closing this modal will remove the academic period draft you entered. Do you want to discard your changes?">
+
+        @csrf
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-calendar-plus"></i>
                 </div>
 
-                <div>
-                    <h3 class="ap-add-header-title">Add Academic Period</h3>
-                    <p class="ap-add-header-subtitle">Add new semester or academic term schedule</p>
-                </div>
-            </div>
-
-            <button type="button" data-close-modal="addModal" data-discard-close="addModal" class="ap-add-close">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <div class="ap-add-body">
-                <div class="ap-panel ap-panel-soft">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
-                    </div>
-
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <div class="ap-input-wrap" id="addAcademicYearWrap" style="flex: 1;">
-                            <span class="ap-input-icon">
-                                <i class="fa-solid fa-calendar"></i>
-                            </span>
-                            <input name="academic_year" id="addYear" type="text" placeholder="e.g. 2026-2027"
-                                class="ap-input field-input no-voice" required>
-                        </div>
-                        <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
-                            <button type="button" class="voice-search-mic external" id="addYearMicBtn"
-                                data-global-voice-trigger data-voice-target="#addYear"
-                                data-voice-status="#addYearVoiceStatus" aria-label="Voice input for academic year"
-                                aria-pressed="false">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                            <span id="addYearVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                data-voice-status></span>
-                        </div>
-                    </div>
-
-                    <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                </div>
-
-                <div class="ap-panel ap-panel-soft">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Semester <span class="text-red-500">*</span></span>
-                    </div>
-
-                    <div class="ap-semester-grid-redesign">
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" value="First Semester" required>
-                            <div class="ap-semester-card">
-                                <i class="fa-solid fa-book"></i>
-                                <span>First Semester</span>
-                            </div>
-                        </label>
-
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" value="Second Semester" required>
-                            <div class="ap-semester-card">
-                                <i class="fa-solid fa-book-open"></i>
-                                <span>Second Semester</span>
-                            </div>
-                        </label>
-
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" value="Summer" required>
-                            <div class="ap-semester-card">
-                                <i class="fa-solid fa-sun"></i>
-                                <span>Summer</span>
-                            </div>
-                        </label>
-                    </div>
-
-                    <span class="sem-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                </div>
-
-                <div class="ap-col-span-2 ap-panel">
-                    <div class="ap-date-grid-redesign">
-                        <div>
-                            <div class="ap-label">
-                                <span class="ap-label-text">Start Date <span class="text-red-500">*</span></span>
-                            </div>
-
-                            <div class="ap-input-wrap">
-                                <span class="ap-input-icon">
-                                    <i class="fa-solid fa-calendar-day"></i>
-                                </span>
-                                <input name="start_date" type="text" class="ap-input field-input js-flatpickr-date"
-                                    placeholder="Select start date" required readonly min="1900-01-01" max="9999-12-31">
-                            </div>
-                            <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                        </div>
-
-                        <div>
-                            <div class="ap-label">
-                                <span class="ap-label-text">End Date <span class="text-red-500">*</span></span>
-                            </div>
-
-                            <div class="ap-input-wrap">
-                                <span class="ap-input-icon">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                </span>
-                                <input name="end_date" type="text" class="ap-input field-input js-flatpickr-date"
-                                    placeholder="Select end date" required readonly>
-                            </div>
-                            <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ap-col-span-2 ap-panel ap-desc-panel">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Description</span>
-                        <span class="ap-label-hint">Optional</span>
-                    </div>
-
-                    <div class="ap-textarea-wrap" id="addDescWrap">
-                        <div class="ap-textarea-inner">
-                            <span class="ap-placeholder">Add any notes about this academic period...</span>
-                            <textarea name="description" rows="6" class="ap-textarea field-input no-voice" id="addDesc"
-                                data-word-limit="150" maxlength="150"></textarea>
-                        </div>
-                        <div style="position: relative;">
-                            <button type="button" class="voice-search-mic external" id="addDescMicBtn"
-                                data-global-voice-trigger data-voice-target="#addDesc"
-                                data-voice-status="#addDescVoiceStatus" aria-label="Voice input for description"
-                                aria-pressed="false">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                            <span id="addDescVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                data-voice-status></span>
-                        </div>
-                    </div>
-
-                    <div class="ap-desc-meta">
-                        <span class="ap-desc-help">Maximum of 150 characters</span>
-                        <span class="ap-word-counter" id="addDescCounter">0 / 150 characters</span>
-                    </div>
-                    <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                </div>
-
-                <div class="ap-col-span-2">
-                    <div class="ap-active-card">
-                        <div class="ap-active-card-left">
-                            <div class="ap-active-badge">
-                                <i class="fa-solid fa-star text-sm"></i>
-                            </div>
-
-                            <div>
-                                <p class="ap-active-title">Set as Active Period</p>
-                                <p class="ap-active-desc">This will deactivate the currently active semester.</p>
-                            </div>
-                        </div>
-
-                        <label class="ap-switch">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" name="is_active" value="1">
-                            <span class="ap-switch-slider"></span>
-                        </label>
-                    </div>
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Add Academic Period
+                    </h3>
+                    <p class="modal-subtitle">
+                        Add new semester or academic term schedule
+                    </p>
                 </div>
             </div>
 
-            <div class="ap-add-footer">
-                <button type="button" data-close-modal="addModal" data-discard-close="addModal"
-                    class="ap-add-btn ap-add-btn-cancel">
-                    Cancel
-                </button>
-
-                <button type="submit" class="ap-add-btn ap-add-btn-submit">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    Save Period
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="ui-modal modal-overlay ap-add-modal" id="editModal" onclick="closeModalOutside(event,'editModal')">
-    <div class="modal-box modal-box-inner ap-academic-modal ap-academic-modal-lg">
-        <form method="POST" id="editForm" class="ap-add-form" data-discard-form
-            data-discard-title="Discard academic period changes?"
-            data-discard-subtitle="You have unsaved changes in this academic period."
-            data-discard-message="Closing this modal will remove the changes you made. Do you want to discard them?">
-            @csrf
-            @method('PUT')
-
-            <div class="ap-add-header">
-                <div class="ap-add-header-left">
-                    <div class="ap-add-header-icon" style="background: linear-gradient(145deg, #2563eb, #1d4ed8);">
-                        <i class="fa-solid fa-pen text-xl"></i>
-                    </div>
-
-                    <div>
-                        <h3 class="ap-add-header-title">Edit Academic Period</h3>
-                        <p class="ap-add-header-subtitle" id="editSubtitle">Updating period details</p>
-                    </div>
-                </div>
-
-                <button type="button" onclick="closeAcademicPeriodModal('editModal')" class="ap-add-close"
-                    aria-label="Close edit modal">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="ap-add-body">
-                <div class="ap-panel ap-panel-soft">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
-                    </div>
-
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <div class="ap-input-wrap" id="editAcademicYearWrap" style="flex: 1;">
-                            <span class="ap-input-icon">
-                                <i class="fa-solid fa-calendar"></i>
-                            </span>
-                            <input type="text" name="academic_year" id="editYear" class="ap-input field-input no-voice"
-                                placeholder="e.g. 2026-2027" required>
-                        </div>
-                        <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
-                            <button type="button" class="voice-search-mic external" id="editYearMicBtn"
-                                data-global-voice-trigger data-voice-target="#editYear"
-                                data-voice-status="#editYearVoiceStatus" aria-label="Voice input for academic year"
-                                aria-pressed="false">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                            <span id="editYearVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                data-voice-status></span>
-                        </div>
-                    </div>
-
-                    <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                </div>
-
-                <div class="ap-panel ap-panel-soft">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Semester <span class="text-red-500">*</span></span>
-                    </div>
-
-                    <div class="ap-semester-grid-redesign">
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" id="edit-sem-1" value="First Semester" class="edit-sem"
-                                required>
-                            <div class="ap-semester-card" style="--active-color:#2563eb;">
-                                <i class="fa-solid fa-book"></i>
-                                <span>First Semester</span>
-                            </div>
-                        </label>
-
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" id="edit-sem-2" value="Second Semester" class="edit-sem"
-                                required>
-                            <div class="ap-semester-card" style="--active-color:#2563eb;">
-                                <i class="fa-solid fa-book-open"></i>
-                                <span>Second Semester</span>
-                            </div>
-                        </label>
-
-                        <label class="ap-semester-item">
-                            <input type="radio" name="semester" id="edit-sem-3" value="Summer" class="edit-sem"
-                                required>
-                            <div class="ap-semester-card" style="--active-color:#2563eb;">
-                                <i class="fa-solid fa-sun"></i>
-                                <span>Summer</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="ap-col-span-2 ap-panel">
-                    <div class="ap-date-grid-redesign">
-                        <div>
-                            <div class="ap-label">
-                                <span class="ap-label-text">Start Date <span class="text-red-500">*</span></span>
-                            </div>
-
-                            <div class="ap-input-wrap">
-                                <span class="ap-input-icon">
-                                    <i class="fa-solid fa-calendar-day"></i>
-                                </span>
-                                <input type="text" name="start_date" id="editStart"
-                                    class="ap-input field-input js-flatpickr-date" placeholder="Select start date"
-                                    required readonly>
-                            </div>
-                            <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                        </div>
-
-                        <div>
-                            <div class="ap-label">
-                                <span class="ap-label-text">End Date <span class="text-red-500">*</span></span>
-                            </div>
-
-                            <div class="ap-input-wrap">
-                                <span class="ap-input-icon">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                </span>
-                                <input type="text" name="end_date" id="editEnd"
-                                    class="ap-input field-input js-flatpickr-date" placeholder="Select end date"
-                                    required readonly>
-                            </div>
-                            <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ap-col-span-2 ap-panel ap-desc-panel">
-                    <div class="ap-label">
-                        <span class="ap-label-text">Description</span>
-                        <span class="ap-label-hint">Optional</span>
-                    </div>
-
-                    <div class="ap-textarea-wrap" id="editDescWrap">
-                        <div class="ap-textarea-inner">
-                            <span class="ap-placeholder">Add any notes about this academic period...</span>
-                            <textarea rows="6" name="description" id="editDesc" class="ap-textarea field-input no-voice"
-                                data-word-limit="150" maxlength="150"></textarea>
-                        </div>
-                        <div style="position: relative;">
-                            <button type="button" class="voice-search-mic external" id="editDescMicBtn"
-                                data-global-voice-trigger data-voice-target="#editDesc"
-                                data-voice-status="#editDescVoiceStatus" aria-label="Voice input for description"
-                                aria-pressed="false">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                            <span id="editDescVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                data-voice-status></span>
-                        </div>
-                    </div>
-
-                    <div class="ap-desc-meta">
-                        <span class="ap-desc-help">Maximum of 150 characters</span>
-                        <span class="ap-word-counter" id="editDescCounter">0 / 150 characters</span>
-                    </div>
-                    <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
-                </div>
-
-                <div class="ap-col-span-2">
-                    <div class="ap-active-card"
-                        style="border-color: rgba(37, 99, 235, 0.16); background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%);">
-                        <div class="ap-active-card-left">
-                            <div class="ap-active-badge" style="color:#2563eb;">
-                                <i class="fa-solid fa-star text-sm"></i>
-                            </div>
-
-                            <div>
-                                <p class="ap-active-title">Set as Active Period</p>
-                                <p class="ap-active-desc">This will deactivate the currently active semester.</p>
-                            </div>
-                        </div>
-
-                        <label class="ap-switch">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" name="is_active" id="editIsActive" value="1">
-                            <span class="ap-switch-slider" style="--switch-color:#2563eb;"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ap-add-footer">
-                <button type="button" onclick="closeAcademicPeriodModal('editModal')"
-                    class="ap-add-btn ap-add-btn-cancel">
-                    Cancel
-                </button>
-
-                <button type="submit" class="ap-add-btn"
-                    style="background: linear-gradient(145deg, #2563eb, #1d4ed8); color:#fff; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    Update Period
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-overlay ui-modal ap-delete-modal" id="deleteModal" aria-hidden="true">
-    <div class="modal-box-inner ap-delete-shell" onclick="event.stopPropagation()" role="dialog" aria-modal="true"
-        aria-labelledby="academicDeleteTitle">
-
-        <div class="ap-delete-head">
-            <div class="ap-delete-head-left">
-                <div class="ap-delete-head-icon">
-                    <i class="fa-solid fa-trash"></i>
-                </div>
-
-                <div>
-                    <h3 id="academicDeleteTitle" class="ap-delete-title">Delete Academic Period</h3>
-                    <p class="ap-delete-subtitle">This action requires confirmation</p>
-                </div>
-            </div>
-
-            <button type="button" onclick="closeModal('deleteModal')" class="ap-delete-x"
-                aria-label="Close delete modal">
+            <button type="button" data-discard-close="addModal" class="modal-x"
+                aria-label="Close add academic period modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" id="deleteForm">
-            @csrf
-            @method('DELETE')
+        <div class="modal-bd ap-add-body">
+            <div class="ap-panel ap-panel-soft">
+                <div class="ap-label">
+                    <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
+                </div>
 
-            <div class="ap-delete-content">
-                <div class="ap-delete-warning">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-
-                    <div>
-                        <p>
-                            Are you sure you want to delete
-                            <strong id="deletePeriodLabel">—</strong>?
-                        </p>
-                        <span>This academic period will be permanently removed.</span>
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div class="ap-input-wrap" id="addAcademicYearWrap" style="flex: 1;">
+                        <span class="ap-input-icon">
+                            <i class="fa-solid fa-calendar"></i>
+                        </span>
+                        <input name="academic_year" id="addYear" type="text" placeholder="e.g. 2026-2027"
+                            class="ap-input field-input no-voice" required>
+                    </div>
+                    <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
+                        <button type="button" class="voice-search-mic external" id="addYearMicBtn"
+                            data-global-voice-trigger data-voice-target="#addYear"
+                            data-voice-status="#addYearVoiceStatus" aria-label="Voice input for academic year"
+                            aria-pressed="false">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <span id="addYearVoiceStatus" class="voice-status hidden" aria-live="polite"
+                            data-voice-status></span>
                     </div>
                 </div>
 
-                <div class="ap-delete-footer">
-                    <button type="button" onclick="closeModal('deleteModal')" class="modal-btn-ghost">
-                        Cancel
-                    </button>
+                <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+            </div>
 
-                    <button type="submit" class="ap-delete-confirm-btn">
-                        <i class="fa-solid fa-trash"></i>
-                        Delete
-                    </button>
+            <div class="ap-panel ap-panel-soft">
+                <div class="ap-label">
+                    <span class="ap-label-text">Semester <span class="text-red-500">*</span></span>
+                </div>
+
+                <div class="ap-semester-grid-redesign">
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" value="First Semester" required>
+                        <div class="ap-semester-card">
+                            <i class="fa-solid fa-book"></i>
+                            <span>First Semester</span>
+                        </div>
+                    </label>
+
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" value="Second Semester" required>
+                        <div class="ap-semester-card">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Second Semester</span>
+                        </div>
+                    </label>
+
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" value="Summer" required>
+                        <div class="ap-semester-card">
+                            <i class="fa-solid fa-sun"></i>
+                            <span>Summer</span>
+                        </div>
+                    </label>
+                </div>
+
+                <span class="sem-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+            </div>
+
+            <div class="ap-col-span-2 ap-panel">
+                <div class="ap-date-grid-redesign">
+                    <div>
+                        <div class="ap-label">
+                            <span class="ap-label-text">Start Date <span class="text-red-500">*</span></span>
+                        </div>
+
+                        <div class="ap-input-wrap">
+                            <span class="ap-input-icon">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </span>
+                            <input name="start_date" type="text" class="ap-input field-input js-flatpickr-date"
+                                placeholder="Select start date" required readonly min="1900-01-01" max="9999-12-31">
+                        </div>
+                        <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+                    </div>
+
+                    <div>
+                        <div class="ap-label">
+                            <span class="ap-label-text">End Date <span class="text-red-500">*</span></span>
+                        </div>
+
+                        <div class="ap-input-wrap">
+                            <span class="ap-input-icon">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </span>
+                            <input name="end_date" type="text" class="ap-input field-input js-flatpickr-date"
+                                placeholder="Select end date" required readonly>
+                        </div>
+                        <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+                    </div>
                 </div>
             </div>
-        </form>
-    </div>
+
+            <div class="ap-col-span-2 ap-panel ap-desc-panel">
+                <div class="global-label-row">
+                    <div class="global-label-main">
+                        <span class="ap-label-text">
+                            Description
+                        </span>
+
+                        <span class="ap-label-hint">
+                            Optional
+                        </span>
+                    </div>
+
+                    <span class="char-counter" id="addDescCounter">
+                        0 / 150 characters
+                    </span>
+                </div>
+
+                <div class="ap-textarea-wrap" id="addDescWrap">
+                    <div class="ap-textarea-inner" data-clearable-field>
+                        <span class="ap-placeholder">
+                            Add any notes about this academic period...
+                        </span>
+
+                        <textarea name="description" rows="6" class="ap-textarea field-input no-voice" id="addDesc"
+                            maxlength="150" data-char-limit="150" data-char-counter="#addDescCounter"
+                            data-clearable-input></textarea>
+
+                        <button type="button" id="addDescClearBtn"
+                            class="search-clear field-clear-btn field-clear-btn--textarea" data-field-clear
+                            aria-label="Clear description" title="Clear description">
+
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="voice-input-toggle">
+                        <button type="button" class="voice-search-mic external" id="addDescMicBtn"
+                            data-global-voice-trigger data-voice-target="#addDesc"
+                            data-voice-status="#addDescVoiceStatus" aria-label="Voice input for description"
+                            aria-pressed="false">
+
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+
+                        <span id="addDescVoiceStatus" class="voice-status hidden" aria-live="polite"
+                            data-voice-status></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ap-col-span-2">
+                <div class="ap-active-card">
+                    <div class="ap-active-card-left">
+                        <div class="ap-active-badge">
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+
+                        <div>
+                            <p class="ap-active-title">
+                                Set as Active Period
+                            </p>
+
+                            <p class="ap-active-desc">
+                                This will deactivate the currently active semester.
+                            </p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="is_active" value="0">
+
+                    <label class="global-switch">
+                        <input type="checkbox" name="is_active" id="addIsActive" value="1" class="global-switch-input"
+                            aria-label="Set as active academic period">
+
+                        <span class="global-switch-track" aria-hidden="true">
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" data-discard-close="addModal" class="ui-btn ui-btn-secondary">
+
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-primary">
+
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Period</span>
+            </button>
+        </div>
+    </form>
 </div>
+
+<div id="editModal" class="ui-modal modal-theme-edit" aria-hidden="true">
+
+    <form method="POST" id="editForm" class="ui-modal-card modal-lg modal-card-form ap-add-form" data-discard-form
+        data-discard-title="Discard academic period changes?"
+        data-discard-subtitle="You have unsaved changes in this academic period."
+        data-discard-message="Closing this modal will remove the changes you made. Do you want to discard them?">
+
+        @csrf
+        @method('PUT')
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-pen"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Edit Academic Period
+                    </h3>
+
+                    <p class="modal-subtitle" id="editSubtitle">
+                        Updating period details
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeAcademicPeriodModal('editModal')" class="modal-x"
+                aria-label="Close edit modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd ap-add-body">
+            <div class="ap-panel ap-panel-soft">
+                <div class="ap-label">
+                    <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div class="ap-input-wrap" id="editAcademicYearWrap" style="flex: 1;">
+                        <span class="ap-input-icon">
+                            <i class="fa-solid fa-calendar"></i>
+                        </span>
+                        <input type="text" name="academic_year" id="editYear" class="ap-input field-input no-voice"
+                            placeholder="e.g. 2026-2027" required>
+                    </div>
+                    <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
+                        <button type="button" class="voice-search-mic external" id="editYearMicBtn"
+                            data-global-voice-trigger data-voice-target="#editYear"
+                            data-voice-status="#editYearVoiceStatus" aria-label="Voice input for academic year"
+                            aria-pressed="false">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <span id="editYearVoiceStatus" class="voice-status hidden" aria-live="polite"
+                            data-voice-status></span>
+                    </div>
+                </div>
+
+                <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+            </div>
+
+            <div class="ap-panel ap-panel-soft">
+                <div class="ap-label">
+                    <span class="ap-label-text">Semester <span class="text-red-500">*</span></span>
+                </div>
+
+                <div class="ap-semester-grid-redesign">
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" id="edit-sem-1" value="First Semester" class="edit-sem"
+                            required>
+                        <div class="ap-semester-card" style="--active-color:#2563eb;">
+                            <i class="fa-solid fa-book"></i>
+                            <span>First Semester</span>
+                        </div>
+                    </label>
+
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" id="edit-sem-2" value="Second Semester" class="edit-sem"
+                            required>
+                        <div class="ap-semester-card" style="--active-color:#2563eb;">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Second Semester</span>
+                        </div>
+                    </label>
+
+                    <label class="ap-semester-item">
+                        <input type="radio" name="semester" id="edit-sem-3" value="Summer" class="edit-sem" required>
+                        <div class="ap-semester-card" style="--active-color:#2563eb;">
+                            <i class="fa-solid fa-sun"></i>
+                            <span>Summer</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="ap-col-span-2 ap-panel">
+                <div class="ap-date-grid-redesign">
+                    <div>
+                        <div class="ap-label">
+                            <span class="ap-label-text">Start Date <span class="text-red-500">*</span></span>
+                        </div>
+
+                        <div class="ap-input-wrap">
+                            <span class="ap-input-icon">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </span>
+                            <input type="text" name="start_date" id="editStart"
+                                class="ap-input field-input js-flatpickr-date" placeholder="Select start date" required
+                                readonly>
+                        </div>
+                        <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+                    </div>
+
+                    <div>
+                        <div class="ap-label">
+                            <span class="ap-label-text">End Date <span class="text-red-500">*</span></span>
+                        </div>
+
+                        <div class="ap-input-wrap">
+                            <span class="ap-input-icon">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </span>
+                            <input type="text" name="end_date" id="editEnd"
+                                class="ap-input field-input js-flatpickr-date" placeholder="Select end date" required
+                                readonly>
+                        </div>
+                        <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ap-col-span-2 ap-panel ap-desc-panel">
+                <div class="global-label-row">
+                    <div class="global-label-main">
+                        <span class="ap-label-text">
+                            Description
+                        </span>
+
+                        <span class="ap-label-hint">
+                            Optional
+                        </span>
+                    </div>
+
+                    <span class="char-counter" id="editDescCounter">
+                        0 / 150 characters
+                    </span>
+                </div>
+
+                <div class="ap-textarea-wrap" id="editDescWrap">
+
+                    <div class="ap-textarea-inner" data-clearable-field>
+
+                        <span class="ap-placeholder">
+                            Add any notes about this academic period...
+                        </span>
+
+                        <textarea name="description" rows="6" class="ap-textarea field-input no-voice" id="editDesc"
+                            maxlength="150" data-char-limit="150" data-char-counter="#editDescCounter"
+                            data-clearable-input></textarea>
+
+                        <button type="button" id="editDescClearBtn"
+                            class="search-clear field-clear-btn field-clear-btn--textarea" data-field-clear
+                            aria-label="Clear description" title="Clear description">
+
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="voice-input-toggle">
+                        <button type="button" class="voice-search-mic external" id="editDescMicBtn" data-voice-trigger
+                            data-voice-target="#editDesc" data-voice-status="#editDescVoiceStatus"
+                            aria-label="Voice input for description" aria-pressed="false">
+
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+
+                        <span id="editDescVoiceStatus" class="voice-status hidden" data-voice-status
+                            aria-live="polite"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ap-col-span-2">
+                <div class="ap-active-card">
+                    <div class="ap-active-card-left">
+                        <div class="ap-active-badge">
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+
+                        <div>
+                            <p class="ap-active-title">Set as Active Period</p>
+                            <p class="ap-active-desc">This will deactivate the currently active semester.</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="is_active" value="0">
+
+                    <label class="global-switch">
+                        <input type="checkbox" name="is_active" id="editIsActive" value="1" class="global-switch-input"
+                            aria-label="Set as active academic period">
+
+                        <span class="global-switch-track" aria-hidden="true">
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closeAcademicPeriodModal('editModal')" class="ui-btn ui-btn-secondary">
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-edit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Update Period</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div id="setActiveModal" class="ui-modal modal-theme-success" aria-hidden="true">
+
+    <form id="setActiveForm" method="POST" action="" class="ui-modal-card modal-sm modal-card-form">
+
+        @csrf
+        @method('PATCH')
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Set Active Period
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Confirm the active academic period
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="modal-x" onclick="closeModal('setActiveModal')"
+                aria-label="Close confirmation modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <div>
+                    <p>
+                        Set
+                        <strong id="setActivePeriodName"></strong>
+                        as the active academic period?
+                    </p>
+
+                    <span>
+                        The currently active period will be deactivated.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeModal('setActiveModal')">
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Set as Active</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<x-delete-confirm-modal id="deleteModal" form-id="deleteForm" name-id="deletePeriodLabel" title="Delete Academic Period"
+    helper="This academic period will be permanently removed." />
 
 <div class="modal-overlay ui-modal ap-sync-modal" id="syncFlssModal" aria-hidden="true" data-sync-flss-modal>
     <form method="POST" action="{{ route('admin.academic_periods.sync_flss') }}"
@@ -1246,6 +1392,25 @@ $activePeriodPayload = $activePeriod
 
 @section('scripts')
 <script>
+    window.openSetActiveModal = function (
+        action,
+        label
+    ) {
+        const form =
+            document.getElementById('setActiveForm');
+
+        const name =
+            document.getElementById(
+                'setActivePeriodName'
+            );
+
+        if (!form || !name) return;
+
+        form.action = action;
+        name.textContent = label;
+
+        window.openModal?.('setActiveModal');
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
         const addForm = document.querySelector('#addModal form');
@@ -1256,9 +1421,7 @@ $activePeriodPayload = $activePeriod
         const endInput = addForm.querySelector('[name="end_date"]');
         const semRadios = addForm.querySelectorAll('[name="semester"]');
         const addDesc = addForm.querySelector('#addDesc');
-        const addDescCounter = addForm.querySelector('#addDescCounter');
         const editDesc = document.getElementById('editDesc');
-        const editDescCounter = document.getElementById('editDescCounter');
         const existingAcademicPeriods = @json($calendarPeriodsPayload);
         const semesterAliases = {
             '1st Semester': ['First Semester', '1st Semester'],
@@ -1430,42 +1593,14 @@ $activePeriodPayload = $activePeriod
             validateDates();
         });
 
-        if (addDesc) {
-            addDesc.addEventListener('input', () => {
-                const limit = Number(addDesc.dataset.wordLimit || 150);
-                if (addDesc.value.length > limit) {
-                    addDesc.value = addDesc.value.slice(0, limit);
-                }
-                validateDescription(addDesc, addDescCounter, setError, clearError);
-            });
-
-            addDesc.addEventListener('blur', () => validateDescription(addDesc, addDescCounter, setError,
-                clearError));
-            updateWordCounter(addDesc, addDescCounter);
-        }
-
-        if (editDesc) {
-            editDesc.addEventListener('input', () => {
-                const limit = Number(editDesc.dataset.wordLimit || 150);
-                if (editDesc.value.length > limit) {
-                    editDesc.value = editDesc.value.slice(0, limit);
-                }
-                validateDescription(editDesc, editDescCounter, setError, clearError);
-            });
-
-            editDesc.addEventListener('blur', () => validateDescription(editDesc, editDescCounter, setError,
-                clearError));
-            updateWordCounter(editDesc, editDescCounter);
-        }
-
         addForm.addEventListener('submit', e => {
             const y = validateYear();
             const s = validateSemester();
             const d = validateDates();
             const dup = validateDuplicateAcademicPeriod(addForm);
-            const descOk = validateDescription(addDesc, addDescCounter, setError, clearError);
-
-            if (!y || !s || !d || !dup || !descOk) e.preventDefault();
+            if (!y || !s || !d || !dup) {
+                e.preventDefault();
+            }
         });
 
         const editForm = document.getElementById('editForm');
@@ -1474,58 +1609,13 @@ $activePeriodPayload = $activePeriod
             editForm.addEventListener('submit', e => {
                 const periodId = editForm.action.split('/').pop();
                 const dup = validateDuplicateAcademicPeriod(editForm, periodId);
-                const descOk = validateDescription(editDesc, editDescCounter, setError, clearError);
 
-                if (!dup || !descOk) e.preventDefault();
+                if (!dup) {
+                    e.preventDefault();
+                }
             });
         }
     });
-
-    function countChars(value) {
-        return value.length;
-    }
-
-    function updateWordCounter(textarea, counter) {
-        if (!textarea || !counter) return true;
-
-        const limit = Number(textarea.dataset.wordLimit || 150);
-        const chars = countChars(textarea.value);
-
-        counter.textContent = `${chars} / ${limit} characters`;
-        counter.classList.remove('is-warning', 'is-danger', 'is-invalid');
-
-        if (chars >= 120 && chars < 140) {
-            counter.classList.add('is-warning');
-        } else if (chars >= 140 && chars <= limit) {
-            counter.classList.add('is-danger');
-        } else if (chars > limit) {
-            counter.classList.add('is-invalid');
-        }
-
-        return chars <= limit;
-    }
-
-    function validateDescription(textarea, counter, setErrorFn, clearErrorFn) {
-        if (!textarea) return true;
-
-        const limit = Number(textarea.dataset.wordLimit || 150);
-        const chars = countChars(textarea.value);
-
-        updateWordCounter(textarea, counter);
-
-        if (chars > limit) {
-            if (typeof setErrorFn === 'function') {
-                setErrorFn(textarea, `Description must not exceed ${limit} characters.`);
-            }
-            return false;
-        }
-
-        if (typeof clearErrorFn === 'function') {
-            clearErrorFn(textarea);
-        }
-
-        return true;
-    }
 
     function bindTextareaPlaceholder(textareaId, wrapId) {
         const textarea = document.getElementById(textareaId);
@@ -1659,17 +1749,17 @@ $activePeriodPayload = $activePeriod
         });
 
         const addDesc = document.getElementById('addDesc');
-        const addDescCounter = document.getElementById('addDescCounter');
         const editDesc = document.getElementById('editDesc');
-        const editDescCounter = document.getElementById('editDescCounter');
 
-        if (id === 'addModal' && typeof updateWordCounter === 'function' && addDesc && addDescCounter) {
-            updateWordCounter(addDesc, addDescCounter);
-        }
-
-        if (id === 'editModal' && typeof updateWordCounter === 'function' && editDesc && editDescCounter) {
-            updateWordCounter(editDesc, editDescCounter);
-        }
+        form
+            .querySelectorAll('[data-char-limit]')
+            .forEach(function (field) {
+                field.dispatchEvent(
+                    new Event('input', {
+                        bubbles: true
+                    })
+                );
+            });
 
         if (typeof bindTextareaPlaceholder === 'function') {
             bindTextareaPlaceholder('addDesc', 'addDescWrap');
@@ -1837,9 +1927,15 @@ $activePeriodPayload = $activePeriod
             editDescWrap.classList.remove('is-focused');
         }
 
-        if (typeof updateWordCounter === 'function') {
-            updateWordCounter(editDesc, document.getElementById('editDescCounter'));
-        }
+        window.initCharLimitFields?.(
+            document.getElementById('editModal')
+        );
+
+        editDesc.dispatchEvent(
+            new Event('input', {
+                bubbles: true
+            })
+        );
 
         document.getElementById('editIsActive').checked = !!period.is_active;
 
@@ -1864,9 +1960,13 @@ $activePeriodPayload = $activePeriod
     };
 
     window.openDeleteModal = function (action, label) {
-        document.getElementById('deleteForm').action = action;
-        document.getElementById('deletePeriodLabel').textContent = label;
-        openModal('deleteModal');
+        window.openDeleteConfirmModal({
+            modalId: 'deleteModal',
+            formId: 'deleteForm',
+            nameId: 'deletePeriodLabel',
+            action: action,
+            itemName: label,
+        });
     };
 
     window.openDeleteModalFromButton = function (button) {
@@ -1927,7 +2027,15 @@ $activePeriodPayload = $activePeriod
         if (searchInput) searchInput.value = '';
         if (clearBtn) clearBtn.classList.remove('visible', 'show');
 
-        const items = document.querySelectorAll('.academic-item');
+        const items =
+            document.querySelectorAll(
+                '[data-record-row], ' +
+                '[data-record-card]'
+            );
+
+        items.forEach(item => {
+            item.style.display = '';
+        });
         items.forEach(item => item.style.display = '');
 
         const jsEmpty = document.getElementById('jsEmptyState');
@@ -1944,13 +2052,17 @@ $activePeriodPayload = $activePeriod
 
         const serverEmpty = document.getElementById('serverEmptyState');
         if (serverEmpty) {
-            const hasRows = document.querySelectorAll('#academicTableBody tr.tbl-row').length > 0;
+            const hasRows = document.querySelectorAll(
+                '#academicTableBody [data-record-row]'
+            ).length > 0;
             serverEmpty.style.display = hasRows ? 'none' : '';
         }
 
         const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
         if (serverEmptyGrid) {
-            const hasCards = document.querySelectorAll('#academicGridView .academic-card').length > 0;
+            const hasCards = document.querySelectorAll(
+                '#academicGridView [data-record-card]'
+            ).length > 0;
             serverEmptyGrid.style.display = hasCards ? 'none' : '';
         }
 
@@ -1982,60 +2094,6 @@ $activePeriodPayload = $activePeriod
         if (activeFilters) activeFilters.classList.add('hidden');
     }
 
-    function getPreferredAcademicView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem('academicView') || 'list';
-    }
-
-    function applyAcademicView(view, save = true) {
-        const listView = document.getElementById('academicListView');
-        const gridView = document.getElementById('academicGridView');
-        const listBtn = document.getElementById('academicListBtn');
-        const gridBtn = document.getElementById('academicGridBtn');
-
-        if (!listView || !gridView) return;
-
-        const finalView = window.innerWidth <= 767 ? 'grid' : view;
-
-        if (finalView === 'grid') {
-            listView.style.display = 'none';
-            gridView.style.display = 'grid';
-        } else {
-            listView.style.display = 'block';
-            gridView.style.display = 'none';
-        }
-
-        const mainContent = document.getElementById('mainContent');
-        if (mainContent) {
-            mainContent.classList.toggle('mode-list', finalView === 'list');
-            mainContent.classList.toggle('mode-grid', finalView === 'grid');
-        }
-
-        if (listBtn) listBtn.classList.toggle('active', finalView === 'list');
-        if (gridBtn) gridBtn.classList.toggle('active', finalView === 'grid');
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem('academicView', finalView);
-        }
-    }
-
-    function initAcademicViewToggle() {
-        const listBtn = document.getElementById('academicListBtn');
-        const gridBtn = document.getElementById('academicGridBtn');
-
-        applyAcademicView(getPreferredAcademicView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', () => applyAcademicView('list', true));
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', () => applyAcademicView('grid', true));
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         updateClock();
         renderCalendar();
@@ -2062,8 +2120,19 @@ $activePeriodPayload = $activePeriod
         const semesterRadios = Array.from(document.querySelectorAll('input[name="filter_semester"]'));
         const statusRadios = Array.from(document.querySelectorAll('input[name="filter_status"]'));
 
-        const allTableRows = () => tableBody ? tableBody.querySelectorAll('tr.tbl-row') : [];
-        const allGridCards = () => gridView ? gridView.querySelectorAll('.academic-card') : [];
+        const allTableRows = () =>
+            tableBody
+                ? tableBody.querySelectorAll(
+                    '[data-record-row]'
+                )
+                : [];
+
+        const allGridCards = () =>
+            gridView
+                ? gridView.querySelectorAll(
+                    '[data-record-card]'
+                )
+                : [];
 
         filterForm?.addEventListener('submit', (event) => event.preventDefault());
 
@@ -2232,7 +2301,7 @@ $activePeriodPayload = $activePeriod
                 rowEmpty = document.createElement('tr');
                 rowEmpty.id = 'jsEmptyState';
                 rowEmpty.innerHTML = `
-            <td colspan="7" class="ap-empty-state-cell">
+            <td colspan="7" class="table-empty-state-cell">
                 <div class="empty-state">
                     <div class="empty-state-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -2252,7 +2321,7 @@ $activePeriodPayload = $activePeriod
                 tableBody.appendChild(rowEmpty);
             } else if (rowEmpty) {
                 rowEmpty.innerHTML = `
-            <td colspan="7" class="ap-empty-state-cell">
+            <td colspan="7" class="table-empty-state-cell">
                 <div class="empty-state">
                     <div class="empty-state-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -2275,7 +2344,16 @@ $activePeriodPayload = $activePeriod
             if (!gridEmpty && gridView) {
                 gridEmpty = document.createElement('div');
                 gridEmpty.id = 'jsEmptyStateGrid';
-                gridEmpty.className = 'empty-state';
+                gridEmpty.className =
+                    'empty-state table-grid-empty';
+
+                const recordGrid =
+                    gridView.querySelector(
+                        '.table-record-grid'
+                    );
+
+                (recordGrid || gridView)
+                    .appendChild(gridEmpty);
                 gridEmpty.innerHTML = `
             <div class="empty-state-icon">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -2292,7 +2370,8 @@ $activePeriodPayload = $activePeriod
 
                 gridView.appendChild(gridEmpty);
             } else if (gridEmpty) {
-                gridEmpty.className = 'empty-state';
+                gridEmpty.className =
+                    'empty-state table-grid-empty';
                 gridEmpty.innerHTML = `
             <div class="empty-state-icon">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -2332,7 +2411,7 @@ $activePeriodPayload = $activePeriod
                 rowEmpty = document.createElement('tr');
                 rowEmpty.id = 'jsFilterEmptyState';
                 rowEmpty.innerHTML = `
-            <td colspan="7" class="ap-empty-state-cell">
+            <td colspan="7" class="table-empty-state-cell">
                 <div class="empty-state">
                     <div class="empty-state-icon">
                         <i class="fa-solid fa-sliders"></i>
@@ -2357,7 +2436,16 @@ $activePeriodPayload = $activePeriod
             if (!gridEmpty && gridView) {
                 gridEmpty = document.createElement('div');
                 gridEmpty.id = 'jsFilterEmptyStateGrid';
-                gridEmpty.className = 'empty-state';
+                gridEmpty.className =
+                    'empty-state table-grid-empty';
+
+                const recordGrid =
+                    gridView.querySelector(
+                        '.table-record-grid'
+                    );
+
+                (recordGrid || gridView)
+                    .appendChild(gridEmpty);
                 gridEmpty.innerHTML = `
             <div class="empty-state-icon">
                 <i class="fa-solid fa-sliders"></i>
@@ -2372,7 +2460,6 @@ $activePeriodPayload = $activePeriod
             </button>
         `;
 
-                gridView.appendChild(gridEmpty);
             }
 
             if (rowEmpty) rowEmpty.style.display = '';
@@ -2478,11 +2565,6 @@ $activePeriodPayload = $activePeriod
         statusFilter?.addEventListener('change', filterItems);
 
         filterItems();
-        initAcademicViewToggle();
-
-        window.addEventListener('resize', () => {
-            applyAcademicView(getPreferredAcademicView(), false);
-        });
 
         document.addEventListener('click', function (event) {
             const openButton = event.target.closest('[data-open-modal]');

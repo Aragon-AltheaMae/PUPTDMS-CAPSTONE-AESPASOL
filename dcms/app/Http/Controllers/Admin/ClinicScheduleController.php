@@ -57,17 +57,18 @@ class ClinicScheduleController extends Controller
         $philippineHolidays = PhilippineHolidays::range(0, 1);
         $notifications      = [];
 
-        return view('admin.clinic-schedule', [
+        return view('shared.clinic-schedule', [
+            'layoutRole' => 'admin',
+            'pageTitle' => 'Clinic Schedule',
+            'pageShellClass' => 'admin-page-shell',
+            'isDentistView' => false,
+
             'schedules' => $schedules,
             'blockedDates' => $blockedDates,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
             'notifications' => $notifications,
-
-            'layoutRole' => 'admin',
-            'pageShellClass' => 'admin-page-shell',
-            'isDentistView' => false,
 
             'clinicScheduleRouteNames' => [
                 'store' => 'admin.clinic_schedule.store',
