@@ -80,9 +80,12 @@
         personalAppointments: @json($personalAppointments ?? []),
         completedAppointments: @json($completedAppointments ?? []),
         disallowToday: @json($disallowToday ?? true),
+        allowPastDates: @json($allowPastDates ?? false),
+        allowAllDates: @json($allowAllDates ?? false),
         allowToggleOffDate: @json($allowToggleOffDate ?? true),
         useDynamicScheduleRules: @json($useDynamicScheduleRules ?? false),
         renderStyle: @json($renderStyle ?? 'patient'),
+        enableMonthYearShortcut: @json($enableMonthYearShortcut ?? false),
     };
 
     let selectedDate = null;
@@ -375,7 +378,9 @@
 
         const isToday = cellDate.getTime() === todayDate.getTime();
         const isPast = cellDate < todayDate;
-        const isPastOrToday = calendarConfig.disallowToday ? cellDate <= todayDate : isPast;
+        const isPastOrToday = calendarConfig.allowPastDates
+            ? (calendarConfig.disallowToday ? isToday : false)
+            : (calendarConfig.disallowToday ? cellDate <= todayDate : isPast);
 
         const holidayName = calendarConfig.holidaysMap?.[iso] || null;
         const isHoliday = !!holidayName;
@@ -396,11 +401,14 @@
 
         const isBookingMode = calendarConfig.mode === 'booking';
 
-        const isDisabled =
-            isPastOrToday ||
-            isHoliday ||
-            isClosed ||
-            isFull;
+        const isDisabled = calendarConfig.allowAllDates
+            ? false
+            : (
+                isPastOrToday ||
+                isHoliday ||
+                isClosed ||
+                isFull
+            );
         const isSelected = iso === selectedDate;
 
         return {
@@ -451,6 +459,7 @@
 
     function getCalendarDayDecorations(state, variant = 'patient') {
         let cellClass = "cal-cell";
+        const allowAllDates = calendarConfig.allowAllDates === true;
 
         let badgeHtml = "";
         let tooltipHtml = "";
@@ -474,27 +483,27 @@
                 } else {
                     cellClass += " today";
                 }
-            } else if (state.isHoliday) {
+            } else if (!allowAllDates && state.isHoliday) {
                 cellClass += " holiday disabled";
-            } else if (state.isFull) {
+            } else if (!allowAllDates && state.isFull) {
                 cellClass += " full disabled";
-            } else if (state.isClosed) {
+            } else if (!allowAllDates && state.isClosed) {
                 cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (state.isPastOrToday && state.isBookingMode) {
+            } else if (!allowAllDates && state.isPastOrToday && state.isBookingMode) {
                 cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (state.isPast && !state.hasCompletedAppointment) {
+            } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
                 cellClass += " text-gray-400 cursor-default disabled";
             }
         } else {
             if (state.isSelected && !state.isDisabled) {
                 cellClass += " selected";
-            } else if (state.isToday) {
+            } else if (!allowAllDates && state.isToday) {
                 cellClass += " today disabled";
-            } else if (state.isHoliday) {
+            } else if (!allowAllDates && state.isHoliday) {
                 cellClass += " holiday disabled";
-            } else if (state.isFull) {
+            } else if (!allowAllDates && state.isFull) {
                 cellClass += " full disabled";
-            } else if (state.isClosed || state.isPastOrToday) {
+            } else if (!allowAllDates && (state.isClosed || state.isPastOrToday)) {
                 cellClass += ` disabled ${CALENDAR_THEME.statuses.clinicClosed.cellText}`;
             }
         }
@@ -527,7 +536,7 @@
                 CALENDAR_THEME.statuses.completedAppointment.tooltipArrow;
         }
 
-        if (state.isHoliday) {
+        if (state.isHoliday && !allowAllDates) {
             badgeHtml += CALENDAR_THEME.statuses.holiday.badge();
             if (!tooltip) {
                 tooltip = `<i class="fa-solid fa-star mr-1 text-white"></i>${state.holidayName}`;
@@ -544,7 +553,7 @@
                 tooltipBg = CALENDAR_THEME.statuses.fullyBooked.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.fullyBooked.tooltipArrow;
             }
-        } else if (state.isClosed && !state.isPast) {
+        } else if (!allowAllDates && state.isClosed && !state.isPast) {
             if (!state.myAppointment) {
                 badgeHtml += CALENDAR_THEME.statuses.clinicClosed.badge();
             }
@@ -557,7 +566,7 @@
                 tooltipBg = CALENDAR_THEME.statuses.clinicClosed.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.clinicClosed.tooltipArrow;
             }
-        } else if (state.isPast && !state.hasCompletedAppointment) {
+        } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
             if (!tooltip) {
                 tooltip = `
             <i class="fa-solid fa-clock-rotate-left mr-1"></i>
@@ -581,21 +590,21 @@
             }
         }
 
-        if (state.isHoliday) {} else if (state.isToday && calendarConfig.disallowToday) {
+        if (state.isHoliday && !allowAllDates) {} else if (!allowAllDates && state.isToday && calendarConfig.disallowToday) {
             tooltip = `
         <i class="fa-solid fa-calendar-day mr-1"></i>
         Same-day booking is not allowed
     `;
             tooltipBg = "bg-gray-600";
             tooltipArrow = "after:border-t-gray-600";
-        } else if (state.isPast && !state.hasCompletedAppointment) {
+        } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
             tooltip = `
         <i class="fa-solid fa-clock-rotate-left mr-1"></i>
         Past date — booking not allowed
     `;
             tooltipBg = "bg-gray-500";
             tooltipArrow = "after:border-t-gray-500";
-        } else if (state.isClosed) {
+        } else if (!allowAllDates && state.isClosed) {
             tooltip = `
         <i class="fa-solid fa-circle-minus mr-1"></i>
         Clinic closed on this date
@@ -734,7 +743,7 @@
         const isDashboard =
             calendarConfig.mode === 'patient-dashboard';
 
-        const minimum = isDashboard ?
+        const minimum = (isDashboard || calendarConfig.allowPastDates) ?
             new Date(
                 todayDate.getFullYear(),
                 todayDate.getMonth() -
@@ -915,7 +924,7 @@
             maximum
         } = getMonthBounds();
         const endDate = new Date(maximum.getFullYear(), maximum.getMonth() + 1, 0);
-        const cursor = new Date(Math.max(todayDate.getTime(), minimum.getTime()));
+        const cursor = new Date(calendarConfig.allowPastDates ? minimum.getTime() : Math.max(todayDate.getTime(), minimum.getTime()));
 
         try {
             while (cursor <= endDate) {
@@ -986,6 +995,8 @@
         if (!container) return;
 
         const monthPicker = container.querySelector('[data-calendar-month-picker]');
+        const monthSelect = container.querySelector('[data-calendar-month-select]');
+        const yearSelect = container.querySelector('[data-calendar-year-select]');
 
         monthPicker?.addEventListener('change', event => {
             const [year, month] = String(event.target.value)
@@ -1004,6 +1015,36 @@
 
             renderCalendar();
         });
+
+        function updateCalendarFromSplitSelectors() {
+            const selectedMonth = Number(monthSelect?.value);
+            const selectedYear = Number(yearSelect?.value);
+
+            if (Number.isNaN(selectedMonth) || Number.isNaN(selectedYear)) return;
+
+            const candidate = new Date(selectedYear, selectedMonth, 1);
+            const {
+                minimum,
+                maximum
+            } = getMonthBounds();
+
+            if (candidate < minimum || candidate > maximum) {
+                return;
+            }
+
+            clearTimeout(dashboardLoadingTimer);
+            dashboardLoadingTimer = null;
+
+            currentYear = selectedYear;
+            currentMonth = selectedMonth;
+            selectedDate = null;
+            focusedDateIso = null;
+
+            renderCalendar();
+        }
+
+        monthSelect?.addEventListener('change', updateCalendarFromSplitSelectors);
+        yearSelect?.addEventListener('change', updateCalendarFromSplitSelectors);
 
         container.querySelectorAll('[data-calendar-filter]').forEach(button => {
             button.addEventListener('click', async () => {
@@ -1028,6 +1069,7 @@
 
         const isDentist = calendarConfig.renderStyle === 'dentist';
         const isDashboard = calendarConfig.mode === 'patient-dashboard';
+        const showMonthYearShortcut = isDashboard || calendarConfig.enableMonthYearShortcut === true;
         const dayLabels = isDentist ? DAYS_DENTIST : DAYS_PATIENT;
 
         const firstDow = new Date(year, month, 1).getDay();
@@ -1046,6 +1088,19 @@
             <option value="${option.year}-${option.month}"
                 ${option.year === year && option.month === month ? 'selected' : ''}>
                 ${option.label}
+            </option>
+        `).join('');
+
+        const visibleMonthOptions = getVisibleMonthOptions();
+        const visibleYears = [...new Set(visibleMonthOptions.map(option => option.year))];
+        const splitMonthOptions = MONTHS.map((label, index) => `
+            <option value="${index}" ${index === month ? 'selected' : ''}>
+                ${label}
+            </option>
+        `).join('');
+        const splitYearOptions = visibleYears.map(optionYear => `
+            <option value="${optionYear}" ${optionYear === year ? 'selected' : ''}>
+                ${optionYear}
             </option>
         `).join('');
 
@@ -1118,22 +1173,42 @@
             </div>
         ` : '';
 
-        const monthControl = isDashboard ? `
-            <label class="calendar-month-picker-wrap">
-                <span class="sr-only">Choose month</span>
+        const monthControl = showMonthYearShortcut ? `
+            <div class="calendar-split-picker" aria-label="Choose month and year">
+                <label class="calendar-month-picker-wrap calendar-split-picker-item">
+                    <span class="sr-only">Choose month</span>
 
-                <select
-                    data-calendar-month-picker
-                    class="calendar-month-picker"
-                >
-                    ${monthOptions}
-                </select>
+                    <select
+                        ${isDashboard ? 'data-calendar-month-picker' : 'data-calendar-month-select'}
+                        class="calendar-month-picker"
+                    >
+                        ${isDashboard ? monthOptions : splitMonthOptions}
+                    </select>
 
-                <i
-                    class="fa-solid fa-chevron-down"
-                    aria-hidden="true"
-                ></i>
-            </label>
+                    <i
+                        class="fa-solid fa-chevron-down"
+                        aria-hidden="true"
+                    ></i>
+                </label>
+
+                ${isDashboard ? '' : `
+                    <label class="calendar-month-picker-wrap calendar-split-picker-item calendar-year-picker-wrap">
+                        <span class="sr-only">Choose year</span>
+
+                        <select
+                            data-calendar-year-select
+                            class="calendar-month-picker calendar-year-picker"
+                        >
+                            ${splitYearOptions}
+                        </select>
+
+                        <i
+                            class="fa-solid fa-chevron-down"
+                            aria-hidden="true"
+                        ></i>
+                    </label>
+                `}
+            </div>
         ` : `
             <div class="text-center">
                 <p class="cal-month-label text-base font-extrabold">
@@ -1516,6 +1591,8 @@
             }, iso);
         }
     }
+
+    window.selectDate = selectDate;
 
     function formatCalendarDateLabel(iso) {
         const [year, month, day] = iso.split('-').map(Number);

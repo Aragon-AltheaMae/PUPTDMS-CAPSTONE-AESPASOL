@@ -20,7 +20,8 @@ class RecordController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        $records = Appointment::where('patient_id', $patient->id)
+        $records = Appointment::with(['procedure', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')

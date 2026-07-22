@@ -3,6 +3,10 @@
 @section('layout-role', 'admin')
 @section('title', $transition->exists ? 'Edit Dentist Transition' : 'Create Dentist Transition')
 
+@section('styles')
+@vite('resources/css/pages/admin/dentist-continuity.css')
+@endsection
+
 @section('content')
 <main id="mainContent" class="admin-page-shell page-enter mode-list continuity-page">
     <div class="w-full dt-wrap">
@@ -33,5 +37,4 @@
         </div>
     </div>
 </main>
-@include('admin.dentist-transitions._styles')
 @endsection

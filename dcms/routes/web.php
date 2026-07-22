@@ -1176,6 +1176,22 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.start');
 
+    Route::get('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'createHistorical'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.create');
+
+    Route::post('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'storeHistoricalIntake'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.intake.store');
+
+    Route::get('/odontogram/historical/slots', [OdontogramController::class, 'historicalSlotsForDate'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.slots');
+
+    Route::get('/odontogram/patient/{patient}/historical/odontogram', [OdontogramController::class, 'showHistoricalOdontogram'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.odontogram');
+
     Route::get('/odontogram/appointment/{appointment}', [OdontogramController::class, 'show'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram');
@@ -1183,6 +1199,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/odontogram/appointment/{appointment}/save', [OdontogramController::class, 'save'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.save');
+
+    Route::post('/odontogram/patient/{patient}/historical/save', [OdontogramController::class, 'storeHistorical'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.store');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])
