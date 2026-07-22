@@ -10,6 +10,12 @@
 use Carbon\Carbon;
 $patientName = $patient->name ?? 'Unknown Patient';
 $today = Carbon::now()->format('F d, Y');
+$historicalMode = (bool) ($historicalMode ?? false);
+$pageEyebrow = $historicalMode ? 'Historical Appointment Import' : 'Dental Procedure Workspace';
+$pageTitle = $historicalMode ? 'Add Existing Appointment' : 'Patient Odontogram';
+$pageSubtitle = $historicalMode
+    ? 'Record previous manual appointments with notes, duration, and odontogram'
+    : '2D / 3D Treatment &amp; Condition Mapping';
 @endphp
 
 <main id="mainContent" class="odontogram-page pt-[100px] px-3 md:px-6 pb-6">
@@ -18,9 +24,10 @@ $today = Carbon::now()->format('F d, Y');
             <div class="odontogram-hero-main">
                 <div class="odontogram-hero-left">
                     <button type="button" id="cancelProcedureBtn" class="hero-danger-btn"
-                        data-tooltip="Cancel Procedure" aria-label="Cancel Procedure">
+                        data-tooltip="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}"
+                        aria-label="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}">
                         <i class="fa-solid fa-xmark"></i>
-                        <span>Cancel Procedure</span>
+                        <span>{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}</span>
                     </button>
 
                     <div class="hero-title-card">
@@ -28,9 +35,9 @@ $today = Carbon::now()->format('F d, Y');
                             <i class="fa-solid fa-tooth"></i>
                         </div>
                         <div>
-                            <p class="hero-eyebrow">Dental Procedure Workspace</p>
-                            <h1 class="hero-title">Patient Odontogram</h1>
-                            <p class="hero-subtitle">2D / 3D Treatment &amp; Condition Mapping</p>
+                            <p class="hero-eyebrow">{{ $pageEyebrow }}</p>
+                            <h1 class="hero-title">{{ $pageTitle }}</h1>
+                            <p class="hero-subtitle">{!! $pageSubtitle !!}</p>
                         </div>
                     </div>
                 </div>
@@ -43,11 +50,11 @@ $today = Carbon::now()->format('F d, Y');
 
                     <div class="hero-procedure-meta">
                         <div class="hero-stat">
-                            <span class="hero-stat-label">Procedure Time</span>
+                            <span class="hero-stat-label">{{ $historicalMode ? 'Session Timer' : 'Procedure Time' }}</span>
                             <span id="procedureTimer" class="hero-stat-value">00:00:00</span>
                         </div>
                         <div class="hero-stat">
-                            <span class="hero-stat-label">Date</span>
+                            <span class="hero-stat-label">{{ $historicalMode ? 'Entry Date' : 'Date' }}</span>
                             <span class="hero-stat-date">{{ $today }}</span>
                         </div>
                     </div>
@@ -309,6 +316,45 @@ $today = Carbon::now()->format('F d, Y');
                         </section>
 
                         <section class="right-section-card">
+                            @if ($historicalMode)
+                            <div class="right-section-head">
+                                <div>
+                                    <p class="right-section-eyebrow">Historical Appointment</p>
+                                    <h3 class="right-section-title">Old Appointment Details</h3>
+                                </div>
+                            </div>
+
+                            <div class="right-section-body space-y-4">
+                                <div class="historical-intro-card">
+                                    Review the imported patient history details below. When you save this odontogram, the old appointment will be stored as a completed visit in the system.
+                                </div>
+
+                                <div class="historical-grid">
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Service Type</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'service_type', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Date</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_date', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Time</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_time', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Procedure Duration</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'procedure_duration_hms', '—') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        @endif
+
+                        <section class="right-section-card">
                             <div class="right-section-head">
                                 <div>
                                     <p class="right-section-eyebrow">Clinical Documentation</p>
@@ -354,16 +400,18 @@ $today = Carbon::now()->format('F d, Y');
                 </div>
 
                 <div class="odontogram-right-bottom space-y-3">
+                    @unless ($historicalMode)
                     <button type="button" id="followUpBtn"
                         class="w-full flex justify-center items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold py-2.75 rounded-xl transition shadow-sm border border-amber-200">
                         <i class="fa-solid fa-calendar-plus"></i>
                         Follow-Up Appointment
                     </button>
+                    @endunless
 
                     <button type="button" id="finishProcedureBtn"
                         class="w-full flex justify-center items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-semibold py-2.75 rounded-xl transition shadow-md">
                         <i class="fa-solid fa-check"></i>
-                        Finish Procedure
+                        {{ $historicalMode ? 'Save Existing Appointment' : 'Finish Procedure' }}
                     </button>
                 </div>
             </div>
@@ -539,6 +587,7 @@ $today = Carbon::now()->format('F d, Y');
     </div>
 </div>
 
+@unless ($historicalMode)
 <div id="followUpModal"
     class="fixed inset-0 bg-black/50 hidden items-end sm:items-center justify-center backdrop-blur-sm z-[9999] p-0 sm:p-4">
 
@@ -686,12 +735,14 @@ $today = Carbon::now()->format('F d, Y');
         </div>
     </div>
 </div>
+@endunless
 
 @endsection
 
 @section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+@unless ($historicalMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'calendarContainerId' => 'followUpCalendarWrap',
@@ -732,6 +783,7 @@ $today = Carbon::now()->format('F d, Y');
 'useDynamicScheduleRules' => true,
 'renderStyle' => 'patient',
 ])
+@endunless
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const cancelProcedureBtn = document.getElementById('cancelProcedureBtn');
@@ -746,6 +798,7 @@ $today = Carbon::now()->format('F d, Y');
         const confirmFinishProcedureBtn = document.getElementById('confirmFinishProcedureBtn');
         const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
         const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
+        const historicalMode = @json($historicalMode);
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
         let finishProcedureModalCloseTimer = null;
@@ -2965,8 +3018,8 @@ $today = Carbon::now()->format('F d, Y');
 
         const finishProcedureBtn = document.getElementById('finishProcedureBtn');
         const followUpBtn = document.getElementById('followUpBtn');
-        const saveProcedureUrl = @json(route('dentist.odontogram.save', $appointment -> id));
-        const storeFollowUpUrl = @json(route('dentist.dentist.appointments.follow-up.store', $appointment -> id));
+        const saveProcedureUrl = @json($saveProcedureUrl ?? null);
+        const storeFollowUpUrl = @json(!$historicalMode && $appointment ? route('dentist.dentist.appointments.follow-up.store', $appointment -> id) : null);
 
         function showProcedureToast(message, type = 'success') {
             const existingToast = document.getElementById('procedureToast');
@@ -3418,10 +3471,15 @@ $today = Carbon::now()->format('F d, Y');
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
                 has_applied_treatment: hasAppliedTreatmentThisSession,
+                procedure_duration_seconds: historicalMode
+                    ? 0
+                    : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
             };
 
             finishProcedureBtn.disabled = true;
-            followUpBtn.disabled = true;
+            if (followUpBtn) {
+                followUpBtn.disabled = true;
+            }
 
             clickedButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}`;
 
@@ -3450,10 +3508,12 @@ $today = Carbon::now()->format('F d, Y');
 
                 if (completionAction === 'finished') {
                     openFinishProcedureModal({
-                        title: 'Procedure Completed!',
-                        message: 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
+                        title: historicalMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
+                        message: historicalMode
+                            ? 'The historical appointment, notes, duration, and odontogram were saved successfully.'
+                            : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
                         icon: 'fa-clipboard-check',
-                        buttonText: 'Back to Appointments',
+                        buttonText: historicalMode ? 'Back to Patient Profile' : 'Back to Appointments',
                         redirectUrl: result.redirect_url || null,
                     });
                 } else {
@@ -3471,7 +3531,9 @@ $today = Carbon::now()->format('F d, Y');
                 showProcedureToast('Something went wrong while saving the procedure.', 'error');
             } finally {
                 finishProcedureBtn.disabled = false;
-                followUpBtn.disabled = false;
+                if (followUpBtn) {
+                    followUpBtn.disabled = false;
+                }
                 clickedButton.innerHTML = originalButtonHtml;
             }
         }
@@ -3490,8 +3552,10 @@ $today = Carbon::now()->format('F d, Y');
             }
 
             openFinishProcedureModal({
-                title: 'Finish Procedure?',
-                message: 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+                title: historicalMode ? 'Save Existing Appointment?' : 'Finish Procedure?',
+                message: historicalMode
+                    ? 'Are you sure you want to save this historical appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
+                    : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
                 icon: 'fa-circle-question',
                 confirmation: true,
             });
@@ -3511,7 +3575,7 @@ $today = Carbon::now()->format('F d, Y');
             }
         });
 
-        followUpBtn.addEventListener('click', function () {
+        followUpBtn?.addEventListener('click', function () {
             openFollowUpModal();
         });
 

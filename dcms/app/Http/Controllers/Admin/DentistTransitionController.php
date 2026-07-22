@@ -66,7 +66,7 @@ class DentistTransitionController extends Controller
     {
         $this->authorizeAction('create_dentist_transitions');
 
-        return view('admin.dentist-transitions.create', [
+        return view('dentist.dentist-continuity', [
             'transition' => new DentistTransition(),
             'dentists' => $this->activeDentists(),
             'types' => DentistTransition::TYPES,
@@ -116,7 +116,7 @@ class DentistTransitionController extends Controller
     {
         $this->authorizeAction('update_dentist_transitions');
 
-        return view('admin.dentist-transitions.create', [
+        return view('dentist.dentist-continuity', [
             'transition' => $transition,
             'dentists' => $this->activeDentists($transition->dentist_id),
             'types' => DentistTransition::TYPES,

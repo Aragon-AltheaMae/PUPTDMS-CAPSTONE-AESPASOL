@@ -190,6 +190,17 @@ class DentistAppointmentController extends Controller
                 ->with('error', 'Patient not found for this appointment.');
         }
 
+        $patient->loadMissing([
+            'user',
+            'odontogram',
+            'medicalHistory.answers.question',
+            'medicalHistory.diseaseAnswers.disease',
+            'dentalHistory',
+            'dentalHistoryDates',
+            'dentalHistoryConcerns',
+            'dentalHistoryAnswers.condition',
+        ]);
+
         AuditLogger::log(
             'view',
             'dentist_patients',
@@ -198,13 +209,15 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $futureVisits = Appointment::where('patient_id', $patient->id)
+        $futureVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::where('patient_id', $patient->id)
+        $pastVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->where(function ($q) use ($today) {
                 $q->whereIn('status', ['completed', 'cancelled'])
                     ->orWhereDate('appointment_date', '<', $today);
@@ -220,16 +233,18 @@ class DentistAppointmentController extends Controller
         $notifications = collect([]);
 
 
-        return view('dentist.dentist-patientprofile', compact(
-            'patient',
-            'appointment',
-            'futureVisits',
-            'pastVisits',
-            'lastVisit',
-            'nextAppointment',
-            'totalVisits',
-            'notifications'
-        ));
+        return view('patient.shared-profile', [
+            'patient' => $patient,
+            'appointment' => $appointment,
+            'futureVisits' => $futureVisits,
+            'pastVisits' => $pastVisits,
+            'totalVisits' => $totalVisits,
+            'lastVisit' => $lastVisit,
+            'nextAppointment' => $nextAppointment,
+            'notifications' => $notifications,
+            'profileLayout' => 'layouts.dentist',
+            'profileMode' => 'dentist',
+        ]);
     }
 
     public function start($id)
