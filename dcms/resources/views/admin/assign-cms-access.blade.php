@@ -323,6 +323,7 @@
         let fullListLoaded = false;
         let isDropdownMode = false;
         let usersFetchPromise = null;
+        let searchRequestSerial = 0;
 
         @if ($errors -> any())
             window.showToast?.({
@@ -477,23 +478,87 @@
             showResults();
         }
 
-        async function fetchAllUsers() {
-            if (fullListLoaded) return fullUserList;
-            if (usersFetchPromise) return usersFetchPromise;
+        function normalizeSearchText(value) {
+            return String(value ?? '')
+                .toLowerCase()
+                .replace(/[^a-z0-9@\s._-]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
 
-            usersFetchPromise = fetch('/admin/external-admins/search', {
+        function buildSearchTokens(value) {
+            return normalizeSearchText(value).split(' ').filter(Boolean);
+        }
+
+        function scoreSearchValue(haystack, query, tokens) {
+            const normalizedHaystack = normalizeSearchText(haystack);
+            if (!normalizedHaystack) return -1;
+            if (normalizedHaystack === query) return 1000;
+            if (normalizedHaystack.startsWith(query)) return 800;
+            if (tokens.length && tokens.every(token => normalizedHaystack.includes(token))) {
+                return 500 - normalizedHaystack.indexOf(tokens[0]);
+            }
+            if (normalizedHaystack.includes(query)) return 250 - normalizedHaystack.indexOf(query);
+            return -1;
+        }
+
+        function scoreUser(user, query) {
+            const tokens = buildSearchTokens(query);
+            if (!tokens.length) return 0;
+
+            const values = [
+                user.full_name,
+                `${user.fname ?? ''} ${user.lname ?? ''}`,
+                user.email,
+                user.office,
+                user.admin_id,
+            ];
+
+            let best = -1;
+            values.forEach((value, index) => {
+                const score = scoreSearchValue(value, normalizeSearchText(query), tokens);
+                if (score >= 0) {
+                    best = Math.max(best, score - index * 10);
+                }
+            });
+
+            return best;
+        }
+
+        async function fetchUsers(query = '') {
+            const params = new URLSearchParams();
+            const trimmed = query.trim();
+            if (trimmed) {
+                params.set('search', trimmed);
+            }
+
+            const response = await fetch(`/admin/external-admins/search?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
-            })
-                .then(async res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    if (!data || !data.success || !Array.isArray(data.data)) throw new Error(
-                        'Invalid response format');
-                    fullUserList = data.data;
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data || !data.success || !Array.isArray(data.data)) {
+                throw new Error('Invalid response format');
+            }
+
+            return data.data;
+        }
+
+        async function fetchAllUsers() {
+            if (fullListLoaded) return fullUserList;
+            if (usersFetchPromise) return usersFetchPromise;
+
+            usersFetchPromise = fetchUsers('')
+                .then(users => {
+                    fullUserList = users;
                     fullListLoaded = true;
                     return fullUserList;
                 })
@@ -508,12 +573,18 @@
             return usersFetchPromise;
         }
 
-        function filterUsersLocally(query) {
-            const term = query.trim().toLowerCase();
-            if (!term) return [];
-            return fullUserList.filter(u => [u.full_name, u.fname, u.lname, u.email, u.office]
-                .some(v => String(v ?? '').toLowerCase().includes(term))
-            );
+        function rankUsers(users, query) {
+            const normalizedQuery = normalizeSearchText(query);
+            if (!normalizedQuery) return users;
+
+            return [...users]
+                .map(user => ({
+                    user,
+                    score: scoreUser(user, normalizedQuery),
+                }))
+                .filter(entry => entry.score >= 0)
+                .sort((a, b) => b.score - a.score)
+                .map(entry => entry.user);
         }
 
         searchInput.addEventListener('input', async function () {
@@ -523,23 +594,32 @@
             clearFormFields();
             isDropdownMode = false;
 
-            if (!fullListLoaded) {
-                await fetchAllUsers();
-            }
-
             if (!query) {
-                fullUserList.length
-                    ? renderResults(fullUserList)
+                const users = await fetchAllUsers();
+                users.length
+                    ? renderResults(users)
                     : renderNoResults('No users available.');
 
                 return;
             }
 
-            const filtered = filterUsersLocally(query);
+            const requestId = ++searchRequestSerial;
 
-            filtered.length
-                ? renderResults(filtered)
-                : renderNoResults('No results found.');
+            try {
+                const users = await fetchUsers(query);
+                if (requestId !== searchRequestSerial) return;
+
+                const filtered = rankUsers(users, query);
+
+                filtered.length
+                    ? renderResults(filtered)
+                    : renderNoResults('No matching users found.');
+            } catch (error) {
+                console.error('User search error:', error);
+                if (requestId !== searchRequestSerial) return;
+
+                renderNoResults('Unable to search users right now.');
+            }
         });
 
         async function openUserDropdown() {
@@ -552,11 +632,11 @@
             const query = searchInput.value.trim();
 
             if (query) {
-                const filtered = filterUsersLocally(query);
+                const filtered = rankUsers(fullUserList, query);
 
                 filtered.length
                     ? renderResults(filtered)
-                    : renderNoResults('No results found.');
+                    : renderNoResults('No matching users found.');
 
                 return;
             }
