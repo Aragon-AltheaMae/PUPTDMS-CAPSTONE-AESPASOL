@@ -76,21 +76,35 @@ class AdminPatientController extends Controller
 
     public function show(Patient $patient)
     {
+        $patient->loadMissing([
+            'user',
+            'odontogram',
+            'medicalHistory.answers.question',
+            'medicalHistory.diseaseAnswers.disease',
+            'dentalHistory',
+            'dentalHistoryDates',
+            'dentalHistoryConcerns',
+            'dentalHistoryAnswers.condition',
+        ]);
+
         $today = Carbon::today()->toDateString();
 
-        $appointments = Appointment::where('patient_id', $patient->id)
+        $appointments = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        $futureVisits = Appointment::where('patient_id', $patient->id)
+        $futureVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->whereDate('appointment_date', '>=', $today)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::where('patient_id', $patient->id)
+        $pastVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->where(function ($query) use ($today) {
                 $query->whereDate('appointment_date', '<', $today)
                     ->orWhereIn('status', ['completed', 'cancelled']);

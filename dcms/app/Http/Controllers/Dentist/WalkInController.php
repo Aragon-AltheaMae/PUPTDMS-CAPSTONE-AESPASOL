@@ -11,11 +11,13 @@ use App\Models\Disease;
 use App\Models\Patient;
 use App\Models\ServiceType;
 use App\Models\User;
+use App\Services\FacultyApiService;
 use App\Services\StudentApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -70,7 +72,11 @@ class WalkInController extends Controller
         ));
     }
 
-    public function searchPatient(Request $request, StudentApiService $studentApiService)
+    public function searchPatient(
+        Request $request,
+        FacultyApiService $facultyApiService,
+        StudentApiService $studentApiService
+    )
     {
         $search = trim((string) $request->query('q', ''));
         $showAll = $request->boolean('show_all');
@@ -81,13 +87,50 @@ class WalkInController extends Controller
         }
 
         try {
+            $patients = collect()
+                ->merge($this->searchOgosPatients($search, $limit, $studentApiService))
+                ->merge($this->searchFacultyPatients($search, $limit, $facultyApiService))
+                ->merge($this->searchExternalAdminPatients($search, $limit))
+                ->unique(fn (array $patient) => strtolower((string) ($patient['email'] ?? '')) . '|' . strtolower((string) ($patient['name'] ?? '')))
+                ->map(function (array $patient) use ($search) {
+                    $patient['_score'] = $this->scorePatientSearchMatch($patient, $search);
+                    return $patient;
+                })
+                ->filter(fn (array $patient) => $search === '' || (($patient['_score'] ?? -1) >= 0))
+                ->sortByDesc('_score')
+                ->take($limit)
+                ->filter()
+                ->map(function (array $patient) {
+                    unset($patient['_score']);
+                    return $patient;
+                })
+                ->values();
+
+            return response()->json($patients);
+        } catch (\Throwable $e) {
+            Log::error('Walk-in student API search failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'message' => 'Unable to load patient records from connected systems.',
+                'debug' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+    private function searchOgosPatients(string $search, int $limit, StudentApiService $studentApiService): array
+    {
+        try {
             $students = $studentApiService->searchStudents(
                 search: $search !== '' ? $search : null,
                 limit: $limit
             );
 
-            $patients = collect($students)
-                ->map(fn($student) => $studentApiService->normalizeStudent((array) $student))
+            return collect($students)
+                ->map(fn ($student) => $studentApiService->normalizeStudent((array) $student))
                 ->filter()
                 ->map(function (array $student) {
                     return DB::transaction(function () use ($student) {
@@ -104,21 +147,193 @@ class WalkInController extends Controller
                         ];
                     });
                 })
-                ->values();
-
-            return response()->json($patients);
+                ->all();
         } catch (\Throwable $e) {
-            Log::error('Walk-in student API search failed', [
+            Log::warning('Walk-in OGOS search failed', [
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
             ]);
 
-            return response()->json([
-                'message' => 'Unable to load student records from Guidance API.',
-                'debug' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return [];
         }
+    }
+
+    private function scorePatientSearchMatch(array $patient, string $search): int
+    {
+        $normalizedQuery = $this->normalizeSearchText($search);
+        if ($normalizedQuery === '') {
+            return 0;
+        }
+
+        $tokens = array_values(array_filter(explode(' ', $normalizedQuery)));
+        $values = [
+            $patient['name'] ?? '',
+            $patient['email'] ?? '',
+            $patient['student_number'] ?? '',
+            $patient['program'] ?? '',
+            $patient['type'] ?? '',
+        ];
+
+        $best = -1;
+
+        foreach ($values as $index => $value) {
+            $score = $this->scoreSearchValue((string) $value, $normalizedQuery, $tokens);
+            if ($score >= 0) {
+                $best = max($best, $score - ($index * 10));
+            }
+        }
+
+        return $best;
+    }
+
+    private function scoreSearchValue(string $haystack, string $query, array $tokens): int
+    {
+        $normalizedHaystack = $this->normalizeSearchText($haystack);
+        if ($normalizedHaystack === '') {
+            return -1;
+        }
+
+        if ($normalizedHaystack === $query) {
+            return 1000;
+        }
+
+        if (str_starts_with($normalizedHaystack, $query)) {
+            return 800;
+        }
+
+        if ($tokens !== [] && collect($tokens)->every(fn (string $token) => str_contains($normalizedHaystack, $token))) {
+            return 500 - strpos($normalizedHaystack, $tokens[0]);
+        }
+
+        if (str_contains($normalizedHaystack, $query)) {
+            return 250 - strpos($normalizedHaystack, $query);
+        }
+
+        return -1;
+    }
+
+    private function normalizeSearchText(string $value): string
+    {
+        $normalized = strtolower(trim($value));
+        $normalized = preg_replace('/[^a-z0-9@\s._-]/', ' ', $normalized) ?? '';
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? '';
+
+        return trim($normalized);
+    }
+
+    private function searchFacultyPatients(string $search, int $limit, FacultyApiService $facultyApiService): array
+    {
+        $faculties = collect($facultyApiService->getFaculties())
+            ->filter(function ($faculty) use ($search) {
+                if ($search === '') {
+                    return true;
+                }
+
+                $haystack = strtolower(implode(' ', array_filter([
+                    (string) ($faculty['name'] ?? ''),
+                    (string) ($faculty['email'] ?? ''),
+                    (string) ($faculty['faculty_code'] ?? ''),
+                    (string) data_get($faculty, 'profile.department'),
+                ])));
+
+                return str_contains($haystack, strtolower($search));
+            })
+            ->take($limit)
+            ->map(function (array $faculty) {
+                return DB::transaction(function () use ($faculty) {
+                    $name = trim((string) ($faculty['name'] ?? ''));
+                    $email = strtolower((string) ($faculty['email'] ?? ('faculty_' . Str::uuid() . '@walkin.local')));
+
+                    $user = $this->syncWalkInUser([
+                        'name' => $name !== '' ? $name : 'Faculty Member',
+                        'email' => $email,
+                    ]);
+
+                    $patient = $this->syncWalkInPatient($user, [
+                        'name' => $name !== '' ? $name : 'Faculty Member',
+                        'email' => $email,
+                        'phone' => $faculty['contact_number'] ?? null,
+                        'gender' => data_get($faculty, 'profile.gender'),
+                        'student_number' => null,
+                        'program' => $faculty['faculty_code'] ?? data_get($faculty, 'profile.department'),
+                        'faculty_code' => $faculty['faculty_code'] ?? null,
+                    ], 'Faculty');
+
+                    return [
+                        'id' => $patient->id,
+                        'name' => $patient->name,
+                        'email' => $patient->email,
+                        'type' => 'Faculty',
+                        'student_number' => null,
+                        'program' => $faculty['faculty_code'] ?? data_get($faculty, 'profile.department'),
+                    ];
+                });
+            });
+
+        return $faculties->all();
+    }
+
+    private function searchExternalAdminPatients(string $search, int $limit): array
+    {
+        $baseUrl = rtrim((string) env('OCMS_EXTERNAL_API_URL'), '/');
+        $apiKey = (string) env('OCMS_EXTERNAL_API_KEY');
+
+        if ($baseUrl === '' || $apiKey === '') {
+            return [];
+        }
+
+        $response = Http::timeout(15)
+            ->acceptJson()
+            ->withHeaders([
+                'X-External-Api-Key' => $apiKey,
+            ])
+            ->get($baseUrl . '/external/admins', array_filter([
+                'search' => $search !== '' ? $search : null,
+            ]));
+
+        if ($response->failed()) {
+            Log::error('OCMS external admin search failed during walk-in', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return [];
+        }
+
+        $records = collect(is_array($response->json('data')) ? $response->json('data') : [])
+            ->take($limit)
+            ->map(function (array $admin) {
+                return DB::transaction(function () use ($admin) {
+                    $name = trim((string) (($admin['name'] ?? '') ?: trim(((string) ($admin['first_name'] ?? '')) . ' ' . ((string) ($admin['last_name'] ?? '')))));
+                    $email = strtolower((string) (($admin['email'] ?? '') ?: ('admin_' . Str::uuid() . '@walkin.local')));
+                    $office = (string) ($admin['office'] ?? '');
+
+                    $user = $this->syncWalkInUser([
+                        'name' => $name !== '' ? $name : 'Administrative Patient',
+                        'email' => $email,
+                    ]);
+
+                    $patient = $this->syncWalkInPatient($user, [
+                        'name' => $name !== '' ? $name : 'Administrative Patient',
+                        'email' => $email,
+                        'phone' => $admin['emergency_contact_no'] ?? null,
+                        'gender' => $admin['gender'] ?? null,
+                        'student_number' => null,
+                        'program' => $office !== '' ? $office : null,
+                        'faculty_code' => null,
+                    ], 'Administrative');
+
+                    return [
+                        'id' => $patient->id,
+                        'name' => $patient->name,
+                        'email' => $patient->email,
+                        'type' => 'Administrative',
+                        'student_number' => null,
+                        'program' => $office !== '' ? $office : null,
+                    ];
+                });
+            });
+
+        return $records->all();
     }
 
     public function storeGuest(Request $request)
@@ -285,6 +500,10 @@ class WalkInController extends Controller
 
         if (Schema::hasColumn('patients', 'gender')) {
             $patientData['gender'] = $data['gender'] ?? null;
+        }
+
+        if (Schema::hasColumn('patients', 'faculty_code')) {
+            $patientData['faculty_code'] = $data['faculty_code'] ?? null;
         }
 
         if (Schema::hasColumn('patients', 'program_code')) {

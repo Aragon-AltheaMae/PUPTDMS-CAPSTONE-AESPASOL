@@ -487,10 +487,20 @@ class AppointmentController extends Controller
                     ]);
             }
         } else {
-            \Log::info('Store Appointment Signature Result', [
+            $aiResult = [
                 'accepted' => true,
                 'source' => 'drawn',
                 'reason' => 'Drawn signature skipped AI validation.',
+                'confidence' => 1,
+                'review_required' => false,
+                'review_status' => 'verified',
+                'detected_type' => 'drawn_signature',
+            ];
+
+            \Log::info('Store Appointment Signature Result', [
+                'accepted' => $aiResult['accepted'],
+                'source' => $aiResult['source'],
+                'reason' => $aiResult['reason'],
             ]);
         }
 

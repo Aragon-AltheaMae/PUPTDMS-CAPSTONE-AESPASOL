@@ -152,6 +152,15 @@ $notifCount = $notifications->count();
                 $fmtDate = $apptDate->format('F d, Y'); // Binago sa 'F' para sa Full Month (e.g., May)
                 $fmtTime = $apptTime->format('g:i A');
                 $fmtRange = $fmtTime . ' – ' . $apptTime->copy()->addHour()->format('g:i A');
+                $recordProcedure = $record->procedure;
+                $recordDuration = $recordProcedure?->procedure_duration_seconds
+                    ? \Carbon\CarbonInterval::seconds((int) $recordProcedure->procedure_duration_seconds)->cascade()->forHumans(['short' => true, 'minimumUnit' => 'second'])
+                    : ($record->duration
+                    ?? ($record->procedure_duration
+                    ?? ($record->treatment_duration ?? '60 mins')));
+                $recordTreatment = $recordProcedure?->completion_action
+                    ? \Illuminate\Support\Str::of($recordProcedure->completion_action)->replace('_', ' ')->title()
+                    : ($record->remarks ?? '');
                 @endphp
                 <div class="rec-row" style="animation-delay:{{ $i * 0.08 }}s;">
                     <div class="rec-tl">
@@ -173,9 +182,10 @@ $notifCount = $notifications->count();
                         <button class="rec-btn" onclick="openRecordModal(this)"
                             data-service="{{ $record->service_type }}" data-date="{{ $fmtDate }}"
                             data-time="{{ $record->appointment_time }}" data-status="{{ $record->status }}"
-                            data-duration="{{ $record->duration }}" data-remarks="{{ $record->remarks }}"
-                            data-oral="{{ $record->oral_examination }}" data-diagnosis="{{ $record->diagnosis }}"
-                            data-prescription="{{ $record->prescription }}">
+                            data-duration="{{ $recordDuration }}" data-remarks="{{ $recordTreatment }}"
+                            data-oral="{{ $recordProcedure?->oral_examination ?? '' }}"
+                            data-diagnosis="{{ $recordProcedure?->diagnosis ?? '' }}"
+                            data-prescription="{{ $recordProcedure?->prescriptions ?? '' }}">
                             View Details
                         </button>
                     </div>

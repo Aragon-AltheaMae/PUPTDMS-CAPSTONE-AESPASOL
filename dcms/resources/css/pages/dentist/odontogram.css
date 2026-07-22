@@ -132,6 +132,44 @@
     color: #9A3412;
 }
 
+.historical-intro-card {
+    background: linear-gradient(135deg, #fff7f7 0%, #fffdfd 100%);
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+    padding: 12px 14px;
+    color: #7f1d1d;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+.historical-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.historical-field {
+    min-height: 48px;
+}
+
+.historical-help-text {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.historical-summary-card {
+    border: 1px solid #e7ddd8;
+    background: #fff;
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    color: #2b221d;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
 .primary-action-btn {
     background: #8B0000;
     color: #ffffff;
@@ -235,6 +273,12 @@
 
 .legend-drawer-open {
     overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .historical-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .legend-drawer-header {

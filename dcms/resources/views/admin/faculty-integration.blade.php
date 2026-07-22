@@ -587,17 +587,65 @@
         }
 
         function filterFaculties(query) {
-            const q = query.trim().toLowerCase();
-            if (!q) return [];
+            const normalizedQuery = normalizeFacultySearchText(query);
+            if (!normalizedQuery) return [];
 
-            return faculties.filter(f => {
-                const name = `${f.first_name ?? ''} ${f.middle_name ?? ''} ${f.last_name ?? ''}`
-                    .toLowerCase();
-                return name.includes(q) ||
-                    (f.email ?? '').toLowerCase().includes(q) ||
-                    (f.faculty_code ?? '').toLowerCase().includes(q) ||
-                    (f.department ?? '').toLowerCase().includes(q);
+            return faculties
+                .map(faculty => ({
+                    faculty,
+                    score: scoreFacultyMatch(faculty, normalizedQuery),
+                }))
+                .filter(entry => entry.score >= 0)
+                .sort((a, b) => b.score - a.score)
+                .map(entry => entry.faculty);
+        }
+
+        function normalizeFacultySearchText(value) {
+            return String(value ?? '')
+                .toLowerCase()
+                .replace(/[^a-z0-9@\s._-]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildFacultySearchTokens(value) {
+            return normalizeFacultySearchText(value).split(' ').filter(Boolean);
+        }
+
+        function scoreFacultyValue(haystack, query, tokens) {
+            const normalizedHaystack = normalizeFacultySearchText(haystack);
+            if (!normalizedHaystack) return -1;
+            if (normalizedHaystack === query) return 1000;
+            if (normalizedHaystack.startsWith(query)) return 800;
+            if (tokens.length && tokens.every(token => normalizedHaystack.includes(token))) {
+                return 500 - normalizedHaystack.indexOf(tokens[0]);
+            }
+            if (normalizedHaystack.includes(query)) return 250 - normalizedHaystack.indexOf(query);
+            return -1;
+        }
+
+        function scoreFacultyMatch(faculty, query) {
+            const tokens = buildFacultySearchTokens(query);
+            if (!tokens.length) return 0;
+
+            const values = [
+                `${faculty.first_name ?? ''} ${faculty.middle_name ?? ''} ${faculty.last_name ?? ''}`,
+                faculty.email,
+                faculty.faculty_code,
+                faculty.department,
+                faculty.faculty_id,
+            ];
+
+            let best = -1;
+
+            values.forEach((value, index) => {
+                const score = scoreFacultyValue(value, query, tokens);
+                if (score >= 0) {
+                    best = Math.max(best, score - index * 10);
+                }
             });
+
+            return best;
         }
 
         const facultyForm = document.getElementById('facultyIntegrationForm');
