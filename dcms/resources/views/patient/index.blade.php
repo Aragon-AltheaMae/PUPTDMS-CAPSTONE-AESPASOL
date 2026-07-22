@@ -19,11 +19,17 @@ return [
 'date' => $r->appointment_date ? \Carbon\Carbon::parse($r->appointment_date)->format('F d, Y') : '',
 'time' => $r->appointment_time ?? '',
 'status' => strtolower($r->status ?? ''),
-'duration' => $r->duration ?? '',
-'remarks' => $r->remarks ?? '',
-'oral' => $r->oral_examination ?? '',
-'diagnosis' => $r->diagnosis ?? '',
-'prescription' => $r->prescription ?? '',
+'duration' => $r->procedure?->procedure_duration_seconds
+    ? \Carbon\CarbonInterval::seconds((int) $r->procedure->procedure_duration_seconds)->cascade()->forHumans(['short' => true, 'minimumUnit' => 'second'])
+    : ($r->duration
+    ?? ($r->procedure_duration
+    ?? ($r->treatment_duration ?? '60 mins'))),
+'remarks' => $r->procedure?->completion_action
+    ? \Illuminate\Support\Str::of($r->procedure->completion_action)->replace('_', ' ')->title()
+    : ($r->remarks ?? ''),
+'oral' => $r->procedure?->oral_examination ?? '',
+'diagnosis' => $r->procedure?->diagnosis ?? '',
+'prescription' => $r->procedure?->prescriptions ?? '',
 ];
 })
 ->values();
@@ -75,10 +81,17 @@ foreach (
             ?? optional($record->dentist)->name
             ?? 'Assigned Dentist',
 
-        'duration' => $record->duration ?? null,
-        'remarks' => $record->remarks ?? null,
-        'diagnosis' => $record->diagnosis ?? null,
-        'prescription' => $record->prescription ?? null,
+        'duration' => $record->procedure?->procedure_duration_seconds
+            ? \Carbon\CarbonInterval::seconds((int) $record->procedure->procedure_duration_seconds)->cascade()->forHumans(['short' => true, 'minimumUnit' => 'second'])
+            : ($record->duration
+            ?? ($record->procedure_duration
+            ?? ($record->treatment_duration ?? '60 mins'))),
+        'remarks' => $record->procedure?->completion_action
+            ? \Illuminate\Support\Str::of($record->procedure->completion_action)->replace('_', ' ')->title()
+            : ($record->remarks ?? null),
+        'oral' => $record->procedure?->oral_examination ?? null,
+        'diagnosis' => $record->procedure?->diagnosis ?? null,
+        'prescription' => $record->procedure?->prescriptions ?? null,
     ];
 }
 

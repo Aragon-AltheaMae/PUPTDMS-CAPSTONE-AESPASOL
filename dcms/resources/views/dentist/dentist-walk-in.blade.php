@@ -1572,9 +1572,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
     }
 
+    let patientSearchRequestId = 0;
+
     async function loadPatients(query = "", showAll = false) {
         if (!patientResults) return;
 
+        const requestId = ++patientSearchRequestId;
         renderPatientMessage("Loading patient records...");
 
         try {
@@ -1602,8 +1605,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
 
             const patients = await response.json();
+            if (requestId !== patientSearchRequestId) return;
             renderPatients(Array.isArray(patients) ? patients : []);
         } catch (error) {
+            if (requestId !== patientSearchRequestId) return;
             renderPatientMessage("Unable to load patient records. Please try again.");
         }
     }

@@ -77,4 +77,9 @@ class Appointment extends Model
     {
         return $this->hasMany(Appointment::class, 'follow_up_for_appointment_id');
     }
+
+    public function procedure()
+    {
+        return $this->hasOne(AppointmentProcedure::class);
+    }
 }

@@ -18,10 +18,10 @@ class StudentApiService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim((string) config('services.ogos.base_url'), '/');
-        $this->tokenUrl = (string) config('services.ogos.token_url');
-        $this->clientId = (string) config('services.ogos.client_id');
-        $this->clientSecret = (string) config('services.ogos.client_secret');
+        $this->baseUrl = rtrim(trim((string) config('services.ogos.base_url')), '/');
+        $this->tokenUrl = trim((string) config('services.ogos.token_url'));
+        $this->clientId = trim((string) config('services.ogos.client_id'));
+        $this->clientSecret = trim((string) config('services.ogos.client_secret'));
 
         $this->studentSearchPath = '/' . ltrim(
             (string) (config('services.ogos.student_search_path') ?: '/integrations/students/profiles'),
@@ -32,40 +32,87 @@ class StudentApiService
     public function getAccessToken(): string
     {
         return Cache::remember('ogos_student_api_access_token', now()->addMinutes(50), function () {
-            $response = Http::acceptJson()
-                ->asJson()
-                ->timeout(15)
-                ->post($this->tokenUrl, [
-                    'clientId' => $this->clientId,
-                    'clientSecret' => $this->clientSecret,
-                ]);
+            $attempts = [
+                [
+                    'label' => 'json-camel',
+                    'request' => fn () => Http::acceptJson()
+                        ->asJson()
+                        ->timeout(15)
+                        ->post($this->tokenUrl, [
+                            'clientId' => $this->clientId,
+                            'clientSecret' => $this->clientSecret,
+                        ]),
+                ],
+                [
+                    'label' => 'json-snake',
+                    'request' => fn () => Http::acceptJson()
+                        ->asJson()
+                        ->timeout(15)
+                        ->post($this->tokenUrl, [
+                            'client_id' => $this->clientId,
+                            'client_secret' => $this->clientSecret,
+                        ]),
+                ],
+                [
+                    'label' => 'form-snake',
+                    'request' => fn () => Http::acceptJson()
+                        ->asForm()
+                        ->timeout(15)
+                        ->post($this->tokenUrl, [
+                            'client_id' => $this->clientId,
+                            'client_secret' => $this->clientSecret,
+                        ]),
+                ],
+            ];
 
-            if (! $response->successful()) {
-                Log::error('Student API token request failed', [
+            $lastResponse = null;
+
+            foreach ($attempts as $attempt) {
+                $response = $attempt['request']();
+                $lastResponse = $response;
+
+                if ($response->successful()) {
+                    Log::info('Student API token request succeeded', [
+                        'url' => $this->tokenUrl,
+                        'attempt' => $attempt['label'],
+                    ]);
+
+                    $data = $response->json();
+
+                    $accessToken = data_get($data, 'data.accessToken')
+                        ?? data_get($data, 'data.access_token')
+                        ?? data_get($data, 'accessToken')
+                        ?? data_get($data, 'access_token');
+
+                    if (! $accessToken) {
+                        Log::error('Student API token missing in response', [
+                            'attempt' => $attempt['label'],
+                            'response' => $data,
+                        ]);
+
+                        throw new Exception('Student API access token not found.');
+                    }
+
+                    return $accessToken;
+                }
+
+                Log::warning('Student API token attempt failed', [
                     'url' => $this->tokenUrl,
+                    'attempt' => $attempt['label'],
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
-
-                throw new Exception('Failed to get student API access token.');
             }
 
-            $data = $response->json();
-
-            $accessToken = data_get($data, 'data.accessToken')
-                ?? data_get($data, 'data.access_token')
-                ?? data_get($data, 'accessToken')
-                ?? data_get($data, 'access_token');
-
-            if (! $accessToken) {
-                Log::error('Student API token missing in response', [
-                    'response' => $data,
+            if ($lastResponse) {
+                Log::error('Student API token request failed', [
+                    'url' => $this->tokenUrl,
+                    'status' => $lastResponse->status(),
+                    'body' => $lastResponse->body(),
                 ]);
-
-                throw new Exception('Student API access token not found.');
             }
 
-            return $accessToken;
+            throw new Exception('Failed to get student API access token.');
         });
     }
 
@@ -78,9 +125,14 @@ class StudentApiService
         $url = $this->baseUrl . $this->studentSearchPath;
 
         $query = [
-            'limit' => $limit,
-            'search' => $search !== null ? trim($search) : '',
+            'page' => 1,
+            'page_size' => $limit,
         ];
+
+        $trimmedSearch = $search !== null ? trim($search) : '';
+        if ($trimmedSearch !== '') {
+            $query['search'] = $trimmedSearch;
+        }
 
         Log::info('Student API search request', [
             'url' => $url,
@@ -216,6 +268,13 @@ class StudentApiService
             ?? data_get($student, 'mobile_number')
             ?? data_get($student, 'mobileNumber');
 
+        $programId = data_get($student, 'programId')
+            ?? data_get($student, 'program_id')
+            ?? data_get($student, 'program.id')
+            ?? data_get($student, 'courseId')
+            ?? data_get($student, 'course_id')
+            ?? data_get($student, 'course.id');
+
         $program = data_get($student, 'program.code')
             ?? data_get($student, 'program_code')
             ?? data_get($student, 'programCode')
@@ -248,6 +307,7 @@ class StudentApiService
             'name' => $name,
             'email' => strtolower($email),
             'phone' => $phone,
+            'programId' => $programId,
             'program' => $program,
             'gender' => $gender,
             'raw' => $student,

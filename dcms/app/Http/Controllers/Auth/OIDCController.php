@@ -517,8 +517,16 @@ class OIDCController extends Controller
         $phone = $studentData['mobileNumber'] ?? '';
         $facultyCode = null;
         $studentNo = $studentData['studentNumber'] ?? null;
-        $courseCode = $studentData['course']['code'] ?? null;
-        $courseName = $studentData['course']['name'] ?? null;
+        $programCode = $studentData['program']['code']
+            ?? $studentData['programCode']
+            ?? $studentData['course']['code']
+            ?? $studentData['courseCode']
+            ?? null;
+        $programName = $studentData['program']['name']
+            ?? $studentData['program']
+            ?? $studentData['course']['name']
+            ?? $studentData['course']
+            ?? null;
         $yearLevel = $studentData['yearLevel'] ?? null;
         $section = $studentData['section'] ?? null;
 
@@ -608,8 +616,8 @@ class OIDCController extends Controller
             'gender' => $gender,
             'faculty_code' => $facultyCode,
             'student_no' => $studentNo,
-            'course_code' => $courseCode,
-            'course_name' => $courseName,
+            'program_code' => $programCode,
+            'program_name' => $programName,
             'year_level' => $yearLevel,
             'section' => $section,
         ]);
@@ -623,8 +631,8 @@ class OIDCController extends Controller
             $patient->gender = $gender ?: $patient->gender;
             $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
             $patient->student_no = $studentNo ?: $patient->student_no;
-            $patient->course_code = $courseCode ?: $patient->course_code;
-            $patient->course_name = $courseName ?: $patient->course_name;
+            $patient->course_code = $programCode ?: $patient->course_code;
+            $patient->course_name = $programName ?: $patient->course_name;
             $patient->year_level = $yearLevel ?: $patient->year_level;
             $patient->section = $section ?: $patient->section;
             $patient->is_pwd = $patient->is_pwd ?? false;
@@ -650,8 +658,8 @@ class OIDCController extends Controller
             'password' => Hash::make(Str::random(16)),
             'faculty_code' => $facultyCode,
             'student_no' => $studentNo,
-            'course_code' => $courseCode,
-            'course_name' => $courseName,
+            'course_code' => $programCode,
+            'course_name' => $programName,
             'year_level' => $yearLevel,
             'section' => $section,
             'is_pwd' => false,

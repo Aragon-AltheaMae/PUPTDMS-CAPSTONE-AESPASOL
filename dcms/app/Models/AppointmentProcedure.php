@@ -17,10 +17,15 @@ class AppointmentProcedure extends Model
         'diagnosis',
         'prescriptions',
         'completion_action',
+        'procedure_started_at',
+        'procedure_completed_at',
+        'procedure_duration_seconds',
     ];
 
     protected $casts = [
         'odontogram_data' => 'array',
+        'procedure_started_at' => 'datetime',
+        'procedure_completed_at' => 'datetime',
     ];
 
     public function appointment()

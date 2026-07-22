@@ -685,6 +685,24 @@
     margin-inline: auto;
 }
 
+.calendar-split-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    width: min(100%, 320px);
+    margin-inline: auto;
+}
+
+.calendar-split-picker-item {
+    flex: 1 1 0;
+    width: auto;
+}
+
+.calendar-year-picker-wrap {
+    max-width: 112px;
+}
+
 .calendar-month-picker {
     width: 100%;
     min-height: 38px;
@@ -715,6 +733,12 @@
     color: #8B0000;
     font-size: .65rem;
     pointer-events: none;
+}
+
+.calendar-year-picker {
+    text-align: center;
+    padding-left: .8rem;
+    padding-right: 2rem;
 }
 
 .dashboard-calendar-toolbar {
