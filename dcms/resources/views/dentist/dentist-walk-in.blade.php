@@ -547,10 +547,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
                                 </div>
                             </div>
-                    </div>
+                        
 
                     <div class="step-content hidden">
-                        <div class="booking-step-shell">
                             <div class="booking-step-header">
                                 <p class="booking-step-eyebrow">Step 4 of 5</p>
                                 <h2 class="booking-step-title">Medical History</h2>
