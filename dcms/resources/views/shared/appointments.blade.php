@@ -81,6 +81,12 @@ $pastGrouped = $pastAppointments->groupBy(fn($a) => \Carbon\Carbon::parse($a->ap
 $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
 $allAppointments = $upcomingAppointments->merge($pastAppointments);
+$appointmentRefreshItems = $allAppointments
+->map(fn($appointment) => [
+'id' => $appointment->id,
+'updated_at' => optional($appointment->updated_at)->toISOString(),
+])
+->values();
 $normalizeAppointmentStatus = function ($status) {
 $normalized = strtolower(trim((string) ($status ?? '')));
 
@@ -234,7 +240,6 @@ $notifCount = $notifications->count();
             <div class="appointment-controls-bar">
                 <div class="appointment-control-copy">
                     <span class="appointment-control-kicker">Manage view</span>
-                    <span class="appointment-control-text">Switch layout or review appointment history.</span>
                 </div>
 
                 <div class="appointment-filter-wrap">
@@ -397,7 +402,9 @@ $notifCount = $notifications->count();
 
                         $studentNumber = filled($patient?->student_no)
                         ? $patient->student_no
-                        : 'No student number';
+                        : (filled($patient?->faculty_code)
+                        ? 'Faculty: ' . $patient->faculty_code
+                        : 'No identity number');
 
                         $courseCode = trim((string) ($patient?->course_code ?? ''));
                         $courseName = trim((string) ($patient?->course_name ?? ''));
@@ -553,7 +560,7 @@ $notifCount = $notifications->count();
                                     </span>
                                 </div>
 
-                                <div class="appt-actions-wrap">
+                                <div class="appt-actions-wrap ui-action-group">
 
                                     @if ($profileUrl)
                                     <a href="{{ $profileUrl }}" class="ui-action-btn ui-action-view"
@@ -584,7 +591,8 @@ $notifCount = $notifications->count();
 
                                     @if ($canRescheduleAppointment)
                                     <button type="button" class="ui-action-btn ui-action-warning"
-                                        data-tooltip="Reschedule appointment" data-tooltip-tone="reschedule" onclick="openRescheduleModal({
+                                        data-tooltip="Reschedule appointment" data-tooltip-tone="reschedule"
+                                        aria-label="Reschedule appointment" onclick="openRescheduleModal({
                 id: '{{ $appt->id }}',
                 name: @js($patientName),
                 datetime: @js($modalDatetime),
@@ -598,7 +606,8 @@ $notifCount = $notifications->count();
 
                                     @if ($canCancelAppointment)
                                     <button type="button" class="ui-action-btn ui-action-delete"
-                                        data-tooltip="Cancel appointment" data-tooltip-tone="cancel" onclick="cancelAppointmentFromModal(
+                                        data-tooltip="Cancel appointment" data-tooltip-tone="cancel"
+                                        aria-label="Cancel appointment" onclick="cancelAppointmentFromModal(
                 '{{ route('dentist.dentist.appointments.cancel', $appt->id) }}',
                 @js($patientName),
                 @js($dateLabel . ' | ' . $timeLabel)
@@ -632,7 +641,9 @@ $notifCount = $notifications->count();
 
                     $studentNumber = filled($patient?->student_no)
                     ? $patient->student_no
-                    : 'No student number';
+                    : (filled($patient?->faculty_code)
+                    ? 'Faculty: ' . $patient->faculty_code
+                    : 'No identity number');
 
                     $courseCode = trim((string) ($patient?->course_code ?? ''));
                     $courseName = trim((string) ($patient?->course_name ?? ''));
@@ -768,37 +779,38 @@ $notifCount = $notifications->count();
                             </span>
                         </div>
 
-                        <div class="bg-gray-50 rounded-xl p-3 mb-4 grid grid-cols-2 gap-3 border border-gray-100 ml-1">
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
-                                    Schedule Time</p>
-                                <span
-                                    class="time-chip text-[11px] bg-white w-full justify-center shadow-sm py-1.5 border-gray-200">
-                                    <i class="fa-regular fa-clock text-[#8B0000]"></i> {{ $timeLabel }}
+                        <div class="appointment-grid-details">
+                            <div class="appointment-grid-detail">
+                                <span class="appointment-grid-detail-label">
+                                    Schedule Time
+                                </span>
+
+                                <span class="time-chip">
+                                    <i class="fa-regular fa-clock"></i>
+                                    {{ $timeLabel }}
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
-                                    Service Type</p>
-                                <span
-                                    class="service-badge {{ $badgeClass }} text-[11px] w-full justify-center py-1.5 truncate shadow-sm border border-gray-100/50">
+
+                            <div class="appointment-grid-detail">
+                                <span class="appointment-grid-detail-label">
+                                    Service Type
+                                </span>
+
+                                <span class="service-badge {{ $badgeClass }}">
                                     {{ $serviceLabel }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="mobile-appt-actions">
-
+                        <div class="mobile-appt-actions ui-action-group">
                             @if ($profileUrl)
                             <a href="{{ $profileUrl }}" class="ui-action-btn ui-action-view" data-tooltip="View profile"
                                 aria-label="View profile">
-
                                 <i class="fa-regular fa-user"></i>
                             </a>
                             @else
                             <button type="button" class="ui-action-btn ui-action-view" data-tooltip="No patient profile"
                                 aria-label="No patient profile" disabled>
-
                                 <i class="fa-regular fa-user"></i>
                             </button>
                             @endif
@@ -806,47 +818,50 @@ $notifCount = $notifications->count();
                             @if ($canStartProcedure)
                             <button type="button"
                                 class="ui-action-btn ui-action-success {{ $isToday ? '' : 'is-start-locked' }}"
+                                data-tooltip="{{ $isToday
+        ? 'Start procedure'
+        : 'Start procedure is available on the appointment date only' }}"
+                                data-tooltip-tone="{{ $isToday ? 'start' : 'locked' }}"
                                 data-start-locked="{{ $isToday ? '0' : '1' }}"
                                 aria-disabled="{{ $isToday ? 'false' : 'true' }}"
                                 onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                 data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
                                 data-start-url="{{ route('dentist.odontogram', ['appointment' => $appt->id]) }}?from=appointments&start_procedure=1">
-
                                 <i class="fa-solid fa-play"></i>
-                                Start
                             </button>
                             @endif
 
                             @if ($canRescheduleAppointment)
-                            <button type="button" class="ui-action-btn ui-action-warning" onclick="openRescheduleModal({
+                            <button type="button" class="ui-action-btn ui-action-warning"
+                                data-tooltip="Reschedule appointment" data-tooltip-tone="reschedule"
+                                aria-label="Reschedule appointment" onclick="openRescheduleModal({
                 id: '{{ $appt->id }}',
                 name: @js($patientName),
                 datetime: @js($modalDatetime),
                 serviceType: @js($appt->service_type),
                 updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
             })">
-
-                                <i class="fa-solid fa-rotate-right text-[10px]"></i>
-                                Reschedule
+                                <i class="fa-solid fa-rotate-right"></i>
                             </button>
                             @endif
 
                             @if ($canCancelAppointment)
-                            <button type="button" class="ui-action-btn ui-action-delete" onclick="cancelAppointmentFromModal(
+                            <button type="button" class="ui-action-btn ui-action-delete"
+                                data-tooltip="Cancel appointment" data-tooltip-tone="cancel"
+                                aria-label="Cancel appointment" onclick="cancelAppointmentFromModal(
                 '{{ route('dentist.dentist.appointments.cancel', $appt->id) }}',
                 @js($patientName),
                 @js($dateLabel . ' | ' . $timeLabel)
             )">
-
-                                <i class="fa-solid fa-xmark text-[10px]"></i>
-                                Cancel
+                                <i class="fa-solid fa-xmark"></i>
                             </button>
                             @endif
                         </div>
-
                     </div>
-                    @endforeach
+
                 </div>
+                @endforeach
+            </div>
             </div>
         </details>
         @empty
@@ -1025,7 +1040,7 @@ $notifCount = $notifications->count();
                         $recordPrescription = $appt->prescription ?? '';
                         @endphp
 
-                        <div class="appt-card opacity-70" data-appt-id="{{ $appt->id }}" data-period="past"
+                        <div class="appt-card" data-appt-id="{{ $appt->id }}" data-period="past"
                             data-date="{{ $appt->appointment_date }}" data-patient="{{ strtolower($patientName) }}"
                             data-student-no="{{ strtolower($studentNumber) }}"
                             data-program="{{ strtolower($programFull) }}" data-service="{{ strtolower($serviceLabel) }}"
@@ -1035,10 +1050,9 @@ $notifCount = $notifications->count();
 
                             <div class="appointment-table-grid grid gap-4 items-center px-5 py-3.5">
 
-                                <div>
-                                    <p class="text-[13px] font-semibold text-gray-500">{{ $dateLabel }}
-                                    </p>
-                                    <p class="text-[11px] text-gray-400 mt-0.5">{{ $weekday }}</p>
+                                <div class="appt-row-date">
+                                    <p class="date-main">{{ $dateLabel }}</p>
+                                    <p class="date-sub">{{ $weekday }}</p>
                                 </div>
 
                                 <div><span class="time-chip text-gray-400"><i class="fa-regular fa-clock text-xs"></i>{{
@@ -1054,11 +1068,11 @@ $notifCount = $notifications->count();
                                         alt="{{ $patientName }}"
                                         class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 opacity-80">
                                     <div class="text-left min-w-0">
-                                        <p class="past-patient-name text-[13px] font-bold text-gray-500 leading-tight"
+                                        <p class="appt-patient-name text-[13px] font-bold text-gray-800 leading-tight"
                                             title="{{ $patientName }}">
                                             {{ $patientName }}</p>
-                                        <div class="appt-patient-meta">
-                                            <span class="appt-student-number">
+                                        <div class="global-info-group">
+                                            <span class="global-info-pill">
                                                 <i class="fa-regular fa-id-card"></i>
                                                 {{ $studentNumber }}
                                             </span>
@@ -1081,7 +1095,7 @@ $notifCount = $notifications->count();
                                             }}</span></span>
                                 </div>
 
-                                <div class="appt-actions-wrap">
+                                <div class="appt-actions-wrap ui-action-group">
 
                                     @if ($canViewTreatmentRecord)
                                     <button type="button" class="ui-action-btn ui-action-neutral"
@@ -1137,7 +1151,9 @@ $notifCount = $notifications->count();
 
                     $studentNumber = filled($patient?->student_no)
                     ? $patient->student_no
-                    : 'No student number';
+                    : (filled($patient?->faculty_code)
+                    ? 'Faculty: ' . $patient->faculty_code
+                    : 'No identity number');
 
                     $courseCode = trim((string) ($patient?->course_code ?? ''));
                     $courseName = trim((string) ($patient?->course_name ?? ''));
@@ -1206,17 +1222,17 @@ $notifCount = $notifications->count();
                     $recordPrescription = $appt->prescription ?? '';
                     @endphp
 
-                    <div class="mobile-appt-card opacity-75 border-gray-200" data-appt-id="{{ $appt->id }}"
-                        data-period="past" data-date="{{ $appt->appointment_date }}"
-                        data-patient="{{ strtolower($patientName) }}" data-student-no="{{ strtolower($studentNumber) }}"
-                        data-program="{{ strtolower($programFull) }}" data-service="{{ strtolower($serviceLabel) }}"
+                    <div class="mobile-appt-card" data-appt-id="{{ $appt->id }}" data-period="past"
+                        data-date="{{ $appt->appointment_date }}" data-patient="{{ strtolower($patientName) }}"
+                        data-student-no="{{ strtolower($studentNumber) }}" data-program="{{ strtolower($programFull) }}"
+                        data-service="{{ strtolower($serviceLabel) }}"
                         data-patient-id="{{ strtolower((string) ($appt->patient_id ?? '')) }}"
                         data-status="{{ $isCancelledPast ? 'cancelled' : 'completed' }}"
                         style="animation-delay:{{ $i * 0.04 }}s">
                         <div class="pl-1">
                             <div class="flex items-start justify-between gap-2 mb-3">
                                 <div class="min-w-0">
-                                    <p class="past-grid-name text-[14px] font-extrabold text-gray-500"
+                                    <p class="mobile-patient-name text-[15px] font-extrabold text-gray-800 leading-snug"
                                         title="{{ $patientName }}">
                                         {{ $patientName }}
                                     </p>
@@ -1244,47 +1260,54 @@ $notifCount = $notifications->count();
                                         class="past-status-text">{{ $pastStatusLabel }}</span></span>
                             </div>
 
-                            <div class="bg-gray-50 rounded-xl p-2.5 grid grid-cols-2 gap-2 border border-gray-100 mb-3">
-                                <span
-                                    class="time-chip text-[11px] text-gray-400 bg-white w-full justify-center shadow-sm py-1.5 border-gray-100">
-                                    <i class="fa-regular fa-clock"></i> {{ $timeLabel }}
-                                </span>
-                                <span
-                                    class="service-badge {{ $badgeClass }} opacity-70 text-[11px] w-full justify-center py-1.5 truncate border border-gray-100/50">
-                                    {{ $serviceLabel }}
-                                </span>
+                            <div class="appointment-grid-details">
+                                <div class="appointment-grid-detail">
+                                    <span class="appointment-grid-detail-label">
+                                        Schedule Time
+                                    </span>
+
+                                    <span class="time-chip">
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ $timeLabel }}
+                                    </span>
+                                </div>
+
+                                <div class="appointment-grid-detail">
+                                    <span class="appointment-grid-detail-label">
+                                        Service Type
+                                    </span>
+
+                                    <span class="service-badge {{ $badgeClass }}">
+                                        {{ $serviceLabel }}
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="mobile-appt-actions">
-
+                            <div class="mobile-appt-actions ui-action-group">
                                 @if ($canViewTreatmentRecord)
                                 <button type="button" class="ui-action-btn ui-action-neutral"
-                                    onclick="openRecordModal(this)" data-appt-id="{{ $appt->id }}"
-                                    data-service="{{ $serviceLabel }}" data-date="{{ $dateLabel }}"
-                                    data-time="{{ $timeLabel }}" data-status="{{ $pastStatusLabel }}"
-                                    data-duration="{{ $recordDuration }}" data-remarks="{{ $recordRemarks }}"
-                                    data-oral="{{ $recordOral }}" data-diagnosis="{{ $recordDiagnosis }}"
+                                    data-tooltip="View details" onclick="openRecordModal(this)"
+                                    data-appt-id="{{ $appt->id }}" data-service="{{ $serviceLabel }}"
+                                    data-date="{{ $dateLabel }}" data-time="{{ $timeLabel }}"
+                                    data-status="{{ $pastStatusLabel }}" data-duration="{{ $recordDuration }}"
+                                    data-remarks="{{ $recordRemarks }}" data-oral="{{ $recordOral }}"
+                                    data-diagnosis="{{ $recordDiagnosis }}"
                                     data-prescription="{{ $recordPrescription }}">
-
-                                    <i class="fa-regular fa-eye text-[10px]"></i>
-                                    Details
+                                    <i class="fa-regular fa-eye"></i>
                                 </button>
                                 @endif
 
                                 @if ($profileUrl)
                                 <a href="{{ $profileUrl }}" class="ui-action-btn ui-action-view"
                                     data-tooltip="View profile" aria-label="View profile">
-
                                     <i class="fa-regular fa-user"></i>
                                 </a>
                                 @else
                                 <button type="button" class="ui-action-btn ui-action-view"
                                     data-tooltip="No patient profile" aria-label="No patient profile" disabled>
-
                                     <i class="fa-regular fa-user"></i>
                                 </button>
                                 @endif
-
                             </div>
                         </div>
                     </div>
@@ -1489,10 +1512,6 @@ $notifCount = $notifications->count();
     </div>
 </div>
 
-<div id="actionTooltip" class="action-tooltip">
-    <div class="action-tooltip-bubble" id="actionTooltipText"></div>
-</div>
-
 @if ($isDentistView)
 <div id="startProcedureModal"
     class="start-procedure-overlay fixed inset-0 hidden z-[9999] items-end sm:items-center justify-center p-0 sm:p-4">
@@ -1561,6 +1580,50 @@ $notifCount = $notifications->count();
 
 @section('scripts')
 <script>
+    const APPOINTMENT_REFRESH_ITEMS = @json($appointmentRefreshItems);
+    const APPOINTMENT_REFRESH_URL = window.location.href;
+    let appointmentRefreshWatcher = null;
+
+    function initAppointmentRefreshWatcher() {
+        if (!window.initGlobalRefreshWatcher) return;
+
+        appointmentRefreshWatcher = window.initGlobalRefreshWatcher({
+            key: @json($isDentistView ? 'dentist-appointments' : 'admin-appointments'),
+            url: APPOINTMENT_REFRESH_URL,
+            initialItems: APPOINTMENT_REFRESH_ITEMS,
+            anchorSelector: '#mainContent.shared-appointments-page .appointment-controls-bar',
+            itemLabel: 'appointment',
+
+            getItems(payload) {
+                if (Array.isArray(payload)) {
+                    return payload;
+                }
+
+                return Array.isArray(payload?.appointments)
+                    ? payload.appointments
+                    : [];
+            },
+
+            getItemId(appointment) {
+                return appointment?.id;
+            },
+
+            title(count) {
+                return `${count} new appointment${count === 1 ? '' : 's'} available`;
+            },
+
+            subtitle(count) {
+                return `Refresh to see the latest appointment update${count === 1 ? '' : 's'}.`;
+            },
+
+            onRefresh() {
+                window.location.reload();
+            },
+
+            toast: false
+        });
+    }
+
     function normalizeCancelReasonLabel(reason) {
         reason = String(reason || '').trim();
         if (!reason) return '';
@@ -1598,72 +1661,7 @@ $notifCount = $notifications->count();
 
     document.addEventListener('DOMContentLoaded', hydratePastCancellationReasons);
 
-    function initActionTooltips() {
-        const tooltip = document.getElementById('actionTooltip');
-        const tooltipText = document.getElementById('actionTooltipText');
-
-        if (!tooltip || !tooltipText) return;
-
-        const targets = document.querySelectorAll(
-            '.appt-actions-wrap [data-tooltip], .mobile-appt-actions [data-tooltip]'
-        );
-
-        const toneClasses = [
-            'tooltip-view',
-            'tooltip-start',
-            'tooltip-reschedule',
-            'tooltip-cancel',
-            'tooltip-locked'
-        ];
-
-        const showTooltip = (el) => {
-            const message = el.dataset.tooltip || '';
-            if (!message) return;
-
-            const tone = el.dataset.tooltipTone || 'default';
-
-            tooltip.classList.remove(...toneClasses);
-            tooltip.classList.add(`tooltip-${tone}`);
-
-            tooltipText.textContent = message;
-            tooltip.classList.add('show');
-
-            requestAnimationFrame(() => {
-                const rect = el.getBoundingClientRect();
-                const tooltipRect = tooltip.getBoundingClientRect();
-
-                let top = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
-                let left = rect.left - tooltipRect.width - 12;
-
-                if (left < 8) {
-                    left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-                    top = rect.top - tooltipRect.height - 10;
-                }
-
-                tooltip.style.top = `${Math.max(8, top)}px`;
-                tooltip.style.left = `${Math.max(8, left)}px`;
-            });
-        };
-
-        const hideTooltip = () => {
-            tooltip.classList.remove('show');
-            tooltip.classList.remove(...toneClasses);
-        };
-
-        targets.forEach((el) => {
-            el.addEventListener('mouseenter', () => showTooltip(el));
-            el.addEventListener('mouseleave', hideTooltip);
-            el.addEventListener('focus', () => showTooltip(el));
-            el.addEventListener('blur', hideTooltip);
-        });
-
-        window.addEventListener('scroll', hideTooltip, true);
-        window.addEventListener('resize', hideTooltip);
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-        initActionTooltips();
-
         if (typeof initRecordModal === 'function') {
             initRecordModal();
         }
@@ -1914,6 +1912,7 @@ $notifCount = $notifications->count();
         updateAppointmentFilterButtonState();
         revealAppointmentContainer?.();
         setupAppointmentAccordions();
+        initAppointmentRefreshWatcher();
     });
 
     function getAppointmentFilterModal() {
@@ -2180,21 +2179,60 @@ $notifCount = $notifications->count();
         setStatusEmptyContent('Upcoming');
         setStatusEmptyContent('Past');
 
-        const showUpcomingSearchEmpty = upcomingAllowed && hasSearch && !upcomingVisible;
-        const showPastSearchEmpty = pastAllowed && hasSearch && !pastVisible;
+        const showCombinedSearchEmpty =
+            appointmentPeriodFilter === 'all' &&
+            hasSearch &&
+            !upcomingVisible &&
+            !pastVisible;
+
+        const showUpcomingSearchEmpty =
+            hasSearch &&
+            (
+                showCombinedSearchEmpty ||
+                (
+                    appointmentPeriodFilter === 'upcoming' &&
+                    !upcomingVisible
+                )
+            );
+
+        const showPastSearchEmpty =
+            hasSearch &&
+            appointmentPeriodFilter === 'past' &&
+            !pastVisible;
+
+        const showCombinedPanelEmpty =
+            appointmentPeriodFilter === 'all' &&
+            !hasSearch &&
+            hasPanelFilters &&
+            !upcomingVisible &&
+            !pastVisible;
 
         const showUpcomingStatusEmpty =
-            upcomingAllowed &&
             !hasSearch &&
-            (hasPanelFilters || hasDropdownStatusFilter) &&
-            !upcomingVisible;
+            (
+                showCombinedPanelEmpty ||
+                (
+                    appointmentPeriodFilter === 'upcoming' &&
+                    (hasPanelFilters || hasDropdownStatusFilter) &&
+                    !upcomingVisible
+                )
+            );
 
         const showPastStatusEmpty =
-            pastAllowed &&
             !hasSearch &&
+            appointmentPeriodFilter === 'past' &&
             (hasPanelFilters || hasDropdownStatusFilter) &&
             !pastVisible;
 
+        const upcomingSection = document.getElementById('upcomingSection');
+        const pastSection = document.getElementById('pastSection');
+
+        if (appointmentPeriodFilter === 'all' && (hasSearch || hasPanelFilters)) {
+            const noCombinedResults = !upcomingVisible && !pastVisible;
+
+            upcomingSection?.classList.toggle('hidden', false);
+            pastSection?.classList.toggle('hidden', noCombinedResults);
+        }
         const isDefaultState = !hasSearch &&
             !hasPanelFilters &&
             !hasDropdownStatusFilter &&
@@ -2480,44 +2518,6 @@ $notifCount = $notifications->count();
             content?.classList.remove('is-skeleton-hidden');
             content?.classList.add('is-ready');
         }, 320);
-    }
-
-    function setupAppointmentAccordions() {
-        document.querySelectorAll('details.appt-month-group').forEach((group) => {
-            const summary = group.querySelector('summary');
-            if (!summary || group.dataset.accordionReady === 'true') return;
-
-            group.dataset.accordionReady = 'true';
-
-            summary.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                if (group.dataset.animating === 'true') return;
-
-                if (group.open) {
-                    group.dataset.animating = 'true';
-                    group.classList.add('is-closing');
-
-                    setTimeout(() => {
-                        group.open = false;
-                        group.classList.remove('is-closing');
-                        group.dataset.animating = 'false';
-                    }, 220);
-
-                    return;
-                }
-
-                group.open = true;
-                group.dataset.animating = 'true';
-                group.classList.remove('is-closing');
-                group.classList.add('is-opening');
-
-                setTimeout(() => {
-                    group.classList.remove('is-opening');
-                    group.dataset.animating = 'false';
-                }, 280);
-            });
-        });
     }
 </script>
 @endsection

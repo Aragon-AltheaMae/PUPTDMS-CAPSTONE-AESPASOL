@@ -734,10 +734,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                 <div class="fp-date-input-wrap">
                                     <input type="text" id="addBirthdateInput" name="birthdate"
-                                        value="{{ old('birthdate') }}"
-                                        class="field-input fp-date-input js-flatpickr-date-max-today"
-                                        placeholder="Select birthdate" autocomplete="off"
-                                        data-validation-rule="notFutureDate" readonly>
+                                        value="{{ old('birthdate') }}" class="field-input fp-date-input js-flatpickr-date-max-today
+        w-full border border-gray-200 rounded-lg px-3.5 py-3 bg-white" placeholder="Select birthdate"
+                                        autocomplete="off" data-validation-rule="notFutureDate" readonly>
 
                                     <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
                                 </div>
@@ -1009,10 +1008,9 @@ $inactiveCount = $inactiveCount ?? 0;
                         </label>
 
                         <div class="fp-date-input-wrap">
-                            <input type="text" id="editBirthdate" name="birthdate"
-                                class="field-input fp-date-input js-flatpickr-date-max-today"
-                                placeholder="Select birthdate" autocomplete="off" data-validation-rule="notFutureDate"
-                                readonly>
+                            <input type="text" id="editBirthdate" name="birthdate" class="field-input fp-date-input js-flatpickr-date-max-today
+        w-full border border-gray-200 rounded-lg px-3.5 py-3 bg-white" placeholder="Select birthdate"
+                                autocomplete="off" data-validation-rule="notFutureDate" readonly>
 
                             <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
                         </div>
@@ -2122,7 +2120,9 @@ $inactiveCount = $inactiveCount ?? 0;
                 gender_raw: ''
             }))}"
                                 onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                                class="ui-action-btn ui-action-edit" title="Edit account">
+                                class="ui-action-btn ui-action-edit"
+data-tooltip="Edit account" data-tooltip-tone="edit"
+aria-label="Edit account">
                                 <i class="fa-solid fa-pen text-[11px]"></i>
                             </button>
 
@@ -2144,7 +2144,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                             <button type="button"
                                 onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                                class="ui-action-btn ui-action-reset" title="Reset password">
+                                class="ui-action-btn ui-action-reset"
+                                data-tooltip="Reset password"
+                                aria-label="Reset password">
                                 <i class="fa-solid fa-key text-[11px]"></i>
                             </button>
 
@@ -2227,7 +2229,9 @@ $inactiveCount = $inactiveCount ?? 0;
                 gender_raw: ''
             }))}"
                             onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                            class="ui-action-btn ui-action-edit" title="Edit account">
+                            class="ui-action-btn ui-action-edit"
+data-tooltip="Edit account" data-tooltip-tone="edit"
+aria-label="Edit account">
                             <i class="fa-solid fa-pen text-[11px]"></i>
                         </button>
 
@@ -2240,7 +2244,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                         <button type="button"
                             onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                            class="ui-action-btn ui-action-reset" title="Reset password">
+                            class="ui-action-btn ui-action-reset"
+data-tooltip="Reset password"
+aria-label="Reset password">
                             <i class="fa-solid fa-key text-[11px]"></i>
                         </button>
 
@@ -2255,7 +2261,9 @@ $inactiveCount = $inactiveCount ?? 0;
                 created_at: createdFull
             }))}"
                             onclick="openViewModalFromButton(this)"
-                            class="ui-action-btn ui-action-view" title="View details">
+                            class="ui-action-btn ui-action-view"
+data-tooltip="View details"
+aria-label="View details">
                             <i class="fa-solid fa-eye text-[11px]"></i>
                         </button>
                     </div>

@@ -17,7 +17,7 @@ class InventoryController extends Controller
             'Dentist viewed inventory page'
         );
 
-        return view('admin.admin-inventory', [
+        return view('shared.inventory', [
             'notifications' => collect([]),
 
             'layoutRole' => 'dentist',

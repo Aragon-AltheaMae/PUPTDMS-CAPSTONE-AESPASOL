@@ -1,4 +1,5 @@
 import './bootstrap';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import Chart from 'chart.js/auto';
 import JSVoice from 'jsvoice';
 
@@ -875,6 +876,164 @@ function initSearchClearButtons(
         )
         .forEach(bindInputClearButton);
 }
+
+function initGlobalActionTooltips() {
+    const tooltip = document.getElementById('globalActionTooltip');
+
+    if (!tooltip || tooltip.dataset.initialized === 'true') {
+        return;
+    }
+
+    tooltip.dataset.initialized = 'true';
+
+    const toneClasses = [
+        'tooltip-view',
+        'tooltip-start',
+        'tooltip-reschedule',
+        'tooltip-cancel',
+        'tooltip-delete',
+        'tooltip-edit',
+        'tooltip-reset',
+        'tooltip-locked',
+        'tooltip-neutral'
+    ];
+
+    let activeTarget = null;
+
+    function hideTooltip() {
+        tooltip.classList.remove('show', ...toneClasses);
+        tooltip.setAttribute('aria-hidden', 'true');
+        tooltip.textContent = '';
+        activeTarget = null;
+    }
+
+    function positionTooltip(target) {
+        const targetRect = target.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+
+        const viewportPadding = 12;
+        const gap = 10;
+
+        let left =
+            targetRect.left +
+            targetRect.width / 2 -
+            tooltipRect.width / 2;
+
+        let top =
+            targetRect.top -
+            tooltipRect.height -
+            gap;
+
+        if (top < viewportPadding) {
+            top = targetRect.bottom + gap;
+        }
+
+        const maximumLeft =
+            window.innerWidth -
+            tooltipRect.width -
+            viewportPadding;
+
+        const maximumTop =
+            window.innerHeight -
+            tooltipRect.height -
+            viewportPadding;
+
+        left = Math.min(
+            Math.max(viewportPadding, left),
+            Math.max(viewportPadding, maximumLeft)
+        );
+
+        top = Math.min(
+            Math.max(viewportPadding, top),
+            Math.max(viewportPadding, maximumTop)
+        );
+
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+    }
+
+    function showTooltip(target) {
+        const message = target.dataset.tooltip?.trim();
+
+        if (!message) {
+            return;
+        }
+
+        activeTarget = target;
+
+        const tone =
+            target.dataset.tooltipTone ||
+            (target.classList.contains('ui-action-view')
+                ? 'view'
+                : target.classList.contains('ui-action-success')
+                    ? 'start'
+                    : target.classList.contains('ui-action-warning')
+                        ? 'reschedule'
+                        : target.classList.contains('ui-action-delete')
+                            ? 'delete'
+                            : target.classList.contains('ui-action-edit')
+                                ? 'edit'
+                                : target.classList.contains('ui-action-reset')
+                                    ? 'reset'
+                                    : 'neutral');
+
+        tooltip.classList.remove(...toneClasses);
+        tooltip.classList.add(`tooltip-${tone}`);
+
+        tooltip.textContent = message;
+        tooltip.setAttribute('aria-hidden', 'false');
+        tooltip.classList.add('show');
+
+        requestAnimationFrame(() => {
+            if (activeTarget === target) {
+                positionTooltip(target);
+            }
+        });
+    }
+
+    document.addEventListener('pointerover', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (!target) {
+            return;
+        }
+
+        showTooltip(target);
+    });
+
+    document.addEventListener('pointerout', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (!target) {
+            return;
+        }
+
+        if (target.contains(event.relatedTarget)) {
+            return;
+        }
+
+        hideTooltip();
+    });
+
+    document.addEventListener('focusin', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (target) {
+            showTooltip(target);
+        }
+    });
+
+    document.addEventListener('focusout', event => {
+        if (event.target.closest('[data-tooltip]')) {
+            hideTooltip();
+        }
+    });
+
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('resize', hideTooltip);
+}
+
+document.addEventListener('DOMContentLoaded', initGlobalActionTooltips);
 
 document.addEventListener(
     'reset',
@@ -4298,47 +4457,6 @@ window.initGlobalPageSizeSelects = initGlobalPageSizeSelects;
 window.syncGlobalPageSizeSelect = syncGlobalPageSizeSelect;
 window.setGlobalPageSizeValue = setGlobalPageSizeValue;
 
-function initDashboardLogsViewToggle() {
-    const root = document.getElementById('mainContent');
-    const toggle = document.getElementById('dashboardLogsViewToggle');
-    const listView = document.getElementById('dashboardLogsListView');
-    const gridView = document.getElementById('dashboardLogsGridView');
-    const buttons = document.querySelectorAll('[data-dashboard-logs-view]');
-
-    if (!toggle || !listView || !gridView || !buttons.length) return;
-
-    const setMode = (mode) => {
-        const nextMode = mode === 'grid' ? 'grid' : 'list';
-        const isGrid = nextMode === 'grid';
-
-        listView.hidden = isGrid;
-        gridView.hidden = !isGrid;
-
-        root?.classList.toggle('mode-grid', isGrid);
-        root?.classList.toggle('mode-list', !isGrid);
-
-        buttons.forEach((button) => {
-            const active = button.dataset.dashboardLogsView === nextMode;
-
-            button.classList.toggle('active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-
-        localStorage.setItem('admin_dashboard_logs_view', nextMode);
-    };
-
-    buttons.forEach((button) => {
-        button.addEventListener('click', () => {
-            setMode(button.dataset.dashboardLogsView);
-        });
-    });
-
-    const mobile = window.matchMedia('(max-width: 767px)').matches;
-    const savedMode = localStorage.getItem('admin_dashboard_logs_view');
-
-    setMode(mobile ? 'grid' : savedMode || 'list');
-}
-
 const activeVoiceControllers = new Map();
 
 function getSpeechRecognitionConstructor() {
@@ -4560,9 +4678,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.initGlobalVoiceInputs = initGlobalVoiceInputs;
-
-document.addEventListener('DOMContentLoaded', initDashboardLogsViewToggle);
-window.initDashboardLogsViewToggle = initDashboardLogsViewToggle;
 
 function closeCustomSelects(except = null) {
     document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {

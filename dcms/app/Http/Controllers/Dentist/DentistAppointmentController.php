@@ -48,7 +48,7 @@ class DentistAppointmentController extends Controller
             ->update($updatePayload);
     }
 
-    public function index()
+    public function index(Request $request)
     {
 
         $activeRole = session('impersonated_role') ?: session('role');
@@ -139,6 +139,20 @@ class DentistAppointmentController extends Controller
             'dentist_appointments',
             "Dentist viewed appointments page"
         );
+
+        if ($request->expectsJson()) {
+            $appointments = $upcomingAppointments
+                ->merge($pastAppointments)
+                ->map(fn($appointment) => [
+                    'id' => $appointment->id,
+                    'updated_at' => optional($appointment->updated_at)->toISOString(),
+                ])
+                ->values();
+
+            return response()->json([
+                'appointments' => $appointments,
+            ]);
+        }
 
         return view('shared.appointments', [
             'layoutRole' => 'dentist',

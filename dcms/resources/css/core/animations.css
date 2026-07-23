@@ -1097,37 +1097,3 @@
         opacity: 1 !important;
     }
 }
-
-.action-btn {
-    transform: translateY(0) scale(1);
-    transform-origin: center;
-
-    transition:
-        transform .18s cubic-bezier(.22, 1, .36, 1),
-        background-color .18s ease,
-        border-color .18s ease,
-        color .18s ease,
-        box-shadow .18s ease;
-}
-
-.action-btn:not(:disabled):not([aria-disabled="true"]):hover,
-.action-btn:not(:disabled):not([aria-disabled="true"]):focus-visible {
-    transform: translateY(-2px) scale(1.02);
-}
-
-.action-btn:not(:disabled):not([aria-disabled="true"]):active {
-    transform: translateY(0) scale(.97);
-}
-
-.action-btn:disabled,
-.action-btn[aria-disabled="true"],
-.action-btn.is-start-locked {
-    transform: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .action-btn {
-        transition: none !important;
-        transform: none !important;
-    }
-}

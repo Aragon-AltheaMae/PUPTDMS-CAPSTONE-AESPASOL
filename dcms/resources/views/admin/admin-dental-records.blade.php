@@ -493,15 +493,22 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
                     </div>
                 </section>
 
-                <section class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-                        <div
-                            class="dental-req-quick-actions-icon w-10 h-10 rounded-2xl bg-red-50 text-[#8B0000] border border-red-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-sm font-black text-gray-800">Quick Actions</h2>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Common tasks</p>
+                <section class="card quick-actions-card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="card-title">
+                                    Quick Actions
+                                </h2>
+
+                                <p class="card-subtitle">
+                                    Common tasks
+                                </p>
+                            </div>
                         </div>
                     </div>
 

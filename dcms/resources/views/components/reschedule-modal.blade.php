@@ -3,29 +3,29 @@
 
     <div class="ui-modal-card modal-xl reschedule-modal-panel">
 
-        <div class="modal-hd appointment-modal-header reschedule-modal-header">
-
-            <div class="modal-header-custom">
-                <div class="appointment-modal-header-icon reschedule-modal-icon">
+        <div class="modal-hd modal-themed-header reschedule-modal-header">
+            <div class="modal-heading">
+                <div class="modal-icon modal-themed-icon">
                     <i class="fa-regular fa-calendar-check"></i>
                 </div>
 
-                <div class="appointment-modal-header-copy">
+                <div class="modal-copy">
                     <span class="appointment-modal-eyebrow">
                         Appointment Update
                     </span>
 
-                    <h2 id="rescheduleModalTitle" class="appointment-modal-title">
+                    <h2 id="rescheduleModalTitle" class="modal-title">
                         Reschedule Appointment
                     </h2>
 
-                    <p class="appointment-modal-subtitle">
+                    <p class="modal-subtitle">
                         Choose a new date and time, then save the changes.
                     </p>
                 </div>
             </div>
 
-            <button type="button" onclick="closeRescheduleModal()" class="modal-x" aria-label="Close reschedule modal">
+            <button type="button" onclick="closeRescheduleModal()" class="modal-x" data-discard-close="rescheduleModal"
+                aria-label="Close reschedule modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
