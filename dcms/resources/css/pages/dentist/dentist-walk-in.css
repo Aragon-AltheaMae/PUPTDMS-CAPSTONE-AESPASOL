@@ -118,6 +118,29 @@ body {
     opacity: 1;
 }
 
+.step-content {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.step-content.show {
+    opacity: 1;
+}
+
+#mainContent #step5 {
+    margin-top: -3rem !important;
+}
+
+@media (max-width: 768px) {
+    #mainContent #step5 {
+        margin-top: -1.5rem !important;
+    }
+}
+
+.step-circle {
+    transition: all 0.4s ease;
+}
+
 .step-circle {
     transition: all 0.4s ease;
 }
@@ -1778,6 +1801,7 @@ textarea {
 
 #introBookingModal::backdrop {
     background: rgba(17, 24, 39, 0.45);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
 }
 
@@ -1790,7 +1814,13 @@ textarea {
     background: transparent;
     width: min(calc(100vw - 1rem), 560px);
     border-radius: 28px;
-    overflow: hidden;
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+    border-radius: 28px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 #introBookingModal[open] {
@@ -2101,6 +2131,184 @@ body.intro-modal-open {
     box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
 }
 
+@media (max-width: 640px) {
+    #introBookingModal {
+        width: calc(100vw - 0.75rem);
+        max-width: calc(100vw - 0.75rem);
+        border-radius: 20px;
+    }
+
+    #introBookingModal .intro-booking-modal-panel {
+        border-radius: 20px;
+    }
+
+    #introBookingModal .intro-booking-modal-hero {
+        padding: 0.95rem 1rem 0.85rem;
+    }
+
+    #introBookingModal .intro-booking-modal-eyebrow {
+        margin-bottom: 0.55rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.16em;
+    }
+
+    #introBookingModal .intro-booking-modal-title {
+        font-size: clamp(1.35rem, 7vw, 1.75rem);
+        line-height: 1.08;
+
+        word-break: normal;
+        overflow-wrap: normal;
+        hyphens: none;
+    }
+
+    #introBookingModal .intro-booking-modal-subtitle {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    #introBookingModal .intro-booking-modal-body {
+        padding: 0.85rem;
+    }
+
+    #introBookingModal .intro-step-strip {
+        grid-template-columns: repeat(5, minmax(64px, 1fr));
+        gap: 0.38rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 0.3rem;
+
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    #introBookingModal .intro-step-pill {
+        min-width: 64px;
+        padding: 0.5rem 0.3rem;
+        font-size: 0.61rem;
+    }
+
+    #introBookingModal .intro-step-pill span {
+        font-size: 0.68rem;
+    }
+
+    #introBookingModal .intro-checklist {
+        gap: 0.55rem;
+    }
+
+    #introBookingModal .intro-check-item {
+        gap: 0.6rem;
+        padding: 0.65rem;
+        border-radius: 14px;
+    }
+
+    #introBookingModal .intro-check-item p {
+        font-size: 0.78rem;
+        line-height: 1.4;
+    }
+
+    #introBookingModal .intro-check-icon {
+        width: 1.55rem;
+        height: 1.55rem;
+        flex-basis: 1.55rem;
+        font-size: 0.72rem;
+    }
+
+    #introBookingModal .intro-modal-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+        margin-top: 0.8rem;
+    }
+
+    #introBookingModal .intro-action-btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        padding: 0.7rem 0.85rem;
+    }
+}
+
+@media (max-width: 380px) {
+    #introBookingModal {
+        width: calc(100vw - 0.5rem);
+        max-width: calc(100vw - 0.5rem);
+    }
+
+    #introBookingModal .intro-booking-modal-hero {
+        padding: 0.8rem;
+    }
+
+    #introBookingModal .intro-booking-modal-body {
+        padding: 0.7rem;
+    }
+
+    #introBookingModal .intro-booking-modal-title {
+        font-size: 1.3rem;
+    }
+
+    #introBookingModal .intro-step-strip {
+        grid-template-columns: repeat(5, 60px);
+    }
+
+    #introBookingModal .intro-step-pill {
+        min-width: 60px;
+    }
+
+    #introBookingModal .intro-check-item p {
+        font-size: 0.74rem;
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    #introBookingModal {
+        max-height: calc(100vh - 0.5rem);
+        max-height: calc(100dvh - 0.5rem);
+    }
+
+    #introBookingModal .intro-booking-modal-hero {
+        padding: 0.7rem 1rem;
+    }
+
+    #introBookingModal .intro-booking-modal-subtitle {
+        margin-top: 0.35rem;
+    }
+
+    #introBookingModal .intro-booking-modal-body {
+        padding: 0.7rem 1rem;
+    }
+
+    #introBookingModal .intro-checklist {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    #introBookingModal .intro-check-item {
+        min-width: 0;
+    }
+}
+
+@media (hover: none), (pointer: coarse) {
+    #introBookingModal .intro-action-btn:hover {
+        transform: none;
+        filter: none;
+    }
+
+    #introBookingModal .intro-action-primary:hover,
+    #introBookingModal .intro-action-secondary:hover,
+    #introBookingModal .intro-action-muted:hover {
+        box-shadow: none;
+    }
+}
+
+@supports not (
+    (backdrop-filter: blur(1px)) or
+    (-webkit-backdrop-filter: blur(1px))
+) {
+    #introBookingModal::backdrop {
+        background: rgba(17, 24, 39, 0.78);
+    }
+}
 
 .signature-methods-grid {
     display: grid;
