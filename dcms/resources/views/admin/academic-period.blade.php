@@ -153,7 +153,7 @@ $activePeriodPayload = $activePeriod
                             </p>
                         </div>
 
-                        <button type="button"
+                        <button type="button" id="manageActivePeriodBtn"
                             onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
                             class="bg-[#8B0000] hover:bg-[#760000] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow transition-all flex items-center justify-center gap-2">
                             <i class="fa-solid fa-gear"></i> Manage Period
@@ -256,11 +256,9 @@ $activePeriodPayload = $activePeriod
                                     };
 
                                     $semesterClass = match ($period->semester) {
-                                    'First Semester',
-                                    '1st Semester' => 'table-tag-danger',
+                                    'First Semester', '1st Semester' => 'table-tag-danger',
 
-                                    'Second Semester',
-                                    '2nd Semester' => 'table-tag-info',
+                                    'Second Semester', '2nd Semester' => 'table-tag-info',
 
                                     'Summer' => 'table-tag-warning',
 
@@ -284,7 +282,9 @@ $activePeriodPayload = $activePeriod
                                     ];
                                     @endphp
 
-                                    <tr data-record-row class="{{ $period->is_active ? 'is-active' : '' }}"
+                                    <tr data-record-row data-period-id="{{ $period->id }}"
+                                        class="{{ $period->is_active ? 'is-active' : '' }}"
+                                        data-set-active-url="{{ route('admin.academic_periods.set_active', $period) }}"
                                         data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
                                         data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
                                         <td>
@@ -294,9 +294,7 @@ $activePeriodPayload = $activePeriod
                                         <td class="table-cell-main">
                                             <div class="table-primary">
                                                 <span class="table-dot
-            {{ $period->is_active
-                ? 'table-dot-success'
-                : 'table-dot-muted' }}">
+            {{ $period->is_active ? 'table-dot-success' : 'table-dot-muted' }}">
                                                 </span>
 
                                                 <strong>
@@ -308,9 +306,7 @@ $activePeriodPayload = $activePeriod
                                         <td class="table-cell-main">
                                             <span class="table-tag {{ $semesterClass }}">
                                                 <i class="fa-solid
-            {{ $period->semester === 'Summer'
-                ? 'fa-sun'
-                : 'fa-book' }}">
+            {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}">
                                                 </i>
 
                                                 {{ $semesterLabel }}
@@ -417,11 +413,9 @@ $activePeriodPayload = $activePeriod
                                 };
 
                                 $semesterClass = match ($period->semester) {
-                                'First Semester',
-                                '1st Semester' => 'table-tag-danger',
+                                'First Semester', '1st Semester' => 'table-tag-danger',
 
-                                'Second Semester',
-                                '2nd Semester' => 'table-tag-info',
+                                'Second Semester', '2nd Semester' => 'table-tag-info',
 
                                 'Summer' => 'table-tag-warning',
 
@@ -450,24 +444,27 @@ $activePeriodPayload = $activePeriod
                                 str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester);
                                 @endphp
 
-                                <article class="table-record-card table-record-card-layout
+                                <article data-period-id="{{ $period->id }}" class="table-record-card table-record-card-layout
         {{ $period->is_active ? 'is-active' : '' }}" data-record-card data-semester="{{ $period->semester }}"
+                                    data-set-active-url="{{ route('admin.academic_periods.set_active', $period) }}"
                                     data-status="{{ $period->status }}" data-search="{{ strtolower(
-        $period->academic_year . ' ' .
-        $period->semester . ' ' .
-        $period->status . ' ' .
-        optional($period->start_date)->format('M d, Y') . ' ' .
-        optional($period->end_date)->format('M d, Y')
-    ) }}">
+                                                $period->academic_year .
+                                                    ' ' .
+                                                    $period->semester .
+                                                    ' ' .
+                                                    $period->status .
+                                                    ' ' .
+                                                    optional($period->start_date)->format('M d, Y') .
+                                                    ' ' .
+                                                    optional($period->end_date)->format('M d, Y'),
+                                            ) }}">
 
                                     <div class="table-record-content">
 
                                         <div class="table-record-header">
                                             <div class="table-primary">
                                                 <span class="table-dot
-                {{ $period->is_active
-                    ? 'table-dot-success'
-                    : 'table-dot-muted' }}">
+                {{ $period->is_active ? 'table-dot-success' : 'table-dot-muted' }}">
                                                 </span>
 
                                                 <h3 class="table-record-title">
@@ -490,9 +487,7 @@ $activePeriodPayload = $activePeriod
                                                 <span class="table-record-value">
                                                     <span class="table-tag {{ $semesterClass }}">
                                                         <i class="fa-solid
-                        {{ $period->semester === 'Summer'
-                            ? 'fa-sun'
-                            : 'fa-book' }}">
+                        {{ $period->semester === 'Summer' ? 'fa-sun' : 'fa-book' }}">
                                                         </i>
 
                                                         {{ $semesterLabel }}
@@ -539,11 +534,7 @@ $activePeriodPayload = $activePeriod
                                             <button type="button" class="ui-action-btn ui-action-success"
                                                 data-tooltip="Set as active" aria-label="Set as active" onclick="openSetActiveModal(
         @js(route('admin.academic_periods.set_active', $period)),
-        @js($period->academic_year . ' — ' . str_replace(
-            ['1st', '2nd'],
-            ['First', 'Second'],
-            $period->semester
-        ))
+        @js($period->academic_year . ' — ' . str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester))
     )">
 
                                                 <i class="fa-solid fa-circle-check"></i>
@@ -576,7 +567,6 @@ $activePeriodPayload = $activePeriod
                                         No academic periods found.
                                     </p>
                                 </div>
-
                                 @endforelse
                             </div>
                         </div>
@@ -598,9 +588,7 @@ $activePeriodPayload = $activePeriod
                             </div>
 
                             <div class="global-pagination-wrap">
-                                {{ $academicPeriods
-                                ->onEachSide(2)
-                                ->links('vendor.pagination.tailwind') }}
+                                {{ $academicPeriods->onEachSide(2)->links('vendor.pagination.tailwind') }}
                             </div>
                         </div>
                     </div>
@@ -608,10 +596,23 @@ $activePeriodPayload = $activePeriod
 
                 <div class="space-y-5">
 
-                    <div class="table-card">
-                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Quick Actions</h2>
+                    <section class="card quick-actions-card">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <div class="card-header-icon">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+
+                                <div>
+                                    <h2 class="card-title">
+                                        Quick Actions
+                                    </h2>
+
+                                    <p class="card-subtitle">
+                                        Common academic period tasks
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         <div class="quick-actions-list">
                             <button id="openAddPeriodQuickBtn" type="button" data-open-modal="addModal"
@@ -659,47 +660,76 @@ $activePeriodPayload = $activePeriod
                                 <i class="fa-solid fa-cloud-arrow-down quick-action-bg-icon"></i>
                             </button>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="table-card">
-                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center gap-2">
-                            <i class="fa-solid fa-clock text-[#8B0000]"></i>
-                            <h2 class="font-bold text-gray-800 text-sm">Date &amp; Time</h2>
-                            <span class="ml-auto text-[10px] text-gray-400 font-semibold">Philippine Time</span>
+                    <section class="card academic-period-time-card">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <div class="card-header-icon">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+
+                                <div>
+                                    <h2 class="card-title">Date &amp; Time</h2>
+                                    <p class="card-subtitle">Current local date and time</p>
+                                </div>
+                            </div>
+
+                            <span class="card-header-meta">
+                                Philippine Time
+                            </span>
                         </div>
-                        <div class="p-5 text-center">
+
+                        <div class="card-body text-center">
                             <div id="liveClock"
                                 class="text-4xl font-extrabold text-[#8B0000] tracking-tight leading-none mb-1">
                                 00:00:00
                             </div>
-                            <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">AM
-                            </div>
-                            <div id="liveDate" class="text-sm font-semibold text-gray-700 mb-1"></div>
-                            <div id="liveDay" class="text-xs text-gray-400"></div>
-                        </div>
-                    </div>
 
-                    <div class="bg-white rounded-xl shadow overflow-hidden cal-card">
-                        <div class="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i class="ap-calendar-title-icon fa-solid fa-calendar-days"></i>
-                                <h2 class="font-bold text-gray-800 text-sm">PUP Academic Calendar</h2>
+                            <div id="liveAmPm" class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                AM
                             </div>
-                            <span id="calYear"
-                                class="text-[9px] font-bold text-[#8B0000] bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                Academic Periods
-                            </span>
+
+                            <div id="liveDate" class="text-sm font-semibold text-gray-700 mb-1">
+                            </div>
+
+                            <div id="liveDay" class="text-xs text-gray-400">
+                            </div>
                         </div>
-                        <div id="calendarList" class="p-4 space-y-1 overflow-y-auto scrollbar-thin"
-                            style="max-height:485px;"></div>
+                    </section>
+
+                    <section class="card cal-card">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <div class="card-header-icon">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </div>
+
+                                <div>
+                                    <h2 class="card-title">
+                                        PUP Academic Calendar
+                                    </h2>
+
+                                    <p class="card-subtitle">
+                                        Academic periods and university holidays
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="calendarList" class="card-body space-y-1 overflow-y-auto scrollbar-thin"
+                            style="max-height: 485px;">
+                        </div>
+
                         <div class="px-4 pb-4">
-                            <a href="https://www.pup.edu.ph/calendar/" target="_blank"
+                            <a href="https://www.pup.edu.ph/calendar/" target="_blank" rel="noopener noreferrer"
                                 class="ap-pup-calendar-link flex items-center justify-center gap-2 w-full py-2 rounded-lg border text-xs font-semibold transition-all mt-2">
+
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                                 View Full PUP Calendar
                             </a>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -1080,8 +1110,7 @@ $activePeriodPayload = $activePeriod
                 </div>
             </div>
 
-            <button type="button" onclick="closeAcademicPeriodModal('editModal')" class="modal-x"
-                aria-label="Close edit modal">
+            <button type="button" class="modal-x" data-discard-close="editModal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -1263,7 +1292,7 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="modal-ft">
-            <button type="button" onclick="closeAcademicPeriodModal('editModal')" class="ui-btn ui-btn-secondary">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="editModal">
                 Cancel
             </button>
 
@@ -1339,51 +1368,68 @@ $activePeriodPayload = $activePeriod
 <x-delete-confirm-modal id="deleteModal" form-id="deleteForm" name-id="deletePeriodLabel" title="Delete Academic Period"
     helper="This academic period will be permanently removed." />
 
-<div class="modal-overlay ui-modal ap-sync-modal" id="syncFlssModal" aria-hidden="true" data-sync-flss-modal>
-    <form method="POST" action="{{ route('admin.academic_periods.sync_flss') }}"
-        class="modal-box modal-box-inner ap-sync-shell" onclick="event.stopPropagation()">
+<div id="syncFlssModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+
+    <form id="syncFlssForm" method="POST" action="{{ route('admin.academic_periods.sync_flss') }}"
+        class="ui-modal-card modal-md modal-card-form">
+
         @csrf
 
-        <div class="ap-sync-head">
-            <div class="ap-sync-head-left">
-                <div class="ap-sync-head-icon">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-cloud-arrow-down"></i>
                 </div>
 
-                <div>
-                    <h3 class="ap-sync-title">Sync from FLSS</h3>
-                    <p class="ap-sync-subtitle">Update the active academic year and semester</p>
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Sync from FLSS
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Update the active academic year and semester
+                    </p>
                 </div>
             </div>
 
-            <button type="button" class="ap-sync-x" data-sync-flss-close aria-label="Close sync modal">
+            <button type="button" class="modal-x" data-sync-flss-close aria-label="Close sync modal">
+
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="ap-sync-body">
-            <div class="ap-sync-alert">
-                <i class="fa-solid fa-circle-info"></i>
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+
                 <div>
-                    <p>Sync the active academic period from FLSS?</p>
-                    <span>This will fetch the current academic year and semester from the external FLSS source.</span>
+                    <p>
+                        Sync the active academic period from FLSS?
+                    </p>
+
+                    <span>
+                        This will fetch the current academic year and semester
+                        from the external FLSS source.
+                    </span>
                 </div>
             </div>
 
-            <div class="ap-sync-note">
+            <p class="modal-helper-text">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Existing records will only be updated based on the FLSS response.</span>
-            </div>
+                Existing records will only be updated based on the FLSS response.
+            </p>
         </div>
 
-        <div class="ap-sync-footer">
-            <button type="button" class="modal-btn-ghost" data-sync-flss-close>
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-sync-flss-close>
+
                 Cancel
             </button>
 
-            <button type="submit" class="ap-sync-confirm-btn">
+            <button type="submit" id="syncFlssSubmitBtn" class="ui-btn ui-btn-primary">
+
                 <i class="fa-solid fa-rotate"></i>
-                Sync Now
+                <span>Sync Now</span>
             </button>
         </div>
     </form>
@@ -1420,8 +1466,6 @@ $activePeriodPayload = $activePeriod
         const startInput = addForm.querySelector('[name="start_date"]');
         const endInput = addForm.querySelector('[name="end_date"]');
         const semRadios = addForm.querySelectorAll('[name="semester"]');
-        const addDesc = addForm.querySelector('#addDesc');
-        const editDesc = document.getElementById('editDesc');
         const existingAcademicPeriods = @json($calendarPeriodsPayload);
         const semesterAliases = {
             '1st Semester': ['First Semester', '1st Semester'],
@@ -1456,12 +1500,6 @@ $activePeriodPayload = $activePeriod
                 err.textContent = '⚠ ' + msg;
                 err.classList.add('show');
             }
-        }
-
-        function clearError(field) {
-            field.classList.remove('field-invalid');
-            const err = getErr(field);
-            if (err) err.classList.remove('show');
         }
 
         function setValid(field) {
@@ -1633,12 +1671,11 @@ $activePeriodPayload = $activePeriod
         sync();
     }
 
-    const calendarPeriods = @json($calendarPeriodsPayload);
+    let calendarPeriods = @json($calendarPeriodsPayload);
     const holidayEvents = @json($holidayEvents);
 
     function renderCalendar() {
         const list = document.getElementById('calendarList');
-        const calYear = document.getElementById('calYear');
         if (!list) return;
 
         const periodEvents = [];
@@ -1665,16 +1702,14 @@ $activePeriodPayload = $activePeriod
             }
         });
 
-        const events = [...periodEvents, ...holidayEvents].sort((a, b) => a.date.localeCompare(b.date));
-        const today = todayStr();
-        const show = events.sort((a, b) => a.date.localeCompare(b.date));
+        const show = [
+            ...periodEvents,
+            ...holidayEvents
+        ].sort((a, b) =>
+            a.date.localeCompare(b.date)
+        );
 
-        if (show.length) {
-            const years = [...new Set(show.map(e => e.year))];
-            calYear.textContent = years.length === 1 ? years[0] : 'Academic Periods & Holidays';
-        } else {
-            calYear.textContent = 'Academic Periods & Holidays';
-        }
+        const today = todayStr();
 
         if (!show.length) {
             list.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">No events found</p>';
@@ -1725,191 +1760,308 @@ $activePeriodPayload = $activePeriod
         return `${ph.getFullYear()}-${String(ph.getMonth() + 1).padStart(2, '0')}-${String(ph.getDate()).padStart(2, '0')}`;
     }
 
-    function resetModalForm(id) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
+    function updateSyncedAcademicBanner(period) {
+        if (!period) return;
 
-        const form = modal.querySelector('form');
-        if (!form) return;
+        const semester =
+            document.getElementById('bannerSem');
 
-        form.reset();
+        const year =
+            document.getElementById('bannerYear');
 
-        form.querySelectorAll('.field-invalid, .field-valid').forEach(el => {
-            el.classList.remove('field-invalid', 'field-valid');
-        });
+        const end =
+            document.getElementById('bannerEnd');
 
-        form.querySelectorAll('.field-error').forEach(el => {
-            el.classList.remove('show');
-            el.textContent = '';
-        });
+        const percentage =
+            document.getElementById('bannerPct');
 
-        form.querySelectorAll('.sem-error').forEach(el => {
-            el.classList.remove('show');
-            el.textContent = '';
-        });
+        const progress =
+            document.getElementById('bannerFill');
 
-        const addDesc = document.getElementById('addDesc');
-        const editDesc = document.getElementById('editDesc');
+        const daysLeft =
+            document.getElementById('bannerDaysLeft');
 
-        form
-            .querySelectorAll('[data-char-limit]')
-            .forEach(function (field) {
-                field.dispatchEvent(
-                    new Event('input', {
-                        bubbles: true
-                    })
+        if (semester) {
+            semester.textContent =
+                period.semester || 'No Active Period';
+        }
+
+        if (year) {
+            year.textContent =
+                period.academic_year || '—';
+        }
+
+        if (end) {
+            end.textContent =
+                period.end_date_long || '—';
+        }
+
+        const progressValue = Math.max(
+            0,
+            Math.min(
+                100,
+                Number(period.progress_percent || 0)
+            )
+        );
+
+        if (percentage) {
+            percentage.textContent =
+                `${progressValue}%`;
+        }
+
+        if (progress) {
+            progress.style.width =
+                `${progressValue}%`;
+        }
+
+        const remainingDays =
+            Number(period.days_remaining || 0);
+
+        if (daysLeft) {
+            daysLeft.textContent =
+                `${remainingDays} day`
+                + `${remainingDays === 1 ? '' : 's'} remaining`;
+        }
+
+        updateManageActivePeriodButton(period);
+    }
+
+    function updateManageActivePeriodButton(period) {
+        const button =
+            document.getElementById(
+                'manageActivePeriodBtn'
+            );
+
+        if (!button || !period) return;
+
+        button.onclick = function () {
+            window.openEditModal?.(period);
+        };
+    }
+
+    function updateSyncedAcademicRecords(period) {
+        if (!period?.id) return;
+
+        document
+            .querySelectorAll(
+                '[data-record-row], [data-record-card]'
+            )
+            .forEach(function (record) {
+                const isCurrent =
+                    String(record.dataset.periodId) ===
+                    String(period.id);
+
+                record.classList.toggle(
+                    'is-active',
+                    isCurrent
+                );
+
+                if (!isCurrent) {
+                    record.dataset.status = getAcademicPeriodStatus(
+                        record
+                    );
+                }
+
+                const statusBadge =
+                    record.querySelector('.status-badge');
+
+                if (!statusBadge) return;
+
+                statusBadge.classList.remove(
+                    'status-active',
+                    'status-upcoming',
+                    'status-cancelled',
+                    'status-pending'
+                );
+
+                if (isCurrent) {
+                    record.dataset.status = 'Active';
+                    statusBadge.textContent = 'Active';
+                    statusBadge.classList.add(
+                        'status-active'
+                    );
+
+                    updateActiveRecordButton(record);
+                    return;
+                }
+
+                const status =
+                    getAcademicPeriodStatus(record);
+
+                record.dataset.status = status;
+                statusBadge.textContent = status;
+
+                statusBadge.classList.add(
+                    getAcademicPeriodStatusClass(status)
+                );
+
+                updateInactiveRecordButton(record);
+            });
+    }
+
+    function getAcademicPeriodStatus(record) {
+        const currentStatus =
+            record.dataset.status || 'Inactive';
+
+        return currentStatus === 'Active'
+            ? 'Inactive'
+            : currentStatus;
+    }
+
+    function getAcademicPeriodStatusClass(status) {
+        if (status === 'Active') {
+            return 'status-active';
+        }
+
+        if (status === 'Upcoming') {
+            return 'status-upcoming';
+        }
+
+        if (status === 'Ended') {
+            return 'status-cancelled';
+        }
+
+        return 'status-pending';
+    }
+
+    function updateActiveRecordButton(record) {
+        const actionGroup =
+            record.querySelector('.ui-action-group');
+
+        if (!actionGroup) return;
+
+        const setActiveButton =
+            Array.from(
+                actionGroup.querySelectorAll(
+                    '.ui-action-btn'
+                )
+            ).find(function (button) {
+                return (
+                    button.getAttribute(
+                        'data-tooltip'
+                    ) === 'Set as active' ||
+                    button.getAttribute(
+                        'data-tooltip'
+                    ) === 'Active period'
                 );
             });
 
-        if (typeof bindTextareaPlaceholder === 'function') {
-            bindTextareaPlaceholder('addDesc', 'addDescWrap');
-            bindTextareaPlaceholder('editDesc', 'editDescWrap');
+        if (!setActiveButton) return;
+
+        const form =
+            setActiveButton.closest('form');
+
+        const disabledButton =
+            document.createElement('button');
+
+        disabledButton.type = 'button';
+        disabledButton.disabled = true;
+        disabledButton.className =
+            'ui-action-btn ui-action-warning';
+
+        disabledButton.setAttribute(
+            'data-tooltip',
+            'Active period'
+        );
+
+        disabledButton.setAttribute(
+            'aria-label',
+            'Active period'
+        );
+
+        disabledButton.innerHTML =
+            '<i class="fa-solid fa-star"></i>';
+
+        if (form) {
+            form.replaceWith(disabledButton);
+        } else {
+            setActiveButton.replaceWith(
+                disabledButton
+            );
         }
     }
 
-    function setModalState(id, isOpen) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
-
-        if (isOpen) {
-            modal.classList.remove('closing');
-            modal.classList.add('open');
-            document.body.classList.add('modal-lock');
-
-            requestAnimationFrame(() => {
-                document.dispatchEvent(new CustomEvent('ui-modal:opened', {
-                    detail: {
-                        modal
-                    }
-                }));
-
-                if (window.DiscardChanges && typeof window.DiscardChanges.captureModal === 'function') {
-                    window.DiscardChanges.captureModal(modal);
-                }
+    function updateInactiveRecordButton(record) {
+        const activeButton =
+            Array.from(
+                record.querySelectorAll(
+                    '.ui-action-btn'
+                )
+            ).find(function (button) {
+                return (
+                    button.getAttribute(
+                        'data-tooltip'
+                    ) === 'Active period'
+                );
             });
 
-            return;
-        }
+        if (!activeButton) return;
 
-        if (id === 'addModal' || id === 'editModal') {
-            resetModalForm(id);
-        }
+        const action =
+            record.dataset.setActiveUrl || '';
 
-        modal.classList.remove('open');
-        modal.classList.add('closing');
+        if (!action) return;
 
-        setTimeout(() => {
-            modal.classList.remove('closing');
+        const label =
+            record.dataset.search || 'academic period';
 
-            if (!document.querySelector('.ui-modal.open, .ui-modal.closing')) {
-                document.body.classList.remove('modal-lock');
+        const setActiveButton =
+            document.createElement('button');
+
+        setActiveButton.type = 'button';
+        setActiveButton.className =
+            'ui-action-btn ui-action-success';
+
+        setActiveButton.setAttribute(
+            'data-tooltip',
+            'Set as active'
+        );
+
+        setActiveButton.setAttribute(
+            'aria-label',
+            'Set as active'
+        );
+
+        setActiveButton.innerHTML =
+            '<i class="fa-solid fa-circle-check"></i>';
+
+        setActiveButton.addEventListener(
+            'click',
+            function () {
+                window.openSetActiveModal?.(
+                    action,
+                    label
+                );
             }
-        }, 180);
+        );
+
+        activeButton.replaceWith(
+            setActiveButton
+        );
     }
 
-    window.openModal = function (id) {
-        setModalState(id, true);
-    };
-
-    window.forceCloseModal = function (id) {
-        setModalState(id, false);
-    };
-
-    window.closeModal = function (id, options = {}) {
-        const shouldUseDiscard = !options.force && (id === 'addModal' || id === 'editModal');
-
-        if (shouldUseDiscard && window.DiscardChanges && typeof window.DiscardChanges.confirmClose === 'function') {
-            window.DiscardChanges.confirmClose(id, () => setModalState(id, false));
-            return;
-        }
-
-        setModalState(id, false);
-    };
-
-    window.closeAcademicPeriodModal = function (id) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
-
-        const closeNow = () => {
-            setModalState(id, false);
-        };
-
-        if (
-            (id === 'addModal' || id === 'editModal') &&
-            window.DiscardChanges &&
-            typeof window.DiscardChanges.confirmClose === 'function'
-        ) {
-            window.DiscardChanges.confirmClose(id, closeNow);
-            return;
-        }
-
-        closeNow();
-    };
-
-    window.openSyncFlssModal = function () {
-        const modal = document.getElementById('syncFlssModal');
-        if (!modal) {
-            console.warn('syncFlssModal was not found.');
-            return;
-        }
-
-        modal.classList.remove('closing');
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-
-        modal.style.display = 'flex';
-        modal.style.opacity = '1';
-        modal.style.visibility = 'visible';
-        modal.style.pointerEvents = 'auto';
-
-        document.body.classList.add('modal-lock');
-    };
-
-    window.closeSyncFlssModal = function () {
-        const modal = document.getElementById('syncFlssModal');
-        if (!modal) return;
-
-        modal.classList.remove('open');
-        modal.classList.add('closing');
-        modal.setAttribute('aria-hidden', 'true');
-
-        setTimeout(() => {
-            modal.classList.remove('closing');
-            modal.style.display = '';
-            modal.style.opacity = '';
-            modal.style.visibility = '';
-            modal.style.pointerEvents = '';
-
-            if (!document.querySelector('.ui-modal.open, .ui-modal.closing')) {
-                document.body.classList.remove('modal-lock');
-            }
-        }, 180);
-    };
-
     document.addEventListener('click', function (event) {
-        const openBtn = event.target.closest('[data-sync-flss-trigger]');
-        if (openBtn) {
+        const openButton =
+            event.target.closest('[data-sync-flss-trigger]');
+
+        if (openButton) {
             event.preventDefault();
-            event.stopImmediatePropagation();
-            window.openSyncFlssModal();
+            event.stopPropagation();
+
+            window.openModal?.('syncFlssModal');
             return;
         }
 
-        const closeBtn = event.target.closest('[data-sync-flss-close]');
-        if (closeBtn) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            window.closeSyncFlssModal();
-            return;
-        }
+        const closeButton =
+            event.target.closest('[data-sync-flss-close]');
 
-        const syncModal = event.target.closest('[data-sync-flss-modal]');
-        if (syncModal && event.target === syncModal) {
+        if (closeButton) {
             event.preventDefault();
-            event.stopImmediatePropagation();
-            window.closeSyncFlssModal();
+            event.stopPropagation();
+
+            window.closeModal?.('syncFlssModal');
         }
-    }, true);
+    });
 
     window.openEditModal = function (period) {
         document.getElementById('editForm').action = `/admin/academic-periods/${period.id}`;
@@ -1999,25 +2151,11 @@ $activePeriodPayload = $activePeriod
         const liveAmPm = document.getElementById('liveAmPm');
         const liveDate = document.getElementById('liveDate');
         const liveDay = document.getElementById('liveDay');
-        const currentDateTime = document.getElementById('currentDateTime');
-        const timeIcon = document.getElementById('timeIcon');
 
         if (liveClock) liveClock.textContent = `${hh}:${m}:${s}`;
         if (liveAmPm) liveAmPm.textContent = ampm;
         if (liveDate) liveDate.textContent = `${months[ph.getMonth()]} ${ph.getDate()}, ${ph.getFullYear()}`;
         if (liveDay) liveDay.textContent = days[ph.getDay()];
-        if (currentDateTime) {
-            currentDateTime.textContent =
-                `${days[ph.getDay()]}, ${months[ph.getMonth()]} ${ph.getDate()}, ${ph.getFullYear()} · ${hh}:${m} ${ampm}`;
-        }
-
-        if (timeIcon) {
-            if (ph.getHours() >= 6 && ph.getHours() < 18) {
-                timeIcon.className = 'fa-solid fa-sun text-yellow-400 text-xs';
-            } else {
-                timeIcon.className = 'fa-solid fa-moon text-indigo-400 text-xs';
-            }
-        }
     }
 
     function clearAcademicSearch() {
@@ -2033,10 +2171,9 @@ $activePeriodPayload = $activePeriod
                 '[data-record-card]'
             );
 
-        items.forEach(item => {
+        items.forEach(function (item) {
             item.style.display = '';
         });
-        items.forEach(item => item.style.display = '');
 
         const jsEmpty = document.getElementById('jsEmptyState');
         if (jsEmpty) jsEmpty.style.display = 'none';
@@ -2121,18 +2258,18 @@ $activePeriodPayload = $activePeriod
         const statusRadios = Array.from(document.querySelectorAll('input[name="filter_status"]'));
 
         const allTableRows = () =>
-            tableBody
-                ? tableBody.querySelectorAll(
+            tableBody ?
+                tableBody.querySelectorAll(
                     '[data-record-row]'
-                )
-                : [];
+                ) :
+                [];
 
         const allGridCards = () =>
-            gridView
-                ? gridView.querySelectorAll(
+            gridView ?
+                gridView.querySelectorAll(
                     '[data-record-card]'
-                )
-                : [];
+                ) :
+                [];
 
         filterForm?.addEventListener('submit', (event) => event.preventDefault());
 
@@ -2566,6 +2703,160 @@ $activePeriodPayload = $activePeriod
 
         filterItems();
 
+        const syncFlssForm =
+            document.getElementById('syncFlssForm');
+
+        const syncFlssSubmitBtn =
+            document.getElementById('syncFlssSubmitBtn');
+
+        syncFlssForm?.addEventListener(
+            'submit',
+            async function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (
+                    !syncFlssSubmitBtn ||
+                    syncFlssSubmitBtn.disabled
+                ) {
+                    return;
+                }
+
+                const originalContent =
+                    syncFlssSubmitBtn.innerHTML;
+
+                syncFlssSubmitBtn.disabled = true;
+                syncFlssSubmitBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Syncing...</span>
+        `;
+
+                try {
+                    const response = await fetch(
+                        syncFlssForm.action,
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                Accept: 'application/json',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+                            },
+
+                            body: new FormData(
+                                syncFlssForm
+                            ),
+                        }
+                    );
+
+                    const contentType =
+                        response.headers.get(
+                            'content-type'
+                        ) || '';
+
+                    if (
+                        !contentType.includes(
+                            'application/json'
+                        )
+                    ) {
+                        throw new Error(
+                            'The server returned an invalid response.'
+                        );
+                    }
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(
+                            data.message ||
+                            'Unable to sync from FLSS.'
+                        );
+                    }
+
+                    const period =
+                        data.academic_period;
+
+                    updateSyncedAcademicBanner(
+                        period
+                    );
+
+                    updateSyncedAcademicRecords(
+                        period
+                    );
+
+                    const existingIndex =
+                        calendarPeriods.findIndex(
+                            function (item) {
+                                return (
+                                    String(item.id) ===
+                                    String(period.id)
+                                );
+                            }
+                        );
+
+                    const calendarPayload = {
+                        id: period.id,
+                        academic_year:
+                            period.academic_year,
+                        semester:
+                            period.semester,
+                        start_date:
+                            period.start_date,
+                        end_date:
+                            period.end_date,
+                    };
+
+                    if (existingIndex >= 0) {
+                        calendarPeriods[
+                            existingIndex
+                        ] = calendarPayload;
+                    } else {
+                        calendarPeriods.push(
+                            calendarPayload
+                        );
+                    }
+
+                    renderCalendar();
+
+                    window.closeModal?.(
+                        'syncFlssModal'
+                    );
+
+                    window.showToast?.({
+                        type: data.already_synced
+                            ? 'info'
+                            : 'success',
+
+                        title: data.already_synced
+                            ? 'Already Synced'
+                            : 'FLSS Sync Complete',
+
+                        message: data.message,
+
+                        duration: 5000,
+                    });
+                } catch (error) {
+                    window.showToast?.({
+                        type: 'error',
+                        title: 'FLSS Sync Failed',
+
+                        message:
+                            error.message ||
+                            'Unable to sync the academic period.',
+
+                        duration: 6000,
+                    });
+                } finally {
+                    syncFlssSubmitBtn.disabled =
+                        false;
+
+                    syncFlssSubmitBtn.innerHTML =
+                        originalContent;
+                }
+            }
+        );
+
         document.addEventListener('click', function (event) {
             const openButton = event.target.closest('[data-open-modal]');
             if (!openButton) return;
@@ -2609,67 +2900,6 @@ $activePeriodPayload = $activePeriod
                 const target = button.getAttribute('data-close-modal');
                 if (target) window.closeModal(target);
             });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.open').forEach(modal => {
-                    if (modal.id === 'addModal' || modal.id === 'editModal') {
-                        window.closeModal(modal.id);
-                    } else {
-                        setModalState(modal.id, false);
-                    }
-                });
-                document.body.style.overflow = '';
-            }
-        });
-
-        const addPeriodButtons = document.querySelectorAll('[data-open-modal="addModal"]');
-        const addModalCloseButtons = document.querySelectorAll('[data-close-modal="addModal"]');
-        const editModal = document.getElementById('editModal');
-        const deleteModal = document.getElementById('deleteModal');
-        const addModal = document.getElementById('addModal');
-
-        addPeriodButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                setModalState('addModal', true);
-            });
-        });
-
-        addModalCloseButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                if (button.hasAttribute('data-discard-close')) return;
-
-                e.preventDefault();
-                e.stopPropagation();
-                window.closeModal('addModal');
-            });
-        });
-
-        [addModal, editModal, deleteModal].forEach(modal => {
-            if (!modal) return;
-
-            modal.addEventListener('click', function (e) {
-                if (e.target === modal) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.open').forEach(modal => {
-                    if (modal.id === 'addModal' || modal.id === 'editModal') {
-                        window.closeModal(modal.id);
-                    } else {
-                        setModalState(modal.id, false);
-                    }
-                });
-                document.body.style.overflow = '';
-            }
         });
 
         bindTextareaPlaceholder('addDesc', 'addDescWrap');

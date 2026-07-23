@@ -70,7 +70,6 @@
     </title>
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,6 +204,9 @@
             }
         </script>
     @endif
+
+    <div id="globalActionTooltip" class="global-action-tooltip" role="tooltip" aria-hidden="true">
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>

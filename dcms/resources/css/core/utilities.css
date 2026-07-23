@@ -709,40 +709,82 @@
     box-shadow: none;
 }
 
-.ui-action-btn::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 9px);
-    transform:
-        translateX(-50%) translateY(4px);
-    min-width: max-content;
-    max-width: 180px;
-    padding: 7px 9px;
+.global-action-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000000;
+
+    width: max-content;
+    max-width: min(300px, calc(100vw - 24px));
+
+    padding: 8px 11px;
     border-radius: 9px;
-    background: var(--action-tooltip-bg);
+
+    background: var(--tooltip-bg, #374151);
     color: #ffffff;
+
+    font-family: inherit;
     font-size: 11px;
-    font-weight: 800;
-    line-height: 1.1;
-    white-space: nowrap;
+    font-weight: 850;
+    line-height: 1.3;
+    text-align: center;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .22);
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, .18);
+
+    transform: translateY(4px);
     transition:
         opacity .15s ease,
         visibility .15s ease,
         transform .15s ease;
-    z-index: 999;
 }
 
-.ui-action-btn:hover::after,
-.ui-action-btn:hover::before,
-.ui-action-btn:focus-visible::after,
-.ui-action-btn:focus-visible::before {
+.global-action-tooltip.show {
     opacity: 1;
     visibility: visible;
+    transform: translateY(0);
+}
+
+.global-action-tooltip.tooltip-view {
+    --tooltip-bg: var(--crimson, #8B0000);
+}
+
+.global-action-tooltip.tooltip-start {
+    --tooltip-bg: #047857;
+}
+
+.global-action-tooltip.tooltip-reschedule {
+    --tooltip-bg: #B45309;
+}
+
+.global-action-tooltip.tooltip-cancel,
+.global-action-tooltip.tooltip-delete {
+    --tooltip-bg: #DC2626;
+}
+
+.global-action-tooltip.tooltip-edit {
+    --tooltip-bg: #2563EB;
+}
+
+.global-action-tooltip.tooltip-reset {
+    background: #6d28d9;
+}
+
+.global-action-tooltip.tooltip-locked,
+.global-action-tooltip.tooltip-neutral {
+    --tooltip-bg: #475569;
+}
+
+[data-theme="dark"] .global-action-tooltip,
+.dark .global-action-tooltip {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .42);
 }
 
 .ui-action-btn:hover::after,
@@ -883,13 +925,12 @@
 .field-valid {
     border-color: #16a34a !important;
 }
-:is(
-    .status-pill,
+
+:is(.status-pill,
     .status-badge,
     .appointment-status-pill,
     .past-status-pill,
-    .patient-status-pill
-).s-active {
+    .patient-status-pill).s-active {
     --status-bg: var(--status-active-bg);
     --status-text: var(--status-active-text);
     --status-border: var(--status-active-border);
@@ -897,13 +938,11 @@
     --status-soft: var(--status-active-soft);
 }
 
-:is(
-    .status-pill,
+:is(.status-pill,
     .status-badge,
     .appointment-status-pill,
     .past-status-pill,
-    .patient-status-pill
-).s-upcoming {
+    .patient-status-pill).s-upcoming {
     --status-bg: var(--status-upcoming-bg);
     --status-text: var(--status-upcoming-text);
     --status-border: var(--status-upcoming-border);
@@ -911,13 +950,11 @@
     --status-soft: var(--status-upcoming-soft);
 }
 
-:is(
-    .status-pill,
+:is(.status-pill,
     .status-badge,
     .appointment-status-pill,
     .past-status-pill,
-    .patient-status-pill
-).s-ended {
+    .patient-status-pill).s-ended {
     --status-bg: var(--status-ended-bg);
     --status-text: var(--status-ended-text);
     --status-border: var(--status-ended-border);
@@ -925,13 +962,11 @@
     --status-soft: var(--status-ended-soft);
 }
 
-:is(
-    .status-pill,
+:is(.status-pill,
     .status-badge,
     .appointment-status-pill,
     .past-status-pill,
-    .patient-status-pill
-).s-inactive {
+    .patient-status-pill).s-inactive {
     --status-bg: var(--status-inactive-bg);
     --status-text: var(--status-inactive-text);
     --status-border: var(--status-inactive-border);

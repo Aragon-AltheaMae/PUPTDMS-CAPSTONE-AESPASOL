@@ -17,7 +17,7 @@ class AdminInventoryController extends Controller
             'Admin viewed inventory page'
         );
 
-        return view('admin.admin-inventory', [
+        return view('shared.inventory', [
             'notifications' => collect([]),
 
             'layoutRole' => 'admin',

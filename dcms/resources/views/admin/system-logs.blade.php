@@ -433,7 +433,7 @@ $status = $status ?? 'active';
         </div>
 </main>
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="closeSlFilterPanel()"></div>
+    <div class="filter-drawer-overlay"></div>
 
     <div class="filter-drawer-panel" aria-label="Filter system logs">
         <div class="filter-drawer-header">
@@ -613,51 +613,88 @@ $status = $status ?? 'active';
     </div>
 </div>
 
-<div id="slArchiveModal" class="ui-modal modal-overlay sl-archive-modal" aria-hidden="true"
-    onclick="closeModalOnBackdrop(event, 'slArchiveModal')">
-    <div class="modal-box-inner sl-archive-modal-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true"
-        aria-labelledby="slArchiveModalTitle">
-        <div class="sl-archive-modal-hero">
-            <button type="button" class="sl-archive-modal-close" onclick="closeSlArchiveModal()"
-                aria-label="Close archive modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+<div id="slArchiveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
 
-            <div class="sl-archive-icon-ring">
-                <div class="sl-archive-icon-core">
+    <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="slArchiveModalTitle">
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-box-archive"></i>
                 </div>
-            </div>
 
-            <h3 id="slArchiveModalTitle" class="sl-archive-modal-title">Archive System Logs</h3>
-            <p class="sl-archive-modal-sub">Move older log records out of the active view without affecting other
-                dashboards.</p>
-        </div>
+                <div class="modal-copy">
+                    <h3 id="slArchiveModalTitle" class="modal-title">
+                        Archive System Logs
+                    </h3>
 
-        <div class="sl-archive-modal-body">
-            <div class="sl-archive-modal-note">
-                <i class="fa-solid fa-circle-info"></i>
-                <span>Only active logs older than the selected number of days will be archived.</span>
-            </div>
-
-            <div class="sl-archive-field">
-                <label for="slArchiveDaysInput" class="sl-archive-label">Archive logs older than</label>
-                <div class="sl-archive-input-wrap">
-                    <input type="number" id="slArchiveDaysInput" class="sl-archive-input" min="1" max="3650" step="1"
-                        value="90" placeholder="Enter number of days">
-                    <span class="sl-archive-suffix">days</span>
-                </div>
-                <div id="slArchiveError" class="sl-archive-error hidden">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>Please enter a valid number from 1 to 3650.</span>
+                    <p class="modal-subtitle">
+                        Move older log records out of the active view.
+                    </p>
                 </div>
             </div>
+
+            <button type="button" class="modal-x" onclick="closeSlArchiveModal()" aria-label="Close archive modal">
+
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
-        <div class="sl-archive-modal-actions">
-            <button type="button" class="modal-btn-ghost" onclick="closeSlArchiveModal()">Cancel</button>
-            <button type="button" id="slArchiveConfirmBtn" class="sl-archive-confirm-btn"
+        <div class="modal-bd">
+            <div class="modal-form-grid">
+
+                <div class="global-confirm-alert">
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <p>
+                        Archive older active logs
+
+                        <span>
+                            Only active logs older than the selected
+                            number of days will be archived. Archived
+                            records remain accessible and are not deleted.
+                        </span>
+                    </p>
+                </div>
+
+                <div>
+                    <label for="slArchiveDaysInput" class="form-label">
+                        Archive logs older than
+                    </label>
+
+                    <div class="modal-inline-control">
+                        <div class="modal-inline-main">
+                            <input type="number" id="slArchiveDaysInput" class="form-input" min="1" max="3650" step="1"
+                                value="90" placeholder="Enter number of days">
+                        </div>
+
+                        <span class="modal-helper-text">
+                            days
+                        </span>
+                    </div>
+
+                    <div id="slArchiveError" class="modal-error-banner hidden mt-3">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <span>
+                            Please enter a valid number from 1 to 3650.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeSlArchiveModal()">
+
+                <i class="fa-solid fa-xmark"></i>
+                <span>Cancel</span>
+            </button>
+
+            <button type="button" id="slArchiveConfirmBtn" class="ui-btn ui-btn-warning"
                 onclick="submitSlArchiveModal()">
+
                 <i class="fa-solid fa-box-archive"></i>
                 <span>Archive Logs</span>
             </button>
@@ -687,6 +724,7 @@ $status = $status ?? 'active';
     var slController = null;
     var slDraftCountController = null;
     var slDraftCountTimer = null;
+    var systemLogsRefreshWatcher = null;
 
     document.addEventListener('DOMContentLoaded', function () {
         syncSlFilterInputs();
@@ -852,57 +890,76 @@ $status = $status ?? 'active';
         });
     }
 
-    @php $latestLogId = optional(($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs -> getCollection() : $logs) -> first()) -> id ?? 0; @endphp
+    @php
+    $latestLogId = optional(
+        (
+            $logs instanceof \Illuminate\Pagination\LengthAwarePaginator
+        ? $logs -> getCollection()
+        : $logs
+    ) -> first()
+    ) -> id ?? 0;
+    @endphp
 
-    var lastKnownId = {{ (int) $latestLogId }};
-    var notifBanner = null;
+    systemLogsRefreshWatcher = window.initGlobalRefreshWatcher?.({
+        key: 'system-logs',
 
-    function checkForNewLogs() {
-        if (slState.status === 'archived') return;
+        url: @json(
+            route('admin.system_logs.check'). '?status=active'
+        ),
 
-        fetch("{{ route('admin.system_logs.check') }}?status=" + encodeURIComponent(slState.status || 'active'), {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+        interval: 5000,
+
+        initialItems: @json(
+            $latestLogId
+                ? [['id' => (int) $latestLogId]]
+                : []
+        ),
+
+        anchorSelector:
+            '#mainContent.system-logs-page .card',
+
+        itemLabel: 'log entry',
+
+        getItems: function (payload) {
+            if (Array.isArray(payload)) {
+                return payload;
             }
-        })
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                if (data.latest_id > lastKnownId) {
-                    lastKnownId = data.latest_id;
-                    showNewLogBanner();
-                }
-            }).catch(function () { });
-    }
 
-    function showNewLogBanner() {
-        if (notifBanner) notifBanner.remove();
+            var latestId =
+                Number(payload?.latest_id || 0);
 
-        notifBanner = document.createElement('div');
-        notifBanner.className = 'sl-new-log-banner';
-        notifBanner.innerHTML =
-            '<i class="fa-solid fa-circle-check"></i>' +
-            '<span>New log entries detected.</span>' +
-            '<button type="button" class="sl-toast-refresh">Refresh to see</button>' +
-            '<button type="button" class="sl-toast-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>';
+            return latestId > 0
+                ? [{ id: latestId }]
+                : [];
+        },
 
-        notifBanner.querySelector('.sl-toast-refresh')?.addEventListener('click', function () {
+        getItemId: function (item) {
+            return item?.id;
+        },
+
+        title: function () {
+            return 'New log entries detected';
+        },
+
+        subtitle: function () {
+            return 'Refresh to see the latest system activity.';
+        },
+
+        onRefresh: function () {
             slState.page = 1;
             slFetch();
-            notifBanner.remove();
-        });
+        },
 
-        notifBanner.querySelector('.sl-toast-close')?.addEventListener('click', function () {
-            notifBanner.remove();
-        });
+        toast: {
+            type: 'success',
+            title: 'System logs updated',
+            message: 'Latest log entries are now shown.'
+        }
+    });
 
-        document.body.appendChild(notifBanner);
+    if (slState.status === 'archived') {
+        systemLogsRefreshWatcher?.stop();
     }
-
-    setInterval(checkForNewLogs, 5000);
-        });
 
     function escapeSlHtml(value) {
         return String(value ?? '')
@@ -1057,9 +1114,10 @@ $status = $status ?? 'active';
 
         el?.classList.add('active');
 
-        if (slState.status === 'archived' && notifBanner) {
-            notifBanner.remove();
-            notifBanner = null;
+        if (slState.status === 'archived') {
+            systemLogsRefreshWatcher?.stop();
+        } else {
+            systemLogsRefreshWatcher?.start();
         }
 
         slFetch();
