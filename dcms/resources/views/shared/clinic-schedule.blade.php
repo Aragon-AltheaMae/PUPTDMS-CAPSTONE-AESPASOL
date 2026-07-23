@@ -238,12 +238,13 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                             <div class="flex items-center justify-between gap-2 sm:justify-end">
 
                                 <button type="button" id="prevWeek" class="ui-icon-btn neutral"
-                                    aria-label="Previous week">
+                                    data-tooltip="Previous week" data-tooltip-tone="neutral" aria-label="Previous week">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </button>
                                 <span id="weekRangeLabel"
                                     class="text-xs font-semibold text-gray-600 px-1 min-w-[140px] text-center"></span>
-                                <button type="button" id="nextWeek" class="ui-icon-btn neutral" aria-label="Next week">
+                                <button type="button" id="nextWeek" class="ui-icon-btn neutral" data-tooltip="Next week"
+                                    data-tooltip-tone="neutral" aria-label="Next week">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </button>
                                 <button type="button" id="todayBtn" class="ui-btn ui-btn-secondary ui-btn-sm">
