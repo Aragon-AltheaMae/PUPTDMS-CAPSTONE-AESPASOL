@@ -447,6 +447,116 @@
     outline-offset: 2px;
 }
 
+.ui-modal .modal-preview-card {
+    width: min(96vw, 1440px) !important;
+    max-width: 1440px !important;
+    height: min(94dvh, 980px) !important;
+    max-height: 94dvh !important;
+}
+
+.ui-modal .modal-preview-body {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1rem 1.25rem;
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.ui-modal .modal-preview-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+.ui-modal .modal-preview-toolbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.ui-modal .modal-preview-zoom-value {
+    min-width: 56px;
+    color: var(--text-2);
+    font-size: .75rem;
+    font-weight: 850;
+    text-align: center;
+}
+
+.ui-modal .modal-preview-stage {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #F8FAFC;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.ui-modal .modal-preview-canvas {
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 0;
+    margin-inline: auto;
+    overflow: visible;
+}
+
+.ui-modal .modal-preview-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #FFFFFF;
+    overflow: hidden;
+    transform-origin: top left;
+    transition:
+        transform .18s ease;
+}
+
+[data-theme="dark"] .ui-modal .modal-preview-stage,
+.dark .ui-modal .modal-preview-stage {
+    background: #0B1117;
+    border-color: rgba(255, 255, 255, .10);
+}
+
+[data-theme="dark"] .ui-modal .modal-preview-frame,
+.dark .ui-modal .modal-preview-frame {
+    background: #FFFFFF;
+    border-color: rgba(255, 255, 255, .12);
+}
+
+@media (max-width: 767px) {
+    .ui-modal .modal-preview-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 94dvh !important;
+        max-height: 94dvh !important;
+    }
+
+    .ui-modal .modal-preview-body {
+        padding: .85rem 1rem;
+    }
+
+    .ui-modal .modal-preview-stage {
+        padding: .65rem;
+    }
+}
+
 .ui-modal .ui-modal-card.modal-sm {
     width: min(94vw, 420px) !important;
     max-width: 420px !important;
@@ -510,6 +620,7 @@
     font-size: 0.72rem !important;
     font-weight: 700 !important;
     line-height: 1.25 !important;
+    margin-top: 0.45rem !important;
 }
 
 .ui-modal .modal-error-banner {

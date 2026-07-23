@@ -8,7 +8,7 @@
 
 @php $logs = $logs ?? collect([]); @endphp
 
-<main id="mainContent" class="admin-page-shell page-enter">
+<main id="mainContent" class="admin-page-shell page-enter mode-list">
 
     <x-dashboard-loading-status />
 
@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-           <div class="stat-card s-ongoing" data-admin-dashboard-card="appointments-this-month">
+            <div class="stat-card s-ongoing" data-admin-dashboard-card="appointments-this-month">
                 <div class="stat-card-info">
                     <div class="stat-label">Appointments</div>
 
@@ -118,17 +118,22 @@
                         </div>
 
                         <div class="card-header-right">
-                            <div class="view-toggle-container" id="dashboardLogsViewToggle"
-                                aria-label="System logs view toggle">
-                                <span class="view-slider"></span>
+                            <div class="view-toggle-container" id="dashboardLogsViewToggle" data-global-view-toggle
+                                data-view-root="#mainContent" data-list-view="#dashboardLogsListView"
+                                data-grid-view="#dashboardLogsGridView" data-storage-key="admin_dashboard_logs_view"
+                                aria-label="System logs view options">
 
-                                <button type="button" class="btn-view-mode active" data-dashboard-logs-view="list"
-                                    aria-label="List view" aria-pressed="true">
+                                <span class="view-slider" aria-hidden="true"></span>
+
+                                <button type="button" class="btn-view-mode active" data-view-mode="list"
+                                    title="List view" aria-label="List view" aria-pressed="true">
+
                                     <i class="fa-solid fa-list"></i>
                                 </button>
 
-                                <button type="button" class="btn-view-mode" data-dashboard-logs-view="grid"
+                                <button type="button" class="btn-view-mode" data-view-mode="grid" title="Grid view"
                                     aria-label="Grid view" aria-pressed="false">
+
                                     <i class="fa-solid fa-grip"></i>
                                 </button>
                             </div>
@@ -396,7 +401,7 @@
 
             <div class="flex flex-col gap-5 min-w-0">
 
-                <div class="card dashboard-quick-actions-card">
+                <div class="card quick-actions-card">
                     <div class="card-header">
                         <div class="card-header-left">
                             <div class="card-header-icon">
@@ -409,7 +414,7 @@
                         </div>
                     </div>
 
-                    <div class="quick-actions-list dashboard-quick-actions-list">
+                    <div class="quick-actions-list">
                         <a href="{{ route('admin.reports') }}" class="quick-action quick-action-card">
                             <span class="quick-action-icon">
                                 <i class="fa-solid fa-chart-column"></i>
@@ -752,8 +757,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        window.initGlobalViewToggles?.();
+
         if (typeof window.setDashboardLoadingStatus === 'function') {
-            window.setDashboardLoadingStatus('Loading system dashboard', 22);
+            window.setDashboardLoadingStatus(
+                'Loading system dashboard',
+                22
+            );
         }
 
         loadAdminDashboardInventoryOverview();

@@ -37,6 +37,7 @@
 @import "./pages/shared/document-requests.css";
 @import './pages/shared/appointments.css';
 @import './pages/shared/clinic-schedule.css';
+@import "./pages/shared/inventory.css";
 
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
@@ -57,7 +58,6 @@
 
 /* Admin pages */
 @import './pages/admin/admin-dashboard.css';
-@import './pages/admin/admin-inventory.css';
 @import './pages/admin/admin-dental-records.css';
 @import './pages/admin/admin-document-templates.css';
 @import './pages/admin/admin-reports.css';

@@ -2,31 +2,24 @@
 
 @section('title', 'Page Not Found')
 @section('code', '404')
+@section('tone', 'missing')
 
-@section('code_styled')
-4<span>0</span>4
-@endsection
+@section('label', 'Page not found')
+@section('message', 'We couldn’t find that page.')
 
-@section('label', 'Page Not Found')
-@section('message', 'We could not find the page you requested.')
-@section('description', 'The page may have been moved, renamed, deleted, or the link you opened may be invalid.')
-@section('status', 'Missing page')
+@section('description', 'The page may have been moved, renamed, removed, or the link may be incorrect.')
 
-@section('brand_title', 'The requested page is unavailable')
-@section('brand_text', 'The resource you are trying to access could not be located in the clinic management system.')
-@section('notice_text', 'Check the link, go back to the previous page, or return home to continue browsing the system.')
+@section('notice_text', 'Check the link, go back to the previous page, or return home to continue.')
 
-@section('brand_icon')
-<svg fill="none" stroke="white" stroke-width="1.7" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="6"></circle>
-    <path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5"></path>
-</svg>
-@endsection
+@section('primary_label', 'Return Home')
+@section('primary_url', url('/'))
 
 @section('notice_icon')
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="12" cy="12" r="9"></circle>
-    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v5"></path>
-    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16h.01"></path>
-</svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+
+        <circle cx="11" cy="11" r="6"></circle>
+
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5">
+        </path>
+    </svg>
 @endsection

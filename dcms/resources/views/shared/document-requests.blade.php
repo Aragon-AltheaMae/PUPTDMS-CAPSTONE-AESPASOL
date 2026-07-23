@@ -1660,7 +1660,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             <button
                 type="button"
                 class="ui-action-btn ui-action-success"
-                data-tooltip="Approve request"
+                data-tooltip="Approve request" data-tooltip-tone="start"
                 aria-label="Approve request"
                 onclick="event.stopPropagation(); openApprove(${request.id}, ${patientArg})">
                 <i class="fa-solid fa-check"></i>
@@ -1669,7 +1669,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             <button
                 type="button"
                 class="ui-action-btn ui-action-delete"
-                data-tooltip="Reject request"
+                data-tooltip="Reject request" data-tooltip-tone="cancel"
                 aria-label="Reject request"
                 onclick="event.stopPropagation(); openReject(${request.id}, ${patientArg})">
                 <i class="fa-solid fa-xmark"></i>

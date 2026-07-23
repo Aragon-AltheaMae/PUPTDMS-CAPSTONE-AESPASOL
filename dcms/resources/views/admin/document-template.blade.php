@@ -226,22 +226,26 @@
                         </span>
 
                         <div class="template-actions" data-template-actions>
-                            <button type="button" class="ui-icon-btn view template-action-btn" title="Preview"
-                                aria-label="Preview template"
+                            <button type="button" class="ui-action-btn ui-action-view template-action-btn"
+                                data-tooltip="Preview template" data-tooltip-tone="view" aria-label="Preview template"
                                 onclick="event.stopPropagation(); openTemplatePreview({{ $tpl->id }})">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
 
                             @if ($tpl->status === 'active')
-                            <button type="button" class="ui-icon-btn template-action-btn template-archive-btn"
-                                title="Archive" aria-label="Archive template" data-template-action="archive"
+                            <button type="button"
+                                class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
+                                data-tooltip="Archive template" data-tooltip-tone="reschedule"
+                                aria-label="Archive template" data-template-action="archive"
                                 data-template-id="{{ $tpl->id }}"
                                 onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
                                 <i class="fa-solid fa-box-archive"></i>
                             </button>
                             @elseif($tpl->status === 'archived')
-                            <button type="button" class="ui-icon-btn template-action-btn template-activate-btn"
-                                title="Activate" aria-label="Activate template" data-template-action="activate"
+                            <button type="button"
+                                class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
+                                data-tooltip="Activate template" data-tooltip-tone="start"
+                                aria-label="Activate template" data-template-action="activate"
                                 data-template-id="{{ $tpl->id }}"
                                 onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
                                 <i class="fa-solid fa-circle-check"></i>
@@ -272,72 +276,148 @@
     </div>
 </main>
 
-<div class="template-preview-backdrop" id="templatePreviewBackdrop" aria-hidden="true">
-    <div class="template-preview-modal" role="dialog" aria-modal="true" aria-labelledby="templatePreviewTitle">
-        <div class="template-preview-header">
-            <div class="template-preview-heading">
-                <div class="template-preview-title" id="templatePreviewTitle">Template Preview</div>
-                <div class="template-preview-subtitle" id="templatePreviewSubtitle">Loading...</div>
+<div id="templatePreviewBackdrop" class="ui-modal modal-theme-primary" aria-hidden="true">
+
+    <div class="ui-modal-card modal-preview-card modal-card-form" role="dialog" aria-modal="true"
+        aria-labelledby="templatePreviewTitle">
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 id="templatePreviewTitle" class="modal-title">
+                        Template Preview
+                    </h2>
+
+                    <p id="templatePreviewSubtitle" class="modal-subtitle">
+                        Loading...
+                    </p>
+                </div>
             </div>
-            <button type="button" class="template-preview-close" id="closeTemplatePreview" aria-label="Close preview">
+
+            <button type="button" class="modal-x" id="closeTemplatePreview" aria-label="Close preview">
+
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="template-preview-meta" id="templatePreviewMeta"></div>
+        <div class="modal-preview-body">
+            <div id="templatePreviewMeta" class="modal-preview-toolbar">
+            </div>
 
-        <div class="template-preview-body">
-            <iframe class="preview-frame" id="templatePreviewFrame"></iframe>
+            <div class="modal-preview-toolbar">
+                <span class="modal-helper-text">
+                    Use the controls to adjust the preview size.
+                </span>
+
+                <div class="modal-preview-toolbar-actions">
+                    <button type="button" id="templateZoomOut" class="ui-action-btn ui-action-neutral"
+                        data-tooltip="Zoom out" aria-label="Zoom out">
+
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+
+                    <span id="templateZoomValue" class="modal-preview-zoom-value">
+                        100%
+                    </span>
+
+                    <button type="button" id="templateZoomIn" class="ui-action-btn ui-action-neutral"
+                        data-tooltip="Zoom in" aria-label="Zoom in">
+
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                    <button type="button" id="templateZoomReset" class="ui-action-btn ui-action-reset"
+                        data-tooltip="Reset zoom" aria-label="Reset zoom">
+
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-preview-stage" id="templatePreviewStage">
+
+                <div class="modal-preview-canvas" id="templatePreviewCanvas">
+
+                    <iframe id="templatePreviewFrame" class="modal-preview-frame" title="Document template preview"
+                        scrolling="no">
+                    </iframe>
+                </div>
+            </div>
         </div>
 
-        <div class="template-preview-footer" id="templatePreviewFooter"></div>
+        <div class="modal-ft" id="templatePreviewFooter">
+        </div>
     </div>
 </div>
 
-<div class="template-action-modal" id="templateArchiveModal" aria-hidden="true" role="dialog" aria-modal="true"
-    aria-labelledby="templateArchiveTitle">
-    <div class="template-action-modal-backdrop" data-template-archive-close></div>
-    <div class="template-action-modal-card template-archive-modal-card">
-        <button type="button" class="template-action-modal-x" data-template-archive-close aria-label="Close modal">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+<div id="templateArchiveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
 
-        <div class="template-action-modal-hero">
-            <div class="template-action-modal-icon">
-                <i class="fa-solid fa-box-archive"></i>
-            </div>
-            <div>
-                <p class="template-action-modal-eyebrow">Template action</p>
-                <h2 class="template-action-modal-title" id="templateArchiveTitle">Archive this template?</h2>
-                <p class="template-action-modal-subtitle">This template will be hidden from active template lists.</p>
-            </div>
-        </div>
+    <div class="ui-modal-card modal-md modal-card-form" role="dialog" aria-modal="true"
+        aria-labelledby="templateArchiveTitle">
 
-        <div class="template-action-modal-body">
-            <div class="template-action-summary-card">
-                <div class="template-action-summary-icon">
-                    <i class="fa-solid fa-file-lines"></i>
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-box-archive"></i>
                 </div>
-                <div class="min-w-0">
-                    <span>Selected template</span>
-                    <strong id="templateArchiveName">Template</strong>
+
+                <div class="modal-copy">
+                    <h2 id="templateArchiveTitle" class="modal-title">
+                        Archive this template?
+                    </h2>
+
+                    <p class="modal-subtitle">
+                        This template will be hidden from active template lists.
+                    </p>
                 </div>
             </div>
 
-            <div class="template-action-warning">
-                <i class="fa-solid fa-circle-info"></i>
-                <p>You can activate this template again later from the archived templates filter.</p>
-            </div>
-        </div>
+            <button type="button" class="modal-x" data-template-archive-close aria-label="Close archive modal">
 
-        <div class="template-action-modal-footer">
-            <button type="button" class="ui-btn ui-btn-secondary template-modal-keep-btn" data-template-archive-close>
-                <i class="fa-solid fa-arrow-left"></i>
-                Keep
+                <i class="fa-solid fa-xmark"></i>
             </button>
-            <button type="button" class="ui-btn template-modal-archive-btn" id="confirmTemplateArchiveBtn">
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-file-lines"></i>
+
+                <div>
+                    <p>
+                        Selected template
+                    </p>
+
+                    <strong id="templateArchiveName">
+                        Template
+                    </strong>
+                </div>
+            </div>
+
+            <div class="modal-helper-text">
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>
+                    You can activate this template again later from the
+                    archived templates filter.
+                </span>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-template-archive-close>
+
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Keep</span>
+            </button>
+
+            <button type="button" class="ui-btn ui-btn-warning" id="confirmTemplateArchiveBtn">
+
                 <i class="fa-solid fa-box-archive"></i>
-                Yes, Archive
+                <span>Yes, Archive</span>
             </button>
         </div>
     </div>
@@ -351,6 +431,14 @@
     let pendingTemplateAction = null;
     let currentPreviewTemplateId = null;
     let currentPreviewPayload = null;
+
+    let templatePreviewScale = 1;
+    let templatePreviewBaseWidth = 0;
+    let templatePreviewBaseHeight = 0;
+
+    const TEMPLATE_PREVIEW_MIN_SCALE = 0.5;
+    const TEMPLATE_PREVIEW_MAX_SCALE = 2;
+    const TEMPLATE_PREVIEW_SCALE_STEP = 0.1;
 
     function templateEscapeHtml(value = '') {
         return String(value ?? '')
@@ -370,22 +458,192 @@
         return d.content || '<p style="padding:1rem;color:#9ca3af;">No preview available.</p>';
     }
 
+    function measureTemplatePreview() {
+        const frame =
+            document.getElementById('templatePreviewFrame');
+
+        const stage =
+            document.getElementById('templatePreviewStage');
+
+        if (!frame || !stage) return;
+
+        const frameDocument =
+            frame.contentDocument ||
+            frame.contentWindow?.document;
+
+        if (!frameDocument) return;
+
+        const html =
+            frameDocument.documentElement;
+
+        const body =
+            frameDocument.body;
+
+        if (!html || !body) return;
+
+        html.style.overflow = 'hidden';
+        body.style.overflow = 'hidden';
+
+        const availableWidth =
+            Math.max(
+                320,
+                stage.clientWidth - 32
+            );
+
+        const contentWidth =
+            Math.max(
+                html.scrollWidth || 0,
+                body.scrollWidth || 0,
+                320
+            );
+
+        templatePreviewBaseWidth =
+            Math.min(
+                availableWidth,
+                contentWidth
+            );
+
+        frame.style.width =
+            `${templatePreviewBaseWidth}px`;
+
+        requestAnimationFrame(function () {
+            templatePreviewBaseHeight =
+                Math.max(
+                    680,
+                    html.scrollHeight || 0,
+                    body.scrollHeight || 0
+                );
+
+            applyTemplatePreviewZoom();
+        });
+    }
+
+    function applyTemplatePreviewZoom() {
+        const frame =
+            document.getElementById('templatePreviewFrame');
+
+        const canvas =
+            document.getElementById('templatePreviewCanvas');
+
+        const value =
+            document.getElementById('templateZoomValue');
+
+        if (
+            !frame ||
+            !canvas ||
+            !templatePreviewBaseWidth ||
+            !templatePreviewBaseHeight
+        ) {
+            return;
+        }
+
+        const scaledWidth =
+            Math.round(
+                templatePreviewBaseWidth *
+                templatePreviewScale
+            );
+
+        const scaledHeight =
+            Math.round(
+                templatePreviewBaseHeight *
+                templatePreviewScale
+            );
+
+        frame.style.width =
+            `${templatePreviewBaseWidth}px`;
+
+        frame.style.height =
+            `${templatePreviewBaseHeight}px`;
+
+        frame.style.transform =
+            `scale(${templatePreviewScale})`;
+
+        canvas.style.width =
+            `${scaledWidth}px`;
+
+        canvas.style.height =
+            `${scaledHeight}px`;
+
+        if (value) {
+            value.textContent =
+                `${Math.round(
+                    templatePreviewScale * 100
+                )}%`;
+        }
+
+        const zoomOut =
+            document.getElementById('templateZoomOut');
+
+        const zoomIn =
+            document.getElementById('templateZoomIn');
+
+        if (zoomOut) {
+            zoomOut.disabled =
+                templatePreviewScale <=
+                TEMPLATE_PREVIEW_MIN_SCALE;
+        }
+
+        if (zoomIn) {
+            zoomIn.disabled =
+                templatePreviewScale >=
+                TEMPLATE_PREVIEW_MAX_SCALE;
+        }
+    }
+
+    function setTemplatePreviewZoom(scale) {
+        templatePreviewScale = Math.min(
+            TEMPLATE_PREVIEW_MAX_SCALE,
+            Math.max(
+                TEMPLATE_PREVIEW_MIN_SCALE,
+                Number(scale) || 1
+            )
+        );
+
+        templatePreviewScale =
+            Math.round(templatePreviewScale * 10) / 10;
+
+        applyTemplatePreviewZoom();
+    }
+
+    function resetTemplatePreviewZoom() {
+        templatePreviewScale = 1;
+
+        applyTemplatePreviewZoom();
+
+        const stage =
+            document.getElementById('templatePreviewStage');
+
+        if (stage) {
+            stage.scrollTop = 0;
+            stage.scrollLeft = 0;
+        }
+    }
+
     function openPreviewModal() {
-        const backdrop = document.getElementById('templatePreviewBackdrop');
-        backdrop?.classList.add('show');
-        backdrop?.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
+        templatePreviewScale = 1;
+        window.openModal?.('templatePreviewBackdrop');
     }
 
     function closePreviewModal() {
-        const backdrop = document.getElementById('templatePreviewBackdrop');
-        backdrop?.classList.remove('show');
-        backdrop?.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        document.getElementById('templatePreviewFrame').srcdoc = '';
+        window.closeModal?.('templatePreviewBackdrop');
+
+        const frame = document.getElementById('templatePreviewFrame');
+
+        if (frame) {
+            frame.srcdoc = '';
+        }
+
         currentPreviewTemplateId = null;
         currentPreviewPayload = null;
-        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+
+        templatePreviewBaseWidth = 0;
+        templatePreviewBaseHeight = 0;
+
+        templatePreviewScale = 1;
+
+        document
+            .querySelectorAll('.template-card')
+            .forEach(card => card.classList.remove('selected'));
     }
 
     function getTemplateCard(id) {
@@ -439,22 +697,30 @@
         const id = card.dataset.id;
 
         actions.innerHTML = `
-        <button type="button" class="ui-icon-btn view template-action-btn" title="Preview"
-            aria-label="Preview template" onclick="event.stopPropagation(); openTemplatePreview(${Number(id)})">
+        <button type="button"
+            class="ui-action-btn ui-action-view template-action-btn"
+            data-tooltip="Preview template"
+            data-tooltip-tone="view"
+            aria-label="Preview template"
+            onclick="event.stopPropagation(); openTemplatePreview(${id})">
             <i class="fa-solid fa-eye"></i>
         </button>
         ${status === 'active' ? `
-            <button type="button" class="ui-icon-btn template-action-btn template-archive-btn"
-                title="Archive" aria-label="Archive template"
+            <button type="button"
+    class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
+    data-tooltip="Archive template"
+    data-tooltip-tone="reschedule"
+    aria-label="Archive template"
                 data-template-action="archive" data-template-id="${id}"
                 onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
                 <i class="fa-solid fa-box-archive"></i>
             </button>
         ` : `
-            <button type="button" class="ui-icon-btn template-action-btn template-activate-btn"
-                title="Activate" aria-label="Activate template"
-                data-template-action="activate" data-template-id="${id}"
-                onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+            <button type="button"
+    class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
+    data-tooltip="Activate template" data-tooltip-tone="start"
+    aria-label="Activate template" data-template-action="activate" data-template-id="${id}"
+    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
                 <i class="fa-solid fa-circle-check"></i>
             </button>
         `}
@@ -508,55 +774,98 @@
     }
 
     function renderPreviewMeta(d) {
-        const metaEl = document.getElementById('templatePreviewMeta');
+        const metaEl =
+            document.getElementById('templatePreviewMeta');
+
         if (!metaEl || !d) return;
 
         const status = d.status || 'active';
-        const statusClass = getStatusBadgeClass(status);
+        const statusClass =
+            getStatusBadgeClass(status);
 
         metaEl.innerHTML = `
-            <span class="template-preview-chip status-badge">
+        <div class="ui-action-group">
+            <span class="status-badge">
                 <i class="fa-solid fa-file-lines"></i>
-                ${templateEscapeHtml(formatTitle(d.document_type))}
+                ${templateEscapeHtml(
+            formatTitle(d.document_type)
+        )}
             </span>
-            <span class="template-preview-chip status-badge">
+
+            <span class="status-badge">
                 <i class="fa-solid fa-layer-group"></i>
-                ${templateEscapeHtml(d.category || '—')}
+                ${templateEscapeHtml(
+            d.category || '—'
+        )}
             </span>
-            <span class="template-preview-chip status-badge">
+
+            <span class="status-badge">
                 <i class="fa-solid fa-print"></i>
-                ${templateEscapeHtml(d.paper_size || '—')} • ${templateEscapeHtml(formatTitle(d.orientation || ''))}
+                ${templateEscapeHtml(
+            d.paper_size || '—'
+        )}
+                •
+                ${templateEscapeHtml(
+            formatTitle(d.orientation || '')
+        )}
             </span>
-            <span class="template-preview-chip status-badge ${statusClass}">
-                ${templateEscapeHtml(getStatusLabel(status))}
+
+            <span class="status-badge ${statusClass}">
+                ${templateEscapeHtml(
+            getStatusLabel(status)
+        )}
             </span>
-            ${d.is_default ? `<span class="template-preview-chip status-badge template-default-badge">Default</span>` : ''}
-        `;
+
+            ${d.is_default
+                ? `
+                    <span class="status-badge">
+                        Default
+                    </span>
+                `
+                : ''
+            }
+        </div>
+    `;
     }
 
     function renderPreviewFooter(d) {
-        const footerEl = document.getElementById('templatePreviewFooter');
+        const footerEl =
+            document.getElementById('templatePreviewFooter');
+
         if (!footerEl || !d) return;
 
         footerEl.innerHTML = `
-            ${d.status === 'active' ? `
-                    <button type="button" class="ui-btn template-modal-archive-btn"
-                        data-template-action="archive" data-template-id="${d.id}">
-                        <i class="fa-solid fa-box-archive"></i>
-                        Archive
-                    </button>
-                ` : `
-                    <button type="button" class="ui-btn template-activate-btn template-preview-activate-btn"
-                        data-template-action="activate" data-template-id="${d.id}">
-                        <i class="fa-solid fa-circle-check"></i>
-                        Activate
-                    </button>
-                `}
-            <button type="button" class="ui-btn ui-btn-secondary" onclick="closePreviewModal()">
-                <i class="fa-solid fa-xmark"></i>
-                Close
-            </button>
-        `;
+        <button type="button"
+            class="ui-btn ui-btn-secondary"
+            onclick="closePreviewModal()">
+
+            <i class="fa-solid fa-xmark"></i>
+            <span>Close</span>
+        </button>
+
+        ${d.status === 'active'
+                ? `
+                <button type="button"
+                    class="ui-btn ui-btn-warning"
+                    data-template-action="archive"
+                    data-template-id="${d.id}">
+
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>Archive</span>
+                </button>
+            `
+                : `
+                <button type="button"
+                    class="ui-btn ui-btn-success"
+                    data-template-action="activate"
+                    data-template-id="${d.id}">
+
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Activate</span>
+                </button>
+            `
+            }
+    `;
     }
 
     async function openTemplatePreview(id) {
@@ -576,6 +885,9 @@
         subtitleEl.textContent = 'Please wait';
         metaEl.innerHTML = '';
         footerEl.innerHTML = '';
+        templatePreviewBaseWidth = 0;
+        templatePreviewBaseHeight = 0;
+
         frameEl.srcdoc =
             '<p style="padding:2rem;text-align:center;color:#94a3b8;font-family:Arial,sans-serif;">Loading preview...</p>';
 
@@ -680,24 +992,20 @@
     function openTemplateArchiveModal(actionData) {
         pendingTemplateAction = actionData;
 
-        const modal = document.getElementById('templateArchiveModal');
-        const nameEl = document.getElementById('templateArchiveName');
+        const nameEl =
+            document.getElementById('templateArchiveName');
 
-        if (nameEl) nameEl.textContent = actionData.name || 'Template';
-        modal?.classList.add('open');
-        modal?.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-lock');
+        if (nameEl) {
+            nameEl.textContent =
+                actionData.name || 'Template';
+        }
+
+        window.openModal?.('templateArchiveModal');
     }
 
     function closeTemplateArchiveModal() {
-        const modal = document.getElementById('templateArchiveModal');
-        modal?.classList.remove('open');
-        modal?.setAttribute('aria-hidden', 'true');
+        window.closeModal?.('templateArchiveModal');
         pendingTemplateAction = null;
-
-        if (!document.querySelector('.template-preview-backdrop.show')) {
-            document.body.classList.remove('modal-lock');
-        }
     }
 
     async function submitTemplateAction(actionData) {
@@ -974,21 +1282,111 @@
         }
 
         document.getElementById('closeTemplatePreview')?.addEventListener('click', closePreviewModal);
-        document.getElementById('templatePreviewBackdrop')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('templatePreviewBackdrop')) closePreviewModal();
-        });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (document.getElementById('templateArchiveModal')?.classList.contains('open')) {
-                    closeTemplateArchiveModal();
-                    return;
-                }
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') return;
+
+            const archiveModal =
+                document.getElementById('templateArchiveModal');
+
+            const previewModal =
+                document.getElementById('templatePreviewBackdrop');
+
+            if (archiveModal?.classList.contains('open')) {
+                closeTemplateArchiveModal();
+                return;
+            }
+
+            if (previewModal?.classList.contains('open')) {
                 closePreviewModal();
             }
         });
 
         filterTemplateCards();
+
+        document
+            .getElementById('templatePreviewFooter')
+            ?.addEventListener('click', function (event) {
+                const actionButton =
+                    event.target.closest('[data-template-action]');
+
+                if (!actionButton) return;
+
+                event.preventDefault();
+
+                window.handleTemplateActionClick(actionButton);
+            });
+
+        document
+            .getElementById('templateZoomOut')
+            ?.addEventListener('click', function () {
+                setTemplatePreviewZoom(
+                    templatePreviewScale -
+                    TEMPLATE_PREVIEW_SCALE_STEP
+                );
+            });
+
+        document
+            .getElementById('templateZoomIn')
+            ?.addEventListener('click', function () {
+                setTemplatePreviewZoom(
+                    templatePreviewScale +
+                    TEMPLATE_PREVIEW_SCALE_STEP
+                );
+            });
+
+        document
+            .getElementById('templateZoomReset')
+            ?.addEventListener(
+                'click',
+                resetTemplatePreviewZoom
+            );
+
+        document.addEventListener('keydown', function (event) {
+            const previewModal =
+                document.getElementById(
+                    'templatePreviewBackdrop'
+                );
+
+            if (!previewModal?.classList.contains('open')) {
+                return;
+            }
+
+            if (!(event.ctrlKey || event.metaKey)) {
+                return;
+            }
+
+            if (event.key === '+' || event.key === '=') {
+                event.preventDefault();
+
+                setTemplatePreviewZoom(
+                    templatePreviewScale +
+                    TEMPLATE_PREVIEW_SCALE_STEP
+                );
+            }
+
+            if (event.key === '-') {
+                event.preventDefault();
+
+                setTemplatePreviewZoom(
+                    templatePreviewScale -
+                    TEMPLATE_PREVIEW_SCALE_STEP
+                );
+            }
+
+            if (event.key === '0') {
+                event.preventDefault();
+                templatePreviewScale = 1;
+            }
+        });
+
+        document
+            .getElementById('templatePreviewFrame')
+            ?.addEventListener(
+                'load',
+                measureTemplatePreview
+            );
+
     });
 </script>
 @endsection

@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Carbon\Carbon;
 
 class AdminAppointmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $today = Carbon::today()->toDateString();
 
@@ -54,6 +54,20 @@ class AdminAppointmentController extends Controller
             return $appt->appointment_date < $today
                 || in_array($status, ['completed', 'cancelled'], true);
         });
+
+        if ($request->expectsJson()) {
+            $appointments = $upcomingAppointments
+                ->merge($pastAppointments)
+                ->map(fn($appointment) => [
+                    'id' => $appointment->id,
+                    'updated_at' => optional($appointment->updated_at)->toISOString(),
+                ])
+                ->values();
+
+            return response()->json([
+                'appointments' => $appointments,
+            ]);
+        }
 
         return view('shared.appointments', [
             'layoutRole' => 'admin',
