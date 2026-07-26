@@ -8,7 +8,6 @@
 
     <title>
         @yield('title', 'Page Unavailable')
-        — PUP Taguig Dental Clinic
     </title>
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
@@ -24,7 +23,7 @@
         $primaryLabel = trim($__env->yieldContent('primary_label')) ?: 'Return Home';
     @endphp
 
-    <main class="error-stage">
+    <main class="error-stage" style="--error-background-image: url('{{ asset('images/PUP-Pylon.jpg') }}');">
 
         <div class="error-ripples" aria-hidden="true">
             <span></span>

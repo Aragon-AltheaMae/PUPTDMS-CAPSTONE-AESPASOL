@@ -250,7 +250,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                             @php $roleSlug = optional($user->role)->slug ?? 'none'; @endphp
 
                                             <span class="badge-role role-{{ $roleSlug }}">
-                                                {{ optional($user->role)->name ?? 'No Role' }}
+                                                {{ optional($user->role)->name ?? 'Patient' }}
                                             </span>
                                         </td>
 
@@ -274,7 +274,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                             'email' => $user->email,
                                             'role' =>
                                             optional($user->role)->display_name ??
-                                            (optional($user->role)->name ?? 'No Role'),
+                                            (optional($user->role)->name ?? 'Patient'),
                                             'status' => ucfirst($user->status),
                                             'source' => 'Users',
                                             'created_at' => $user->created_at
@@ -386,7 +386,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                 @forelse($users as $user)
                                 @php
                                 $roleSlug = optional($user->role)->slug;
-                                $roleName = optional($user->role)->name ?? 'No Role';
+                                $roleName = optional($user->role)->name ?? 'Patient';
                                 @endphp
 
                                 <div class="um-grid-card">
@@ -452,7 +452,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         'email' => $user->email,
                                         'role' =>
                                         optional($user->role)->display_name ??
-                                        (optional($user->role)->name ?? 'No Role'),
+                                        (optional($user->role)->name ?? 'Patient'),
                                         'status' => ucfirst($user->status),
                                         'source' => 'Users',
                                         'created_at' => $user->created_at
@@ -545,46 +545,47 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </main>
 
-<div class="modal-overlay" id="generatedPasswordModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div class="modal-themed-header
-           px-6 py-5 border-b
-           flex items-center justify-between
-           sticky top-0 rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow">
-                    <i class="fa-solid fa-key text-white text-sm"></i>
+<div id="generatedPasswordModal" class="ui-modal modal-theme-success" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Generated Password</h3>
-                    <p class="text-[12px] text-gray-500">Share this with the new user before closing.</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Generated Password</h3>
+                    <p class="modal-subtitle">
+                        Share this with the new user before closing.
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('generatedPasswordModal')"
-                data-close-modal="generatedPasswordModal" class="modal-x" aria-label="Close generated password modal">
+
+            <button type="button" onclick="closeModal('generatedPasswordModal')" class="modal-x"
+                aria-label="Close generated password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="p-6 space-y-4">
+        <div class="modal-bd">
             <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
                 <strong>{{ session('generated_user_password.name') }}</strong><br>
                 <span class="text-xs">{{ session('generated_user_password.email') }}</span>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                <label class="form-label" for="generatedUserPasswordValue">
                     Temporary Password
                 </label>
-                <div class="relative">
+
+                <div class="global-control-wrap">
                     <input type="text" id="generatedUserPasswordValue"
-                        value="{{ session('generated_user_password.password') }}"
-                        class="field-input w-full border border-gray-200 px-3.5 py-3 pr-24 text-sm bg-white font-mono"
-                        readonly>
-                    <button type="button" onclick="copyGeneratedPassword()"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-[#8B0000] text-white text-xs font-bold">
-                        Copy
+                        value="{{ session('generated_user_password.password') }}" class="form-input-custom" readonly>
+
+                    <button type="button" onclick="copyGeneratedPassword()" class="ui-btn ui-btn-primary">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy</span>
                     </button>
                 </div>
             </div>
@@ -593,20 +594,30 @@ $inactiveCount = $inactiveCount ?? 0;
                 This password is shown only once. Ask the user to change it after first login.
             </div>
         </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closeModal('generatedPasswordModal')" class="ui-btn ui-btn-secondary">
+                Close
+            </button>
+        </div>
+
     </div>
 </div>
 
-<div class="modal-overlay modal-theme-primary" id="addModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-lg" onclick="event.stopPropagation()">
-        <div
-            class="um-user-modal-header modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="w-11 h-11 rounded-2xl modal-themed-icon flex-shrink-0">
-                    <i class="fa-solid fa-user-plus text-white text-sm"></i>
+<div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+
+    <div class="ui-modal-card modal-xl">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-plus"></i>
                 </div>
-                <div class="min-w-0">
-                    <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Add New User</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Create a system account and assign access permissions.</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Add New User</h3>
+                    <p class="modal-subtitle">
+                        Create a system account and assign access permissions.
+                    </p>
                 </div>
             </div>
 
@@ -615,14 +626,14 @@ $inactiveCount = $inactiveCount ?? 0;
             </button>
         </div>
 
-        <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm"
-            class="flex-1 flex flex-col min-h-0" data-global-validation data-global-selects data-discard-form
-            data-discard-title="Discard new user?" data-discard-subtitle="You have unsaved account details."
+        <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm" class="modal-card-form"
+            data-global-validation data-global-selects data-discard-form data-discard-title="Discard new user?"
+            data-discard-subtitle="You have unsaved account details."
             data-discard-message="Closing this modal will remove the user information you entered. Do you want to discard your changes?"
             novalidate>
             @csrf
 
-            <div class="um-user-modal-body">
+            <div class="modal-bd">
                 @if ($errors->any())
                 <div class="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 text-xs text-red-700 space-y-1.5">
                     @foreach ($errors->all() as $error)
@@ -634,7 +645,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
                 @endif
 
-                <div class="um-user-modal-grid">
+                <div class="modal-form-grid-2">
                     <div class="um-user-main-card">
                         <div class="um-section-title">
                             <div class="um-section-icon bg-red-50 text-[#8B0000]">
@@ -648,45 +659,53 @@ $inactiveCount = $inactiveCount ?? 0;
                         </div>
 
                         <div class="um-field-grid">
-                            <div class="um-field-full" data-global-field>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Full Name <span class="text-red-500">*</span>
+                            <div class="global-form-group um-field-full" data-global-field>
+
+                                <label class="global-form-label" for="addNameInput">
+                                    Full Name
+                                    <span class="required-mark">*</span>
                                 </label>
-                                <div class="voice-search-row" data-voice-field>
-                                    <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 bg-white"
-                                        placeholder="e.g. Juan dela Cruz" required>
-                                    <div class="voice-input-toggle">
+
+                                <div class="modal-inline-control" data-voice-field>
+
+                                    <div class="modal-inline-main">
+                                        <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
+                                            class="form-input-custom" placeholder="e.g. Juan dela Cruz"
+                                            autocomplete="name" data-field-label="Full Name"
+                                            data-required-message="Please enter the user's full name." required>
+                                    </div>
+
+                                    <div class="modal-control-action voice-input-toggle">
                                         <button type="button" id="addNameMicBtn" class="voice-search-mic external"
                                             data-voice-trigger data-voice-target="#addNameInput"
                                             data-voice-status="#addNameVoiceStatus"
                                             aria-label="Voice input for full name">
+
                                             <i class="fa-solid fa-microphone"></i>
                                         </button>
+
                                         <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                            aria-live="polite"></span>
+                                            aria-live="polite">
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="um-field-full" data-global-field>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Email Address <span class="text-red-500">*</span>
+                            <div class="global-form-group um-field-full" data-global-field>
+
+                                <label class="global-form-label" for="addEmailInput">
+                                    Email Address
+                                    <span class="required-mark">*</span>
                                 </label>
-                                <div class="voice-search-row" data-voice-field>
-                                    <i class="fa-solid fa-envelope text-gray-400 text-xs flex-shrink-0 pl-1"></i>
+
+                                <div class="global-control-wrap">
+                                    <i class="fa-solid fa-envelope global-control-icon"></i>
+
                                     <input type="email" id="addEmailInput" name="email" value="{{ old('email') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 bg-white"
-                                        placeholder="user@pup.edu.ph" required>
-                                    <div class="voice-input-toggle">
-                                        <button type="button" id="addEmailMicBtn" class="voice-search-mic external"
-                                            data-voice-trigger data-voice-target="#addEmailInput"
-                                            data-voice-status="#addEmailVoiceStatus" aria-label="Voice input for email">
-                                            <i class="fa-solid fa-microphone"></i>
-                                        </button>
-                                        <span id="addEmailVoiceStatus" class="voice-status hidden" data-voice-status
-                                            aria-live="polite"></span>
-                                    </div>
+                                        class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
+                                        autocomplete="email" data-field-label="Email Address"
+                                        data-required-message="Please enter an email address."
+                                        data-type-message="Please enter a valid email address." required>
                                 </div>
                             </div>
 
@@ -694,10 +713,29 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Role
                                 </label>
-                                <select name="role_id" id="addRoleSelect" class="field-input js-custom-select">
-                                    <option value="">No Role</option>
+                                <select id="addRoleSelect" name="role_id" class="js-custom-select"
+                                    data-placeholder="Patient" data-field-label="Role">
+                                    @php
+                                    $patientRole = $roles->first(
+                                    fn ($role) =>
+                                    strtolower($role->slug) === 'patient' ||
+                                    strtolower($role->name) === 'patient'
+                                    );
+                                    @endphp
+
+                                    @if ($patientRole)
+                                    <option value="{{ $patientRole->id }}" {{ old('role_id', $patientRole->id) ==
+                                        $patientRole->id ? 'selected' : '' }}>
+                                        {{ $patientRole->display_name }}
+                                    </option>
+                                    @endif
 
                                     @foreach ($roles as $role)
+                                    @continue(
+                                    $patientRole &&
+                                    (int) $role->id === (int) $patientRole->id
+                                    )
+
                                     <option value="{{ $role->id }}" {{ old('role_id')==$role->id ? 'selected' : '' }}>
                                         {{ $role->display_name }}
                                     </option>
@@ -715,30 +753,40 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            <div class="global-form-group" data-global-field>
+
+                                <label class="global-form-label" for="addPhoneInput">
                                     Phone Number
                                 </label>
-                                <input type="text" id="addPhoneInput" name="phone" value="{{ old('phone') }}"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white"
-                                    placeholder="09xx xxx xxxx" inputmode="numeric" autocomplete="tel" maxlength="13">
-                                <p id="addPhoneInputFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx
+
+                                <div class="global-control-wrap">
+                                    <i class="fa-solid fa-phone global-control-icon"></i>
+
+                                    <input type="tel" id="addPhoneInput" name="phone" value="{{ old('phone') }}"
+                                        class="form-input-custom global-control-with-icon" placeholder="09xx xxx xxxx"
+                                        inputmode="numeric" autocomplete="tel" maxlength="13"
+                                        data-field-label="Phone Number">
+                                </div>
+
+                                <p id="addPhoneInputFeedback" class="modal-helper-text">
+                                    Format: 09XX XXX XXXX
                                 </p>
                             </div>
 
-                            <div data-global-field>
-                                <label for="addBirthdateInput"
-                                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            <div class="global-form-group" data-global-field>
+
+                                <label class="global-form-label" for="addBirthdateInput">
                                     Birthdate
                                 </label>
 
-                                <div class="fp-date-input-wrap">
-                                    <input type="text" id="addBirthdateInput" name="birthdate"
-                                        value="{{ old('birthdate') }}" class="field-input fp-date-input js-flatpickr-date-max-today
-        w-full border border-gray-200 rounded-lg px-3.5 py-3 bg-white" placeholder="Select birthdate"
-                                        autocomplete="off" data-validation-rule="notFutureDate" readonly>
+                                <div class="global-control-wrap">
+                                    <i class="fa-regular fa-calendar global-control-icon"></i>
 
-                                    <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                    <input type="text" id="addBirthdateInput" name="birthdate"
+                                        value="{{ old('birthdate') }}"
+                                        class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
+                                        placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
+                                        data-validation-rule="notFutureDate">
                                 </div>
                             </div>
 
@@ -746,8 +794,8 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Gender
                                 </label>
-                                <select name="gender" id="addGenderInput" class="field-input js-custom-select"
-                                    data-placeholder="Select gender">
+                                <select id="addGenderInput" name="gender" class="js-custom-select"
+                                    data-placeholder="Select gender" data-field-label="Gender">
                                     <option value="" disabled>Select gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -823,35 +871,57 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </div>
                             </div>
 
-                            <div class="um-password-note">
+                            <div class="modal-helper-text">
                                 The same generated password is saved for the account and shown again after creation.
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-2">
-                                    Status <span class="text-red-500">*</span>
+                            <div data-global-field>
+                                <label class="form-label">
+                                    Status
+                                    <span class="required-mark">*</span>
                                 </label>
 
-                                <div class="um-status-grid">
-                                    <label class="um-status-card um-status-card--active">
-                                        <input type="radio" name="status" value="active" {{ old('status', 'active'
-                                            )==='active' ? 'checked' : '' }} required
-                                            style="accent-color:#8B0000; margin-top:.22rem;">
-                                        <div class="min-w-0">
-                                            <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
-                                            <div class="text-[11px] text-emerald-700 mt-0.5">Can access the system
-                                                immediately</div>
-                                        </div>
+                                <div class="global-choice-group" role="radiogroup" aria-label="Account status">
+
+                                    <label class="global-choice-card">
+                                        <input type="radio" name="status" id="addStatusActive" value="active"
+                                            class="global-choice-input" data-field-label="Status"
+                                            data-required-message="Please select an account status." {{
+                                            old('status', 'active' )==='active' ? 'checked' : '' }} required>
+
+                                        <span class="global-choice-indicator">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+
+                                        <span class="global-choice-copy">
+                                            <strong class="global-choice-title">
+                                                Active
+                                            </strong>
+
+                                            <small class="global-choice-description">
+                                                User can access the system immediately
+                                            </small>
+                                        </span>
                                     </label>
 
-                                    <label class="um-status-card um-status-card--inactive">
-                                        <input type="radio" name="status" value="inactive" {{ old('status')==='inactive'
-                                            ? 'checked' : '' }} style="accent-color:#8B0000; margin-top:.22rem;">
-                                        <div class="min-w-0">
-                                            <div class="text-sm font-bold text-gray-700 leading-tight">Inactive</div>
-                                            <div class="text-[11px] text-gray-500 mt-0.5">Account exists but login is
-                                                disabled</div>
-                                        </div>
+                                    <label class="global-choice-card">
+                                        <input type="radio" name="status" id="addStatusInactive" value="inactive"
+                                            class="global-choice-input" {{ old('status')==='inactive' ? 'checked' : ''
+                                            }}>
+
+                                        <span class="global-choice-indicator">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </span>
+
+                                        <span class="global-choice-copy">
+                                            <strong class="global-choice-title">
+                                                Inactive
+                                            </strong>
+
+                                            <small class="global-choice-description">
+                                                User login will be disabled
+                                            </small>
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -860,12 +930,12 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div class="modal-ft um-user-modal-footer">
+            <div class="modal-ft">
                 <button type="button" data-discard-close="addModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
-                <button type="submit" class="ui-btn ui-btn-primary um-save-user-btn">
+                <button type="submit" class="ui-btn ui-btn-primary">
                     <i class="fa-solid fa-floppy-disk"></i>
                     <span>Save User</span>
                 </button>
@@ -904,66 +974,64 @@ $inactiveCount = $inactiveCount ?? 0;
             @method('PUT')
             <input type="hidden" id="editOriginalRole" value="">
             <div class="modal-bd modal-scroll-body space-y-4">
-                <div data-global-field>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                        Full Name <span class="text-red-500">*</span>
+                <div class="global-form-group" data-global-field>
+                    <label class="global-form-label" for="editName">
+                        Full Name
+                        <span class="required-mark">*</span>
                     </label>
 
-                    <div class="voice-search-row" data-voice-field>
-                        <input type="text" name="name" id="editName" placeholder="Full name"
-                            class="field-input flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
-                            required>
+                    <div class="modal-inline-control" data-voice-field>
+                        <div class="modal-inline-main">
+                            <input type="text" name="name" id="editName" class="form-input-custom"
+                                placeholder="Full name" autocomplete="name" data-field-label="Full Name"
+                                data-required-message="Please enter the user's full name." required>
+                        </div>
 
                         <div class="voice-input-toggle">
                             <button type="button" id="editNameMicBtn" class="voice-search-mic external"
                                 data-voice-trigger data-voice-target="#editName"
                                 data-voice-status="#editNameVoiceStatus" aria-label="Voice input for edit full name">
+
                                 <i class="fa-solid fa-microphone"></i>
                             </button>
 
                             <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
+                                aria-live="polite">
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div data-global-field>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                        Email Address <span class="text-red-500">*</span>
+                <div class="global-form-group" data-global-field>
+
+                    <label class="global-form-label" for="editEmail">
+                        Email Address
+                        <span class="required-mark">*</span>
                     </label>
 
-                    <div class="voice-search-row" data-voice-field>
-                        <div class="relative flex-1 min-w-0">
-                            <i
-                                class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <div class="global-control-wrap">
+                        <i class="fa-solid fa-envelope global-control-icon"></i>
 
-                            <input type="email" name="email" id="editEmail" placeholder="user@pup.edu.ph"
-                                class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
-                                required>
-                        </div>
-
-                        <div class="voice-input-toggle">
-                            <button type="button" id="editEmailMicBtn" class="voice-search-mic external"
-                                data-voice-trigger data-voice-target="#editEmail"
-                                data-voice-status="#editEmailVoiceStatus" aria-label="Voice input for edit email">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editEmailVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
-                        </div>
+                        <input type="email" name="email" id="editEmail"
+                            class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
+                            autocomplete="email" data-field-label="Email Address"
+                            data-required-message="Please enter an email address."
+                            data-type-message="Please enter a valid email address." required>
                     </div>
                 </div>
 
-                <div data-global-field>
-                    <label for="editRole"
-                        class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                <div class="global-form-group" data-global-field>
+                    <label for="editRole" class="global-form-label">
                         Role
                     </label>
 
-                    <select name="role_id" id="editRole" class="field-input js-custom-select"
-                        data-placeholder="No Role">
-                        <option value="">No Role</option>
+                    <select name="role_id" id="editRole" class="js-custom-select" data-placeholder="Patient"
+                        data-field-label="Role">
+                        @if ($patientRole)
+                        <option value="{{ $patientRole->id }}">
+                            {{ $patientRole->display_name }}
+                        </option>
+                        @endif
 
                         @foreach ($roles as $role)
                         <option value="{{ $role->id }}">
@@ -1001,18 +1069,19 @@ $inactiveCount = $inactiveCount ?? 0;
                         <p id="editPhoneFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
                     </div>
 
-                    <div data-global-field>
-                        <label for="editBirthdate"
-                            class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    <div class="global-form-group" data-global-field>
+
+                        <label class="global-form-label" for="editBirthdate">
                             Birthdate
                         </label>
 
-                        <div class="fp-date-input-wrap">
-                            <input type="text" id="editBirthdate" name="birthdate" class="field-input fp-date-input js-flatpickr-date-max-today
-        w-full border border-gray-200 rounded-lg px-3.5 py-3 bg-white" placeholder="Select birthdate"
-                                autocomplete="off" data-validation-rule="notFutureDate" readonly>
+                        <div class="global-control-wrap">
+                            <i class="fa-regular fa-calendar global-control-icon"></i>
 
-                            <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                            <input type="text" id="editBirthdate" name="birthdate"
+                                class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
+                                placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
+                                data-validation-rule="notFutureDate">
                         </div>
                     </div>
 
@@ -1084,26 +1153,26 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay modal-theme-reset" id="resetModal" aria-hidden="true">
-    <div class="modal-box-inner
-           um-user-modal
-           um-user-modal-sm
-           modal-split-card" onclick="event.stopPropagation()">
-        <div class="modal-themed-header
-           px-6 py-5 border-b
-           flex items-center justify-between
-           sticky top-0 rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl modal-themed-icon">
-                    <i class="fa-solid fa-key text-white text-sm"></i>
+<div id="resetModal" class="ui-modal modal-theme-reset" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <div>
-                    <h3 class="modal-themed-title font-extrabold text-base">
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
                         Reset Password
                     </h3>
-                    <p class="text-[10px] text-gray-500" id="resetModalSubtitle">Set a new password</p>
+
+                    <p class="modal-subtitle" id="resetModalSubtitle">
+                        Set a new password
+                    </p>
                 </div>
             </div>
+
             <button type="button" data-discard-close="resetModal" class="modal-x"
                 aria-label="Close reset password modal">
                 <i class="fa-solid fa-xmark"></i>
@@ -1178,27 +1247,30 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay" id="viewModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-md um-view-details-modal" onclick="event.stopPropagation()">
-        <div class="um-view-details-head">
-            <div class="um-view-head-left">
-                <div class="um-view-head-icon">
+<div id="viewModal" class="ui-modal modal-theme-view" aria-hidden="true">
+
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-id-card-clip"></i>
                 </div>
 
-                <div>
-                    <h3>Account Details</h3>
-                    <p>Review selected account information</p>
+                <div class="modal-copy">
+                    <h3 class="modal-title">Account Details</h3>
+                    <p class="modal-subtitle">
+                        Review selected account information
+                    </p>
                 </div>
             </div>
 
-            <button type="button" onclick="closeModal('viewModal')" data-close-modal="viewModal" class="modal-x"
+            <button type="button" onclick="closeModal('viewModal')" class="modal-x"
                 aria-label="Close account details modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="um-view-details-body">
+        <div class="modal-bd">
             <div class="um-view-profile-card">
                 <div class="um-view-avatar" id="viewInitial">?</div>
 
@@ -1332,7 +1404,7 @@ $inactiveCount = $inactiveCount ?? 0;
             </div>
         </div>
 
-        <div class="modal-ft um-view-details-foot">
+        <div class="modal-ft">
             <button type="button" onclick="closeModal('viewModal')" class="ui-btn ui-btn-secondary">
                 Close
             </button>
@@ -1340,34 +1412,44 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay" id="toggleConfirmModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="modal-themed-header px-6 py-5 border-b flex items-center justify-between sticky top-0 rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div id="toggleModalIcon" class="w-10 h-10 rounded-xl modal-themed-icon">
-                    <i class="fa-solid fa-question-circle text-white text-sm"></i>
+<div id="toggleConfirmModal" class="ui-modal modal-theme-warning" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon" id="toggleModalIcon">
+                    <i class="fa-solid fa-question"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base" id="toggleModalTitle">Confirm Action</h3>
-                    <p class="text-[10px] text-gray-500" id="toggleModalSubtitle">Please confirm this change</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title" id="toggleModalTitle">
+                        Confirm Action
+                    </h3>
+
+                    <p class="modal-subtitle" id="toggleModalSubtitle">
+                        Please confirm this change
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('toggleConfirmModal')" data-close-modal="toggleConfirmModal"
-                class="modal-x" aria-label="Close confirm action modal">
+
+            <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-x"
+                aria-label="Close confirm action modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="p-6">
-            <div id="toggleModalBody" class="rounded-xl p-4 mb-5 flex items-start gap-3 text-sm"></div>
+        <div class="modal-bd">
+            <div id="toggleModalBody" class="global-confirm-alert">
+            </div>
 
-            <div class="flex items-center justify-end gap-3">
+            <div class="modal-ft">
                 <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
+
                 <form id="toggleConfirmForm" method="POST">
                     @csrf
+
                     <button type="submit" id="toggleConfirmBtn" class="ui-btn ui-btn-primary">
                     </button>
                 </form>
@@ -1744,7 +1826,7 @@ $inactiveCount = $inactiveCount ?? 0;
         if (viewName) viewName.textContent = payload.name || 'Unknown User';
         if (viewEmail) viewEmail.textContent = payload.email || 'No email available';
         if (viewId) viewId.textContent = payload.id || 'N/A';
-        if (viewRole) viewRole.textContent = payload.role || 'No Role';
+        if (viewRole) viewRole.textContent = payload.role || 'Patient';
         if (viewSource) viewSource.textContent = payload.source || 'Users';
         if (viewCreatedAt) viewCreatedAt.textContent = payload.created_at || 'N/A';
         if (viewUpdatedAt) viewUpdatedAt.textContent = payload.updated_at || 'N/A';
@@ -1996,7 +2078,7 @@ $inactiveCount = $inactiveCount ?? 0;
             !user.role_id;
 
         return {
-            label: hasNoRole ? 'No Role' : rawName,
+            label: hasNoRole ? 'Patient' : rawName,
             slug: hasNoRole ? 'none' : rawSlug || 'none'
         };
     }

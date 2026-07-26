@@ -304,7 +304,8 @@
             </button>
         </div>
 
-        <div class="modal-preview-body">
+        <div class="modal-preview-body" data-global-preview-zoom data-preview-min="0.5" data-preview-max="2"
+            data-preview-step="0.1">
             <div id="templatePreviewMeta" class="modal-preview-toolbar">
             </div>
 
@@ -315,35 +316,35 @@
 
                 <div class="modal-preview-toolbar-actions">
                     <button type="button" id="templateZoomOut" class="ui-action-btn ui-action-neutral"
-                        data-tooltip="Zoom out" aria-label="Zoom out">
+                        data-preview-zoom-out data-tooltip="Zoom out" aria-label="Zoom out">
 
                         <i class="fa-solid fa-minus"></i>
                     </button>
 
-                    <span id="templateZoomValue" class="modal-preview-zoom-value">
+                    <span id="templateZoomValue" class="modal-preview-zoom-value" data-preview-zoom-value>
                         100%
                     </span>
 
                     <button type="button" id="templateZoomIn" class="ui-action-btn ui-action-neutral"
-                        data-tooltip="Zoom in" aria-label="Zoom in">
+                        data-preview-zoom-in data-tooltip="Zoom in" aria-label="Zoom in">
 
                         <i class="fa-solid fa-plus"></i>
                     </button>
 
                     <button type="button" id="templateZoomReset" class="ui-action-btn ui-action-reset"
-                        data-tooltip="Reset zoom" aria-label="Reset zoom">
+                        data-preview-zoom-reset data-tooltip="Reset zoom" aria-label="Reset zoom">
 
                         <i class="fa-solid fa-arrows-rotate"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="modal-preview-stage" id="templatePreviewStage">
+            <div class="modal-preview-stage" id="templatePreviewStage" data-preview-stage>
 
-                <div class="modal-preview-canvas" id="templatePreviewCanvas">
+                <div class="modal-preview-canvas" id="templatePreviewCanvas" data-preview-canvas>
 
-                    <iframe id="templatePreviewFrame" class="modal-preview-frame" title="Document template preview"
-                        scrolling="no">
+                    <iframe id="templatePreviewFrame" class="modal-preview-frame" data-preview-content
+                        title="Document template preview" scrolling="no">
                     </iframe>
                 </div>
             </div>
@@ -432,14 +433,6 @@
     let currentPreviewTemplateId = null;
     let currentPreviewPayload = null;
 
-    let templatePreviewScale = 1;
-    let templatePreviewBaseWidth = 0;
-    let templatePreviewBaseHeight = 0;
-
-    const TEMPLATE_PREVIEW_MIN_SCALE = 0.5;
-    const TEMPLATE_PREVIEW_MAX_SCALE = 2;
-    const TEMPLATE_PREVIEW_SCALE_STEP = 0.1;
-
     function templateEscapeHtml(value = '') {
         return String(value ?? '')
             .replaceAll('&', '&amp;')
@@ -458,170 +451,18 @@
         return d.content || '<p style="padding:1rem;color:#9ca3af;">No preview available.</p>';
     }
 
-    function measureTemplatePreview() {
-        const frame =
-            document.getElementById('templatePreviewFrame');
-
-        const stage =
-            document.getElementById('templatePreviewStage');
-
-        if (!frame || !stage) return;
-
-        const frameDocument =
-            frame.contentDocument ||
-            frame.contentWindow?.document;
-
-        if (!frameDocument) return;
-
-        const html =
-            frameDocument.documentElement;
-
-        const body =
-            frameDocument.body;
-
-        if (!html || !body) return;
-
-        html.style.overflow = 'hidden';
-        body.style.overflow = 'hidden';
-
-        const availableWidth =
-            Math.max(
-                320,
-                stage.clientWidth - 32
-            );
-
-        const contentWidth =
-            Math.max(
-                html.scrollWidth || 0,
-                body.scrollWidth || 0,
-                320
-            );
-
-        templatePreviewBaseWidth =
-            Math.min(
-                availableWidth,
-                contentWidth
-            );
-
-        frame.style.width =
-            `${templatePreviewBaseWidth}px`;
-
-        requestAnimationFrame(function () {
-            templatePreviewBaseHeight =
-                Math.max(
-                    680,
-                    html.scrollHeight || 0,
-                    body.scrollHeight || 0
-                );
-
-            applyTemplatePreviewZoom();
-        });
-    }
-
-    function applyTemplatePreviewZoom() {
-        const frame =
-            document.getElementById('templatePreviewFrame');
-
-        const canvas =
-            document.getElementById('templatePreviewCanvas');
-
-        const value =
-            document.getElementById('templateZoomValue');
-
-        if (
-            !frame ||
-            !canvas ||
-            !templatePreviewBaseWidth ||
-            !templatePreviewBaseHeight
-        ) {
-            return;
-        }
-
-        const scaledWidth =
-            Math.round(
-                templatePreviewBaseWidth *
-                templatePreviewScale
-            );
-
-        const scaledHeight =
-            Math.round(
-                templatePreviewBaseHeight *
-                templatePreviewScale
-            );
-
-        frame.style.width =
-            `${templatePreviewBaseWidth}px`;
-
-        frame.style.height =
-            `${templatePreviewBaseHeight}px`;
-
-        frame.style.transform =
-            `scale(${templatePreviewScale})`;
-
-        canvas.style.width =
-            `${scaledWidth}px`;
-
-        canvas.style.height =
-            `${scaledHeight}px`;
-
-        if (value) {
-            value.textContent =
-                `${Math.round(
-                    templatePreviewScale * 100
-                )}%`;
-        }
-
-        const zoomOut =
-            document.getElementById('templateZoomOut');
-
-        const zoomIn =
-            document.getElementById('templateZoomIn');
-
-        if (zoomOut) {
-            zoomOut.disabled =
-                templatePreviewScale <=
-                TEMPLATE_PREVIEW_MIN_SCALE;
-        }
-
-        if (zoomIn) {
-            zoomIn.disabled =
-                templatePreviewScale >=
-                TEMPLATE_PREVIEW_MAX_SCALE;
-        }
-    }
-
-    function setTemplatePreviewZoom(scale) {
-        templatePreviewScale = Math.min(
-            TEMPLATE_PREVIEW_MAX_SCALE,
-            Math.max(
-                TEMPLATE_PREVIEW_MIN_SCALE,
-                Number(scale) || 1
-            )
+    function openPreviewModal() {
+        window.openModal?.(
+            'templatePreviewBackdrop'
         );
 
-        templatePreviewScale =
-            Math.round(templatePreviewScale * 10) / 10;
-
-        applyTemplatePreviewZoom();
-    }
-
-    function resetTemplatePreviewZoom() {
-        templatePreviewScale = 1;
-
-        applyTemplatePreviewZoom();
-
-        const stage =
-            document.getElementById('templatePreviewStage');
-
-        if (stage) {
-            stage.scrollTop = 0;
-            stage.scrollLeft = 0;
-        }
-    }
-
-    function openPreviewModal() {
-        templatePreviewScale = 1;
-        window.openModal?.('templatePreviewBackdrop');
+        requestAnimationFrame(() => {
+            window.resetGlobalPreviewZoom?.(
+                document.getElementById(
+                    'templatePreviewBackdrop'
+                )
+            );
+        });
     }
 
     function closePreviewModal() {
@@ -635,11 +476,6 @@
 
         currentPreviewTemplateId = null;
         currentPreviewPayload = null;
-
-        templatePreviewBaseWidth = 0;
-        templatePreviewBaseHeight = 0;
-
-        templatePreviewScale = 1;
 
         document
             .querySelectorAll('.template-card')
@@ -706,24 +542,24 @@
             <i class="fa-solid fa-eye"></i>
         </button>
         ${status === 'active' ? `
-            <button type="button"
-    class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
-    data-tooltip="Archive template"
-    data-tooltip-tone="reschedule"
-    aria-label="Archive template"
-                data-template-action="archive" data-template-id="${id}"
-                onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                <i class="fa-solid fa-box-archive"></i>
-            </button>
-        ` : `
-            <button type="button"
-    class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
-    data-tooltip="Activate template" data-tooltip-tone="start"
-    aria-label="Activate template" data-template-action="activate" data-template-id="${id}"
-    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                <i class="fa-solid fa-circle-check"></i>
-            </button>
-        `}
+                <button type="button"
+        class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
+        data-tooltip="Archive template"
+        data-tooltip-tone="reschedule"
+        aria-label="Archive template"
+                    data-template-action="archive" data-template-id="${id}"
+                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                    <i class="fa-solid fa-box-archive"></i>
+                </button>
+            ` : `
+                <button type="button"
+        class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
+        data-tooltip="Activate template" data-tooltip-tone="start"
+        aria-label="Activate template" data-template-action="activate" data-template-id="${id}"
+        onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                    <i class="fa-solid fa-circle-check"></i>
+                </button>
+            `}
     `;
     }
 
@@ -818,10 +654,10 @@
 
             ${d.is_default
                 ? `
-                    <span class="status-badge">
-                        Default
-                    </span>
-                `
+                        <span class="status-badge">
+                            Default
+                        </span>
+                    `
                 : ''
             }
         </div>
@@ -845,25 +681,25 @@
 
         ${d.status === 'active'
                 ? `
-                <button type="button"
-                    class="ui-btn ui-btn-warning"
-                    data-template-action="archive"
-                    data-template-id="${d.id}">
+                    <button type="button"
+                        class="ui-btn ui-btn-warning"
+                        data-template-action="archive"
+                        data-template-id="${d.id}">
 
-                    <i class="fa-solid fa-box-archive"></i>
-                    <span>Archive</span>
-                </button>
-            `
+                        <i class="fa-solid fa-box-archive"></i>
+                        <span>Archive</span>
+                    </button>
+                `
                 : `
-                <button type="button"
-                    class="ui-btn ui-btn-success"
-                    data-template-action="activate"
-                    data-template-id="${d.id}">
+                    <button type="button"
+                        class="ui-btn ui-btn-success"
+                        data-template-action="activate"
+                        data-template-id="${d.id}">
 
-                    <i class="fa-solid fa-circle-check"></i>
-                    <span>Activate</span>
-                </button>
-            `
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Activate</span>
+                    </button>
+                `
             }
     `;
     }
@@ -885,8 +721,6 @@
         subtitleEl.textContent = 'Please wait';
         metaEl.innerHTML = '';
         footerEl.innerHTML = '';
-        templatePreviewBaseWidth = 0;
-        templatePreviewBaseHeight = 0;
 
         frameEl.srcdoc =
             '<p style="padding:2rem;text-align:center;color:#94a3b8;font-family:Arial,sans-serif;">Loading preview...</p>';
@@ -1316,77 +1150,6 @@
 
                 window.handleTemplateActionClick(actionButton);
             });
-
-        document
-            .getElementById('templateZoomOut')
-            ?.addEventListener('click', function () {
-                setTemplatePreviewZoom(
-                    templatePreviewScale -
-                    TEMPLATE_PREVIEW_SCALE_STEP
-                );
-            });
-
-        document
-            .getElementById('templateZoomIn')
-            ?.addEventListener('click', function () {
-                setTemplatePreviewZoom(
-                    templatePreviewScale +
-                    TEMPLATE_PREVIEW_SCALE_STEP
-                );
-            });
-
-        document
-            .getElementById('templateZoomReset')
-            ?.addEventListener(
-                'click',
-                resetTemplatePreviewZoom
-            );
-
-        document.addEventListener('keydown', function (event) {
-            const previewModal =
-                document.getElementById(
-                    'templatePreviewBackdrop'
-                );
-
-            if (!previewModal?.classList.contains('open')) {
-                return;
-            }
-
-            if (!(event.ctrlKey || event.metaKey)) {
-                return;
-            }
-
-            if (event.key === '+' || event.key === '=') {
-                event.preventDefault();
-
-                setTemplatePreviewZoom(
-                    templatePreviewScale +
-                    TEMPLATE_PREVIEW_SCALE_STEP
-                );
-            }
-
-            if (event.key === '-') {
-                event.preventDefault();
-
-                setTemplatePreviewZoom(
-                    templatePreviewScale -
-                    TEMPLATE_PREVIEW_SCALE_STEP
-                );
-            }
-
-            if (event.key === '0') {
-                event.preventDefault();
-                templatePreviewScale = 1;
-            }
-        });
-
-        document
-            .getElementById('templatePreviewFrame')
-            ?.addEventListener(
-                'load',
-                measureTemplatePreview
-            );
-
     });
 </script>
 @endsection

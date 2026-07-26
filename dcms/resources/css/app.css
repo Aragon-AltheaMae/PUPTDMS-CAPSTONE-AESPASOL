@@ -24,6 +24,7 @@
 @import './components/stat-cards.css';
 @import './components/tables.css';
 @import './components/forms.css';
+@import './components/header.css';
 @import './components/sidebar.css';
 @import './components/footer.css';
 @import './components/impersonation-banner.css';
@@ -38,10 +39,10 @@
 @import './pages/shared/appointments.css';
 @import './pages/shared/clinic-schedule.css';
 @import "./pages/shared/inventory.css";
+@import './pages/shared/reports.css';
 
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
-@import './pages/dentist/dentist-reports.css';
 @import './pages/dentist/dental-services.css';
 @import './pages/dentist/daily-treatment.css';
 @import './pages/dentist/dentist-book-appointment.css';
@@ -60,7 +61,6 @@
 @import './pages/admin/admin-dashboard.css';
 @import './pages/admin/admin-dental-records.css';
 @import './pages/admin/admin-document-templates.css';
-@import './pages/admin/admin-reports.css';
 @import './pages/admin/academic-period.css';
 @import './pages/admin/cms-access.css';
 @import './pages/admin/faculty-integration.css';

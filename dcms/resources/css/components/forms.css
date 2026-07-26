@@ -618,12 +618,24 @@ textarea.form-input-custom.global-form-textarea {
     color: #ffffff;
 }
 
-.custom-select-check {
-    display: none;
+.custom-select-option .custom-select-check {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    flex: 0 0 auto;
 }
 
-.custom-select-option.is-active .custom-select-check {
-    display: inline-flex;
+.custom-select-option.is-active .custom-select-check,
+.custom-select-option[aria-selected="true"] .custom-select-check {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.custom-select-option:not(.is-active)[aria-selected="false"] .custom-select-check {
+    display: none !important;
 }
 
 .custom-select.is-disabled {
@@ -656,6 +668,10 @@ textarea.form-input-custom.global-form-textarea {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .75rem;
+}
+
+.global-choice-group-single {
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .global-choice-card {
@@ -1102,4 +1118,33 @@ textarea.form-input-custom.global-form-textarea {
 [data-theme="dark"] .global-number-stepper-input,
 .dark .global-number-stepper-input {
     color: #F8FAFC !important;
+}
+
+.form-input-custom[class*="js-flatpickr-"][readonly],
+.form-input-custom.js-flatpickr-date[readonly],
+.form-input-custom.js-flatpickr-date-min-today[readonly],
+.form-input-custom.js-flatpickr-date-max-today[readonly],
+.form-input-custom.js-flatpickr-date-range-from[readonly],
+.form-input-custom.js-flatpickr-date-range-to[readonly] {
+    background: #ffffff !important;
+    border-color: #e0ddd8 !important;
+    color: #333333 !important;
+    cursor: pointer !important;
+}
+
+.form-input-custom[class*="js-flatpickr-"][readonly]:hover {
+    border-color: #d3c7c7 !important;
+    background: #fffdfd !important;
+}
+
+.form-input-custom[class*="js-flatpickr-"][readonly]:focus {
+    border-color: var(--crimson, #8b0000) !important;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, .10) !important;
+}
+
+[data-theme="dark"] .form-input-custom[class*="js-flatpickr-"][readonly],
+.dark .form-input-custom[class*="js-flatpickr-"][readonly] {
+    background: #0d1117 !important;
+    border-color: #30363d !important;
+    color: #e5e7eb !important;
 }

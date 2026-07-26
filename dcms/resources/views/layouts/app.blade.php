@@ -35,13 +35,39 @@
 
     <script>
         (function() {
-            const theme = localStorage.getItem('theme') || 'light';
-            const role = @json($layoutRole);
+            const savedTheme =
+                localStorage.getItem('theme');
 
-            document.documentElement.setAttribute('data-theme', theme);
-            document.documentElement.classList.toggle('dark', theme === 'dark');
+            const theme =
+                savedTheme === 'dark' ?
+                'dark' :
+                'light';
+
+            const isDark =
+                theme === 'dark';
+
+            const role =
+                @json($layoutRole);
+
+            document.documentElement.setAttribute(
+                'data-theme',
+                theme
+            );
+
+            document.documentElement.classList.toggle(
+                'dark',
+                isDark
+            );
+
+            document.documentElement.style.colorScheme =
+                isDark ?
+                'dark' :
+                'light';
+
             document.documentElement.style.backgroundColor =
-                theme === 'dark' ? '#000D1A' : '#F4F4F4';
+                isDark ?
+                '#101111' :
+                '#F4F4F4';
 
             const sidebarKeys = {
                 admin: 'adminSidebarCollapsed',
@@ -61,6 +87,40 @@
         })();
     </script>
 
+    <style>
+        html.accessibility-preload .header,
+        html.accessibility-preload #sidebar,
+        html.accessibility-preload #mainContent,
+        html.accessibility-preload #siteFooter {
+            visibility: hidden !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const root = document.documentElement;
+
+            root.classList.add('accessibility-preload');
+
+            const releaseAccessibilityPreload = () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        root.classList.remove(
+                            'accessibility-preload'
+                        );
+                    });
+                });
+            };
+
+            window.releaseAccessibilityPreload =
+                releaseAccessibilityPreload;
+            setTimeout(
+                releaseAccessibilityPreload,
+                1500
+            );
+        })();
+    </script>
+
     <title>
         @hasSection('title')
             @yield('title') | PUP Taguig Dental Clinic
@@ -74,14 +134,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=optional"
         rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-
-    <script src="{{ asset('js/header.js') }}?v={{ filemtime(public_path('js/header.js')) }}" defer></script>
 
     @yield('styles')
     @stack('styles')
@@ -210,6 +266,45 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
+
+    <script>
+        document.addEventListener(
+            'DOMContentLoaded',
+            function() {
+                const release = () => {
+                    window.releaseAccessibilityPreload?.();
+                };
+
+                if (document.querySelector('.asw-widget')) {
+                    release();
+                    return;
+                }
+
+                const observer = new MutationObserver(() => {
+                    if (
+                        !document.querySelector(
+                            '.asw-widget'
+                        )
+                    ) {
+                        return;
+                    }
+
+                    observer.disconnect();
+                    release();
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                setTimeout(() => {
+                    observer.disconnect();
+                    release();
+                }, 1500);
+            }
+        );
+    </script>
 
     @include('partials.chatbot')
 
