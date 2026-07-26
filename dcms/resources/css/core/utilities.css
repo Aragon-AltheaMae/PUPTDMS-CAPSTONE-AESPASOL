@@ -746,6 +746,28 @@
         transform .15s ease;
 }
 
+.global-action-tooltip strong {
+    display: block;
+    margin-bottom: 3px;
+    color: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.global-action-tooltip span {
+    display: block;
+    color: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+    opacity: .92;
+}
+
+.global-action-tooltip span+span {
+    margin-top: 2px;
+}
+
 .global-action-tooltip.show {
     opacity: 1;
     visibility: visible;
