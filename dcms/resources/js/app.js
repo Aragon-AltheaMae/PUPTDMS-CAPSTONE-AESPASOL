@@ -647,103 +647,307 @@ function initAiHelpPopover() {
 function initAccessibilitySheetGesture() {
     let startY = 0;
     let currentY = 0;
+    let tracking = false;
     let dragging = false;
 
-    document.addEventListener('touchstart', (e) => {
-        const menu = document.querySelector('.asw-menu');
-        if (!menu || !menu.contains(e.target)) return;
+    document.addEventListener('touchstart', event => {
+        const menu = event.target.closest('.asw-menu');
 
-        startY = e.touches[0].clientY;
+        if (!menu) return;
+
+        const interactiveElement = event.target.closest(
+            'button, a, input, select, textarea, label'
+        );
+
+        if (interactiveElement) {
+            tracking = false;
+            dragging = false;
+            return;
+        }
+
+        startY = event.touches[0].clientY;
         currentY = startY;
+        tracking = true;
+        dragging = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', event => {
+        if (!tracking) return;
+
+        const menu = document.querySelector('.asw-menu');
+
+        if (!menu) {
+            tracking = false;
+            dragging = false;
+            return;
+        }
+
+        currentY = event.touches[0].clientY;
+
+        const difference = Math.max(
+            0,
+            currentY - startY
+        );
+
+        if (difference < 6) return;
+
         dragging = true;
 
         menu.classList.add('asw-dragging');
-    }, { passive: true });
 
-    document.addEventListener('touchmove', (e) => {
-        if (!dragging) return;
-
-        const menu = document.querySelector('.asw-menu');
-        if (!menu) return;
-
-        currentY = e.touches[0].clientY;
-        const diff = Math.max(0, currentY - startY);
-
-        menu.style.transform = `translateX(-50%) translateY(${diff}px)`;
+        menu.style.transform =
+            `translateX(-50%) translateY(${difference}px)`;
     }, { passive: true });
 
     document.addEventListener('touchend', () => {
-        if (!dragging) return;
+        if (!tracking) return;
 
         const menu = document.querySelector('.asw-menu');
-        if (!menu) return;
 
-        const diff = currentY - startY;
+        tracking = false;
+
+        if (!menu || !dragging) {
+            dragging = false;
+            return;
+        }
+
+        const difference = Math.max(
+            0,
+            currentY - startY
+        );
 
         menu.classList.remove('asw-dragging');
 
-        if (diff > 90) {
-            const closeBtn = menu.querySelector('.asw-menu-close');
-            if (closeBtn) closeBtn.click();
+        if (difference > 90) {
+            menu.querySelector('.asw-menu-close')?.click();
+        } else {
+            menu.style.transform =
+                'translateX(-50%) translateY(0)';
         }
 
-        menu.style.transform = 'translateX(-50%) translateY(0)';
         dragging = false;
+    });
+
+    document.addEventListener('touchcancel', () => {
+        const menu = document.querySelector('.asw-menu');
+
+        tracking = false;
+        dragging = false;
+
+        if (!menu) return;
+
+        menu.classList.remove('asw-dragging');
+        menu.style.removeProperty('transform');
     });
 }
 
-document.addEventListener('DOMContentLoaded', initAccessibilitySheetGesture);
+document.addEventListener(
+    'DOMContentLoaded',
+    initAccessibilitySheetGesture
+);
+
+function initAccessibilityCloseIsolation() {
+    const bindCloseButtons = () => {
+        document
+            .querySelectorAll('.asw-menu-close')
+            .forEach(closeButton => {
+                if (
+                    closeButton.dataset.closeIsolationInitialized ===
+                    'true'
+                ) {
+                    return;
+                }
+
+                closeButton.dataset.closeIsolationInitialized =
+                    'true';
+
+                closeButton.addEventListener('click', event => {
+                    const assistiveGroup =
+                        document.getElementById(
+                            'assistiveFabGroup'
+                        );
+
+                    const assistiveMainFab =
+                        document.getElementById(
+                            'assistiveMainFab'
+                        );
+
+                    const shouldKeepWandOpen =
+                        assistiveGroup?.classList.contains(
+                            'open'
+                        );
+
+                    event.stopPropagation();
+
+                    if (!shouldKeepWandOpen) return;
+
+                    setTimeout(() => {
+                        assistiveGroup.classList.add('open');
+
+                        document.body.classList.add(
+                            'assistive-menu-open'
+                        );
+
+                        assistiveMainFab?.setAttribute(
+                            'aria-expanded',
+                            'true'
+                        );
+                    }, 0);
+                });
+            });
+    };
+
+    bindCloseButtons();
+
+    const observer = new MutationObserver(() => {
+        bindCloseButtons();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    initAccessibilityCloseIsolation
+);
+
 
 function fixSiennaPosition() {
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
     const isPatient = document.body.classList.contains('role-patient');
 
-    const nav = document.querySelector(
-        '.patient-mobile-nav, .mobile-bottom-nav, .bottom-nav, nav[class*="mobile"], #mobileBottomNav'
+    const navCandidates = Array.from(
+        document.querySelectorAll(
+            [
+                '.patient-mobile-nav',
+                '.mobile-bottom-nav',
+                '.bottom-nav',
+                '#mobileBottomNav',
+                '[data-mobile-bottom-nav]'
+            ].join(',')
+        )
     );
 
-    let navHeight = 0;
+    const visibleBottomNav = navCandidates
+        .map(nav => {
+            const rect = nav.getBoundingClientRect();
+            const style = window.getComputedStyle(nav);
 
-    if (isPatient && isMobile && nav) {
-        navHeight = Math.ceil(nav.getBoundingClientRect().height);
-    }
-
-    if (isPatient && isMobile && navHeight < 70) {
-        navHeight = 92;
-    }
+            return {
+                rect,
+                visible:
+                    style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    rect.width > 0 &&
+                    rect.height > 0 &&
+                    rect.bottom > window.innerHeight * 0.7
+            };
+        })
+        .filter(item => item.visible)
+        .sort((first, second) => second.rect.top - first.rect.top)[0];
 
     const right = isMobile ? 18 : 22;
     const fabSize = isMobile ? 48 : 46;
     const gap = 14;
 
-    const accessibilityBottom = isPatient && isMobile
-        ? navHeight + 16
+    let navClearance = 0;
+
+    if (isPatient && isMobile) {
+        navClearance = visibleBottomNav
+            ? Math.max(0, window.innerHeight - visibleBottomNav.rect.top)
+            : 92;
+    }
+
+    const assistiveGroupBottom = isPatient && isMobile
+        ? navClearance + 10
         : 24;
 
-    const chatbotBottom = accessibilityBottom;
-    const backTopBottom = accessibilityBottom + fabSize + gap;
+    const backTopBottom =
+        assistiveGroupBottom + fabSize + gap;
 
-    document.documentElement.style.setProperty('--float-right', `${right}px`);
-    document.documentElement.style.setProperty('--float-right-final', `${right}px`);
-    document.documentElement.style.setProperty('--patient-nav-height', `${navHeight}px`);
-    document.documentElement.style.setProperty('--fab-final-size', `${fabSize}px`);
-    document.documentElement.style.setProperty('--accessibility-bottom', `${accessibilityBottom}px`);
-    document.documentElement.style.setProperty('--accessibility-bottom-final', `${accessibilityBottom}px`);
-    document.documentElement.style.setProperty('--chatbot-bottom-final', `${chatbotBottom}px`);
-    document.documentElement.style.setProperty('--back-top-bottom', `${backTopBottom}px`);
-    document.documentElement.style.setProperty('--back-top-bottom-final', `${backTopBottom}px`);
+    const root = document.documentElement;
 
-    document.querySelectorAll('.asw-widget, .asw-menu-btn').forEach((el) => {
-        el.style.setProperty('--asw-off-x', `${right}px`);
-        el.style.setProperty('--asw-off-y', `${accessibilityBottom}px`);
-        el.style.setProperty('--asw-right', `${right}px`);
-        el.style.setProperty('--asw-bottom', `${accessibilityBottom}px`);
-        el.style.right = `${right}px`;
-        el.style.bottom = `${accessibilityBottom}px`;
-    });
+    root.style.setProperty('--float-right', `${right}px`, 'important');
+    root.style.setProperty('--float-right-final', `${right}px`, 'important');
+    root.style.setProperty('--patient-nav-height', `${navClearance}px`, 'important');
+    root.style.setProperty('--fab-final-size', `${fabSize}px`, 'important');
+    root.style.setProperty('--accessibility-bottom', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--accessibility-bottom-final', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--chatbot-bottom-final', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--back-top-bottom', `${backTopBottom}px`, 'important');
+    root.style.setProperty('--back-top-bottom-final', `${backTopBottom}px`, 'important');
+
+    const assistiveGroup =
+        document.getElementById('assistiveFabGroup');
+
+    if (assistiveGroup) {
+        assistiveGroup.style.setProperty(
+            'right',
+            `${right}px`,
+            'important'
+        );
+
+        assistiveGroup.style.setProperty(
+            'bottom',
+            `${assistiveGroupBottom}px`,
+            'important'
+        );
+    }
+
+    document
+        .querySelectorAll('.asw-widget, .asw-menu-btn')
+        .forEach(element => {
+            element.style.setProperty(
+                '--asw-off-x',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-off-y',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-right',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-bottom',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                'right',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                'bottom',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+        });
 }
 
-document.addEventListener('DOMContentLoaded', fixSiennaPosition);
+document.addEventListener('DOMContentLoaded', () => {
+    fixSiennaPosition();
+
+    requestAnimationFrame(() => {
+        fixSiennaPosition();
+    });
+
+    setTimeout(fixSiennaPosition, 250);
+});
+
 window.addEventListener('load', fixSiennaPosition);
 window.addEventListener('resize', fixSiennaPosition);
 window.addEventListener('orientationchange', fixSiennaPosition);
