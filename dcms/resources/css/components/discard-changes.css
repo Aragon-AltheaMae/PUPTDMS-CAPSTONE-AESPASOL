@@ -268,3 +268,150 @@
         padding-inline: .8rem;
     }
 }
+
+.floating-save-bar {
+    position: fixed;
+    left: 50%;
+    bottom: -120px;
+    z-index: 1200;
+
+    width: max-content;
+    max-width: calc(100vw - 2rem);
+    min-height: 64px;
+
+    padding: .7rem .75rem .7rem 1.25rem;
+
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 999px;
+
+    background: #111827;
+    color: #ffffff;
+
+    box-shadow:
+        0 20px 44px rgba(15, 23, 42, .26);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateX(-50%) translateY(18px);
+
+    transition:
+        bottom .24s ease,
+        opacity .2s ease,
+        visibility .2s ease,
+        transform .24s ease;
+}
+
+.floating-save-bar.show {
+    bottom: 2rem;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.fsb-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.fsb-title {
+    color: #ffffff;
+    font-size: .84rem;
+    font-weight: 850;
+    line-height: 1.2;
+}
+
+.fsb-sub {
+    margin-top: 2px;
+    color: #9ca3af;
+    font-size: .7rem;
+    font-weight: 650;
+}
+
+.fsb-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.floating-save-bar .btn-discard,
+.floating-save-bar .btn-save-float,
+.floating-save-bar .btn-reset-defaults {
+    min-height: 40px;
+    padding: 0 1rem;
+    border-radius: 999px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+
+    font-family: inherit;
+    font-size: .78rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.floating-save-bar .btn-discard {
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .10);
+    color: #ffffff;
+}
+
+.floating-save-bar .btn-discard:hover {
+    background: rgba(255, 255, 255, .18);
+}
+
+.floating-save-bar .btn-save-float {
+    border: 1px solid rgba(255, 255, 255, .16);
+    background:
+        linear-gradient(135deg, #8b0000, #b91c1c);
+    color: #ffffff;
+    box-shadow:
+        0 10px 22px rgba(139, 0, 0, .30);
+}
+
+.floating-save-bar .btn-save-float:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+@media (max-width: 767px) {
+    .floating-save-bar {
+        left: .85rem;
+        right: .85rem;
+        width: auto;
+        max-width: none;
+
+        padding: .9rem;
+        border-radius: 20px;
+
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .8rem;
+
+        transform: translateY(18px);
+    }
+
+    .floating-save-bar.show {
+        bottom: 1rem;
+        transform: translateY(0);
+    }
+
+    .fsb-actions {
+        display: grid;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .fsb-actions>button {
+        width: 100%;
+    }
+}

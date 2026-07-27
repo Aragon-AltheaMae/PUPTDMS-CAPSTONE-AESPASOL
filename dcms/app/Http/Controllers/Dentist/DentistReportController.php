@@ -166,35 +166,61 @@ class DentistReportController extends Controller
             "Dentist viewed reports dashboard"
         );
 
-        return view('dentist.dentist-report', compact(
-            'patientsThisMonth',
-            'patientsDelta',
-            'appointmentsToday',
-            'appointmentsDelta',
-            'casesThisMonth',
-            'casesDelta',
-            'lowStockItems',
-            'gadLabels',
-            'gadFemale',
-            'gadMale',
-            'weekLabels',
-            'weeklyDatasets',
-            'medicineItems',
-            'suppliesItems',
-            'lowStockMedicine',
-            'lowStockSupplies',
-            'periodOptions',
-            'totalAppointmentsThisMonth',
-            'cancelledAppointments',
-            'cancellationRate',
-            'avgPatientsPerDay',
-            'returningPatients',
-            'newPatients',
-            'topServices',
-            'notifications',
-            'documentTemplates',
-            'customReportTemplates'
-        ));
+        return view('shared.reports', [
+            'layoutRole' => 'dentist',
+            'pageTitle' => 'Reports & Analytics',
+            'pageShellClass' => 'dentist-page-shell dentist-report-page',
+
+            'isAdminView' => false,
+            'isDentistView' => true,
+
+            'reportStats' => [
+                'patients_this_month' => $patientsThisMonth,
+                'patients_delta' => $patientsDelta,
+
+                'appointments_today' => $appointmentsToday,
+                'appointments_delta' => $appointmentsDelta,
+
+                'cases_this_month' => $casesThisMonth,
+                'cases_delta' => $casesDelta,
+                'completed_appointments' => $casesThisMonth,
+
+                'cancellation_rate' => $cancellationRate,
+                'average_patients_per_day' => $avgPatientsPerDay,
+
+                'returning_patients' => $returningPatients,
+                'new_patients' => $newPatients,
+
+                'low_stock_items' => $lowStockItems,
+                'total_appointments_this_month' => $totalAppointmentsThisMonth,
+                'cancelled_appointments' => $cancelledAppointments,
+            ],
+
+            'reportCharts' => [
+                'gad' => [
+                    'labels' => $gadLabels,
+                    'female' => $gadFemale,
+                    'male' => $gadMale,
+                ],
+
+                'weekly' => [
+                    'labels' => $weekLabels,
+                    'datasets' => $weeklyDatasets,
+                ],
+            ],
+
+            'reportInventory' => [
+                'medicine_items' => $medicineItems,
+                'supplies_items' => $suppliesItems,
+                'low_stock_medicine' => $lowStockMedicine,
+                'low_stock_supplies' => $lowStockSupplies,
+            ],
+
+            'topServices' => $topServices,
+            'periodOptions' => $periodOptions,
+            'documentTemplates' => $documentTemplates,
+            'customReportTemplates' => $customReportTemplates,
+        ]);
     }
 
     public function printTemplate(DocumentTemplate $template)

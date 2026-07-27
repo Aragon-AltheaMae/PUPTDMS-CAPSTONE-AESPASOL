@@ -489,7 +489,7 @@
                         </label>
                     </div>
 
-                    <div id="manageDefaultNote" class="service-default-note admin-hidden">
+                    <div id="manageDefaultNote" class="modal-helper-text">
                         This is a default service type. It can be edited
                         and hidden from booking, but it cannot be deleted.
                     </div>

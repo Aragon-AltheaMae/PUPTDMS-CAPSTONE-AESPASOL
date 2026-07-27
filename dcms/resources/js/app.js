@@ -1,4 +1,5 @@
 import './bootstrap';
+import './header';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Chart from 'chart.js/auto';
 import JSVoice from 'jsvoice';
@@ -1239,6 +1240,144 @@ function initGlobalActionTooltips() {
 
 document.addEventListener('DOMContentLoaded', initGlobalActionTooltips);
 
+function renderGlobalChartTooltip(context) {
+    const {
+        chart,
+        tooltip
+    } = context;
+
+    const element =
+        document.getElementById(
+            'globalActionTooltip'
+        );
+
+    if (!element) return;
+
+    const toneClasses = [
+        'tooltip-view',
+        'tooltip-start',
+        'tooltip-reschedule',
+        'tooltip-cancel',
+        'tooltip-delete',
+        'tooltip-edit',
+        'tooltip-reset',
+        'tooltip-locked',
+        'tooltip-neutral'
+    ];
+
+    if (
+        !tooltip ||
+        tooltip.opacity === 0
+    ) {
+        element.classList.remove(
+            'show',
+            ...toneClasses
+        );
+
+        element.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        element.replaceChildren();
+        return;
+    }
+
+    element.replaceChildren();
+
+    const titleText =
+        tooltip.title
+            ?.filter(Boolean)
+            .join(' · ') || '';
+
+    if (titleText) {
+        const title =
+            document.createElement('strong');
+
+        title.textContent = titleText;
+        element.appendChild(title);
+    }
+
+    const lines =
+        tooltip.body
+            ?.flatMap(
+                item => item.lines || []
+            ) || [];
+
+    lines.forEach(line => {
+        const row =
+            document.createElement('span');
+
+        row.textContent = line;
+        element.appendChild(row);
+    });
+
+    element.classList.remove(
+        ...toneClasses
+    );
+
+    element.classList.add(
+        'show',
+        'tooltip-neutral'
+    );
+
+    element.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    const canvasRect =
+        chart.canvas.getBoundingClientRect();
+
+    const tooltipRect =
+        element.getBoundingClientRect();
+
+    const viewportPadding = 12;
+    const gap = 10;
+
+    let left =
+        canvasRect.left +
+        tooltip.caretX -
+        tooltipRect.width / 2;
+
+    let top =
+        canvasRect.top +
+        tooltip.caretY -
+        tooltipRect.height -
+        gap;
+
+    left = Math.min(
+        Math.max(viewportPadding, left),
+        window.innerWidth -
+        tooltipRect.width -
+        viewportPadding
+    );
+
+    if (top < viewportPadding) {
+        top =
+            canvasRect.top +
+            tooltip.caretY +
+            gap;
+    }
+
+    element.style.left = `${left}px`;
+    element.style.top = `${top}px`;
+}
+
+function getGlobalChartTooltipOptions(
+    callbacks = {}
+) {
+    return {
+        enabled: false,
+        external: renderGlobalChartTooltip,
+        callbacks
+    };
+}
+
+window.renderGlobalChartTooltip = renderGlobalChartTooltip;
+
+window.getGlobalChartTooltipOptions = getGlobalChartTooltipOptions;
+
 document.addEventListener(
     'reset',
     event => {
@@ -1677,34 +1816,115 @@ function initSidebarScrollMemory() {
 }
 
 function applyGlobalTheme(theme = 'light') {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    const nextTheme =
+        theme === 'dark'
+            ? 'dark'
+            : 'light';
 
-    document.documentElement.setAttribute('data-theme', nextTheme);
-    document.documentElement.style.backgroundColor = nextTheme === 'dark' ? '#000D1A' : '#F4F4F4';
+    const isDark =
+        nextTheme === 'dark';
 
-    localStorage.setItem('theme', nextTheme);
+    const root =
+        document.documentElement;
 
-    document.querySelectorAll('.theme-option[data-theme-choice]').forEach(option => {
-        option.classList.toggle('active', option.dataset.themeChoice === nextTheme);
-    });
+    root.setAttribute(
+        'data-theme',
+        nextTheme
+    );
 
-    document.querySelectorAll('.theme-indicator').forEach(indicator => {
-        indicator.classList.toggle('dark-mode', nextTheme === 'dark');
-    });
+    root.classList.toggle(
+        'dark',
+        isDark
+    );
 
-    document.querySelectorAll('#themeSwitchCheckbox').forEach(checkbox => {
-        checkbox.checked = nextTheme === 'dark';
-    });
+    root.style.colorScheme =
+        isDark
+            ? 'dark'
+            : 'light';
 
-    document.querySelectorAll('#themeIcon').forEach(icon => {
-        icon.className = nextTheme === 'dark'
-            ? 'fa-regular fa-moon text-gray-400 text-base'
-            : 'fa-regular fa-sun text-gray-400 text-base';
-    });
+    root.style.backgroundColor =
+        isDark
+            ? '#101111'
+            : '#F4F4F4';
 
-    window.dispatchEvent(new CustomEvent('global-theme-change', {
-        detail: { theme: nextTheme }
-    }));
+    localStorage.setItem(
+        'theme',
+        nextTheme
+    );
+
+    document
+        .querySelectorAll(
+            '.theme-option[data-theme-choice]'
+        )
+        .forEach(option => {
+            option.classList.toggle(
+                'active',
+                option.dataset.themeChoice ===
+                nextTheme
+            );
+
+            option.setAttribute(
+                'aria-pressed',
+                option.dataset.themeChoice ===
+                    nextTheme
+                    ? 'true'
+                    : 'false'
+            );
+        });
+
+    document
+        .querySelectorAll(
+            '.theme-indicator'
+        )
+        .forEach(indicator => {
+            indicator.classList.toggle(
+                'dark-mode',
+                isDark
+            );
+        });
+
+    document
+        .querySelectorAll(
+            '#themeSwitchCheckbox'
+        )
+        .forEach(checkbox => {
+            checkbox.checked =
+                isDark;
+        });
+
+    document
+        .querySelectorAll(
+            '#themeIcon'
+        )
+        .forEach(icon => {
+            icon.className =
+                isDark
+                    ? 'fa-solid fa-moon text-gray-400 text-base'
+                    : 'fa-regular fa-sun text-gray-400 text-base';
+        });
+
+    document
+        .querySelectorAll(
+            '[data-sidebar-theme-icon]'
+        )
+        .forEach(icon => {
+            icon.className =
+                isDark
+                    ? 'fa-regular fa-moon'
+                    : 'fa-solid fa-sun';
+        });
+
+    window.dispatchEvent(
+        new CustomEvent(
+            'global-theme-change',
+            {
+                detail: {
+                    theme: nextTheme,
+                    isDark
+                }
+            }
+        )
+    );
 }
 
 function initGlobalThemeControls(root = document) {
@@ -1955,42 +2175,75 @@ function initGlobalSidebar() {
             'sidebar-preload',
             'sidebar-collapsed-init'
         );
+
         return;
     }
 
     const storageKey = getSidebarStorageKey();
-    const storedValue = localStorage.getItem(storageKey);
-    const savedState = storedValue === '1';
+    const savedState =
+        localStorage.getItem(storageKey) === '1';
 
-    document.documentElement.classList.remove('sidebar-collapsed-init');
-
+    /*
+     * Apply muna ang totoong state bago alisin
+     * ang initialization classes.
+     */
     applySidebarState(savedState);
 
     document.querySelectorAll(
         '#sidebarToggleBtn, #desktopSidebarToggle, [data-sidebar-toggle]'
     ).forEach(button => {
-        if (button.dataset.sidebarInitialized === 'true') return;
+        if (
+            button.dataset.sidebarInitialized ===
+            'true'
+        ) {
+            return;
+        }
 
         button.dataset.sidebarInitialized = 'true';
 
         if (!button.getAttribute('onclick')) {
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-                toggleSidebar();
-            });
+            button.addEventListener(
+                'click',
+                event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    toggleSidebar();
+                }
+            );
         }
     });
 
     requestAnimationFrame(() => {
-        document.documentElement.classList.remove(
-            'sidebar-preload',
-            'sidebar-collapsed-init'
-        );
-
         applySidebarState(savedState);
+
+        requestAnimationFrame(() => {
+            document.documentElement.classList.remove(
+                'sidebar-preload',
+                'sidebar-collapsed-init'
+            );
+        });
     });
 }
+
+window.addEventListener('pageshow', () => {
+    const sidebar =
+        document.getElementById('sidebar');
+
+    if (!sidebar) return;
+
+    const savedState =
+        localStorage.getItem(
+            getSidebarStorageKey()
+        ) === '1';
+
+    applySidebarState(savedState);
+
+    document.documentElement.classList.remove(
+        'sidebar-preload',
+        'sidebar-collapsed-init'
+    );
+});
 
 function initAdminSidebarGroupClick() {
     const sidebar = document.querySelector('#sidebar.sidebar-admin');
@@ -2298,6 +2551,88 @@ function initFlashToasts() {
     });
 }
 
+function initSessionTimeoutModal() {
+    const modal = document.querySelector(
+        '[data-session-timeout-modal]'
+    );
+
+    if (
+        !modal?.id ||
+        modal.dataset.sessionTimeoutInitialized === 'true'
+    ) {
+        return;
+    }
+
+    modal.dataset.sessionTimeoutInitialized = 'true';
+
+    const primaryButton = modal.querySelector(
+        '[data-session-timeout-primary]'
+    );
+
+    const closeButtons = modal.querySelectorAll(
+        '[data-session-timeout-close]'
+    );
+
+    const redirectUrl =
+        primaryButton?.dataset.redirectUrl ||
+        '/';
+
+    let redirectStarted = false;
+
+    const redirectToLandingPage = () => {
+        if (redirectStarted) return;
+
+        redirectStarted = true;
+
+        if (primaryButton) {
+            primaryButton.disabled = true;
+            primaryButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Redirecting...</span>
+            `;
+        }
+
+        window.location.assign(redirectUrl);
+    };
+
+    primaryButton?.addEventListener(
+        'click',
+        redirectToLandingPage
+    );
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            closeModal(modal.id);
+        });
+    });
+
+    const currentUrl = new URL(
+        window.location.href
+    );
+
+    if (
+        currentUrl.searchParams.get('reason') === 'idle'
+    ) {
+        currentUrl.searchParams.delete('reason');
+
+        window.history.replaceState(
+            {},
+            document.title,
+            `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+        );
+    }
+
+    requestAnimationFrame(() => {
+        openModal(modal.id);
+
+        requestAnimationFrame(() => {
+            primaryButton?.focus({
+                preventScroll: true
+            });
+        });
+    });
+}
+
 function acceptTerms() {
     const modal = document.getElementById('termsModal');
 
@@ -2336,11 +2671,13 @@ function initTermsModal() {
 document.addEventListener('DOMContentLoaded', () => {
     initFlashToasts();
     initTermsModal();
+    initSessionTimeoutModal();
 });
 
 window.acceptTerms = acceptTerms;
 window.initTermsModal = initTermsModal;
 window.initFlashToasts = initFlashToasts;
+window.initSessionTimeoutModal = initSessionTimeoutModal;
 
 const modalTimers = {};
 
@@ -2476,6 +2813,603 @@ document.addEventListener('keydown', function (event) {
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.closeModalOnBackdrop = closeModalOnBackdrop;
+
+const globalPreviewZoomStates = new WeakMap();
+
+function resolveGlobalPreviewZoomRoot(source = document) {
+    let element = source;
+
+    if (typeof source === 'string') {
+        element = document.querySelector(source);
+    }
+
+    if (!element) return null;
+
+    if (
+        element.matches?.(
+            '[data-global-preview-zoom]'
+        )
+    ) {
+        return element;
+    }
+
+    return element.querySelector?.(
+        '[data-global-preview-zoom]'
+    ) || null;
+}
+
+function getGlobalPreviewZoomNumber(
+    root,
+    key,
+    fallback
+) {
+    const value = Number(root.dataset[key]);
+
+    return Number.isFinite(value)
+        ? value
+        : fallback;
+}
+
+function applyGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (
+        !previewRoot ||
+        !state ||
+        !state.baseWidth ||
+        !state.baseHeight
+    ) {
+        return;
+    }
+
+    const scaledWidth = Math.ceil(
+        state.baseWidth * state.scale
+    );
+
+    const scaledHeight = Math.ceil(
+        state.baseHeight * state.scale
+    );
+
+    state.content.style.transformOrigin =
+        'top left';
+
+    state.content.style.transform =
+        `scale(${state.scale})`;
+
+    state.canvas.style.width =
+        `${scaledWidth}px`;
+
+    state.canvas.style.height =
+        `${scaledHeight}px`;
+
+    if (state.value) {
+        state.value.textContent =
+            `${Math.round(
+                state.scale * 100
+            )}%`;
+    }
+
+    if (state.zoomOut) {
+        state.zoomOut.disabled =
+            state.scale <= state.min;
+    }
+
+    if (state.zoomIn) {
+        state.zoomIn.disabled =
+            state.scale >= state.max;
+    }
+
+    previewRoot.dataset.previewScale =
+        String(state.scale);
+}
+
+function measureGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    const {
+        stage,
+        canvas,
+        content
+    } = state;
+
+    const isIframe =
+        content.tagName.toLowerCase() ===
+        'iframe';
+
+    content.style.transform = 'none';
+    content.style.transformOrigin =
+        'top left';
+
+    canvas.style.width = '';
+    canvas.style.height = '';
+
+    let baseWidth = 0;
+    let baseHeight = 0;
+
+    if (isIframe) {
+        content.style.position = 'absolute';
+        content.style.top = '0';
+        content.style.left = '0';
+
+        const frameDocument =
+            content.contentDocument ||
+            content.contentWindow?.document;
+
+        if (!frameDocument) return;
+
+        const html =
+            frameDocument.documentElement;
+
+        const body =
+            frameDocument.body;
+
+        if (!html || !body) return;
+
+        html.style.overflow = 'hidden';
+        body.style.overflow = 'hidden';
+
+        const availableWidth = Math.max(
+            320,
+            stage.clientWidth - 32
+        );
+
+        const contentWidth = Math.max(
+            html.scrollWidth || 0,
+            body.scrollWidth || 0,
+            320
+        );
+
+        baseWidth = Math.min(
+            availableWidth,
+            contentWidth
+        );
+
+        content.style.width =
+            `${baseWidth}px`;
+
+        baseHeight = Math.max(
+            680,
+            html.scrollHeight || 0,
+            body.scrollHeight || 0
+        );
+
+        content.style.height =
+            `${baseHeight}px`;
+    } else {
+        content.style.position = 'relative';
+        content.style.top = '';
+        content.style.left = '';
+        content.style.removeProperty('width');
+        content.style.removeProperty('height');
+
+        const rect =
+            content.getBoundingClientRect();
+
+        baseWidth = Math.max(
+            Math.ceil(rect.width || 0),
+            1
+        );
+
+        baseHeight = Math.max(
+            Math.ceil(rect.height || 0),
+            content.scrollHeight || 0,
+            1
+        );
+
+        content.style.width =
+            `${baseWidth}px`;
+
+        content.style.height =
+            `${baseHeight}px`;
+
+        content.style.position = 'absolute';
+        content.style.top = '0';
+        content.style.left = '0';
+    }
+
+    state.baseWidth =
+        Math.ceil(baseWidth);
+
+    state.baseHeight =
+        Math.ceil(baseHeight);
+
+    applyGlobalPreviewZoom(
+        previewRoot
+    );
+}
+
+function setGlobalPreviewZoom(
+    root,
+    scale
+) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    const nextScale = Math.min(
+        state.max,
+        Math.max(
+            state.min,
+            Number(scale) || 1
+        )
+    );
+
+    state.scale =
+        Math.round(nextScale * 100) / 100;
+
+    applyGlobalPreviewZoom(previewRoot);
+}
+
+function resetGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    state.scale = 1;
+
+    applyGlobalPreviewZoom(previewRoot);
+
+    state.stage.scrollTop = 0;
+    state.stage.scrollLeft = 0;
+}
+
+function refreshGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    if (!previewRoot) return;
+
+    if (
+        !globalPreviewZoomStates.has(
+            previewRoot
+        )
+    ) {
+        initGlobalPreviewZoom(previewRoot);
+    }
+
+    requestAnimationFrame(() => {
+        measureGlobalPreviewZoom(
+            previewRoot
+        );
+    });
+}
+
+function getGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    return (
+        globalPreviewZoomStates.get(
+            previewRoot
+        )?.scale || 1
+    );
+}
+
+function initGlobalPreviewZoom(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const previews = [];
+
+    if (
+        scope.matches?.(
+            '[data-global-preview-zoom]'
+        )
+    ) {
+        previews.push(scope);
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-global-preview-zoom]'
+        )
+        .forEach(preview => {
+            previews.push(preview);
+        });
+
+    previews.forEach(preview => {
+        if (
+            globalPreviewZoomStates.has(
+                preview
+            )
+        ) {
+            return;
+        }
+
+        const stage =
+            preview.querySelector(
+                '[data-preview-stage]'
+            );
+
+        const canvas =
+            preview.querySelector(
+                '[data-preview-canvas]'
+            );
+
+        const content =
+            preview.querySelector(
+                '[data-preview-content]'
+            );
+
+        if (
+            !stage ||
+            !canvas ||
+            !content
+        ) {
+            return;
+        }
+
+        const state = {
+            stage,
+            canvas,
+            content,
+
+            zoomOut:
+                preview.querySelector(
+                    '[data-preview-zoom-out]'
+                ),
+
+            zoomIn:
+                preview.querySelector(
+                    '[data-preview-zoom-in]'
+                ),
+
+            zoomReset:
+                preview.querySelector(
+                    '[data-preview-zoom-reset]'
+                ),
+
+            value:
+                preview.querySelector(
+                    '[data-preview-zoom-value]'
+                ),
+
+            min:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewMin',
+                    0.5
+                ),
+
+            max:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewMax',
+                    2
+                ),
+
+            step:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewStep',
+                    0.1
+                ),
+
+            scale: 1,
+            baseWidth: 0,
+            baseHeight: 0
+        };
+
+        globalPreviewZoomStates.set(
+            preview,
+            state
+        );
+
+        content.style.transition =
+            'transform 180ms ease';
+
+        state.zoomOut?.addEventListener(
+            'click',
+            () => {
+                setGlobalPreviewZoom(
+                    preview,
+                    state.scale -
+                    state.step
+                );
+            }
+        );
+
+        state.zoomIn?.addEventListener(
+            'click',
+            () => {
+                setGlobalPreviewZoom(
+                    preview,
+                    state.scale +
+                    state.step
+                );
+            }
+        );
+
+        state.zoomReset?.addEventListener(
+            'click',
+            () => {
+                resetGlobalPreviewZoom(
+                    preview
+                );
+            }
+        );
+
+        if (
+            content.tagName.toLowerCase() ===
+            'iframe'
+        ) {
+            content.addEventListener(
+                'load',
+                () => {
+                    refreshGlobalPreviewZoom(
+                        preview
+                    );
+                }
+            );
+        }
+
+        requestAnimationFrame(() => {
+            measureGlobalPreviewZoom(
+                preview
+            );
+        });
+    });
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalPreviewZoom();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        const modal =
+            event.detail?.modal ||
+            document;
+
+        initGlobalPreviewZoom(modal);
+
+        requestAnimationFrame(() => {
+            refreshGlobalPreviewZoom(
+                modal
+            );
+        });
+    }
+);
+
+document.addEventListener(
+    'keydown',
+    event => {
+        if (
+            !event.ctrlKey &&
+            !event.metaKey
+        ) {
+            return;
+        }
+
+        const openModal =
+            document.querySelector(
+                '.ui-modal.open'
+            );
+
+        const previewRoot =
+            openModal?.querySelector(
+                '[data-global-preview-zoom]'
+            );
+
+        if (!previewRoot) return;
+
+        const state =
+            globalPreviewZoomStates.get(
+                previewRoot
+            );
+
+        if (!state) return;
+
+        if (
+            event.key === '+' ||
+            event.key === '='
+        ) {
+            event.preventDefault();
+
+            setGlobalPreviewZoom(
+                previewRoot,
+                state.scale + state.step
+            );
+        }
+
+        if (event.key === '-') {
+            event.preventDefault();
+
+            setGlobalPreviewZoom(
+                previewRoot,
+                state.scale - state.step
+            );
+        }
+
+        if (event.key === '0') {
+            event.preventDefault();
+
+            resetGlobalPreviewZoom(
+                previewRoot
+            );
+        }
+    }
+);
+
+let globalPreviewResizeFrame = null;
+
+window.addEventListener(
+    'resize',
+    () => {
+        window.cancelAnimationFrame(
+            globalPreviewResizeFrame
+        );
+
+        globalPreviewResizeFrame =
+            window.requestAnimationFrame(
+                () => {
+                    document
+                        .querySelectorAll(
+                            [
+                                '.ui-modal.open ',
+                                '[data-global-preview-zoom]'
+                            ].join('')
+                        )
+                        .forEach(preview => {
+                            refreshGlobalPreviewZoom(
+                                preview
+                            );
+                        });
+                }
+            );
+    }
+);
+
+window.initGlobalPreviewZoom =
+    initGlobalPreviewZoom;
+
+window.refreshGlobalPreviewZoom =
+    refreshGlobalPreviewZoom;
+
+window.setGlobalPreviewZoom =
+    setGlobalPreviewZoom;
+
+window.resetGlobalPreviewZoom =
+    resetGlobalPreviewZoom;
+
+window.getGlobalPreviewZoom =
+    getGlobalPreviewZoom;
 
 window.openInventoryModal = openModal;
 window.closeInventoryModal = closeModal;

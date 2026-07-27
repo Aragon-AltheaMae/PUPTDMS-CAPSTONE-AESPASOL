@@ -16,14 +16,6 @@
 @section('primary_label', 'Return Home')
 @section('primary_url', url('/'))
 
-@section('brand_icon')
-    <svg fill="none" stroke="white" stroke-width="1.7" viewBox="0 0 24 24">
-        <circle cx="12" cy="13" r="8"></circle>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 1.5"></path>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6"></path>
-    </svg>
-@endsection
-
 @section('notice_icon')
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"></path>

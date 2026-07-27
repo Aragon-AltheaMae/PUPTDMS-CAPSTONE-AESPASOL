@@ -12,8 +12,13 @@
     --error-accent-soft: #FEF2F2;
     --error-accent-border: #FECACA;
 
-    --error-text: #172033;
-    --error-muted: #667085;
+    --error-icon-accent: #8B0000;
+    --error-icon-dark: #650000;
+    --error-icon-soft: #FEF2F2;
+    --error-icon-border: #FECACA;
+
+    --error-text: #5d0303;
+    --error-muted: #29292a;
     --error-border: rgba(148, 163, 184, .28);
 }
 
@@ -34,26 +39,6 @@ body {
         sans-serif;
 
     color: var(--error-text);
-}
-
-@keyframes errorBackgroundPan {
-    0% {
-        background-position:
-            center center,
-            44% 48%;
-    }
-
-    50% {
-        background-position:
-            center center,
-            56% 52%;
-    }
-
-    100% {
-        background-position:
-            center center,
-            44% 48%;
-    }
 }
 
 @keyframes errorGlowDrift {
@@ -116,34 +101,6 @@ body {
     }
 }
 
-.error-page--access {
-    --error-accent: #B45309;
-    --error-accent-dark: #92400E;
-    --error-accent-soft: #FFFBEB;
-    --error-accent-border: #FDE68A;
-}
-
-.error-page--missing {
-    --error-accent: #475569;
-    --error-accent-dark: #334155;
-    --error-accent-soft: #F8FAFC;
-    --error-accent-border: #CBD5E1;
-}
-
-.error-page--session {
-    --error-accent: #7C3AED;
-    --error-accent-dark: #6D28D9;
-    --error-accent-soft: #F5F3FF;
-    --error-accent-border: #DDD6FE;
-}
-
-.error-page--system {
-    --error-accent: #B91C1C;
-    --error-accent-dark: #991B1B;
-    --error-accent-soft: #FEF2F2;
-    --error-accent-border: #FECACA;
-}
-
 .error-ripples {
     position: absolute;
     inset: 0;
@@ -203,39 +160,47 @@ body {
 
     overflow: hidden;
 
-    background:
-        linear-gradient(115deg,
-            rgba(21, 4, 6, .88),
-            rgba(42, 8, 10, .65)),
-        url('/images/PUP-Pylon.jpg');
+    background-color: #26070b;
 
-    background-repeat: no-repeat;
-    background-size: auto, cover;
+    background-image:
+        linear-gradient(115deg,
+            rgba(241, 41, 74, 0.68),
+            rgba(45, 2, 7, 0.528)),
+        var(--error-background-image);
+
+    background-repeat:
+        no-repeat,
+        no-repeat;
+
+    background-size:
+        cover,
+        122% auto;
+
     background-position:
-        center center,
-        48% 50%;
+        center,
+        84% 48%;
+
+    background-attachment:
+        scroll,
+        fixed;
 }
 
 .error-stage::before {
     content: "";
-
     position: absolute;
     z-index: 0;
     inset: -10%;
-
     background:
         radial-gradient(circle at 12% 20%,
-            rgba(255, 255, 255, .13),
+            rgba(255, 255, 255, .10),
             transparent 28%),
-        radial-gradient(circle at 80% 75%,
-            color-mix(in srgb,
-                var(--error-accent) 42%,
-                transparent),
-            transparent 34%);
-
+        radial-gradient(circle at 86% 78%,
+            rgba(139, 0, 0, .28),
+            transparent 36%);
     pointer-events: none;
-
-    will-change: transform, opacity;
+    will-change:
+        transform,
+        opacity;
 
     animation:
         errorGlowDrift 8s linear infinite;
@@ -244,21 +209,22 @@ body {
 .error-panel {
     position: relative;
     z-index: 1;
+
     width: min(760px, 100%);
     overflow: hidden;
-
-    border:
-        1px solid rgba(255, 255, 255, .44);
 
     border-radius: 30px;
 
     background:
         linear-gradient(145deg,
-            rgba(255, 255, 255, .96),
-            rgba(255, 255, 255, .88));
+            rgba(255, 255, 255, 0.206),
+            rgba(255, 255, 255, 0.922));
 
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter:
+        blur(10px) saturate(98%);
+
+    -webkit-backdrop-filter:
+        blur(9px) saturate(10%);
 
     box-shadow:
         0 40px 100px rgba(0, 0, 0, .34),
@@ -320,7 +286,7 @@ body {
     gap: 18px;
 
     border-bottom:
-        1px solid rgba(148, 163, 184, .20);
+        1px solid rgba(226, 228, 229, 0.2);
 }
 
 .error-brand {
@@ -338,24 +304,11 @@ body {
     width: 48px;
     height: 48px;
     flex: 0 0 auto;
-
     display: grid;
     place-items: center;
-
-    border:
-        1px solid color-mix(in srgb,
-            var(--error-accent) 22%,
-            transparent);
-
     border-radius: 15px;
-
-    background:
-        linear-gradient(145deg,
-            #FFFFFF,
-            var(--error-accent-soft));
-
-    box-shadow:
-        0 8px 20px rgba(15, 23, 42, .08);
+    background: #7b03032e;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
 }
 
 .error-brand__logo img {
@@ -421,25 +374,20 @@ body {
 .error-symbol {
     width: 68px;
     height: 68px;
-
     display: grid;
     place-items: center;
-
     border:
-        1px solid var(--error-accent-border);
-
+        1px solid var(--error-icon-border);
     border-radius: 22px;
-
     background:
         linear-gradient(145deg,
-            #FFFFFF,
-            var(--error-accent-soft));
+            #ffffff4c,
+            var(--error-icon-soft));
 
-    color: var(--error-accent);
-
+    color: var(--error-icon-accent);
     box-shadow:
         0 14px 30px color-mix(in srgb,
-            var(--error-accent) 13%,
+            var(--error-icon-accent) 13%,
             transparent);
 }
 
@@ -456,13 +404,12 @@ body {
     max-width: 630px;
     margin: 11px auto 0;
     color: var(--error-text);
-    font-size:
-        clamp(2.35rem,
-            6vw,
-            4rem);
+    font-size: clamp(1.85rem,
+            4.2vw,
+            3rem);
     font-weight: 900;
-    line-height: 1.02;
-    letter-spacing: -.055em;
+    line-height: 1.08;
+    letter-spacing: -.045em;
     text-align: center;
 }
 
@@ -470,7 +417,7 @@ body {
     max-width: 620px;
     margin: 20px auto 0;
     color: var(--error-muted);
-    font-size: .98rem;
+    font-size: .78rem;
     font-weight: 500;
     line-height: 1.75;
     text-align: center;
@@ -583,11 +530,6 @@ body {
     order: -1;
 }
 
-.error-action svg {
-    width: 17px;
-    height: 17px;
-}
-
 .error-action--primary {
     border: 1px solid var(--error-accent);
 
@@ -628,12 +570,10 @@ body {
 
 .error-support {
     margin: 26px auto 0;
-
-    color: #98A2B3;
+    color: var(--error-muted);
     font-size: .72rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.55;
-
     text-align: center;
 }
 
@@ -663,12 +603,12 @@ body {
     .error-brand__logo {
         width: 42px;
         height: 42px;
-        border-radius: 13px;
+        border-radius: 99px;
     }
 
     .error-brand__logo img {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
     }
 
     .error-brand__copy strong {
@@ -707,13 +647,13 @@ body {
 
     .error-heading {
         margin-top: 8px;
-        font-size: clamp(2.15rem, 4.5vw, 3.1rem);
-        line-height: 1.02;
+        font-size: clamp(1.75rem, 3.6vw, 2.55rem);
+        line-height: 1.06;
     }
 
     .error-description {
         margin-top: 13px;
-        font-size: .88rem;
+        font-size: .78rem;
         line-height: 1.6;
     }
 
@@ -778,10 +718,8 @@ body {
     }
 
     .error-heading {
-        font-size:
-            clamp(2.15rem,
-                11vw,
-                3.25rem);
+        font-size: clamp(1.75rem, 8.5vw, 2.6rem);
+        line-height: 1.08;
     }
 
     .error-actions {
