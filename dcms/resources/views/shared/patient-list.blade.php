@@ -545,110 +545,17 @@ $notifCount = $notifications->count();
 
                                 <div class="accent-bar {{ $statusToneClass }}"></div>
 
-                                <div class="card-body-desktop items-center gap-5 px-8 py-4 pl-10">
-                                    <div class="relative flex-shrink-0">
-                                        <img src="{{ $patientImage }}"
-                                            class="patient-avatar w-14 h-14 rounded-full object-cover shadow-sm"
+                                <div class="patient-list-card-body">
+                                    <div class="patient-list-main">
+                                        <img src="{{ $patientImage }}" class="patient-list-avatar"
                                             alt="{{ $patientName }}" />
-                                    </div>
-                                    <div class="patient-list-identity">
-                                        <p class="patient-list-name">
-                                            {{ $patientName }}
-                                        </p>
 
-                                        <div class="global-info-group">
-                                            <span class="global-info-pill">
-                                                <i class="fa-regular fa-id-card"></i>
-                                                {{ $patientStudentNo }}
-                                            </span>
-
-                                            <span class="global-info-pill" title="{{ $patientCourseFull }}">
-                                                <i class="fa-solid fa-graduation-cap"></i>
-                                                {{ $patientCourse }}
-                                            </span>
-                                        </div>
-
-                                        <span class="patient-info hidden">
-                                            {{ $patientCourseCode }}|
-                                            {{ $patientYearLevel }}|
-                                            {{ $patientSection }}|
-                                            {{ $appt->appointment_date }}|
-                                            {{ $patient?->department ?? '' }}|
-                                            {{ optional($appt->created_at)->toDateTimeString() }}
-                                        </span>
-                                    </div>
-
-                                    <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
-                                    <div class="global-info-item global-info-item-inline">
-                                        <div class="global-info-icon {{ $statusToneClass }}">
-                                            <i class="fa-regular fa-calendar"></i>
-                                        </div>
-
-                                        <div class="global-info-copy">
-                                            <span class="global-info-label">
-                                                Date &amp; Time
-                                            </span>
-
-                                            <strong class="global-info-value">
-                                                {{ $dateLabel }}
-                                            </strong>
-
-                                            <small class="global-info-subvalue">
-                                                {{ $timeLabel }}
-                                            </small>
-
-                                            @if ($showDateUrgency)
-                                            <span class="urgency-chip {{ $urgencyClass }}">
-                                                {{ $urgencyLabel }}
-                                            </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="w-px h-10 bg-gray-200 flex-shrink-0"></div>
-                                    <div class="global-info-item global-info-item-inline">
-                                        <div class="global-info-icon {{ $statusToneClass }}">
-                                            <i class="fa-solid fa-tooth"></i>
-                                        </div>
-
-                                        <div class="global-info-copy">
-                                            <span class="global-info-label">
-                                                Service
-                                            </span>
-
-                                            <strong class="global-info-value">
-                                                {{ $serviceLabel }}
-                                            </strong>
-
-                                            <span class="status-pill {{ $pillClass }}">
-                                                <span class="pill-dot"></span>
-                                                {{ $pillText }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="patient-actions">
-                                        <span class="patient-action-chip">
-                                            <i class="fa-regular fa-user"></i>
-                                            View Profile
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="card-body-mobile redesigned-grid-card w-full h-full relative">
-
-                                    <div class="grid-card-top mobile-profile-header">
-                                        <div class="mobile-avatar-row">
-                                            <div class="grid-avatar-wrap">
-                                                <img src="{{ $patientImage }}"
-                                                    class="patient-avatar grid-patient-avatar object-cover shadow-sm"
-                                                    alt="{{ $patientName }}" />
-                                            </div>
-                                        </div>
-
-                                        <div class="grid-patient-main">
-                                            <h3 class="patient-grid-name">
+                                        <div class="patient-list-person">
+                                            <h3 class="patient-list-name">
                                                 {{ $patientName }}
                                             </h3>
-                                            <div class="global-info-group">
+
+                                            <div class="patient-list-meta">
                                                 <span class="global-info-pill">
                                                     <i class="fa-regular fa-id-card"></i>
                                                     {{ $patientStudentNo }}
@@ -659,59 +566,123 @@ $notifCount = $notifications->count();
                                                     {{ $patientCourse }}
                                                 </span>
                                             </div>
-                                            <div class="grid-badge-row">
-                                                <span class="status-pill {{ $pillClass }} grid-status-pill">
-                                                    <span class="pill-dot"></span>{{ $pillText }}
-                                                </span>
-                                            </div>
+
+                                            <span class="patient-info hidden">
+                                                {{ $patientCourseCode }}|
+                                                {{ $patientYearLevel }}|
+                                                {{ $patientSection }}|
+                                                {{ $appt->appointment_date }}|
+                                                {{ $patient?->department ?? '' }}|
+                                                {{ optional($appt->created_at)->toDateTimeString() }}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div class="global-info-grid">
-                                        <div class="global-info-item">
-                                            <div class="global-info-icon {{ $statusToneClass }}">
-                                                <i class="fa-regular fa-calendar"></i>
-                                            </div>
+                                    <div class="patient-list-detail patient-list-date-block">
+                                        <span class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
+                                            <i class="fa-regular fa-calendar"></i>
+                                        </span>
 
-                                            <div class="global-info-copy">
-                                                <span class="global-info-label">
-                                                    Date &amp; Time
-                                                </span>
+                                        <div class="patient-list-detail-copy">
+                                            <span class="patient-list-detail-label">
+                                                Appointment
+                                            </span>
 
-                                                <strong class="global-info-value">
-                                                    {{ $dateLabel }} · {{ $timeLabel }}
-                                                </strong>
+                                            <strong class="patient-list-detail-value">
+                                                {{ $dateLabel }}
+                                            </strong>
+
+                                            <small class="patient-list-detail-subvalue">
+                                                {{ $timeLabel }}
+                                            </small>
+
+                                            @if ($showDateUrgency)
+                                            <span class="urgency-chip {{ $urgencyClass }}">
+                                                {{ $urgencyLabel }}
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="patient-list-detail patient-list-service-block patient-service-block">
+                                        <span class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
+                                            <i class="fa-solid fa-tooth"></i>
+                                        </span>
+
+                                        <div class="patient-list-detail-copy">
+                                            <span class="patient-list-detail-label global-info-label">
+                                                Service
+                                            </span>
+
+                                            <strong class="patient-list-detail-value font-semibold">
+                                                {{ $serviceLabel }}
+                                            </strong>
+
+                                            <span class="status-pill {{ $pillClass }} patient-list-status">
+                                                <span class="pill-dot"></span>
+                                                {{ $pillText }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <span class="patient-list-chevron" aria-hidden="true">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </span>
+                                </div>
+
+                                <div class="patient-grid-card-body">
+                                    <div class="patient-grid-card-header">
+                                        <div class="patient-grid-card-identity">
+                                            <img src="{{ $patientImage }}" class="patient-grid-card-avatar"
+                                                alt="{{ $patientName }}" />
+
+                                            <div class="patient-grid-card-person">
+                                                <h3 class="patient-grid-card-name">
+                                                    {{ $patientName }}
+                                                </h3>
+
+                                                <div class="patient-grid-card-meta">
+                                                    <span class="global-info-pill">
+                                                        <i class="fa-regular fa-id-card"></i>
+                                                        {{ $patientStudentNo }}
+                                                    </span>
+
+                                                    <span class="global-info-pill" title="{{ $patientCourseFull }}">
+                                                        <i class="fa-solid fa-graduation-cap"></i>
+                                                        {{ $patientCourse }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="global-info-item">
-                                            <div class="global-info-icon {{ $statusToneClass }}">
+                                        <div class="patient-grid-card-schedule">
+                                            <strong>{{ $dateLabel }}</strong>
+                                            <span>{{ $timeLabel }}</span>
+
+                                            @if ($showDateUrgency)
+                                            <span class="urgency-chip {{ $urgencyClass }}">
+                                                {{ $urgencyLabel }}
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="patient-grid-card-footer">
+                                        <div class="patient-grid-card-service">
+                                            <span
+                                                class="patient-grid-card-service-icon global-info-icon {{ $statusToneClass }}">
                                                 <i class="fa-solid fa-tooth"></i>
-                                            </div>
+                                            </span>
 
-                                            <div class="global-info-copy">
-                                                <span class="global-info-label">
-                                                    Service
-                                                </span>
-
-                                                <strong class="global-info-value">
-                                                    {{ $serviceLabel }}
-                                                </strong>
-                                            </div>
+                                            <span class="patient-grid-card-service-name">
+                                                {{ $serviceLabel }}
+                                            </span>
                                         </div>
-                                    </div>
 
-                                    <div class="grid-card-footer">
-                                        <span class="grid-action-pill">
-                                            <i class="fa-regular fa-user"></i>
-                                            View Profile
+                                        <span class="status-pill {{ $pillClass }} patient-grid-card-status">
+                                            <span class="pill-dot"></span>
+                                            {{ $pillText }}
                                         </span>
-
-                                        @if ($showDateUrgency)
-                                        <span class="grid-urgency-pill {{ $urgencyClass }}">
-                                            {{ $urgencyLabel }}
-                                        </span>
-                                        @endif
                                     </div>
                                 </div>
                                 @if ($patientProfileUrl)
@@ -732,7 +703,8 @@ $notifCount = $notifications->count();
                     </div>
                     @endforelse
 
-                    <div id="patientSearchEmptyState" class="empty-state empty-state-controlled col-span-full w-full">
+                    <div id="patientSearchEmptyState"
+                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
 
                         <div class="empty-state-icon patient-empty-icon">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -753,7 +725,8 @@ $notifCount = $notifications->count();
                         </button>
                     </div>
 
-                    <div id="patientStatusEmptyState" class="empty-state empty-state-controlled col-span-full w-full">
+                    <div id="patientStatusEmptyState"
+                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
 
                         <div class="empty-state-icon patient-empty-icon">
                             <i id="patientStatusEmptyIcon" class="fa-regular fa-calendar-xmark"></i>
@@ -2090,6 +2063,9 @@ $notifCount = $notifications->count();
             function setPatientEmptyVisible(element, visible) {
                 if (!element) return;
 
+                element.hidden = !visible;
+
+                element.classList.toggle("hidden", !visible);
                 element.classList.toggle("show", visible);
                 element.classList.toggle("is-visible", visible);
             }
@@ -2164,18 +2140,28 @@ $notifCount = $notifications->count();
 
                 var currentStatus = getCurrentPatientStatus();
 
-                var isStatusOnlyEmptyState = !hasSearch &&
+                var isStatusOnlyEmptyState =
+                    !hasSearch &&
                     !hasAdvancedFilters &&
                     currentStatus !== "all";
-                setPatientEmptyVisible(patientSearchEmptyState, false);
-                setPatientEmptyVisible(patientStatusEmptyState, false);
+
+                setPatientEmptyVisible(
+                    patientSearchEmptyState,
+                    false
+                );
+
+                setPatientEmptyVisible(
+                    patientStatusEmptyState,
+                    false
+                );
 
                 if (resetPatientFiltersBtn) {
                     var showClearFiltersButton =
                         hasAdvancedFilters &&
                         !isStatusOnlyEmptyState;
 
-                    resetPatientFiltersBtn.hidden = !showClearFiltersButton;
+                    resetPatientFiltersBtn.hidden =
+                        !showClearFiltersButton;
 
                     resetPatientFiltersBtn.classList.toggle(
                         "hidden",
@@ -2188,41 +2174,67 @@ $notifCount = $notifications->count();
                     );
 
                     resetPatientFiltersBtn.style.display =
-                        showClearFiltersButton ?
-                            "inline-flex" :
-                            "none";
+                        showClearFiltersButton
+                            ? "inline-flex"
+                            : "none";
                 }
+
                 if (hasResults) {
+                    return;
+                }
+
+                if (allPatients.length === 0) {
                     return;
                 }
 
                 if (hasSearch) {
                     if (patientSearchEmptyTitle) {
                         patientSearchEmptyTitle.textContent =
-                            'No results for "' + searchKeyword + '"';
+                            'No results for "' +
+                            searchKeyword +
+                            '"';
                     }
 
-                    setPatientEmptyVisible(patientSearchEmptyState, true);
+                    setPatientEmptyVisible(
+                        patientSearchEmptyState,
+                        true
+                    );
+
+                    return;
+                }
+
+                if (
+                    currentStatus === "all" &&
+                    !hasAdvancedFilters
+                ) {
                     return;
                 }
 
                 var meta = getPatientStatusEmptyMeta(
-                    hasAdvancedFilters ? "all" : currentStatus
+                    hasAdvancedFilters
+                        ? "all"
+                        : currentStatus
                 );
 
                 if (patientStatusEmptyIcon) {
-                    patientStatusEmptyIcon.className = meta.icon;
+                    patientStatusEmptyIcon.className =
+                        meta.icon;
                 }
 
                 if (patientStatusEmptyTitle) {
-                    patientStatusEmptyTitle.textContent = meta.title;
+                    patientStatusEmptyTitle.textContent =
+                        meta.title;
                 }
 
                 if (patientStatusEmptyText) {
-                    patientStatusEmptyText.textContent = meta.text;
+                    patientStatusEmptyText.textContent =
+                        meta.text;
                 }
 
-                setPatientEmptyVisible(patientStatusEmptyState, true);
+                setPatientEmptyVisible(
+                    patientStatusEmptyState,
+                    true
+                );
             }
 
             function updatePage() {

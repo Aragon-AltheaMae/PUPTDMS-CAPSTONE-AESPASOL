@@ -147,8 +147,17 @@ class UserManagementController extends Controller
 
         $plainPassword = $this->generateRandomPassword();
 
+
+        $roleId = $this->resolveUserRoleId(
+            $request->input('role_id')
+        );
+
+        $request->merge([
+            'role_id' => $roleId,
+        ]);
+
         $user = DB::transaction(function () use ($request, $plainPassword) {
-            $role = $request->role_id ? Role::find($request->role_id) : null;
+            $role = Role::findOrFail($request->role_id);
 
             $user = User::create([
                 'name' => $request->name,
@@ -216,8 +225,11 @@ class UserManagementController extends Controller
         ]);
 
         $originalRole = $user->role;
-        $newRoleId = $validated['role_id'] ?? null;
-        $newRole = $newRoleId ? Role::find($newRoleId) : null;
+        $newRoleId = $this->resolveUserRoleId(
+            $validated['role_id'] ?? null
+        );
+
+        $newRole = Role::findOrFail($newRoleId);
         $roleChanged = (string) ($user->role_id ?? '') !== (string) ($newRoleId ?? '');
 
         if ($roleChanged) {
@@ -498,6 +510,26 @@ class UserManagementController extends Controller
                 'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
             ],
         ];
+    }
+
+    private function resolveUserRoleId(mixed $roleId): int
+    {
+        if (!empty($roleId)) {
+            return (int) $roleId;
+        }
+
+        $patientRoleId = Role::query()
+            ->where('slug', 'patient')
+            ->orWhereRaw('LOWER(name) = ?', ['patient'])
+            ->value('id');
+
+        abort_unless(
+            $patientRoleId,
+            422,
+            'The default Patient role is not configured.'
+        );
+
+        return (int) $patientRoleId;
     }
 
     private function generateRandomPassword(): string

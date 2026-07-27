@@ -240,14 +240,25 @@ class AdminReportController extends Controller
             'most_requested_count' => $docMostRequested->total ?? 0,
         ];
 
-        return view('admin.reports', compact(
-            'stats',
-            'treatments',
-            'appointments',
-            'documentRequests',
-            'inventory',
-            'charts'
-        ));
+        return view('shared.reports', [
+            'layoutRole' => 'admin',
+            'pageTitle' => 'Reports & Analytics',
+            'pageShellClass' => 'admin-page-shell',
+
+            'isAdminView' => true,
+            'isDentistView' => false,
+
+            'reportStats' => [
+                'patients' => $stats,
+                'treatments' => $treatments,
+                'appointments' => $appointments,
+                'document_requests' => $documentRequests,
+            ],
+
+            'reportCharts' => $charts,
+
+            'reportInventory' => $inventory,
+        ]);
     }
 
     public function aiGenerated(OpenAIReportService $openAIReportService)
