@@ -96,12 +96,6 @@
     overflow-y: auto;
 }
 
-html.filter-lock,
-body.filter-lock {
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
-}
-
 [data-theme="dark"] .filter-drawer-ui,
 .dark .filter-drawer-ui {
     background:
