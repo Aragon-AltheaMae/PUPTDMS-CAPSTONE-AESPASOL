@@ -29,48 +29,84 @@ $status = $status ?? 'active';
             </div>
         </div>
 
-        <div id="statCards" class="stat-grid sl-stat-grid">
-            <div class="stat-card s-crimson sl-stat-card">
+        <div id="statCards" class="stat-grid">
+            <div class="stat-card s-crimson">
                 <div class="stat-icon-wrapper">
                     <i class="fa-solid fa-clipboard-list"></i>
                 </div>
+
                 <div class="stat-card-info">
-                    <span class="stat-label">Total Logs</span>
-                    <span class="stat-num" id="statTotal">{{ $totalCount }}</span>
-                    <span class="sl-stat-hint">All recorded activity</span>
+                    <span class="stat-label">
+                        Total Logs
+                    </span>
+
+                    <span class="stat-num" id="statTotal">
+                        {{ $totalCount }}
+                    </span>
+
+                    <span class="stat-footer">
+                        All recorded activity
+                    </span>
                 </div>
             </div>
 
-            <div class="stat-card s-red sl-stat-card">
+            <div class="stat-card s-red">
                 <div class="stat-icon-wrapper">
                     <i class="fa-solid fa-user-tie"></i>
                 </div>
+
                 <div class="stat-card-info">
-                    <span class="stat-label">Admin Actions</span>
-                    <span class="stat-num" id="statAdmin">{{ $adminCount }}</span>
-                    <span class="sl-stat-hint">Administrator activity</span>
+                    <span class="stat-label">
+                        Admin Actions
+                    </span>
+
+                    <span class="stat-num" id="statAdmin">
+                        {{ $adminCount }}
+                    </span>
+
+                    <span class="stat-footer">
+                        Administrator activity
+                    </span>
                 </div>
             </div>
 
-            <div class="stat-card s-blue sl-stat-card">
+            <div class="stat-card s-blue">
                 <div class="stat-icon-wrapper">
                     <i class="fa-solid fa-user-doctor"></i>
                 </div>
+
                 <div class="stat-card-info">
-                    <span class="stat-label">Dentist Actions</span>
-                    <span class="stat-num" id="statDentist">{{ $dentistCount }}</span>
-                    <span class="sl-stat-hint">Dentist activity</span>
+                    <span class="stat-label">
+                        Dentist Actions
+                    </span>
+
+                    <span class="stat-num" id="statDentist">
+                        {{ $dentistCount }}
+                    </span>
+
+                    <span class="stat-footer">
+                        Dentist activity
+                    </span>
                 </div>
             </div>
 
-            <div class="stat-card s-green sl-stat-card">
+            <div class="stat-card s-green">
                 <div class="stat-icon-wrapper">
                     <i class="fa-solid fa-user"></i>
                 </div>
+
                 <div class="stat-card-info">
-                    <span class="stat-label">Patient Actions</span>
-                    <span class="stat-num" id="statPatient">{{ $patientCount }}</span>
-                    <span class="sl-stat-hint">Patient activity</span>
+                    <span class="stat-label">
+                        Patient Actions
+                    </span>
+
+                    <span class="stat-num" id="statPatient">
+                        {{ $patientCount }}
+                    </span>
+
+                    <span class="stat-footer">
+                        Patient activity
+                    </span>
                 </div>
             </div>
         </div>
@@ -114,14 +150,16 @@ $status = $status ?? 'active';
                             <span id="slFilterBadge" class="filter-badge hidden"></span>
                         </button>
 
-                        <button type="button" id="slArchiveBtn" class="sl-toolbar-btn sl-toolbar-btn-archive"
-                            title="Archive old active logs">
+                        <button type="button" id="slArchiveBtn" class="ui-btn ui-btn-secondary ui-btn-sm"
+                            title="Archive old active logs" onclick="openSlArchiveModal()">
+
                             <i class="fa-solid fa-box-archive"></i>
                             <span>Archive Old Logs</span>
                         </button>
 
-                        <button type="button" id="slExportBtn" class="sl-toolbar-btn sl-toolbar-btn-export"
-                            title="Export current logs view to PDF">
+                        <button type="button" id="slExportBtn" class="ui-btn ui-btn-primary ui-btn-sm"
+                            title="Export current logs view to PDF" onclick="exportSystemLogsPdf()">
+
                             <i class="fa-solid fa-file-pdf"></i>
                             <span>Export PDF</span>
                         </button>
@@ -130,8 +168,9 @@ $status = $status ?? 'active';
                     <x-view-toggle id="slViewToggle" class="sl-view-toggle" storage-key="systemLogsView"
                         list-view="#slListView" grid-view="#slGridView" />
 
-                    <button id="slClearFilterBtn" type="button" onclick="clearOnlySlFilters()"
-                        class="global-filter-reset-btn hidden" title="Reset filters" aria-label="Reset filters">
+                    <button type="button" id="slClearFilterBtn" class="global-filter-reset-btn hidden"
+                        onclick="clearOnlySlFilters()" title="Reset filters" aria-label="Reset filters">
+
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
@@ -431,7 +470,8 @@ $status = $status ?? 'active';
         </div>
 </main>
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay"></div>
+    <div class="filter-drawer-overlay" onclick="closeSlFilterPanel()">
+    </div>
 
     <div class="filter-drawer-panel" aria-label="Filter system logs">
         <div class="filter-drawer-header">
@@ -704,6 +744,25 @@ $status = $status ?? 'active';
 
 @section('scripts')
 <script>
+    function exportSystemLogsPdf() {
+        var params = new URLSearchParams({
+            role: slState.role || "all",
+            search: slState.search || "",
+            status: slState.status || "active",
+            sort: slState.sort || "desc",
+            date_from: slState.dateFrom || "",
+            date_to: slState.dateTo || "",
+            action_type: slState.actionType || "",
+            module: slState.module || ""
+        });
+
+        window.location.assign(
+            @json(route("admin.system_logs.export")) +
+            "?" +
+            params.toString()
+        );
+    }
+
     function handleSystemLogsPerPageChange(value) {
         const nextPerPage = Number(value) || 10;
 
@@ -841,8 +900,6 @@ $status = $status ?? 'active';
     @endif
 
     var searchInput = document.getElementById('slSearch');
-    var slArchiveBtn = document.getElementById('slArchiveBtn');
-    var slExportBtn = document.getElementById('slExportBtn');
     var slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
     var slArchiveError = document.getElementById('slArchiveError');
     var slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
@@ -880,33 +937,6 @@ $status = $status ?? 'active';
         );
 
         window.initGlobalPageSizeSelects?.();
-    }
-
-    if (slExportBtn) {
-        slExportBtn.addEventListener('click', function () {
-            var params = new URLSearchParams({
-                role: slState.role || 'all',
-                search: slState.search || '',
-                status: slState.status || 'active',
-                sort: slState.sort || 'desc',
-                date_from: slState.dateFrom || '',
-                date_to: slState.dateTo || '',
-                action_type: slState.actionType || '',
-                module: slState.module || '',
-            });
-
-            window.location.href = '{{ route('admin.system_logs.export') }}?' + params.toString();
-        });
-    }
-
-    if (slArchiveBtn) {
-        slArchiveBtn.addEventListener('click', function () {
-            if (slState.status === 'archived') {
-                window.showToast?.('Switch to active or all logs before archiving.', 'warning');
-                return;
-            }
-            openSlArchiveModal();
-        });
     }
 
     if (slArchiveDaysInput) {
@@ -1025,31 +1055,68 @@ $status = $status ?? 'active';
     }
 
     function openSlArchiveModal() {
+        if (slState.status === "archived") {
+            window.showToast?.(
+                "Switch to active or all logs before archiving.",
+                "warning"
+            );
+
+            return;
+        }
+
+        var modal =
+            document.getElementById("slArchiveModal");
+
+        if (!modal) {
+            console.error(
+                "Archive modal #slArchiveModal was not found."
+            );
+            return;
+        }
+
         clearSlArchiveError();
 
-        if (slArchiveDaysInput) {
-            slArchiveDaysInput.value = slArchiveDaysInput.value || '90';
+        if (
+            slArchiveDaysInput &&
+            !slArchiveDaysInput.value
+        ) {
+            slArchiveDaysInput.value = "90";
         }
 
-        if (typeof window.openModal === 'function') {
-            window.openModal('slArchiveModal');
+        if (typeof window.openModal === "function") {
+            window.openModal("slArchiveModal");
         } else {
-            document.getElementById('slArchiveModal')?.classList.add('open');
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+            document.documentElement.classList.add(
+                "modal-open"
+            );
+            document.body.classList.add("modal-open");
         }
 
-        setTimeout(function () {
+        window.setTimeout(function () {
             slArchiveDaysInput?.focus();
             slArchiveDaysInput?.select();
-        }, 80);
+        }, 100);
     }
 
     function closeSlArchiveModal() {
+        var modal =
+            document.getElementById("slArchiveModal");
+
         clearSlArchiveError();
 
-        if (typeof window.closeModal === 'function') {
-            window.closeModal('slArchiveModal');
+        if (!modal) return;
+
+        if (typeof window.closeModal === "function") {
+            window.closeModal("slArchiveModal");
         } else {
-            document.getElementById('slArchiveModal')?.classList.remove('open');
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+            document.documentElement.classList.remove(
+                "modal-open"
+            );
+            document.body.classList.remove("modal-open");
         }
     }
 
@@ -1122,10 +1189,6 @@ $status = $status ?? 'active';
                 }
             });
     }
-
-    window.openSlArchiveModal = openSlArchiveModal;
-    window.closeSlArchiveModal = closeSlArchiveModal;
-    window.submitSlArchiveModal = submitSlArchiveModal;
 
     function slSetStatus(el, status) {
         slState.status = status || 'active';
@@ -2054,9 +2117,39 @@ $status = $status ?? 'active';
         emptyState.querySelector('[data-empty-action="clear-filters"]')?.addEventListener('click',
             clearOnlySlFilters);
 
-        emptyState.querySelector('[data-empty-action="show-all"]')?.addEventListener('click', function () {
-            slSetTab(document.querySelector('.sl-role-tabs .tab-btn'), 'all');
+        emptyState.querySelector(
+            '[data-empty-action="show-all"]'
+        )?.addEventListener('click', function () {
+            slSetTab(
+                document.querySelector(
+                    '.sl-role-tabs .tab-btn'
+                ),
+                'all'
+            );
         });
     }
+
+    window.slSetTab = slSetTab;
+    window.slSetStatus = slSetStatus;
+    window.slGoPage = slGoPage;
+
+    window.openSlFilterPanel = openSlFilterPanel;
+    window.closeSlFilterPanel = closeSlFilterPanel;
+    window.applySlFilters = applySlFilters;
+    window.clearOnlySlFilters = clearOnlySlFilters;
+    window.clearSlFilterPanelDraft =
+        clearSlFilterPanelDraft;
+    window.setSlQuickDate = setSlQuickDate;
+
+    window.openSlArchiveModal =
+        openSlArchiveModal;
+    window.closeSlArchiveModal =
+        closeSlArchiveModal;
+    window.submitSlArchiveModal =
+        submitSlArchiveModal;
+
+    window.exportSystemLogsPdf =
+        exportSystemLogsPdf;
+});
 </script>
 @endsection

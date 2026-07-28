@@ -963,8 +963,7 @@
 }
 
 #addModal.ui-modal:not(.open):not(.closing),
-#editModal.ui-modal:not(.open):not(.closing),
-#deleteModal.ui-modal:not(.open):not(.closing) {
+#editModal.ui-modal:not(.open):not(.closing) {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
@@ -973,17 +972,14 @@
 
 #addModal.ui-modal.open,
 #editModal.ui-modal.open,
-#deleteModal.ui-modal.open,
 #addModal.ui-modal.closing,
-#editModal.ui-modal.closing,
-#deleteModal.ui-modal.closing {
+#editModal.ui-modal.closing{
     display: flex !important;
     visibility: visible !important;
 }
 
 #addModal.ui-modal.open,
-#editModal.ui-modal.open,
-#deleteModal.ui-modal.open {
+#editModal.ui-modal.open {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
@@ -1751,27 +1747,6 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important;
 }
 
-#deleteModal.ui-modal {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 24px !important;
-    display: none !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-    transform: none !important;
-}
-
-#deleteModal.ui-modal.open,
-#deleteModal.ui-modal.closing {
-    display: flex !important;
-    visibility: visible !important;
-}
-
 #deleteModal #deletePeriodLabel {
     display: inline-flex !important;
     padding: .14rem .42rem !important;
@@ -1812,10 +1787,6 @@
 }
 
 @media (max-width: 767px) {
-    #deleteModal.ui-modal {
-        align-items: flex-end !important;
-        padding: 0 !important;
-    }
 
     #deleteModal .modal-btn-ghost {
         width: 100% !important;

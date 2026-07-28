@@ -1,16 +1,16 @@
 @props([
-'id',
-'formId',
-'nameId',
-'title' => 'Delete Item',
-'subtitle' => 'This action requires confirmation',
-'message' => 'Are you sure you want to delete',
-'helper' => 'This item will be permanently removed.',
+    'id',
+    'formId',
+    'nameId',
+    'title' => 'Delete Item',
+    'subtitle' => 'This action requires confirmation',
+    'message' => 'Are you sure you want to delete',
+    'helper' => 'This item will be permanently removed.',
 ])
 
 <div id="{{ $id }}" class="ui-modal modal-theme-danger global-delete-modal" aria-hidden="true">
-    <form id="{{ $formId }}" method="POST" action="" class="ui-modal-card modal-sm global-delete-card" role="dialog"
-        aria-modal="true" aria-labelledby="{{ $id }}Title" onclick="event.stopPropagation()">
+    <form id="{{ $formId }}" method="POST" action="" class="ui-modal-card modal-sm global-delete-card"
+        role="dialog" aria-modal="true" aria-labelledby="{{ $id }}Title" onclick="event.stopPropagation()">
         @csrf
         @method('DELETE')
 
@@ -31,23 +31,34 @@
                 </div>
             </div>
 
-            <button type="button" class="modal-x" onclick="closeModal('{{ $id }}')" aria-label="Close delete modal">
+            <button type="button" class="modal-x" onclick="closeModal('{{ $id }}')"
+                aria-label="Close delete modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <div class="modal-bd">
             <div class="global-delete-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div class="global-delete-alert-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
 
-                <div>
-                    <p>
-                        {{ $message }}
-
-                        <strong id="{{ $nameId }}"></strong>?
+                <div class="global-delete-alert-content">
+                    <p class="global-delete-question">
+                        {{ $message }} this item?
                     </p>
 
-                    <span>
+                    <div class="global-delete-target">
+                        <span class="global-delete-target-label">
+                            Selected item
+                        </span>
+
+                        <strong id="{{ $nameId }}">
+                            —
+                        </strong>
+                    </div>
+
+                    <span class="global-delete-helper">
                         {{ $helper }}
                     </span>
                 </div>
