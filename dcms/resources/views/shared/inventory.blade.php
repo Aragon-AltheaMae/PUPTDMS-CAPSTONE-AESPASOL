@@ -4,9 +4,7 @@
 $layoutRole = $layoutRole ?? 'admin';
 $isDentistView = $isDentistView ?? false;
 
-$pageShellClass =
-$pageShellClass ??
-($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
 
 $inventoryRouteNames = $inventoryRouteNames ?? [
 'data' => 'admin.inventory.data',
@@ -28,7 +26,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
         inventory-page
         mode-list">
 
-    <div class="{{ $isDentistView ? 'w-full' : 'full' }}">
+    <div class="{{ $isDentistView ? 'w-full' : 'full' }} inventory-page-shell">
 
         @if ($isDentistView)
         <div class="inventory-header-wrap">
@@ -72,9 +70,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
         </div>
         @endif
 
-        <div class="relative z-10 mt-4 pb-8">
+        <div class="relative z-10 mt-4 pb-8 inventory-page-content">
 
-            <div class="stat-grid inventory-stat-grid" id="statCards">
+            <div class="stat-grid inventory-stat-grid" id="inventoryStats">
                 <div class="stat-card s-crimson">
                     <div class="stat-card-info">
                         <div class="stat-label">Total Items</div>
@@ -130,7 +128,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                     onclick="setTab('supplies',this)">Supplies</button>
                             </div>
 
-                            <span class="row-count row-count-desktop js-row-count" aria-live="polite"></span>
+                            <span id="inventoryEntryBadge" class="entry-badge js-row-count" aria-live="polite">
+                                0 items
+                            </span>
                         </div>
 
                         <div
@@ -142,7 +142,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
                                     <input type="text" id="searchInput" placeholder="Search Stock No." data-search-input
-                                        class="search-input" oninput="renderTable()" />
+                                        class="search-input" oninput="inventoryCurrentPage = 1; renderTable();" />
 
                                     <button type="button" class="search-clear" data-search-clear
                                         aria-label="Clear search">
@@ -189,6 +189,65 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     </div>
                 </div>
 
+                <div class="global-pagebar global-pagebar-top">
+                    <div class="global-pagebar-left">
+                        <span id="inventoryPageInfoTop" class="global-pagebar-info" aria-live="polite">
+                        </span>
+
+                        <div class="global-page-size-control">
+                            <label for="inventoryPerPageSelect">
+                                Show
+                            </label>
+
+                            <div class="global-page-size-select" data-global-page-size
+                                data-page-size-input="#inventoryPerPageSelect"
+                                data-page-size-callback="handleInventoryPerPageChange">
+
+                                <select id="inventoryPerPageSelect" class="global-page-size-native" tabindex="-1"
+                                    aria-hidden="true">
+
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <option value="{{ $size }}" {{ $size===10 ? 'selected' : '' }}>
+                                        {{ $size }}
+                                    </option>
+                                    @endforeach
+                                </select>
+
+                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
+                                    aria-haspopup="listbox" aria-expanded="false">
+
+                                    <span data-page-size-value>
+                                        10
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+
+                                <div class="global-page-size-menu" role="listbox">
+
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <button type="button"
+                                        class="global-page-size-option {{ $size === 10 ? 'is-selected' : '' }}"
+                                        data-page-size-option data-value="{{ $size }}" role="option"
+                                        aria-selected="{{ $size === 10 ? 'true' : 'false' }}">
+
+                                        <span>{{ $size }}</span>
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <span>per page</span>
+                        </div>
+                    </div>
+
+                    <div class="global-pagination-wrap">
+                        <div id="inventoryPaginationTop" class="global-pagination" aria-label="Inventory pagination">
+                        </div>
+                    </div>
+                </div>
+
                 <div id="tableWrapper" class="inventory-table-wrap">
                     <table class="data-table inventory-data-table">
                         <thead>
@@ -210,10 +269,16 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 <div id="inventoryGrid" class="inventory-grid"></div>
                 <div id="emptyState" class="empty-state-host"></div>
 
-                <div class="table-footer-bar">
-                    <span class="text-xs text-gray-400" id="pageInfo"></span>
-                    <div></div>
+                <div class="global-pagebar global-pagebar-bottom">
+                    <span id="inventoryPageInfoBottom" class="global-pagebar-info" aria-live="polite">
+                    </span>
+
+                    <div class="global-pagination-wrap">
+                        <div id="inventoryPaginationBottom" class="global-pagination" aria-label="Inventory pagination">
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -902,9 +967,9 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
             'global-view-change',
             function (event) {
                 currentViewMode =
-                    event.detail?.mode === 'grid'
-                        ? 'grid'
-                        : 'list';
+                    event.detail?.mode === 'grid' ?
+                        'grid' :
+                        'list';
 
                 renderTable();
             }
@@ -913,6 +978,34 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
     var inventory = [];
     var activeTab = 'all';
+
+    var inventoryCurrentPage = 1;
+    var inventoryEntriesPerPage = 10;
+
+    function handleInventoryPerPageChange(value) {
+        const nextPerPage =
+            Math.max(
+                1,
+                Number(value) || 10
+            );
+
+        if (
+            inventoryEntriesPerPage ===
+            nextPerPage
+        ) {
+            return;
+        }
+
+        inventoryEntriesPerPage =
+            nextPerPage;
+
+        inventoryCurrentPage = 1;
+
+        renderTable();
+    }
+
+    window.handleInventoryPerPageChange =
+        handleInventoryPerPageChange;
 
     let inventoryRefreshWatcher = null;
 
@@ -972,6 +1065,23 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
             );
 
             window.initGlobalVoiceInputs?.(document);
+
+            const inventoryPerPageSelect =
+                document.getElementById(
+                    'inventoryPerPageSelect'
+                );
+
+            if (inventoryPerPageSelect) {
+                inventoryPerPageSelect.value =
+                    String(inventoryEntriesPerPage);
+
+                window.syncGlobalPageSizeSelect?.(
+                    inventoryPerPageSelect,
+                    inventoryEntriesPerPage
+                );
+
+                window.initGlobalPageSizeSelects?.();
+            }
         }
     );
 
@@ -1017,18 +1127,60 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
     }
 
     function setTab(tab, btn) {
-        activeTab = tab;
+        const normalizedTab =
+            String(tab || 'all')
+                .trim()
+                .toLowerCase();
 
-        document.querySelectorAll('.tab-group .tab-btn').forEach(function (button) {
-            const isActive = button.getAttribute('data-tab') === tab || button === btn;
-            button.classList.toggle('active', isActive);
-            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        });
+        activeTab =
+            ['all', 'medicine', 'supplies']
+                .includes(normalizedTab)
+                ? normalizedTab
+                : 'all';
 
-        document.querySelectorAll('#statCards .stat-card').forEach(function (card) {
-            card.classList.remove('active', 'stat-active');
-            card.setAttribute('aria-pressed', 'false');
-        });
+        document
+            .querySelectorAll(
+                '#mainContent.inventory-page .tab-group .tab-btn'
+            )
+            .forEach(function (button) {
+                const buttonTab =
+                    String(
+                        button.dataset.tab || ''
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                const isActive =
+                    buttonTab === activeTab;
+
+                button.classList.toggle(
+                    'active',
+                    isActive
+                );
+
+                button.setAttribute(
+                    'aria-selected',
+                    isActive ? 'true' : 'false'
+                );
+            });
+
+        document
+            .querySelectorAll(
+                '#inventoryStats .stat-card'
+            )
+            .forEach(function (card) {
+                card.classList.remove(
+                    'active',
+                    'stat-active'
+                );
+
+                card.setAttribute(
+                    'aria-pressed',
+                    'false'
+                );
+            });
+
+        inventoryCurrentPage = 1;
 
         renderTable();
     }
@@ -1235,6 +1387,7 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
         updateFilterButtonState();
         renderFilterChips();
         updateShowResultsButton();
+        inventoryCurrentPage = 1;
         renderTable();
         closeFilterPanel();
     }
@@ -1256,6 +1409,7 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
         updateFilterButtonState();
         closeFilterPanel();
+        inventoryCurrentPage = 1;
         renderTable();
     }
 
@@ -1632,25 +1786,325 @@ aria-label="Delete inventory item"
     `;
     }
 
-    function renderTable() {
-        var tbody = document.getElementById('tableBody');
-        var grid = document.getElementById('inventoryGrid');
-        var tableWrapper = document.getElementById('tableWrapper');
-        var emptyState = document.getElementById('emptyState');
+    function renderInventoryPagination(
+        totalItems,
+        currentPage,
+        totalPages
+    ) {
+        const containers = [
+            document.getElementById(
+                'inventoryPaginationTop'
+            ),
+            document.getElementById(
+                'inventoryPaginationBottom'
+            )
+        ].filter(Boolean);
 
-        tbody.innerHTML = '';
-        if (grid) grid.innerHTML = '';
+        containers.forEach(container => {
+            container.replaceChildren();
+        });
 
-        var data = inventory.slice();
-
-        if (activeTab === 'medicine') {
-            data = data.filter(function (i) {
-                return i.category === 'Medicine';
+        if (totalItems <= 0) {
+            containers.forEach(container => {
+                container.hidden = true;
             });
+
+            return;
         }
-        if (activeTab === 'supplies') {
-            data = data.filter(function (i) {
-                return i.category === 'Supplies';
+
+        containers.forEach(container => {
+            container.hidden = false;
+        });
+
+        const pageWindow = 5;
+        const halfWindow =
+            Math.floor(pageWindow / 2);
+
+        let startPage =
+            Math.max(
+                1,
+                currentPage - halfWindow
+            );
+
+        let endPage =
+            Math.min(
+                totalPages,
+                startPage + pageWindow - 1
+            );
+
+        if (
+            endPage - startPage + 1 <
+            pageWindow
+        ) {
+            startPage =
+                Math.max(
+                    1,
+                    endPage - pageWindow + 1
+                );
+        }
+
+        function goToPage(page) {
+            const nextPage =
+                Math.max(
+                    1,
+                    Math.min(totalPages, page)
+                );
+
+            if (
+                nextPage ===
+                inventoryCurrentPage
+            ) {
+                return;
+            }
+
+            inventoryCurrentPage =
+                nextPage;
+
+            renderTable();
+
+            document
+                .querySelector(
+                    '.inventory-table-card'
+                )
+                ?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+        }
+
+        function createButton({
+            page,
+            label = '',
+            icon = '',
+            current = false,
+            disabled = false,
+            ariaLabel = ''
+        }) {
+            let element;
+
+            if (current) {
+                element =
+                    document.createElement('span');
+
+                element.className =
+                    'global-page-current';
+
+                element.setAttribute(
+                    'aria-current',
+                    'page'
+                );
+            } else if (disabled) {
+                element =
+                    document.createElement('button');
+
+                element.type = 'button';
+                element.className =
+                    'global-page-disabled';
+
+                element.disabled = true;
+            } else {
+                element =
+                    document.createElement('button');
+
+                element.type = 'button';
+                element.className =
+                    'global-page-btn';
+
+                element.addEventListener(
+                    'click',
+                    function () {
+                        goToPage(page);
+                    }
+                );
+            }
+
+            if (icon) {
+                const iconElement =
+                    document.createElement('i');
+
+                iconElement.className =
+                    `fa-solid ${icon} global-page-icon`;
+
+                element.appendChild(
+                    iconElement
+                );
+            } else {
+                element.textContent =
+                    String(label);
+            }
+
+            if (ariaLabel) {
+                element.setAttribute(
+                    'aria-label',
+                    ariaLabel
+                );
+            }
+
+            return element;
+        }
+
+        function createEllipsis() {
+            const ellipsis =
+                document.createElement('span');
+
+            ellipsis.className =
+                'global-page-ellipsis';
+
+            ellipsis.innerHTML =
+                '&hellip;';
+
+            ellipsis.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            return ellipsis;
+        }
+
+        function buildPagination(container) {
+            container.appendChild(
+                createButton({
+                    page: currentPage - 1,
+                    icon: 'fa-chevron-left',
+                    disabled: currentPage === 1,
+                    ariaLabel: 'Previous page'
+                })
+            );
+
+            if (startPage > 1) {
+                container.appendChild(
+                    createButton({
+                        page: 1,
+                        label: 1,
+                        ariaLabel: 'Page 1'
+                    })
+                );
+
+                if (startPage > 2) {
+                    container.appendChild(
+                        createEllipsis()
+                    );
+                }
+            }
+
+            for (
+                let page = startPage; page <= endPage; page++
+            ) {
+                container.appendChild(
+                    createButton({
+                        page,
+                        label: page,
+                        current: page === currentPage,
+                        ariaLabel: `Page ${page}`
+                    })
+                );
+            }
+
+            if (endPage < totalPages) {
+                if (
+                    endPage <
+                    totalPages - 1
+                ) {
+                    container.appendChild(
+                        createEllipsis()
+                    );
+                }
+
+                container.appendChild(
+                    createButton({
+                        page: totalPages,
+                        label: totalPages,
+                        ariaLabel: `Page ${totalPages}`
+                    })
+                );
+            }
+
+            container.appendChild(
+                createButton({
+                    page: currentPage + 1,
+                    icon: 'fa-chevron-right',
+                    disabled: currentPage === totalPages,
+                    ariaLabel: 'Next page'
+                })
+            );
+        }
+
+        containers.forEach(
+            buildPagination
+        );
+    }
+
+    function renderTable() {
+        const tbody =
+            document.getElementById(
+                'tableBody'
+            );
+
+        const grid =
+            document.getElementById(
+                'inventoryGrid'
+            );
+
+        const tableWrapper =
+            document.getElementById(
+                'tableWrapper'
+            );
+
+        const emptyState =
+            document.getElementById(
+                'emptyState'
+            );
+
+        if (!tbody) {
+            return;
+        }
+
+        tbody.replaceChildren();
+
+        if (grid) {
+            grid.replaceChildren();
+            grid.hidden = false;
+            grid.style.removeProperty(
+                'display'
+            );
+            grid.style.removeProperty(
+                'visibility'
+            );
+        }
+
+        if (tableWrapper) {
+            tableWrapper.hidden = false;
+            tableWrapper.style.removeProperty(
+                'display'
+            );
+            tableWrapper.style.removeProperty(
+                'visibility'
+            );
+        }
+
+        if (emptyState) {
+            emptyState.classList.remove(
+                'show',
+                'is-visible'
+            );
+
+            emptyState.replaceChildren();
+            emptyState.hidden = true;
+        }
+
+        let data =
+            Array.isArray(inventory)
+                ? inventory.slice()
+                : [];
+
+        if (activeTab !== 'all') {
+            data = data.filter(function (item) {
+                const itemCategory =
+                    String(item.category || '')
+                        .trim()
+                        .toLowerCase();
+
+                return itemCategory === activeTab;
             });
         }
 
@@ -1713,18 +2167,140 @@ aria-label="Delete inventory item"
         }
 
         updateStats();
-        const visibleInventoryItems = data.length;
-        const countText = visibleInventoryItems + ' item' + (visibleInventoryItems !== 1 ? 's' : '');
 
-        document.querySelectorAll('.js-row-count').forEach(function (el) {
-            el.textContent = countText;
-        });
-        document.getElementById('pageInfo').textContent = 'Showing ' + data.length + ' of ' + inventory.length +
-            ' items';
+        const filteredInventoryCount =
+            data.length;
+
+        const totalInventoryCount =
+            Array.isArray(inventory)
+                ? inventory.length
+                : 0;
+
+        const totalInventoryLabel =
+            totalInventoryCount === 1
+                ? 'item'
+                : 'items';
+
+        document
+            .querySelectorAll(
+                '.js-row-count'
+            )
+            .forEach(function (element) {
+                element.textContent =
+                    `${totalInventoryCount} ${totalInventoryLabel}`;
+            });
+
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    filteredInventoryCount /
+                    inventoryEntriesPerPage
+                )
+            );
+
+        if (inventoryCurrentPage > totalPages) {
+            inventoryCurrentPage = totalPages;
+        }
+
+        const pageStart =
+            (
+                inventoryCurrentPage - 1
+            ) * inventoryEntriesPerPage;
+
+        const pageEnd =
+            Math.min(
+                pageStart +
+                inventoryEntriesPerPage,
+                filteredInventoryCount
+            );
+
+        const paginatedData =
+            data.slice(
+                pageStart,
+                pageEnd
+            );
+
+        const entryLabel =
+            filteredInventoryCount === 1
+                ? 'entry'
+                : 'entries';
+
+        const pageInformation =
+            filteredInventoryCount > 0
+                ? `
+            Showing
+            <strong>
+                ${pageStart + 1}–${pageEnd}
+            </strong>
+            of
+            <strong>
+                ${filteredInventoryCount}
+            </strong>
+            ${entryLabel}
+        `
+                : `
+            Showing
+            <strong>0</strong>
+            entries
+        `;
+
+        [
+            document.getElementById(
+                'inventoryPageInfoTop'
+            ),
+            document.getElementById(
+                'inventoryPageInfoBottom'
+            )
+        ]
+            .filter(Boolean)
+            .forEach(function (element) {
+                element.innerHTML =
+                    pageInformation;
+            });
+
+        renderInventoryPagination(
+            filteredInventoryCount,
+            inventoryCurrentPage,
+            totalPages
+        );
 
         if (!data.length) {
-            if (tableWrapper) tableWrapper.style.display = 'none';
-            if (grid) grid.style.display = 'none';
+            if (tableWrapper) {
+                tableWrapper.hidden = true;
+                tableWrapper.style.setProperty(
+                    'display',
+                    'none',
+                    'important'
+                );
+            }
+
+            if (grid) {
+                grid.hidden = true;
+                grid.style.setProperty(
+                    'display',
+                    'none',
+                    'important'
+                );
+            }
+
+            if (emptyState) {
+                emptyState.hidden = false;
+            }
+
+            [
+                document.getElementById(
+                    'inventoryPaginationTop'
+                ),
+                document.getElementById(
+                    'inventoryPaginationBottom'
+                )
+            ]
+                .filter(Boolean)
+                .forEach(function (pagination) {
+                    pagination.hidden = true;
+                    pagination.replaceChildren();
+                });
 
             var isSearching = q.length > 0;
             var hasFilters = Object.values(activeFilters).some(Boolean);
@@ -1774,22 +2350,80 @@ aria-label="Delete inventory item"
                 actionHtml: extraHtml
             });
 
-            emptyState.classList.add('show');
+            if (emptyState) {
+                emptyState.classList.add(
+                    'show'
+                );
+            }
             return;
         }
 
-        emptyState.classList.remove('show');
-        emptyState.innerHTML = '';
+        if (emptyState) {
+            emptyState.hidden = true;
 
-        if (currentViewMode === 'grid') {
-            if (tableWrapper) tableWrapper.style.display = 'none';
-            if (grid) grid.style.display = 'grid';
-        } else {
-            if (tableWrapper) tableWrapper.style.display = 'block';
-            if (grid) grid.style.display = 'none';
+            emptyState.classList.remove(
+                'show',
+                'is-visible'
+            );
+
+            emptyState.replaceChildren();
         }
 
-        data.forEach(function (item) {
+        if (currentViewMode === 'grid') {
+            if (tableWrapper) {
+                tableWrapper.hidden = true;
+
+                tableWrapper.style.setProperty(
+                    'display',
+                    'none',
+                    'important'
+                );
+            }
+
+            if (grid) {
+                grid.hidden = false;
+
+                grid.style.setProperty(
+                    'display',
+                    'grid',
+                    'important'
+                );
+
+                grid.style.setProperty(
+                    'visibility',
+                    'visible',
+                    'important'
+                );
+            }
+        } else {
+            if (grid) {
+                grid.hidden = true;
+
+                grid.style.setProperty(
+                    'display',
+                    'none',
+                    'important'
+                );
+            }
+
+            if (tableWrapper) {
+                tableWrapper.hidden = false;
+
+                tableWrapper.style.setProperty(
+                    'display',
+                    'block',
+                    'important'
+                );
+
+                tableWrapper.style.setProperty(
+                    'visibility',
+                    'visible',
+                    'important'
+                );
+            }
+        }
+
+        paginatedData.forEach(function (item) {
             var balance = n(item.qty) - n(item.used);
 
             var balClass = balance <= 0 ? 'critical' : balance <= 5 ? 'low' : 'ok';
@@ -2082,17 +2716,15 @@ aria-label="Delete inventory item"
             if (!id) return;
 
             const response = await fetch(
-                inventoryUrl('destroy', id),
-                {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                .content,
-                        Accept: 'application/json',
-                    },
-                }
+                inventoryUrl('destroy', id), {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .content,
+                    Accept: 'application/json',
+                },
+            }
             );
 
             const result = await response.json().catch(() => ({}));

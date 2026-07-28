@@ -617,36 +617,6 @@
     flex: 0 0 auto;
 }
 
-.sl-toolbar-btn {
-    min-height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .45rem;
-    padding: 0 .9rem;
-    border-radius: 12px;
-    border: 1px solid transparent;
-    font-size: .74rem;
-    font-weight: 800;
-    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
-}
-
-.sl-toolbar-btn:hover {
-    transform: translateY(-1px);
-}
-
-.sl-toolbar-btn-export {
-    background: #fef2f2;
-    color: #991b1b;
-    border-color: #fecaca;
-}
-
-.sl-toolbar-btn-archive {
-    background: #f8fafc;
-    color: #334155;
-    border-color: #cbd5e1;
-}
-
 .sl-status-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -840,20 +810,6 @@
 .dark .sl-role-tabs .tab-count {
     background: rgba(255, 255, 255, .08) !important;
     color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] .sl-toolbar-btn-export,
-.dark .sl-toolbar-btn-export {
-    background: rgba(127, 29, 29, .24) !important;
-    color: #fecaca !important;
-    border-color: rgba(252, 165, 165, .22) !important;
-}
-
-[data-theme="dark"] .sl-toolbar-btn-archive,
-.dark .sl-toolbar-btn-archive {
-    background: rgba(51, 65, 85, .38) !important;
-    color: #e2e8f0 !important;
-    border-color: rgba(148, 163, 184, .22) !important;
 }
 
 [data-theme="dark"] .sl-status-tab,
@@ -1178,9 +1134,6 @@
 }
 
 @media (max-width: 1023px) {
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
 
     .system-logs-page .sl-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -1216,14 +1169,6 @@
     }
 }
 
-@media (max-width: 520px) {
-
-    .system-logs-page #statCards.sl-stat-grid,
-    .system-logs-page .sl-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-
 #filterModal.open .filter-drawer-overlay {
     opacity: 1 !important;
 }
@@ -1241,76 +1186,6 @@
     flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow-y: auto !important;
-}
-
-.system-logs-page #statCards.sl-stat-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 16px !important;
-}
-
-.system-logs-page #statCards .sl-stat-card {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    text-align: left !important;
-}
-
-.system-logs-page #statCards .sl-stat-card .stat-card-info {
-    order: 1 !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    align-items: flex-start !important;
-    text-align: left !important;
-}
-
-.system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-    order: 2 !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-    color: var(--stat-accent) !important;
-}
-
-.system-logs-page #statCards .sl-stat-card .stat-icon-wrapper i {
-    color: currentColor !important;
-}
-
-.system-logs-page #statCards .sl-stat-card .stat-label,
-.system-logs-page #statCards .sl-stat-card .stat-num {
-    margin: 0 !important;
-    text-align: left !important;
-}
-
-.system-logs-page #statCards .sl-stat-hint {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    font-weight: 700 !important;
-    font-size: .67rem !important;
-    line-height: 1.25 !important;
-    color: color-mix(in srgb, var(--stat-accent) 50%, #6B7280) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-[data-theme="dark"] .system-logs-page #statCards .sl-stat-hint,
-.dark .system-logs-page #statCards .sl-stat-hint {
-    color: color-mix(in srgb, var(--stat-accent) 58%, #8B949E) !important;
-}
-
-@media (max-width: 1023px) {
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 520px) {
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: 1fr !important;
-    }
 }
 
 .system-logs-page~#filterModal .filter-drawer-title h2 {
@@ -1519,25 +1394,6 @@
 .system-logs-page~#filterModal .sl-action-select-menu::-webkit-scrollbar-thumb {
     background: rgba(139, 0, 0, .28) !important;
     border-radius: 999px !important;
-}
-
-[data-theme="dark"] .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper,
-.dark .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-    background:
-        radial-gradient(circle at top left,
-            color-mix(in srgb, var(--stat-accent) 26%, transparent),
-            transparent 58%),
-        color-mix(in srgb, var(--stat-accent) 14%, #0D1117) !important;
-    color: color-mix(in srgb, var(--stat-accent) 82%, #FFFFFF) !important;
-    border-color: color-mix(in srgb, var(--stat-accent) 28%, transparent) !important;
-    box-shadow:
-        0 12px 26px color-mix(in srgb, var(--stat-accent) 12%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, .06) !important;
-}
-
-[data-theme="dark"] .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper i,
-.dark .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper i {
-    color: currentColor !important;
 }
 
 [data-theme="dark"] .system-logs-page~#filterModal .sl-action-select-menu::-webkit-scrollbar-thumb,
@@ -1860,6 +1716,7 @@
 }
 
 @media (max-width: 1280px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         overflow-x: hidden !important;
@@ -1880,6 +1737,7 @@
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: 1rem !important;
@@ -1912,35 +1770,6 @@
         height: 36px !important;
         padding: 0 .85rem !important;
         font-size: .7rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        gap: .85rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 96px !important;
-        padding: .85rem !important;
-        border-radius: 16px !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-num {
-        font-size: 1.35rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-hint {
-        font-size: .58rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
     .system-logs-page .sl-table-wrap {
@@ -2014,7 +1843,7 @@
         word-break: normal !important;
         overflow-wrap: break-word !important;
     }
-    
+
 
     .system-logs-page #slSearch {
         height: 42px !important;
@@ -2040,6 +1869,7 @@
 }
 
 @media (min-width: 901px) and (max-width: 1024px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: .9rem !important;
@@ -2072,36 +1902,6 @@
         height: 34px !important;
         padding: 0 .8rem !important;
         font-size: .68rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .8rem !important;
-        margin-bottom: .9rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 88px !important;
-        padding: .8rem !important;
-        border-radius: 15px !important;
-        flex-direction: row !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-num {
-        font-size: 1.32rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-hint {
-        font-size: .58rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
     .system-logs-page .card-header {
@@ -2168,6 +1968,7 @@
 }
 
 @media (min-width: 768px) and (max-width: 900px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: .8rem !important;
@@ -2203,53 +2004,6 @@
         min-height: 32px !important;
         padding: 0 .75rem !important;
         font-size: .66rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .7rem !important;
-        margin-bottom: .9rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 78px !important;
-        padding: .75rem !important;
-        border-radius: 14px !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: .65rem !important;
-        text-align: left !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        border-radius: 12px !important;
-        order: 2 !important;
-        margin: 0 !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-label {
-        font-size: .56rem !important;
-        line-height: 1.1 !important;
-        white-space: nowrap !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-num {
-        font-size: 1.25rem !important;
-        line-height: 1 !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-hint {
-        display: block !important;
-        font-size: .54rem !important;
-        line-height: 1.15 !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
     .system-logs-page .card-header {
@@ -2419,6 +2173,7 @@
 }
 
 @media (min-width: 481px) and (max-width: 767px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: 12px !important;
@@ -2450,20 +2205,6 @@
         min-height: 32px !important;
         padding: 0 .75rem !important;
         font-size: .68rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .75rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 104px !important;
-        padding: .85rem !important;
-        border-radius: 16px !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
     }
 
     .system-logs-page .card-header {
@@ -2559,6 +2300,7 @@
 }
 
 @media (min-width: 361px) and (max-width: 480px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: 11px !important;
@@ -2589,39 +2331,6 @@
         min-height: 31px !important;
         padding: 0 .7rem !important;
         font-size: .64rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .65rem !important;
-        margin-bottom: .85rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 98px !important;
-        padding: .75rem !important;
-        border-radius: 15px !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-label {
-        font-size: .54rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-num {
-        font-size: 1.22rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-hint {
-        font-size: .52rem !important;
-        white-space: normal !important;
     }
 
     .system-logs-page .card-header {
@@ -2732,6 +2441,7 @@
 }
 
 @media (max-width: 360px) {
+
     #mainContent.system-logs-page,
     .system-logs-page {
         padding-left: 9px !important;
@@ -2763,38 +2473,6 @@
         min-height: 30px !important;
         padding: 0 .65rem !important;
         font-size: .6rem !important;
-    }
-
-    .system-logs-page #statCards.sl-stat-grid {
-        grid-template-columns: 1fr !important;
-        gap: .6rem !important;
-        margin-bottom: .8rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card {
-        min-height: 82px !important;
-        padding: .72rem !important;
-        border-radius: 14px !important;
-        flex-direction: row !important;
-        align-items: center !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-icon-wrapper {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        order: 2 !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-card .stat-num {
-        font-size: 1.18rem !important;
-    }
-
-    .system-logs-page #statCards .sl-stat-hint {
-        font-size: .5rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
     .system-logs-page .card-header {
