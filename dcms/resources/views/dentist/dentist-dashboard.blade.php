@@ -67,8 +67,7 @@
                                 </div>
 
                                 <button id="statusBtn" onclick="openStatusModal()"
-                                    class="banner-status-btn font-bold text-white flex items-center gap-2 transition-colors duration-300"
-                                    style="background:#00A96E; font-size:13px; border:none;">
+                                    class="ui-btn ui-btn-success ui-btn-sm banner-status-btn">
                                     <span id="statusLabel" class="flex items-center gap-2">
                                         <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
                                     </span>
@@ -79,7 +78,7 @@
                 </div>
             </div>
 
-            <div id="kpiGridContainer" class="kpi-grid skeleton-section skeleton-fade-swap">
+            <div id="kpiGridContainer" class="stat-grid dashboard-kpi-grid skeleton-section skeleton-fade-swap">
                 <div class="skeleton-shell space-y-4">
                     @for ($i = 0; $i < 5; $i++)
                         <div class="rounded-2xl h-32 skeleton-block">
@@ -216,7 +215,6 @@
             </div>
         </div>
 
-        </div>
     </main>
 
     <div id="statusModal"
@@ -279,26 +277,6 @@
             </div>
         </div>
     </div>
-
-    {{-- @if (session('activeAppointmentModal'))
-<dialog id="activeAppointmentModal" class="modal">
-    <div class="modal-box">
-        <h3 class="font-bold text-base">Active Appointment!</h3>
-        <p class="py-4">You have an ongoing appointment setup.</p>
-        <div class="modal-action">
-            <form method="dialog">
-                <button class="btn" id="closeActiveApptModalBtn">Close</button>
-            </form>
-        </div>
-    </div>
-</dialog>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var modal = document.getElementById("activeAppointmentModal");
-        if (modal) modal.showModal();
-    });
-</script>
-@endif --}}
 @endsection
 
 @section('scripts')
@@ -361,15 +339,15 @@
                     const hasAppointments = count > 0;
 
                     return `
-                <button type="button" onclick="renderUpcomingAppointmentsDay('${key}')"
-                    class="upcoming-date-btn ${active ? 'active' : ''} ${hasAppointments ? 'has-appointments' : ''}">
-                    ${hasAppointments ? `<span class="upcoming-date-badge">${count}</span>` : ''}
-                    <div class="text-sm font-extrabold">${d.getDate()}</div>
-                    <div class="text-[10px] font-semibold opacity-70">
-                        ${d.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </div>
-                </button>
-                `;
+<button type="button" onclick="renderUpcomingAppointmentsDay('${key}')"
+class="upcoming-date-btn ${active ? 'active' : ''} ${hasAppointments ? 'has-appointments' : ''}">
+${hasAppointments ? `<span class="upcoming-date-badge">${count}</span>` : ''}
+<div class="text-sm font-extrabold">${d.getDate()}</div>
+<div class="text-[10px] font-semibold opacity-70">
+${d.toLocaleDateString('en-US', { weekday: 'short' })}
+</div>
+</button>
+`;
                 }).join('');
 
                 const items = appointments.length ?
@@ -379,62 +357,65 @@
                         const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
 
                         return `
-    <a href="${appt.patientProfileUrl || '{{ route('dentist.dentist.appointments') }}'}"
-        class="upcoming-item hover:bg-red-50/40 rounded-xl transition">
+<a href="${appt.patientProfileUrl || '{{ route('dentist.dentist.appointments') }}'}"
+class="upcoming-item hover:bg-red-50/40 rounded-xl transition" >
 
-        <span class="upcoming-time-dot ${statusClass(appt.status)}"></span>
+<span class="upcoming-time-dot ${statusClass(appt.status)}"></span>
 
-        <div class="patient-avatar patient-avatar-sm upcoming-avatar ${avatarClass(appt.status)}">
-            ${
-                photo
-                    ? `<img src="${escHtml(photo)}" alt="${escHtml(name)}">`
-                    : `<span>${escHtml(initials)}</span>`
-            }
-        </div>
+<div class="patient-avatar patient-avatar-sm upcoming-avatar ${avatarClass(appt.status)}">
+${
+photo
+? `<img src="${escHtml(photo)}" alt="${escHtml(name)}">`
+: `<span>${escHtml(initials)}</span>`
+}
+</div>
 
-        <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between gap-2">
-                <p class="text-sm font-bold text-gray-800 truncate">${escHtml(name)}</p>
-                <span class="text-[11px] font-bold text-[#8B0000] flex-shrink-0">${escHtml(appt.time || '—')}</span>
-            </div>
-            <p class="text-xs text-gray-500 truncate">${escHtml(appt.service || 'General Service')}</p>
-        </div>
-    </a>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<p class="text-sm font-bold text-gray-800 truncate">${escHtml(name)}</p>
+<span class="text-[11px] font-bold text-[#8B0000] flex-shrink-0">${escHtml(appt.time || '—')}</span>
+</div>
+<p class="text-xs text-gray-500 truncate">${escHtml(appt.service || 'General Service')}</p>
+</div>
+</a >
 `;
                     }).join('') :
                     `
-                <div class="upcoming-empty-state text-gray-400">
-        <div>
-            <i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-[#8B0000]/40"></i>
-            <p class="text-sm font-semibold">No appointments for this day</p>
-        </div>
-    </div>
-                `;
+<div class="upcoming-empty-state text-gray-400" >
+<div>
+<i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-[#8B0000]/40"></i>
+<p class="text-sm font-semibold">No appointments for this day</p>
+</div>
+</div>
+`;
 
                 const html = `
-                <div class="upcoming-card" >
-                <div class="dashboard-side-card-head">
-                    <h3 class="dashboard-side-card-title">
-                        <i class="fa-regular fa-calendar-days"></i> Upcoming Appointments
-                    </h3>
-                </div>
+<article class="card upcoming-card" >
+<header class="card-header">
+<div class="card-header-left">
+<div class="card-header-icon"><i class="fa-regular fa-calendar-days"></i></div>
+<h3 class="card-title">
+Upcoming Appointments
+</h3>
+</div>
+</header>
 
-                <div class="dashboard-side-card-body">
-                    <div class="upcoming-date-strip mb-3">
-                        ${dateButtons}
-                    </div>
+<div class="card-body upcoming-card-body">
+<div class="upcoming-date-strip mb-3">
+${dateButtons}
+</div>
 
-                    <div class="upcoming-list-area divide-y divide-gray-100">
-                        ${items}
-                    </div>
+<div class="upcoming-list-area divide-y divide-gray-100">
+${items}
+</div>
 
-                    <a href="{{ route('dentist.dentist.appointments') }}"
-                        class="mt-2 pt-3 border-t border-gray-100 flex items-center justify-center gap-2 text-xs font-bold text-[#8B0000] hover:text-[#660000]">
-                        View all appointments <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div >
-                `;
+<a href="{{ route('dentist.dentist.appointments') }}"
+class="card-link upcoming-view-all">
+View all appointments <i class="fa-solid fa-arrow-right"></i>
+</a>
+</div>
+</article>
+`;
 
                 const container = document.getElementById('upcomingAppointmentsContainer');
 
@@ -493,72 +474,72 @@
             const hasData = [...GAD_FEMALE, ...GAD_MALE].some(v => Number(v || 0) > 0);
 
             const cardHeader = `
-            <div class="relative z-10 flex items-start justify-between mb-5 flex-wrap gap-4">
-                <div class="flex items-start gap-3 min-w-0">
-                    <div class="gad-header-badge flex-shrink-0">
-                        <i class="fa-solid fa-chart-simple text-base"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-base font-extrabold text-[#8B0000] leading-tight">GAD Analytics</h3>
-                            <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-[#8B0000]/10 text-[#8B0000]">${monthLabel}</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mt-1">Gender and Development Data</p>
-                        <p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex</p>
-                    </div>
-                </div>
+<div class="relative z-10 flex items-start justify-between mb-5 flex-wrap gap-4" >
+<div class="flex items-start gap-3 min-w-0">
+<div class="gad-header-badge flex-shrink-0">
+<i class="fa-solid fa-chart-simple text-base"></i>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-base font-extrabold text-[#8B0000] leading-tight">GAD Analytics</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-[#8B0000]/10 text-[#8B0000]">${monthLabel}</span>
+</div>
+<p class="text-sm text-gray-600 mt-1">Gender and Development Data</p>
+<p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex</p>
+</div>
+</div>
 
-                <div class="flex items-center justify-end gap-2 flex-wrap">
-                    <div class="gad-metric-chip">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#E5B5B5]"></span>
-                        Female <span class="font-semibold">${totalFemale}</span>
-                    </div>
-                    <div class="gad-metric-chip">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#89CFF0]"></span>
-                        Male <span class="font-semibold">${totalMale}</span>
-                    </div>
-                    <div class="gad-metric-chip">
-                        <i class="fa-solid fa-users text-[11px]"></i>
-                        Total <span class="font-semibold">${totalCases}</span>
-                    </div>
-                </div>
-            </div>
-        `;
+<div class="flex items-center justify-end gap-2 flex-wrap">
+<div class="gad-metric-chip">
+<span class="w-2.5 h-2.5 rounded-full bg-[#E5B5B5]"></span>
+Female <span class="font-semibold">${totalFemale}</span>
+</div>
+<div class="gad-metric-chip">
+<span class="w-2.5 h-2.5 rounded-full bg-[#89CFF0]"></span>
+Male <span class="font-semibold">${totalMale}</span>
+</div>
+<div class="gad-metric-chip">
+<i class="fa-solid fa-users text-[11px]"></i>
+Total <span class="font-semibold">${totalCases}</span>
+</div>
+</div>
+</div>
+`;
 
             if (!hasData) {
                 const html = `
-                <div class="gad-analytics-card p-5 sm:p-6 flex flex-col">
-                    ${cardHeader}
-                    <div class="relative z-10 flex-grow flex items-center justify-center w-full min-h-[255px]">
-                        <div class="gad-empty-panel text-center">
-                            <div class="gad-empty-icon-wrap">
-                                <i class="fa-regular fa-clipboard text-5xl"></i>
-                            </div>
-                            <p class="font-extrabold text-base text-gray-800 leading-tight">No Treatments Recorded</p>
-                            <p class="text-sm text-gray-500 max-w-md mx-auto mt-2">
-                                Completed treatment records for this month will appear here once available.
-                            </p>
-                            <div class="gad-empty-actions">
-                                <span class="gad-empty-pill"><i class="fa-solid fa-chart-column"></i> Category breakdown</span>
-                                <span class="gad-empty-pill"><i class="fa-solid fa-venus-mars"></i> Sex-disaggregated data</span>
-                                <span class="gad-empty-pill"><i class="fa-regular fa-calendar"></i> Monthly view</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+<div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
+${ cardHeader }
+<div class="relative z-10 flex-grow flex items-center justify-center w-full min-h-[255px]">
+<div class="gad-empty-panel text-center">
+<div class="gad-empty-icon-wrap">
+<i class="fa-regular fa-clipboard text-5xl"></i>
+</div>
+<p class="font-extrabold text-base text-gray-800 leading-tight">No Treatments Recorded</p>
+<p class="text-sm text-gray-500 max-w-md mx-auto mt-2">
+Completed treatment records for this month will appear here once available.
+</p>
+<div class="gad-empty-actions">
+<span class="gad-empty-pill"><i class="fa-solid fa-chart-column"></i> Category breakdown</span>
+<span class="gad-empty-pill"><i class="fa-solid fa-venus-mars"></i> Sex-disaggregated data</span>
+<span class="gad-empty-pill"><i class="fa-regular fa-calendar"></i> Monthly view</span>
+</div>
+</div>
+</div>
+</div>
+`;
                 swapSkeletonContent('gadAnalyticsContainer', html);
                 return true;
             }
 
             const chartHtml = `
-            <div class="gad-analytics-card p-5 sm:p-6 flex flex-col">
-                ${cardHeader}
-                <div class="gad-chart-shell relative z-10 flex-grow flex items-center justify-center w-full">
-                    <canvas id="gadChart" style="display:block;width:100%;height:100%;min-height:240px;"></canvas>
-                </div>
-            </div>
-        `;
+<div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
+${ cardHeader }
+<div class="gad-chart-shell relative z-10 flex-grow flex items-center justify-center w-full">
+<canvas id="gadChart" style="display:block;width:100%;height:100%;min-height:240px;"></canvas>
+</div>
+</div>
+`;
 
             swapSkeletonContent('gadAnalyticsContainer', chartHtml);
 
@@ -643,159 +624,62 @@
         function buildKpiGrid() {
             const kpiData = KPI_DATA;
 
+            const deltaBadge = (value) => {
+                if (value === null || typeof value === 'undefined') return '';
+                const tone = value >= 0 ? 'status-completed' : 'status-cancelled';
+                return `<span class="status-pill ${tone}">${value >= 0 ? '+' : ''}${value}%</span>`;
+            };
+
             const html = `
-            <div class="kpi-card relative overflow-hidden rounded-xl p-4 text-white" style="background:linear-gradient(135deg,#8B0000 0%,#5a0000 100%);box-shadow:0 4px 15px rgba(139,0,0,.2);">
-                <div class="z-10 flex items-start justify-between w-full">
-                    <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-tooth text-yellow-300 text-sm"></i>
-                    </div>
-                    ${kpiData.dentalCasesDelta !== null ? `<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-white/20">${kpiData.dentalCasesDelta >= 0 ? '+' : ''}${kpiData.dentalCasesDelta}%</span>` : ''}
-                </div>
-                <div class="z-10 mt-4">
-                    <p class="text-3xl font-extrabold leading-none">${kpiData.dentalCases}</p>
-                    <p class="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-80">Dental Cases</p>
-                </div>
-                <div class="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-white/5"></div>
-            </div>
+<article class="stat-card s-crimson dashboard-kpi-card" >
+<div class="stat-card-info">
+<span class="stat-label">Dental Cases</span>
+<strong class="stat-num">${kpiData.dentalCases}</strong>
+<div class="stat-footer">${deltaBadge(kpiData.dentalCasesDelta)}</div>
+</div>
+<div class="stat-icon-wrapper"><i class="fa-solid fa-tooth"></i></div>
+</article>
 
-            <div class="kpi-card relative overflow-hidden rounded-xl p-4 bg-white border border-red-50 shadow-sm">
-                <div class="z-10 flex items-start justify-between w-full">
-                    <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-regular fa-calendar-check text-[#8B0000] text-sm"></i>
-                    </div>
-                    ${kpiData.totalApptsDelta !== null ? `<span class="text-[9px] font-bold px-2 py-1 rounded-full ${kpiData.totalApptsDelta >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}">${kpiData.totalApptsDelta >= 0 ? '+' : ''}${kpiData.totalApptsDelta}%</span>` : ''}
-                </div>
-                <div class="z-10 mt-4">
-                    <p class="text-3xl font-extrabold leading-none text-[#8B0000]">${kpiData.totalAppts}</p>
-                    <p class="text-[10px] font-bold uppercase tracking-widest mt-1 text-[#8B0000]/60">Appointments</p>
-                </div>
-            </div>
+<article class="stat-card s-red dashboard-kpi-card">
+<div class="stat-card-info">
+<span class="stat-label">Appointments</span>
+<strong class="stat-num">${kpiData.totalAppts}</strong>
+<div class="stat-footer">${deltaBadge(kpiData.totalApptsDelta)}</div>
+</div>
+<div class="stat-icon-wrapper"><i class="fa-regular fa-calendar-check"></i></div>
+</article>
 
-            <div class="kpi-card relative overflow-hidden rounded-xl p-4 bg-white border border-red-50 shadow-sm">
-                <div class="z-10 flex items-start justify-between w-full">
-                    <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-user-clock text-[#8B0000] text-sm"></i>
-                    </div>
-                    <span class="text-[9px] font-bold px-2 py-1 rounded-full bg-green-100 text-green-700">Today</span>
-                </div>
-                <div class="z-10 mt-4 flex items-end justify-between w-full">
-                    <div>
-                        <p class="text-3xl font-extrabold leading-none text-[#8B0000]">${kpiData.todayCount}</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest mt-1 text-[#8B0000]/60">Today's Patients</p>
-                    </div>
-                    <div class="flex flex-col text-right">
-                        <span class="text-[9px] text-green-600 font-bold">${kpiData.todayCompleted} Completed</span>
-                        <span class="text-[9px] text-blue-600 font-bold">${kpiData.todayUpcoming} Upcoming</span>
-                    </div>
-                </div>
-            </div>
+<article class="stat-card s-blue dashboard-kpi-card">
+<div class="stat-card-info">
+<span class="stat-label">Today's Patients</span>
+<strong class="stat-num">${kpiData.todayCount}</strong>
+<div class="stat-footer dashboard-kpi-breakdown">
+<span>${kpiData.todayCompleted} completed</span>
+<span>${kpiData.todayUpcoming} upcoming</span>
+</div>
+</div>
+<div class="stat-icon-wrapper"><i class="fa-solid fa-user-clock"></i></div>
+</article>
 
-            <div class="kpi-card relative overflow-hidden rounded-xl p-4 bg-white border shadow-sm" style="border-color:#d1fae5;">
-                <div class="z-10 flex items-start justify-between w-full">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#e6f4ea;">
-                        <i id="statusKpiIcon" class="fa-solid fa-door-open text-sm" style="color:#00A96E;"></i>
-                    </div>
-                    
-                    <div class="text-right">
-                        <span class="flex items-center justify-end gap-1 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span> Live
-                        </span>
-                        <div class="text-gray-800 flex items-baseline justify-end mt-0.5">
-                            <span id="kpi-clock-hhmm" class="text-lg font-extrabold tabular-nums">00:00</span>
-                            <span id="kpi-clock-ampm" class="text-[9px] font-bold text-gray-500 ml-0.5">AM</span>
-                            <span id="kpi-clock-ss" class="hidden"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="z-10 mt-3 flex items-end justify-between w-full border-t border-gray-200 dark:border-gray-600 pt-2">
-                    <div>
-                        <p id="statusKpiLabel" class="text-2xl font-extrabold leading-none" style="color:#00A96E;">Open</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest mt-1 text-[#8B0000]/50">Clinic Status</p>
-                    </div>
-                    <button onclick="openStatusModal()"
-                        class="status-change-btn text-[9px] font-bold px-3 py-1.5 rounded-lg transition-all duration-200">
-                        Change
-                    </button>
-                </div>
-            </div>
-        `;
+<article class="stat-card s-green dashboard-kpi-card dashboard-clinic-status-card">
+<div class="stat-card-info">
+<span class="stat-label">Clinic Status</span>
+<strong id="statusKpiLabel" class="stat-num">Open</strong>
+<div class="stat-footer dashboard-live-clock">
+<span class="dashboard-live-dot"></span>
+<span id="kpi-clock-hhmm">00:00</span>
+<span id="kpi-clock-ampm">AM</span>
+<span id="kpi-clock-ss" hidden></span>
+</div>
+</div>
+<div class="dashboard-kpi-actions">
+<div class="stat-icon-wrapper"><i id="statusKpiIcon" class="fa-solid fa-door-open"></i></div>
+<button type="button" onclick="openStatusModal()" class="ui-btn ui-btn-secondary ui-btn-sm status-change-btn">Change</button>
+</div>
+</article>
+`;
 
             swapSkeletonContent('kpiGridContainer', html);
-        }
-
-        function buildScheduledToday() {
-            const todayAppointments = TODAY_APPOINTMENTS;
-
-            if (todayAppointments.length === 0) {
-                const html = `
-                <div class="card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow rounded-xl h-full" >
-                    <div class="card-body flex flex-col">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-base font-bold flex items-center gap-2">
-                                <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
-                            </h2>
-                            <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">0 patients</span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-10 opacity-60 flex-1">
-                            <i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-yellow-300"></i>
-                            <p class="text-sm font-semibold">No appointments today</p>
-                            <p class="text-xs opacity-70 mt-1">Enjoy your free day, Doctor!</p>
-                        </div>
-                        <a href="{{ route('dentist.dentist.appointments') }}" class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
-                            View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div >
-                `;
-                swapSkeletonContent('scheduledTodayContainer', html);
-            } else {
-                const items = todayAppointments.map(appointment => {
-                    const name = appointment.patient?.name || 'Unknown Patient';
-                    const time = new Date(appointment.appointment_time).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    const service = appointment.service_type === 'others' ? appointment.other_services ||
-                        'Other Service' : appointment.service_type;
-                    const isConfirmed = appointment.status === 'confirmed';
-                    const initial = name.charAt(0).toUpperCase();
-
-                    return `
-                <a href = "{{ route('dentist.dentist.appointments') }}" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 p-3 rounded-xl w-full transition duration-200 hover:scale-[1.01]" >
-                        <div class="rounded-full w-9 h-9 border-2 border-yellow-300 bg-white/20 flex items-center justify-center font-bold text-sm flex-shrink-0">${initial}</div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-sm truncate">${name}</p>
-                            <p class="text-xs opacity-70 truncate flex items-center gap-1">
-                                <i class="fa-solid fa-stethoscope text-yellow-300 flex-shrink-0 text-[10px]"></i>
-                                ${service} · ${time}
-                            </p>
-                        </div>
-                        <span class="badge badge-sm ${isConfirmed ? 'bg-green-400 text-white' : 'bg-yellow-400 text-[#660000]'} border-none flex-shrink-0 text-[10px]">${isConfirmed ? '✓' : '!'}</span>
-                    </a >
-                `;
-                }).join('');
-
-                const html = `
-                <div class="card bg-gradient-to-b from-[#8B0000] to-[#660000] text-white shadow rounded-xl h-full" >
-                    <div class="card-body flex flex-col">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-base font-bold flex items-center gap-2">
-                                <i class="fa-regular fa-clock text-yellow-300"></i> Scheduled Today
-                            </h2>
-                            <span class="badge bg-yellow-400 text-[#660000] font-bold border-none px-3">${todayAppointments.length} ${todayAppointments.length === 1 ? 'patient' : 'patients'}</span>
-                        </div>
-                        <div class="space-y-2 flex-1 overflow-y-auto pr-1">
-                            ${items}
-                        </div>
-                        <a href="{{ route('dentist.dentist.appointments') }}" class="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition border-t border-white/10 pt-3">
-                            View all appointments <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div >
-                `;
-                swapSkeletonContent('scheduledTodayContainer', html);
-            }
         }
 
         function buildMedicalSupplies() {
@@ -807,69 +691,80 @@
                     const balance = item.qty - item.used;
                     const pct = item.qty > 0 ? (balance / item.qty) * 100 : 100;
                     const isLow = pct <= 30;
-                    const badgeCls = isLow ? 'bg-red-50 text-red-600 border-red-200 animate-pulse' :
-                        'bg-green-50 text-green-600 border-green-200';
+
+                    const balanceClass = isLow ?
+                        'table-tag table-tag-danger' :
+                        'table-tag table-tag-info';
 
                     return `
-                <tr class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors" >
-                        <td class="py-2.5 max-w-[140px] truncate font-semibold text-gray-800">${item.name}</td>
-                        <td class="py-2.5 text-center font-medium">${item.qty}</td>
-                        <td class="py-2.5 text-center text-gray-500">${item.used}</td>
-                        <td class="py-2.5 text-right">
-                            <span class="px-2 py-1 rounded-md border text-[10px] font-bold ${badgeCls}">
-                                ${balance}${isLow ? ' ⚠' : ''}
-                            </span>
-                        </td>
-                    </tr >
-                `;
+<tr >
+<td class="table-cell-main">
+<strong>${escHtml(item.name)}</strong>
+</td>
+<td class="table-cell-center">${item.qty}</td>
+<td class="table-cell-center">${item.used}</td>
+<td class="table-cell-center">
+<span class="${balanceClass}">
+${balance}
+${isLow ? '<i class="fa-solid fa-triangle-exclamation"></i>' : ''}
+</span>
+</td>
+</tr>
+`;
                 }).join('');
 
                 tableHtml = `
-                <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style = "max-height: 180px;" >
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
-                            <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                <th class="pb-2 font-bold">Item</th>
-                                <th class="pb-2 text-center font-bold">Stock</th>
-                                <th class="pb-2 text-center font-bold">Used</th>
-                                <th class="pb-2 text-right font-bold">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-xs text-gray-700">
-                            ${rows}
-                        </tbody>
-                    </table>
-                </div >
-                `;
+<div class="table-body-surface table-scroll inventory-dashboard-table-scroll">
+<table class="data-table inventory-dashboard-table">
+<thead>
+<tr class="table-column-header">
+<th>Item</th>
+<th class="table-cell-center">Stock</th>
+<th class="table-cell-center">Used</th>
+<th class="table-cell-center">Balance</th>
+</tr>
+</thead>
+<tbody>
+${rows}
+</tbody>
+</table>
+</div>
+`;
             } else {
                 tableHtml = `
-                <div class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200" >
-                    <i class="fa-solid fa-box-open text-3xl mb-2 text-[#8B0000]/50"></i>
-                    <p class="text-xs font-semibold text-gray-500">No medical supplies yet</p>
-                </div >
-                `;
+<div class="empty-state inventory-dashboard-empty">
+    <div class="inventory-empty-icon">
+        <i class="fa-solid fa-box-open"></i>
+    </div>
+
+    <h4 class="empty-state-title">No medical supplies yet</h4>
+
+    <p class="empty-state-sub">
+        Medical supply records will appear here once inventory items are available.
+    </p>
+</div>
+`;
             }
 
             const html = `
-                <div class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100" >
-                <div class="absolute -top-6 -right-6 w-24 h-24 bg-red-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
-                <div class="relative z-10 flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-[#8B0000] border border-red-100 flex-shrink-0">
-                            <i class="fa-solid fa-boxes-stacked text-base"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-extrabold text-[#8B0000] text-sm">Medical Supplies</h3>
-                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
-                        </div>
-                    </div>
-                    <a href="{{ route('dentist.dentist.inventory') }}" class="text-[11px] font-bold text-[#8B0000] bg-red-50 hover:bg-[#8B0000] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
-                        View All <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-                ${ tableHtml }
-            </div >
-                `;
+<article class="card inventory-dashboard-card">
+<header class="card-header">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-[#8B0000] border border-red-100 flex-shrink-0">
+<i class="fa-solid fa-boxes-stacked text-base"></i>
+</div>
+<div>
+<h3 class="font-extrabold text-[#8B0000] text-sm">Medical Supplies</h3>
+<p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
+</div>
+</div>
+<a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
+View All <i class="fa-solid fa-arrow-right"></i>
+</a>
+</header>
+<div class="card-body">${ tableHtml }</div>
+</article>
+`;
 
             swapSkeletonContent('medicalSuppliesContainer', html);
         }
@@ -883,78 +778,82 @@
                     const balance = item.qty - item.used;
                     const pct = item.qty > 0 ? (balance / item.qty) * 100 : 100;
                     const isLow = pct <= 30;
-                    const badgeCls = isLow ? 'bg-red-50 text-red-600 border-red-200 animate-pulse' :
-                        'bg-green-50 text-green-600 border-green-200';
+
+                    const balanceClass = isLow ?
+                        'table-tag table-tag-danger' :
+                        'table-tag table-tag-info';
 
                     return `
-                <tr class="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors" >
-                        <td class="py-2.5 max-w-[120px] truncate font-semibold text-gray-800">${item.name}</td>
-                        <td class="py-2.5 text-center text-gray-500">${item.form || '—'}</td>
-                        <td class="py-2.5 text-center font-medium">${item.qty}</td>
-                        <td class="py-2.5 text-right">
-                            <span class="px-2 py-1 rounded-md border text-[10px] font-bold ${badgeCls}">
-                                ${balance}${isLow ? ' ⚠' : ''}
-                            </span>
-                        </td>
-                    </tr >
-                `;
+<tr >
+<td class="table-cell-main">
+<strong>${escHtml(item.name)}</strong>
+</td>
+<td class="table-cell-center">${escHtml(item.form || '—')}</td>
+<td class="table-cell-center">${item.qty}</td>
+<td class="table-cell-center">
+<span class="${balanceClass}">
+${balance}
+${isLow ? '<i class="fa-solid fa-triangle-exclamation"></i>' : ''}
+</span>
+</td>
+</tr>
+`;
                 }).join('');
 
                 tableHtml = `
-                <div class="relative z-10 overflow-y-auto overflow-x-auto pr-1" style = "max-height: 180px;" >
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-white/90 backdrop-blur-sm z-10">
-                            <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                <th class="pb-2 font-bold">Medicine</th>
-                                <th class="pb-2 text-center font-bold">Form</th>
-                                <th class="pb-2 text-center font-bold">Stock</th>
-                                <th class="pb-2 text-right font-bold">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-xs text-gray-700">
-                            ${rows}
-                        </tbody>
-                    </table>
-                </div >
-                `;
+<div class="table-body-surface table-scroll inventory-dashboard-table-scroll">
+<table class="data-table inventory-dashboard-table">
+<thead>
+<tr class="table-column-header">
+<th>Medicine</th>
+<th class="table-cell-center">Form</th>
+<th class="table-cell-center">Stock</th>
+<th class="table-cell-center">Balance</th>
+</tr>
+</thead>
+<tbody>
+${rows}
+</tbody>
+</table>
+</div>
+`;
             } else {
                 tableHtml = `
-                <div class="relative z-10 flex flex-col items-center justify-center py-6 text-center opacity-60 bg-gray-50 rounded-xl mt-2 border border-dashed border-gray-200" >
-                    <i class="fa-solid fa-prescription-bottle-medical text-3xl mb-2 text-[#FACC15]"></i>
-                    <p class="text-xs font-semibold text-[#9CA3AF]">No medicine items yet</p>
-                </div >
-                `;
+<div class="empty-state inventory-dashboard-empty">
+    <div class="inventory-empty-icon">
+        <i class="fa-solid fa-prescription-bottle-medical"></i>
+    </div>
+
+    <h4 class="empty-state-title">No medicine items yet</h4>
+
+    <p class="empty-state-sub">
+        Medicine inventory records will appear here once items are available.
+    </p>
+</div>
+`;
             }
 
             const html = `
-                <div class="relative bg-white p-5 rounded-3xl shadow-sm flex flex-col overflow-hidden group border border-gray-100">
-                <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-yellow-50 rounded-full z-0 opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
-                <div class="relative z-10 flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center text-[#8B0000] border border-yellow-100 flex-shrink-0">
-                            <i class="fa-solid fa-pills text-base text-yellow-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-extrabold text-[#8B0000] text-sm">Medicine Supplies</h3>
-                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
-                        </div>
-                    </div>
-                    <a href="{{ route('dentist.dentist.inventory') }}" class="text-[11px] font-bold text-yellow-700 bg-yellow-50 hover:bg-yellow-400 hover:text-[#8B0000] px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
-                        View All <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-                ${ tableHtml }
-            </div >
-                `;
+<article class="card inventory-dashboard-card">
+<header class="card-header">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center text-[#8B0000] border border-yellow-100 flex-shrink-0">
+<i class="fa-solid fa-pills text-base text-yellow-600"></i>
+</div>
+<div>
+<h3 class="font-extrabold text-[#8B0000] text-sm">Medicine Supplies</h3>
+<p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
+</div>
+</div>
+<a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
+View All <i class="fa-solid fa-arrow-right"></i>
+</a>
+</header>
+<div class="card-body">${ tableHtml }</div>
+</article>
+`;
 
             swapSkeletonContent('medicineSuppliesContainer', html);
-        }
-
-        function scrollToTodayPatients() {
-            document.getElementById('scheduledTodayContainer')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
         }
 
         function scrollToDashboardAnalytics() {
@@ -1007,7 +906,7 @@
                 },
                 {
                     label: 'Loading charts and summaries',
-                    tasks: [renderGadChart, buildScheduledToday, buildUpcomingAppointments]
+                    tasks: [renderGadChart, buildUpcomingAppointments]
                 },
                 {
                     label: 'Loading inventory',
@@ -1040,7 +939,6 @@
                 }
 
                 renderGadChart();
-                buildScheduledToday();
 
                 if (typeof window.setDashboardLoadingStatus === 'function') {
                     window.setDashboardLoadingStatus('Loading inventory', 70);
@@ -1175,7 +1073,9 @@
                 const kpiIcon = document.getElementById('statusKpiIcon');
 
                 if (dentistIsIn) {
-                    btn.style.background = '#00A96E';
+                    btn.classList.remove('ui-btn-danger');
+                    btn.classList.add('ui-btn-success');
+                    btn.style.removeProperty('background');
                     label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN';
 
                     if (kpiLabel) {
@@ -1188,7 +1088,9 @@
                         kpiIcon.style.color = '#00A96E';
                     }
                 } else {
-                    btn.style.background = '#EF4444';
+                    btn.classList.remove('ui-btn-success');
+                    btn.classList.add('ui-btn-danger');
+                    btn.style.removeProperty('background');
                     label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full"></span> OUT';
 
                     if (kpiLabel) {
@@ -1241,28 +1143,30 @@
             return 'tooltip-center';
         }
 
-        function buildDayHoverCard(dateStr, appointments) {
+        function buildDayHoverCard(dateStr, appointments, placement = 'hover-bottom') {
             const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
             if (!safeAppointments.length) {
                 return `
-                <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[320px] -translate-x-1/2 rounded-2xl border border-[#efe6df] bg-white p-4 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
-            <div class="absolute -top-3 left-0 right-0 h-3"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div>
-                    <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
-                    <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
-                </div>
-            </div>
-            <div class="rounded-xl border border-dashed border-gray-200 bg-[#fafafa] px-4 py-6 text-center">
-                <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-[#fff5f5] flex items-center justify-center text-[#8B0000]">
-                    <i class="fa-regular fa-calendar-xmark"></i>
-                </div>
-                <p class="text-sm font-semibold text-gray-700">No scheduled patients</p>
-                <p class="text-[12px] text-gray-500 mt-1">This date has no booked appointments.</p>
-            </div>
-        </div >
-                `;
+<div class="card day-hover-card ${placement} w-[320px] opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
+<div class="absolute -top-3 left-0 right-0 h-3"></div>
+<div class="card-header">
+<div class="card-header-left">
+<div>
+<p class="card-title">Scheduled Patients</p>
+<p class="card-subtitle">${escHtml(formatModalDate(dateStr))}</p>
+</div>
+</div>
+</div>
+<div class="card-body text-center">
+<div class="w-11 h-11 mx-auto mb-3 rounded-full bg-[#fff5f5] flex items-center justify-center text-[#8B0000]">
+<i class="fa-regular fa-calendar-xmark"></i>
+</div>
+<p class="text-sm font-semibold text-gray-700">No scheduled patients</p>
+<p class="text-[12px] text-gray-500 mt-1">This date has no booked appointments.</p>
+</div>
+</div>
+`;
             }
 
             const items = safeAppointments.slice(0, 3).map(appt => {
@@ -1275,65 +1179,67 @@
                 const safeSchedule = escJs(`${ formatModalDate(appt.date || dateStr) } • ${ appt.time || '—' } `);
                 const rawProfileUrl = appt.patientProfileUrl || '#';
                 const profileUrl =
-                `${ rawProfileUrl }${ rawProfileUrl.includes('?') ? '&' : '?' } from = dashboard`;
+                    `${rawProfileUrl}${rawProfileUrl.includes('?') ? '&' : '?'}from=dashboard`;
 
                 return `
-                <div class="rounded-xl border border-gray-100 p-3 bg-white" >
-            <div class="flex items-center justify-between gap-3 mb-2">
-                <div class="min-w-0">
-                    <p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
-                    <p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
-                </div>
-                <a href="${escHtml(profileUrl)}"
-                class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
-                    View
-                </a>
-            </div>
+<div class="card scheduled-hover-patient-card" >
+<div class="flex items-center justify-between gap-3 mb-2">
+<div class="min-w-0">
+<p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
+<p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
+</div>
+<a href="${escHtml(profileUrl)}"
+class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
+View
+</a>
+</div>
 
-            <div class="flex flex-wrap gap-2">
-                <a href="${escHtml(profileUrl)}"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#8B0000] text-white text-[10px] font-semibold hover:bg-[#660000] transition">
-                    <i class="fa-regular fa-user text-[10px]"></i> Profile
-                </a>
+<div class="flex flex-wrap gap-2">
+<a href="${escHtml(profileUrl)}"
+class="ui-btn ui-btn-primary ui-btn-sm">
+<i class="fa-regular fa-user text-[10px]"></i> Profile
+</a>
 
-                ${canReschedule ? `
-                                <button type="button"
-                                    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
-                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-semibold hover:bg-amber-200 transition">
-                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
-                                </button>
-                            ` : ''}
+${canReschedule ? `
+    <button type="button"
+    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
+    class="ui-btn ui-btn-warning ui-btn-sm">
+    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
+    </button>
+    ` : ''}
 
-                ${canCancel ? `
-                                <button type="button"
-                                    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
-                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-100 text-red-700 text-[10px] font-semibold hover:bg-red-200 transition">
-                                    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
-                                </button>
-                            ` : ''}
-            </div>
-        </div >
-                `;
+${canCancel ? `
+    <button type="button"
+    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
+    class="ui-btn ui-btn-danger ui-btn-sm">
+    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
+    </button>
+    ` : ''}
+</div>
+</div>
+`;
             }).join('');
 
             return `
-                <div class="day-hover-card absolute left-1/2 top-full z-[70] mt-1 w-[340px] -translate-x-1/2 rounded-2xl border border-[#efe6df] bg-white p-3 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
-            <div class="absolute -top-3 left-0 right-0 h-3"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div>
-                    <p class="text-[11px] font-bold uppercase tracking-wider text-[#8B0000]">Scheduled Patients</p>
-                    <p class="text-[11px] text-gray-500">${escHtml(formatModalDate(dateStr))}</p>
-                </div>
-                <a href="{{ route('dentist.dentist.appointments') }}"
-                class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
-                    View all
-                </a>
-            </div>
-            <div class="space-y-2">
-                ${items}
-            </div>
-        </div >
-                `;
+<div class="card day-hover-card ${placement} w-[340px] opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
+<div class="absolute -top-3 left-0 right-0 h-3"></div>
+<div class="card-header">
+<div class="card-header-left">
+<div>
+<p class="card-title">Scheduled Patients</p>
+<p class="card-subtitle">${escHtml(formatModalDate(dateStr))}</p>
+</div>
+</div>
+<a href="{{ route('dentist.dentist.appointments') }}"
+class="card-link">
+View all
+</a>
+</div>
+<div class="card-body space-y-2">
+${items}
+</div>
+</div>
+`;
         }
 
         function loadDentistCalendar() {
@@ -1342,34 +1248,34 @@
                 if (mode !== 'dentist') return '';
 
                 return `
-                <div class="cal-legend mt-4" >
-            <div class="cal-legend-item">
-                <span class="cal-pill cal-pill-maroon">
-                    <i class="fa-solid fa-calendar-day text-[10px]"></i> Today
-                </span>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-pill cal-pill-green">
-                    <i class="fa-solid fa-user-check text-[10px]"></i> Has Patients
-                </span>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-pill cal-pill-red">
-                    <i class="fa-solid fa-ban text-[10px]"></i> Fully Booked
-                </span>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-pill cal-pill-yellow">
-                    <i class="fa-solid fa-star text-[10px]"></i> Holiday
-                </span>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-pill cal-pill-gray">
-                    <i class="fa-solid fa-circle-minus text-[10px]"></i> Unavailable
-                </span>
-            </div>
-        </div >
-                `;
+<div class="cal-legend mt-4" >
+<div class="cal-legend-item">
+<span class="cal-pill cal-pill-maroon">
+<i class="fa-solid fa-calendar-day text-[10px]"></i> Today
+</span>
+</div>
+<div class="cal-legend-item">
+<span class="cal-pill cal-pill-green">
+<i class="fa-solid fa-user-check text-[10px]"></i> Has Patients
+</span>
+</div>
+<div class="cal-legend-item">
+<span class="cal-pill cal-pill-red">
+<i class="fa-solid fa-ban text-[10px]"></i> Fully Booked
+</span>
+</div>
+<div class="cal-legend-item">
+<span class="cal-pill cal-pill-yellow">
+<i class="fa-solid fa-star text-[10px]"></i> Holiday
+</span>
+</div>
+<div class="cal-legend-item">
+<span class="cal-pill cal-pill-gray">
+<i class="fa-solid fa-circle-minus text-[10px]"></i> Unavailable
+</span>
+</div>
+</div>
+`;
             }
 
             const MAX_PER_DAY = 5;
@@ -1412,11 +1318,11 @@
                 const holidays = getHolidaysForMonth(year, month);
 
                 const headerHtml = dayLabels.map((l, i) =>
-                    `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${(i === 0 || i === 6) ? 'cal-day-weekend' : 'cal-day-label'}" > ${ l }</div > `
+                    `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${(i === 0 || i === 6) ? 'cal-day-weekend' : 'cal-day-label'}" > ${ l }</div> `
                 ).join('');
 
                 let cells = '';
-                for (let i = 0; i < firstDow; i++) cells += `<div ></div > `;
+                for (let i = 0; i < firstDow; i++) cells += `<div ></div> `;
 
                 for (let d = 1; d <= totalDays; d++) {
                     const dateStr = `${year}-${pad(month + 1)}-${pad(d)}`;
@@ -1438,9 +1344,9 @@
 
                     if (holiday) {
                         badgeHtml = `
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
-                    <i class="fa-solid fa-star text-[8px]"></i>
-                </span > `;
+<span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
+<i class="fa-solid fa-star text-[8px]"></i>
+</span> `;
                         tooltipTxt = `<i class="fa-solid fa-star mr-1 text-white" ></i > ${ holiday } `;
                         tooltipTone = 'yellow';
                     }
@@ -1457,9 +1363,9 @@
                         }
                         const dotClass = isFull ? 'bg-red-600' : 'bg-emerald-600';
                         badgeHtml = `
-                <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full ${dotClass} text-[9px] font-bold leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
-                    ${ count }
-                </span > `;
+<span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full ${dotClass} text-[9px] font-bold leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
+${ count }
+</span> `;
                     }
 
                     if (isToday && !hasAppts && !holiday) {
@@ -1467,9 +1373,9 @@
                         tooltipTone = 'today';
                     } else if (isUnavail && !holiday && !hasAppts) {
                         badgeHtml = `
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gray-500 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
-                    <i class="fa-solid fa-minus text-[8px]"></i>
-                </span > `;
+<span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gray-500 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
+<i class="fa-solid fa-minus text-[8px]"></i>
+</span> `;
                         tooltipTxt = weekend ? `<i class="fa-solid fa-ban mr-1 text-gray-300" ></i > Clinic closed` :
                             ` <i class="fa-solid fa-ban mr-1 text-gray-300" ></i > Not available`;
                         tooltipTone = 'gray';
@@ -1525,51 +1431,53 @@
 
                     const palette = tooltipPalette[tooltipTone] || tooltipPalette.dark;
                     const showHoverCard = isHoverDevice && hasAppts && !holiday;
+                    const calendarRow = Math.floor((firstDow + d - 1) / 7);
+                    const hoverPlacement = calendarRow >= 3 ? 'hover-top' : 'hover-bottom';
 
                     const tooltipHtml = (!showHoverCard && tooltipTxt) ? `
-                <div class="day-smart-tooltip ${tooltipSide} absolute bottom-[calc(100%+10px)] z-[9999] pointer-events-none" >
-                    <div class="${palette.bg} relative text-white text-[0.65rem] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl
-                        after:content-[''] after:absolute after:top-full after:border-4 after:border-transparent ${palette.arrow}">
-                        ${tooltipTxt}
-                    </div>
-                </div >
-                ` : '';
+<div class="day-smart-tooltip ${tooltipSide} absolute bottom-[calc(100%+10px)] z-[9999] pointer-events-none" >
+<div class="${palette.bg} relative text-white text-[0.65rem] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl
+after:content-[''] after:absolute after:top-full after:border-4 after:border-transparent ${palette.arrow}">
+${tooltipTxt}
+</div>
+</div>
+` : '';
 
-                    const hoverCardHtml = showHoverCard ? buildDayHoverCard(dateStr, dayAppointments) : '';
+                    const hoverCardHtml = showHoverCard ? buildDayHoverCard(dateStr, dayAppointments, hoverPlacement) : '';
                     const clickOpen = canOpenModal && !isHoverDevice ?
                         `onclick = "openDayAppointmentsModal('${dateStr}', decodeURIComponent('${encodedAppointments}'))"` :
                         '';
 
                     cells += `
-                <div class="cal-cell-wrap relative flex items-center justify-center group" ${ clickOpen }>
-                    ${ tooltipHtml }
-                    ${ hoverCardHtml }
-            <div class="${cellClass}" data-date="${dateStr}">
-                <span>${d}</span>
-                ${badgeHtml}
-            </div>
-                </div > `;
+<div class="cal-cell-wrap relative flex items-center justify-center group" ${ clickOpen }>
+${ tooltipHtml }
+${ hoverCardHtml }
+<div class="${cellClass}" data-date="${dateStr}">
+<span>${d}</span>
+${badgeHtml}
+</div>
+</div> `;
                 }
 
                 const container = document.getElementById('dentistCalendarContainer');
                 if (container) {
                     const html = `
-                <div class="cal-shell flex flex-col justify-between h-full bg-white shadow-sm border-none p-5 sm:p-6" >
-                    <div>
-                        <div class="flex items-center justify-between mb-5">
-                            <button onclick="changeDentistMonth(-1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
-                            <div class="text-center">
-                                <p class="cal-month-label text-base font-extrabold">${monthNames[month]}</p>
-                                <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
-                            </div>
-                            <button onclick="changeDentistMonth(1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-                        <hr class="border-[#f0ebe6] mb-3">
-                            <div class="cal-grid">${headerHtml}</div>
-                            <div class="cal-grid" style="row-gap: 0.5rem;">${cells}</div>
-                    </div>
-                ${ renderUnifiedCalendarLegend('dentist') }
-            </div > `;
+<div class="card cal-shell flex flex-col justify-between h-full p-5 sm:p-6" >
+<div>
+<div class="flex items-center justify-between mb-5">
+<button onclick="changeDentistMonth(-1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+<div class="text-center">
+<p class="cal-month-label text-base font-extrabold">${monthNames[month]}</p>
+<p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
+</div>
+<button onclick="changeDentistMonth(1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+<hr class="border-[#f0ebe6] mb-3">
+<div class="cal-grid">${headerHtml}</div>
+<div class="cal-grid" style="row-gap: 0.5rem;">${cells}</div>
+</div>
+${ renderUnifiedCalendarLegend('dentist') }
+</div> `;
 
                     swapSkeletonContent('dentistCalendarContainer', html);
                 }
@@ -1651,96 +1559,98 @@
 
             if (!appointments.length) {
                 listEl.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-10 text-center opacity-60" >
+<div class="flex flex-col items-center justify-center py-10 text-center opacity-60" >
 <i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-[#8B0000]"></i>
 <p class="text-sm font-semibold text-gray-700">No appointments for this date</p>
-</div >
-                `;
+</div>
+`;
             } else {
                 listEl.innerHTML = appointments.map(appt => {
-    const badgeClass = getStatusBadgeClass(appt.status);
-    const initial = (appt.name || '?').charAt(0).toUpperCase();
-    const profileUrl = appt.patientProfileUrl || '#';
-    const rescheduleUrl = appt.rescheduleUrl || '#';
-    const cancelUrl = appt.cancelUrl || '#';
-    const status = String(appt.status || '').toLowerCase().trim();
+                    const badgeClass = getStatusBadgeClass(appt.status);
+                    const initial = (appt.name || '?').charAt(0).toUpperCase();
+                    const profileUrl = appt.patientProfileUrl || '#';
+                    const rescheduleUrl = appt.rescheduleUrl || '#';
+                    const cancelUrl = appt.cancelUrl || '#';
+                    const status = String(appt.status || '').toLowerCase().trim();
 
-    const canReschedule = ['upcoming', 'rescheduled'].includes(status);
-    const canCancel = ['upcoming', 'rescheduled'].includes(status);
+                    const canReschedule = ['upcoming', 'rescheduled'].includes(status);
+                    const canCancel = ['upcoming', 'rescheduled'].includes(status);
 
-    const displayName = escHtml(appt.name || 'Unknown Patient');
-    const displayService = escHtml(appt.service || 'General Service');
-    const displayDate = escHtml(formatModalDate(appt.date || dateStr));
-    const displayTime = escHtml(appt.time || '—');
+                    const displayName = escHtml(appt.name || 'Unknown Patient');
+                    const displayService = escHtml(appt.service || 'General Service');
+                    const displayDate = escHtml(formatModalDate(appt.date || dateStr));
+                    const displayTime = escHtml(appt.time || '—');
 
-    const safeName = (appt.name || 'Unknown Patient').replace(/'/g, "\\'");
-    const safeSchedule = `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'}`.replace(/'/g, "\\'");
-    const safeService = (appt.service || '').replace(/'/g, "\\'");
+                    const safeName = (appt.name || 'Unknown Patient').replace(/'/g, "\\'");
+                    const safeSchedule = `${ formatModalDate(appt.date || dateStr) } • ${ appt.time || '—' } `
+                        .replace(
+                            /'/g, "\\'");
+                    const safeService = (appt.service || '').replace(/'/g, "\\'");
 
-    const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
-    const avatarHtml = photo
-        ? `<img src="${escHtml(photo)}" alt="${displayName}">`
-        : `<span>${escHtml(initial)}</span>`;
+                    const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
+                    const avatarHtml = photo ?
+                        `<img src = "${escHtml(photo)}" alt = "${displayName}" > ` :
+                        `<span > ${ escHtml(initial) }</span> `;
 
-    return `
-        <div class="scheduled-patient-card">
-            <div class="scheduled-patient-head">
-                <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
-                    onclick="closeDayAppointmentsModal()"
-                    class="patient-avatar patient-avatar-sm scheduled-patient-avatar">
-                    ${avatarHtml}
-                </a>
+                    return `
+<article class="card scheduled-patient-card" >
+<div class="scheduled-patient-head">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
+onclick="closeDayAppointmentsModal()"
+class="patient-avatar patient-avatar-sm scheduled-patient-avatar">
+${avatarHtml}
+</a>
 
-                <div class="scheduled-patient-info">
-                    <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
-                        onclick="closeDayAppointmentsModal()"
-                        class="scheduled-patient-name">
-                        ${displayName}
-                    </a>
+<div class="scheduled-patient-info">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
+onclick="closeDayAppointmentsModal()"
+class="scheduled-patient-name">
+${displayName}
+</a>
 
-                    <p class="scheduled-patient-meta">
-                        <i class="fa-solid fa-stethoscope"></i>
-                        <span class="scheduled-patient-meta-lines">
-                            <span class="scheduled-patient-service">${displayService}</span>
-                            <span class="scheduled-patient-schedule">${displayDate} · ${displayTime}</span>
-                        </span>
-                    </p>
-                </div>
+<p class="scheduled-patient-meta">
+<i class="fa-solid fa-stethoscope"></i>
+<span class="scheduled-patient-meta-lines">
+<span class="scheduled-patient-service">${displayService}</span>
+<span class="scheduled-patient-schedule">${displayDate} · ${displayTime}</span>
+</span>
+</p>
+</div>
 
-                <span class="${badgeClass}">
-                    ${getAppointmentStatusLabel(appt.status)}
-                </span>
-            </div>
+<span class="${badgeClass}">
+${getAppointmentStatusLabel(appt.status)}
+</span>
+</div>
 
-            <div class="scheduled-patient-actions">
-                <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
-                    onclick="closeDayAppointmentsModal()"
-                    class="scheduled-action-btn scheduled-profile-btn">
-                    <i class="fa-regular fa-user"></i>
-                    <span>View Profile</span>
-                </a>
+<div class="scheduled-patient-actions">
+<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
+onclick="closeDayAppointmentsModal()"
+class="ui-btn ui-btn-primary ui-btn-sm scheduled-action-btn">
+<i class="fa-regular fa-user"></i>
+<span>View Profile</span>
+</a>
 
-                ${canReschedule ? `
-                    <button type="button"
-                        onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${safeService}', '${rescheduleUrl}')"
-                        class="scheduled-action-btn scheduled-reschedule-btn">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span>Reschedule</span>
-                    </button>
-                ` : ''}
+${canReschedule ? `
+    <button type="button"
+    onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${safeService}', '${rescheduleUrl}')"
+    class="ui-btn ui-btn-warning ui-btn-sm scheduled-action-btn">
+    <i class="fa-solid fa-rotate-right"></i>
+    <span>Reschedule</span>
+    </button>
+    ` : ''}
 
-                ${canCancel ? `
-                    <button type="button"
-                        onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
-                        class="scheduled-action-btn scheduled-cancel-btn">
-                        <i class="fa-solid fa-ban"></i>
-                        <span>Cancel</span>
-                    </button>
-                ` : ''}
-            </div>
-        </div>
-    `;
-}).join('');
+${canCancel ? `
+    <button type="button"
+    onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
+    class="ui-btn ui-btn-danger ui-btn-sm scheduled-action-btn">
+    <i class="fa-solid fa-ban"></i>
+    <span>Cancel</span>
+    </button>
+    ` : ''}
+</div>
+</article>
+`;
+                }).join('');
             }
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');

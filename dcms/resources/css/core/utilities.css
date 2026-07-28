@@ -2313,30 +2313,20 @@
 }
 
 .global-info-icon {
-    --info-accent: var(--crimson, #8B0000);
-    --info-soft: rgba(139, 0, 0, .08);
-    --info-border: rgba(139, 0, 0, .14);
-
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    flex: 0 0 40px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    border: 1px solid var(--info-border);
-    border-radius: 12px;
-
-    background: var(--info-soft);
-    color: var(--info-accent);
+    flex-shrink: 0;
+    background: var(--status-bg,
+            var(--status-default-bg));
+    color: var(--status-text,
+            var(--status-default-text));
+    border: 1px solid var(--status-border,
+            var(--status-default-border));
 }
 
 .global-info-icon i {
     color: currentColor;
-    font-size: 13px;
-    line-height: 1;
 }
 
 .global-info-copy {

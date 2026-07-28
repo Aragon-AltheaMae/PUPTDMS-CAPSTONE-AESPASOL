@@ -1006,7 +1006,6 @@
     gap: .5rem;
     transition: all .2s;
     box-shadow: 0 4px 14px rgba(139, 0, 0, .3);
-    font-family: 'Inter', sans-serif;
 }
 
 .run-backup-btn:hover {
