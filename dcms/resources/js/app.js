@@ -40,6 +40,139 @@ function normalizeDateOnly(value) {
     return date;
 }
 
+function normalizeCalendarDays(days) {
+    if (Array.isArray(days)) return days;
+
+    if (typeof days === 'string') {
+        try {
+            const parsed = JSON.parse(days);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (_) {
+            return days.split(',').map(day => day.trim()).filter(Boolean);
+        }
+    }
+
+    return [];
+}
+
+function isCalendarRuleActive(rule) {
+    return (
+        rule?.is_active === true ||
+        rule?.is_active === 1 ||
+        rule?.is_active === '1'
+    );
+}
+
+function getCalendarDayAbbr(dateObj) {
+    return dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+    }).replace('.', '');
+}
+
+function toIsoDate(dateObj) {
+    const date = normalizeDateOnly(dateObj);
+
+    if (!date) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function createCalendarSource(config = {}) {
+    const blockedDates = Array.isArray(config.blockedDates) ? config.blockedDates : [];
+    const blockedDateSet = new Set(blockedDates.map(value => String(value).trim()).filter(Boolean));
+    const holidaysMap = config.holidaysMap && typeof config.holidaysMap === 'object'
+        ? config.holidaysMap
+        : {};
+    const scheduleRules = Array.isArray(config.scheduleRules) ? config.scheduleRules : [];
+    const useDynamicScheduleRules = config.useDynamicScheduleRules === true;
+
+    return {
+        blockedDates,
+        blockedDateSet,
+        holidaysMap,
+        scheduleRules,
+        useDynamicScheduleRules,
+        rawConfig: config,
+
+        toIsoDate(dateObj) {
+            return toIsoDate(dateObj);
+        },
+
+        getRuleForDate(dateObj) {
+            if (!useDynamicScheduleRules) return null;
+
+            const dayAbbr = getCalendarDayAbbr(dateObj);
+
+            return scheduleRules.find(rule => {
+                const days = normalizeCalendarDays(rule?.days);
+
+                return isCalendarRuleActive(rule) && days.includes(dayAbbr);
+            }) || null;
+        },
+
+        getMaxPerDay(dateObj) {
+            const rule = this.getRuleForDate(dateObj);
+            return Number(rule?.max_slots ?? 0) || 0;
+        },
+
+        isBlocked(iso) {
+            return this.blockedDateSet.has(String(iso || '').trim());
+        },
+
+        getHoliday(iso) {
+            return this.holidaysMap?.[iso] || null;
+        },
+
+        isDateSchedulable(dateObj, iso = this.toIsoDate(dateObj)) {
+            if (!iso) return false;
+
+            if (this.isBlocked(iso)) {
+                return false;
+            }
+
+            if (this.getHoliday(iso)) {
+                return false;
+            }
+
+            if (!useDynamicScheduleRules) {
+                return true;
+            }
+
+            const rule = this.getRuleForDate(dateObj);
+            const status = String(rule?.status || '').trim().toLowerCase();
+
+            if (!rule || !isCalendarRuleActive(rule) || status === 'closed') {
+                return false;
+            }
+
+            return true;
+        },
+
+        buildFlatpickrOptions(overrides = {}) {
+            const existingDisable = Array.isArray(overrides.disable)
+                ? overrides.disable
+                : [];
+
+            return {
+                ...overrides,
+                disable: [
+                    ...existingDisable,
+                    dateObj => !this.isDateSchedulable(dateObj),
+                ],
+            };
+        },
+    };
+}
+
+window.createCalendarSource = createCalendarSource;
+window.buildFlatpickrCalendarOptions = function buildFlatpickrCalendarOptions(config = {}, overrides = {}) {
+    return createCalendarSource(config).buildFlatpickrOptions(overrides);
+};
+
 function decorateFlatpickrDays(instance) {
     if (!instance?.calendarContainer) return;
 
