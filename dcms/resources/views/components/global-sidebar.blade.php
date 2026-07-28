@@ -179,14 +179,20 @@ $sidebarGroups = [
 'icon' => 'fa-users',
 'label' => 'Patients',
 ],
-[
-'route' => 'dentist.walk-in.index',
-'active' => ['dentist.walk-in.*'],
-'icon' => 'fa-person-walking',
-'label' => 'Walk-in',
-],
-[
-'route' => 'dentist.dentist.appointments',
+      [
+      'route' => 'dentist.walk-in.index',
+      'active' => ['dentist.walk-in.*'],
+      'icon' => 'fa-person-walking',
+      'label' => 'Walk-in',
+    ],
+    [
+      'route' => 'dentist.existing-record.index',
+      'active' => ['dentist.existing-record.*'],
+      'icon' => 'fa-folder-open',
+      'label' => 'Add Existing Record',
+    ],
+    [
+      'route' => 'dentist.dentist.appointments',
 'active' => ['dentist.dentist.appointments'],
 'icon' => 'fa-calendar-check',
 'label' => 'Appointments',

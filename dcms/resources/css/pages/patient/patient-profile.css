@@ -494,44 +494,73 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
+    isolation: isolate;
 }
 
 .profile-odontogram-modal.hidden {
-    display: none;
+    display: none !important;
 }
 
 .profile-odontogram-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(38, 14, 14, 0.48);
+    z-index: 0;
+    background: rgba(15, 23, 42, 0.68);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .profile-odontogram-card {
     position: relative;
-    width: min(92vw, 620px);
-    max-height: 86vh;
-    overflow-y: auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 680px);
+    max-height: calc(100dvh - 2rem);
     border-radius: 1.25rem;
     background: #fff8ef;
-    border: 1px solid rgba(139, 0, 0, 0.18);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(139, 0, 0, 0.16);
+    box-shadow:
+        0 30px 80px rgba(15, 23, 42, 0.34),
+        0 8px 24px rgba(139, 0, 0, 0.14);
+    overflow: hidden;
+    animation: profileOdontogramModalIn 0.2s ease-out;
+}
+
+@keyframes profileOdontogramModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .profile-odontogram-card-hero {
     position: relative;
-    padding: 1.25rem;
+    flex-shrink: 0;
+    padding: 1.25rem 3.75rem 1.25rem 1.25rem;
     color: #fff;
-    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.14), transparent 30%), linear-gradient(135deg, #7a0000, #8b0000, #661010);
+    background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 32%),
+        linear-gradient(135deg, #7a0000, #8b0000, #661010);
 }
 
 .profile-odontogram-card-hero h3 {
+    margin: 0;
     font-size: 1.35rem;
     font-weight: 900;
+    line-height: 1.25;
 }
 
 .profile-odontogram-card-hero p {
+    margin: 0.25rem 0 0;
     font-size: 0.82rem;
-    opacity: 0.85;
+    opacity: 0.86;
     font-weight: 700;
 }
 
@@ -539,21 +568,55 @@
     position: absolute;
     top: 0.85rem;
     right: 0.85rem;
-    width: 2rem;
-    height: 2rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #fff;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+.profile-odontogram-close:hover {
+    background: rgba(255, 255, 255, 0.24);
+    transform: rotate(4deg);
+}
+
+.profile-odontogram-close:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.65);
+    outline-offset: 2px;
 }
 
 .profile-odontogram-card-body {
-    padding: 0.9rem;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 0, 0, 0.35) transparent;
+}
+
+.profile-odontogram-card-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.profile-odontogram-card-body::-webkit-scrollbar-thumb {
+    background: rgba(139, 0, 0, 0.30);
+    border-radius: 999px;
 }
 
 .profile-odontogram-tooth-main {
     display: grid;
-    grid-template-columns: 150px 1fr;
-    padding: 0.85rem;
+    grid-template-columns: 150px minmax(0, 1fr);
+    padding: 0.95rem;
     gap: 1rem;
     align-items: center;
     border: 1px solid rgba(139, 0, 0, 0.13);
@@ -562,7 +625,7 @@
 }
 
 .profile-odontogram-tooth-visual {
-    min-height: 96px;
+    min-height: 110px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -613,18 +676,22 @@
 }
 
 .profile-odontogram-condition-pill {
+    display: inline-flex;
+    max-width: 100%;
     margin-top: 0.4rem;
-    border-radius: 0.45rem;
-    padding: 0.45rem 0.65rem;
+    border-radius: 0.55rem;
+    padding: 0.48rem 0.7rem;
     font-size: 0.78rem;
     font-weight: 800;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
     border: 1px solid rgba(139, 0, 0, 0.28);
     background: #fee2e2;
     color: #7f1d1d;
 }
 
 .profile-odontogram-tooth-name {
-    margin: 0.7rem 0;
+    margin: 0.8rem 0;
     color: #7b6b6b;
     font-size: 0.82rem;
     font-weight: 700;
@@ -633,12 +700,13 @@
 .profile-odontogram-info-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
 .profile-odontogram-info-box {
-    padding: 0.6rem 0.7rem !important;
-    border-radius: 0.7rem;
+    min-width: 0;
+    padding: 0.7rem 0.8rem !important;
+    border-radius: 0.75rem;
     border: 1px solid rgba(139, 0, 0, 0.13);
     background: #fff;
 }
@@ -655,11 +723,13 @@
     display: block;
     margin-top: 0.25rem;
     font-size: 0.82rem;
+    line-height: 1.35;
     color: #2b1515;
+    overflow-wrap: anywhere;
 }
 
 .profile-odontogram-history {
-    margin-top: 0.7rem;
+    margin-top: 0.85rem;
 }
 
 .profile-odontogram-surface-list {
@@ -673,8 +743,9 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+    max-width: 100%;
     border-radius: 999px;
-    padding: 0.35rem 0.55rem;
+    padding: 0.38rem 0.6rem;
     font-size: 0.72rem;
     font-weight: 800;
     border: 1px solid rgba(139, 0, 0, 0.18);
@@ -693,7 +764,8 @@
 .profile-odontogram-history-item {
     margin-top: 0.65rem;
     display: flex;
-    gap: 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.65rem;
     align-items: center;
     font-size: 0.8rem;
     color: #4b3b3b;
@@ -705,6 +777,7 @@
     border-radius: 999px;
     background: #fecaca;
     border: 1px solid #fca5a5;
+    flex-shrink: 0;
 }
 
 @media (max-width: 640px) {
@@ -721,14 +794,37 @@
         min-height: 360px;
     }
 
+    .profile-odontogram-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .profile-odontogram-card {
+        width: 100%;
+        max-height: 94dvh;
+        border-radius: 1.25rem 1.25rem 0 0;
+        border-bottom: 0;
+    }
+
+    .profile-odontogram-card-hero {
+        padding: 1rem 3.5rem 1rem 1rem;
+    }
+
+    .profile-odontogram-card-body {
+        padding: 0.85rem;
+    }
+
     .profile-odontogram-tooth-main,
     .profile-odontogram-info-grid {
         grid-template-columns: 1fr;
     }
 
-    .profile-odontogram-card {
-        width: 94vw;
-        max-height: 84dvh;
+    .profile-odontogram-tooth-main {
+        text-align: center;
+    }
+
+    .profile-odontogram-condition-pill {
+        justify-content: center;
     }
 }
 
@@ -832,4 +928,117 @@
 .dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-500,
 .dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-400 {
     color: #94a3b8 !important;
+}
+
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-card,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-card {
+    background:
+        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
+        linear-gradient(145deg, #0d1117, #161b22) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-card-body,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-card-body {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-main,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-main,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill {
+    background: rgba(248, 250, 252, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box strong,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-history-item,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box strong,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-history-item,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-name,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-label,
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box p,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-name,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-label,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box p {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-wrap,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-wrap {
+    border-color: rgba(252, 165, 165, 0.18) !important;
+    background:
+        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
+        linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.74)) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-label,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-label {
+    color: #fca5a5 !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-sub,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-item {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-dot,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-dot {
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-board-wrap,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-board-wrap {
+    background:
+        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.74)) !important;
+    border-color: rgba(252, 165, 165, 0.12) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-loading,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-loading {
+    background: rgba(13, 17, 23, 0.92) !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-empty,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-empty {
+    fill: rgba(248, 250, 252, 0.06) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-surface,
+.dark body:has(#mainContent.patient-profile-page) .profile-tooth-surface {
+    fill: rgba(248, 250, 252, 0.06) !important;
+    stroke: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-status,
+.dark body:has(#mainContent.patient-profile-page) .profile-tooth-status {
+    background: rgba(248, 250, 252, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-number,
+.dark body:has(#mainContent.patient-profile-page) .profile-tooth-root {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-root {
+    background: rgba(255, 255, 255, 0.16) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-arch-line,
+.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-arch-line {
+    color: #94a3b8 !important;
+    border-color: rgba(252, 165, 165, 0.18) !important;
 }
