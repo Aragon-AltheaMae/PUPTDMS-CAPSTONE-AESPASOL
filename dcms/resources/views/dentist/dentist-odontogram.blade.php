@@ -2250,31 +2250,71 @@ $pageSubtitle = $historicalMode
         view2dBtn.addEventListener('click', () => switchView('2d'));
         view3dBtn.addEventListener('click', () => switchView('3d'));
 
+        function getOdontogramTheme() {
+            const root = document.documentElement;
+
+            return (
+                root.getAttribute('data-theme') === 'dark' ||
+                root.classList.contains('dark')
+            )
+                ? 'dark'
+                : 'light';
+        }
+
+        function syncOdontogram3DTheme(theme = getOdontogramTheme()) {
+            const isDark = theme === 'dark';
+
+            const backgroundColor = isDark
+                ? '#0D1117'
+                : '#D8E0EA';
+
+            if (scene) {
+                scene.background = new THREE.Color(backgroundColor);
+            }
+
+            if (renderer) {
+                renderer.setClearColor(backgroundColor, 1);
+            }
+
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.addEventListener('global-theme-change', function (event) {
+            syncOdontogram3DTheme(
+                event.detail?.theme || getOdontogramTheme()
+            );
+        });
+
         function initThreeScene() {
             const width = container.clientWidth || 700;
             const height = container.clientHeight || 480;
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(
-                document.documentElement.getAttribute('data-theme') === 'dark' ||
-                    document.documentElement.classList.contains('dark') ||
-                    document.body.classList.contains('dark') ?
-                    '#0D1117' :
-                    '#D8E0EA'
+            syncOdontogram3DTheme();
+
+            camera = new THREE.PerspectiveCamera(
+                40,
+                width / height,
+                0.1,
+                1000
+
             );
 
-            camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
             camera.position.set(0, 1.2, 14);
 
             renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 alpha: false
             });
+
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(width, height);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.appendChild(renderer.domElement);
+            syncOdontogram3DTheme();
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
