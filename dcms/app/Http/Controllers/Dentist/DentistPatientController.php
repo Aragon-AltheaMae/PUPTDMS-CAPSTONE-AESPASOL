@@ -24,7 +24,34 @@ class DentistPatientController extends Controller
 
         $appointments = Appointment::with('patient')
             ->whereHas('patient')
-            ->orderBy('appointment_date', 'asc')
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date = ? THEN 0
+            WHEN appointment_date > ? THEN 1
+            ELSE 2
+        END
+        ',
+                [$today, $today]
+            )
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date >= ?
+            THEN appointment_date
+        END ASC
+        ',
+                [$today]
+            )
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date < ?
+            THEN appointment_date
+        END DESC
+        ',
+                [$today]
+            )
             ->orderBy('appointment_time', 'asc')
             ->get();
 

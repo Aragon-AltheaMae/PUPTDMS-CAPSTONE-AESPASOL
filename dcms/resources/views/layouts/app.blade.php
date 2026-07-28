@@ -131,12 +131,6 @@
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=optional"
-        rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @yield('styles')
@@ -199,6 +193,64 @@
     @endif
 
     @include('partials.global-toast')
+
+    <div id="logoutConfirmModal" class="ui-modal logout-confirm-modal modal-theme-warning" role="dialog"
+        aria-modal="true" aria-labelledby="logoutConfirmTitle" aria-describedby="logoutConfirmDescription"
+        aria-hidden="true">
+        <div class="ui-modal-card modal-sm logout-confirm-card">
+            <div class="modal-hd">
+                <div class="modal-heading">
+                    <div class="modal-icon logout-confirm-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </div>
+
+                    <div class="modal-copy">
+                        <h2 id="logoutConfirmTitle" class="modal-title">
+                            Confirm Logout
+                        </h2>
+
+                        <p class="modal-subtitle">
+                            You are about to end your current session.
+                        </p>
+                    </div>
+                </div>
+
+                <button type="button" class="modal-x" data-logout-modal-close aria-label="Close logout confirmation">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modal-bd">
+                <div class="logout-confirm-message">
+                    <div class="logout-confirm-message-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <p id="logoutConfirmDescription">
+                            Are you sure you want to log out?
+                        </p>
+
+                        <span>
+                            You will need to sign in again to access your account.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-ft logout-confirm-actions">
+                <button type="button" class="btn-close-modal" data-logout-modal-close>
+                    Stay Signed In
+                </button>
+
+                <button type="button" id="confirmLogoutBtn" class="modal-btn-confirm danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     @include('partials.terms-modal')
     @include('partials.inactivity-logout')
 

@@ -813,39 +813,6 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     font-weight: 650;
 }
 
-.global-confirm-alert--centered {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: .7rem;
-    text-align: center;
-}
-
-.global-confirm-alert--centered>i {
-    margin-top: 0;
-    font-size: 20px;
-}
-
-.global-confirm-alert-copy {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .4rem;
-    width: 100%;
-    text-align: center;
-}
-
-.global-confirm-alert--centered p {
-    width: 100%;
-    text-align: center;
-}
-
-.global-confirm-alert--centered span {
-    width: 100%;
-    margin-top: 0;
-    text-align: center;
-}
-
 .modal-ft--centered {
     justify-content: center;
 }
@@ -3755,4 +3722,597 @@ body.doc-modal-lock .floating-action {
     background: var(--card, #ffffff);
     box-shadow:
         0 -10px 24px rgba(15, 23, 42, .04);
+}
+
+.session-timeout-modal {
+    --session-accent: #8B0000;
+    --session-accent-dark: #5F0000;
+    --session-accent-soft: #FFF1F2;
+    --session-border: rgba(139, 0, 0, .14);
+
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 22px !important;
+
+    background:
+        radial-gradient(circle at 18% 18%,
+            rgba(139, 0, 0, .25),
+            transparent 32%),
+        radial-gradient(circle at 82% 82%,
+            rgba(185, 28, 28, .14),
+            transparent 30%),
+        rgba(15, 23, 42, .68) !important;
+
+    backdrop-filter:
+        blur(10px) saturate(130%) !important;
+
+    -webkit-backdrop-filter:
+        blur(10px) saturate(130%) !important;
+}
+
+.session-timeout-modal .session-timeout-card {
+    width: min(94vw, 450px) !important;
+    max-width: 450px !important;
+    max-height: calc(100dvh - 44px) !important;
+
+    border:
+        1px solid rgba(255, 255, 255, .72) !important;
+
+    border-radius: 28px !important;
+
+    background:
+        radial-gradient(circle at top center,
+            rgba(139, 0, 0, .07),
+            transparent 35%),
+        #FFFFFF !important;
+
+    box-shadow:
+        0 34px 90px rgba(2, 6, 23, .34),
+        0 8px 30px rgba(139, 0, 0, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .92) !important;
+
+    overflow: hidden !important;
+}
+
+.session-timeout-hero {
+    position: relative;
+    padding: 1.4rem 1.5rem .9rem;
+    text-align: center;
+}
+
+.session-timeout-badge {
+    width: max-content;
+    max-width: 100%;
+    min-height: 30px;
+    margin: 0 auto 1rem;
+    padding: 0 .8rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+
+    border:
+        1px solid rgba(139, 0, 0, .12);
+
+    border-radius: 999px;
+
+    background:
+        rgba(139, 0, 0, .055);
+
+    color: var(--session-accent);
+
+    font-size: .68rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.session-timeout-badge i {
+    color: currentColor;
+    font-size: .68rem;
+}
+
+.session-timeout-icon {
+    position: relative;
+
+    width: 90px;
+    height: 90px;
+    margin: 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(145deg,
+            #FFF1F2,
+            #FFFFFF);
+
+    border:
+        1px solid rgba(139, 0, 0, .12);
+
+    box-shadow:
+        0 18px 38px rgba(139, 0, 0, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.session-timeout-icon::before {
+    content: '';
+
+    position: absolute;
+    inset: -9px;
+
+    border:
+        1px solid rgba(139, 0, 0, .08);
+
+    border-radius: 36px;
+}
+
+.session-timeout-icon-inner {
+    width: 60px;
+    height: 60px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(135deg,
+            var(--session-accent),
+            var(--session-accent-dark));
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 16px 30px rgba(139, 0, 0, .26),
+        inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.session-timeout-icon-inner i {
+    color: currentColor;
+    font-size: 1.35rem;
+}
+
+.session-timeout-content {
+    padding: .55rem 1.7rem 1.2rem;
+    text-align: center;
+}
+
+.session-timeout-title {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: clamp(1.35rem, 3vw, 1.65rem);
+    font-weight: 950;
+    line-height: 1.15;
+    letter-spacing: -.035em;
+}
+
+.session-timeout-description {
+    max-width: 350px;
+    margin: .65rem auto 0;
+
+    color: #6B7280;
+
+    font-size: .88rem;
+    font-weight: 650;
+    line-height: 1.55;
+}
+
+.session-timeout-message {
+    width: 100%;
+    margin-top: 1.1rem;
+    padding: .85rem .9rem;
+
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+
+    border:
+        1px solid rgba(139, 0, 0, .11);
+
+    border-radius: 17px;
+
+    background:
+        linear-gradient(135deg,
+            #FFF7F7,
+            #FFFDFD);
+
+    text-align: left;
+}
+
+.session-timeout-message-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        rgba(139, 0, 0, .09);
+
+    color: var(--session-accent);
+}
+
+.session-timeout-message-icon i {
+    color: currentColor;
+    font-size: .75rem;
+}
+
+.session-timeout-message p {
+    margin: 0;
+
+    color: #4B5563;
+
+    font-size: .76rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.session-timeout-actions {
+    padding: 1rem 1.7rem 1.55rem;
+
+    border-top:
+        1px solid rgba(139, 0, 0, .08);
+
+    background:
+        linear-gradient(to bottom,
+            rgba(249, 250, 251, .6),
+            #FFFFFF);
+}
+
+.session-timeout-button {
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 0 1.25rem !important;
+
+    justify-content: center !important;
+    gap: .7rem !important;
+
+    border-radius: 16px !important;
+
+    font-size: .9rem !important;
+    font-weight: 900 !important;
+
+    background:
+        linear-gradient(135deg,
+            #8B0000,
+            #660000) !important;
+
+    box-shadow:
+        0 16px 30px rgba(139, 0, 0, .24) !important;
+}
+
+.session-timeout-button:hover {
+    background:
+        linear-gradient(135deg,
+            #A30000,
+            #750000) !important;
+
+    box-shadow:
+        0 20px 36px rgba(139, 0, 0, .30) !important;
+}
+
+.session-timeout-button i {
+    color: currentColor;
+    font-size: .78rem;
+    transition: transform .18s ease;
+}
+
+.session-timeout-button:hover i {
+    transform: translateX(3px);
+}
+
+html.session-expired,
+body.session-expired {
+    overflow: hidden !important;
+}
+
+[data-theme="dark"] .session-timeout-modal .session-timeout-card,
+.dark .session-timeout-modal .session-timeout-card {
+    background:
+        radial-gradient(circle at top center,
+            rgba(139, 0, 0, .22),
+            transparent 38%),
+        #0D1117 !important;
+
+    border-color:
+        rgba(255, 255, 255, .11) !important;
+
+    box-shadow:
+        0 36px 96px rgba(0, 0, 0, .65),
+        0 10px 34px rgba(139, 0, 0, .20) !important;
+}
+
+[data-theme="dark"] .session-timeout-icon,
+.dark .session-timeout-icon {
+    background:
+        linear-gradient(145deg,
+            rgba(139, 0, 0, .22),
+            rgba(255, 255, 255, .035));
+
+    border-color:
+        rgba(252, 165, 165, .14);
+}
+
+[data-theme="dark"] .session-timeout-badge,
+.dark .session-timeout-badge {
+    background:
+        rgba(139, 0, 0, .22);
+
+    border-color:
+        rgba(252, 165, 165, .16);
+
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .session-timeout-title,
+.dark .session-timeout-title {
+    color: #F8FAFC;
+}
+
+[data-theme="dark"] .session-timeout-description,
+.dark .session-timeout-description {
+    color: #AAB4C3;
+}
+
+[data-theme="dark"] .session-timeout-message,
+.dark .session-timeout-message {
+    background:
+        rgba(255, 255, 255, .045);
+
+    border-color:
+        rgba(255, 255, 255, .09);
+}
+
+[data-theme="dark"] .session-timeout-message-icon,
+.dark .session-timeout-message-icon {
+    background:
+        rgba(139, 0, 0, .25);
+
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .session-timeout-message p,
+.dark .session-timeout-message p {
+    color: #CBD5E1;
+}
+
+[data-theme="dark"] .session-timeout-actions,
+.dark .session-timeout-actions {
+    background:
+        rgba(13, 17, 23, .82);
+
+    border-color:
+        rgba(255, 255, 255, .09);
+}
+
+@media (max-width: 767px) {
+    .ui-modal.session-timeout-modal {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 18px !important;
+    }
+
+    .session-timeout-modal .session-timeout-card {
+        width: min(100%, 430px) !important;
+        max-width: 430px !important;
+        max-height: calc(100dvh - 36px) !important;
+        border-radius: 26px !important;
+    }
+
+    .session-timeout-hero {
+        padding:
+            1.2rem 1.15rem .8rem;
+    }
+
+    .session-timeout-content {
+        padding:
+            .45rem 1.25rem 1rem;
+    }
+
+    .session-timeout-actions {
+        padding:
+            .9rem 1.25rem 1.25rem;
+    }
+
+    .session-timeout-icon {
+        width: 82px;
+        height: 82px;
+        border-radius: 27px;
+    }
+
+    .session-timeout-icon-inner {
+        width: 55px;
+        height: 55px;
+        border-radius: 18px;
+    }
+}
+
+.logout-confirm-modal {
+    --logout-accent: #DC2626;
+    --logout-accent-dark: #991B1B;
+    --logout-accent-soft: #FEF2F2;
+    --logout-accent-border: #FECACA;
+}
+
+.logout-confirm-modal .logout-confirm-card {
+    width: min(94vw, 440px) !important;
+    max-width: 440px !important;
+    border-radius: 24px !important;
+}
+
+.logout-confirm-modal .modal-hd {
+    min-height: 94px;
+    background:
+        radial-gradient(circle at top left,
+            rgba(220, 38, 38, .10),
+            transparent 46%),
+        linear-gradient(110deg,
+            #FEF2F2,
+            #FFFFFF 58%);
+    border-bottom-color:
+        var(--logout-accent-border);
+}
+
+.logout-confirm-icon {
+    background:
+        linear-gradient(135deg,
+            var(--logout-accent),
+            var(--logout-accent-dark)) !important;
+    box-shadow:
+        0 12px 26px rgba(220, 38, 38, .22) !important;
+}
+
+.logout-confirm-modal .modal-title {
+    color: var(--logout-accent-dark);
+}
+
+.logout-confirm-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 16px;
+    border: 1px solid var(--logout-accent-border);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at top left,
+            rgba(220, 38, 38, .09),
+            transparent 48%),
+        var(--logout-accent-soft);
+}
+
+.logout-confirm-message-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: rgba(220, 38, 38, .11);
+    color: var(--logout-accent);
+}
+
+.logout-confirm-message p {
+    margin: 0;
+    color: #991B1B;
+    font-size: .92rem;
+    font-weight: 850;
+    line-height: 1.4;
+}
+
+.logout-confirm-message span {
+    display: block;
+    margin-top: 5px;
+    color: #6B7280;
+    font-size: .76rem;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+.logout-confirm-actions {
+    display: grid !important;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 10px !important;
+}
+
+.logout-confirm-actions>button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+}
+
+.logout-confirm-modal .modal-btn-confirm.danger {
+    background:
+        linear-gradient(135deg,
+            #DC2626,
+            #991B1B);
+    border-color: rgba(220, 38, 38, .22);
+    box-shadow:
+        0 10px 22px rgba(220, 38, 38, .20);
+}
+
+.logout-confirm-modal .modal-btn-confirm.danger:hover:not(:disabled) {
+    background:
+        linear-gradient(135deg,
+            #EF4444,
+            #B91C1C);
+    transform: translateY(-1px);
+    box-shadow:
+        0 14px 28px rgba(220, 38, 38, .28);
+}
+
+[data-theme="dark"] .logout-confirm-modal .modal-hd,
+.dark .logout-confirm-modal .modal-hd {
+    background:
+        radial-gradient(circle at top left,
+            rgba(220, 38, 38, .20),
+            transparent 46%),
+        linear-gradient(110deg,
+            #161B22,
+            #0D1117) !important;
+
+    border-bottom-color:
+        rgba(252, 165, 165, .16) !important;
+}
+
+[data-theme="dark"] .logout-confirm-message,
+.dark .logout-confirm-message {
+    background:
+        rgba(220, 38, 38, .12);
+    border-color:
+        rgba(252, 165, 165, .24);
+}
+
+[data-theme="dark"] .logout-confirm-message-icon,
+.dark .logout-confirm-message-icon {
+    background:
+        rgba(220, 38, 38, .20);
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .logout-confirm-message p,
+.dark .logout-confirm-message p {
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .logout-confirm-message span,
+.dark .logout-confirm-message span {
+    color: #CBD5E1;
+}
+
+@media (max-width: 767px) {
+    .ui-modal.logout-confirm-modal {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 18px !important;
+    }
+
+    .logout-confirm-modal .logout-confirm-card {
+        width: 100% !important;
+        max-width: 430px !important;
+        border-radius: 24px !important;
+    }
+
+    .logout-confirm-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    .logout-confirm-actions .btn-close-modal {
+        order: 2;
+    }
+
+    .logout-confirm-actions .modal-btn-confirm {
+        order: 1;
+    }
 }

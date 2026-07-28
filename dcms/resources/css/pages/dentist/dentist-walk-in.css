@@ -1,11 +1,3 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-}
-
 @keyframes confirmBackdropFade {
     from {
         opacity: 0;
