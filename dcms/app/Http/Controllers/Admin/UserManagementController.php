@@ -137,6 +137,7 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|unique:patients,email',
             'role_id' => 'nullable|exists:roles,id',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'status' => 'required|in:active,inactive',
             'phone' => ['nullable', 'regex:/^09\d{9}$/'],
             'birthdate' => 'nullable|date',
@@ -144,9 +145,6 @@ class UserManagementController extends Controller
         ], [
             'phone.regex' => 'Phone number must start with 09 and contain exactly 11 digits.',
         ]);
-
-        $plainPassword = $this->generateRandomPassword();
-
 
         $roleId = $this->resolveUserRoleId(
             $request->input('role_id')
@@ -156,7 +154,7 @@ class UserManagementController extends Controller
             'role_id' => $roleId,
         ]);
 
-        $user = DB::transaction(function () use ($request, $plainPassword) {
+        $user = DB::transaction(function () use ($request) {
             $role = Role::findOrFail($request->role_id);
 
             $user = User::create([
@@ -165,7 +163,7 @@ class UserManagementController extends Controller
                 'phone' => $request->phone,
                 'birthdate' => $request->birthdate,
                 'gender' => $request->gender,
-                'password' => Hash::make($plainPassword),
+                'password' => Hash::make((string) $request->password),
                 'role_id' => $request->role_id,
                 'status' => $request->status,
             ]);
@@ -192,12 +190,7 @@ class UserManagementController extends Controller
         );
 
         return redirect()->route('admin.user_management')
-            ->with('success', 'User created successfully.')
-            ->with('generated_user_password', [
-                'name' => $user->name,
-                'email' => $user->email,
-                'password' => $plainPassword,
-            ]);
+            ->with('success', 'User created successfully.');
     }
     public function update(Request $request, User $user)
     {
