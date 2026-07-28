@@ -236,8 +236,13 @@ class UserManagementController extends Controller
             $this->authorizeRoleChange($request, $user);
         }
 
-        DB::transaction(function () use ($request, $user, $newRole, $newRoleId) {
-            $user->update([
+        DB::transaction(function () use (
+            $request,
+            $user,
+            $newRole,
+            $newRoleId
+        ) {
+            $user->forceFill([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -245,7 +250,9 @@ class UserManagementController extends Controller
                 'gender' => $request->gender,
                 'role_id' => $newRoleId,
                 'status' => $request->status,
-            ]);
+            ])->save();
+
+            $user->refresh();
 
             if ($newRole && $newRole->slug === 'patient') {
                 $patient = Patient::firstOrNew(['user_id' => $user->id]);

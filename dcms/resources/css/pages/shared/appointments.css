@@ -40,12 +40,16 @@
 }
 
 .appt-card {
+    position: relative;
+    isolation: isolate;
     background: #fff;
     border: 1px solid #EDE8E3;
-    border-radius: 14px;
-    position: relative;
+    border-radius: 16px;
     overflow: visible;
-    transition: box-shadow .2s, border-color .2s, transform .15s;
+    transition:
+        box-shadow .2s,
+        border-color .2s,
+        transform .15s;
 }
 
 .appt-card:nth-child(even) {
@@ -58,16 +62,23 @@
 }
 
 .appt-card::before {
-    content: '';
+    content: "";
+
     position: absolute;
+    z-index: 2;
+
     left: -1px;
     top: -1px;
-    bottom: -1px;
+
     width: 5px;
+    height: calc(100% + 2px);
+
     background: #8B0000;
     border-radius: 16px 0 0 16px;
+
     opacity: 0;
     pointer-events: none;
+
     transition:
         opacity .2s ease,
         background-color .2s ease;
@@ -106,7 +117,9 @@
 }
 
 .mode-list .desktop-appointments-table .appt-card .grid {
-    min-height: 72px;
+    min-height: 88px;
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
 
 [data-theme="dark"] #mainContent .appt-table-head,
@@ -155,7 +168,14 @@
 
 #mainContent.shared-appointments-page .appointment-table-grid {
     grid-template-columns:
-        135px 110px 160px minmax(250px, 300px) 120px 130px minmax(140px, 1fr) !important;
+        140px 115px 155px minmax(250px, 1fr) 125px 145px minmax(110px, 150px) !important;
+
+    column-gap: 18px !important;
+}
+
+#mainContent.shared-appointments-page.dentist-appointments-view .appointment-table-grid {
+    grid-template-columns:
+        140px 115px 150px minmax(240px, 1fr) 115px 135px 190px !important;
 }
 
 #mainContent.shared-appointments-page.mode-list .appt-table-head>*,
@@ -555,15 +575,17 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
     width: 100%;
-    min-width: 0;
+    min-width: max-content;
+    gap: 8px;
+    padding-left: 10px;
     flex-wrap: nowrap;
     overflow: visible;
 }
 
 .appt-status-cell {
-    margin-left: -4px !important;
+    margin-left: 0 !important;
+    padding-right: 8px;
 }
 
 .mode-list .desktop-appointments-table .appt-patient-cell,
