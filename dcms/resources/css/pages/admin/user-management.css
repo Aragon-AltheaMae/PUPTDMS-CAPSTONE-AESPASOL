@@ -889,14 +889,6 @@
     background: #161b22 !important;
 }
 
-[data-theme="dark"] #mainContent.user-management-page .um-user-main-card,
-[data-theme="dark"] #mainContent.user-management-page .um-user-side-card,
-[data-theme="dark"] #mainContent.user-management-page .um-status-card {
-    background: #0d1117 !important;
-    border-color: #21262d !important;
-    color: #d1d5db !important;
-}
-
 [data-theme="dark"] #mainContent.user-management-page input,
 [data-theme="dark"] #mainContent.user-management-page select,
 [data-theme="dark"] #mainContent.user-management-page textarea {
@@ -2104,44 +2096,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     visibility: visible !important;
 }
 
-#addModal .voice-search-row,
-#editModal .voice-search-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: .75rem !important;
-    width: 100% !important;
-    position: relative !important;
-}
-
-#addModal .voice-search-row>input,
-#editModal .voice-search-row>input,
-#editModal .voice-search-row>.relative {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-}
-
-#addModal .voice-search-row>.voice-input-toggle,
-#editModal .voice-search-row>.voice-input-toggle {
-    flex: 0 0 50px !important;
-    width: 50px !important;
-    min-width: 50px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#addModal .voice-search-row>.voice-input-toggle>.voice-search-mic.external,
-#editModal .voice-search-row>.voice-input-toggle>.voice-search-mic.external {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    min-height: 50px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 999px !important;
-}
-
 [data-theme="dark"] #addModal.modal-overlay,
 [data-theme="dark"] #resetModal.modal-overlay,
 [data-theme="dark"] #toggleConfirmModal.modal-overlay,
@@ -2843,73 +2797,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
         inset 0 1px 0 rgba(255, 255, 255, .06) !important;
 }
 
-#addModal .um-save-user-btn {
-    min-height: 44px !important;
-    padding: 0 1.45rem !important;
-    border-radius: 12px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .6rem !important;
-
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    color: #FFFFFF !important;
-    border: 0 !important;
-    font-size: .875rem !important;
-    font-weight: 900 !important;
-    line-height: 1 !important;
-
-    box-shadow: 0 10px 22px rgba(139, 0, 0, .22) !important;
-    transition:
-        background .18s ease,
-        transform .18s ease,
-        box-shadow .18s ease !important;
-}
-
-#addModal .um-save-user-btn:hover,
-#addModal .um-save-user-btn:focus-visible {
-    background: linear-gradient(135deg, #6B0000, #991B1B) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 14px 28px rgba(139, 0, 0, .30) !important;
-    outline: none !important;
-}
-
-#addModal .um-save-user-btn .btn-confirm-icon {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
-    border-radius: 8px !important;
-    background: rgba(255, 255, 255, .18) !important;
-    color: #FFFFFF !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#addModal .um-save-user-btn .btn-confirm-icon i {
-    color: currentColor !important;
-    font-size: .82rem !important;
-}
-
-[data-theme="dark"] #addModal .um-save-user-btn,
-.dark #addModal .um-save-user-btn {
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    color: #FFFFFF !important;
-    box-shadow:
-        0 12px 26px rgba(139, 0, 0, .36),
-        inset 0 1px 0 rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] #addModal .um-save-user-btn:hover,
-[data-theme="dark"] #addModal .um-save-user-btn:focus-visible,
-.dark #addModal .um-save-user-btn:hover,
-.dark #addModal .um-save-user-btn:focus-visible {
-    background: linear-gradient(135deg, #6B0000, #991B1B) !important;
-    box-shadow:
-        0 14px 30px rgba(139, 0, 0, .46),
-        inset 0 1px 0 rgba(255, 255, 255, .14) !important;
-}
-
 #mainContent.user-management-page .um-hero-btn {
     min-height: 42px !important;
     padding: 0 1rem !important;
@@ -3258,38 +3145,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
         overflow: hidden !important;
     }
 
-    #addModal .um-user-main-card,
-    #addModal .um-user-side-card {
-        padding: .75rem !important;
-        border-radius: 16px !important;
-    }
-
-    #addModal .um-section-title {
-        align-items: center !important;
-        gap: .55rem !important;
-        margin-bottom: .7rem !important;
-    }
-
-    #addModal .um-section-icon {
-        width: 2rem !important;
-        height: 2rem !important;
-        min-width: 2rem !important;
-        border-radius: .75rem !important;
-        font-size: .82rem !important;
-    }
-
-    #addModal .um-section-title h4,
-    #addModal .um-section-title .text-gray-800 {
-        font-size: .86rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #addModal .um-section-title p,
-    #addModal .um-section-title .text-gray-500 {
-        font-size: .68rem !important;
-        line-height: 1.2 !important;
-    }
-
     #addModal .um-field-grid {
         grid-template-columns: 1fr !important;
         gap: .65rem !important;
@@ -3316,54 +3171,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     #addModal .fa-lock,
     #addModal .fa-envelope {
         font-size: .78rem !important;
-    }
-
-    #addModal .voice-search-row {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .45rem !important;
-        width: 100% !important;
-        align-items: stretch !important;
-    }
-
-    #addModal .voice-search-row>input,
-    #addModal .voice-search-row>.relative {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #addModal .voice-search-row>.voice-input-toggle {
-        display: flex !important;
-        justify-content: flex-end !important;
-        align-items: center !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        flex: none !important;
-        margin-top: .1rem !important;
-    }
-
-    #addModal .voice-search-row>.voice-input-toggle>.voice-search-mic.external,
-    #addModal .voice-search-mic.external {
-        display: inline-flex !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        min-height: 38px !important;
-        border-radius: 999px !important;
-        position: static !important;
-        transform: none !important;
-        margin: 0 !important;
-        z-index: 1 !important;
-    }
-
-    #addModal .voice-search-mic.external i {
-        font-size: .78rem !important;
-    }
-
-    #addModal .um-divider {
-        margin: .7rem 0 .8rem !important;
     }
 
     #addModal .um-status-grid {
@@ -3406,22 +3213,6 @@ html[data-theme="dark"] #mainContent.user-management-page .badge-active::before,
     #addModal .um-status-card .text-xs {
         font-size: .64rem !important;
         line-height: 1.12 !important;
-    }
-
-    #addModal .modal-btn-ghost,
-    #addModal .um-save-user-btn {
-        width: 100% !important;
-        min-height: 40px !important;
-        padding: 0 .75rem !important;
-        border-radius: 12px !important;
-        font-size: .78rem !important;
-        white-space: nowrap !important;
-    }
-
-    #addModal .um-save-user-btn .btn-confirm-icon {
-        width: 22px !important;
-        height: 22px !important;
-        min-width: 22px !important;
     }
 }
 

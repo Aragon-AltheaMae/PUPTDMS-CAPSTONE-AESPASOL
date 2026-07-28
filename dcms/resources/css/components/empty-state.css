@@ -242,14 +242,26 @@
         text-align: center !important;
     }
 
-    #mainContent .empty-state-icon {
+    #mainContent :is(.empty-state-icon,
+        .inventory-empty-icon,
+        .patient-empty-icon,
+        .appointment-empty-icon,
+        .document-empty-icon,
+        .empty-icon-box,
+        .appointment-filter-empty-icon) {
         width: 74px !important;
         height: 74px !important;
         border-radius: 26px !important;
         margin-bottom: 22px !important;
     }
 
-    #mainContent .empty-state-icon i {
+    #mainContent :is(.empty-state-icon,
+        .inventory-empty-icon,
+        .patient-empty-icon,
+        .appointment-empty-icon,
+        .document-empty-icon,
+        .empty-icon-box,
+        .appointment-filter-empty-icon) i {
         font-size: 30px !important;
     }
 

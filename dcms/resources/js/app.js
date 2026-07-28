@@ -1254,6 +1254,8 @@ function initGlobalActionTooltips() {
         activeTarget = null;
     }
 
+    window.hideGlobalActionTooltip = hideTooltip;
+
     function positionTooltip(target) {
         const targetRect = target.getBoundingClientRect();
         const tooltipRect = tooltip.getBoundingClientRect();
@@ -5104,8 +5106,37 @@ window.APPOINTMENT_STATUS_META = {
 };
 
 window.getAppointmentStatusMeta = function (status) {
-    const key = String(status || '').toLowerCase().trim();
-    return window.APPOINTMENT_STATUS_META[key] || window.APPOINTMENT_STATUS_META.default;
+    const value =
+        String(status || '')
+            .toLowerCase()
+            .trim()
+            .replaceAll(' ', '_');
+
+    let key = value;
+
+    if (
+        value === 'scheduled' ||
+        value === 'scheduled_today'
+    ) {
+        key = value === 'scheduled_today'
+            ? 'today'
+            : 'upcoming';
+    } else if (value.includes('resched')) {
+        key = 'rescheduled';
+    } else if (value.includes('complete')) {
+        key = 'completed';
+    } else if (value.includes('cancel')) {
+        key = 'cancelled';
+    } else if (
+        value.includes('upcoming') ||
+        value.includes('pending') ||
+        value.includes('confirmed')
+    ) {
+        key = 'upcoming';
+    }
+
+    return window.APPOINTMENT_STATUS_META[key] ||
+        window.APPOINTMENT_STATUS_META.default;
 };
 
 window.setGlobalFilterButtonState = function ({
