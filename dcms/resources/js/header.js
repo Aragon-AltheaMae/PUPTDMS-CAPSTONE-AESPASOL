@@ -218,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function () {
             markItemAsRead(item);
             updateNotifSummaryUi();
         } catch (_err) {
-            // Keep navigation working even if the read-state request fails.
         } finally {
             window.location.href = destination;
         }
@@ -320,4 +319,180 @@ document.addEventListener('DOMContentLoaded', function () {
             closeAllMenus();
         }
     });
+
+    function initLogoutConfirmation() {
+        const modal =
+            document.getElementById(
+                'logoutConfirmModal'
+            );
+
+        const confirmButton =
+            document.getElementById(
+                'confirmLogoutBtn'
+            );
+
+        if (
+            !modal ||
+            !confirmButton ||
+            modal.dataset.initialized === 'true'
+        ) {
+            return;
+        }
+
+        modal.dataset.initialized = 'true';
+
+        let pendingLogoutForm = null;
+        let lastFocusedElement = null;
+        let closingTimer = null;
+
+        const openModal = form => {
+            if (!form) return;
+
+            clearTimeout(closingTimer);
+
+            pendingLogoutForm = form;
+            lastFocusedElement =
+                document.activeElement;
+
+            closeAllMenus();
+
+            document
+                .getElementById('mobileDrawer')
+                ?.classList.remove('open');
+
+            document
+                .getElementById('mobileDrawerOverlay')
+                ?.classList.remove('open');
+
+            document.body.style.overflow = '';
+
+            modal.classList.remove('closing');
+            modal.classList.add('open');
+            modal.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.documentElement.classList.add(
+                'modal-lock'
+            );
+
+            document.body.classList.add(
+                'modal-lock'
+            );
+
+            requestAnimationFrame(() => {
+                confirmButton.focus();
+            });
+        };
+
+        const closeModal = () => {
+            if (!modal.classList.contains('open')) {
+                return;
+            }
+
+            modal.classList.add('closing');
+            modal.classList.remove('open');
+            modal.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            closingTimer = setTimeout(() => {
+                modal.classList.remove('closing');
+
+                document.documentElement.classList.remove(
+                    'modal-lock'
+                );
+
+                document.body.classList.remove(
+                    'modal-lock'
+                );
+
+                pendingLogoutForm = null;
+
+                lastFocusedElement?.focus?.();
+            }, 170);
+        };
+
+        document.addEventListener(
+            'submit',
+            event => {
+                const form =
+                    event.target.closest(
+                        '.js-logout-form'
+                    );
+
+                if (!form) return;
+
+                if (
+                    form.dataset.logoutConfirmed ===
+                    'true'
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                openModal(form);
+            }
+        );
+
+        modal
+            .querySelectorAll(
+                '[data-logout-modal-close]'
+            )
+            .forEach(button => {
+                button.addEventListener(
+                    'click',
+                    closeModal
+                );
+            });
+
+        modal.addEventListener(
+            'click',
+            event => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+        );
+
+        confirmButton.addEventListener(
+            'click',
+            () => {
+                if (!pendingLogoutForm) return;
+
+                confirmButton.disabled = true;
+
+                confirmButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Logging Out...</span>
+            `;
+
+                pendingLogoutForm.dataset.logoutConfirmed =
+                    'true';
+
+                pendingLogoutForm.submit();
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            event => {
+                if (
+                    event.key === 'Escape' &&
+                    (
+                        modal.classList.contains('open') ||
+                        modal.classList.contains('closing')
+                    )
+                ) {
+                    closeModal();
+                }
+            }
+        );
+    }
+
+    initLogoutConfirmation();
 });

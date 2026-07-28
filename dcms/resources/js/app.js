@@ -1,5 +1,14 @@
 import './bootstrap';
 import './header';
+
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/inter/800.css';
+import '@fontsource/inter/900.css';
+
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Chart from 'chart.js/auto';
 import JSVoice from 'jsvoice';
@@ -2183,10 +2192,6 @@ function initGlobalSidebar() {
     const savedState =
         localStorage.getItem(storageKey) === '1';
 
-    /*
-     * Apply muna ang totoong state bago alisin
-     * ang initialization classes.
-     */
     applySidebarState(savedState);
 
     document.querySelectorAll(
@@ -2558,79 +2563,268 @@ function initSessionTimeoutModal() {
 
     if (
         !modal?.id ||
-        modal.dataset.sessionTimeoutInitialized === 'true'
+        modal.dataset.sessionTimeoutInitialized ===
+        'true'
     ) {
         return;
     }
 
-    modal.dataset.sessionTimeoutInitialized = 'true';
+    modal.dataset.sessionTimeoutInitialized =
+        'true';
 
     const primaryButton = modal.querySelector(
         '[data-session-timeout-primary]'
     );
 
-    const closeButtons = modal.querySelectorAll(
-        '[data-session-timeout-close]'
+    const timeoutSeconds = Math.max(
+        60,
+        Number(
+            modal.dataset.sessionTimeoutSeconds
+        ) || 600
     );
+
+    const timeoutMilliseconds =
+        timeoutSeconds * 1000;
+
+    const activityUrl =
+        modal.dataset.sessionActivityUrl;
+
+    const expireUrl =
+        modal.dataset.sessionExpireUrl;
 
     const redirectUrl =
-        primaryButton?.dataset.redirectUrl ||
+        modal.dataset.sessionRedirectUrl ||
         '/';
 
+    const activitySyncInterval = 60000;
+
+    let idleTimer = null;
+    let sessionExpired = false;
     let redirectStarted = false;
+    let activityRequestRunning = false;
 
-    const redirectToLandingPage = () => {
-        if (redirectStarted) return;
+    let lastActivityAt = Date.now();
+    let lastHandledActivityAt = 0;
+    let lastServerSyncAt = 0;
 
-        redirectStarted = true;
-
-        if (primaryButton) {
-            primaryButton.disabled = true;
-            primaryButton.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>Redirecting...</span>
-            `;
-        }
-
-        window.location.assign(redirectUrl);
-    };
-
-    primaryButton?.addEventListener(
-        'click',
-        redirectToLandingPage
-    );
-
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            closeModal(modal.id);
-        });
+    const requestHeaders = () => ({
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': getCsrfToken(),
     });
 
-    const currentUrl = new URL(
-        window.location.href
-    );
+    const showSessionTimeoutModal = () => {
+        if (sessionExpired) return;
 
-    if (
-        currentUrl.searchParams.get('reason') === 'idle'
-    ) {
-        currentUrl.searchParams.delete('reason');
+        sessionExpired = true;
+        window.__SESSION_EXPIRED__ = true;
 
-        window.history.replaceState(
-            {},
-            document.title,
-            `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+        window.clearTimeout(idleTimer);
+
+        document.documentElement.classList.add(
+            'session-expired'
         );
-    }
 
-    requestAnimationFrame(() => {
+        document.body.classList.add(
+            'session-expired'
+        );
+
         openModal(modal.id);
 
         requestAnimationFrame(() => {
             primaryButton?.focus({
-                preventScroll: true
+                preventScroll: true,
             });
         });
+
+        document.dispatchEvent(
+            new CustomEvent(
+                'session:expired'
+            )
+        );
+    };
+
+    const scheduleIdleTimeout = () => {
+        if (sessionExpired) return;
+
+        window.clearTimeout(idleTimer);
+
+        const elapsed =
+            Date.now() - lastActivityAt;
+
+        const remaining =
+            timeoutMilliseconds - elapsed;
+
+        if (remaining <= 0) {
+            showSessionTimeoutModal();
+            return;
+        }
+
+        idleTimer = window.setTimeout(
+            showSessionTimeoutModal,
+            remaining
+        );
+    };
+
+    const syncActivityWithServer = async () => {
+        if (
+            sessionExpired ||
+            activityRequestRunning ||
+            !activityUrl
+        ) {
+            return;
+        }
+
+        activityRequestRunning = true;
+        lastServerSyncAt = Date.now();
+
+        try {
+            const response = await fetch(
+                activityUrl,
+                {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: requestHeaders(),
+                    cache: 'no-store',
+                }
+            );
+
+            if (
+                response.status === 401 ||
+                response.status === 419
+            ) {
+                showSessionTimeoutModal();
+            }
+        } catch (_) {
+            /*
+             * Huwag mag-redirect dahil lamang sa
+             * temporary network error.
+             */
+        } finally {
+            activityRequestRunning = false;
+        }
+    };
+
+    const registerUserActivity = () => {
+        if (sessionExpired) return;
+
+        const now = Date.now();
+
+        if (
+            now - lastHandledActivityAt <
+            800
+        ) {
+            return;
+        }
+
+        lastHandledActivityAt = now;
+        lastActivityAt = now;
+
+        scheduleIdleTimeout();
+
+        if (
+            now - lastServerSyncAt >=
+            activitySyncInterval
+        ) {
+            syncActivityWithServer();
+        }
+    };
+
+    [
+        'pointerdown',
+        'pointermove',
+        'keydown',
+        'scroll',
+        'touchstart',
+    ].forEach(eventName => {
+        document.addEventListener(
+            eventName,
+            registerUserActivity,
+            {
+                capture: true,
+                passive: true,
+            }
+        );
     });
+
+    window.addEventListener(
+        'focus',
+        registerUserActivity
+    );
+
+    document.addEventListener(
+        'visibilitychange',
+        () => {
+            if (
+                document.visibilityState !==
+                'visible' ||
+                sessionExpired
+            ) {
+                return;
+            }
+
+            const idleDuration =
+                Date.now() - lastActivityAt;
+
+            if (
+                idleDuration >=
+                timeoutMilliseconds
+            ) {
+                showSessionTimeoutModal();
+                return;
+            }
+
+            registerUserActivity();
+        }
+    );
+
+    document.addEventListener(
+        'submit',
+        event => {
+            if (!sessionExpired) return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        },
+        true
+    );
+
+    primaryButton?.addEventListener(
+        'click',
+        async () => {
+            if (redirectStarted) return;
+
+            redirectStarted = true;
+            primaryButton.disabled = true;
+
+            primaryButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Opening Sign In...</span>
+            `;
+
+            try {
+                if (expireUrl) {
+                    await fetch(
+                        expireUrl,
+                        {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: requestHeaders(),
+                            cache: 'no-store',
+                        }
+                    );
+                }
+            } catch (_) {
+            } finally {
+                window.location.assign(
+                    redirectUrl
+                );
+            }
+        }
+    );
+
+    syncActivityWithServer();
+    scheduleIdleTimeout();
 }
 
 function acceptTerms() {
@@ -2782,6 +2976,16 @@ document.addEventListener('keydown', function (event) {
         );
 
     if (!openModalEl?.id) return;
+
+    if (
+        openModalEl.hasAttribute(
+            'data-modal-static'
+        )
+    ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+    }
 
     const hasDiscardForm =
         Boolean(
