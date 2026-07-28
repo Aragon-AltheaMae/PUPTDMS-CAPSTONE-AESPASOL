@@ -1148,3 +1148,106 @@ textarea.form-input-custom.global-form-textarea {
     border-color: #30363d !important;
     color: #e5e7eb !important;
 }
+
+.global-readonly-field {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 13px;
+
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+
+    border: 1.5px solid #e0ddd8;
+    border-radius: 9px;
+    background: #f2f0ec;
+    color: #6b7280;
+
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.global-readonly-field i {
+    flex: 0 0 auto;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.global-readonly-field span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+[data-theme="dark"] .global-readonly-field,
+.dark .global-readonly-field {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .global-readonly-field i,
+.dark .global-readonly-field i {
+    color: #94a3b8;
+}
+
+.global-control-with-action {
+    padding-right: 44px !important;
+}
+
+.global-input-action {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    z-index: 3;
+
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #6b7280;
+
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition:
+        color .18s ease,
+        background-color .18s ease,
+        transform .18s ease;
+}
+
+.global-input-action i {
+    color: currentColor;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.global-input-action:hover,
+.global-input-action:focus-visible {
+    background: var(--crimson-light, #fef2f2);
+    color: var(--crimson, #8b0000);
+    outline: none;
+}
+
+.global-input-action:active {
+    transform: translateY(-50%) scale(.95);
+}
+
+[data-theme="dark"] .global-input-action,
+.dark .global-input-action {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .global-input-action:hover,
+[data-theme="dark"] .global-input-action:focus-visible,
+.dark .global-input-action:hover,
+.dark .global-input-action:focus-visible {
+    background: rgba(139, 0, 0, .18);
+    color: #fca5a5;
+}

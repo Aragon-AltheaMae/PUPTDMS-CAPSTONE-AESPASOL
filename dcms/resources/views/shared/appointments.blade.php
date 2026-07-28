@@ -485,7 +485,7 @@ $notifCount = $notifications->count();
                             data-status="{{ strtolower($appt->status ?? 'upcoming') === 'reschedule' ? 'rescheduled' : strtolower($appt->status ?? 'upcoming') }}"
                             style="animation-delay:{{ $i * 0.04 }}s">
 
-                            <div class="appointment-table-grid rounded-[14px] grid gap-4 items-center px-5 py-3.5">
+                            <div class="appointment-table-grid grid gap-4 items-center px-5 py-3.5">
 
                                 <div class="appt-row-date">
                                     <p class="date-main">{{ $dateLabel }}</p>

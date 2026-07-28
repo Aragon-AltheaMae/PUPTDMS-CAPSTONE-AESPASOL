@@ -393,12 +393,12 @@ body.role-patient #mainContent.patient-dashboard-page .greeting-time-icon.is-moo
     animation: floatMoon 3s ease-in-out infinite;
 }
 
-.profile-toggle-btn {
-    transition: all 0.2s ease;
-}
-
-.profile-toggle-btn:hover {
-    transform: translateY(-1px);
+body.role-patient #mainContent .patient-privacy-toggle {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 999px;
+    flex-shrink: 0;
 }
 
 .card-lift {
@@ -564,26 +564,6 @@ body.role-patient #mainContent.patient-dashboard-page .greeting-time-icon.is-moo
     }
 }
 
-:root {
-    --bg-main: #0d0f12;
-    --bg-card: #0d0f12;
-    --bg-card-soft: #111827;
-    --bg-panel: #161B22;
-    --bg-panel-soft: #1C2128;
-
-    --border-dark: rgba(255, 255, 255, 0.10);
-
-    --text-primary: #F3F4F6;
-    --text-secondary: #C9D1D9;
-    --text-muted: #8B949E;
-
-    --brand-red: #8B0000;
-    --brand-red-soft: rgba(139, 0, 0, 0.18);
-
-    --theme-speed: 180ms;
-    --theme-curve: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 .upcoming-ready-line {
     background: linear-gradient(90deg, #8B0000, #FCA5A5);
     box-shadow: 0 0 10px rgba(139, 0, 0, 0.25);
@@ -744,7 +724,7 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
     flex-wrap: nowrap;
 }
 
-.dashboard-greeting-copy{
+.dashboard-greeting-copy {
     min-width: 0;
 }
 
@@ -860,23 +840,23 @@ body.role-patient #mainContent.patient-dashboard-page * {
 
 }
 
-@media only screen and (min-width:376px) and (max-width:480px){
+@media only screen and (min-width:376px) and (max-width:480px) {
 
-    .dashboard-greeting-name-line{
-        font-size:clamp(1.2rem,7vw,1.45rem)!important;
+    .dashboard-greeting-name-line {
+        font-size: clamp(1.2rem, 7vw, 1.45rem) !important;
     }
 
-    .request-doc-card{
-        padding:.85rem!important;
+    .request-doc-card {
+        padding: .85rem !important;
     }
 
-    .upcoming-reminder-chip{
-        padding:.6rem .75rem;
+    .upcoming-reminder-chip {
+        padding: .6rem .75rem;
     }
 
 }
 
-@media (hover:none){
+@media (hover:none) {
 
     .request-doc-card:hover,
     .card-lift:hover,
@@ -884,46 +864,46 @@ body.role-patient #mainContent.patient-dashboard-page * {
     .book-appointment-btn:hover,
     .profile-toggle-btn:hover,
     .greeting-insight-chip:hover,
-    .greeting-scroll-cue:hover{
+    .greeting-scroll-cue:hover {
 
-        transform:none!important;
-        box-shadow:inherit;
-        filter:none!important;
+        transform: none !important;
+        box-shadow: inherit;
+        filter: none !important;
 
     }
 
 }
 
-@media (prefers-reduced-motion:reduce){
+@media (prefers-reduced-motion:reduce) {
 
     *,
     *::before,
-    *::after{
+    *::after {
 
-        animation:none!important;
-        transition:none!important;
-        scroll-behavior:auto!important;
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
 
     }
 
 }
 
-@supports not ((backdrop-filter:blur(18px)) or (-webkit-backdrop-filter:blur(18px))){
+@supports not ((backdrop-filter:blur(18px)) or (-webkit-backdrop-filter:blur(18px))) {
 
     body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
     [data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
     .upcoming-tooth-glass,
-    .glass-icon-red{
+    .glass-icon-red {
 
-        background:rgba(255,255,255,.95)!important;
+        background: rgba(255, 255, 255, .95) !important;
 
     }
 
     [data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .dashboard-glass,
     [data-theme="dark"] .upcoming-tooth-glass,
-    [data-theme="dark"] .glass-icon-red{
+    [data-theme="dark"] .glass-icon-red {
 
-        background:#161B22!important;
+        background: #161B22 !important;
 
     }
 
