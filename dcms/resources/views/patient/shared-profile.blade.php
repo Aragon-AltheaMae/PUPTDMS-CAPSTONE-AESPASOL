@@ -675,21 +675,6 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             </div>
 
                             <div class="profile-odontogram-board-wrap">
-                                <div class="profile-odontogram-guide" aria-label="3D model mouse controls">
-                                    <div class="profile-odontogram-guide-item">
-                                        <span class="profile-odontogram-guide-key">L</span>
-                                        <span>Select tooth</span>
-                                    </div>
-                                    <div class="profile-odontogram-guide-item">
-                                        <span class="profile-odontogram-guide-key">R</span>
-                                        <span>Move model</span>
-                                    </div>
-                                    <div class="profile-odontogram-guide-item">
-                                        <span class="profile-odontogram-guide-key"><i class="fa-solid fa-arrows-up-down text-[9px]"></i></span>
-                                        <span>Zoom</span>
-                                    </div>
-                                </div>
-
                                 <div id="profileOdontogramLoading" class="profile-odontogram-loading">
                                     <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#8B0000]"></i>
                                     <p class="text-sm font-semibold text-gray-600">Generating 3D Model...</p>
@@ -702,54 +687,6 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             </div>
                         </div>
 
-                        <div id="profileOdontogramModal" class="profile-odontogram-modal hidden">
-                            <div class="profile-odontogram-backdrop" onclick="closeProfileOdontogramModal()"></div>
-
-                            <div class="profile-odontogram-card">
-                                <div class="profile-odontogram-card-hero">
-                                    <button type="button" onclick="closeProfileOdontogramModal()" class="profile-odontogram-close">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-
-                                    <h3 id="profileOdontogramModalTitle">Tooth #18</h3>
-                                    <p id="profileOdontogramModalSubtitle">Upper Right · 3rd Molar</p>
-                                </div>
-
-                                <div class="profile-odontogram-card-body">
-                                    <div class="profile-odontogram-tooth-main">
-                                        <div id="profileOdontogramToothVisual" class="profile-odontogram-tooth-visual"></div>
-
-                                        <div>
-                                            <p class="profile-odontogram-info-label">Overall Marking</p>
-                                            <div id="profileOdontogramCondition" class="profile-odontogram-condition-pill">Healthy</div>
-                                        </div>
-                                    </div>
-
-                                    <p id="profileOdontogramToothName" class="profile-odontogram-tooth-name">#18 — 3rd Molar</p>
-
-                                    <div class="profile-odontogram-info-grid">
-                                        <div class="profile-odontogram-info-box"><p>FDI Number</p><strong id="profileOdontogramFdi">#18</strong></div>
-                                        <div class="profile-odontogram-info-box"><p>Quadrant</p><strong id="profileOdontogramQuadrant">Upper Right</strong></div>
-                                        <div class="profile-odontogram-info-box"><p>Tooth Type</p><strong id="profileOdontogramToothType">3rd Molar</strong></div>
-                                        <div class="profile-odontogram-info-box"><p>Arch</p><strong id="profileOdontogramArch">Maxillary (Upper)</strong></div>
-                                    </div>
-
-                                    <div class="profile-odontogram-history">
-                                        <p class="profile-odontogram-info-label">Surface Markings</p>
-                                        <div id="profileOdontogramSurfaceList" class="profile-odontogram-surface-list"></div>
-                                    </div>
-
-                                    <div class="profile-odontogram-history">
-                                        <p class="profile-odontogram-info-label">Latest Saved Visit</p>
-                                        <div class="profile-odontogram-history-item">
-                                            <span class="profile-odontogram-history-dot"></span>
-                                            <span>{{ $odontogramMetaDate }}</span>
-                                            <strong>{{ $odontogramMetaService }}</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         @else
                         <div class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
                             <p class="text-gray-600 font-bold text-sm">No odontogram saved yet</p>
@@ -781,6 +718,84 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
         </div>
     </div>
 </main>
+
+@if (!empty($odontogramData))
+<div id="profileOdontogramModal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center p-3 sm:p-5"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="profileOdontogramModalTitle">
+
+    <button type="button"
+        class="absolute inset-0 bg-slate-950/65 backdrop-blur-sm"
+        aria-label="Close odontogram details"
+        onclick="closeProfileOdontogramModal()"></button>
+
+    <div id="profileOdontogramModalContent"
+        class="profile-odontogram-card relative z-10 w-full max-w-2xl max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden shadow-2xl"
+        onclick="event.stopPropagation()">
+
+        <div class="profile-odontogram-card-hero">
+            <button type="button"
+                onclick="closeProfileOdontogramModal()"
+                class="profile-odontogram-close"
+                aria-label="Close odontogram details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 id="profileOdontogramModalTitle">Tooth #18</h3>
+            <p id="profileOdontogramModalSubtitle">Upper Right · 3rd Molar</p>
+        </div>
+
+        <div class="profile-odontogram-card-body overflow-y-auto overscroll-contain"
+            style="max-height: calc(100dvh - 9rem);">
+            <div class="profile-odontogram-tooth-main">
+                <div id="profileOdontogramToothVisual" class="profile-odontogram-tooth-visual"></div>
+
+                <div>
+                    <p class="profile-odontogram-info-label">Overall Marking</p>
+                    <div id="profileOdontogramCondition" class="profile-odontogram-condition-pill">Healthy</div>
+                </div>
+            </div>
+
+            <p id="profileOdontogramToothName" class="profile-odontogram-tooth-name">#18 — 3rd Molar</p>
+
+            <div class="profile-odontogram-info-grid">
+                <div class="profile-odontogram-info-box">
+                    <p>FDI Number</p>
+                    <strong id="profileOdontogramFdi">#18</strong>
+                </div>
+                <div class="profile-odontogram-info-box">
+                    <p>Quadrant</p>
+                    <strong id="profileOdontogramQuadrant">Upper Right</strong>
+                </div>
+                <div class="profile-odontogram-info-box">
+                    <p>Tooth Type</p>
+                    <strong id="profileOdontogramToothType">3rd Molar</strong>
+                </div>
+                <div class="profile-odontogram-info-box">
+                    <p>Arch</p>
+                    <strong id="profileOdontogramArch">Maxillary (Upper)</strong>
+                </div>
+            </div>
+
+            <div class="profile-odontogram-history">
+                <p class="profile-odontogram-info-label">Surface Markings</p>
+                <div id="profileOdontogramSurfaceList" class="profile-odontogram-surface-list"></div>
+            </div>
+
+            <div class="profile-odontogram-history">
+                <p class="profile-odontogram-info-label">Latest Saved Visit</p>
+                <div class="profile-odontogram-history-item">
+                    <span class="profile-odontogram-history-dot"></span>
+                    <span>{{ $odontogramMetaDate }}</span>
+                    <strong>{{ $odontogramMetaService }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 @if ($isDentistProfile)
 <div id="startModal"
@@ -1177,6 +1192,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeStartModal();
+                closeProfileOdontogramModal();
                 closeDetailsDrawer();
             }
         });
@@ -1408,13 +1424,31 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                     ${profileSurfaceLabels[item.key]}: ${item.record.code}
                 </span>
             `).join('')
-            : '<span class="text-xs text-gray-500">No individual surface markings saved for this tooth.</span>';
+            : '<span class="text-[11px] text-gray-400 italic">No surface markings recorded.</span>';
 
-        document.getElementById('profileOdontogramModal').classList.remove('hidden');
+        const modal = document.getElementById('profileOdontogramModal');
+        if (!modal) return;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.documentElement.classList.add('overflow-hidden');
+        document.body.classList.add('overflow-hidden');
+
+        requestAnimationFrame(() => {
+            modal.querySelector('.profile-odontogram-close')?.focus();
+        });
     }
 
     function closeProfileOdontogramModal() {
-        document.getElementById('profileOdontogramModal')?.classList.add('hidden');
+        const modal = document.getElementById('profileOdontogramModal');
+        if (!modal || modal.classList.contains('hidden')) return;
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.documentElement.classList.remove('overflow-hidden');
+        document.body.classList.remove('overflow-hidden');
+        profileSelectedTooth = null;
+        renderProfileThreeVisuals();
     }
 
     function initProfileThreeScene() {
@@ -1424,9 +1458,10 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
         const width = container.clientWidth || 700;
         const height = container.clientHeight || 440;
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
 
         profileScene = new THREE.Scene();
-        profileScene.background = new THREE.Color('#D8E0EA');
+        profileScene.background = new THREE.Color(isDarkMode ? '#0d1117' : '#D8E0EA');
 
         profileCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
         profileCamera.position.set(0, 1.2, 14);
@@ -1517,9 +1552,14 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
         }
 
         function createSoftCusp(x, y, z, scale, material) {
-            const cusp = new THREE.Mesh(new THREE.SphereGeometry(0.105 * scale, 18, 12), material.clone());
+            const cusp = new THREE.Mesh(
+                new THREE.SphereGeometry(0.105 * scale, 18, 12),
+                material.clone()
+            );
+
             cusp.scale.set(1.05, 0.50, 0.85);
             cusp.position.set(x, y, z);
+
             return cusp;
         }
 
@@ -1778,6 +1818,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
     }
 
     function onProfileThreePointerDown(event) {
+        event.preventDefault();
         updateProfileMousePosition(event);
         profileRaycaster.setFromCamera(profileMouse, profileCamera);
         const intersects = profileRaycaster.intersectObjects(profileTeethMeshes);
