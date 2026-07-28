@@ -820,14 +820,6 @@
     width: 100%;
 }
 
-@media (min-width: 1280px) {
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-        gap: 14px !important;
-        align-items: stretch !important;
-    }
-}
-
 #mainContent.mode-grid .grid-badge-row {
     min-height: 24px !important;
 }
@@ -1018,14 +1010,6 @@
     color: #C9D1D9 !important;
 }
 
-[data-theme="dark"] #mainContent .patient-card .fa-calendar,
-[data-theme="dark"] #mainContent .patient-card .fa-calendar-days,
-.dark #mainContent .patient-card .fa-calendar,
-.dark #mainContent .patient-card .fa-calendar-days {
-    color: #60A5FA !important;
-    filter: none !important;
-}
-
 [data-theme="dark"] .patient-card .patient-avatar,
 .dark .patient-card .patient-avatar {
     border: 0 !important;
@@ -1076,22 +1060,6 @@
         min-width: 0 !important;
     }
 
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (min-width: 1024px) and (max-width: 1279px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
 }
 
 @media (min-width: 1280px) {
@@ -2080,14 +2048,36 @@
 
 #mainContent.mode-grid #patientContainer {
     display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: 1fr !important;
     align-items: stretch !important;
     grid-auto-rows: 1fr !important;
 
     width: 100% !important;
     min-width: 0 !important;
 
-    gap: 14px !important;
+    gap: 18px !important;
+}
+
+#mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
+    grid-template-columns: 1fr !important;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+
+    #mainContent.mode-grid #patientContainer,
+    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 1200px) {
+
+    #mainContent.mode-grid #patientContainer,
+    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
 }
 
 #mainContent.mode-grid #patientContainer>.patient-item:not(.hidden) {
@@ -2112,13 +2102,11 @@
 .patient-grid-card-body {
     flex: 1 1 auto;
     flex-direction: column;
-
     width: 100%;
     min-width: 0;
-    min-height: 164px;
-
-    gap: 12px;
-    padding: 15px 15px 13px 19px;
+    min-height: 220px;
+    gap: 16px;
+    padding: 20px 20px 17px 24px;
 }
 
 .patient-grid-card-header {
@@ -2137,26 +2125,21 @@
 .patient-grid-card-identity {
     display: grid;
     grid-template-columns:
-        46px minmax(0, 1fr);
-
+        58px minmax(0, 1fr);
     align-items: center;
-
     min-width: 0;
-    gap: 10px;
+    gap: 13px;
 }
 
 .patient-grid-card-avatar {
-    width: 46px;
-    height: 46px;
-    min-width: 46px;
-
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
     object-fit: cover;
-
     border: 0;
     border-radius: 999px;
-
     box-shadow:
-        0 4px 10px rgba(15, 23, 42, 0.15);
+        0 5px 13px rgba(15, 23, 42, 0.16);
 }
 
 .patient-grid-card-person {
@@ -2170,43 +2153,44 @@
 .patient-grid-card-name {
     width: 100%;
     max-width: 100%;
-
     margin: 0;
-
     color: #161B22;
-
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 850;
-    line-height: 1.2;
+    line-height: 1.22;
     letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
+    overflow-wrap: anywhere;
 }
 
 .patient-grid-card-meta {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
-
-    gap: 4px;
+    width: 100%;
+    min-width: 0;
+    gap: 5px;
 }
 
 .patient-grid-card-meta .global-info-pill {
     min-width: 0;
-    min-height: 19px;
+    min-height: 25px;
     max-width: 100%;
-
-    gap: 4px;
-    padding: 3px 6px;
-
-    font-size: 8px;
-    line-height: 1;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    gap: 5px;
+    padding: 5px 9px;
+    font-size: 10px;
+    line-height: 1.15;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
 }
 
 .patient-grid-card-meta .global-info-pill i {
@@ -2215,60 +2199,48 @@
 }
 
 .patient-grid-card-schedule {
-    min-width: 76px;
-
+    min-width: 94px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-
-    gap: 2px;
-
+    gap: 3px;
     text-align: right;
 }
 
 .patient-grid-card-schedule>strong {
     color: #161B22;
-
-    font-size: 10px;
+    font-size: 12.5px;
     font-weight: 850;
-    line-height: 1.15;
-
+    line-height: 1.2;
     white-space: nowrap;
 }
 
 .patient-grid-card-schedule>span:not(.urgency-chip) {
     color: var(--table-heading-muted);
-
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
-    line-height: 1.1;
-
+    line-height: 1.15;
     white-space: nowrap;
 }
 
 .patient-grid-card-schedule .urgency-chip {
     min-height: 17px;
-
     margin-top: 2px;
     padding: 3px 6px;
-
     font-size: 7.5px;
     line-height: 1;
 }
 
 .patient-grid-card-footer {
-    display: flex;
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-
     width: 100%;
     min-width: 0;
-
-    gap: 8px;
-
+    gap: 12px;
     margin-top: auto;
-    padding-top: 10px;
-
+    padding-top: 12px;
     border-top: 1px solid var(--table-border);
 }
 
@@ -2281,48 +2253,44 @@
 }
 
 .patient-grid-card-service-icon {
-    width: 27px !important;
-    height: 27px !important;
-    min-width: 27px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
 
-    border-radius: 8px !important;
-    font-size: 9px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
 }
 
 .patient-grid-card-service-name {
     display: block;
 
     min-width: 0;
-    max-width: 145px;
+    max-width: 190px;
 
     color: #161B22;
 
-    font-size: 10.5px;
+    font-size: 13px;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.25;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
 }
 
 .patient-grid-card-status {
     flex-shrink: 0;
 
-    min-height: 22px !important;
-    max-width: 116px;
+    min-height: 27px !important;
+    max-width: none;
 
     margin: 0 !important;
-    padding: 4px 7px !important;
-
-    gap: 4px !important;
-
-    font-size: 8px !important;
+    padding: 6px 10px !important;
+    gap: 5px !important;
+    font-size: 10px !important;
     line-height: 1 !important;
-
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 #mainContent.mode-list .patient-card {
@@ -2335,26 +2303,24 @@
 
 .patient-list-card-body {
     grid-template-columns:
-        minmax(240px, 1.4fr) minmax(170px, 0.8fr) minmax(220px, 1fr) 28px;
-
+        minmax(320px, 1.45fr) minmax(210px, 0.8fr) minmax(250px, 1fr) 36px;
     align-items: center;
-
     width: 100%;
     min-width: 0;
-
-    gap: 18px;
-    padding: 14px 18px 14px 24px;
+    min-height: 96px;
+    gap: 24px;
+    padding: 18px 22px 18px 28px;
 }
 
 .patient-list-main {
     display: grid;
     grid-template-columns:
-        46px minmax(0, 1fr);
+        56px minmax(0, 1fr);
 
     align-items: center;
 
     min-width: 0;
-    gap: 11px;
+    gap: 14px;
 }
 
 .patient-list-avatar {
@@ -2406,12 +2372,11 @@
 
 .patient-list-meta .global-info-pill {
     min-width: 0;
-    min-height: 20px;
+    min-height: 25px;
     max-width: 100%;
-
-    padding: 3px 7px;
-
-    font-size: 8.5px;
+    padding: 5px 9px;
+    gap: 5px;
+    font-size: 10.5px;
     line-height: 1;
 
     white-space: nowrap;
@@ -2422,26 +2387,21 @@
 .patient-list-detail {
     display: grid;
     grid-template-columns:
-        32px minmax(0, 1fr);
-
+        42px minmax(0, 1fr);
     align-items: center;
-
     min-width: 0;
-    min-height: 52px;
-
-    gap: 9px;
-    padding-left: 16px;
-
+    min-height: 64px;
+    gap: 12px;
+    padding-left: 20px;
     border-left: 1px solid var(--table-border);
 }
 
 .patient-list-detail-icon {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-
-    border-radius: 9px !important;
-    font-size: 10px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
 }
 
 .patient-list-detail-copy {
@@ -2455,13 +2415,11 @@
 
 .patient-list-detail-label {
     color: var(--table-heading-muted);
-
-    font-size: 7px;
+    font-size: 9px;
     font-weight: 900;
     line-height: 1;
     letter-spacing: 0.07em;
     text-transform: uppercase;
-
     white-space: nowrap;
 }
 
@@ -2473,48 +2431,39 @@
 
     color: #161B22;
 
-    font-size: 10.5px;
+    font-size: 13px;
     font-weight: 850;
-    line-height: 1.2;
+    line-height: 1.25;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
 }
 
 .patient-list-detail-subvalue {
     color: var(--table-heading-muted);
-
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
-    line-height: 1.1;
-
+    line-height: 1.15;
     white-space: nowrap;
 }
 
 .patient-list-detail .urgency-chip {
-    min-height: 18px;
-
-    margin-top: 2px;
-    padding: 3px 6px;
-
-    font-size: 7.5px;
+    min-height: 22px;
+    margin-top: 3px;
+    padding: 4px 8px;
+    font-size: 9px;
     line-height: 1;
 }
 
 .patient-list-status {
-    min-height: 20px !important;
-    max-width: 150px;
-
-    margin: 2px 0 0 !important;
-    padding: 3px 7px !important;
-
-    font-size: 7.5px !important;
+    min-height: 24px !important;
+    max-width: 180px;
+    margin: 3px 0 0 !important;
+    padding: 5px 9px !important;
+    font-size: 10px !important;
     line-height: 1 !important;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .patient-list-chevron {
@@ -2541,12 +2490,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr)) !important;
-    }
 
     .patient-list-card-body {
         grid-template-columns:
@@ -2596,11 +2539,6 @@
 }
 
 @media (max-width: 767px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns: 1fr !important;
-    }
 
     #mainContent.mode-grid #patientContainer {
         gap: 10px !important;
@@ -2768,24 +2706,6 @@
     }
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (min-width: 1280px) {
-
-    #mainContent.mode-grid #patientContainer,
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr)) !important;
-    }
-}
-
 #mainContent.mode-list #patientSkeleton .skeleton-list-layout {
     display: block !important;
 }
@@ -2824,21 +2744,16 @@
 }
 
 @media (min-width: 768px) {
-
-    #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     #mainContent.mode-grid #patientContainer {
         display: grid !important;
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        gap: 14px !important;
+        gap: 18px !important;
         align-items: stretch !important;
         grid-auto-rows: 1fr !important;
     }
 
     #mainContent.mode-grid #patientContainer>.patient-item:not(.hidden) {
         display: flex !important;
+
         width: 100% !important;
         min-width: 0 !important;
         height: 100% !important;

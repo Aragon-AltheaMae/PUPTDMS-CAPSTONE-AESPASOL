@@ -419,7 +419,7 @@
             </div>
         </div>
 
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST" class="js-logout-form">
             @csrf
 
             <button type="submit" class="logout-btn">
@@ -509,7 +509,7 @@
                 <div class="theme-indicator" aria-hidden="true"></div>
             </div>
 
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="POST" class="js-logout-form">
                 @csrf
 
                 <button type="submit" class="drawer-logout-btn">

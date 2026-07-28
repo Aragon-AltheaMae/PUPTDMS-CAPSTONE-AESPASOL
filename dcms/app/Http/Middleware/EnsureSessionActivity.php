@@ -9,63 +9,111 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureSessionActivity
 {
-    public function handle(Request $request, Closure $next): Response
-    {
+    public function handle(
+        Request $request,
+        Closure $next
+    ): Response {
         if (!$request->hasSession()) {
             return $next($request);
         }
 
-        $timeoutSeconds = (int) env('SESSION_IDLE_TIMEOUT_SECONDS', 600);
+        $timeoutSeconds = max(
+            0,
+            (int) env(
+                'SESSION_IDLE_TIMEOUT_SECONDS',
+                600
+            )
+        );
 
         if ($timeoutSeconds <= 0) {
             return $next($request);
         }
 
         if (!Auth::check()) {
-            $request->session()->forget('last_activity_at');
+            $request->session()->forget([
+                'last_activity_at',
+                'session_idle_locked',
+            ]);
 
             return $next($request);
         }
 
-        $now = now()->getTimestamp();
-        $lastActivityAt = (int) $request->session()->get('last_activity_at', $now);
-
-        if (!$request->routeIs('logout') && ($now - $lastActivityAt) >= $timeoutSeconds) {
-            Auth::guard('patient')->logout();
-            Auth::logout();
-
-            $request->session()->forget([
-                'oidc_id_token',
-                'oidc_state',
-                'role',
-                'patient_id',
-                'patient_name',
-                'email',
-                'admin_logged_in',
-                'admin_id',
-                'admin_name',
-                'admin_email',
-                'dentist_id',
-                'dentist_name',
-                'dentist_email',
-                'impersonated_role',
-                'impersonated_patient_id',
-                'impersonator_role',
-                'impersonator_admin_id',
-                'impersonator_admin_email',
-                'last_activity_at',
-            ]);
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()->route('login', [
-                'logged_out' => 1,
-                'reason' => 'idle',
-            ]);
+        if (
+            $request->routeIs([
+                'logout',
+                'session.expire',
+            ])
+        ) {
+            return $next($request);
         }
 
-        $request->session()->put('last_activity_at', $now);
+        if (
+            $request->routeIs([
+                'login',
+                'backup.login',
+                'oidc.redirect',
+                'oidc.callback',
+            ])
+        ) {
+            return $next($request);
+        }
+
+        $now = now()->getTimestamp();
+
+        if (
+            !$request->session()->has(
+                'last_activity_at'
+            )
+        ) {
+            $request->session()->put(
+                'last_activity_at',
+                $now
+            );
+        }
+
+        $lastActivityAt = (int) $request
+            ->session()
+            ->get(
+                'last_activity_at',
+                $now
+            );
+
+        $alreadyLocked = (bool) $request
+            ->session()
+            ->get(
+                'session_idle_locked',
+                false
+            );
+
+        $hasTimedOut =
+            ($now - $lastActivityAt) >=
+            $timeoutSeconds;
+
+        if ($alreadyLocked || $hasTimedOut) {
+
+            $request->session()->put(
+                'session_idle_locked',
+                true
+            );
+
+            if (
+                $request->expectsJson() ||
+                $request->ajax()
+            ) {
+                return response()->json([
+                    'expired' => true,
+                    'message' =>
+                    'Your session has expired due to inactivity.',
+                ], 401);
+            }
+
+            return redirect()->route(
+                'login',
+                [
+                    'reason' => 'idle',
+                ]
+            );
+        }
 
         return $next($request);
     }

@@ -158,222 +158,261 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 </div>
             </aside>
 
-            <div class="card-header">
-                <div class="perm-search-row voice-search-row relative flex-1 md:flex-none flex items-center gap-2"
-                    data-voice-field>
-                    <div class="search-wrap global-search flex-1" data-search-wrapper>
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <section class="card role-permission-card">
 
-                        <input type="text" id="permSearch" placeholder="Search permissions..." class="search-input"
-                            data-search-input oninput="filterPerms(this.value)">
+                <div class="card-header">
+                    <div class="perm-search-row voice-search-row relative flex-1 md:flex-none flex items-center gap-2"
+                        data-voice-field>
+                        <div class="search-wrap global-search flex-1" data-search-wrapper>
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-                        <button type="button" id="permSearchClearBtn" class="search-clear" data-search-clear
-                            title="Clear" aria-label="Clear search">
-                            <i class="fa-solid fa-xmark text-xs"></i>
+                            <input type="text" id="permSearch" placeholder="Search permissions..." class="search-input"
+                                data-search-input oninput="filterPerms(this.value)">
+
+                            <button type="button" id="permSearchClearBtn" class="search-clear" data-search-clear
+                                title="Clear" aria-label="Clear search">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" id="permSearchMicBtn" class="voice-search-mic external"
+                                data-voice-trigger data-voice-target="#permSearch"
+                                data-voice-status="#permSearchVoiceStatus"
+                                aria-label="Voice input for permission search">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="permSearchVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <div class="card-header-actions">
+                        <button type="button" class="btn-view-as" id="globalViewAsBtn" onclick="openViewAs()">
+                            <i class="fa-solid fa-eye"></i> View As
+                            <span class="va-count-badge" id="globalVaBadge">0</span>
+                        </button>
+                        <button type="button" class="btn-collapse" id="collapseBtn" onclick="toggleAllGroups()">Collapse
+                            All</button>
+                        <button type="button" class="btn-reset" id="resetDefaultsBtn" onclick="ajaxResetDefaults()">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Defaults
                         </button>
                     </div>
+                </div>
 
-                    <div class="voice-input-toggle">
-                        <button type="button" id="permSearchMicBtn" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#permSearch" data-voice-status="#permSearchVoiceStatus"
-                            aria-label="Voice input for permission search">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="permSearchVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
+                <div class="role-permission-card-body">
+                    <div class="protected-banner" id="protectedBanner" style="display:none;">
+                        <i class="fa-solid fa-shield-halved" style="font-size:24px; color:#d97706;"></i>
+                        <div>
+                            <div style="font-weight:800; font-size:13px; color:#92400e;">Protected Role</div>
+                            <div style="font-size:12px; color:#b45309;">Admin has unrestricted access and
+                                cannot be modified.</div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card-header-actions">
-                    <button type="button" class="btn-view-as" id="globalViewAsBtn" onclick="openViewAs()">
-                        <i class="fa-solid fa-eye"></i> View As
-                        <span class="va-count-badge" id="globalVaBadge">0</span>
-                    </button>
-                    <button type="button" class="btn-collapse" id="collapseBtn" onclick="toggleAllGroups()">Collapse
-                        All</button>
-                    <button type="button" class="btn-reset" id="resetDefaultsBtn" onclick="ajaxResetDefaults()">
-                        <i class="fa-solid fa-rotate-left"></i> Reset Defaults
-                    </button>
-                </div>
-            </div>
+                    @foreach ($roles as $ri => $role)
+                    @php
+                    $isSuperRole =
+                    in_array(strtolower($role->slug), [
+                    'super_admin',
+                    'super-admin',
+                    'superadmin',
+                    ]) || str_contains(strtolower($role->name), 'super');
+                    $isActiveRole = isset($highlightRoleId)
+                    ? (int) $highlightRoleId === (int) $role->id
+                    : $ri === 0;
+                    $micons = [
+                    'Dental Records' => ['fa-notes-medical', '#8B0000'],
+                    'Patients' => ['fa-user-group', '#d97706'],
+                    'Appointments' => ['fa-calendar-days', '#059669'],
+                    'Document Requests' => ['fa-envelope-open-text', '#2563eb'],
+                    'Document Templates' => ['fa-file-lines', '#7c3aed'],
+                    'Reports' => ['fa-chart-pie', '#7c3aed'],
+                    'General Access' => ['fa-user-shield', '#059669'],
+                    'Inventory' => ['fa-boxes-stacked', '#ea580c'],
+                    'User Management' => ['fa-user-cog', '#dc2626'],
+                    'System Settings' => ['fa-screwdriver-wrench', '#4b5563'],
+                    ];
+                    @endphp
 
-            <div class="role-permission-card-body">
-                <div class="protected-banner" id="protectedBanner" style="display:none;">
-                    <i class="fa-solid fa-shield-halved" style="font-size:24px; color:#d97706;"></i>
-                    <div>
-                        <div style="font-weight:800; font-size:13px; color:#92400e;">Protected Role</div>
-                        <div style="font-size:12px; color:#b45309;">Admin has unrestricted access and
-                            cannot be modified.</div>
-                    </div>
-                </div>
+                    <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}"
+                        data-discard-form data-discard-title="Discard permission changes?"
+                        data-discard-subtitle="You have unsaved changes for this role."
+                        data-discard-message="The permission changes for this role will be restored to their last saved state."
+                        style="display:{{ $isActiveRole ? 'block' : 'none' }}; height: 100%;">
+                        @csrf
+                        <input type="hidden" name="role_id" value="{{ $role->id }}">
 
-                @foreach ($roles as $ri => $role)
-                @php
-                $isSuperRole =
-                in_array(strtolower($role->slug), [
-                'super_admin',
-                'super-admin',
-                'superadmin',
-                ]) || str_contains(strtolower($role->name), 'super');
-                $isActiveRole = isset($highlightRoleId)
-                ? (int) $highlightRoleId === (int) $role->id
-                : $ri === 0;
-                $micons = [
-                'Dental Records' => ['fa-notes-medical', '#8B0000'],
-                'Patients' => ['fa-user-group', '#d97706'],
-                'Appointments' => ['fa-calendar-days', '#059669'],
-                'Document Requests' => ['fa-envelope-open-text', '#2563eb'],
-                'Document Templates' => ['fa-file-lines', '#7c3aed'],
-                'Reports' => ['fa-chart-pie', '#7c3aed'],
-                'General Access' => ['fa-user-shield', '#059669'],
-                'Inventory' => ['fa-boxes-stacked', '#ea580c'],
-                'User Management' => ['fa-user-cog', '#dc2626'],
-                'System Settings' => ['fa-screwdriver-wrench', '#4b5563'],
-                ];
-                @endphp
+                        <div class="groups-container">
+                            @forelse($groupedPermissions as $module => $permissions)
+                            @php
+                            [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#4b5563'];
+                            $mSlug = Str::slug($module);
+                            $mTotal = $permissions->count();
+                            $roleGranted = 0;
+                            foreach ($permissions as $_p) {
+                            if ($role->permissions->contains('id', $_p->id)) {
+                            $roleGranted++;
+                            }
+                            }
+                            $allOn = $roleGranted === $mTotal;
+                            @endphp
 
-                <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}" data-discard-form
-                    data-discard-title="Discard permission changes?"
-                    data-discard-subtitle="You have unsaved changes for this role."
-                    data-discard-message="The permission changes for this role will be restored to their last saved state."
-                    style="display:{{ $isActiveRole ? 'block' : 'none' }}; height: 100%;">
-                    @csrf
-                    <input type="hidden" name="role_id" value="{{ $role->id }}">
+                            <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
+                                <div class="perm-group-header" onclick="togglePermGroup(this)">
+                                    <div class="perm-group-icon" style="--module-color: {{ $icol }};">
+                                        <i class="fa-solid {{ $ico }}"></i>
+                                    </div>
 
-                    <div class="groups-container">
-                        @forelse($groupedPermissions as $module => $permissions)
-                        @php
-                        [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#4b5563'];
-                        $mSlug = Str::slug($module);
-                        $mTotal = $permissions->count();
-                        $roleGranted = 0;
-                        foreach ($permissions as $_p) {
-                        if ($role->permissions->contains('id', $_p->id)) {
-                        $roleGranted++;
-                        }
-                        }
-                        $allOn = $roleGranted === $mTotal;
-                        @endphp
+                                    <div class="perm-group-info">
+                                        <div class="perm-group-title">{{ $module }}</div>
 
-                        <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
-                            <div class="perm-group-header" onclick="togglePermGroup(this)">
-                                <div class="perm-group-icon" style="--module-color: {{ $icol }};">
-                                    <i class="fa-solid {{ $ico }}"></i>
+                                        <div class="group-count">
+                                            {{ $roleGranted }} of {{ $mTotal }} enabled
+                                        </div>
+                                    </div>
+
+                                    <div class="perm-group-actions">
+                                        <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
+                                            @for ($d = 0; $d < $mTotal; $d++) <div
+                                                class="dot {{ $d < $roleGranted ? 'is-granted' : '' }}"
+                                                style="--dot-color: {{ $icol }};">
+                                        </div>
+                                        @endfor
+                                    </div>
+
+                                    <div class="all-toggle-wrap" onclick="event.stopPropagation(); toggleGroupPerms(
+                    this,
+                    '{{ $role->id }}',
+                    '{{ $mSlug }}',
+                    {{ $allOn ? 'true' : 'false' }}
+                )">
+
+                                        <span>All</span>
+
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
+                                            onclick="event.preventDefault();">
+
+                                            <input type="checkbox" class="group-master" data-role="{{ $role->id }}"
+                                                data-module="{{ $mSlug }}" {{ $allOn ? 'checked' : '' }} {{ $isSuperRole
+                                                ? 'disabled' : '' }}>
+
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                    </div>
+
+                                    <i class="fa-solid fa-chevron-up chevron"></i>
                                 </div>
+                            </div>
 
-                                <div class="perm-group-info">
-                                    <div class="perm-group-title">{{ $module }}</div>
-                                    <div class="group-count">
-                                        {{ $roleGranted }} of {{ $mTotal }} enabled
+                            <div class="perm-group-body">
+                                @foreach ($permissions as $permission)
+                                @php
+                                $isGranted = $role->permissions->contains('id', $permission->id);
+                                @endphp
+
+                                <div class="perm-row"
+                                    data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
+
+                                    <div class="perm-main">
+                                        <div class="perm-title-row">
+                                            <span class="perm-label">
+                                                {{ $permission->name }}
+                                            </span>
+                                        </div>
+
+                                        <div class="perm-slug">
+                                            {{ $permission->slug }}
+                                        </div>
+                                    </div>
+
+                                    <div class="perm-row-actions">
+                                        <span class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}">
+                                            {{ $isGranted ? 'Granted' : 'Denied' }}
+                                        </span>
+
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
+                                            <input type="checkbox" name="permissions[{{ $role->id }}][]"
+                                                value="{{ $permission->id }}" class="perm-toggle"
+                                                data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
+                                                data-color="{{ $icol }}" data-perm-name="{{ $permission->name }}"
+                                                data-perm-slug="{{ $permission->slug }}" {{ $isGranted ? 'checked' : ''
+                                                }} {{ $isSuperRole ? 'disabled' : '' }} onchange="onPermChange(this)">
+
+                                            <span class="toggle-track"></span>
+                                        </label>
                                     </div>
                                 </div>
-
-                                <div class="perm-group-actions">
-                                    <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
-                                        @for ($d = 0; $d < $mTotal; $d++) <div
-                                            class="dot {{ $d < $roleGranted ? 'is-granted' : '' }}"
-                                            style="--dot-color: {{ $icol }};">
-                                    </div>
-                                    @endfor
-                                </div>
-
-                                <div class="all-toggle-wrap"
-                                    onclick="event.stopPropagation(); toggleGroupPerms(this,'{{ $role->id }}','{{ $mSlug }}',{{ $allOn ? 'true' : 'false' }})">
-                                    <span>All</span>
-                                    <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
-                                        onclick="event.preventDefault();">
-                                        <input type="checkbox" class="group-master" data-role="{{ $role->id }}"
-                                            data-module="{{ $mSlug }}" {{ $allOn ? 'checked' : '' }} {{ $isSuperRole
-                                            ? 'disabled' : '' }}>
-                                        <span class="toggle-track"></span>
-                                    </label>
-                                </div>
-
-                                <i class="fa-solid fa-chevron-up chevron"></i>
+                                @endforeach
                             </div>
                         </div>
 
-                        <div class="perm-group-body">
-                            @foreach ($permissions as $permission)
-                            @php $isGranted = $role->permissions->contains('id',$permission->id); @endphp
+                        @empty
 
-                            <div class="perm-row"
-                                data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
-                                <div class="perm-main">
-                                    <div class="perm-title-row">
-                                        <span class="perm-label">{{ $permission->name }}</span>
-                                    </div>
-                                    <div class="perm-slug">{{ $permission->slug }}</div>
-                                </div>
+                        <div style="text-align:center; padding:60px 20px;">
+                            <i class="fa-solid fa-shield-halved"
+                                style="font-size:40px; color:#e5e7eb; margin-bottom:12px;"></i>
 
-                                <div class="perm-row-actions">
-                                    <span class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}">
-                                        {{ $isGranted ? 'Granted' : 'Denied' }}
-                                    </span>
-
-                                    <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
-                                        <input type="checkbox" name="permissions[{{ $role->id }}][]"
-                                            value="{{ $permission->id }}" class="perm-toggle"
-                                            data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
-                                            data-color="{{ $icol }}" data-perm-name="{{ $permission->name }}"
-                                            data-perm-slug="{{ $permission->slug }}" {{ $isGranted ? 'checked' : '' }}
-                                            {{ $isSuperRole ? 'disabled' : '' }} onchange="onPermChange(this)">
-                                        <span class="toggle-track"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            @endforeach
+                            <p style="font-size:14px; font-weight:700; color:#6b7280;">
+                                No permissions found.
+                            </p>
                         </div>
+
+                        @endforelse
+                </div>
+
+                @if (!$isSuperRole)
+                <div class="floating-save-bar" id="footer-bar-{{ $role->id }}">
+                    <div class="fsb-text">
+                        <span class="fsb-title">Unsaved changes</span>
+                        <span class="fsb-sub">0 changes</span>
                     </div>
-                    @empty
-                    <div style="text-align:center; padding:60px 20px;">
-                        <i class="fa-solid fa-shield-halved"
-                            style="font-size:40px; color:#e5e7eb; margin-bottom:12px;"></i>
-                        <p style="font-size:14px; font-weight:700; color:#6b7280;">No permissions
-                            found.</p>
+
+                    <div class="fsb-actions">
+                        <button type="button" class="btn-view-as fsb-view-as" onclick="openViewAs()">
+                            <i class="fa-solid fa-eye"></i>
+                            View As
+                            <span class="va-count-badge">0</span>
+                        </button>
+
+                        <button type="button" class="btn-discard"
+                            onclick="requestDiscardRoleChanges('{{ $role->id }}')">
+                            Discard
+                        </button>
+
+                        <button type="button" class="btn-save-float" id="save-btn-{{ $role->id }}"
+                            onclick="ajaxSaveRole('{{ $role->id }}')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save
+                        </button>
                     </div>
-                    @endforelse
-            </div>
-
-            @if (!$isSuperRole)
-            <div class="floating-save-bar" id="footer-bar-{{ $role->id }}">
-                <div class="fsb-text">
-                    <span class="fsb-title">Unsaved changes</span>
-                    <span class="fsb-sub">0 changes</span>
                 </div>
-                <div class="fsb-actions">
-                    <button type="button" class="btn-view-as fsb-view-as" onclick="openViewAs()">
-                        <i class="fa-solid fa-eye"></i> View As
-                        <span class="va-count-badge">0</span>
-                    </button>
-                    <button type="button" class="btn-discard" onclick="requestDiscardRoleChanges('{{ $role->id }}')">
-                        Discard
-                    </button>
-                    <button type="button" class="btn-save-float" id="save-btn-{{ $role->id }}"
-                        onclick="ajaxSaveRole('{{ $role->id }}')">
-                        <i class="fa-solid fa-floppy-disk"></i> Save
+                @endif
+                </form>
+                @endforeach
+
+                <div id="permSearchEmptyState" class="empty-state perm-search-empty-state" hidden>
+
+                    <div class="empty-state-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <h3 class="empty-state-title">No permissions found</h3>
+
+                    <p class="empty-state-sub" id="permSearchEmptyText">
+                        Try a different permission name or slug.
+                    </p>
+
+                    <button type="button" class="empty-state-btn" id="permSearchEmptyClearBtn">
+                        <i class="fa-solid fa-xmark"></i>
+                        Clear search
                     </button>
                 </div>
-            </div>
-            @endif
-
-            </form>
-            @endforeach
-
-            <div id="permSearchEmptyState" class="empty-state perm-search-empty-state" hidden>
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <h3 class="empty-state-title">No permissions found</h3>
-                <p class="empty-state-sub" id="permSearchEmptyText">Try a different permission name or
-                    slug.</p>
-                <button type="button" class="empty-state-btn" id="permSearchEmptyClearBtn">
-                    <i class="fa-solid fa-xmark"></i>
-                    Clear search
-                </button>
-            </div>
         </div>
+
+        </section>
+    </div>
     </div>
 </main>
 

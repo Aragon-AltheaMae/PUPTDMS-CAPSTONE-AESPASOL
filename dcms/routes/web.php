@@ -193,6 +193,25 @@ Route::post('/login', [BackupLoginController::class, 'store'])->name('login.stor
 // Logout (all roles)
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
+Route::post(
+    '/session/expire',
+    [
+        SessionManagementController::class,
+        'expire',
+    ]
+)->name('session.expire');
+
+Route::post(
+    '/session/activity',
+    [
+        SessionManagementController::class,
+        'activity',
+    ]
+)
+    ->middleware('auth')
+    ->name('session.activity');
+
+
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::post('/{notificationId}/read', [NotificationController::class, 'markAsRead'])
         ->name('mark-read');

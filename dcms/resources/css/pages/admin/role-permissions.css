@@ -234,7 +234,6 @@
     transition: all 0.15s;
     position: relative;
     white-space: nowrap;
-    font-family: 'Inter', sans-serif;
 }
 
 .btn-view-as.show {
@@ -2898,8 +2897,9 @@
 
     .main-grid {
         display: grid !important;
-        grid-template-columns: 1fr !important;
+        grid-template-columns: minmax(240px, 290px) minmax(0, 1fr) !important;
         gap: 1rem !important;
+        align-items: start !important;
     }
 
     #roleListContainer,
@@ -3277,12 +3277,36 @@
     padding-right: .35rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
     .role-sidebar-sticky {
         position: static;
         top: auto;
         max-height: none;
         overflow: visible;
         padding-right: 0;
+    }
+}
+
+.role-permission-card {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.role-permission-card-body {
+    min-width: 0;
+    width: 100%;
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.groups-container {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 767px) {
+    .role-permission-card {
+        grid-column: 1;
     }
 }

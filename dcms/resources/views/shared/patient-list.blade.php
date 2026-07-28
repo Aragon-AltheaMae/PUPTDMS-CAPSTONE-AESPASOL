@@ -146,30 +146,30 @@ $notifCount = $notifications->count();
                                 <div class="patient-sort-row">
 
                                     <div class="patient-stats-dropdown" id="patientStatsDropdown">
-                                        <button type="button" class="patient-stats-trigger" id="patientStatsToggle"
-                                            aria-expanded="false">
+                                        <button type="button" class="patient-stats-trigger s-all"
+                                            id="patientStatsToggle" aria-expanded="false">
                                             <span class="patient-stats-trigger-left">
-                                                <span class="patient-stats-trigger-icon">
-                                                    <i class="fa-solid fa-calendar-day"></i>
+                                                <span class="patient-stats-trigger-icon s-all">
+                                                    <i class="fa-solid fa-users"></i>
                                                 </span>
 
                                                 <span class="patient-stats-trigger-text">
                                                     <span class="patient-stats-trigger-label">Status</span>
-                                                    <strong id="patientStatsSelectedLabel">Today</strong>
+                                                    <strong id="patientStatsSelectedLabel">All Patients</strong>
                                                 </span>
                                             </span>
 
                                             <span class="patient-stats-trigger-right">
-                                                <span class="patient-stats-count-badge"
-                                                    id="patientStatsSelectedCount">{{ $todayCount ?? 0 }}</span>
+                                                <span class="patient-stats-count-badge" id="patientStatsSelectedCount">
+                                                    {{ $allCount ?? 0 }}
+                                                </span>
                                                 <i class="fa-solid fa-chevron-down patient-stats-chevron"></i>
                                             </span>
                                         </button>
 
                                         <div class="patient-stats-panel" id="patientStatsPanel">
                                             <div id="tabsGrid" class="patient-stats-grid">
-                                                <button type="button"
-                                                    class="patient-stat-option filter-btn tab-active s-today"
+                                                <button type="button" class="patient-stat-option filter-btn s-today"
                                                     data-filter="today">
                                                     <span class="patient-stat-option-icon">
                                                         <i class="fa-solid fa-clock"></i>
@@ -220,7 +220,8 @@ $notifCount = $notifications->count();
                                                         $cancelledCount ?? 0 }}</span>
                                                 </button>
 
-                                                <button type="button" class="patient-stat-option filter-btn s-all"
+                                                <button type="button"
+                                                    class="patient-stat-option filter-btn tab-active s-all"
                                                     data-filter="all">
                                                     <span class="patient-stat-option-icon">
                                                         <i class="fa-solid fa-users"></i>
@@ -803,8 +804,13 @@ $notifCount = $notifications->count();
             <div>
                 <h3 class="filter-section-title">Sort By</h3>
                 <div class="filter-chip-row" id="fSortGroup">
-                    <button type="button" class="ftag ftag-active" data-val="newest">Newest First</button>
-                    <button type="button" class="ftag" data-val="oldest">Oldest First</button>
+                    <button type="button" class="ftag ftag-active" data-val="nearest">
+                        Nearest Appointment
+                    </button>
+
+                    <button type="button" class="ftag" data-val="farthest">
+                        Farthest Appointment
+                    </button>
                     <button type="button" class="ftag" data-val="az">Patient Name A-Z</button>
                     <button type="button" class="ftag" data-val="za">Patient Name Z-A</button>
                 </div>
@@ -1004,7 +1010,7 @@ $notifCount = $notifications->count();
             }
         };
 
-        return map[status] || map.today;
+        return map[status] || map.all;
     }
 
     function getPatientDropdownCount(status) {
@@ -1015,7 +1021,7 @@ $notifCount = $notifications->count();
     function updatePatientStatsDropdownLabel() {
         const activeBtn =
             document.querySelector('#tabsGrid .filter-btn.tab-active') ||
-            document.querySelector('#tabsGrid .filter-btn[data-filter="today"]');
+            document.querySelector('#tabsGrid .filter-btn[data-filter="all"]');
 
         const labelEl = document.getElementById('patientStatsSelectedLabel');
         const countEl = document.getElementById('patientStatsSelectedCount');
@@ -1023,7 +1029,7 @@ $notifCount = $notifications->count();
 
         if (!activeBtn || !labelEl || !countEl) return;
 
-        const status = activeBtn.getAttribute('data-filter') || 'today';
+        const status = activeBtn.getAttribute('data-filter') || 'all';
         const meta = getPatientDropdownMeta(status);
 
         labelEl.textContent = meta.label;
@@ -1122,7 +1128,7 @@ $notifCount = $notifications->count();
             activeToDate = "";
             activeDatePreset = "";
 
-            dateSort = "desc";
+            dateSort = "nearest";
             nameSort = null;
 
             renderFilterChips();
@@ -1204,7 +1210,7 @@ $notifCount = $notifications->count();
             patientFilterBadge = filterBadge;
             patientExternalResetBtn = externalClearFilterBtn;
 
-            var activeTab = "today";
+            var activeTab = "all";
             var searchKeyword = "";
 
             function selectPatientStatus(status) {
@@ -1228,7 +1234,7 @@ $notifCount = $notifications->count();
                 selectedSection = null,
                 selectedDepartment = null;
             var nameSort = null,
-                dateSort = 'desc';
+                dateSort = "nearest";
 
             var activeFromDate = "",
                 activeToDate = "",
@@ -1337,12 +1343,15 @@ $notifCount = $notifications->count();
                 activeToDate = "";
                 activeDatePreset = "";
 
-                window.syncFilterTagGroup("fSortGroup", "newest");
+                window.syncFilterTagGroup(
+                    "fSortGroup",
+                    "nearest"
+                );
 
                 syncMutualExclusion();
                 updateFilterButtonState();
 
-                dateSort = 'desc';
+                dateSort = 'nearest';
                 nameSort = null;
 
                 updateShowResultsButton();
@@ -1371,7 +1380,9 @@ $notifCount = $notifications->count();
                 var draft = getDraftFilterState();
 
                 var sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-                var sortVal = sortActive ? sortActive.getAttribute('data-val') : 'newest';
+                var sortVal = sortActive ?
+                    sortActive.getAttribute("data-val") :
+                    "nearest";
 
                 return !!(
                     draft.department ||
@@ -1381,7 +1392,7 @@ $notifCount = $notifications->count();
                     draft.fromDate ||
                     draft.toDate ||
                     activeDatePreset ||
-                    sortVal !== 'newest'
+                    sortVal !== 'nearest'
                 );
             }
 
@@ -1504,12 +1515,17 @@ $notifCount = $notifications->count();
                 }
 
                 var sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-                if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
+                if (
+                    sortActive &&
+                    sortActive.getAttribute("data-val") !== "nearest"
+                ) {
                     addChip("Sort: " + sortActive.textContent.trim().replace(/\n/g, ' '), function () {
                         document.querySelectorAll('#fSortGroup .ftag').forEach(function (b) {
                             b.classList.remove('ftag-active');
                         });
-                        var defSort = document.querySelector('#fSortGroup .ftag[data-val="newest"]');
+                        var defSort = document.querySelector(
+                            '#fSortGroup .ftag[data-val="nearest"]'
+                        );
                         if (defSort) defSort.classList.add('ftag-active');
                     });
                 }
@@ -1570,7 +1586,7 @@ $notifCount = $notifications->count();
                             selectedSection = null;
                             activeFromDate = "";
                             activeToDate = "";
-                            dateSort = 'desc';
+                            dateSort = 'nearest';
                             nameSort = null;
 
                             applyFilters();
@@ -1672,6 +1688,81 @@ $notifCount = $notifications->count();
                 };
             }
 
+            function getPatientAppointmentTime(patient) {
+                var dateValue =
+                    getInfo(patient).dateStr;
+
+                if (!dateValue) {
+                    return null;
+                }
+
+                var timestamp = Date.parse(
+                    dateValue + "T00:00:00"
+                );
+
+                return Number.isNaN(timestamp) ?
+                    null :
+                    timestamp;
+            }
+
+            function getPatientDateRank(patient) {
+                var appointmentTime =
+                    getPatientAppointmentTime(patient);
+
+                if (appointmentTime === null) {
+                    return {
+                        group: 3,
+                        distance: Number.MAX_SAFE_INTEGER
+                    };
+                }
+
+                var today = new Date();
+
+                today.setHours(0, 0, 0, 0);
+
+                var difference =
+                    appointmentTime - today.getTime();
+
+                if (difference === 0) {
+                    return {
+                        group: 0,
+                        distance: 0
+                    };
+                }
+
+                if (difference > 0) {
+                    return {
+                        group: 1,
+                        distance: difference
+                    };
+                }
+
+                return {
+                    group: 2,
+                    distance: Math.abs(difference)
+                };
+            }
+
+            function compareNearestAppointments(
+                firstPatient,
+                secondPatient
+            ) {
+                var firstRank =
+                    getPatientDateRank(firstPatient);
+
+                var secondRank =
+                    getPatientDateRank(secondPatient);
+
+                if (firstRank.group !== secondRank.group) {
+                    return firstRank.group - secondRank.group;
+                }
+
+                return (
+                    firstRank.distance -
+                    secondRank.distance
+                );
+            }
+
             function getName(patient) {
                 var element = patient.querySelector(
                     ".patient-list-name, .patient-grid-name"
@@ -1764,7 +1855,7 @@ $notifCount = $notifications->count();
                 if (activeFromDate || activeToDate || activeDatePreset) count++;
 
                 var sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-                if (sortActive && sortActive.getAttribute('data-val') !== 'newest') count++;
+                if (sortActive && sortActive.getAttribute("data-val") !== "nearest") count++;
 
                 var has = count > 0;
 
@@ -1861,19 +1952,21 @@ $notifCount = $notifications->count();
                     activeDatePreset = activePresetBtn ? activePresetBtn.getAttribute("data-range") : "";
 
                     var sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-                    var sortVal = sortActive ? sortActive.getAttribute('data-val') : 'newest';
+                    var sortVal = sortActive ?
+                        sortActive.getAttribute("data-val") :
+                        "nearest";
 
-                    if (sortVal === 'az') {
-                        nameSort = 'az';
+                    if (sortVal === "az") {
+                        nameSort = "az";
                         dateSort = null;
-                    } else if (sortVal === 'za') {
-                        nameSort = 'za';
+                    } else if (sortVal === "za") {
+                        nameSort = "za";
                         dateSort = null;
-                    } else if (sortVal === 'newest') {
-                        dateSort = 'desc';
+                    } else if (sortVal === "nearest") {
+                        dateSort = "nearest";
                         nameSort = null;
-                    } else if (sortVal === 'oldest') {
-                        dateSort = 'asc';
+                    } else if (sortVal === "farthest") {
+                        dateSort = "farthest";
                         nameSort = null;
                     }
 
@@ -2135,13 +2228,12 @@ $notifCount = $notifications->count();
                     activeToDate ||
                     activeDatePreset ||
                     nameSort ||
-                    dateSort !== "desc"
+                    dateSort !== "nearest"
                 );
 
                 var currentStatus = getCurrentPatientStatus();
 
-                var isStatusOnlyEmptyState =
-                    !hasSearch &&
+                var isStatusOnlyEmptyState = !hasSearch &&
                     !hasAdvancedFilters &&
                     currentStatus !== "all";
 
@@ -2160,8 +2252,7 @@ $notifCount = $notifications->count();
                         hasAdvancedFilters &&
                         !isStatusOnlyEmptyState;
 
-                    resetPatientFiltersBtn.hidden =
-                        !showClearFiltersButton;
+                    resetPatientFiltersBtn.hidden = !showClearFiltersButton;
 
                     resetPatientFiltersBtn.classList.toggle(
                         "hidden",
@@ -2174,9 +2265,9 @@ $notifCount = $notifications->count();
                     );
 
                     resetPatientFiltersBtn.style.display =
-                        showClearFiltersButton
-                            ? "inline-flex"
-                            : "none";
+                        showClearFiltersButton ?
+                            "inline-flex" :
+                            "none";
                 }
 
                 if (hasResults) {
@@ -2211,9 +2302,9 @@ $notifCount = $notifications->count();
                 }
 
                 var meta = getPatientStatusEmptyMeta(
-                    hasAdvancedFilters
-                        ? "all"
-                        : currentStatus
+                    hasAdvancedFilters ?
+                        "all" :
+                        currentStatus
                 );
 
                 if (patientStatusEmptyIcon) {
@@ -2401,17 +2492,21 @@ $notifCount = $notifications->count();
                         if (nameSort === "za") data.sort(function (a, b) {
                             return getName(b).localeCompare(getName(a));
                         });
-                        if (dateSort === "asc") data.sort(function (a, b) {
-                            return new Date(getInfo(a).createdAt || getInfo(a).dateStr) -
-                                new Date(
-                                    getInfo(b).createdAt || getInfo(b).dateStr);
-                        });
+                        if (dateSort === "nearest") {
+                            data.sort(compareNearestAppointments);
+                        }
 
-                        if (dateSort === "desc") data.sort(function (a, b) {
-                            return new Date(getInfo(b).createdAt || getInfo(b).dateStr) -
-                                new Date(
-                                    getInfo(a).createdAt || getInfo(a).dateStr);
-                        });
+                        if (dateSort === "farthest") {
+                            data.sort(function (
+                                firstPatient,
+                                secondPatient
+                            ) {
+                                return compareNearestAppointments(
+                                    secondPatient,
+                                    firstPatient
+                                );
+                            });
+                        }
 
                         var rowCountEl = document.getElementById("rowCount");
                         if (rowCountEl) {
@@ -2439,13 +2534,15 @@ $notifCount = $notifications->count();
                 b.classList.remove('tab-active');
             });
 
-            var todayBtn = document.querySelector(
-                '.filter-btn[data-filter="today"]'
+            var allPatientsBtn = document.querySelector(
+                '.filter-btn[data-filter="all"]'
             );
 
-            if (todayBtn) {
-                todayBtn.classList.add('tab-active');
+            if (allPatientsBtn) {
+                allPatientsBtn.classList.add('tab-active');
             }
+
+            activeTab = "all";
 
             updatePatientStatsDropdownLabel();
             window.initGlobalPageSizeSelects?.(document);
