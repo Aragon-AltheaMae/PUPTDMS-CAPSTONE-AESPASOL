@@ -7,26 +7,26 @@
 @vite('resources/css/pages/dentist/add-existing-record.css')
 
 @section('content')
-<main id="mainContent" class="dentist-page-shell">
+<main id="mainContent" class="dentist-page-shell existing-record-page">
     <div class="w-full animate-fade-up pt-6">
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#660000]">
+            <h1 class="existing-record-title text-2xl sm:text-3xl font-extrabold text-[#660000]">
                 <i class="fa-solid fa-folder-open mr-2 text-[#8B0000]"></i>
                 Add Existing Record
             </h1>
-            <span class="text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
+            <span class="existing-record-chip text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
                 Select a patient to import a paper record
             </span>
         </div>
 
-        <div class="section-card mb-6">
+        <div class="section-card existing-record-search-card mb-6">
             <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#9e9690] text-sm"></i>
+                <i class="fa-solid fa-magnifying-glass existing-record-search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[#9e9690] text-sm"></i>
                 <input type="text" id="patientSearchInput"
-                    class="w-full border border-[#e8e2dd] rounded-xl bg-white outline-none pl-10 pr-10 py-3 text-sm"
+                    class="existing-record-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none pl-10 pr-10 py-3 text-sm"
                     placeholder="Search by name, ID, email, or program..."
                     autocomplete="off">
-                <button type="button" id="clearSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9690] hover:text-[#8B0000] hidden">
+                <button type="button" id="clearSearch" class="existing-record-clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9690] hover:text-[#8B0000] hidden">
                     <i class="fa-solid fa-circle-xmark text-lg"></i>
                 </button>
             </div>
