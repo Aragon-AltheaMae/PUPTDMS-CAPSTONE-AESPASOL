@@ -82,11 +82,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('patientSearchInput');
     const clearBtn = document.getElementById('clearSearch');
     const patientGrid = document.getElementById('patientGrid');
+    const initialMarkup = patientGrid ? patientGrid.innerHTML : '';
+    const initialCards = patientGrid ? Array.from(patientGrid.querySelectorAll('.patient-select-card')) : [];
     const noResults = document.getElementById('noResults');
     const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
     const recordUrlTemplate = @json(route('dentist.odontogram.historical.create', ['patient' => '__PATIENT__']));
     let activeRequestId = 0;
     let searchTimer = null;
+    let latestAllPatients = null;
 
     function escapeHtml(value) {
         return String(value || '')
@@ -105,6 +108,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return recordUrlTemplate.replace('__PATIENT__', encodeURIComponent(String(patient.id || '')));
     }
 
+    function patientMatchesQuery(patient, normalizedQuery) {
+        const haystack = [
+            patient.name || '',
+            patient.email || '',
+            patient.student_number || '',
+            patient.program || '',
+            patient.type || '',
+        ].join(' ').toLowerCase();
+
+        return haystack.includes(normalizedQuery);
+    }
+
     function renderEmptyState(message) {
         if (!patientGrid) return;
 
@@ -112,6 +127,67 @@ document.addEventListener('DOMContentLoaded', function () {
         noResults.classList.remove('hidden');
         noResults.removeAttribute('hidden');
         noResults.querySelector('p').textContent = message;
+    }
+
+    function renderInitialPatients() {
+        if (!patientGrid) return;
+
+        if (Array.isArray(latestAllPatients)) {
+            renderPatients(latestAllPatients);
+            return;
+        }
+
+        patientGrid.innerHTML = initialMarkup;
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+    }
+
+    function filterInitialPatients(query) {
+        if (!patientGrid) return false;
+
+        const normalizedQuery = String(query || '').trim().toLowerCase();
+
+        if (!normalizedQuery) {
+            renderInitialPatients();
+            return true;
+        }
+
+        if (Array.isArray(latestAllPatients)) {
+            const filteredPatients = latestAllPatients.filter(function (patient) {
+                return patientMatchesQuery(patient, normalizedQuery);
+            });
+
+            if (!filteredPatients.length) {
+                return false;
+            }
+
+            renderPatients(filteredPatients);
+            return true;
+        }
+
+        const filteredCards = initialCards.filter(function (card) {
+            const haystack = [
+                card.dataset.name || '',
+                card.dataset.email || '',
+                card.dataset.student || '',
+                card.dataset.program || '',
+            ].join(' ');
+
+            return haystack.includes(normalizedQuery);
+        });
+
+        if (!filteredCards.length) {
+            return false;
+        }
+
+        patientGrid.innerHTML = filteredCards.map(function (card) {
+            return card.outerHTML;
+        }).join('');
+
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+
+        return true;
     }
 
     function renderPatients(patients) {
@@ -164,9 +240,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }).join('');
     }
 
-    async function loadPatients(query = '', showAll = false) {
+    async function loadPatients(query = '', showAll = false, options = {}) {
         if (!patientGrid) return;
 
+        const showLoading = options.showLoading !== false;
         const requestId = ++activeRequestId;
         const params = new URLSearchParams();
 
@@ -180,14 +257,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         params.set('limit', '80');
 
-        patientGrid.innerHTML = `
-            <div class="col-span-full empty-state py-12">
-                <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
-                <p class="text-sm text-[#9e9690]">Loading patient records...</p>
-            </div>
-        `;
-        noResults.classList.add('hidden');
-        noResults.setAttribute('hidden', 'hidden');
+        if (showLoading) {
+            patientGrid.innerHTML = `
+                <div class="col-span-full empty-state py-12">
+                    <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
+                    <p class="text-sm text-[#9e9690]">Loading patient records...</p>
+                </div>
+            `;
+            noResults.classList.add('hidden');
+            noResults.setAttribute('hidden', 'hidden');
+        }
 
         try {
             const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
@@ -207,14 +286,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            renderPatients(Array.isArray(patients) ? patients : []);
+            const normalizedPatients = Array.isArray(patients) ? patients : [];
+
+            if (showAll && query === '') {
+                latestAllPatients = normalizedPatients;
+            }
+
+            renderPatients(normalizedPatients);
         } catch (error) {
             if (requestId !== activeRequestId) {
                 return;
             }
 
             console.error(error);
-            renderEmptyState('Unable to load patient records right now.');
+
+            if (showLoading) {
+                renderEmptyState('Unable to load patient records right now.');
+            }
         }
     }
 
@@ -228,18 +316,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         searchTimer = setTimeout(function () {
-            loadPatients(query, query === '');
+            if (query === '') {
+                renderInitialPatients();
+                return;
+            }
+
+            if (filterInitialPatients(query)) {
+                return;
+            }
+
+            loadPatients(query, false);
         }, 120);
     });
 
     clearBtn.addEventListener('click', function () {
         input.value = '';
         clearBtn.classList.add('hidden');
-        loadPatients('', true);
+        renderInitialPatients();
         input.focus();
     });
 
-    loadPatients('', true);
+    renderInitialPatients();
+    loadPatients('', true, { showLoading: false });
     input.focus();
 });
 </script>
