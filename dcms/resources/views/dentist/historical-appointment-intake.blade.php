@@ -673,7 +673,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-circle-check text-xs"></i> Summary
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div id="historicalReviewGrid" class="historical-review-grid"></div>
+                                        <div id="historicalReviewGrid" class="space-y-4"></div>
                                     </div>
                                 </div>
                             </div>
@@ -751,6 +751,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
       const emergencyNumberInput = document.getElementById('emergency_number');
       const emergencyNumberFeedback = document.getElementById('emergency_number_feedback');
       let currentStep = 0;
+      const isFemalePatient = @json($isFemalePatient);
 
       function textValue(selector) {
           const el = document.querySelector(selector);
@@ -804,12 +805,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
           if (!element) return;
 
           element.textContent = message;
-          element.classList.remove('text-[#9e9690]', 'text-[#8B0000]', 'text-[#15803d]');
+          element.classList.remove('text-[#9e9690]', 'text-[#dc2626]', 'text-[#16a34a]');
 
           if (type === 'error') {
-              element.classList.add('text-[#8B0000]');
+              element.classList.add('text-[#dc2626]');
           } else if (type === 'success') {
-              element.classList.add('text-[#15803d]');
+              element.classList.add('text-[#16a34a]');
           } else {
               element.classList.add('text-[#9e9690]');
           }
@@ -957,30 +958,174 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
           sync();
       }
 
-        function buildReview() {
-          const diseases = Array.from(document.querySelectorAll('input[name="diseases[]"]:checked'))
-              .map(el => el.nextElementSibling.textContent.trim())
-              .join(', ') || 'None selected';
+      function buildReview() {
+        const form = document.getElementById('historicalAppointmentForm');
+        const data = new FormData(form);
+        const get = (n) => data.get(n) || 'N/A';
+        const getAll = (n) => data.getAll(n);
 
-          const rows = [
-              ['Service', textValue('#service_type') || '—'],
-              ['Appointment Date', textValue('#appointment_date') || '—'],
-              ['Appointment Time', toDisplayTime(textValue('#appointment_time')) || '—'],
-              ['Duration', textValue('#procedure_duration_hms') || '—'],
-            ['Last Dental Visit', textValue('#last_dental_visit') || '—'],
-            ['Previous Dentist', textValue('#previous_dentist') || '—'],
-            ['Emergency Contact', textValue('#emergency_person') || '—'],
-            ['Emergency Number', textValue('#emergency_number') || '—'],
-            ['Relationship', textValue('#emergency_relation') || '—'],
-            ['Diseases', diseases],
-        ];
+        const diseases = Array.from(document.querySelectorAll('input[name="diseases[]"]:checked'))
+            .map(el => el.nextElementSibling.textContent.trim())
+            .join(', ') || 'None';
 
-          reviewGrid.innerHTML = rows.map(([label, value], index) => `
-              <div class="historical-review-item ${index === rows.length - 1 ? 'historical-review-span' : ''}">
-                  <span>${label}</span>
-                  <strong>${value}</strong>
-              </div>
-          `).join('');
+        const row = (label, val) =>
+            `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val && String(val).trim() !== "" ? val : '<span class="text-[#9e9690]">N/A</span>'}</p>`;
+
+        const optionalRow = (label, val) => {
+            if (!val || String(val).trim() === "" || val === "N/A") return "";
+            return `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val}</p>`;
+        };
+
+        const summaryCard = (title, icon, body) => `
+            <div class="border border-[#e8e2dd] rounded-xl overflow-hidden bg-white">
+                <div class="bg-[#f9e8e8] px-4 py-2.5 text-xs font-bold text-[#8B0000] uppercase tracking-widest border-b border-[#e8e2dd]">
+                    <i class="fa-solid ${icon} mr-2"></i>${title}
+                </div>
+                <div class="p-4 text-sm leading-7 text-[#1a1410] space-y-4">${body}</div>
+            </div>
+        `;
+
+        const subSection = (title, body) => `
+            <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
+                <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
+                    ${title}
+                </div>
+                <div class="p-4">
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+                        ${body}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const fullWidthSection = (title, body) => `
+            <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
+                <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
+                    ${title}
+                </div>
+                <div class="p-4 text-sm leading-7 text-[#1a1410]">
+                    ${body}
+                </div>
+            </div>
+        `;
+
+        const dentalHistoryBody = `
+            ${subSection("Basic Info", `
+                ${row("Last Dental Visit", get("last_dental_visit"))}
+                ${row("Previous Dentist", get("previous_dentist"))}
+            `)}
+
+            ${subSection("Dental Symptoms", `
+                ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
+                ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
+                ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
+                ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
+                ${row("Sores/Lumps", get("dental_answers[sores]"))}
+                ${row("Jaw Injuries", get("dental_answers[injuries]"))}
+            `)}
+
+            ${subSection("Jaw & Bite Symptoms", `
+                ${row("Clicking", get("dental_answers[clicking]"))}
+                ${row("Joint Pain", get("dental_answers[joint_pain]"))}
+                ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
+                ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
+                ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
+                ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
+                ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
+                ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
+                ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
+                ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
+            `)}
+
+            ${subSection("Dental Procedures", `
+                ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
+                ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
+                ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
+                ${row("Dentures", get("dental_answers[dentures]"))}
+                ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
+                ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+            `)}
+
+            ${fullWidthSection("Additional Concerns", `
+                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                    ? get("additional_concerns")
+                    : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
+            `)}
+        `;
+
+        const medicalHistoryBody = `
+            ${subSection("General Health", `
+                ${row("Good Health", get("medical_answers[good_health]"))}
+                ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
+                ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
+                ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
+                ${row("Under Treatment", get("medical_answers[under_treatment]"))}
+                ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
+                ${row("Hospitalized", get("medical_answers[hospitalized]"))}
+                ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
+            `)}
+
+            ${subSection("Allergies", `
+                ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
+                ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
+                ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
+            `)}
+
+            ${subSection("Medications", `
+                ${row("Medication", get("medical_answers[medication]"))}
+                ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
+            `)}
+
+            ${isFemalePatient ? subSection("For Women Only", `
+                ${row("Pregnant", get("medical_answers[pregnant]"))}
+                ${row("Nursing", get("medical_answers[nursing]"))}
+                ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
+            `) : ""}
+
+            ${fullWidthSection("Medical Conditions", `
+                <b class="text-[#5c5550] font-semibold">Selected Conditions:</b> ${diseases}
+            `)}
+
+            ${subSection("Tobacco Use", `
+                ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
+                ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
+                ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
+            `)}
+
+            ${subSection("Do You Suffer From", `
+                ${row("Headaches", get("medical_answers[headaches]"))}
+                ${row("Earaches", get("medical_answers[earaches]"))}
+                ${row("Neck Aches", get("medical_answers[neck_aches]"))}
+            `)}
+        `;
+
+        reviewGrid.innerHTML = `
+            ${summaryCard("Appointment Details", "fa-calendar-check", `
+                <div class="grid grid-cols-1 gap-y-1">
+                    ${row("Service", get("service_type"))}
+                    ${row("Date", get("appointment_date"))}
+                    ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
+                    ${row("Duration", get("procedure_duration_hms"))}
+                </div>
+            `)}
+            ${summaryCard("Dental History", "fa-tooth", dentalHistoryBody)}
+            ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
+            <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+                ${summaryCard("Emergency Contact", "fa-phone", `
+                    <div class="grid grid-cols-1 gap-y-1">
+                        ${row("Name", get("emergency_person"))}
+                        ${row("Number", get("emergency_number"))}
+                        ${row("Relation", get("emergency_relation"))}
+                    </div>
+                `)}
+            </div>
+        `;
+
+        document.querySelectorAll(".sm-grid-1col").forEach(el => {
+            if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
+        });
       }
 
       function resetTimeField(message = 'Enter the original appointment time, or choose from the suggested slots after selecting a date.') {
@@ -1197,6 +1342,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
           if (isLastStep) {
               buildReview();
           }
+
+          window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
     nextBtn.addEventListener('click', function () {
