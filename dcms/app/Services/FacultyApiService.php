@@ -70,7 +70,15 @@ class FacultyApiService
             if ($response->successful()) {
                 $json = $response->json();
 
-                return is_array($json) ? ($json['faculties'] ?? []) : [];
+                if (! is_array($json)) {
+                    return [];
+                }
+
+                return collect($this->extractFacultyList($json))
+                    ->map(fn ($faculty) => is_array($faculty) ? $this->normalizeFaculty($faculty) : null)
+                    ->filter()
+                    ->values()
+                    ->all();
             }
 
             Log::error('Faculty API request failed.', [
@@ -179,6 +187,168 @@ class FacultyApiService
 
         return $baseUrl . '/api/v1';
     }
+
+    private function extractFacultyList(array $payload): array
+    {
+        $possibleLists = [
+            data_get($payload, 'faculties'),
+            data_get($payload, 'data.faculties'),
+            data_get($payload, 'data'),
+            data_get($payload, 'results'),
+            $payload,
+        ];
+
+        foreach ($possibleLists as $list) {
+            if (is_array($list) && array_is_list($list)) {
+                return $list;
+            }
+        }
+
+        return [];
+    }
+
+    private function normalizeFaculty(array $faculty): ?array
+    {
+        $facultyId = data_get($faculty, 'faculty_id')
+            ?? data_get($faculty, 'id')
+            ?? data_get($faculty, 'facultyId');
+
+        $idpUserId = data_get($faculty, 'idp_user_id')
+            ?? data_get($faculty, 'idpUserId')
+            ?? data_get($faculty, 'user_id')
+            ?? data_get($faculty, 'userId');
+
+        $firstName = $this->cleanValue(
+            data_get($faculty, 'first_name')
+                ?? data_get($faculty, 'firstName')
+                ?? data_get($faculty, 'fname')
+                ?? data_get($faculty, 'profile.first_name')
+                ?? data_get($faculty, 'profile.firstName')
+        );
+
+        $middleName = $this->cleanValue(
+            data_get($faculty, 'middle_name')
+                ?? data_get($faculty, 'middleName')
+                ?? data_get($faculty, 'mname')
+                ?? data_get($faculty, 'profile.middle_name')
+                ?? data_get($faculty, 'profile.middleName')
+        );
+
+        $lastName = $this->cleanValue(
+            data_get($faculty, 'last_name')
+                ?? data_get($faculty, 'lastName')
+                ?? data_get($faculty, 'lname')
+                ?? data_get($faculty, 'profile.last_name')
+                ?? data_get($faculty, 'profile.lastName')
+        );
+
+        $suffixName = $this->cleanValue(
+            data_get($faculty, 'suffix_name')
+                ?? data_get($faculty, 'suffixName')
+                ?? data_get($faculty, 'name_suffix')
+                ?? data_get($faculty, 'profile.suffix_name')
+                ?? data_get($faculty, 'profile.suffixName')
+        );
+
+        $composedName = trim(collect([$firstName, $middleName, $lastName, $suffixName])->filter()->implode(' '));
+
+        $name = $this->cleanValue(
+            data_get($faculty, 'name')
+                ?? data_get($faculty, 'full_name')
+                ?? data_get($faculty, 'fullName')
+                ?? ($composedName !== '' ? $composedName : null)
+        );
+
+        $department = $this->cleanValue(
+            data_get($faculty, 'department')
+                ?? data_get($faculty, 'department_name')
+                ?? data_get($faculty, 'departmentName')
+                ?? data_get($faculty, 'profile.department')
+                ?? data_get($faculty, 'profile.department_name')
+                ?? data_get($faculty, 'profile.departmentName')
+        );
+
+        $facultyCode = $this->cleanValue(
+            data_get($faculty, 'faculty_code')
+                ?? data_get($faculty, 'facultyCode')
+                ?? data_get($faculty, 'code')
+        );
+
+        $email = $this->cleanValue(
+            data_get($faculty, 'email')
+                ?? data_get($faculty, 'email_address')
+                ?? data_get($faculty, 'emailAddress')
+                ?? data_get($faculty, 'institutional_email')
+                ?? data_get($faculty, 'institutionalEmail')
+        );
+
+        $contactNumber = $this->cleanValue(
+            data_get($faculty, 'contact_number')
+                ?? data_get($faculty, 'contactNumber')
+                ?? data_get($faculty, 'phone')
+                ?? data_get($faculty, 'mobile_number')
+                ?? data_get($faculty, 'mobileNumber')
+                ?? data_get($faculty, 'profile.contact_number')
+                ?? data_get($faculty, 'profile.contactNumber')
+        );
+
+        $facultyType = $this->cleanValue(
+            data_get($faculty, 'faculty_type')
+                ?? data_get($faculty, 'facultyType')
+                ?? data_get($faculty, 'employment_type')
+                ?? data_get($faculty, 'employmentType')
+        );
+
+        $status = $this->cleanValue(data_get($faculty, 'status'));
+
+        if ($name === '' && $email === '' && $facultyCode === '' && $facultyId === null) {
+            return null;
+        }
+
+        return array_replace_recursive($faculty, [
+            'faculty_id' => $facultyId,
+            'idp_user_id' => $idpUserId,
+            'name' => $name !== '' ? $name : null,
+            'first_name' => $firstName !== '' ? $firstName : null,
+            'middle_name' => $middleName !== '' ? $middleName : null,
+            'last_name' => $lastName !== '' ? $lastName : null,
+            'suffix_name' => $suffixName !== '' ? $suffixName : null,
+            'faculty_code' => $facultyCode !== '' ? $facultyCode : null,
+            'faculty_type' => $facultyType !== '' ? $facultyType : null,
+            'department' => $department !== '' ? $department : null,
+            'email' => $email !== '' ? strtolower($email) : null,
+            'contact_number' => $contactNumber !== '' ? $contactNumber : null,
+            'status' => $status !== '' ? $status : null,
+            'profile' => [
+                'birthday' => data_get($faculty, 'profile.birthday')
+                    ?? data_get($faculty, 'profile.birthdate')
+                    ?? data_get($faculty, 'birthday')
+                    ?? data_get($faculty, 'birthdate'),
+                'gender' => $this->cleanValue(
+                    data_get($faculty, 'profile.gender')
+                        ?? data_get($faculty, 'gender')
+                ),
+                'department' => $department !== '' ? $department : null,
+                'address' => is_array(data_get($faculty, 'profile.address'))
+                    ? data_get($faculty, 'profile.address')
+                    : [],
+            ],
+        ]);
+    }
+
+    private function cleanValue(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+
+        return '';
+    }
+
     public function syncActiveAcademicYearSemester(): AcademicPeriod
     {
         $data = $this->getActiveAcademicYearSemester();
