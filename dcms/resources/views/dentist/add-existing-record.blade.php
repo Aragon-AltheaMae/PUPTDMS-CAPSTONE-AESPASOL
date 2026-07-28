@@ -70,7 +70,7 @@
             @endforelse
         </div>
 
-        <div id="noResults" class="hidden empty-state py-12">
+        <div id="noResults" class="hidden empty-state py-12" hidden>
             <i class="fa-solid fa-magnifying-glass text-3xl text-[#e8e2dd] mb-3"></i>
             <p class="text-sm text-[#9e9690]">No matching patients found.</p>
         </div>
@@ -81,39 +81,166 @@
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('patientSearchInput');
     const clearBtn = document.getElementById('clearSearch');
-    const cards = document.querySelectorAll('.patient-select-card');
+    const patientGrid = document.getElementById('patientGrid');
     const noResults = document.getElementById('noResults');
+    const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
+    const recordUrlTemplate = @json(route('dentist.odontogram.historical.create', ['patient' => '__PATIENT__']));
+    let activeRequestId = 0;
+    let searchTimer = null;
 
-    function filterCards() {
-        const query = input.value.trim().toLowerCase();
-        let visibleCount = 0;
+    function escapeHtml(value) {
+        return String(value || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function buildRecordUrl(patient) {
+        if (patient.record_url) {
+            return patient.record_url;
+        }
+
+        return recordUrlTemplate.replace('__PATIENT__', encodeURIComponent(String(patient.id || '')));
+    }
+
+    function renderEmptyState(message) {
+        if (!patientGrid) return;
+
+        patientGrid.innerHTML = '';
+        noResults.classList.remove('hidden');
+        noResults.removeAttribute('hidden');
+        noResults.querySelector('p').textContent = message;
+    }
+
+    function renderPatients(patients) {
+        if (!patientGrid) return;
+
+        if (!patients.length) {
+            renderEmptyState('No matching patients found.');
+            return;
+        }
+
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+
+        patientGrid.innerHTML = patients.map(function (patient) {
+            const patientName = patient.name || 'Patient';
+            const patientEmail = patient.email || '';
+            const badge = patient.student_number || patient.type || 'Patient';
+            const tags = [];
+
+            if (patient.program) {
+                tags.push(`<span class="patient-select-tag"><i class="fa-solid fa-graduation-cap text-[10px] mr-1"></i>${escapeHtml(patient.program)}</span>`);
+            }
+
+            if (patient.type) {
+                tags.push(`<span class="patient-select-tag"><i class="fa-solid fa-id-badge text-[10px] mr-1"></i>${escapeHtml(patient.type)}</span>`);
+            }
+
+            return `
+                <div class="patient-select-card" data-name="${escapeHtml(String(patientName).toLowerCase())}" data-email="${escapeHtml(String(patientEmail).toLowerCase())}">
+                    <div class="patient-select-card-body">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <p class="patient-select-name">${escapeHtml(patientName)}</p>
+                                <p class="patient-select-meta">${escapeHtml(patientEmail)}</p>
+                            </div>
+                            <span class="patient-select-badge">${escapeHtml(badge)}</span>
+                        </div>
+                        <div class="patient-select-details">
+                            ${tags.join('')}
+                        </div>
+                    </div>
+                    <div class="patient-select-actions">
+                        <a href="${escapeHtml(buildRecordUrl(patient))}" class="select-patient-btn">
+                            <i class="fa-solid fa-arrow-right"></i>
+                            Continue
+                        </a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function loadPatients(query = '', showAll = false) {
+        if (!patientGrid) return;
+
+        const requestId = ++activeRequestId;
+        const params = new URLSearchParams();
+
+        if (query) {
+            params.set('q', query);
+        }
+
+        if (showAll) {
+            params.set('show_all', '1');
+        }
+
+        params.set('limit', '80');
+
+        patientGrid.innerHTML = `
+            <div class="col-span-full empty-state py-12">
+                <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
+                <p class="text-sm text-[#9e9690]">Loading patient records...</p>
+            </div>
+        `;
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+
+        try {
+            const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Search failed with status ${response.status}`);
+            }
+
+            const patients = await response.json();
+
+            if (requestId !== activeRequestId) {
+                return;
+            }
+
+            renderPatients(Array.isArray(patients) ? patients : []);
+        } catch (error) {
+            if (requestId !== activeRequestId) {
+                return;
+            }
+
+            console.error(error);
+            renderEmptyState('Unable to load patient records right now.');
+        }
+    }
+
+    input.addEventListener('input', function () {
+        const query = input.value.trim();
 
         clearBtn.classList.toggle('hidden', !query);
 
-        cards.forEach(function (card) {
-            const name = card.getAttribute('data-name') || '';
-            const email = card.getAttribute('data-email') || '';
-            const student = card.getAttribute('data-student') || '';
-            const program = card.getAttribute('data-program') || '';
-            const match = !query || name.includes(query) || email.includes(query) || student.includes(query) || program.includes(query);
+        if (searchTimer) {
+            clearTimeout(searchTimer);
+        }
 
-            card.style.display = match ? '' : 'none';
-            if (match) visibleCount++;
-        });
+        searchTimer = setTimeout(function () {
+            loadPatients(query, query === '');
+        }, 120);
+    });
 
-        noResults.classList.toggle('hidden', visibleCount > 0);
-    }
-
-    input.addEventListener('input', filterCards);
     clearBtn.addEventListener('click', function () {
         input.value = '';
-        filterCards();
+        clearBtn.classList.add('hidden');
+        loadPatients('', true);
         input.focus();
     });
 
-    if (cards.length > 0) {
-        input.focus();
-    }
+    loadPatients('', true);
+    input.focus();
 });
 </script>
 @endsection
