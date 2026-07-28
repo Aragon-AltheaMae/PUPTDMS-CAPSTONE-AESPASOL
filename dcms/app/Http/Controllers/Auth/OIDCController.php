@@ -357,6 +357,15 @@ class OIDCController extends Controller
         }
 
         $previousRoleSlug = optional($user->role)->slug;
+        $shouldPreserveLocalRole = $user->exists
+            && !$assignedAccess
+            && !($facultyAccess && $facultyAccess->user)
+            && !empty($user->role_id);
+
+        if ($shouldPreserveLocalRole) {
+            $roleId = (int) $user->role_id;
+            $roleSlug = $previousRoleSlug ?: $roleSlug;
+        }
 
         $user->name          = $name ?: $user->name ?: $email;
         $user->first_name    = $firstName !== '' ? $firstName : $user->first_name;
@@ -381,6 +390,7 @@ class OIDCController extends Controller
             'previous_role' => $previousRoleSlug,
             'resolved_role' => $roleSlug,
             'saved_role' => $actualRoleSlug,
+            'preserved_local_role' => $shouldPreserveLocalRole,
         ]);
         $patient = Patient::where('email', $email)->first();
 
