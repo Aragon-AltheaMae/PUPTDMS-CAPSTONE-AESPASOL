@@ -7,26 +7,26 @@
 @vite('resources/css/pages/dentist/add-existing-record.css')
 
 @section('content')
-<main id="mainContent" class="dentist-page-shell">
+<main id="mainContent" class="dentist-page-shell existing-record-page">
     <div class="w-full animate-fade-up pt-6">
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#660000]">
+            <h1 class="existing-record-title text-2xl sm:text-3xl font-extrabold text-[#660000]">
                 <i class="fa-solid fa-folder-open mr-2 text-[#8B0000]"></i>
                 Add Existing Record
             </h1>
-            <span class="text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
+            <span class="existing-record-chip text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
                 Select a patient to import a paper record
             </span>
         </div>
 
-        <div class="section-card mb-6">
+        <div class="section-card existing-record-search-card mb-6">
             <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#9e9690] text-sm"></i>
+                <i class="fa-solid fa-magnifying-glass existing-record-search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[#9e9690] text-sm"></i>
                 <input type="text" id="patientSearchInput"
-                    class="w-full border border-[#e8e2dd] rounded-xl bg-white outline-none pl-10 pr-10 py-3 text-sm"
+                    class="existing-record-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none pl-10 pr-10 py-3 text-sm"
                     placeholder="Search by name, ID, email, or program..."
                     autocomplete="off">
-                <button type="button" id="clearSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9690] hover:text-[#8B0000] hidden">
+                <button type="button" id="clearSearch" class="existing-record-clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9690] hover:text-[#8B0000] hidden">
                     <i class="fa-solid fa-circle-xmark text-lg"></i>
                 </button>
             </div>
@@ -82,11 +82,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('patientSearchInput');
     const clearBtn = document.getElementById('clearSearch');
     const patientGrid = document.getElementById('patientGrid');
+    const initialMarkup = patientGrid ? patientGrid.innerHTML : '';
+    const initialCards = patientGrid ? Array.from(patientGrid.querySelectorAll('.patient-select-card')) : [];
     const noResults = document.getElementById('noResults');
     const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
     const recordUrlTemplate = @json(route('dentist.odontogram.historical.create', ['patient' => '__PATIENT__']));
     let activeRequestId = 0;
     let searchTimer = null;
+    let latestAllPatients = null;
 
     function escapeHtml(value) {
         return String(value || '')
@@ -105,6 +108,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return recordUrlTemplate.replace('__PATIENT__', encodeURIComponent(String(patient.id || '')));
     }
 
+    function patientMatchesQuery(patient, normalizedQuery) {
+        const haystack = [
+            patient.name || '',
+            patient.email || '',
+            patient.student_number || '',
+            patient.program || '',
+            patient.type || '',
+        ].join(' ').toLowerCase();
+
+        return haystack.includes(normalizedQuery);
+    }
+
     function renderEmptyState(message) {
         if (!patientGrid) return;
 
@@ -112,6 +127,67 @@ document.addEventListener('DOMContentLoaded', function () {
         noResults.classList.remove('hidden');
         noResults.removeAttribute('hidden');
         noResults.querySelector('p').textContent = message;
+    }
+
+    function renderInitialPatients() {
+        if (!patientGrid) return;
+
+        if (Array.isArray(latestAllPatients)) {
+            renderPatients(latestAllPatients);
+            return;
+        }
+
+        patientGrid.innerHTML = initialMarkup;
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+    }
+
+    function filterInitialPatients(query) {
+        if (!patientGrid) return false;
+
+        const normalizedQuery = String(query || '').trim().toLowerCase();
+
+        if (!normalizedQuery) {
+            renderInitialPatients();
+            return true;
+        }
+
+        if (Array.isArray(latestAllPatients)) {
+            const filteredPatients = latestAllPatients.filter(function (patient) {
+                return patientMatchesQuery(patient, normalizedQuery);
+            });
+
+            if (!filteredPatients.length) {
+                return false;
+            }
+
+            renderPatients(filteredPatients);
+            return true;
+        }
+
+        const filteredCards = initialCards.filter(function (card) {
+            const haystack = [
+                card.dataset.name || '',
+                card.dataset.email || '',
+                card.dataset.student || '',
+                card.dataset.program || '',
+            ].join(' ');
+
+            return haystack.includes(normalizedQuery);
+        });
+
+        if (!filteredCards.length) {
+            return false;
+        }
+
+        patientGrid.innerHTML = filteredCards.map(function (card) {
+            return card.outerHTML;
+        }).join('');
+
+        noResults.classList.add('hidden');
+        noResults.setAttribute('hidden', 'hidden');
+
+        return true;
     }
 
     function renderPatients(patients) {
@@ -164,9 +240,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }).join('');
     }
 
-    async function loadPatients(query = '', showAll = false) {
+    async function loadPatients(query = '', showAll = false, options = {}) {
         if (!patientGrid) return;
 
+        const showLoading = options.showLoading !== false;
         const requestId = ++activeRequestId;
         const params = new URLSearchParams();
 
@@ -180,14 +257,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         params.set('limit', '80');
 
-        patientGrid.innerHTML = `
-            <div class="col-span-full empty-state py-12">
-                <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
-                <p class="text-sm text-[#9e9690]">Loading patient records...</p>
-            </div>
-        `;
-        noResults.classList.add('hidden');
-        noResults.setAttribute('hidden', 'hidden');
+        if (showLoading) {
+            patientGrid.innerHTML = `
+                <div class="col-span-full empty-state py-12">
+                    <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
+                    <p class="text-sm text-[#9e9690]">Loading patient records...</p>
+                </div>
+            `;
+            noResults.classList.add('hidden');
+            noResults.setAttribute('hidden', 'hidden');
+        }
 
         try {
             const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
@@ -207,14 +286,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            renderPatients(Array.isArray(patients) ? patients : []);
+            const normalizedPatients = Array.isArray(patients) ? patients : [];
+
+            if (showAll && query === '') {
+                latestAllPatients = normalizedPatients;
+            }
+
+            renderPatients(normalizedPatients);
         } catch (error) {
             if (requestId !== activeRequestId) {
                 return;
             }
 
             console.error(error);
-            renderEmptyState('Unable to load patient records right now.');
+
+            if (showLoading) {
+                renderEmptyState('Unable to load patient records right now.');
+            }
         }
     }
 
@@ -228,18 +316,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         searchTimer = setTimeout(function () {
-            loadPatients(query, query === '');
+            if (query === '') {
+                renderInitialPatients();
+                return;
+            }
+
+            if (filterInitialPatients(query)) {
+                return;
+            }
+
+            loadPatients(query, false);
         }, 120);
     });
 
     clearBtn.addEventListener('click', function () {
         input.value = '';
         clearBtn.classList.add('hidden');
-        loadPatients('', true);
+        renderInitialPatients();
         input.focus();
     });
 
-    loadPatients('', true);
+    renderInitialPatients();
+    loadPatients('', true, { showLoading: false });
     input.focus();
 });
 </script>

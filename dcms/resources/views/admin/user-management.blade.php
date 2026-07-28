@@ -37,14 +37,6 @@ $inactiveCount = $inactiveCount ?? 0;
         </script>
         @endif
 
-        @if (session('generated_user_password'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                openModal('generatedPasswordModal');
-            });
-        </script>
-        @endif
-
         @if (session('error'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -545,65 +537,6 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </main>
 
-<div id="generatedPasswordModal" class="ui-modal modal-theme-success" aria-hidden="true">
-
-    <div class="ui-modal-card modal-sm">
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-key"></i>
-                </div>
-
-                <div class="modal-copy">
-                    <h3 class="modal-title">Generated Password</h3>
-                    <p class="modal-subtitle">
-                        Share this with the new user before closing.
-                    </p>
-                </div>
-            </div>
-
-            <button type="button" onclick="closeModal('generatedPasswordModal')" class="modal-x"
-                aria-label="Close generated password modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="modal-bd">
-            <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                <strong>{{ session('generated_user_password.name') }}</strong><br>
-                <span class="text-xs">{{ session('generated_user_password.email') }}</span>
-            </div>
-
-            <div>
-                <label class="form-label" for="generatedUserPasswordValue">
-                    Temporary Password
-                </label>
-
-                <div class="global-control-wrap">
-                    <input type="text" id="generatedUserPasswordValue"
-                        value="{{ session('generated_user_password.password') }}" class="form-input-custom" readonly>
-
-                    <button type="button" onclick="copyGeneratedPassword()" class="ui-btn ui-btn-primary">
-                        <i class="fa-regular fa-copy"></i>
-                        <span>Copy</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="um-password-note">
-                This password is shown only once. Ask the user to change it after first login.
-            </div>
-        </div>
-
-        <div class="modal-ft">
-            <button type="button" onclick="closeModal('generatedPasswordModal')" class="ui-btn ui-btn-secondary">
-                Close
-            </button>
-        </div>
-
-    </div>
-</div>
-
 <div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
     <div class="ui-modal-card modal-xl modal-split-card">
@@ -895,8 +828,8 @@ $inactiveCount = $inactiveCount ?? 0;
                                 Temporary password
 
                                 <span>
-                                    The generated password is saved for the account
-                                    and displayed again after creation.
+                                    The generated password shown here is the exact password
+                                    that will be saved for the account.
                                 </span>
                             </p>
                         </div>
@@ -1772,10 +1705,6 @@ $inactiveCount = $inactiveCount ?? 0;
             input.setAttribute('readonly', 'readonly');
             showSuccessToast('Password copied to clipboard.');
         }
-    }
-
-    function copyGeneratedPassword() {
-        copyFieldValue('generatedUserPasswordValue');
     }
 
     let userPhoneFeedbackTimer = null;
