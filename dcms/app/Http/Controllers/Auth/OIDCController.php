@@ -356,15 +356,15 @@ class OIDCController extends Controller
             ]);
         }
 
+        $previousRoleSlug = optional($user->role)->slug;
+
         $user->name          = $name ?: $user->name ?: $email;
         $user->first_name    = $firstName !== '' ? $firstName : $user->first_name;
         $user->middle_name   = $middleName !== '' ? $middleName : $user->middle_name;
         $user->last_name     = $lastName !== '' ? $lastName : $user->last_name;
         $user->suffix_name   = $suffixName !== '' ? $suffixName : $user->suffix_name;
         $user->email         = $email;
-        if ($user->wasRecentlyCreated) {
-            $user->role_id = $roleId;
-        }
+        $user->role_id       = $roleId;
         $user->sso_user_id   = $ssoUserId ?: $user->sso_user_id;
         $user->access_token  = $accessToken;
         $user->refresh_token = $refreshToken;
@@ -374,6 +374,14 @@ class OIDCController extends Controller
         // I-reload para makuha yung actual role na naka-set sa DB
         $user->refresh();
         $actualRoleSlug = optional($user->role)->slug ?? $roleSlug;
+
+        Log::info('OIDC user role synced', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'previous_role' => $previousRoleSlug,
+            'resolved_role' => $roleSlug,
+            'saved_role' => $actualRoleSlug,
+        ]);
         $patient = Patient::where('email', $email)->first();
 
         if ($patient && !$patient->user_id) {
@@ -589,9 +597,11 @@ class OIDCController extends Controller
                     $userEmail = strtolower((string) $email);
 
                     $facultyId = (string) ($faculty['faculty_id'] ?? '');
+                    $idpUserId = (string) ($faculty['idp_user_id'] ?? '');
                     $currentSsoUserId = (string) ($ssoUserId ?? '');
 
                     return ($facultyEmail !== '' && $facultyEmail === $userEmail)
+                        || ($idpUserId !== '' && $currentSsoUserId !== '' && $idpUserId === $currentSsoUserId)
                         || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
                 });
 

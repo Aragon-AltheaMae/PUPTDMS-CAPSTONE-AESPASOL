@@ -95,6 +95,12 @@
     let hasCalendarRenderedOnce = false;
     let dashboardLoadingTimer = null;
     const dashboardSlotCache = new Map();
+    const sharedCalendarSource = window.createCalendarSource
+        ? window.createCalendarSource(calendarConfig)
+        : null;
+
+    window.__appCalendarSources = window.__appCalendarSources || {};
+    window.__appCalendarSources[calendarConfig.dateInputId] = sharedCalendarSource;
 
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
@@ -133,6 +139,10 @@
     }
 
     function getRuleForDate(dateObj) {
+        if (sharedCalendarSource) {
+            return sharedCalendarSource.getRuleForDate(dateObj);
+        }
+
         if (!calendarConfig.useDynamicScheduleRules) return null;
 
         const dayAbbr = getDayAbbrFromDate(dateObj);
@@ -145,11 +155,19 @@
     }
 
     function getMaxPerDay(dateObj) {
+        if (sharedCalendarSource) {
+            return sharedCalendarSource.getMaxPerDay(dateObj);
+        }
+
         const rule = getRuleForDate(dateObj);
         return rule?.max_slots ?? 0;
     }
 
     function isDateSchedulable(dateObj, iso) {
+        if (sharedCalendarSource) {
+            return sharedCalendarSource.isDateSchedulable(dateObj, iso);
+        }
+
         if (calendarConfig.blockedDates.includes(iso)) {
             return false;
         }
@@ -189,6 +207,21 @@
         }
 
         return response.json();
+    }
+
+    function getSelectedDateValue() {
+        const dateInput = document.getElementById(calendarConfig.dateInputId);
+        const inputValue = String(dateInput?.value || '').trim();
+
+        if (inputValue !== '') {
+            return inputValue;
+        }
+
+        return String(selectedDate || '').trim();
+    }
+
+    function hasSelectedDateValue() {
+        return getSelectedDateValue() !== '';
     }
 
     function getLegendItemsForMode(mode) {
@@ -2014,6 +2047,7 @@
             if (!disabled) {
                 chip.addEventListener("click", () => {
                     const timeError = document.getElementById(calendarConfig.timeErrorId);
+                    const dateError = document.getElementById(calendarConfig.dateErrorId);
                     const slotsWrap = document.querySelector(calendarConfig.slotsWrapSelector);
                     const timeInput = document.getElementById(calendarConfig.timeInputId);
 
@@ -2026,7 +2060,26 @@
                     const currentTimeText = document.getElementById(calendarConfig.selectedTimeTextId ||
                         "selectedTimeText");
 
+                    if (!hasSelectedDateValue()) {
+                        if (dateError) {
+                            dateError.textContent = "Please select a date first.";
+                            dateError.style.display = "block";
+                        }
+
+                        if (timeError) {
+                            timeError.textContent = "Please select a date first.";
+                            timeError.style.display = "block";
+                        }
+
+                        if (slotsWrap) {
+                            slotsWrap.classList.add("error");
+                        }
+
+                        return;
+                    }
+
                     if (timeError) timeError.style.display = "none";
+                    if (dateError) dateError.style.display = "none";
                     if (slotsWrap) slotsWrap.classList.remove("error");
 
                     // click ulit sa same selected time = unselect
