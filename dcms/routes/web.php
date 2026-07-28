@@ -1143,6 +1143,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
         ->name('dentist.walk-in.start');
 
+    Route::get('/add-existing-record', [\App\Http\Controllers\Dentist\ExistingRecordController::class, 'index'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.existing-record.index');
+
     // Document Requests
     //     if (session('role') !== 'dentist') {
     //         return redirect('/login');

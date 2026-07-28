@@ -160,64 +160,70 @@
             ],
         ],
 
-        'dentist' => [
-            [
-                'section' => 'Navigation',
-                'label' => 'Navigation',
-                'sublabel' => 'Dental clinic tools',
-                'icon' => 'fa-tooth',
-                'items' => [
-                    [
-                        'route' => 'dentist.dentist.dashboard',
-                        'active' => ['dentist.dentist.dashboard'],
-                        'icon' => 'fa-chart-line',
-                        'label' => 'Dashboard',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.patients',
-                        'active' => ['dentist.dentist.patients'],
-                        'icon' => 'fa-users',
-                        'label' => 'Patients',
-                    ],
-                    [
-                        'route' => 'dentist.walk-in.index',
-                        'active' => ['dentist.walk-in.*'],
-                        'icon' => 'fa-person-walking',
-                        'label' => 'Walk-in',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.appointments',
-                        'active' => ['dentist.dentist.appointments'],
-                        'icon' => 'fa-calendar-check',
-                        'label' => 'Appointments',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.clinic_schedule',
-                        'active' => ['dentist.dentist.clinic_schedule*'],
-                        'icon' => 'fa-calendar-days',
-                        'label' => 'Clinic Schedule',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.documentrequests',
-                        'active' => ['dentist.dentist.documentrequests'],
-                        'icon' => 'fa-file-circle-check',
-                        'label' => 'Document Requests',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.inventory',
-                        'active' => ['dentist.dentist.inventory'],
-                        'icon' => 'fa-box',
-                        'label' => 'Inventory',
-                    ],
-                    [
-                        'route' => 'dentist.dentist.report',
-                        'active' => ['dentist.dentist.report'],
-                        'icon' => 'fa-file',
-                        'label' => 'Reports',
-                    ],
-                ],
-            ],
-        ],
+'dentist' => [
+[
+'section' => 'Navigation',
+'label' => 'Navigation',
+'sublabel' => 'Dental clinic tools',
+'icon' => 'fa-tooth',
+'items' => [
+[
+'route' => 'dentist.dentist.dashboard',
+'active' => ['dentist.dentist.dashboard'],
+'icon' => 'fa-chart-line',
+'label' => 'Dashboard',
+],
+[
+'route' => 'dentist.dentist.patients',
+'active' => ['dentist.dentist.patients'],
+'icon' => 'fa-users',
+'label' => 'Patients',
+],
+      [
+      'route' => 'dentist.walk-in.index',
+      'active' => ['dentist.walk-in.*'],
+      'icon' => 'fa-person-walking',
+      'label' => 'Walk-in',
+    ],
+    [
+      'route' => 'dentist.existing-record.index',
+      'active' => ['dentist.existing-record.*'],
+      'icon' => 'fa-folder-open',
+      'label' => 'Add Existing Record',
+    ],
+    [
+      'route' => 'dentist.dentist.appointments',
+'active' => ['dentist.dentist.appointments'],
+'icon' => 'fa-calendar-check',
+'label' => 'Appointments',
+],
+[
+'route' => 'dentist.dentist.clinic_schedule',
+'active' => ['dentist.dentist.clinic_schedule*'],
+'icon' => 'fa-calendar-days',
+'label' => 'Clinic Schedule',
+],
+[
+'route' => 'dentist.dentist.documentrequests',
+'active' => ['dentist.dentist.documentrequests'],
+'icon' => 'fa-file-circle-check',
+'label' => 'Document Requests',
+],
+[
+'route' => 'dentist.dentist.inventory',
+'active' => ['dentist.dentist.inventory'],
+'icon' => 'fa-box',
+'label' => 'Inventory',
+],
+[
+'route' => 'dentist.dentist.report',
+'active' => ['dentist.dentist.report'],
+'icon' => 'fa-file',
+'label' => 'Reports',
+],
+],
+],
+],
 
         'patient' => [
             [

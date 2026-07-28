@@ -55,7 +55,6 @@ body.role-dentist #mainContent.book-container .historical-book-page {
     margin-top: 0.45rem;
     font-size: 0.74rem;
     font-weight: 600;
-    color: #8c817a;
 }
 
 .history-question-block {
@@ -145,38 +144,6 @@ body.role-dentist #mainContent.book-container .historical-book-page {
     color: #4b3f38;
 }
 
-.historical-review-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-}
-
-.historical-review-item {
-    border: 1px solid #ece3de;
-    border-radius: 18px;
-    background: linear-gradient(180deg, #fffefe 0%, #fff8f7 100%);
-    padding: 1rem;
-}
-
-.historical-review-item span {
-    display: block;
-    margin-bottom: 0.35rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #8c817a;
-}
-
-.historical-review-item strong {
-    color: #1a1410;
-    line-height: 1.5;
-}
-
-.historical-review-span {
-    grid-column: span 2;
-}
-
 .historical-nav-actions {
     display: flex;
     align-items: center;
@@ -187,13 +154,12 @@ body.role-dentist #mainContent.book-container .historical-book-page {
 
 @media (max-width: 768px) {
     .historical-service-grid,
-    .historical-checkbox-grid,
-    .historical-review-grid {
+    .historical-checkbox-grid {
         grid-template-columns: 1fr;
     }
 
-    .historical-review-span {
-        grid-column: span 1;
+    .sm-grid-1col {
+        grid-template-columns: 1fr !important;
     }
 
     .history-question-row,

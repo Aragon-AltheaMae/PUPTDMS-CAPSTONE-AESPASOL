@@ -30,10 +30,12 @@ class WalkInController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($service) {
+                $image = trim((string) ($service->image ?? ''));
+
                 return [
                     'name' => $service->name,
                     'desc' => $service->description ?? 'Dental service available for walk-in appointment.',
-                    'img' => $service->image ?? null,
+                    'img' => $image !== '' ? $image : null,
                 ];
             });
 
@@ -230,6 +232,8 @@ class WalkInController extends Controller
 
                 $haystack = strtolower(implode(' ', array_filter([
                     (string) ($faculty['name'] ?? ''),
+                    (string) ($faculty['first_name'] ?? ''),
+                    (string) ($faculty['last_name'] ?? ''),
                     (string) ($faculty['email'] ?? ''),
                     (string) ($faculty['faculty_code'] ?? ''),
                     (string) data_get($faculty, 'profile.department'),
@@ -240,16 +244,27 @@ class WalkInController extends Controller
             ->take($limit)
             ->map(function (array $faculty) {
                 return DB::transaction(function () use ($faculty) {
+                    $firstName = trim((string) ($faculty['first_name'] ?? ''));
+                    $lastName = trim((string) ($faculty['last_name'] ?? ''));
                     $name = trim((string) ($faculty['name'] ?? ''));
+
+                    if ($name === '') {
+                        $name = trim($firstName . ' ' . $lastName);
+                    }
+
+                    if ($name === '') {
+                        $name = 'Faculty Member';
+                    }
+
                     $email = strtolower((string) ($faculty['email'] ?? ('faculty_' . Str::uuid() . '@walkin.local')));
 
                     $user = $this->syncWalkInUser([
-                        'name' => $name !== '' ? $name : 'Faculty Member',
+                        'name' => $name,
                         'email' => $email,
                     ]);
 
                     $patient = $this->syncWalkInPatient($user, [
-                        'name' => $name !== '' ? $name : 'Faculty Member',
+                        'name' => $name,
                         'email' => $email,
                         'phone' => $faculty['contact_number'] ?? null,
                         'gender' => data_get($faculty, 'profile.gender'),
