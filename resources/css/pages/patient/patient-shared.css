@@ -1,0 +1,115 @@
+body.role-patient {
+    background-color: var(--page-bg);
+    color: var(--page-text);
+}
+
+body.role-patient .patient-page-shell {
+    padding: 78px 0.75rem 1.25rem;
+    min-height: 100dvh;
+    flex: 1 1 auto;
+    background: #F9FAFB;
+    color: #111827;
+    margin-top: 1rem !important;
+}
+
+@media (min-width: 768px) {
+    body.role-patient .patient-page-shell {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    body.role-patient .patient-page-shell {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+[data-theme="dark"] body.role-patient .patient-page-shell,
+.dark body.role-patient .patient-page-shell {
+    background: #101111 !important;
+    color: #F3F4F6 !important;
+}
+
+body.role-patient #mobileBottomNav {
+    position: fixed;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: min(calc(100dvw - 24px), 420px);
+    max-width: 420px;
+    margin: 0;
+}
+
+body.role-patient #mobFabMenu {
+    position: fixed;
+    left: 50%;
+    bottom: 96px;
+    width: min(230px, calc(100dvw - 32px));
+    transform: translateX(-50%) translateY(10px) scale(.95);
+    margin: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+    z-index: 10000;
+}
+
+body.role-patient #mobFabMenu.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+body.role-patient #mobFab i {
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+body.role-patient #mobFab.open i {
+    transform: rotate(135deg);
+}
+
+@media only screen and (max-width: 1199px) {
+    body.role-patient #mobileBottomNav {
+        display: block !important;
+        position: fixed !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: 12px !important;
+        transform: translateX(-50%) !important;
+        width: min(calc(100vw - 24px), 420px) !important;
+        max-width: 420px !important;
+        margin: 0 !important;
+        z-index: 9999 !important;
+    }
+
+    body.role-patient #mobFabMenu {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) translateY(10px) scale(.95) !important;
+        z-index: 10000 !important;
+    }
+
+    body.role-patient #mobFabMenu.open {
+        transform: translateX(-50%) translateY(0) scale(1) !important;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    body.role-patient #mobileBottomNav {
+        display: none !important;
+    }
+}
+
+[data-theme="dark"] body.role-patient #mobileBottomNav,
+.dark body.role-patient #mobileBottomNav {
+    background-color: #0d1117;
+    border-color: #21262d;
+}
+
+[data-theme="dark"] body.role-patient #mobFab,
+.dark body.role-patient #mobFab {
+    border-color: #101111;
+}
