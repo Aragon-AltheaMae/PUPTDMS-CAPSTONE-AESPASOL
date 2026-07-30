@@ -14,44 +14,6 @@
     gap: 1rem;
 }
 
-.academic-view-toggle {
-    display: inline-flex;
-    align-items: center;
-    background: #FAFAF9;
-    border: 1.5px solid #E0DDD8;
-    border-radius: 14px;
-    padding: 4px;
-    gap: 4px;
-    height: 42px;
-}
-
-.academic-view-btn {
-    width: 38px;
-    height: 34px;
-    border: none;
-    background: transparent;
-    color: #6b7280;
-    border-radius: 10px;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all .15s ease;
-    flex-shrink: 0;
-}
-
-.academic-view-btn:hover {
-    background: #f3f4f6;
-    color: #8B0000;
-}
-
-.academic-view-btn.active {
-    background: #8B0000;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(139, 0, 0, .15);
-}
-
 @media (min-width:1024px) {
     .active-banner-inner {
         flex-direction: row;
@@ -68,228 +30,12 @@
     overflow: hidden;
 }
 
-.s-active {
-    background: #fee2e2;
-    color: #8B0000;
-}
-
-.s-upcoming {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-.s-ended {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-.s-inactive {
-    background: #fef9c3;
-    color: #92400e;
-}
-
-.ap-modal-shell {
-    background: linear-gradient(180deg, #ffffff 0%, #fffdfc 100%);
-}
-
-.ap-modal-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding: 1.1rem 1.35rem;
-    border-bottom: 1px solid #f5dede;
-    background: linear-gradient(180deg, #fff7f7 0%, #ffffff 90%);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.ap-modal-titlewrap {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    min-width: 0;
-}
-
-.ap-modal-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, .12);
-    flex-shrink: 0;
-}
-
-.ap-modal-icon.add {
-    background: linear-gradient(145deg, #8b0000, #b80000);
-}
-
-.ap-modal-icon.edit {
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-}
-
-.ap-modal-icon.delete {
-    background: linear-gradient(145deg, #b91c1c, #ef4444);
-}
-
-.ap-modal-close {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid #f0dcdc;
-    color: #94a3b8;
-    background: #fff;
-    transition: all .2s;
-}
-
-.ap-modal-close:hover {
-    color: #8B0000;
-    border-color: #f6bcbc;
-    background: #fff5f5;
-}
-
-.ap-modal-body {
-    padding: 1.2rem 1.35rem 1rem;
-    display: grid;
-    gap: 1rem;
-    background: linear-gradient(180deg, #ffffff 0%, #fffafa 100%);
-}
-
-.ap-modal-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 800;
-    color: #4b5563;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-bottom: .45rem;
-}
-
-.ap-modal-sem-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    align-items: stretch;
-}
-
-.ap-sem-card {
-    position: relative;
-}
-
-.ap-sem-input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.ap-sem-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    min-height: 76px;
-    border-radius: 16px;
-    border: 1.5px solid #e5e7eb;
-    padding: 14px 10px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: #64748b;
-    background: #fff;
-    transition: all .2s ease;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    z-index: 1;
-}
-
-.ap-sem-option i {
-    font-size: 16px;
-    margin: 0;
-}
-
-.ap-sem-option:hover {
-    border-color: #8B0000;
-    color: #8B0000;
-    box-shadow: 0 4px 14px rgba(139, 0, 0, .08);
-}
-
-.ap-sem-input:checked+.ap-sem-option {
-    background: #8B0000;
-    color: #fff;
-    border-color: #8B0000;
-    box-shadow: 0 10px 24px rgba(139, 0, 0, .18);
-}
-
-.ap-sem-input:focus+.ap-sem-option {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, .12);
-}
-
 .ap-add-form {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
     height: 100%;
-}
-
-.ap-add-header-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-width: 0;
-}
-
-.ap-add-header-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(145deg, #8b0000, #b80000);
-    color: #fff;
-    box-shadow: 0 12px 24px rgba(139, 0, 0, 0.18);
-    flex-shrink: 0;
-}
-
-.ap-add-header-title {
-    font-size: 1.35rem;
-    font-weight: 900;
-    color: #0c111b;
-    line-height: 1.15;
-    margin: 0;
-}
-
-.ap-add-header-subtitle {
-    margin: 0.25rem 0 0;
-    font-size: 0.82rem;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.ap-add-close {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #94a3b8;
-    transition: all .2s ease;
-    flex-shrink: 0;
-}
-
-.ap-add-close:hover {
-    color: #8B0000;
-    border-color: #fecaca;
-    background: #fff5f5;
 }
 
 .ap-add-body {
@@ -471,51 +217,6 @@
     box-sizing: border-box;
 }
 
-.ap-desc-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: .75rem;
-    margin-top: .7rem;
-    flex-wrap: wrap;
-}
-
-.ap-desc-help {
-    font-size: 12px;
-    font-weight: 700;
-    color: #94a3b8;
-}
-
-.ap-word-counter {
-    margin-left: auto;
-    font-size: 12px;
-    font-weight: 800;
-    color: #64748b;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    transition: all .2s ease;
-}
-
-.ap-word-counter.is-warning {
-    color: #a16207;
-    background: #fef9c3;
-    border-color: #fde68a;
-}
-
-.ap-word-counter.is-danger {
-    color: #b91c1c;
-    background: #fee2e2;
-    border-color: #fecaca;
-}
-
-.ap-word-counter.is-invalid {
-    color: #991b1b;
-    background: #fef2f2;
-    border-color: #fca5a5;
-}
-
 .ap-input:focus,
 .ap-textarea:focus {
     outline: none;
@@ -629,168 +330,6 @@
     line-height: 1.4;
 }
 
-.ap-switch {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.ap-switch input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.ap-switch-slider {
-    width: 48px;
-    height: 29px;
-    border-radius: 999px;
-    background: #d1d5db;
-    position: relative;
-    transition: .2s ease;
-}
-
-.ap-add-header {
-    position: relative;
-    flex-shrink: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem 1rem;
-    border-bottom: 1px solid #eef2f7;
-    background: #ffffff;
-    overflow: hidden;
-}
-
-.ap-add-header::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 5px;
-    background: linear-gradient(90deg, #8b0000, #dc2626);
-}
-
-#editModal .ap-add-header::before {
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
-}
-
-.ap-add-header-left {
-    display: flex;
-    align-items: center;
-    gap: .95rem;
-    min-width: 0;
-    flex: 1;
-}
-
-.ap-add-header-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
-    background: linear-gradient(145deg, #8b0000, #b80000);
-}
-
-#editModal .ap-add-header-icon {
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-}
-
-.ap-add-header-title {
-    font-size: 1.5rem;
-    font-weight: 900;
-    line-height: 1.1;
-    color: #0f172a;
-    margin: 0;
-}
-
-.ap-add-header-subtitle {
-    margin: .28rem 0 0;
-    font-size: .88rem;
-    color: #64748b;
-    font-weight: 500;
-    line-height: 1.35;
-}
-
-.ap-add-close {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    color: #94a3b8;
-    transition: all .2s ease;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ap-add-close:hover {
-    color: #8b0000;
-    border-color: #fecaca;
-    background: #fff5f5;
-}
-
-#editModal .ap-add-close:hover {
-    color: #2563eb;
-    border-color: #bfdbfe;
-    background: #eff6ff;
-}
-
-.ap-switch-slider::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
-    transition: .2s ease;
-}
-
-.ap-switch input:checked+.ap-switch-slider {
-    background: var(--switch-color, #8B0000);
-}
-
-.ap-switch input:checked+.ap-switch-slider::after {
-    transform: translateX(20px);
-}
-
-.ap-add-footer {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .75rem;
-    padding-top: 1.15rem;
-    border-top: 1px solid #eef2f7;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(10px);
-}
-
-.ap-add-btn {
-    height: 46px;
-    border-radius: 14px;
-    padding: 0 1.2rem;
-    font-size: 13px;
-    font-weight: 800;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .55rem;
-    border: 1px solid transparent;
-    transition: all .2s ease;
-}
-
 .ap-desc-panel {
     display: flex;
     flex-direction: column;
@@ -798,27 +337,6 @@
 
 .ap-desc-panel .field-error {
     margin-top: .45rem;
-}
-
-.ap-add-btn-cancel {
-    background: #fff;
-    color: #4b5563;
-    border-color: #e5e7eb;
-}
-
-.ap-add-btn-cancel:hover {
-    background: #f9fafb;
-    border-color: #cbd5e1;
-}
-
-.ap-add-btn-submit {
-    background: linear-gradient(145deg, #8b0000, #760000);
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(139, 0, 0, 0.16);
-}
-
-.ap-add-btn-submit:hover {
-    filter: brightness(1.04);
 }
 
 @media (max-width: 991px) {
@@ -832,14 +350,6 @@
 }
 
 @media (max-width: 767px) {
-    .ap-add-modal {
-        align-items: flex-end;
-        justify-content: center;
-        padding: 0;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.42);
-        backdrop-filter: blur(5px);
-    }
 
     .ap-add-form {
         display: flex;
@@ -847,71 +357,6 @@
         height: 100%;
         min-height: 0;
         overflow: hidden;
-    }
-
-    .ap-add-header {
-        flex-shrink: 0;
-        display: grid;
-        grid-template-columns: 44px minmax(0, 1fr) 38px;
-        align-items: start;
-        column-gap: .75rem;
-        padding: 1.35rem 1rem .95rem;
-        padding-top: 2rem;
-        border-radius: 22px 22px 0 0;
-    }
-
-    .ap-add-header-left {
-        display: contents;
-    }
-
-    .ap-add-header-icon {
-        grid-column: 1;
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        flex-shrink: 0;
-    }
-
-    .ap-add-header-left>div:last-child {
-        grid-column: 2;
-        min-width: 0;
-        width: 100%;
-    }
-
-    .ap-add-header-title {
-        font-size: 1rem;
-        line-height: 1.08;
-        margin: 0;
-        word-break: break-word;
-    }
-
-    .ap-add-header-subtitle {
-        display: block;
-        font-size: .72rem;
-        margin-top: .22rem;
-        line-height: 1.3;
-        color: #64748b;
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-        max-width: 100%;
-        padding-right: .15rem;
-    }
-
-    .ap-add-close {
-        grid-column: 3;
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        flex-shrink: 0;
-        align-self: start;
-        justify-self: end;
-    }
-
-    #editModal .ap-add-header-subtitle {
-        max-width: 100%;
-        font-size: .7rem;
-        line-height: 1.28;
     }
 
     .ap-add-body {
@@ -982,16 +427,6 @@
         padding: 14px 15px;
     }
 
-    .ap-desc-meta {
-        gap: .5rem;
-        align-items: flex-start;
-    }
-
-    .ap-desc-help,
-    .ap-word-counter {
-        font-size: 11px;
-    }
-
     .ap-active-card {
         flex-direction: column;
         align-items: stretch;
@@ -1016,48 +451,19 @@
         font-size: 11px;
         line-height: 1.45;
     }
-
-    .ap-switch {
-        align-self: flex-end;
-    }
-
-    .ap-add-footer {
-        flex-shrink: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: .7rem;
-        padding: .85rem 1rem calc(.95rem + env(safe-area-inset-bottom));
-        background: rgba(255, 255, 255, 0.97);
-        backdrop-filter: blur(12px);
-        border-top: 1px solid #e9eef5;
-    }
-
-    .ap-add-footer .ap-add-btn {
-        width: 100%;
-        min-width: 0;
-        height: 44px;
-        border-radius: 13px;
-        font-size: 12px;
-        padding: 0 .85rem;
-    }
 }
 
-[data-theme="dark"] .ap-add-header,
-[data-theme="dark"] .ap-add-footer,
 [data-theme="dark"] .ap-panel,
 [data-theme="dark"] .ap-panel-soft,
-[data-theme="dark"] .ap-active-card,
-[data-theme="dark"] .ap-add-close {
+[data-theme="dark"] .ap-active-card {
     background: #161b22 !important;
     border-color: #2b313a !important;
 }
 
-[data-theme="dark"] .ap-add-header-title,
 [data-theme="dark"] .ap-active-title {
     color: #e5e7eb !important;
 }
 
-[data-theme="dark"] .ap-add-header-subtitle,
 [data-theme="dark"] .ap-active-desc,
 [data-theme="dark"] .ap-label-text,
 [data-theme="dark"] .ap-label-hint {
@@ -1072,137 +478,10 @@
     color: #e5e7eb !important;
 }
 
-@media (max-width: 767px) {
-    .ap-modal-sem-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .ap-sem-option {
-        min-height: 68px;
-        font-size: 12px;
-    }
-}
-
 .ap-date-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .75rem;
-}
-
-.ap-active-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border: 1px solid #f0e2e2;
-    background: linear-gradient(90deg, #fff8f8 0%, #f9fafb 100%);
-    border-radius: 14px;
-    padding: .85rem 1rem;
-    gap: 1rem;
-}
-
-.ap-modal-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    padding: .9rem 1.35rem 1.1rem;
-    border-top: 1px solid #f5dede;
-    background: linear-gradient(180deg, rgba(255, 255, 255, .94), #ffffff 70%);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .6rem;
-}
-
-.ap-btn {
-    height: 42px;
-    padding: 0 1.1rem;
-    border-radius: 11px;
-    border: 1px solid transparent;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    font-size: 13px;
-    font-weight: 700;
-    transition: all .2s;
-}
-
-.ap-btn-ghost {
-    color: #4b5563;
-    border-color: #e5e7eb;
-    background: #fff;
-}
-
-.ap-btn-ghost:hover {
-    border-color: #cbd5e1;
-    background: #f9fafb;
-}
-
-.ap-btn-primary {
-    color: #fff;
-    background: linear-gradient(145deg, #8b0000, #760000);
-}
-
-.ap-btn-primary:hover {
-    filter: brightness(1.04);
-}
-
-.ap-btn-primary-blue {
-    color: #fff;
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-}
-
-.ap-btn-primary-blue:hover {
-    filter: brightness(1.05);
-}
-
-.ap-btn-danger {
-    color: #fff;
-    background: linear-gradient(145deg, #b91c1c, #dc2626);
-}
-
-.ap-btn-danger:hover {
-    filter: brightness(1.05);
-}
-
-.ap-field-block {
-    display: grid;
-    gap: 8px;
-}
-
-.ap-input-shell {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.ap-input-left-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 13px;
-    color: #9ca3af;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.ap-text-input {
-    width: 100%;
-    height: 50px;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding-left: 42px;
-    padding-right: 44px;
-    font-size: 14px;
-    line-height: 1.2;
-    background: #fff;
-}
-
-.ap-text-input::placeholder {
-    color: #a1a1aa;
 }
 
 .reset-btn {
@@ -1249,46 +528,6 @@
     color: #E5E7EB !important;
 }
 
-[data-theme="dark"] .flyout-panel {
-    background: #161b22;
-    border-color: #2d1a1a;
-}
-
-[data-theme="dark"] .flyout-link {
-    color: #d1d5db;
-}
-
-[data-theme="dark"] .ap-modal-header {
-    background: linear-gradient(180deg, #1a1f27 0%, #161b22 100%);
-    border-color: #2b313a;
-}
-
-[data-theme="dark"] .ap-modal-body {
-    background: linear-gradient(180deg, #161b22 0%, #0f141a 100%);
-}
-
-[data-theme="dark"] .ap-modal-footer {
-    background: linear-gradient(180deg, rgba(22, 27, 34, .9), #161b22 70%);
-    border-color: #2b313a;
-}
-
-[data-theme="dark"] .ap-active-toggle {
-    border-color: #2b313a;
-    background: #0f141a;
-}
-
-[data-theme="dark"] .ap-sem-option {
-    background: #0d1117;
-    border-color: #2b313a;
-    color: #d1d5db;
-}
-
-[data-theme="dark"] .ap-btn-ghost {
-    background: #0f141a;
-    border-color: #2b313a;
-    color: #d1d5db;
-}
-
 [data-theme="dark"] .academic-period-page thead tr {
     background: #0d1117 !important;
 }
@@ -1310,180 +549,9 @@
     border-color: #21262d !important;
 }
 
-.ap-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.ap-toolbar-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-}
-
-.ap-toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.ap-table-wrap {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.ap-table {
-    width: 100%;
-    min-width: 760px;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.ap-table th,
-.ap-table td {
-    vertical-align: middle;
-    white-space: nowrap;
-}
-
-.ap-table td.col-year,
-.ap-table td.col-semester {
-    white-space: normal;
-}
-
-.ap-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.ap-empty {
-    padding: 3rem 1rem;
-}
-
-.academic-grid-view {
-    display: none;
-    padding: 14px;
-    gap: 12px;
-}
-
-.academic-card {
-    background: #fff;
-    border: 1px solid #f1e8e8;
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
-}
-
-.academic-card.is-active {
-    border-color: #f3c9c9;
-    box-shadow: 0 4px 16px rgba(139, 0, 0, .08);
-}
-
-.academic-card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.academic-card-year {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-width: 0;
-}
-
-.academic-card-year-text {
-    font-size: 14px;
-    font-weight: 800;
-    color: #0c111b;
-    line-height: 1.2;
-}
-
-.academic-card-meta {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.academic-card-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.academic-card-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: #9ca3af;
-    min-width: 70px;
-}
-
-.academic-card-value {
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
-    text-align: right;
-    line-height: 1.35;
-}
-
-.academic-card-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.academic-card-actions .act,
-.academic-card-actions form {
-    flex: 1;
-}
-
-.academic-card-actions form .act {
-    width: 100%;
-}
-
-@media (max-width: 1023px) {
-    .ap-toolbar {
-        align-items: stretch;
-    }
-
-    .ap-toolbar-right {
-        width: 100%;
-        justify-content: flex-start;
-    }
-}
-
 @media (max-width: 767px) {
     .active-banner-inner {
         padding: 1rem;
-    }
-
-    .ap-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .ap-toolbar-left,
-    .ap-toolbar-right {
-        width: 100%;
-    }
-
-    .ap-toolbar-right {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
     }
 
     .reset-btn {
@@ -1499,103 +567,8 @@
         justify-content: center;
     }
 
-    #academicViewToggle {
-        display: none !important;
-    }
-
-    #academicListView {
-        display: none !important;
-    }
-
-    #academicGridView {
-        display: grid !important;
+    .ap-date-grid {
         grid-template-columns: 1fr;
-    }
-
-    .ap-table {
-        min-width: 640px;
-    }
-
-    .ap-table th,
-    .ap-table td {
-        padding: 10px 12px !important;
-        font-size: 12px;
-    }
-
-    .ap-table thead th:nth-child(4),
-    .ap-table tbody td:nth-child(4),
-    .ap-table thead th:nth-child(5),
-    .ap-table tbody td:nth-child(5) {
-        display: none;
-    }
-
-    .ap-actions {
-        gap: 6px;
-    }
-
-    .ap-modal-header {
-        padding: .95rem 1rem;
-    }
-
-    .ap-modal-body {
-        padding: 1rem;
-        gap: .9rem;
-    }
-
-    .ap-modal-sem-grid,
-    .ap-date-grid,
-    .ap-delete-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .ap-active-toggle {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: .7rem;
-    }
-
-    .ap-modal-footer {
-        padding: .8rem 1rem 1rem;
-        justify-content: stretch;
-    }
-
-    .ap-modal-footer .ap-btn {
-        flex: 1;
-    }
-
-    .ap-delete-body {
-        padding: 1.1rem 1rem;
-    }
-}
-
-@media (max-width: 640px) {
-    #editModal .ap-add-footer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: .9rem 1rem calc(1rem + env(safe-area-inset-bottom));
-    }
-
-    #editModal .ap-add-footer .ap-add-btn {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    #editModal .ap-add-footer .ap-add-btn[type="submit"] {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .5rem;
-        text-align: center;
-        line-height: 1.15;
-        padding: 0 1rem;
-    }
-
-    #editModal .ap-add-footer .ap-add-btn[type="submit"] i {
-        flex-shrink: 0;
-        font-size: 12px;
-        line-height: 1;
     }
 }
 
@@ -1606,48 +579,31 @@
 
 [data-theme="dark"] .academic-period-page .bg-white.rounded-xl.shadow.border.border-gray-100,
 [data-theme="dark"] .cal-card,
-[data-theme="dark"] .active-banner,
-[data-theme="dark"] .academic-card {
+[data-theme="dark"] .active-banner {
     background: linear-gradient(145deg, rgba(22, 27, 34, .90), rgba(13, 17, 23, .82)) !important;
     border-color: rgba(255, 255, 255, .10) !important;
     box-shadow: 0 14px 34px rgba(0, 0, 0, .32) !important;
 }
 
 [data-theme="dark"] .academic-period-page .bg-gray-50,
-[data-theme="dark"] .ap-toolbar,
 [data-theme="dark"] .border-t.bg-gray-50 {
     background: rgba(13, 17, 23, .90) !important;
     border-color: rgba(255, 255, 255, .08) !important;
 }
 
-[data-theme="dark"] .reset-btn,
-[data-theme="dark"] .academic-view-toggle {
+[data-theme="dark"] .reset-btn {
     background: rgba(255, 255, 255, .06) !important;
     border-color: rgba(255, 255, 255, .12) !important;
     color: #d1d5db !important;
 }
 
-[data-theme="dark"] .ap-table td,
-[data-theme="dark"] .ap-table td span,
-[data-theme="dark"] .academic-card-value,
-[data-theme="dark"] .academic-card-year-text,
-[data-theme="dark"] #liveDate {
-    color: #d1d5db !important;
-}
-
 [data-theme="dark"] .academic-period-page h2.text-gray-800,
-[data-theme="dark"] .ap-toolbar-left h2,
 [data-theme="dark"] .cal-card h2 {
     color: #FCA5A5 !important;
 }
 
 [data-theme="dark"] #liveClock {
     color: #fef6f6 !important;
-}
-
-[data-theme="dark"] #calYear {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .academic-period-page .group>div:first-child {
@@ -1662,47 +618,6 @@
 [data-theme="dark"] #calendarList div[style*="background"] {
     background: rgba(255, 255, 255, .08) !important;
     border-color: rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] .ap-table tbody tr.tbl-row {
-    background: rgba(255, 255, 255, .025) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
-}
-
-[data-theme="dark"] .ap-table tbody tr.tbl-row.is-active {
-    background: rgba(252, 165, 165, .055) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035) !important;
-}
-
-[data-theme="dark"] .ap-table tbody tr.tbl-row:hover {
-    background: rgba(255, 255, 255, .04) !important;
-}
-
-[data-theme="dark"] .academic-item[data-semester="Summer"] .sem-pill {
-    background: linear-gradient(135deg, rgba(251, 191, 36, .24), rgba(245, 158, 11, .10)) !important;
-    border: 1px solid rgba(252, 211, 77, .32) !important;
-    color: #fcd34d !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 2px 6px rgba(245, 158, 11, .12) !important;
-}
-
-[data-theme="dark"] .academic-item[data-semester="2nd Semester"] .sem-pill {
-    background: linear-gradient(135deg, rgba(96, 165, 250, .24), rgba(37, 99, 235, .10)) !important;
-    border: 1px solid rgba(147, 197, 253, .32) !important;
-    color: #93c5fd !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 2px 6px rgba(59, 130, 246, .12) !important;
-}
-
-[data-theme="dark"] .academic-item[data-semester="1st Semester"] .sem-pill {
-    background: linear-gradient(135deg, rgba(248, 113, 113, .24), rgba(239, 68, 68, .10)) !important;
-    border: 1px solid rgba(252, 165, 165, .32) !important;
-    color: #fca5a5 !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 2px 6px rgba(239, 68, 68, .12) !important;
 }
 
 [data-theme="dark"] #openAddPeriodQuickBtn .font-bold,
@@ -1722,9 +637,7 @@
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] .ap-add-header,
 [data-theme="dark"] .ap-add-body,
-[data-theme="dark"] .ap-add-footer,
 [data-theme="dark"] .ap-panel,
 [data-theme="dark"] .ap-panel-soft,
 [data-theme="dark"] .ap-active-card,
@@ -1736,31 +649,14 @@
     color: #e5e7eb !important;
 }
 
-[data-theme="dark"] .ap-add-header-title,
 [data-theme="dark"] .ap-active-title {
     color: #e5e7eb !important;
 }
 
-[data-theme="dark"] .ap-add-header-subtitle,
 [data-theme="dark"] .ap-active-desc,
 [data-theme="dark"] .ap-label-text,
 [data-theme="dark"] .ap-label-hint {
     color: #9ca3af !important;
-}
-
-[data-theme="dark"] .ap-add-close {
-    background: #161b22 !important;
-    border-color: #2b313a !important;
-    color: #9ca3af !important;
-}
-
-[data-theme="dark"] .ap-add-close:hover {
-    color: #f87171 !important;
-    background: rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] .ap-add-header-title {
-    color: #FCA5A5 !important;
 }
 
 #mainContent.academic-period-page {
@@ -1770,350 +666,6 @@
 
 .academic-period-page .admin-page-container {
     max-width: 100%;
-}
-
-.academic-period-page .ap-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    overflow: visible !important;
-}
-
-.academic-period-page .ap-toolbar-left,
-.academic-period-page .ap-toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-}
-
-.academic-period-page .ap-toolbar-right {
-    justify-content: flex-end;
-    flex-wrap: wrap;
-}
-
-.academic-period-page .ap-search-row {
-    width: min(360px, 100%);
-    flex: 1 1 320px;
-}
-
-.academic-period-page .ap-search-row .search-wrap.global-search {
-    min-width: 0 !important;
-    width: 100% !important;
-}
-
-.academic-period-page #academicViewToggle.view-toggle-container {
-    flex: 0 0 auto;
-}
-
-.academic-period-page #academicListView[hidden],
-.academic-period-page #academicGridView[hidden] {
-    display: none !important;
-}
-
-.academic-period-page .academic-grid-view {
-    display: none;
-    padding: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .85rem;
-}
-
-.academic-period-page.mode-grid .academic-grid-view {
-    display: grid;
-}
-
-.academic-period-page.mode-list #academicListView {
-    display: block;
-}
-
-.academic-period-page.mode-grid #academicListView {
-    display: none;
-}
-
-.academic-period-page.mode-list #academicGridView {
-    display: none;
-}
-
-.academic-period-page .academic-card {
-    position: relative;
-    min-height: 225px;
-    border-radius: 18px;
-    border: 1px solid #E5E7EB;
-    background: #ffffff;
-    padding: 1rem;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, .04);
-    display: flex;
-    flex-direction: column;
-    gap: .9rem;
-    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-}
-
-.academic-period-page .academic-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(139, 0, 0, .20);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
-}
-
-.academic-period-page .academic-card-meta {
-    flex: 1 1 auto;
-}
-
-.academic-period-page .academic-card-actions {
-    margin-top: auto;
-}
-
-.academic-period-page .quick-actions-list {
-    display: grid;
-    gap: .7rem;
-    padding: .75rem;
-}
-
-.academic-period-page .quick-action-card {
-    position: relative;
-    isolation: isolate;
-    width: 100%;
-    min-height: 76px;
-    display: flex;
-    align-items: center;
-    gap: .85rem;
-    padding: .9rem .95rem;
-    border-radius: 18px;
-    border: 1px solid rgba(139, 0, 0, .10);
-    background:
-        radial-gradient(circle at 100% 100%, rgba(139, 0, 0, .08), transparent 40%),
-        linear-gradient(135deg, #ffffff 0%, #fff7f7 100%);
-    box-shadow:
-        0 2px 10px rgba(15, 23, 42, .035),
-        inset 0 1px 0 rgba(255, 255, 255, .72);
-    overflow: hidden;
-    text-decoration: none;
-    text-align: left;
-    cursor: pointer;
-    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
-}
-
-.academic-period-page .quick-action-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(139, 0, 0, .30);
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .18), transparent 40%),
-        linear-gradient(135deg, #8B0000 0%, #6b0000 58%, #3b0202 100%);
-    box-shadow: 0 14px 28px rgba(139, 0, 0, .18);
-}
-
-.academic-period-page .quick-action-icon {
-    position: relative;
-    z-index: 1;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    border-radius: 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, .64);
-    color: var(--crimson, #8B0000);
-    border: 1px solid rgba(139, 0, 0, .12);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .78), 0 8px 18px rgba(139, 0, 0, .08);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
-}
-
-.academic-period-page .quick-action-icon i,
-.academic-period-page .quick-action-arrow,
-.academic-period-page .quick-action-bg-icon {
-    color: currentColor !important;
-}
-
-.academic-period-page .quick-action-card:hover .quick-action-icon {
-    transform: scale(1.03);
-    background: rgba(255, 255, 255, .16);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, .22);
-}
-
-.academic-period-page .quick-action-copy {
-    position: relative;
-    z-index: 1;
-    min-width: 0;
-    flex: 1;
-    display: grid;
-    gap: .15rem;
-}
-
-.academic-period-page .quick-action-title {
-    display: block;
-    color: #0c111b;
-    font-size: .88rem;
-    font-weight: 900;
-    line-height: 1.15;
-    transition: color .18s ease;
-}
-
-.academic-period-page .quick-action-sub {
-    display: block;
-    color: #9CA3AF;
-    font-size: .70rem;
-    font-weight: 800;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color .18s ease;
-}
-
-.academic-period-page .quick-action-arrow {
-    position: relative;
-    z-index: 1;
-    margin-left: auto;
-    color: #c9cdd3 !important;
-    font-size: .72rem;
-    transition: transform .18s ease, color .18s ease;
-}
-
-.academic-period-page .quick-action-card:hover .quick-action-title,
-.academic-period-page .quick-action-card:hover .quick-action-sub,
-.academic-period-page .quick-action-card:hover .quick-action-arrow {
-    color: #ffffff !important;
-}
-
-.academic-period-page .quick-action-card:hover .quick-action-arrow {
-    transform: translateX(3px);
-}
-
-.academic-period-page .quick-action-bg-icon {
-    position: absolute;
-    right: .75rem;
-    bottom: -1.25rem;
-    z-index: 0;
-    font-size: 4.6rem;
-    color: rgba(139, 0, 0, .075) !important;
-    transform: rotate(-10deg);
-    pointer-events: none;
-    transition: color .18s ease, transform .18s ease;
-}
-
-.academic-period-page .quick-action-card:hover .quick-action-bg-icon {
-    color: rgba(255, 255, 255, .13) !important;
-    transform: rotate(-8deg) scale(1.04);
-}
-
-.academic-period-page .ap-actions,
-.academic-period-page .academic-card-actions {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .45rem;
-    overflow: visible;
-}
-
-.academic-period-page .academic-card-actions form,
-.academic-period-page .ap-actions form {
-    margin: 0;
-    flex: 0 0 auto;
-}
-
-.academic-period-page .ap-action-btn {
-    --ap-action-bg: #F3F4F6;
-    --ap-action-color: #4B5563;
-    --ap-action-hover-bg: #E5E7EB;
-    --ap-action-hover-color: #0c111b;
-
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    background: var(--ap-action-bg) !important;
-    color: var(--ap-action-color) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease !important;
-}
-
-.academic-period-page .ap-action-btn i {
-    color: currentColor !important;
-    font-size: 13px !important;
-}
-
-.academic-period-page .ap-action-btn:hover,
-.academic-period-page .ap-action-btn:focus-visible {
-    background: var(--ap-action-hover-bg) !important;
-    color: var(--ap-action-hover-color) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 10px 18px color-mix(in srgb, var(--ap-action-hover-color) 18%, transparent) !important;
-    outline: none !important;
-}
-
-.academic-period-page .ap-action-edit {
-    --ap-action-bg: #EFF6FF;
-    --ap-action-color: #2563EB;
-    --ap-action-hover-bg: #DBEAFE;
-    --ap-action-hover-color: #1D4ED8;
-}
-
-.academic-period-page .ap-action-active {
-    --ap-action-bg: #DCFCE7;
-    --ap-action-color: #16A34A;
-    --ap-action-hover-bg: #BBF7D0;
-    --ap-action-hover-color: #15803D;
-}
-
-.academic-period-page .ap-action-delete {
-    --ap-action-bg: #FEE2E2;
-    --ap-action-color: #DC2626;
-    --ap-action-hover-bg: #FECACA;
-    --ap-action-hover-color: #B91C1C;
-}
-
-.academic-period-page .ap-action-pinned {
-    --ap-action-bg: #FFF7ED;
-    --ap-action-color: #F97316;
-    pointer-events: none;
-}
-
-.academic-period-page .status-badge,
-.academic-period-page .sem-pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    min-height: 26px !important;
-    padding: 4px 10px !important;
-    border-radius: 999px !important;
-    border: 1px solid transparent !important;
-    font-size: 10px !important;
-    font-weight: 850 !important;
-    line-height: 1 !important;
-}
-
-.academic-period-page .s-active {
-    background: var(--status-completed-bg, #DCFCE7) !important;
-    color: var(--status-completed-text, #166534) !important;
-    border-color: var(--status-completed-border, #BBF7D0) !important;
-}
-
-.academic-period-page .s-upcoming {
-    background: var(--status-info-bg, #EFF6FF) !important;
-    color: var(--status-info-text, #1D4ED8) !important;
-    border-color: var(--status-info-border, #BFDBFE) !important;
-}
-
-.academic-period-page .s-ended {
-    background: var(--status-default-bg, #F1F5F9) !important;
-    color: var(--status-default-text, #475569) !important;
-    border-color: var(--status-default-border, #CBD5E1) !important;
-}
-
-.academic-period-page .s-inactive {
-    background: var(--status-pending-bg, #FFF7ED) !important;
-    color: var(--status-pending-text, #C2410C) !important;
-    border-color: var(--status-pending-border, #FED7AA) !important;
 }
 
 #filterModal.academic-filter-modal .filter-drawer-panel {
@@ -2134,11 +686,9 @@
 [data-theme="dark"] .academic-period-page .bg-white.rounded-xl,
 [data-theme="dark"] .academic-period-page .active-banner,
 [data-theme="dark"] .academic-period-page .cal-card,
-[data-theme="dark"] .academic-period-page .academic-card,
 .dark .academic-period-page .bg-white.rounded-xl,
 .dark .academic-period-page .active-banner,
-.dark .academic-period-page .cal-card,
-.dark .academic-period-page .academic-card {
+.dark .academic-period-page .cal-card {
     background:
         radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 38%),
         linear-gradient(145deg, rgba(13, 17, 23, .94), rgba(22, 27, 34, .88)) !important;
@@ -2147,10 +697,8 @@
 }
 
 [data-theme="dark"] .academic-period-page .bg-gray-50,
-[data-theme="dark"] .academic-period-page .ap-toolbar,
 [data-theme="dark"] .academic-period-page .border-t.bg-gray-50,
 .dark .academic-period-page .bg-gray-50,
-.dark .academic-period-page .ap-toolbar,
 .dark .academic-period-page .border-t.bg-gray-50 {
     background: rgba(13, 17, 23, .82) !important;
     border-color: rgba(255, 255, 255, .10) !important;
@@ -2160,156 +708,21 @@
 [data-theme="dark"] .academic-period-page .text-gray-800,
 [data-theme="dark"] .academic-period-page .text-gray-700,
 [data-theme="dark"] .academic-period-page .text-gray-600,
-[data-theme="dark"] .academic-period-page .academic-card-year-text,
-[data-theme="dark"] .academic-period-page .academic-card-value,
 [data-theme="dark"] .academic-period-page #liveDate,
 .dark .academic-period-page .text-gray-900,
 .dark .academic-period-page .text-gray-800,
 .dark .academic-period-page .text-gray-700,
 .dark .academic-period-page .text-gray-600,
-.dark .academic-period-page .academic-card-year-text,
-.dark .academic-period-page .academic-card-value,
 .dark .academic-period-page #liveDate {
     color: #F3F4F6 !important;
 }
 
-[data-theme="dark"] .academic-period-page .text-gray-500,
-[data-theme="dark"] .academic-period-page .text-gray-400,
-[data-theme="dark"] .academic-period-page .academic-card-label,
-[data-theme="dark"] .academic-period-page #liveDay,
-.dark .academic-period-page .text-gray-500,
-.dark .academic-period-page .text-gray-400,
-.dark .academic-period-page .academic-card-label,
-.dark .academic-period-page #liveDay {
-    color: #94A3B8 !important;
-}
-
 [data-theme="dark"] .academic-period-page h2.text-gray-800,
-[data-theme="dark"] .academic-period-page .ap-toolbar-left h2,
 [data-theme="dark"] .academic-period-page .cal-card h2,
 .dark .academic-period-page h2.text-gray-800,
-.dark .academic-period-page .ap-toolbar-left h2,
 .dark .academic-period-page .cal-card h2,
 .dark .academic-period-page #liveClock {
     color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-table thead tr,
-.dark .academic-period-page .ap-table thead tr {
-    background: rgba(13, 17, 23, .92) !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-table tbody tr.tbl-row,
-.dark .academic-period-page .ap-table tbody tr.tbl-row {
-    background: rgba(255, 255, 255, .025) !important;
-    border-color: rgba(255, 255, 255, .08) !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-table tbody tr.tbl-row:hover,
-.dark .academic-period-page .ap-table tbody tr.tbl-row:hover {
-    background: rgba(252, 165, 165, .07) !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-table td,
-.dark .academic-period-page .ap-table td {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] .academic-period-page .quick-action-card,
-.dark .academic-period-page .quick-action-card {
-    border-color: rgba(255, 255, 255, .08) !important;
-    background:
-        radial-gradient(circle at 100% 100%, rgba(252, 165, 165, .10), transparent 42%),
-        linear-gradient(145deg, rgba(17, 24, 39, .95), rgba(13, 17, 23, .94)) !important;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .055) !important;
-}
-
-[data-theme="dark"] .academic-period-page .quick-action-card:hover,
-.dark .academic-period-page .quick-action-card:hover {
-    border-color: rgba(252, 165, 165, .26) !important;
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .14), transparent 40%),
-        linear-gradient(135deg, #8B0000 0%, #5f0202 58%, #2a0101 100%) !important;
-}
-
-[data-theme="dark"] .academic-period-page .quick-action-icon,
-.dark .academic-period-page .quick-action-icon {
-    color: #FCA5A5 !important;
-    background: rgba(255, 255, 255, .075) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] .academic-period-page .quick-action-title,
-.dark .academic-period-page .quick-action-title {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] .academic-period-page .quick-action-sub,
-.dark .academic-period-page .quick-action-sub {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-action-btn,
-.dark .academic-period-page .ap-action-btn {
-    background: rgba(255, 255, 255, .075) !important;
-    border: 1px solid rgba(255, 255, 255, .10) !important;
-    color: #CBD5E1 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 8px 18px rgba(0, 0, 0, .18) !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-action-edit,
-.dark .academic-period-page .ap-action-edit {
-    color: #93C5FD !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-action-active,
-.dark .academic-period-page .ap-action-active {
-    color: #86EFAC !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-action-delete,
-.dark .academic-period-page .ap-action-delete {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] .academic-period-page .ap-action-pinned,
-.dark .academic-period-page .ap-action-pinned {
-    color: #FDBA74 !important;
-}
-
-[data-theme="dark"] .academic-period-page .s-active,
-.dark .academic-period-page .s-active {
-    background: rgba(34, 197, 94, .12) !important;
-    color: #86EFAC !important;
-    border-color: rgba(134, 239, 172, .22) !important;
-}
-
-[data-theme="dark"] .academic-period-page .s-upcoming,
-.dark .academic-period-page .s-upcoming {
-    background: rgba(59, 130, 246, .12) !important;
-    color: #93C5FD !important;
-    border-color: rgba(147, 197, 253, .22) !important;
-}
-
-[data-theme="dark"] .academic-period-page .s-ended,
-.dark .academic-period-page .s-ended {
-    background: rgba(148, 163, 184, .12) !important;
-    color: #CBD5E1 !important;
-    border-color: rgba(203, 213, 225, .18) !important;
-}
-
-[data-theme="dark"] .academic-period-page .s-inactive,
-.dark .academic-period-page .s-inactive {
-    background: rgba(245, 158, 11, .12) !important;
-    color: #FCD34D !important;
-    border-color: rgba(252, 211, 77, .20) !important;
-}
-
-[data-theme="dark"] .academic-period-page .sem-pill,
-.dark .academic-period-page .sem-pill {
-    background: rgba(252, 165, 165, .10) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, .20) !important;
 }
 
 [data-theme="dark"] #filterModal.academic-filter-modal .filter-drawer-panel,
@@ -2325,43 +738,7 @@
     border-color: var(--filter-panel-border, rgba(255, 255, 255, .10)) !important;
 }
 
-@media (max-width: 1280px) {
-    .academic-period-page .academic-grid-view {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 1023px) {
-    .academic-period-page .ap-toolbar {
-        align-items: stretch;
-    }
-
-    .academic-period-page .ap-toolbar-left,
-    .academic-period-page .ap-toolbar-right,
-    .academic-period-page .ap-search-row {
-        width: 100%;
-    }
-}
-
 @media (max-width: 767px) {
-    .academic-period-page #academicViewToggle {
-        display: none !important;
-    }
-
-    .academic-period-page #academicListView {
-        display: none !important;
-    }
-
-    .academic-period-page #academicGridView {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-    }
-
-    .academic-period-page .ap-toolbar-right {
-        display: grid;
-        grid-template-columns: 1fr;
-        align-items: stretch;
-    }
 
     .academic-period-page .global-filter-btn,
     .academic-period-page .global-filter-reset-btn {
@@ -2375,35 +752,6 @@
 #mainContent.academic-period-page .cal-card {
     border-color: #F0EAEA !important;
     box-shadow: 0 8px 24px rgba(15, 23, 42, .045) !important;
-}
-
-#mainContent.academic-period-page .ap-toolbar,
-#mainContent.academic-period-page .bg-gray-50,
-#mainContent.academic-period-page .border-t.bg-gray-50 {
-    background: #FAFAFA !important;
-    border-color: #F1ECE7 !important;
-}
-
-#mainContent.academic-period-page .ap-table,
-#mainContent.academic-period-page .ap-table thead,
-#mainContent.academic-period-page .ap-table thead tr,
-#mainContent.academic-period-page .ap-table thead th,
-#mainContent.academic-period-page .ap-table tbody td,
-#mainContent.academic-period-page .ap-table tbody tr {
-    border-color: #F1ECE7 !important;
-}
-
-#mainContent.academic-period-page .ap-table thead th {
-    background: #FAFAFA !important;
-    border-bottom: 1px solid #F1ECE7 !important;
-}
-
-#mainContent.academic-period-page .ap-table-wrap {
-    border-top: 0 !important;
-}
-
-#mainContent.academic-period-page .ap-table {
-    border: 0 !important;
 }
 
 #mainContent.academic-period-page .progress-track {
@@ -2484,144 +832,6 @@
     border-radius: 10px !important;
 }
 
-#filterModal.academic-filter-modal .filter-show-results-btn {
-    min-height: 42px !important;
-    border-radius: 10px !important;
-    min-width: 170px !important;
-}
-
-#filterModal.academic-filter-modal .filter-show-results-btn i,
-#filterModal.academic-filter-modal .filter-clear-btn i {
-    color: currentColor !important;
-}
-
-#mainContent.academic-period-page .ap-actions,
-#mainContent.academic-period-page .academic-card-actions,
-#mainContent.academic-period-page .ap-table td:last-child {
-    overflow: visible !important;
-}
-
-#mainContent.academic-period-page .ap-action-btn {
-    --action-bg: #F3F4F6;
-    --action-color: #4B5563;
-    --action-hover-bg: var(--action-bg);
-    --action-hover-color: var(--action-color);
-    --action-tooltip-bg: var(--action-color);
-
-    position: relative !important;
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    border: 0 !important;
-    border-radius: 12px !important;
-    background: var(--action-bg) !important;
-    color: var(--action-color) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease,
-        color .18s ease,
-        filter .18s ease !important;
-    isolation: isolate !important;
-}
-
-#mainContent.academic-period-page .ap-action-btn:hover,
-#mainContent.academic-period-page .ap-action-btn:focus-visible {
-    background: var(--action-hover-bg) !important;
-    color: var(--action-hover-color) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--action-hover-color) 18%, transparent) !important;
-    outline: none !important;
-}
-
-#mainContent.academic-period-page .ap-action-btn i {
-    color: currentColor !important;
-}
-
-#mainContent.academic-period-page .ap-action-edit {
-    --action-bg: #EFF6FF;
-    --action-color: #2563EB;
-    --action-hover-bg: #DBEAFE;
-    --action-hover-color: #1D4ED8;
-    --action-tooltip-bg: #2563EB;
-}
-
-#mainContent.academic-period-page .ap-action-active {
-    --action-bg: #D1FAE5;
-    --action-color: #047857;
-    --action-hover-bg: #A7F3D0;
-    --action-hover-color: #065F46;
-    --action-tooltip-bg: #047857;
-}
-
-#mainContent.academic-period-page .ap-action-delete {
-    --action-bg: #FEE2E2;
-    --action-color: #DC2626;
-    --action-hover-bg: #FECACA;
-    --action-hover-color: #B91C1C;
-    --action-tooltip-bg: #DC2626;
-}
-
-#mainContent.academic-period-page .ap-action-pinned {
-    --action-bg: #FEF3C7;
-    --action-color: #B45309;
-    --action-hover-bg: #FDE68A;
-    --action-hover-color: #92400E;
-    --action-tooltip-bg: #B45309;
-    cursor: default !important;
-    pointer-events: auto !important;
-}
-
-#mainContent.academic-period-page .ap-action-btn[title]::after {
-    content: attr(title);
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 9px);
-    transform: translateX(-50%) translateY(4px);
-    padding: .42rem .58rem;
-    border-radius: 9px;
-    background: var(--action-tooltip-bg);
-    color: #FFFFFF;
-    font-size: .68rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: 0 10px 22px color-mix(in srgb, var(--action-tooltip-bg) 24%, transparent);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 60;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.academic-period-page .ap-action-btn[title]::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(100% + 4px);
-    transform: translateX(-50%) translateY(4px);
-    border: 5px solid transparent;
-    border-top-color: var(--action-tooltip-bg);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 61;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
-}
-
-#mainContent.academic-period-page .ap-action-btn[title]:hover::after,
-#mainContent.academic-period-page .ap-action-btn[title]:hover::before,
-#mainContent.academic-period-page .ap-action-btn[title]:focus-visible::after,
-#mainContent.academic-period-page .ap-action-btn[title]:focus-visible::before {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-}
-
 #mainContent.academic-period-page #externalClearFilterBtn.hidden {
     display: none !important;
 }
@@ -2655,49 +865,6 @@
     color: #660000 !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page .ap-action-edit,
-.dark #mainContent.academic-period-page .ap-action-edit {
-    --action-bg: rgba(37, 99, 235, .16);
-    --action-color: #60A5FA;
-    --action-hover-bg: rgba(37, 99, 235, .24);
-    --action-hover-color: #93C5FD;
-    --action-tooltip-bg: #2563EB;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-action-active,
-.dark #mainContent.academic-period-page .ap-action-active {
-    --action-bg: rgba(16, 185, 129, .17);
-    --action-color: #34D399;
-    --action-hover-bg: rgba(16, 185, 129, .26);
-    --action-hover-color: #6EE7B7;
-    --action-tooltip-bg: #047857;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-action-delete,
-.dark #mainContent.academic-period-page .ap-action-delete {
-    --action-bg: rgba(220, 38, 38, .17);
-    --action-color: #FCA5A5;
-    --action-hover-bg: rgba(220, 38, 38, .26);
-    --action-hover-color: #FECACA;
-    --action-tooltip-bg: #DC2626;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-action-pinned,
-.dark #mainContent.academic-period-page .ap-action-pinned {
-    --action-bg: rgba(245, 158, 11, .17);
-    --action-color: #FBBF24;
-    --action-hover-bg: rgba(245, 158, 11, .26);
-    --action-hover-color: #FCD34D;
-    --action-tooltip-bg: #B45309;
-}
-
-@media (max-width: 640px) {
-    #filterModal.academic-filter-modal .filter-show-results-btn {
-        min-width: 0 !important;
-        width: 100% !important;
-    }
-}
-
 #mainContent.academic-period-page .ap-content-layout {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(390px, 420px) !important;
@@ -2725,136 +892,10 @@
     }
 }
 
-#mainContent.academic-period-page .ap-toolbar {
-    display: grid !important;
-    grid-template-columns: max-content minmax(0, 1fr) !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    overflow: visible !important;
-}
-
-#mainContent.academic-period-page .ap-toolbar-left {
-    min-width: max-content !important;
-    white-space: nowrap !important;
-}
-
-#mainContent.academic-period-page .ap-toolbar-right {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: .85rem !important;
-    min-width: 0 !important;
-}
-
-#mainContent.academic-period-page .ap-search-row {
-    flex: 0 1 420px !important;
-    width: 420px !important;
-    max-width: 420px !important;
-    min-width: 280px !important;
-}
-
-#mainContent.academic-period-page .ap-search-row .search-wrap.global-search {
-    width: 100% !important;
-}
-
-@media (max-width: 900px) {
-    #mainContent.academic-period-page .ap-toolbar {
-        grid-template-columns: 1fr !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-right {
-        justify-content: flex-start !important;
-        flex-wrap: wrap !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex-basis: 100% !important;
-    }
-}
-
 #mainContent.academic-period-page .bg-white.rounded-xl.shadow.border.border-gray-100,
 #mainContent.academic-period-page .active-banner,
 #mainContent.academic-period-page .cal-card {
     box-shadow: 0 8px 24px rgba(16, 17, 20, 0.094) !important;
-}
-
-#mainContent.academic-period-page .ap-toolbar,
-#mainContent.academic-period-page .bg-gray-50,
-#mainContent.academic-period-page .border-t.bg-gray-50 {
-    background: #FAFAFA !important;
-    border-color: #F1ECE7 !important;
-}
-
-#mainContent.academic-period-page .ap-table-wrap {
-    border-top: 0 !important;
-    background: #FFFFFF !important;
-}
-
-#mainContent.academic-period-page .ap-table {
-    width: 100% !important;
-    min-width: 920px !important;
-    table-layout: fixed !important;
-    border: 0 !important;
-    background: transparent !important;
-}
-
-#mainContent.academic-period-page .ap-table thead th {
-    height: 48px !important;
-    background: #FAFAFA !important;
-    border-bottom: 1px solid #F1ECE7 !important;
-    color: #8B0000 !important;
-    font-size: 10px !important;
-    line-height: 1 !important;
-    font-weight: 900 !important;
-    letter-spacing: .08em !important;
-    white-space: nowrap !important;
-}
-
-#mainContent.academic-period-page .ap-table tbody td {
-    height: 58px !important;
-    border-color: #F1ECE7 !important;
-    color: #374151 !important;
-}
-
-#mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td {
-    background: rgba(139, 0, 0, .035) !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(1),
-#mainContent.academic-period-page .ap-table td:nth-child(1) {
-    width: 6% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(2),
-#mainContent.academic-period-page .ap-table td:nth-child(2) {
-    width: 22% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(3),
-#mainContent.academic-period-page .ap-table td:nth-child(3) {
-    width: 20% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(4),
-#mainContent.academic-period-page .ap-table td:nth-child(4),
-#mainContent.academic-period-page .ap-table th:nth-child(5),
-#mainContent.academic-period-page .ap-table td:nth-child(5) {
-    width: 15% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(6),
-#mainContent.academic-period-page .ap-table td:nth-child(6) {
-    width: 12% !important;
-    text-align: center !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(7),
-#mainContent.academic-period-page .ap-table td:nth-child(7) {
-    width: 10% !important;
-    text-align: center !important;
 }
 
 [data-theme="dark"] #mainContent.academic-period-page .bg-white.rounded-xl,
@@ -2864,91 +905,10 @@
     box-shadow: 0 16px 34px rgba(0, 0, 0, .32) !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page .ap-toolbar,
-.dark #mainContent.academic-period-page .ap-toolbar {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table-wrap,
-.dark #mainContent.academic-period-page .ap-table-wrap {
-    background: #161B22 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead th,
-.dark #mainContent.academic-period-page .ap-table thead,
-.dark #mainContent.academic-period-page .ap-table thead tr,
-.dark #mainContent.academic-period-page .ap-table thead th {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody td,
-.dark #mainContent.academic-period-page .ap-table tbody tr,
-.dark #mainContent.academic-period-page .ap-table tbody td {
-    background: transparent !important;
-    border-color: #21262D !important;
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td,
-.dark #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td {
-    background: rgba(252, 165, 165, .06) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table .font-bold,
-.dark #mainContent.academic-period-page .ap-table .font-bold {
-    color: #F3F4F6 !important;
-}
-
-#mainContent.academic-period-page .status-badge.s-upcoming::before {
-    background: #2563EB !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .14) !important;
-}
-
-#mainContent.academic-period-page .status-badge.s-upcoming {
-    color: #1D4ED8 !important;
-    border-color: #BFDBFE !important;
-    background: #EFF6FF !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .status-badge.s-upcoming::before,
-.dark #mainContent.academic-period-page .status-badge.s-upcoming::before {
-    background: #60A5FA !important;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, .16) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .status-badge.s-upcoming,
-.dark #mainContent.academic-period-page .status-badge.s-upcoming {
-    color: #93C5FD !important;
-    border-color: rgba(147, 197, 253, .28) !important;
-    background: rgba(59, 130, 246, .14) !important;
-}
-
 #addModal,
 #editModal,
 #deleteModal {
     z-index: 99999 !important;
-}
-
-#addModal .ap-academic-modal,
-#editModal .ap-academic-modal {
-    width: min(94vw, 980px) !important;
-    max-width: 980px !important;
-    max-height: calc(100dvh - 32px) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    border-radius: 24px !important;
-}
-
-#deleteModal .ap-academic-modal-sm {
-    width: min(94vw, 460px) !important;
-    max-width: 460px !important;
 }
 
 #addModal .ap-add-form,
@@ -2964,27 +924,6 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     background: #F8FAFC !important;
-}
-
-#addModal .ap-add-header,
-#editModal .ap-add-header,
-#addModal .ap-add-footer,
-#editModal .ap-add-footer {
-    flex-shrink: 0 !important;
-}
-
-[data-theme="dark"] #addModal .ap-academic-modal,
-[data-theme="dark"] #editModal .ap-academic-modal,
-[data-theme="dark"] #deleteModal .ap-academic-modal,
-.dark #addModal .ap-academic-modal,
-.dark #editModal .ap-academic-modal,
-.dark #deleteModal .ap-academic-modal {
-    background: #0D1117 !important;
-    border: 1px solid #21262D !important;
-    color: #E5E7EB !important;
-    box-shadow:
-        0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
 }
 
 [data-theme="dark"] #addModal .ap-add-body,
@@ -3015,14 +954,6 @@
 }
 
 @media (max-width: 768px) {
-
-    #addModal .ap-academic-modal,
-    #editModal .ap-academic-modal {
-        width: 100% !important;
-        max-width: 100% !important;
-        max-height: 88dvh !important;
-        border-radius: 24px 24px 0 0 !important;
-    }
 
     #addModal,
     #editModal {
@@ -3079,111 +1010,6 @@
     pointer-events: auto !important;
 }
 
-#mainContent.academic-period-page .ap-search-row .search-wrap.global-search {
-    position: relative !important;
-    width: 100% !important;
-    min-width: 0 !important;
-}
-
-#mainContent.academic-period-page .ap-search-row .search-input,
-#mainContent.academic-period-page .ap-search-row [data-search-input] {
-    width: 100% !important;
-    min-width: 0 !important;
-    padding-right: 44px !important;
-}
-
-#mainContent.academic-period-page .ap-search-row .search-clear,
-#mainContent.academic-period-page .ap-search-row [data-search-clear] {
-    position: absolute !important;
-    right: 12px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    z-index: 5 !important;
-}
-
-#mainContent.academic-period-page .ap-empty-state-cell {
-    padding: 0 !important;
-    height: 360px !important;
-    border-bottom: 0 !important;
-}
-
-#mainContent.academic-period-page .ap-empty-state-cell .empty-state {
-    min-height: 360px !important;
-    padding: 64px 20px 72px !important;
-}
-
-#mainContent.academic-period-page .academic-grid-view .empty-state {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-empty-state-cell,
-.dark #mainContent.academic-period-page .ap-empty-state-cell {
-    background: transparent !important;
-}
-
-#mainContent.academic-period-page .ap-table-wrap {
-    overflow-x: hidden !important;
-}
-
-#mainContent.academic-period-page .ap-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    table-layout: fixed !important;
-}
-
-#mainContent.academic-period-page .ap-table th,
-#mainContent.academic-period-page .ap-table td {
-    padding-left: .75rem !important;
-    padding-right: .75rem !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(1),
-#mainContent.academic-period-page .ap-table td:nth-child(1) {
-    width: 4% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(2),
-#mainContent.academic-period-page .ap-table td:nth-child(2) {
-    width: 15% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(3),
-#mainContent.academic-period-page .ap-table td:nth-child(3) {
-    width: 23% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(4),
-#mainContent.academic-period-page .ap-table td:nth-child(4),
-#mainContent.academic-period-page .ap-table th:nth-child(5),
-#mainContent.academic-period-page .ap-table td:nth-child(5) {
-    width: 14% !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(6),
-#mainContent.academic-period-page .ap-table td:nth-child(6) {
-    width: 14% !important;
-    text-align: center !important;
-}
-
-#mainContent.academic-period-page .ap-table th:nth-child(7),
-#mainContent.academic-period-page .ap-table td:nth-child(7) {
-    width: 16% !important;
-    text-align: center !important;
-}
-
-#mainContent.academic-period-page .ap-table td.col-year .font-bold {
-    font-size: .88rem !important;
-    white-space: nowrap !important;
-}
-
-#mainContent.academic-period-page .ap-actions {
-    justify-content: center !important;
-    gap: .45rem !important;
-    flex-wrap: nowrap !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page .ap-periods-column>.bg-white,
 .dark #mainContent.academic-period-page .ap-periods-column>.bg-white,
 [data-theme="dark"] #mainContent.academic-period-page .bg-white.rounded-xl,
@@ -3195,134 +1021,11 @@
         inset 0 1px 0 rgba(255, 255, 255, .055) !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page .ap-toolbar,
-.dark #mainContent.academic-period-page .ap-toolbar {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page #academicListView,
-.dark #mainContent.academic-period-page #academicListView,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table-wrap,
-.dark #mainContent.academic-period-page .ap-table-wrap {
-    background: #161B22 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table,
-.dark #mainContent.academic-period-page .ap-table {
-    background: transparent !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead th,
-.dark #mainContent.academic-period-page .ap-table thead,
-.dark #mainContent.academic-period-page .ap-table thead tr,
-.dark #mainContent.academic-period-page .ap-table thead th {
-    background: #0D1117 !important;
-    color: #FCA5A5 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody td,
-.dark #mainContent.academic-period-page .ap-table tbody tr,
-.dark #mainContent.academic-period-page .ap-table tbody td {
-    background: transparent !important;
-    color: #CBD5E1 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td,
-.dark #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td {
-    background: rgba(252, 165, 165, .06) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr.tbl-row.is-active td,
-.dark #mainContent.academic-period-page .ap-table tbody tr.tbl-row.is-active td {
-    background: rgba(252, 165, 165, .045) !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page .border-t.bg-gray-50,
 .dark #mainContent.academic-period-page .border-t.bg-gray-50 {
     background: #0D1117 !important;
     border-color: #21262D !important;
     color: #8B949E !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page #academicGridView,
-.dark #mainContent.academic-period-page #academicGridView {
-    background: #161B22 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card,
-.dark #mainContent.academic-period-page .academic-card {
-    background:
-        radial-gradient(circle at top left, rgba(252, 165, 165, .045), transparent 42%),
-        #161B22 !important;
-    border-color: #2B313A !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .045),
-        0 14px 30px rgba(0, 0, 0, .24) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card:hover,
-.dark #mainContent.academic-period-page .academic-card:hover {
-    border-color: rgba(252, 165, 165, .24) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .07),
-        0 0 18px rgba(252, 165, 165, .07),
-        0 16px 30px rgba(0, 0, 0, .26) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-year-text,
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-value,
-.dark #mainContent.academic-period-page .academic-card-year-text,
-.dark #mainContent.academic-period-page .academic-card-value {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-label,
-.dark #mainContent.academic-period-page .academic-card-label {
-    color: #9CA3AF !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card,
-.dark #mainContent.academic-period-page .quick-action-card {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(252, 165, 165, .10), transparent 44%),
-        linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .035)) !important;
-    border: 1px solid rgba(255, 255, 255, .12) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 14px 28px rgba(0, 0, 0, .24) !important;
-    backdrop-filter: blur(16px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover,
-.dark #mainContent.academic-period-page .quick-action-card:hover {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .13), transparent 42%),
-        linear-gradient(135deg, rgba(139, 0, 0, .88), rgba(80, 0, 0, .72)) !important;
-    border-color: rgba(252, 165, 165, .26) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .10),
-        0 18px 34px rgba(139, 0, 0, .22) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-icon,
-.dark #mainContent.academic-period-page .quick-action-icon {
-    background: rgba(255, 255, 255, .08) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-title,
-.dark #mainContent.academic-period-page .quick-action-title {
-    color: #F3F4F6 !important;
 }
 
 [data-theme="dark"] #addModal.modal-overlay,
@@ -3336,30 +1039,6 @@
         rgba(2, 6, 23, .74) !important;
     backdrop-filter: blur(8px) saturate(130%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
-}
-
-[data-theme="dark"] #addModal .ap-academic-modal,
-[data-theme="dark"] #editModal .ap-academic-modal,
-.dark #addModal .ap-academic-modal,
-.dark #editModal .ap-academic-modal {
-    background: #0D1117 !important;
-    border: 1px solid #21262D !important;
-    color: #E5E7EB !important;
-    box-shadow:
-        0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-header,
-[data-theme="dark"] #editModal .ap-add-header,
-[data-theme="dark"] #addModal .ap-add-footer,
-[data-theme="dark"] #editModal .ap-add-footer,
-.dark #addModal .ap-add-header,
-.dark #editModal .ap-add-header,
-.dark #addModal .ap-add-footer,
-.dark #editModal .ap-add-footer {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
 }
 
 [data-theme="dark"] #addModal .ap-add-body,
@@ -3386,21 +1065,10 @@
         inset 0 1px 0 rgba(255, 255, 255, .04) !important;
 }
 
-[data-theme="dark"] #addModal .ap-add-header-title,
-[data-theme="dark"] #editModal .ap-add-header-title,
-.dark #addModal .ap-add-header-title,
-.dark #editModal .ap-add-header-title {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-header-subtitle,
-[data-theme="dark"] #editModal .ap-add-header-subtitle,
 [data-theme="dark"] #addModal .ap-label-text,
 [data-theme="dark"] #editModal .ap-label-text,
 [data-theme="dark"] #addModal .ap-label-hint,
 [data-theme="dark"] #editModal .ap-label-hint,
-.dark #addModal .ap-add-header-subtitle,
-.dark #editModal .ap-add-header-subtitle,
 .dark #addModal .ap-label-text,
 .dark #editModal .ap-label-text,
 .dark #addModal .ap-label-hint,
@@ -3532,80 +1200,6 @@
         inset 0 1px 0 rgba(255, 255, 255, .055) !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page .bg-gray-50,
-[data-theme="dark"] #mainContent.academic-period-page .ap-toolbar,
-[data-theme="dark"] #mainContent.academic-period-page .border-b.bg-gray-50,
-[data-theme="dark"] #mainContent.academic-period-page .border-t.bg-gray-50,
-.dark #mainContent.academic-period-page .bg-gray-50,
-.dark #mainContent.academic-period-page .ap-toolbar,
-.dark #mainContent.academic-period-page .border-b.bg-gray-50,
-.dark #mainContent.academic-period-page .border-t.bg-gray-50 {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .bg-gray-50 h2,
-[data-theme="dark"] #mainContent.academic-period-page .ap-toolbar-left h2,
-[data-theme="dark"] #mainContent.academic-period-page .cal-card h2,
-.dark #mainContent.academic-period-page .bg-gray-50 h2,
-.dark #mainContent.academic-period-page .ap-toolbar-left h2,
-.dark #mainContent.academic-period-page .cal-card h2 {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .bg-gray-50>i,
-[data-theme="dark"] #mainContent.academic-period-page .ap-toolbar-left>i,
-.dark #mainContent.academic-period-page .bg-gray-50>i,
-.dark #mainContent.academic-period-page .ap-toolbar-left>i {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-actions-list,
-.dark #mainContent.academic-period-page .quick-actions-list {
-    background: transparent !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card,
-.dark #mainContent.academic-period-page .quick-action-card {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(252, 165, 165, .10), transparent 44%),
-        linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .035)) !important;
-    border: 1px solid rgba(255, 255, 255, .12) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 14px 28px rgba(0, 0, 0, .24) !important;
-    backdrop-filter: blur(16px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover,
-.dark #mainContent.academic-period-page .quick-action-card:hover {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .13), transparent 42%),
-        linear-gradient(135deg, rgba(139, 0, 0, .88), rgba(80, 0, 0, .72)) !important;
-    border-color: rgba(252, 165, 165, .26) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .10),
-        0 18px 34px rgba(139, 0, 0, .22) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-icon,
-.dark #mainContent.academic-period-page .quick-action-icon {
-    background: rgba(255, 255, 255, .08) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-title,
-.dark #mainContent.academic-period-page .quick-action-title {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-arrow,
-.dark #mainContent.academic-period-page .quick-action-arrow {
-    color: #CBD5E1 !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page #liveAmPm,
 [data-theme="dark"] #mainContent.academic-period-page #liveDay,
 [data-theme="dark"] #mainContent.academic-period-page .text-gray-400,
@@ -3618,96 +1212,6 @@
 [data-theme="dark"] #mainContent.academic-period-page #liveDate,
 .dark #mainContent.academic-period-page #liveDate {
     color: #E5E7EB !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page #academicListView,
-[data-theme="dark"] #mainContent.academic-period-page #academicGridView,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table-wrap,
-.dark #mainContent.academic-period-page #academicListView,
-.dark #mainContent.academic-period-page #academicGridView,
-.dark #mainContent.academic-period-page .ap-table-wrap {
-    background: #161B22 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table thead th,
-.dark #mainContent.academic-period-page .ap-table thead,
-.dark #mainContent.academic-period-page .ap-table thead tr,
-.dark #mainContent.academic-period-page .ap-table thead th {
-    background: #0D1117 !important;
-    color: #FCA5A5 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr,
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody td,
-.dark #mainContent.academic-period-page .ap-table tbody tr,
-.dark #mainContent.academic-period-page .ap-table tbody td {
-    background: transparent !important;
-    color: #CBD5E1 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td,
-.dark #mainContent.academic-period-page .ap-table tbody tr.tbl-row:hover td {
-    background: rgba(252, 165, 165, .06) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table tbody tr.tbl-row.is-active td,
-.dark #mainContent.academic-period-page .ap-table tbody tr.tbl-row.is-active td {
-    background: rgba(252, 165, 165, .045) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table .font-bold,
-.dark #mainContent.academic-period-page .ap-table .font-bold {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card,
-.dark #mainContent.academic-period-page .academic-card {
-    background:
-        radial-gradient(circle at top right, rgba(252, 165, 165, .055), transparent 45%),
-        #161B22 !important;
-    border-color: #21262D !important;
-    box-shadow:
-        0 14px 30px rgba(0, 0, 0, .26),
-        inset 0 1px 0 rgba(255, 255, 255, .045) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card:hover,
-.dark #mainContent.academic-period-page .academic-card:hover {
-    border-color: rgba(252, 165, 165, .24) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .075),
-        0 14px 30px rgba(0, 0, 0, .30) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-year-text,
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-value,
-.dark #mainContent.academic-period-page .academic-card-year-text,
-.dark #mainContent.academic-period-page .academic-card-value {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-card-label,
-.dark #mainContent.academic-period-page .academic-card-label {
-    color: #9CA3AF !important;
-}
-
-[data-theme="dark"] #addModal .ap-academic-modal,
-[data-theme="dark"] #editModal .ap-academic-modal,
-[data-theme="dark"] #deleteModal .ap-delete-shell,
-.dark #addModal .ap-academic-modal,
-.dark #editModal .ap-academic-modal,
-.dark #deleteModal .ap-delete-shell {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-    color: #E5E7EB !important;
-    box-shadow:
-        0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
 }
 
 [data-theme="dark"] #addModal .ap-add-body,
@@ -3739,275 +1243,6 @@
     position: relative !important;
 }
 
-#addModal .ap-semester-check,
-#editModal .ap-semester-check {
-    position: absolute !important;
-    top: 10px !important;
-    right: 10px !important;
-    width: 18px !important;
-    height: 18px !important;
-    border-radius: 999px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: scale(.82) !important;
-    transition: opacity .16s ease, visibility .16s ease, transform .16s ease !important;
-    background: #8B0000 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 8px 18px rgba(139, 0, 0, .20) !important;
-    z-index: 3 !important;
-}
-
-#editModal .ap-semester-check {
-    background: #2563EB !important;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, .22) !important;
-}
-
-#addModal .ap-semester-check i,
-#editModal .ap-semester-check i {
-    color: currentColor !important;
-    font-size: 9px !important;
-    line-height: 1 !important;
-}
-
-#addModal .ap-semester-item input:checked+.ap-semester-card .ap-semester-check,
-#editModal .ap-semester-item input:checked+.ap-semester-card .ap-semester-check {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: scale(1) !important;
-}
-
-[data-theme="dark"] #addModal .ap-semester-check,
-.dark #addModal .ap-semester-check {
-    background: #B91C1C !important;
-    color: #FFFFFF !important;
-    border: 1px solid rgba(252, 165, 165, .30) !important;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, .24) !important;
-}
-
-[data-theme="dark"] #editModal .ap-semester-check,
-.dark #editModal .ap-semester-check {
-    background: #2563EB !important;
-    color: #FFFFFF !important;
-    border: 1px solid rgba(147, 197, 253, .34) !important;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, .24) !important;
-}
-
-#mainContent.academic-period-page .sem-pill .sem-pill-icon {
-    color: currentColor !important;
-    font-size: 10px !important;
-    line-height: 1 !important;
-    margin: 0 !important;
-}
-
-#mainContent.academic-period-page .ap-table td.col-year .ap-year-text {
-    display: inline-block !important;
-    font-size: .78rem !important;
-    line-height: 1.15 !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
-    color: #1F2937 !important;
-    white-space: nowrap !important;
-}
-
-#mainContent.academic-period-page .ap-table td.col-year .font-bold {
-    font-size: .78rem !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .ap-table td.col-year .ap-year-text,
-.dark #mainContent.academic-period-page .ap-table td.col-year .ap-year-text {
-    color: #F3F4F6 !important;
-}
-
-#mainContent.academic-period-page .academic-card-year-text {
-    font-size: .82rem !important;
-    line-height: 1.15 !important;
-}
-
-#mainContent.academic-period-page .academic-quick-actions-panel,
-#mainContent.academic-period-page .academic-quick-actions-panel.table-card {
-    overflow: hidden !important;
-    border-radius: 18px !important;
-    border: 1px solid #f0eaea !important;
-    background: #ffffff !important;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, .045) !important;
-}
-
-#mainContent.academic-period-page .academic-quick-actions-header {
-    padding: 1rem 1.1rem !important;
-    border-bottom: 1px solid #f1ece7 !important;
-    background: #fafafa !important;
-}
-
-#mainContent.academic-period-page .academic-quick-actions-head-icon {
-    width: 42px !important;
-    height: 42px !important;
-    border-radius: 14px !important;
-    background: #fef2f2 !important;
-    border: 1px solid rgba(139, 0, 0, .14) !important;
-    color: #8B0000 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#mainContent.academic-period-page .academic-quick-actions-head-icon i {
-    color: currentColor !important;
-}
-
-#mainContent.academic-period-page .quick-actions-list {
-    display: grid !important;
-    background: transparent !important;
-}
-
-#mainContent.academic-period-page .quick-action-card {
-    position: relative !important;
-    isolation: isolate !important;
-    overflow: hidden !important;
-    min-height: 76px !important;
-    width: 100% !important;
-    padding: 1rem 1.05rem !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    border-radius: 20px !important;
-    text-decoration: none !important;
-    text-align: left !important;
-    cursor: pointer !important;
-
-    background:
-        radial-gradient(circle at 100% 100%, rgba(139, 0, 0, .08), transparent 42%),
-        linear-gradient(135deg, #ffffff 0%, #fff8f8 100%) !important;
-    border: 1px solid rgba(139, 0, 0, .12) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .78),
-        0 8px 20px rgba(15, 23, 42, .045) !important;
-
-    transition:
-        transform .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease,
-        background .18s ease !important;
-}
-
-#mainContent.academic-period-page .quick-action-card:hover {
-    transform: translateY(-2px) !important;
-    border-color: rgba(139, 0, 0, .30) !important;
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .17), transparent 42%),
-        linear-gradient(135deg, #8B0000 0%, #650000 58%, #320101 100%) !important;
-    box-shadow: 0 16px 30px rgba(139, 0, 0, .20) !important;
-}
-
-#mainContent.academic-period-page .quick-action-icon {
-    position: relative !important;
-    z-index: 2 !important;
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    border-radius: 17px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: #f8fafc !important;
-    border: 1px solid #e5e7eb !important;
-    color: #8B0000 !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .78),
-        0 8px 18px rgba(15, 23, 42, .06) !important;
-
-    transition:
-        transform .18s ease,
-        background .18s ease,
-        border-color .18s ease,
-        color .18s ease !important;
-}
-
-#mainContent.academic-period-page .quick-action-icon i {
-    color: currentColor !important;
-    font-size: 1rem !important;
-    line-height: 1 !important;
-}
-
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-icon {
-    transform: scale(1.03) !important;
-    background: rgba(255, 255, 255, .16) !important;
-    border-color: rgba(255, 255, 255, .24) !important;
-    color: #ffffff !important;
-}
-
-#mainContent.academic-period-page .quick-action-copy {
-    position: relative !important;
-    z-index: 2 !important;
-    min-width: 0 !important;
-    flex: 1 !important;
-    display: grid !important;
-    gap: .18rem !important;
-}
-
-#mainContent.academic-period-page .quick-action-title {
-    color: #111827 !important;
-    font-size: .95rem !important;
-    font-weight: 900 !important;
-    line-height: 1.15 !important;
-    letter-spacing: -.015em !important;
-}
-
-#mainContent.academic-period-page .quick-action-sub {
-    color: #6b7280 !important;
-    font-size: .75rem !important;
-    font-weight: 800 !important;
-    line-height: 1.25 !important;
-    white-space: nowrap !important;
-    max-width: 100% !important;
-    white-space: normal !important;
-    overflow: hidden !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 1 !important;
-    -webkit-box-orient: vertical !important;
-}
-
-#mainContent.academic-period-page .quick-action-arrow {
-    position: relative !important;
-    z-index: 2 !important;
-    margin-left: auto !important;
-    color: #9ca3af !important;
-    font-size: .86rem !important;
-    transition: transform .18s ease, color .18s ease !important;
-}
-
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-title,
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-sub,
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-arrow {
-    color: #ffffff !important;
-}
-
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-arrow {
-    transform: translateX(3px) !important;
-}
-
-#mainContent.academic-period-page .quick-action-bg-icon {
-    position: absolute !important;
-    right: .95rem !important;
-    bottom: -1.8rem !important;
-    z-index: 1 !important;
-    font-size: 5.1rem !important;
-    color: rgba(139, 0, 0, .075) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: rotate(-10deg) !important;
-    pointer-events: none !important;
-    transition: color .18s ease, transform .18s ease !important;
-}
-
-#mainContent.academic-period-page .quick-action-card:hover .quick-action-bg-icon {
-    color: rgba(255, 255, 255, .14) !important;
-    transform: rotate(-8deg) scale(1.04) !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel,
 [data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel.table-card,
 .dark #mainContent.academic-period-page .academic-quick-actions-panel,
@@ -4017,165 +1252,6 @@
     box-shadow:
         0 18px 38px rgba(0, 0, 0, .34),
         inset 0 1px 0 rgba(255, 255, 255, .055) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-header,
-.dark #mainContent.academic-period-page .academic-quick-actions-header {
-    background: #0D1117 !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-head-icon,
-.dark #mainContent.academic-period-page .academic-quick-actions-head-icon {
-    background: rgba(252, 165, 165, .08) !important;
-    border-color: rgba(252, 165, 165, .16) !important;
-    color: #FCA5A5 !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .06),
-        0 10px 18px rgba(0, 0, 0, .18) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-header h2,
-.dark #mainContent.academic-period-page .academic-quick-actions-header h2 {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-header p,
-.dark #mainContent.academic-period-page .academic-quick-actions-header p {
-    color: #9CA3AF !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card,
-.dark #mainContent.academic-period-page .quick-action-card {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(252, 165, 165, .08), transparent 42%),
-        linear-gradient(145deg, rgba(17, 24, 39, .96), rgba(13, 17, 23, .94)) !important;
-    border: 1px solid rgba(255, 255, 255, .10) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .055),
-        0 12px 24px rgba(0, 0, 0, .24) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover,
-.dark #mainContent.academic-period-page .quick-action-card:hover {
-    background:
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .14), transparent 40%),
-        linear-gradient(135deg, #8B0000 0%, #5f0202 58%, #2a0101 100%) !important;
-    border-color: rgba(252, 165, 165, .26) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 18px 34px rgba(0, 0, 0, .34) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-icon,
-.dark #mainContent.academic-period-page .quick-action-icon {
-    background: rgba(255, 255, 255, .075) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #FCA5A5 !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .065),
-        0 10px 18px rgba(0, 0, 0, .20) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover .quick-action-icon,
-.dark #mainContent.academic-period-page .quick-action-card:hover .quick-action-icon {
-    background: rgba(255, 255, 255, .16) !important;
-    border-color: rgba(255, 255, 255, .24) !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-title,
-.dark #mainContent.academic-period-page .quick-action-title {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-sub,
-.dark #mainContent.academic-period-page .quick-action-sub {
-    color: #9CA3AF !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-arrow,
-.dark #mainContent.academic-period-page .quick-action-arrow {
-    color: #6B7280 !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-bg-icon,
-.dark #mainContent.academic-period-page .quick-action-bg-icon {
-    color: rgba(252, 165, 165, .07) !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover .quick-action-title,
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover .quick-action-sub,
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover .quick-action-arrow,
-.dark #mainContent.academic-period-page .quick-action-card:hover .quick-action-title,
-.dark #mainContent.academic-period-page .quick-action-card:hover .quick-action-sub,
-.dark #mainContent.academic-period-page .quick-action-card:hover .quick-action-arrow {
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .quick-action-card:hover .quick-action-bg-icon,
-.dark #mainContent.academic-period-page .quick-action-card:hover .quick-action-bg-icon {
-    color: rgba(255, 255, 255, .13) !important;
-}
-
-#addModal .ap-add-header,
-#editModal .ap-add-header {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 1rem !important;
-    padding: 1.25rem 5.75rem 1rem 1.5rem !important;
-    min-height: 86px !important;
-}
-
-#addModal .ap-add-header-left,
-#editModal .ap-add-header-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: .95rem !important;
-    margin-bottom: .95rem !important;
-    min-width: 0 !important;
-    flex: 1 1 auto !important;
-}
-
-#addModal .ap-add-close,
-#editModal .ap-add-close {
-    position: absolute !important;
-    top: 1.25rem !important;
-    right: 1.5rem !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border-radius: 14px !important;
-    border: 1px solid #E5E7EB !important;
-    background: #FFFFFF !important;
-    color: #9CA3AF !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
-    transform: none !important;
-    z-index: 30 !important;
-    flex: 0 0 auto !important;
-    transition: all .18s ease !important;
-}
-
-#addModal .ap-add-close:hover,
-#editModal .ap-add-close:hover {
-    background: #FEF2F2 !important;
-    border-color: #FECACA !important;
-    color: #8B0000 !important;
-    transform: translateY(-1px) !important;
-}
-
-#addModal .ap-add-close i,
-#editModal .ap-add-close i {
-    color: currentColor !important;
-    line-height: 1 !important;
 }
 
 #addModal .ap-semester-card:hover,
@@ -4202,13 +1278,6 @@
         inset 0 1px 0 rgba(255, 255, 255, .75) !important;
 }
 
-#addModal .ap-word-counter,
-#editModal .ap-word-counter {
-    background: #F8FAFC !important;
-    border: 1px solid #E5E7EB !important;
-    color: #64748B !important;
-}
-
 #addModal .ap-active-card,
 #editModal .ap-active-card {
     background: linear-gradient(90deg, #FFF7F7 0%, #FFFFFF 100%) !important;
@@ -4220,79 +1289,6 @@
     background: #FFFFFF !important;
     color: #8B0000 !important;
     border: 1px solid rgba(139, 0, 0, .10) !important;
-}
-
-#addModal .ap-switch-slider,
-#editModal .ap-switch-slider {
-    background: #D1D5DB !important;
-    border: 1px solid #CBD5E1 !important;
-}
-
-#addModal .ap-switch input:checked+.ap-switch-slider {
-    background: #8B0000 !important;
-    border-color: #8B0000 !important;
-}
-
-#editModal .ap-switch input:checked+.ap-switch-slider {
-    background: #2563EB !important;
-    border-color: #2563EB !important;
-}
-
-#addModal .ap-add-btn-cancel,
-#editModal .ap-add-btn-cancel {
-    min-height: 44px !important;
-    height: 46px !important;
-    padding: 0 1.35rem !important;
-    border-radius: 12px !important;
-    border: 1px solid #E5E7EB !important;
-    background: #FFFFFF !important;
-    color: #4B5563 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .5rem !important;
-    font-size: .875rem !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    box-shadow: none !important;
-    transition:
-        background .18s ease,
-        border-color .18s ease,
-        color .18s ease,
-        transform .18s ease,
-        box-shadow .18s ease !important;
-}
-
-#addModal .ap-add-btn-cancel:hover,
-#editModal .ap-add-btn-cancel:hover,
-#addModal .ap-add-btn-cancel:focus-visible,
-#editModal .ap-add-btn-cancel:focus-visible {
-    background: #FEF2F2 !important;
-    border-color: #FECACA !important;
-    color: #8B0000 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 10px 22px rgba(139, 0, 0, .10) !important;
-    outline: none !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-close,
-[data-theme="dark"] #editModal .ap-add-close,
-.dark #addModal .ap-add-close,
-.dark #editModal .ap-add-close {
-    background: rgba(255, 255, 255, .06) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-    color: #CBD5E1 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-close:hover,
-[data-theme="dark"] #editModal .ap-add-close:hover,
-.dark #addModal .ap-add-close:hover,
-.dark #editModal .ap-add-close:hover {
-    background: rgba(252, 165, 165, .13) !important;
-    border-color: rgba(252, 165, 165, .25) !important;
-    color: #FCA5A5 !important;
 }
 
 [data-theme="dark"] #addModal .ap-semester-card:hover,
@@ -4345,23 +1341,6 @@
         inset 0 1px 0 rgba(255, 255, 255, .08) !important;
 }
 
-[data-theme="dark"] #addModal .ap-word-counter,
-[data-theme="dark"] #editModal .ap-word-counter,
-.dark #addModal .ap-word-counter,
-.dark #editModal .ap-word-counter {
-    background: rgba(255, 255, 255, .065) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #CBD5E1 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055) !important;
-}
-
-[data-theme="dark"] #addModal .ap-desc-help,
-[data-theme="dark"] #editModal .ap-desc-help,
-.dark #addModal .ap-desc-help,
-.dark #editModal .ap-desc-help {
-    color: #9CA3AF !important;
-}
-
 [data-theme="dark"] #addModal .ap-active-card,
 [data-theme="dark"] #editModal .ap-active-card,
 .dark #addModal .ap-active-card,
@@ -4404,110 +1383,6 @@
 .dark #addModal .ap-active-desc,
 .dark #editModal .ap-active-desc {
     color: #9CA3AF !important;
-}
-
-[data-theme="dark"] #addModal .ap-switch-slider,
-[data-theme="dark"] #editModal .ap-switch-slider,
-.dark #addModal .ap-switch-slider,
-.dark #editModal .ap-switch-slider {
-    background: rgba(255, 255, 255, .16) !important;
-    border-color: rgba(255, 255, 255, .14) !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35) !important;
-}
-
-[data-theme="dark"] #addModal .ap-switch-slider::after,
-[data-theme="dark"] #editModal .ap-switch-slider::after,
-.dark #addModal .ap-switch-slider::after,
-.dark #editModal .ap-switch-slider::after {
-    background: #F8FAFC !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .35) !important;
-}
-
-[data-theme="dark"] #addModal .ap-switch input:checked+.ap-switch-slider,
-.dark #addModal .ap-switch input:checked+.ap-switch-slider {
-    background: #8B0000 !important;
-    border-color: rgba(252, 165, 165, .34) !important;
-    box-shadow: 0 0 18px rgba(139, 0, 0, .24) !important;
-}
-
-[data-theme="dark"] #editModal .ap-switch input:checked+.ap-switch-slider,
-.dark #editModal .ap-switch input:checked+.ap-switch-slider {
-    background: #2563EB !important;
-    border-color: rgba(147, 197, 253, .34) !important;
-    box-shadow: 0 0 18px rgba(37, 99, 235, .24) !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-btn-cancel,
-[data-theme="dark"] #editModal .ap-add-btn-cancel,
-.dark #addModal .ap-add-btn-cancel,
-.dark #editModal .ap-add-btn-cancel {
-    background: rgba(255, 255, 255, .06) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-    color: #CBD5E1 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-btn-cancel:hover,
-[data-theme="dark"] #editModal .ap-add-btn-cancel:hover,
-[data-theme="dark"] #addModal .ap-add-btn-cancel:focus-visible,
-[data-theme="dark"] #editModal .ap-add-btn-cancel:focus-visible,
-.dark #addModal .ap-add-btn-cancel:hover,
-.dark #editModal .ap-add-btn-cancel:hover,
-.dark #addModal .ap-add-btn-cancel:focus-visible,
-.dark #editModal .ap-add-btn-cancel:focus-visible {
-    background: rgba(252, 165, 165, .13) !important;
-    border-color: rgba(252, 165, 165, .25) !important;
-    color: #FCA5A5 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, .24) !important;
-}
-
-@media (max-width: 767px) {
-
-    #addModal .ap-add-header,
-    #editModal .ap-add-header {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        padding: 1.15rem 4.75rem .95rem 1rem !important;
-        min-height: 74px !important;
-        border-radius: 22px 22px 0 0 !important;
-    }
-
-    #addModal .ap-add-header-left,
-    #editModal .ap-add-header-left {
-        display: flex !important;
-        align-items: center !important;
-        gap: .75rem !important;
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #addModal .ap-add-header-icon,
-    #editModal .ap-add-header-icon {
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        border-radius: 14px !important;
-        flex: 0 0 44px !important;
-    }
-
-    #addModal .ap-add-header-left>div:last-child,
-    #editModal .ap-add-header-left>div:last-child {
-        width: auto !important;
-        min-width: 0 !important;
-        flex: 1 1 auto !important;
-    }
-
-    #addModal .ap-add-close,
-    #editModal .ap-add-close {
-        top: 1.15rem !important;
-        right: 1rem !important;
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
-    }
 }
 
 #mainContent.academic-period-page .ap-pup-calendar-link {
@@ -4897,137 +1772,6 @@
     visibility: visible !important;
 }
 
-#deleteModal .ap-delete-shell {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    transform: none !important;
-    margin: 0 !important;
-    width: min(92vw, 560px) !important;
-    max-width: 680px !important;
-    max-height: calc(100dvh - 2rem) !important;
-    overflow: hidden !important;
-    border-radius: 22px !important;
-    background: #ffffff !important;
-    border: 1px solid #eef2f7 !important;
-    box-shadow: 0 28px 70px rgba(15, 23, 42, .28) !important;
-}
-
-#deleteModal .ap-delete-head {
-    padding: 1rem 1.15rem !important;
-    border-bottom: 1px solid #eef2f7 !important;
-    background:
-        radial-gradient(circle at top right, rgba(239, 68, 68, .10), transparent 38%),
-        #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: .85rem !important;
-}
-
-#deleteModal .ap-delete-head-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: .8rem !important;
-    min-width: 0 !important;
-}
-
-#deleteModal .ap-delete-head-icon {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    border-radius: 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: #fee2e2 !important;
-    color: #dc2626 !important;
-    border: 1px solid #fecaca !important;
-    box-shadow: 0 10px 22px rgba(220, 38, 38, .14) !important;
-}
-
-#deleteModal .ap-delete-head-icon i,
-#deleteModal .ap-delete-x i,
-#deleteModal .ap-delete-confirm-btn i {
-    color: currentColor !important;
-}
-
-#deleteModal .ap-delete-title {
-    margin: 0 !important;
-    color: #1f2937 !important;
-    font-size: 1rem !important;
-    line-height: 1.1 !important;
-    font-weight: 900 !important;
-}
-
-#deleteModal .ap-delete-subtitle {
-    margin: .2rem 0 0 !important;
-    color: #8b95a7 !important;
-    font-size: .76rem !important;
-    line-height: 1.25 !important;
-    font-weight: 800 !important;
-}
-
-#deleteModal .ap-delete-x {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    color: #94a3b8 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all .18s ease !important;
-}
-
-#deleteModal .ap-delete-x:hover {
-    background: #fef2f2 !important;
-    border-color: #fecaca !important;
-    color: #dc2626 !important;
-    transform: translateY(-1px) !important;
-}
-
-#deleteModal .ap-delete-content {
-    padding: 1.15rem !important;
-    background: #ffffff !important;
-}
-
-#deleteModal .ap-delete-warning {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: .75rem !important;
-    padding: .9rem !important;
-    margin-bottom: 1rem !important;
-    border-radius: 16px !important;
-    background: #fef2f2 !important;
-    border: 1px solid #fca5a5 !important;
-    color: #991b1b !important;
-}
-
-#deleteModal .ap-delete-warning>i {
-    margin-top: .12rem !important;
-    color: #dc2626 !important;
-    font-size: .95rem !important;
-}
-
-#deleteModal .ap-delete-warning p {
-    margin: 0 !important;
-    color: #7f1d1d !important;
-    font-size: .88rem !important;
-    line-height: 1.4 !important;
-    font-weight: 900 !important;
-}
-
-#deleteModal .ap-delete-warning span {
-    display: block !important;
-    margin-top: .3rem !important;
-    color: #b91c1c !important;
-    font-size: .76rem !important;
-    font-weight: 600 !important;
-}
-
 #deleteModal #deletePeriodLabel {
     display: inline-flex !important;
     padding: .14rem .42rem !important;
@@ -5037,15 +1781,7 @@
     font-weight: 950 !important;
 }
 
-#deleteModal .ap-delete-footer {
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: .7rem !important;
-}
-
-#deleteModal .modal-btn-ghost,
-#deleteModal .ap-delete-confirm-btn {
+#deleteModal .modal-btn-ghost {
     min-height: 44px !important;
     padding: 0 1.15rem !important;
     border-radius: 12px !important;
@@ -5069,99 +1805,6 @@
     transform: translateY(-1px) !important;
 }
 
-#deleteModal .ap-delete-confirm-btn {
-    border: 0 !important;
-    background: linear-gradient(135deg, #dc2626, #ef4444) !important;
-    color: #ffffff !important;
-    cursor: pointer !important;
-    box-shadow: 0 12px 24px rgba(220, 38, 38, .26) !important;
-    transition: all .18s ease !important;
-}
-
-#deleteModal .ap-delete-confirm-btn:hover {
-    transform: translateY(-1px) !important;
-    background: linear-gradient(135deg, #b91c1c, #dc2626) !important;
-    box-shadow: 0 16px 30px rgba(220, 38, 38, .34) !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-shell,
-.dark #deleteModal .ap-delete-shell {
-    background: #0d1117 !important;
-    border-color: #21262d !important;
-    color: #e5e7eb !important;
-    box-shadow:
-        0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-head,
-.dark #deleteModal .ap-delete-head {
-    background:
-        radial-gradient(circle at top right, rgba(252, 165, 165, .10), transparent 38%),
-        #0d1117 !important;
-    border-color: #21262d !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-content,
-.dark #deleteModal .ap-delete-content {
-    background: #111827 !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-title,
-.dark #deleteModal .ap-delete-title {
-    color: #f8fafc !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-subtitle,
-.dark #deleteModal .ap-delete-subtitle {
-    color: #94a3b8 !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-head-icon,
-.dark #deleteModal .ap-delete-head-icon {
-    background: rgba(220, 38, 38, .17) !important;
-    color: #fca5a5 !important;
-    border-color: rgba(252, 165, 165, .22) !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-x,
-.dark #deleteModal .ap-delete-x,
-[data-theme="dark"] #deleteModal .modal-btn-ghost,
-.dark #deleteModal .modal-btn-ghost {
-    background: rgba(255, 255, 255, .06) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-x:hover,
-.dark #deleteModal .ap-delete-x:hover,
-[data-theme="dark"] #deleteModal .modal-btn-ghost:hover,
-.dark #deleteModal .modal-btn-ghost:hover {
-    background: rgba(252, 165, 165, .13) !important;
-    border-color: rgba(252, 165, 165, .25) !important;
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-warning,
-.dark #deleteModal .ap-delete-warning {
-    background:
-        radial-gradient(circle at top left, rgba(252, 165, 165, .12), transparent 45%),
-        rgba(220, 38, 38, .12) !important;
-    border-color: rgba(252, 165, 165, .26) !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-warning p,
-.dark #deleteModal .ap-delete-warning p {
-    color: #fecaca !important;
-}
-
-[data-theme="dark"] #deleteModal .ap-delete-warning span,
-[data-theme="dark"] #deleteModal .ap-delete-warning>i,
-.dark #deleteModal .ap-delete-warning span,
-.dark #deleteModal .ap-delete-warning>i {
-    color: #fca5a5 !important;
-}
-
 [data-theme="dark"] #deleteModal #deletePeriodLabel,
 .dark #deleteModal #deletePeriodLabel {
     background: rgba(255, 255, 255, .08) !important;
@@ -5174,476 +1817,13 @@
         padding: 0 !important;
     }
 
-    #deleteModal .ap-delete-shell {
-        width: 100% !important;
-        max-width: 100% !important;
-        max-height: 88dvh !important;
-        border-radius: 24px 24px 0 0 !important;
-    }
-
-    #deleteModal .ap-delete-footer {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-    }
-
-    #deleteModal .modal-btn-ghost,
-    #deleteModal .ap-delete-confirm-btn {
+    #deleteModal .modal-btn-ghost {
         width: 100% !important;
     }
-}
-
-#syncFlssModal.ui-modal {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    margin: 0 !important;
-    padding: 24px !important;
-    display: none !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-}
-
-#syncFlssModal.ui-modal.open {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-#syncFlssModal.ui-modal.closing {
-    display: flex !important;
-    opacity: 0 !important;
-    visibility: visible !important;
-    pointer-events: none !important;
-}
-
-#syncFlssModal.ui-modal:not(.open):not(.closing) {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-#syncFlssModal .ap-sync-shell {
-    width: min(92vw, 700px) !important;
-    max-width: 700px !important;
-    max-height: calc(100dvh - 2rem) !important;
-    overflow: hidden !important;
-    border-radius: 22px !important;
-    background: #ffffff !important;
-    border: 1px solid #eef2f7 !important;
-    box-shadow: 0 28px 70px rgba(15, 23, 42, .28) !important;
-}
-
-#syncFlssModal .ap-sync-head {
-    padding: 1rem 1.15rem !important;
-    border-bottom: 1px solid #eef2f7 !important;
-    background:
-        radial-gradient(circle at top right, rgba(37, 99, 235, .10), transparent 38%),
-        #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: .85rem !important;
-}
-
-#syncFlssModal .ap-sync-head-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: .8rem !important;
-    min-width: 0 !important;
-}
-
-#syncFlssModal .ap-sync-head-icon {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    border-radius: 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: #EFF6FF !important;
-    color: #2563EB !important;
-    border: 1px solid #BFDBFE !important;
-    box-shadow: 0 10px 22px rgba(37, 99, 235, .14) !important;
-}
-
-#syncFlssModal .ap-sync-title {
-    margin: 0 !important;
-    color: #1F2937 !important;
-    font-size: 1rem !important;
-    line-height: 1.1 !important;
-    font-weight: 900 !important;
-}
-
-#syncFlssModal .ap-sync-subtitle {
-    margin: .2rem 0 0 !important;
-    color: #8B95A7 !important;
-    font-size: .76rem !important;
-    line-height: 1.25 !important;
-    font-weight: 800 !important;
-}
-
-#syncFlssModal .ap-sync-x {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    border: 1px solid #E5E7EB !important;
-    border-radius: 12px !important;
-    background: #FFFFFF !important;
-    color: #94A3B8 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all .18s ease !important;
-    cursor: pointer !important;
-}
-
-#syncFlssModal .ap-sync-x:hover {
-    background: #EFF6FF !important;
-    border-color: #BFDBFE !important;
-    color: #2563EB !important;
-    transform: translateY(-1px) !important;
-}
-
-#syncFlssModal .ap-sync-body {
-    padding: 1.15rem !important;
-    background: #FFFFFF !important;
-}
-
-#syncFlssModal .ap-sync-alert {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: .75rem !important;
-    padding: .95rem !important;
-    margin-bottom: 1rem !important;
-    border-radius: 16px !important;
-    background: #EFF6FF !important;
-    border: 1px solid #BFDBFE !important;
-    color: #1D4ED8 !important;
-}
-
-#syncFlssModal .ap-sync-alert>i {
-    margin-top: .12rem !important;
-    color: #2563EB !important;
-}
-
-#syncFlssModal .ap-sync-alert p {
-    margin: 0 !important;
-    color: #1E3A8A !important;
-    font-size: .88rem !important;
-    line-height: 1.4 !important;
-    font-weight: 900 !important;
-}
-
-#syncFlssModal .ap-sync-alert span,
-#syncFlssModal .ap-sync-note {
-    color: #64748B !important;
-    font-size: .76rem !important;
-    font-weight: 700 !important;
-    line-height: 1.45 !important;
-}
-
-#syncFlssModal .ap-sync-note {
-    display: flex !important;
-    align-items: center !important;
-    gap: .55rem !important;
-}
-
-#syncFlssModal .ap-sync-note i {
-    color: #2563EB !important;
-}
-
-#syncFlssModal .ap-sync-footer {
-    padding: 0 1.15rem 1.15rem !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: .7rem !important;
-}
-
-#syncFlssModal .modal-btn-ghost,
-#syncFlssModal .ap-sync-confirm-btn {
-    min-height: 44px !important;
-    padding: 0 1.15rem !important;
-    border-radius: 12px !important;
-    font-size: .86rem !important;
-    font-weight: 900 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .55rem !important;
-}
-
-#syncFlssModal .ap-sync-confirm-btn {
-    border: 0 !important;
-    background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
-    color: #FFFFFF !important;
-    cursor: pointer !important;
-    box-shadow: 0 12px 24px rgba(37, 99, 235, .24) !important;
-    transition: all .18s ease !important;
-}
-
-#syncFlssModal .ap-sync-confirm-btn:hover {
-    transform: translateY(-1px) !important;
-    background: linear-gradient(135deg, #1D4ED8, #1E40AF) !important;
-    box-shadow: 0 16px 30px rgba(37, 99, 235, .32) !important;
 }
 
 #syncFlssModal i {
     color: currentColor !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-shell,
-.dark #syncFlssModal .ap-sync-shell {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-    color: #E5E7EB !important;
-    box-shadow:
-        0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-head,
-.dark #syncFlssModal .ap-sync-head {
-    background:
-        radial-gradient(circle at top right, rgba(147, 197, 253, .10), transparent 38%),
-        #0D1117 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-body,
-.dark #syncFlssModal .ap-sync-body {
-    background: #111827 !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-title,
-.dark #syncFlssModal .ap-sync-title {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-subtitle,
-.dark #syncFlssModal .ap-sync-subtitle,
-[data-theme="dark"] #syncFlssModal .ap-sync-note,
-.dark #syncFlssModal .ap-sync-note {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-head-icon,
-.dark #syncFlssModal .ap-sync-head-icon {
-    background: rgba(37, 99, 235, .17) !important;
-    color: #93C5FD !important;
-    border-color: rgba(147, 197, 253, .24) !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-x,
-.dark #syncFlssModal .ap-sync-x,
-[data-theme="dark"] #syncFlssModal .modal-btn-ghost,
-.dark #syncFlssModal .modal-btn-ghost {
-    background: rgba(255, 255, 255, .06) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-x:hover,
-.dark #syncFlssModal .ap-sync-x:hover,
-[data-theme="dark"] #syncFlssModal .modal-btn-ghost:hover,
-.dark #syncFlssModal .modal-btn-ghost:hover {
-    background: rgba(147, 197, 253, .13) !important;
-    border-color: rgba(147, 197, 253, .25) !important;
-    color: #93C5FD !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-alert,
-.dark #syncFlssModal .ap-sync-alert {
-    background:
-        radial-gradient(circle at top left, rgba(147, 197, 253, .12), transparent 45%),
-        rgba(37, 99, 235, .12) !important;
-    border-color: rgba(147, 197, 253, .26) !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-alert p,
-.dark #syncFlssModal .ap-sync-alert p {
-    color: #DBEAFE !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-alert span,
-[data-theme="dark"] #syncFlssModal .ap-sync-alert>i,
-[data-theme="dark"] #syncFlssModal .ap-sync-note i,
-.dark #syncFlssModal .ap-sync-alert span,
-.dark #syncFlssModal .ap-sync-alert>i,
-.dark #syncFlssModal .ap-sync-note i {
-    color: #93C5FD !important;
-}
-
-@media (max-width: 767px) {
-    #syncFlssModal.ui-modal {
-        align-items: flex-end !important;
-        padding: 0 !important;
-    }
-
-    #syncFlssModal .ap-sync-shell {
-        width: 100% !important;
-        max-width: 100% !important;
-        max-height: 88dvh !important;
-        border-radius: 24px 24px 0 0 !important;
-    }
-
-    #syncFlssModal .ap-sync-footer {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-    }
-
-    #syncFlssModal .modal-btn-ghost,
-    #syncFlssModal .ap-sync-confirm-btn {
-        width: 100% !important;
-    }
-}
-
-#editModal .ap-add-close,
-#editModal .ap-add-btn-cancel,
-#syncFlssModal .ap-sync-x,
-#syncFlssModal .modal-btn-ghost {
-    position: relative !important;
-    z-index: 50 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-}
-
-#syncFlssModal[data-sync-flss-modal] {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    display: none !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 24px !important;
-    background: rgba(15, 23, 42, .55) !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
-    z-index: 100000 !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-#syncFlssModal[data-sync-flss-modal].open {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-#syncFlssModal[data-sync-flss-modal].closing {
-    display: flex !important;
-    opacity: 0 !important;
-    visibility: visible !important;
-    pointer-events: none !important;
-}
-
-#syncFlssModal[data-sync-flss-modal] .ap-sync-shell {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transform: none !important;
-}
-
-@media (max-width: 767px) {
-    #syncFlssModal[data-sync-flss-modal] {
-        align-items: flex-end !important;
-        padding: 0 !important;
-    }
-}
-
-#syncFlssModal .ap-sync-shell {
-    background: #ffffff !important;
-    overflow: hidden !important;
-}
-
-#syncFlssModal .ap-sync-head {
-    background: transparent !important;
-    border-bottom: 1px solid #eef2f7 !important;
-}
-
-#syncFlssModal .ap-sync-body {
-    background: transparent !important;
-    padding: 1.15rem 1.15rem 0 !important;
-    border: 0 !important;
-    box-shadow: none !important;
-}
-
-#syncFlssModal .ap-sync-footer {
-    background: transparent !important;
-    padding: 1.15rem !important;
-    border: 0 !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-shell,
-.dark #syncFlssModal .ap-sync-shell {
-    background: #0D1117 !important;
-}
-
-[data-theme="dark"] #syncFlssModal .ap-sync-head,
-.dark #syncFlssModal .ap-sync-head,
-[data-theme="dark"] #syncFlssModal .ap-sync-body,
-.dark #syncFlssModal .ap-sync-body,
-[data-theme="dark"] #syncFlssModal .ap-sync-footer,
-.dark #syncFlssModal .ap-sync-footer {
-    background: transparent !important;
-    border-color: #21262D !important;
-}
-
-#addModal .ap-add-header::before,
-#editModal .ap-add-header::before {
-    content: none !important;
-    display: none !important;
-}
-
-#addModal .ap-add-header,
-#editModal .ap-add-header {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 1rem !important;
-    padding: 1.25rem 5.75rem 1.25rem 1.5rem !important;
-    min-height: 96px !important;
-    overflow: visible !important;
-}
-
-#addModal .ap-add-header-left,
-#editModal .ap-add-header-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: .95rem !important;
-    margin-bottom: 0 !important;
-    min-width: 0 !important;
-    flex: 1 1 auto !important;
-}
-
-#addModal .ap-add-close,
-#editModal .ap-add-close {
-    position: absolute !important;
-    top: 50% !important;
-    right: 1.5rem !important;
-    left: auto !important;
-    transform: translateY(-50%) !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    z-index: 40 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-}
-
-#addModal .ap-add-close:hover,
-#editModal .ap-add-close:hover {
-    transform: translateY(calc(-50% - 1px)) !important;
 }
 
 @media (max-width: 767px) {
@@ -5658,7 +1838,7 @@
         max-width: 100% !important;
     }
 
-    #mainContent.academic-period-page .admin-page-container > .relative,
+    #mainContent.academic-period-page .admin-page-container>.relative,
     #mainContent.academic-period-page .relative.z-10 {
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -5730,30 +1910,30 @@
         padding: .75rem !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: .65rem !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div:nth-child(3) {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div:nth-child(3) {
         grid-column: 1 / -1 !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div,
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > div:last-child {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
         min-height: 82px !important;
         padding: .75rem !important;
         border-radius: 15px !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div > .flex {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div>.flex {
         gap: .45rem !important;
         margin-bottom: .25rem !important;
         min-height: 24px !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div i {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i {
         width: 24px !important;
         height: 24px !important;
         min-width: 24px !important;
@@ -5761,7 +1941,7 @@
         font-size: .68rem !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div p:first-of-type {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type {
         font-size: .56rem !important;
         line-height: 1.1 !important;
     }
@@ -5775,44 +1955,10 @@
         word-break: break-word !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > div:last-child > button {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child>button {
         min-height: 40px !important;
         font-size: .76rem !important;
         border-radius: 12px !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .75rem !important;
-        padding: .85rem !important;
-        align-items: stretch !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-left,
-    #mainContent.academic-period-page .ap-toolbar-right {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-left {
-        justify-content: flex-start !important;
-        white-space: normal !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-right {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .55rem !important;
-        align-items: stretch !important;
-        justify-content: stretch !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        flex-basis: auto !important;
     }
 
     #mainContent.academic-period-page .global-filter-btn,
@@ -5824,79 +1970,6 @@
         border-radius: 13px !important;
     }
 
-    #mainContent.academic-period-page #academicViewToggle,
-    #mainContent.academic-period-page #academicListView {
-        display: none !important;
-    }
-
-    #mainContent.academic-period-page #academicGridView {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .8rem !important;
-        padding: .8rem !important;
-        width: 100% !important;
-    }
-
-    #mainContent.academic-period-page .academic-card {
-        min-height: auto !important;
-        padding: .85rem !important;
-        border-radius: 16px !important;
-        gap: .75rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-top {
-        align-items: flex-start !important;
-        gap: .65rem !important;
-        margin-bottom: .5rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-year-text {
-        font-size: .86rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-meta {
-        gap: .55rem !important;
-        margin-bottom: .75rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-row {
-        display: grid !important;
-        grid-template-columns: 82px minmax(0, 1fr) !important;
-        gap: .6rem !important;
-        align-items: start !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-label {
-        min-width: 0 !important;
-        font-size: .58rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-value {
-        font-size: .72rem !important;
-        text-align: right !important;
-        word-break: break-word !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-actions {
-        display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: .5rem !important;
-        width: 100% !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-actions .ap-action-btn,
-    #mainContent.academic-period-page .academic-card-actions form,
-    #mainContent.academic-period-page .academic-card-actions form .ap-action-btn {
-        width: 100% !important;
-    }
-
-    #mainContent.academic-period-page .ap-action-btn {
-        min-height: 38px !important;
-        height: 38px !important;
-        border-radius: 12px !important;
-    }
-
     #mainContent.academic-period-page .academic-quick-actions-panel,
     #mainContent.academic-period-page .cal-card,
     #mainContent.academic-period-page .bg-white.rounded-xl {
@@ -5904,94 +1977,10 @@
         overflow: hidden !important;
     }
 
-    #mainContent.academic-period-page .academic-quick-actions-header {
-        padding: .85rem !important;
-    }
-
-    #mainContent.academic-period-page .quick-actions-list {
-        padding: .75rem !important;
-        gap: .65rem !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-card {
-        min-height: 68px !important;
-        padding: .8rem !important;
-        border-radius: 16px !important;
-        gap: .75rem !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-icon {
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        border-radius: 13px !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-title {
-        font-size: .82rem !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-sub {
-        font-size: .66rem !important;
-        -webkit-line-clamp: 2 !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-bg-icon {
-        font-size: 4rem !important;
-        bottom: -1.4rem !important;
-    }
-
     #addModal,
     #editModal {
         align-items: flex-end !important;
         padding: 0 !important;
-    }
-
-    #addModal .ap-academic-modal,
-    #editModal .ap-academic-modal {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 90dvh !important;
-        max-height: 90dvh !important;
-        border-radius: 22px 22px 0 0 !important;
-        overflow: hidden !important;
-    }
-
-    #addModal .ap-add-header,
-    #editModal .ap-add-header {
-        min-height: 72px !important;
-        padding: .9rem 4rem .8rem .9rem !important;
-        border-radius: 22px 22px 0 0 !important;
-    }
-
-    #addModal .ap-add-header-icon,
-    #editModal .ap-add-header-icon {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        border-radius: 12px !important;
-    }
-
-    #addModal .ap-add-header-title,
-    #editModal .ap-add-header-title {
-        font-size: .95rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #addModal .ap-add-header-subtitle,
-    #editModal .ap-add-header-subtitle {
-        font-size: .68rem !important;
-        line-height: 1.25 !important;
-    }
-
-    #addModal .ap-add-close,
-    #editModal .ap-add-close {
-        right: .9rem !important;
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        min-height: 36px !important;
-        border-radius: 11px !important;
     }
 
     #addModal .ap-add-body,
@@ -6056,27 +2045,10 @@
         border-radius: 14px !important;
         gap: .6rem !important;
     }
-
-    #addModal .ap-add-footer,
-    #editModal .ap-add-footer {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: .55rem !important;
-        padding: .7rem .8rem calc(.8rem + env(safe-area-inset-bottom)) !important;
-    }
-
-    #addModal .ap-add-footer .ap-add-btn,
-    #editModal .ap-add-footer .ap-add-btn {
-        width: 100% !important;
-        min-height: 40px !important;
-        height: 40px !important;
-        border-radius: 12px !important;
-        font-size: .74rem !important;
-        padding: 0 .6rem !important;
-    }
 }
 
 @media (max-width: 767px) {
+
     #mainContent.academic-period-page,
     #mainContent.academic-period-page * {
         box-sizing: border-box !important;
@@ -6090,7 +2062,7 @@
         overflow-x: hidden !important;
     }
 
-    #mainContent.academic-period-page > .admin-page-container {
+    #mainContent.academic-period-page>.admin-page-container {
         width: 100% !important;
         max-width: 100% !important;
         padding-left: .85rem !important;
@@ -6098,7 +2070,7 @@
         overflow-x: hidden !important;
     }
 
-    #mainContent.academic-period-page .admin-page-container > .relative.z-10 {
+    #mainContent.academic-period-page .admin-page-container>.relative.z-10 {
         width: 100% !important;
         max-width: 100% !important;
         padding-left: 0 !important;
@@ -6109,42 +2081,11 @@
 
     #mainContent.academic-period-page .ap-content-layout,
     #mainContent.academic-period-page .ap-periods-column,
-    #mainContent.academic-period-page .ap-periods-column > .bg-white {
+    #mainContent.academic-period-page .ap-periods-column>.bg-white {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
         overflow: hidden !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar {
-        padding: .85rem !important;
-        overflow: hidden !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-right {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .65rem !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #mainContent.academic-period-page .voice-search-row.ap-search-row {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) 40px !important;
-        gap: .5rem !important;
-        align-items: center !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row .search-wrap.global-search,
-    #mainContent.academic-period-page .ap-search-row .search-input {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
     }
 
     #mainContent.academic-period-page .voice-input-toggle {
@@ -6164,139 +2105,7 @@
         min-height: 40px !important;
         margin: 0 !important;
     }
-
-    #mainContent.academic-period-page #academicListView {
-        display: none !important;
-    }
-
-    #mainContent.academic-period-page #academicGridView {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: .85rem !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        padding: .85rem !important;
-        overflow: hidden !important;
-    }
-
-    #mainContent.academic-period-page .academic-card {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        min-height: auto !important;
-        padding: 1rem !important;
-        border-radius: 16px !important;
-        overflow: hidden !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-top {
-        display: flex !important;
-        align-items: flex-start !important;
-        justify-content: space-between !important;
-        gap: .75rem !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin-bottom: 1rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-year {
-        min-width: 0 !important;
-        flex: 1 1 auto !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-year-text {
-        font-size: .9rem !important;
-        line-height: 1.15 !important;
-        white-space: nowrap !important;
-    }
-
-    #mainContent.academic-period-page .status-badge {
-        flex: 0 0 auto !important;
-        max-width: 95px !important;
-        font-size: .58rem !important;
-        padding: .32rem .58rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-meta {
-        display: grid !important;
-        gap: .8rem !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin-bottom: 1rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-row {
-        display: block !important;
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-label {
-        display: block !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin-bottom: .28rem !important;
-        font-size: .62rem !important;
-        line-height: 1.1 !important;
-        letter-spacing: .07em !important;
-        text-align: left !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-value {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        text-align: left !important;
-        justify-self: start !important;
-        font-size: .82rem !important;
-        line-height: 1.25 !important;
-        overflow-wrap: anywhere !important;
-        word-break: normal !important;
-    }
-
-    #mainContent.academic-period-page .sem-pill {
-        max-width: 100% !important;
-        white-space: normal !important;
-        justify-content: flex-start !important;
-        font-size: .62rem !important;
-        padding: .35rem .65rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-actions {
-        display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: .6rem !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        margin-top: .9rem !important;
-        overflow: hidden !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-actions form {
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-actions .ap-action-btn,
-    #mainContent.academic-period-page .academic-card-actions form .ap-action-btn {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        height: 40px !important;
-        min-height: 40px !important;
-        border-radius: 12px !important;
-    }
 }
-
-
 
 @media (min-width: 768px) and (max-width: 1280px) {
 
@@ -6372,15 +2181,15 @@
         padding: 1rem !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
         display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         gap: .75rem !important;
         min-width: 0 !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 > div,
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > div:last-child {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
         min-height: 104px !important;
         padding: .95rem !important;
         border-radius: 16px !important;
@@ -6413,46 +2222,6 @@
         max-width: 100% !important;
     }
 
-    #mainContent.academic-period-page .ap-toolbar {
-        display: grid !important;
-        grid-template-columns: max-content minmax(0, 1fr) !important;
-        align-items: center !important;
-        gap: .8rem !important;
-        overflow: visible !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-left {
-        min-width: max-content !important;
-        white-space: nowrap !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-left h2 {
-        font-size: .95rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-right {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: .55rem !important;
-        flex-wrap: nowrap !important;
-        min-width: 0 !important;
-        width: 100% !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row {
-        flex: 1 1 auto !important;
-        width: auto !important;
-        max-width: 360px !important;
-        min-width: 220px !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row .search-wrap.global-search {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
     #mainContent.academic-period-page .global-filter-btn {
         min-height: 40px !important;
         height: 40px !important;
@@ -6467,150 +2236,6 @@
         min-width: 40px !important;
     }
 
-    #mainContent.academic-period-page #academicViewToggle.view-toggle-container {
-        flex: 0 0 auto !important;
-        transform: scale(.92) !important;
-        transform-origin: right center !important;
-    }
-
-    #mainContent.academic-period-page .ap-table-wrap {
-        width: 100% !important;
-        max-width: 100% !important;
-        overflow-x: auto !important;
-        overflow-y: visible !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    #mainContent.academic-period-page .ap-table {
-        min-width: 860px !important;
-        width: 100% !important;
-        table-layout: fixed !important;
-    }
-
-    #mainContent.academic-period-page .ap-table th,
-    #mainContent.academic-period-page .ap-table td {
-        padding-left: .6rem !important;
-        padding-right: .6rem !important;
-        font-size: .72rem !important;
-        vertical-align: middle !important;
-    }
-
-    #mainContent.academic-period-page .ap-table thead th {
-        height: 44px !important;
-        font-size: .6rem !important;
-        letter-spacing: .07em !important;
-        white-space: nowrap !important;
-    }
-
-    #mainContent.academic-period-page .ap-table tbody td {
-        height: 54px !important;
-    }
-
-    #mainContent.academic-period-page .ap-table td.col-year .ap-year-text,
-    #mainContent.academic-period-page .ap-table td.col-year .font-bold {
-        font-size: .72rem !important;
-        line-height: 1.15 !important;
-        white-space: nowrap !important;
-    }
-
-    #mainContent.academic-period-page .status-badge,
-    #mainContent.academic-period-page .sem-pill {
-        min-height: 24px !important;
-        padding: 3px 8px !important;
-        font-size: .58rem !important;
-        white-space: nowrap !important;
-    }
-
-    #mainContent.academic-period-page .ap-actions {
-        gap: .35rem !important;
-        flex-wrap: nowrap !important;
-        justify-content: center !important;
-    }
-
-    #mainContent.academic-period-page .ap-action-btn {
-        width: 30px !important;
-        height: 30px !important;
-        min-width: 30px !important;
-        border-radius: 10px !important;
-    }
-
-    #mainContent.academic-period-page .ap-action-btn i {
-        font-size: .68rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-grid-view {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .8rem !important;
-        padding: .85rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card {
-        min-height: 210px !important;
-        padding: .9rem !important;
-        border-radius: 16px !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-year-text {
-        font-size: .78rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-label {
-        font-size: .56rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-card-value {
-        font-size: .7rem !important;
-        line-height: 1.25 !important;
-    }
-
-    #mainContent.academic-period-page .academic-quick-actions-header {
-        padding: .85rem .95rem !important;
-    }
-
-    #mainContent.academic-period-page .academic-quick-actions-head-icon {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        border-radius: 12px !important;
-    }
-
-    #mainContent.academic-period-page .quick-actions-list {
-        gap: .65rem !important;
-        padding: .75rem !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-card {
-        min-height: 68px !important;
-        padding: .8rem .85rem !important;
-        gap: .75rem !important;
-        border-radius: 16px !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-icon {
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        border-radius: 13px !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-title {
-        font-size: .8rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-sub {
-        font-size: .64rem !important;
-        line-height: 1.25 !important;
-        -webkit-line-clamp: 2 !important;
-    }
-
-    #mainContent.academic-period-page .quick-action-bg-icon {
-        font-size: 4rem !important;
-        right: .65rem !important;
-        bottom: -1.35rem !important;
-    }
-
     #mainContent.academic-period-page .cal-card {
         border-radius: 18px !important;
         overflow: hidden !important;
@@ -6620,50 +2245,6 @@
         width: 26px !important;
         height: 26px !important;
         min-width: 26px !important;
-    }
-
-    #addModal .ap-academic-modal,
-    #editModal .ap-academic-modal {
-        width: min(94vw, 900px) !important;
-        max-width: 900px !important;
-        max-height: calc(100dvh - 2rem) !important;
-        border-radius: 22px !important;
-    }
-
-    #addModal .ap-add-header,
-    #editModal .ap-add-header {
-        min-height: 82px !important;
-        padding: 1rem 5rem 1rem 1.15rem !important;
-    }
-
-    #addModal .ap-add-header-icon,
-    #editModal .ap-add-header-icon {
-        width: 46px !important;
-        height: 46px !important;
-        min-width: 46px !important;
-        border-radius: 14px !important;
-    }
-
-    #addModal .ap-add-header-title,
-    #editModal .ap-add-header-title {
-        font-size: 1.15rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #addModal .ap-add-header-subtitle,
-    #editModal .ap-add-header-subtitle {
-        font-size: .72rem !important;
-        line-height: 1.3 !important;
-    }
-
-    #addModal .ap-add-close,
-    #editModal .ap-add-close {
-        right: 1.15rem !important;
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
-        border-radius: 12px !important;
     }
 
     #addModal .ap-add-body,
@@ -6726,41 +2307,6 @@
         padding: .85rem !important;
         border-radius: 16px !important;
     }
-
-    #addModal .ap-add-footer,
-    #editModal .ap-add-footer {
-        padding: .85rem 1rem 1rem !important;
-    }
-
-    #addModal .ap-add-btn,
-    #editModal .ap-add-btn {
-        height: 42px !important;
-        min-height: 42px !important;
-        font-size: .76rem !important;
-        border-radius: 12px !important;
-    }
-
-    #deleteModal .ap-delete-shell,
-    #syncFlssModal .ap-sync-shell {
-        width: min(94vw, 520px) !important;
-        max-width: 94vw !important;
-        border-radius: 22px !important;
-    }
-
-    #deleteModal .ap-delete-head,
-    #syncFlssModal .ap-sync-head {
-        padding: .95rem 1rem !important;
-    }
-
-    #deleteModal .ap-delete-content,
-    #syncFlssModal .ap-sync-body {
-        padding: 1rem !important;
-    }
-
-    #deleteModal .ap-delete-footer,
-    #syncFlssModal .ap-sync-footer {
-        padding: 1rem !important;
-    }
 }
 
 @media (min-width: 768px) and (max-width: 900px) {
@@ -6783,39 +2329,13 @@
         flex: 0 0 auto !important;
     }
 
-    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner > .flex-1 {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 
     #mainContent.academic-period-page .ap-content-layout,
     #mainContent.academic-period-page .grid.grid-cols-1.lg\:grid-cols-3 {
         grid-template-columns: 1fr !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar {
-        grid-template-columns: 1fr !important;
-        gap: .7rem !important;
-    }
-
-    #mainContent.academic-period-page .ap-toolbar-right {
-        justify-content: flex-start !important;
-        flex-wrap: wrap !important;
-        gap: .55rem !important;
-    }
-
-    #mainContent.academic-period-page .ap-search-row {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        flex: 1 1 100% !important;
-    }
-
-    #mainContent.academic-period-page .academic-grid-view {
-        grid-template-columns: 1fr !important;
-    }
-
-    #mainContent.academic-period-page .ap-table {
-        min-width: 880px !important;
     }
 
     #addModal .ap-add-body,
@@ -6833,28 +2353,8 @@
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 
-    #addModal .ap-add-footer,
-    #editModal .ap-add-footer {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-    }
-
-    #addModal .ap-add-btn,
-    #editModal .ap-add-btn {
-        width: 100% !important;
-    }
-
-    #deleteModal .ap-delete-footer,
-    #syncFlssModal .ap-sync-footer {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-    }
-
     #deleteModal .modal-btn-ghost,
-    #deleteModal .ap-delete-confirm-btn,
-    #syncFlssModal .modal-btn-ghost,
-    #syncFlssModal .ap-sync-confirm-btn {
+    #syncFlssModal .modal-btn-ghost {
         width: 100% !important;
     }
 }
-

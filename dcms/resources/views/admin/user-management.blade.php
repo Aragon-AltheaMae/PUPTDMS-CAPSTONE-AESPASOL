@@ -37,6 +37,14 @@ $inactiveCount = $inactiveCount ?? 0;
         </script>
         @endif
 
+        @if (session('generated_user_password'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                openModal('generatedPasswordModal');
+            });
+        </script>
+        @endif
+
         @if (session('error'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -94,7 +102,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
             </div>
 
-            <div class="um-users-card card bg-white rounded-xl shadow border border-gray-100 overflow-visible mb-6">
+            <div class="um-users-card card bg-white rounded-xl shadow border border-gray-100 overflow-visible">
                 <div class="um-users-toolbar px-4 sm:px-5 py-4 border-b bg-gray-50">
                     <div class="um-users-heading">
                         <div class="card-header-icon">
@@ -136,20 +144,64 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                         </div>
 
-                        <div class="view-toggle-container um-view-toggle" id="umViewToggle" aria-label="View options">
-                            <span class="view-slider" aria-hidden="true"></span>
-
-                            <button type="button" class="btn-view-mode um-view-toggle-btn active" id="umListViewBtn"
-                                title="List view" aria-label="List view" aria-pressed="true">
-                                <i class="fa-solid fa-table-list"></i>
-                            </button>
-
-                            <button type="button" class="btn-view-mode um-view-toggle-btn" id="umGridViewBtn"
-                                title="Grid view" aria-label="Grid view" aria-pressed="false">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                        </div>
+                        <x-view-toggle id="umViewToggle" class="um-view-toggle" storage-key="userManagementView"
+                            list-view="#umListView" grid-view="#umGridView" />
                     </form>
+                </div>
+
+                <div class="global-pagebar global-pagebar-top">
+                    <div class="global-pagebar-left">
+                        <span class="global-pagebar-info">
+                            Showing
+                            <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
+                            of <strong>{{ $users->total() }}</strong> users
+                        </span>
+
+                        <div class="global-page-size-control">
+                            <label for="umPerPageSelect">Show</label>
+
+                            <div class="global-page-size-select" data-global-page-size
+                                data-page-size-input="#umPerPageSelect">
+
+                                <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
+                                    aria-hidden="true">
+
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
+                                        {{ $size }}
+                                    </option>
+                                    @endforeach
+                                </select>
+
+                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
+                                    aria-haspopup="listbox" aria-expanded="false">
+
+                                    <span data-page-size-value>
+                                        {{ (int) ($perPage ?? 10) }}
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+
+                                <div class="global-page-size-menu" role="listbox">
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <button type="button"
+                                        class="global-page-size-option {{ (int) ($perPage ?? 10) === $size ? 'is-selected' : '' }}"
+                                        data-page-size-option data-value="{{ $size }}" role="option"
+                                        aria-selected="{{ (int) ($perPage ?? 10) === $size ? 'true' : 'false' }}">
+
+                                        <span>{{ $size }}</span>
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <span>per page</span>
+                        </div>
+                    </div>
+
+                    <div class="global-pagination-wrap"></div>
                 </div>
 
                 <div class="um-users-content">
@@ -174,8 +226,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
                                         <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
                                             <span class="text-xs text-gray-400 font-medium">{{ $users->firstItem() +
-                                                $loop->index
-                                                }}</span>
+                                                $loop->index }}</span>
                                         </td>
 
                                         <td class="py-3.5 px-2 sm:px-4">
@@ -199,7 +250,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                             @php $roleSlug = optional($user->role)->slug ?? 'none'; @endphp
 
                                             <span class="badge-role role-{{ $roleSlug }}">
-                                                {{ optional($user->role)->name ?? 'No Role' }}
+                                                {{ optional($user->role)->name ?? 'Patient' }}
                                             </span>
                                         </td>
 
@@ -216,40 +267,91 @@ $inactiveCount = $inactiveCount ?? 0;
                                         </td>
 
                                         <td class="py-3.5 px-4">
-                                            <div class="um-action-group flex items-center justify-center gap-1">
-                                                <button type="button" onclick="openEditModal(
-                                                    'users',
-                                                    {{ $user->id }},
-                                                    @js($user->name),
-                                                    @js($user->email),
-                                                    @js($user->role_id),
-                                                    @js($user->status)
-                                                  )" class="action-btn btn-edit" title="Edit account">
+                                            @php
+                                            $userDetails = [
+                                            'id' => $user->id,
+                                            'name' => $user->name,
+                                            'email' => $user->email,
+                                            'role' =>
+                                            optional($user->role)->display_name ??
+                                            (optional($user->role)->name ?? 'Patient'),
+                                            'status' => ucfirst($user->status),
+                                            'source' => 'Users',
+                                            'created_at' => $user->created_at
+                                            ? $user->created_at->format('M d, Y h:i
+                                            A')
+                                            : 'N/A',
+                                            'updated_at' => $user->updated_at
+                                            ? $user->updated_at->format('M d, Y h:i
+                                            A')
+                                            : 'N/A',
+                                            'phone' =>
+                                            optional($user->patient)->phone ?:
+                                            ($user->phone ?:
+                                            'N/A'),
+                                            'birthdate' =>
+                                            optional(optional($user->patient)->birthdate)
+                                            ?->format('M d,
+                                            Y') ??
+                                            (optional($user->birthdate)?->format('M d, Y') ??
+                                            'N/A'),
+                                            'gender' =>
+                                            optional($user->patient)->gender ?:
+                                            ($user->gender ?:
+                                            'N/A'),
+                                            'phone_raw' =>
+                                            optional($user->patient)->phone ?? ($user->phone ?? ''),
+                                            'birthdate_raw' =>
+                                            optional(optional($user->patient)->birthdate)?->format(
+                                            'Y-m-d',
+                                            ) ??
+                                            (optional($user->birthdate)?->format('Y-m-d') ?? ''),
+                                            'gender_raw' =>
+                                            optional($user->patient)->gender ??
+                                            ($user->gender ?? ''),
+                                            'patient_profile' => $user->patient
+                                            ? 'Linked'
+                                            : 'Not linked',
+                                            'last_login_at' =>
+                                            optional($user->last_login_at)?->format(
+                                            'M d, Y h:i A',
+                                            ) ?? 'Never',
+                                            ];
+                                            @endphp
+                                            <div class="ui-action-group um-action-group">
+                                                <button type="button" data-user-details='@json($userDetails)'
+                                                    onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                                    class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
+                                                    aria-label="Edit account">
                                                     <i class="fa-solid fa-pen text-[11px]"></i>
                                                 </button>
 
-                                                <button type="button"
-                                                    onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
-                                                    class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                                    title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                                <button type="button" onclick="openToggleConfirm(
+        {{ $user->id }},
+        @js($user->status),
+        @js($user->name)
+    )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
+                                                    data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
+                                                    aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
+
                                                     <i
-                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                                        class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
+                                                    </i>
                                                 </button>
 
-                                                <button type="button"
-                                                    onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                                    class="action-btn btn-reset" title="Reset password">
-                                                    <i class="fa-solid fa-key text-[11px]"></i>
+                                                <button type="button" onclick="openResetModal(
+        'users',
+        {{ $user->id }},
+        @js($user->name)
+    )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password" aria-label="Reset password">
+
+                                                    <i class="fa-solid fa-key"></i>
                                                 </button>
 
-                                                <button type="button" onclick="openViewModal(
-                                                    @js($user->name),
-                                                    @js($user->email),
-                                                    @js(optional($user->role)->name ?? 'No Role'),
-                                                    @js(ucfirst($user->status)),
-                                                    'Users',
-                                                    @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                                  )" class="action-btn btn-view-details" title="View details">
+                                                <button type="button" data-user-details='@json($userDetails)'
+                                                    onclick="openViewModalFromButton(this)"
+                                                    class="ui-action-btn ui-action-view" data-tooltip="View details"
+                                                    aria-label="View details">
                                                     <i class="fa-solid fa-eye text-[11px]"></i>
                                                 </button>
                                             </div>
@@ -284,24 +386,13 @@ $inactiveCount = $inactiveCount ?? 0;
                                 @forelse($users as $user)
                                 @php
                                 $roleSlug = optional($user->role)->slug;
-                                $roleName = optional($user->role)->name ?? 'No Role';
-                                $roleBg =
-                                $roleSlug === 'patient'
-                                ? '#dbeafe'
-                                : ($roleSlug === 'dentist'
-                                ? '#d1fae5'
-                                : '#fee2e2');
-                                $roleColor =
-                                $roleSlug === 'patient'
-                                ? '#1d4ed8'
-                                : ($roleSlug === 'dentist'
-                                ? '#065f46'
-                                : '#8B0000');
+                                $roleName = optional($user->role)->name ?? 'Patient';
                                 @endphp
 
                                 <div class="um-grid-card">
                                     <div class="um-grid-top">
-                                        <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}</div>
+                                        <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}
+                                        </div>
                                         <span
                                             class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
                                             {{ ucfirst($user->status) }}
@@ -325,7 +416,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                     <div class="um-grid-meta">
                                         <div class="um-grid-field">
-                                            <div class="um-grid-label">Role</div>
+                                            <div class="um-grid-label">
+                                                Role
+                                            </div>
+
                                             <div class="um-grid-value">
                                                 <span class="badge-role role-{{ $roleSlug ?? 'none' }}">
                                                     {{ $roleName }}
@@ -334,45 +428,98 @@ $inactiveCount = $inactiveCount ?? 0;
                                         </div>
 
                                         <div class="um-grid-field">
-                                            <div class="um-grid-label">Registered</div>
-                                            <div class="um-grid-value">{{ $user->created_at->format('M d, Y') }}</div>
+                                            <div class="um-grid-label">
+                                                Registered
+                                            </div>
+
+                                            <div class="um-registered-date">
+                                                <span class="um-registered-icon">
+                                                    <i class="fa-solid fa-calendar-day"></i>
+                                                </span>
+
+                                                <span class="um-registered-text">
+                                                    {{ $user->created_at->format('M d, Y') }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="um-action-group flex items-center justify-end gap-1 flex-wrap">
-                                        <button type="button" onclick="openEditModal(
-                                                'users',
-                                                {{ $user->id }},
-                                                @js($user->name),
-                                                @js($user->email),
-                                                @js($user->role_id),
-                                                @js($user->status)
-                                            )" class="action-btn btn-edit" title="Edit account">
+                                    <div class="ui-action-group">
+                                        @php
+                                        $userDetails = [
+                                        'id' => $user->id,
+                                        'name' => $user->name,
+                                        'email' => $user->email,
+                                        'role' =>
+                                        optional($user->role)->display_name ??
+                                        (optional($user->role)->name ?? 'Patient'),
+                                        'status' => ucfirst($user->status),
+                                        'source' => 'Users',
+                                        'created_at' => $user->created_at
+                                        ? $user->created_at->format('M d, Y h:i A')
+                                        : 'N/A',
+                                        'updated_at' => $user->updated_at
+                                        ? $user->updated_at->format('M d, Y h:i A')
+                                        : 'N/A',
+                                        'phone' =>
+                                        optional($user->patient)->phone ?: ($user->phone ?: 'N/A'),
+                                        'birthdate' =>
+                                        optional(optional($user->patient)->birthdate)?->format(
+                                        'M d, Y',
+                                        ) ??
+                                        (optional($user->birthdate)?->format('M d, Y') ?? 'N/A'),
+                                        'gender' =>
+                                        optional($user->patient)->gender ?:
+                                        ($user->gender ?:
+                                        'N/A'),
+                                        'phone_raw' =>
+                                        optional($user->patient)->phone ?? ($user->phone ?? ''),
+                                        'birthdate_raw' =>
+                                        optional(optional($user->patient)->birthdate)?->format(
+                                        'Y-m-d',
+                                        ) ??
+                                        (optional($user->birthdate)?->format('Y-m-d') ?? ''),
+                                        'gender_raw' =>
+                                        optional($user->patient)->gender ?? ($user->gender ?? ''),
+                                        'patient_profile' => $user->patient ? 'Linked' : 'Not linked',
+                                        'last_login_at' =>
+                                        optional($user->last_login_at)?->format('M d, Y h:i A') ??
+                                        'Never',
+                                        ];
+                                        @endphp
+                                        <button type="button" data-user-details='@json($userDetails)'
+                                            onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                            class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
+                                            aria-label="Edit account">
                                             <i class="fa-solid fa-pen text-[11px]"></i>
                                         </button>
 
-                                        <button type="button"
-                                            onclick="openToggleConfirm({{ $user->id }}, @js($user->status), @js($user->name))"
-                                            class="action-btn {{ $user->status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off' }}"
-                                            title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}">
+                                        <button type="button" onclick="openToggleConfirm(
+        {{ $user->id }},
+        @js($user->status),
+        @js($user->name)
+    )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
+                                            data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
+                                            aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
+
                                             <i
-                                                class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }} text-[11px]"></i>
+                                                class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
+                                            </i>
                                         </button>
 
-                                        <button type="button"
-                                            onclick="openResetModal('users', {{ $user->id }}, @js($user->name))"
-                                            class="action-btn btn-reset" title="Reset password">
-                                            <i class="fa-solid fa-key text-[11px]"></i>
+                                        <button type="button" onclick="openResetModal(
+                                        'users',
+                                        {{ $user->id }},
+                                        @js($user->name)
+                                        )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password"
+                                            aria-label="Reset password">
+
+                                            <i class="fa-solid fa-key"></i>
                                         </button>
 
-                                        <button type="button" onclick="openViewModal(
-                                                @js($user->name),
-                                                @js($user->email),
-                                                @js($roleName),
-                                                @js(ucfirst($user->status)),
-                                                'Users',
-                                                @js($user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A')
-                                            )" class="action-btn btn-view-details" title="View details">
+                                        <button type="button" data-user-details='@json($userDetails)'
+                                            onclick="openViewModalFromButton(this)" class="ui-action-btn ui-action-view"
+                                            data-tooltip="View details" aria-label="View details">
                                             <i class="fa-solid fa-eye text-[11px]"></i>
                                         </button>
                                     </div>
@@ -384,86 +531,109 @@ $inactiveCount = $inactiveCount ?? 0;
                     </div>
                 </div>
 
-                <div class="sl-pagebar um-pagebar">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <span class="sl-pagebar-info um-pagebar-info">
-                            Showing
-                            <strong>{{ $users->firstItem() ?? 0 }}</strong>–<strong>{{ $users->lastItem() ?? 0
-                                }}</strong>
-                            of <strong>{{ $users->total() }}</strong> users
-                        </span>
+                <div class="global-pagebar global-pagebar-bottom">
+                    <span class="global-pagebar-info">
+                        Showing
+                        <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
+                        of <strong>{{ $users->total() }}</strong> users
+                    </span>
 
-                        <div class="sl-page-size-control global-page-size-control um-page-size-control">
-                            <label for="umPerPageSelect">Show</label>
-
-                            <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#umPerPageSelect" data-page-size-callback="umSelectPerPage">
-                                <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
-                                    aria-hidden="true">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
-                                        {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-
-                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                    aria-haspopup="listbox" aria-expanded="false">
-                                    <span data-page-size-value>{{ (int) ($perPage ?? 10) }}</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-
-                                <div class="global-page-size-menu" role="listbox">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <button type="button"
-                                        class="global-page-size-option {{ (int) ($perPage ?? 10) === $size ? 'is-selected' : '' }}"
-                                        data-page-size-option data-value="{{ $size }}" role="option"
-                                        aria-selected="{{ (int) ($perPage ?? 10) === $size ? 'true' : 'false' }}">
-                                        <span>{{ $size }}</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <span>per page</span>
-                        </div>
-                    </div>
-
-                    <div class="sl-pagination-wrap um-pagination-wrap">
-                    </div>
+                    <div class="global-pagination-wrap"></div>
                 </div>
             </div>
         </div>
     </div>
 </main>
 
-<div class="modal-overlay" id="addModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-lg" onclick="event.stopPropagation()">
-        <div
-            class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3 min-w-0">
-                <div
-                    class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
-                    <i class="fa-solid fa-user-plus text-white text-sm"></i>
+<div id="generatedPasswordModal" class="ui-modal modal-theme-success" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <div class="min-w-0">
-                    <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Add New User</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Create a system account and assign access permissions.</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Generated Password</h3>
+                    <p class="modal-subtitle">
+                        Share this with the new user before closing.
+                    </p>
                 </div>
             </div>
 
-            <button type="button" onclick="closeModal('addModal')" data-close-modal="addModal" class="um-modal-x"
-                aria-label="Close add user modal">
+            <button type="button" onclick="closeModal('generatedPasswordModal')" class="modal-x"
+                aria-label="Close generated password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm"
-            class="flex-1 flex flex-col min-h-0">
+        <div class="modal-bd">
+            <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <strong>{{ session('generated_user_password.name') }}</strong><br>
+                <span class="text-xs">{{ session('generated_user_password.email') }}</span>
+            </div>
+
+            <div>
+                <label class="form-label" for="generatedUserPasswordValue">
+                    Temporary Password
+                </label>
+
+                <div class="global-control-wrap">
+                    <input type="text" id="generatedUserPasswordValue"
+                        value="{{ session('generated_user_password.password') }}" class="form-input-custom" readonly>
+
+                    <button type="button" onclick="copyGeneratedPassword()" class="ui-btn ui-btn-primary">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="um-password-note">
+                This password is shown only once. Ask the user to change it after first login.
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closeModal('generatedPasswordModal')" class="ui-btn ui-btn-secondary">
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+
+    <div class="ui-modal-card modal-xl">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Add New User</h3>
+                    <p class="modal-subtitle">
+                        Create a system account and assign access permissions.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" data-discard-close="addModal" class="modal-x" aria-label="Close add user modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm" class="modal-card-form"
+            data-global-validation data-global-selects data-discard-form data-discard-title="Discard new user?"
+            data-discard-subtitle="You have unsaved account details."
+            data-discard-message="Closing this modal will remove the user information you entered. Do you want to discard your changes?"
+            novalidate>
             @csrf
 
-            <div class="um-user-modal-body">
+            <div class="modal-bd">
                 @if ($errors->any())
                 <div class="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 text-xs text-red-700 space-y-1.5">
                     @foreach ($errors->all() as $error)
@@ -475,7 +645,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
                 @endif
 
-                <div class="um-user-modal-grid">
+                <div class="modal-form-grid-2">
                     <div class="um-user-main-card">
                         <div class="um-section-title">
                             <div class="um-section-icon bg-red-50 text-[#8B0000]">
@@ -489,45 +659,53 @@ $inactiveCount = $inactiveCount ?? 0;
                         </div>
 
                         <div class="um-field-grid">
-                            <div class="um-field-full">
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Full Name <span class="text-red-500">*</span>
+                            <div class="global-form-group um-field-full" data-global-field>
+
+                                <label class="global-form-label" for="addNameInput">
+                                    Full Name
+                                    <span class="required-mark">*</span>
                                 </label>
-                                <div class="voice-search-row" data-voice-field>
-                                    <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white"
-                                        placeholder="e.g. Juan dela Cruz" required>
-                                    <div class="voice-input-toggle">
+
+                                <div class="modal-inline-control" data-voice-field>
+
+                                    <div class="modal-inline-main">
+                                        <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
+                                            class="form-input-custom" placeholder="e.g. Juan dela Cruz"
+                                            autocomplete="name" data-field-label="Full Name"
+                                            data-required-message="Please enter the user's full name." required>
+                                    </div>
+
+                                    <div class="modal-control-action voice-input-toggle">
                                         <button type="button" id="addNameMicBtn" class="voice-search-mic external"
                                             data-voice-trigger data-voice-target="#addNameInput"
                                             data-voice-status="#addNameVoiceStatus"
                                             aria-label="Voice input for full name">
+
                                             <i class="fa-solid fa-microphone"></i>
                                         </button>
+
                                         <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                            aria-live="polite"></span>
+                                            aria-live="polite">
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="um-field-full">
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Email Address <span class="text-red-500">*</span>
+                            <div class="global-form-group um-field-full" data-global-field>
+
+                                <label class="global-form-label" for="addEmailInput">
+                                    Email Address
+                                    <span class="required-mark">*</span>
                                 </label>
-                                <div class="voice-search-row" data-voice-field>
-                                    <i class="fa-solid fa-envelope text-gray-400 text-xs flex-shrink-0 pl-1"></i>
+
+                                <div class="global-control-wrap">
+                                    <i class="fa-solid fa-envelope global-control-icon"></i>
+
                                     <input type="email" id="addEmailInput" name="email" value="{{ old('email') }}"
-                                        class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white"
-                                        placeholder="user@pup.edu.ph" required>
-                                    <div class="voice-input-toggle">
-                                        <button type="button" id="addEmailMicBtn" class="voice-search-mic external"
-                                            data-voice-trigger data-voice-target="#addEmailInput"
-                                            data-voice-status="#addEmailVoiceStatus" aria-label="Voice input for email">
-                                            <i class="fa-solid fa-microphone"></i>
-                                        </button>
-                                        <span id="addEmailVoiceStatus" class="voice-status hidden" data-voice-status
-                                            aria-live="polite"></span>
-                                    </div>
+                                        class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
+                                        autocomplete="email" data-field-label="Email Address"
+                                        data-required-message="Please enter an email address."
+                                        data-type-message="Please enter a valid email address." required>
                                 </div>
                             </div>
 
@@ -535,10 +713,29 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                                     Role
                                 </label>
-                                <select name="role_id"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
-                                    <option value="">No Role</option>
+                                <select id="addRoleSelect" name="role_id" class="js-custom-select"
+                                    data-placeholder="Patient" data-field-label="Role">
+                                    @php
+                                    $patientRole = $roles->first(
+                                    fn ($role) =>
+                                    strtolower($role->slug) === 'patient' ||
+                                    strtolower($role->name) === 'patient'
+                                    );
+                                    @endphp
+
+                                    @if ($patientRole)
+                                    <option value="{{ $patientRole->id }}" {{ old('role_id', $patientRole->id) ==
+                                        $patientRole->id ? 'selected' : '' }}>
+                                        {{ $patientRole->display_name }}
+                                    </option>
+                                    @endif
+
                                     @foreach ($roles as $role)
+                                    @continue(
+                                    $patientRole &&
+                                    (int) $role->id === (int) $patientRole->id
+                                    )
+
                                     <option value="{{ $role->id }}" {{ old('role_id')==$role->id ? 'selected' : '' }}>
                                         {{ $role->display_name }}
                                     </option>
@@ -555,38 +752,58 @@ $inactiveCount = $inactiveCount ?? 0;
                                     System-managed user account
                                 </div>
                             </div>
+
+                            <div class="global-form-group" data-global-field>
+
+                                <label class="global-form-label" for="addPhoneInput">
+                                    Phone Number
+                                </label>
+
+                                <div class="global-control-wrap">
+                                    <i class="fa-solid fa-phone global-control-icon"></i>
+
+                                    <input type="tel" id="addPhoneInput" name="phone" value="{{ old('phone') }}"
+                                        class="form-input-custom global-control-with-icon" placeholder="09xx xxx xxxx"
+                                        inputmode="numeric" autocomplete="tel" maxlength="13"
+                                        data-field-label="Phone Number">
+                                </div>
+
+                                <p id="addPhoneInputFeedback" class="modal-helper-text">
+                                    Format: 09XX XXX XXXX
+                                </p>
+                            </div>
+
+                            <div class="global-form-group" data-global-field>
+
+                                <label class="global-form-label" for="addBirthdateInput">
+                                    Birthdate
+                                </label>
+
+                                <div class="global-control-wrap">
+                                    <i class="fa-regular fa-calendar global-control-icon"></i>
+
+                                    <input type="text" id="addBirthdateInput" name="birthdate"
+                                        value="{{ old('birthdate') }}"
+                                        class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
+                                        placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
+                                        data-validation-rule="notFutureDate">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                                    Gender
+                                </label>
+                                <select id="addGenderInput" name="gender" class="js-custom-select"
+                                    data-placeholder="Select gender" data-field-label="Gender">
+                                    <option value="" disabled>Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="um-divider"></div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-2">
-                                Status <span class="text-red-500">*</span>
-                            </label>
-
-                            <div class="um-status-grid">
-                                <label class="um-status-card um-status-card--active">
-                                    <input type="radio" name="status" value="active" {{ old('status', 'active'
-                                        )==='active' ? 'checked' : '' }}
-                                        style="accent-color:#8B0000; margin-top:.22rem;">
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-bold text-emerald-800 leading-tight">Active</div>
-                                        <div class="text-[11px] text-emerald-700 mt-0.5">Can access the system
-                                            immediately</div>
-                                    </div>
-                                </label>
-
-                                <label class="um-status-card um-status-card--inactive">
-                                    <input type="radio" name="status" value="inactive" {{ old('status')==='inactive'
-                                        ? 'checked' : '' }} style="accent-color:#8B0000; margin-top:.22rem;">
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-bold text-gray-700 leading-tight">Inactive</div>
-                                        <div class="text-[11px] text-gray-500 mt-0.5">Account exists but login is
-                                            disabled</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="um-user-side-card">
@@ -596,34 +813,49 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                             <div>
                                 <h4 class="text-base font-extrabold text-gray-800 leading-tight">Security Setup</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">Set the initial login credentials.</p>
+                                <p class="text-xs text-gray-500 mt-0.5">A secure password will be generated
+                                    automatically.</p>
                             </div>
                         </div>
 
                         <div class="space-y-4">
-                            <div>
+                            <div data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Password <span class="text-red-500">*</span>
+                                    Generated Password
                                 </label>
                                 <div class="relative">
                                     <i
                                         class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                    <input type="password" name="password" id="addPassword"
-                                        placeholder="Min. 8 characters"
+                                    <input type="password" name="password" id="addPassword" minlength="8"
+                                        placeholder="Auto-generated password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
-                                        required>
+                                        readonly>
                                     <button type="button" onclick="togglePassVis('addPassword','addEye')"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="fa-regular fa-eye text-sm" id="addEye"></i>
                                     </button>
                                 </div>
-                                <p class="text-[11px] text-gray-400 mt-1.5">Use at least 8 characters for better
-                                    security.</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" onclick="refreshGeneratedPassword()"
+                                        class="modal-btn-confirm-reject um-save-user-btn um-inline-action-btn">
+                                        <span class="btn-confirm-icon">
+                                            <i class="fa-solid fa-rotate"></i>
+                                        </span>
+                                        <span>Generate New</span>
+                                    </button>
+                                    <button type="button" onclick="copyFieldValue('addPassword')"
+                                        class="modal-btn-confirm-reject um-save-user-btn um-inline-action-btn">
+                                        <span class="btn-confirm-icon">
+                                            <i class="fa-regular fa-copy"></i>
+                                        </span>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div>
+                            <div data-global-field>
                                 <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                                    Confirm Password <span class="text-red-500">*</span>
+                                    Confirm Password
                                 </label>
                                 <div class="relative">
                                     <i
@@ -631,7 +863,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                     <input type="password" name="password_confirmation" id="addPasswordConf"
                                         placeholder="Repeat password"
                                         class="field-input w-full border border-gray-200 pl-10 pr-11 py-3 text-sm bg-white"
-                                        required>
+                                        readonly>
                                     <button type="button" onclick="togglePassVis('addPasswordConf','addEye2')"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="fa-regular fa-eye text-sm" id="addEye2"></i>
@@ -639,24 +871,72 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </div>
                             </div>
 
-                            <div class="um-password-note">
-                                The user can update their password after first sign-in depending on your account
-                                workflow.
+                            <div class="modal-helper-text">
+                                The same generated password is saved for the account and shown again after creation.
+                            </div>
+
+                            <div data-global-field>
+                                <label class="form-label">
+                                    Status
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <div class="global-choice-group" role="radiogroup" aria-label="Account status">
+
+                                    <label class="global-choice-card">
+                                        <input type="radio" name="status" id="addStatusActive" value="active"
+                                            class="global-choice-input" data-field-label="Status"
+                                            data-required-message="Please select an account status." {{
+                                            old('status', 'active' )==='active' ? 'checked' : '' }} required>
+
+                                        <span class="global-choice-indicator">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+
+                                        <span class="global-choice-copy">
+                                            <strong class="global-choice-title">
+                                                Active
+                                            </strong>
+
+                                            <small class="global-choice-description">
+                                                User can access the system immediately
+                                            </small>
+                                        </span>
+                                    </label>
+
+                                    <label class="global-choice-card">
+                                        <input type="radio" name="status" id="addStatusInactive" value="inactive"
+                                            class="global-choice-input" {{ old('status')==='inactive' ? 'checked' : ''
+                                            }}>
+
+                                        <span class="global-choice-indicator">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </span>
+
+                                        <span class="global-choice-copy">
+                                            <strong class="global-choice-title">
+                                                Inactive
+                                            </strong>
+
+                                            <small class="global-choice-description">
+                                                User login will be disabled
+                                            </small>
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-ft um-user-modal-footer">
-                <button type="button" onclick="closeModal('addModal')" class="modal-btn-ghost">
+            <div class="modal-ft">
+                <button type="button" data-discard-close="addModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
 
-                <button type="submit" class="modal-btn-confirm-reject um-save-user-btn">
-                    <span class="btn-confirm-icon">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                    </span>
+                <button type="submit" class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i>
                     <span>Save User</span>
                 </button>
             </div>
@@ -664,255 +944,333 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div class="modal-overlay" id="editModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-md" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow">
-                    <i class="fa-solid fa-user-pen text-white text-sm"></i>
+<div class="ui-modal modal-theme-edit" id="editModal" aria-hidden="true">
+    <div class="ui-modal-card modal-md modal-split-card">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-pen"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Edit User</h3>
-                    <p class="text-[12px] text-gray-500" id="editModalSubtitle">Updating user details</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">Edit User</h3>
+                    <p class="modal-subtitle" id="editModalSubtitle">
+                        Updating user details
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('editModal')" data-close-modal="editModal" class="um-modal-x"
-                aria-label="Close edit user modal">
+
+            <button type="button" data-discard-close="editModal" class="modal-x">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" id="editForm" class="p-6 space-y-4">
+        <form method="POST" id="editForm" class="modal-card-form" data-global-validation data-global-selects
+            data-discard-form data-discard-title="Discard user changes?"
+            data-discard-subtitle="You have unsaved account updates."
+            data-discard-message="Closing this modal will remove the changes made to this user. Do you want to discard them?"
+            novalidate>
             @csrf
             @method('PUT')
             <input type="hidden" id="editOriginalRole" value="">
+            <div class="modal-bd modal-scroll-body space-y-4">
+                <div class="global-form-group" data-global-field>
+                    <label class="global-form-label" for="editName">
+                        Full Name
+                        <span class="required-mark">*</span>
+                    </label>
 
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                    Full Name <span class="text-red-500">*</span>
-                </label>
+                    <div class="modal-inline-control" data-voice-field>
+                        <div class="modal-inline-main">
+                            <input type="text" name="name" id="editName" class="form-input-custom"
+                                placeholder="Full name" autocomplete="name" data-field-label="Full Name"
+                                data-required-message="Please enter the user's full name." required>
+                        </div>
 
-                <div class="voice-search-row" data-voice-field>
-                    <input type="text" name="name" id="editName" placeholder="Full name"
-                        class="field-input flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
-                        required>
+                        <div class="voice-input-toggle">
+                            <button type="button" id="editNameMicBtn" class="voice-search-mic external"
+                                data-voice-trigger data-voice-target="#editName"
+                                data-voice-status="#editNameVoiceStatus" aria-label="Voice input for edit full name">
 
-                    <div class="voice-input-toggle">
-                        <button type="button" id="editNameMicBtn" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
-                            aria-label="Voice input for edit full name">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
 
-                        <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
+                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                    Email Address <span class="text-red-500">*</span>
-                </label>
+                <div class="global-form-group" data-global-field>
 
-                <div class="voice-search-row" data-voice-field>
-                    <div class="relative flex-1 min-w-0">
-                        <i
-                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <label class="global-form-label" for="editEmail">
+                        Email Address
+                        <span class="required-mark">*</span>
+                    </label>
 
-                        <input type="email" name="email" id="editEmail" placeholder="user@pup.edu.ph"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm"
-                            required>
-                    </div>
+                    <div class="global-control-wrap">
+                        <i class="fa-solid fa-envelope global-control-icon"></i>
 
-                    <div class="voice-input-toggle">
-                        <button type="button" id="editEmailMicBtn" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#editEmail" data-voice-status="#editEmailVoiceStatus"
-                            aria-label="Voice input for edit email">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="editEmailVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
+                        <input type="email" name="email" id="editEmail"
+                            class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
+                            autocomplete="email" data-field-label="Email Address"
+                            data-required-message="Please enter an email address."
+                            data-type-message="Please enter a valid email address." required>
                     </div>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Role</label>
-                <div class="um-custom-select" id="editRoleSelect" data-custom-select>
-                    <input type="hidden" name="role_id" id="editRole" value="">
+                <div class="global-form-group" data-global-field>
+                    <label for="editRole" class="global-form-label">
+                        Role
+                    </label>
 
-                    <button type="button" class="um-custom-select-btn" id="editRoleBtn" aria-haspopup="listbox"
-                        aria-expanded="false">
-                        <span id="editRoleText">No Role</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-
-                    <div class="um-custom-select-menu" id="editRoleMenu" role="listbox">
-                        <button type="button" class="um-custom-select-option" data-value="">
-                            <span>No Role</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
+                    <select name="role_id" id="editRole" class="js-custom-select" data-placeholder="Patient"
+                        data-field-label="Role">
+                        @if ($patientRole)
+                        <option value="{{ $patientRole->id }}">
+                            {{ $patientRole->display_name }}
+                        </option>
+                        @endif
 
                         @foreach ($roles as $role)
-                        <button type="button" class="um-custom-select-option" data-value="{{ $role->id }}">
-                            <span>{{ $role->display_name }}</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
+                        <option value="{{ $role->id }}">
+                            {{ $role->display_name }}
+                        </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
+                        Confirm Role Change
+                    </label>
+                    <p class="text-[12px] text-amber-700 mb-2">
+                        Enter your current admin password to continue changing this user's role.
+                    </p>
+                    <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
+                        placeholder="Current admin password"
+                        class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                        autocomplete="current-password">
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-4 space-y-4">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800">Backup Information</h4>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            Phone Number
+                        </label>
+                        <input type="text" name="phone" id="editPhone" placeholder="09xx xxx xxxx"
+                            class="field-input w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
+                            inputmode="numeric" autocomplete="tel" maxlength="13">
+                        <p id="editPhoneFeedback" class="text-xs text-gray-500 mt-1">Format: 09xx xxx xxxx</p>
+                    </div>
+
+                    <div class="global-form-group" data-global-field>
+
+                        <label class="global-form-label" for="editBirthdate">
+                            Birthdate
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-regular fa-calendar global-control-icon"></i>
+
+                            <input type="text" id="editBirthdate" name="birthdate"
+                                class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
+                                placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
+                                data-validation-rule="notFutureDate">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            Gender
+                        </label>
+                        <select name="gender" id="editGender" class="field-input js-custom-select"
+                            data-placeholder="Select gender">
+                            <option value="" disabled>Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+
+                    <div class="global-choice-group" role="radiogroup" aria-label="Account status">
+
+                        <label class="global-choice-card">
+                            <input type="radio" name="status" id="editStatusActive" value="active"
+                                class="global-choice-input" required>
+
+                            <span class="global-choice-indicator">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+
+                            <span class="global-choice-copy">
+                                <strong class="global-choice-title">Active</strong>
+                                <small class="global-choice-description">
+                                    User can access the system
+                                </small>
+                            </span>
+                        </label>
+
+                        <label class="global-choice-card">
+                            <input type="radio" name="status" id="editStatusInactive" value="inactive"
+                                class="global-choice-input">
+
+                            <span class="global-choice-indicator">
+                                <i class="fa-solid fa-ban"></i>
+                            </span>
+
+                            <span class="global-choice-copy">
+                                <strong class="global-choice-title">Inactive</strong>
+                                <small class="global-choice-description">
+                                    User login will be disabled
+                                </small>
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>
-
-            <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
-                    Confirm Role Change
-                </label>
-                <p class="text-[12px] text-amber-700 mb-2">
-                    Enter your current admin password to continue changing this user's role.
-                </p>
-                <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
-                    placeholder="Current admin password"
-                    class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-                    autocomplete="current-password">
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Status
-                    <span class="text-red-500">*</span></label>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" id="editStatusActive" value="active"
-                            style="accent-color:#8B0000;">
-                        <span class="text-sm text-gray-700 font-medium">Active</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" id="editStatusInactive" value="inactive"
-                            style="accent-color:#8B0000;">
-                        <span class="text-sm text-gray-700 font-medium">Inactive</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('editModal')" class="modal-btn-ghost">
+            <div class="modal-ft modal-sticky-footer">
+                <button type="button" data-discard-close="editModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
-                <button type="submit"
-                    class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i> Update User
+
+                <button type="submit" class="ui-btn ui-btn-edit">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Update User</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Reset Password Modal -->
-<div class="modal-overlay" id="resetModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow">
-                    <i class="fa-solid fa-key text-white text-sm"></i>
+<div id="resetModal" class="ui-modal modal-theme-reset" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base">Reset Password</h3>
-                    <p class="text-[10px] text-gray-500" id="resetModalSubtitle">Set a new password</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Reset Password
+                    </h3>
+
+                    <p class="modal-subtitle" id="resetModalSubtitle">
+                        Set a new password
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('resetModal')" data-close-modal="resetModal" class="um-modal-x"
+
+            <button type="button" data-discard-close="resetModal" class="modal-x"
                 aria-label="Close reset password modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form method="POST" id="resetForm" class="p-6 space-y-4">
+        <form method="POST" id="resetForm" class="modal-card-form" data-global-validation data-discard-form
+            data-discard-title="Discard password reset?" data-discard-subtitle="A new password has not been saved."
+            data-discard-message="Closing this modal will remove the password you entered. Do you want to discard it?"
+            novalidate>
             @csrf
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
-                    Password <span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="password" name="password" id="resetPassword" placeholder="Min. 8 characters"
-                        class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm" required>
-                    <button type="button" onclick="togglePassVis('resetPassword','resetEye')"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <i class="fa-regular fa-eye text-xs" id="resetEye"></i>
-                    </button>
-                </div>
-
-                <div class="password-strength" id="resetPasswordStrength" data-strength="empty">
-                    <div class="password-strength-track">
-                        <span class="password-strength-fill"></span>
+            <div class="modal-bd modal-scroll-body space-y-4">
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
+                        Password <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="password" name="password" id="resetPassword" placeholder="Min. 8 characters"
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
+                            required>
+                        <button type="button" onclick="togglePassVis('resetPassword','resetEye')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-regular fa-eye text-xs" id="resetEye"></i>
+                        </button>
                     </div>
 
-                    <div class="password-strength-meta">
-                        <span id="resetPasswordStrengthLabel">Enter a password</span>
-                        <span id="resetPasswordStrengthHint">Use 8+ chars, number, uppercase, and symbol.</span>
+                    <div class="password-strength" id="resetPasswordStrength" data-strength="empty">
+                        <div class="password-strength-track">
+                            <span class="password-strength-fill"></span>
+                        </div>
+
+                        <div class="password-strength-meta">
+                            <span id="resetPasswordStrengthLabel">Enter a password</span>
+                            <span id="resetPasswordStrengthHint">Use 8+ chars, number, uppercase, and symbol.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-global-field>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
+                        Password <span class="text-red-500">*</span></label>
+
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="password" name="password_confirmation" id="resetPasswordConf"
+                            placeholder="Repeat password"
+                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
+                            required>
+                        <button type="button" onclick="togglePassVis('resetPasswordConf','resetEye2')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-regular fa-eye text-xs" id="resetEye2"></i>
+                        </button>
+                    </div>
+
+                    <div class="password-match" id="resetPasswordMatch" data-match="empty">
+                        <span class="password-match-dot"></span>
+                        <span id="resetPasswordMatchText">Confirm your password.</span>
                     </div>
                 </div>
             </div>
-
-            <div>
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
-                    Password <span class="text-red-500">*</span></label>
-
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="password" name="password_confirmation" id="resetPasswordConf"
-                        placeholder="Repeat password"
-                        class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm" required>
-                    <button type="button" onclick="togglePassVis('resetPasswordConf','resetEye2')"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <i class="fa-regular fa-eye text-xs" id="resetEye2"></i>
-                    </button>
-                </div>
-
-                <div class="password-match" id="resetPasswordMatch" data-match="empty">
-                    <span class="password-match-dot"></span>
-                    <span id="resetPasswordMatchText">Confirm your password.</span>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal('resetModal')" class="modal-btn-ghost">
+            <div class="modal-ft modal-sticky-footer">
+                <button type="button" data-discard-close="resetModal" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
-                <button type="submit"
-                    class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold shadow transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-key"></i> Reset Password
+
+                <button type="submit" class="ui-btn ui-btn-reset-password">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Reset Password</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<div class="modal-overlay" id="viewModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-md um-view-details-modal" onclick="event.stopPropagation()">
-        <div class="um-view-details-head">
-            <div class="um-view-head-left">
-                <div class="um-view-head-icon">
+<div id="viewModal" class="ui-modal modal-theme-view" aria-hidden="true">
+
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
                     <i class="fa-solid fa-id-card-clip"></i>
                 </div>
 
-                <div>
-                    <h3>Account Details</h3>
-                    <p>Review selected account information</p>
+                <div class="modal-copy">
+                    <h3 class="modal-title">Account Details</h3>
+                    <p class="modal-subtitle">
+                        Review selected account information
+                    </p>
                 </div>
             </div>
 
-            <button type="button" onclick="closeModal('viewModal')" data-close-modal="viewModal" class="um-modal-x"
+            <button type="button" onclick="closeModal('viewModal')" class="modal-x"
                 aria-label="Close account details modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="um-view-details-body">
+        <div class="modal-bd">
             <div class="um-view-profile-card">
                 <div class="um-view-avatar" id="viewInitial">?</div>
 
@@ -923,6 +1281,17 @@ $inactiveCount = $inactiveCount ?? 0;
             </div>
 
             <div class="um-view-info-grid">
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-hashtag"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">User ID</span>
+                        <strong id="viewId" class="um-view-value"></strong>
+                    </div>
+                </div>
+
                 <div class="um-view-info-card">
                     <div class="um-view-info-icon role">
                         <i class="fa-solid fa-user-shield"></i>
@@ -966,46 +1335,122 @@ $inactiveCount = $inactiveCount ?? 0;
                         <strong id="viewCreatedAt" class="um-view-value"></strong>
                     </div>
                 </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Phone</span>
+                        <strong id="viewPhone" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon date">
+                        <i class="fa-solid fa-cake-candles"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Birthdate</span>
+                        <strong id="viewBirthdate" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon status">
+                        <i class="fa-solid fa-venus-mars"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Gender</span>
+                        <strong id="viewGender" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon role">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Patient Profile</span>
+                        <strong id="viewPatientProfile" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon source">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Last Login</span>
+                        <strong id="viewLastLoginAt" class="um-view-value"></strong>
+                    </div>
+                </div>
+
+                <div class="um-view-info-card">
+                    <div class="um-view-info-icon date">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+
+                    <div>
+                        <span class="um-view-label">Updated At</span>
+                        <strong id="viewUpdatedAt" class="um-view-value"></strong>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="modal-ft um-view-details-foot">
-            <button type="button" onclick="closeModal('viewModal')" class="modal-btn-ghost">
+        <div class="modal-ft">
+            <button type="button" onclick="closeModal('viewModal')" class="ui-btn ui-btn-secondary">
                 Close
             </button>
         </div>
     </div>
 </div>
 
-<div class="modal-overlay" id="toggleConfirmModal" aria-hidden="true">
-    <div class="modal-box-inner um-user-modal um-user-modal-sm" onclick="event.stopPropagation()">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3">
-                <div id="toggleModalIcon" class="w-10 h-10 rounded-xl flex items-center justify-center shadow">
+<div id="toggleConfirmModal" class="ui-modal modal-theme-warning" aria-hidden="true">
+
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon" id="toggleModalIcon">
+                    <i class="fa-solid fa-question"></i>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-gray-800 text-base" id="toggleModalTitle">Confirm Action</h3>
-                    <p class="text-[10px] text-gray-500" id="toggleModalSubtitle">Please confirm this change</p>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title" id="toggleModalTitle">
+                        Confirm Action
+                    </h3>
+
+                    <p class="modal-subtitle" id="toggleModalSubtitle">
+                        Please confirm this change
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="closeModal('toggleConfirmModal')" data-close-modal="toggleConfirmModal"
-                class="um-modal-x" aria-label="Close confirm action modal">
+
+            <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-x"
+                aria-label="Close confirm action modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="p-6">
-            <div id="toggleModalBody" class="rounded-xl p-4 mb-5 flex items-start gap-3 text-sm"></div>
+        <div class="modal-bd">
+            <div id="toggleModalBody" class="global-confirm-alert">
+            </div>
 
-            <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-btn-ghost">
+            <div class="modal-ft">
+                <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
                     Cancel
                 </button>
+
                 <form id="toggleConfirmForm" method="POST">
                     @csrf
-                    <button type="submit" id="toggleConfirmBtn"
-                        class="px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2">
+
+                    <button type="submit" id="toggleConfirmBtn" class="ui-btn ui-btn-primary">
                     </button>
                 </form>
             </div>
@@ -1016,16 +1461,6 @@ $inactiveCount = $inactiveCount ?? 0;
 
 @section('scripts')
 <script>
-    const currentDateEl = document.getElementById('currentDate');
-    if (currentDateEl) {
-        currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
     var umState = {
         search: @js($search ?? ''),
         role: @js($roleFilter ?? ''),
@@ -1037,168 +1472,17 @@ $inactiveCount = $inactiveCount ?? 0;
     var umSearchTimer = null;
     var umController = null;
 
-    function getPreferredUmView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem('userManagementView') || 'list';
-    }
-
-    function applyUmView(view, save = true) {
-        var listView = document.getElementById('umListView');
-        var gridView = document.getElementById('umGridView');
-        var listBtn = document.getElementById('umListViewBtn');
-        var gridBtn = document.getElementById('umGridViewBtn');
-
-        if (!listView || !gridView) return;
-
-        var finalView = window.innerWidth <= 767 ? 'grid' : view;
-
-        if (finalView === 'grid') {
-            listView.hidden = true;
-            gridView.hidden = false;
-        } else {
-            listView.hidden = false;
-            gridView.hidden = true;
-        }
-
-        document.getElementById('mainContent')?.classList.toggle('mode-grid', finalView === 'grid');
-        document.getElementById('mainContent')?.classList.toggle('mode-list', finalView === 'list');
-
-        if (listBtn) {
-            listBtn.classList.toggle('active', finalView === 'list');
-            listBtn.setAttribute('aria-pressed', finalView === 'list' ? 'true' : 'false');
-        }
-
-        if (gridBtn) {
-            gridBtn.classList.toggle('active', finalView === 'grid');
-            gridBtn.setAttribute('aria-pressed', finalView === 'grid' ? 'true' : 'false');
-        }
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem('userManagementView', finalView);
-        }
-    }
-
-    function initUmViewToggle() {
-        var listBtn = document.getElementById('umListViewBtn');
-        var gridBtn = document.getElementById('umGridViewBtn');
-
-        applyUmView(getPreferredUmView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', function () {
-                applyUmView('list', true);
-            });
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', function () {
-                applyUmView('grid', true);
-            });
-        }
-    }
-
-    const UM_MODAL_ANIMATION_MS = 220;
-
-    function forceCloseModal(modal) {
-        if (!modal) return;
-
-        clearTimeout(modal._closeTimer);
-
-        modal.classList.remove('open', 'closing', 'is-open', 'is-closing');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.pointerEvents = '';
-    }
-
     window.closeAllModals = function () {
-        document.querySelectorAll('.modal-overlay.open').forEach(function (modal) {
-            window.closeModal(modal.id);
-        });
+        document
+            .querySelectorAll(
+                '.modal-overlay.open, .ui-modal.open'
+            )
+            .forEach(function (modal) {
+                if (modal.id) {
+                    window.closeModal?.(modal.id);
+                }
+            });
     };
-
-    window.openModal = function (id, trigger = null) {
-        var modal = document.getElementById(id);
-        if (!modal) return;
-
-        window.lastModalTrigger = trigger || document.activeElement;
-
-        document.querySelectorAll('.modal-overlay.open').forEach(function (m) {
-            if (m.id !== id) {
-                forceCloseModal(m);
-            }
-        });
-
-        clearTimeout(modal._closeTimer);
-
-        modal.classList.remove('closing', 'is-closing');
-        modal.classList.add('open', 'is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.pointerEvents = 'auto';
-
-        document.body.classList.add('modal-open', 'modal-lock');
-
-        var firstField = modal.querySelector('input, select, textarea, button');
-        if (firstField) {
-            setTimeout(function () {
-                firstField.focus();
-            }, 80);
-        }
-    };
-
-    window.closeModal = function (id) {
-        var modal = document.getElementById(id);
-        if (!modal || modal.classList.contains('closing')) return;
-
-        var activeEl = document.activeElement;
-        if (activeEl && modal.contains(activeEl)) {
-            activeEl.blur();
-        }
-
-        modal.classList.remove('is-open');
-        modal.classList.add('closing', 'is-closing');
-        modal.style.pointerEvents = 'none';
-
-        clearTimeout(modal._closeTimer);
-
-        modal._closeTimer = setTimeout(function () {
-            modal.classList.remove('open', 'closing', 'is-closing');
-            modal.setAttribute('aria-hidden', 'true');
-            modal.style.pointerEvents = '';
-
-            if (!document.querySelector('.modal-overlay.open')) {
-                document.body.classList.remove('modal-open', 'modal-lock');
-            }
-
-            if (window.lastModalTrigger && typeof window.lastModalTrigger.focus === 'function') {
-                setTimeout(function () {
-                    window.lastModalTrigger.focus();
-                }, 30);
-            }
-        }, UM_MODAL_ANIMATION_MS);
-    };
-
-    window.closeModalOutside = function (e, id) {
-        if (e.target && e.target.id === id) {
-            window.closeModal(id);
-        }
-    };
-
-    document.addEventListener('click', function (e) {
-        var closeBtn = e.target.closest('[data-close-modal]');
-        if (!closeBtn) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        window.closeModal(closeBtn.getAttribute('data-close-modal'));
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            closeAllModals();
-        }
-    });
 
     @if ($errors -> any() && old('_method') !== 'PUT')
         document.addEventListener('DOMContentLoaded', () => openModal('addModal'));
@@ -1235,8 +1519,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 '<i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-amber-800">' +
                 userName +
                 '</strong><span class="text-amber-700"> will be <strong>deactivated</strong>. They will no longer be able to log in until reactivated.</span></div>';
-            btn.className =
-                'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-amber-500 hover:bg-amber-600';
+            btn.className = 'ui-btn ui-btn-warning';
             btn.innerHTML = '<i class="fa-solid fa-user-slash"></i> Deactivate';
         } else {
             icon.className =
@@ -1250,48 +1533,13 @@ $inactiveCount = $inactiveCount ?? 0;
                 '<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-emerald-800">' +
                 userName +
                 '</strong><span class="text-emerald-700"> will be <strong>activated</strong>. They will regain full access to the system.</span></div>';
-            btn.className =
-                'px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow transition-all flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700';
+            btn.className = 'ui-btn ui-btn-success';
             btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Activate';
         }
 
         btn.dataset.originalHtml = btn.innerHTML;
 
         openModal('toggleConfirmModal');
-    }
-
-    function closeEditRoleDropdown() {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-
-        if (!wrapper || !button) return;
-
-        wrapper.classList.remove('is-open');
-        button.setAttribute('aria-expanded', 'false');
-    }
-
-    function setEditRoleValue(value) {
-        const hiddenInput = document.getElementById('editRole');
-        const label = document.getElementById('editRoleText');
-        const menu = document.getElementById('editRoleMenu');
-
-        if (!hiddenInput || !label || !menu) return;
-
-        const normalizedValue = value ? String(value) : '';
-        hiddenInput.value = normalizedValue;
-
-        const options = Array.from(menu.querySelectorAll('.um-custom-select-option'));
-        const selected = options.find(function (option) {
-            return String(option.dataset.value || '') === normalizedValue;
-        }) || options[0];
-
-        options.forEach(function (option) {
-            option.classList.toggle('active', option === selected);
-            option.setAttribute('aria-selected', option === selected ? 'true' : 'false');
-        });
-
-        label.textContent = selected ? selected.querySelector('span').textContent.trim() : '— No Role —';
-        syncEditRoleConfirmation();
     }
 
     function syncEditRoleConfirmation() {
@@ -1316,57 +1564,23 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function setEditRoleDisabled(isDisabled) {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-        const hiddenInput = document.getElementById('editRole');
+        const select = document.getElementById('editRole');
 
-        if (!wrapper || !button || !hiddenInput) return;
+        if (!select) return;
 
-        wrapper.classList.toggle('is-disabled', isDisabled);
-        button.disabled = isDisabled;
-        hiddenInput.disabled = isDisabled;
+        select.disabled = isDisabled;
 
-        if (isDisabled) {
-            closeEditRoleDropdown();
+        const wrapper = select.closest('.custom-select');
+
+        if (wrapper) {
+            wrapper.classList.toggle('is-disabled', isDisabled);
+            window.syncCustomSelect?.(wrapper);
         }
     }
 
-    (function initEditRoleDropdown() {
-        const wrapper = document.getElementById('editRoleSelect');
-        const button = document.getElementById('editRoleBtn');
-        const menu = document.getElementById('editRoleMenu');
-
-        if (!wrapper || !button || !menu) return;
-
-        button.addEventListener('click', function () {
-            if (button.disabled) return;
-
-            const isOpen = wrapper.classList.toggle('is-open');
-            button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        menu.querySelectorAll('.um-custom-select-option').forEach(function (option) {
-            option.addEventListener('click', function () {
-                setEditRoleValue(option.dataset.value || '');
-                closeEditRoleDropdown();
-            });
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!wrapper.contains(event.target)) {
-                closeEditRoleDropdown();
-            }
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeEditRoleDropdown();
-            }
-        });
-    })();
-
-    function openEditModal(source, id, name, email, roleId, status) {
+    function openEditModal(source, id, name, email, roleId, status, details = null) {
         const form = document.getElementById('editForm');
+        const payload = details && typeof details === 'object' ? details : {};
 
         if (source === 'patients') {
             form.action = `/admin/user-management/patient/${id}`;
@@ -1386,6 +1600,20 @@ $inactiveCount = $inactiveCount ?? 0;
             setEditRoleDisabled(false);
             document.getElementById('editStatusActive').disabled = false;
             document.getElementById('editStatusInactive').disabled = false;
+
+            const editGender =
+                document.getElementById('editGender');
+
+            if (editGender) {
+                editGender.value =
+                    payload.gender_raw ||
+                    payload.gender ||
+                    '';
+
+                window.syncCustomSelect?.(
+                    editGender.closest('.custom-select')
+                );
+            }
         }
 
         form.dataset.source = source;
@@ -1395,8 +1623,28 @@ $inactiveCount = $inactiveCount ?? 0;
         document.getElementById('editModalSubtitle').textContent = 'Editing: ' + name;
         document.getElementById('editOriginalRole').value = roleId || '';
         document.getElementById('editAdminCurrentPassword').value = '';
+        document.getElementById('editPhone').value = payload.phone_raw || payload.phone || '';
 
-        setEditRoleValue(roleId || '');
+        const editBirthdate =
+            document.getElementById('editBirthdate');
+
+        const birthdateValue =
+            payload.birthdate_raw || '';
+
+        if (editBirthdate?._flatpickr) {
+            editBirthdate._flatpickr.setDate(
+                birthdateValue,
+                false
+            );
+        } else if (editBirthdate) {
+            editBirthdate.value = birthdateValue;
+        }
+
+        document.getElementById('editGender').value = payload.gender_raw || payload.gender || '';
+        document.getElementById('editPhone').value = formatUserPhoneDisplay(
+            getNormalizedUserPhoneValue(document.getElementById('editPhone'))
+        );
+
         syncEditRoleConfirmation();
 
         document.getElementById('editStatusActive').checked = (status === 'active');
@@ -1419,29 +1667,183 @@ $inactiveCount = $inactiveCount ?? 0;
         openModal('resetModal');
     }
 
-    function openViewModal(name, email, role, status, source, createdAt) {
+    function buildGeneratedPassword(length = 12) {
+        const lower = 'abcdefghijkmnopqrstuvwxyz';
+        const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        const numbers = '23456789';
+        const symbols = '@#$%*!?';
+        const all = lower + upper + numbers + symbols;
+
+        const pick = (chars) => chars.charAt(Math.floor(Math.random() * chars.length));
+        const chars = [
+            pick(lower),
+            pick(upper),
+            pick(numbers),
+            pick(symbols),
+        ];
+
+        while (chars.length < length) {
+            chars.push(pick(all));
+        }
+
+        for (let i = chars.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [chars[i], chars[j]] = [chars[j], chars[i]];
+        }
+
+        return chars.join('');
+    }
+
+    function refreshGeneratedPassword() {
+        const password = buildGeneratedPassword();
+        const passwordInput = document.getElementById('addPassword');
+        const confirmInput = document.getElementById('addPasswordConf');
+
+        if (passwordInput) passwordInput.value = password;
+        if (confirmInput) confirmInput.value = password;
+    }
+
+    async function copyFieldValue(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input || !input.value) return;
+
+        try {
+            await navigator.clipboard.writeText(input.value);
+            showSuccessToast('Password copied to clipboard.');
+        } catch (error) {
+            input.removeAttribute('readonly');
+            input.select();
+            document.execCommand('copy');
+            input.setAttribute('readonly', 'readonly');
+            showSuccessToast('Password copied to clipboard.');
+        }
+    }
+
+    function copyGeneratedPassword() {
+        copyFieldValue('generatedUserPasswordValue');
+    }
+
+    let userPhoneFeedbackTimer = null;
+
+    function formatUserPhoneDisplay(rawDigits) {
+        const digits = String(rawDigits || '').slice(0, 11);
+        let out = '';
+
+        if (digits.length > 0) out += digits.slice(0, 4);
+        if (digits.length > 4) out += ' ' + digits.slice(4, 7);
+        if (digits.length > 7) out += ' ' + digits.slice(7, 11);
+
+        return out;
+    }
+
+    function getNormalizedUserPhoneValue(input) {
+        return String(input?.value || '').replace(/\D/g, '');
+    }
+
+    function bindUserPhoneValidation(inputId) {
+        const input = document.getElementById(inputId);
+
+        if (
+            !input ||
+            input.dataset.phoneFormattingReady === 'true'
+        ) {
+            return;
+        }
+
+        input.dataset.phoneFormattingReady = 'true';
+
+        const syncPhone = () => {
+            let digits =
+                getNormalizedUserPhoneValue(input);
+
+            if (digits.startsWith('9')) {
+                digits = `0${digits}`;
+            }
+
+            input.value =
+                formatUserPhoneDisplay(
+                    digits.slice(0, 11)
+                );
+
+            window.validateFormInputField?.(input);
+        };
+
+        input.addEventListener('input', syncPhone);
+        input.addEventListener('blur', syncPhone);
+    }
+
+    function parseUserDetailsFromButton(button) {
+        if (!button) return {};
+
+        const raw = button.getAttribute('data-user-details');
+
+        if (!raw) return {};
+
+        try {
+            return JSON.parse(raw);
+        } catch (error) {
+            console.warn('Unable to parse user details payload.', error);
+            return {};
+        }
+    }
+
+    function openEditModalFromButton(button, source, id, name, email, roleId, status) {
+        openEditModal(source, id, name, email, roleId, status, parseUserDetailsFromButton(button));
+    }
+
+    function openViewModalFromButton(button) {
+        openViewModal(parseUserDetailsFromButton(button));
+    }
+
+    function openViewModal(payloadOrName, email, role, status, source, createdAt, details) {
+        const payload = typeof payloadOrName === 'object' && payloadOrName !== null ?
+            payloadOrName :
+            {
+                name: payloadOrName,
+                email,
+                role,
+                status,
+                source,
+                created_at: createdAt,
+                ...(details || {}),
+            };
+
         const viewName = document.getElementById('viewName');
         const viewEmail = document.getElementById('viewEmail');
+        const viewId = document.getElementById('viewId');
         const viewRole = document.getElementById('viewRole');
         const viewStatus = document.getElementById('viewStatus');
         const viewSource = document.getElementById('viewSource');
         const viewCreatedAt = document.getElementById('viewCreatedAt');
+        const viewUpdatedAt = document.getElementById('viewUpdatedAt');
+        const viewPhone = document.getElementById('viewPhone');
+        const viewBirthdate = document.getElementById('viewBirthdate');
+        const viewGender = document.getElementById('viewGender');
+        const viewPatientProfile = document.getElementById('viewPatientProfile');
+        const viewLastLoginAt = document.getElementById('viewLastLoginAt');
         const viewInitial = document.getElementById('viewInitial');
 
-        if (viewName) viewName.textContent = name || 'Unknown User';
-        if (viewEmail) viewEmail.textContent = email || 'No email available';
-        if (viewRole) viewRole.textContent = role || 'No Role';
-        if (viewSource) viewSource.textContent = source || 'Users';
-        if (viewCreatedAt) viewCreatedAt.textContent = createdAt || 'N/A';
+        if (viewName) viewName.textContent = payload.name || 'Unknown User';
+        if (viewEmail) viewEmail.textContent = payload.email || 'No email available';
+        if (viewId) viewId.textContent = payload.id || 'N/A';
+        if (viewRole) viewRole.textContent = payload.role || 'Patient';
+        if (viewSource) viewSource.textContent = payload.source || 'Users';
+        if (viewCreatedAt) viewCreatedAt.textContent = payload.created_at || 'N/A';
+        if (viewUpdatedAt) viewUpdatedAt.textContent = payload.updated_at || 'N/A';
+        if (viewPhone) viewPhone.textContent = payload.phone || 'N/A';
+        if (viewBirthdate) viewBirthdate.textContent = payload.birthdate || 'N/A';
+        if (viewGender) viewGender.textContent = payload.gender || 'N/A';
+        if (viewPatientProfile) viewPatientProfile.textContent = payload.patient_profile || 'Not linked';
+        if (viewLastLoginAt) viewLastLoginAt.textContent = payload.last_login_at || 'Never';
 
         if (viewInitial) {
-            viewInitial.textContent = String(name || '?').trim().charAt(0).toUpperCase() || '?';
+            viewInitial.textContent = String(payload.name || '?').trim().charAt(0).toUpperCase() || '?';
         }
 
         if (viewStatus) {
-            const normalizedStatus = String(status || '').toLowerCase();
+            const normalizedStatus = String(payload.status || '').toLowerCase();
 
-            viewStatus.textContent = status || 'Unknown';
+            viewStatus.textContent = payload.status || 'Unknown';
             viewStatus.classList.remove('is-active', 'is-inactive');
 
             if (normalizedStatus === 'active') {
@@ -1576,18 +1978,21 @@ $inactiveCount = $inactiveCount ?? 0;
 
     window.openToggleConfirm = openToggleConfirm;
     window.openEditModal = openEditModal;
+    window.openEditModalFromButton = openEditModalFromButton;
     window.openResetModal = openResetModal;
     window.openViewModal = openViewModal;
+    window.openViewModalFromButton = openViewModalFromButton;
     window.togglePassVis = togglePassVis;
+    window.refreshGeneratedPassword = refreshGeneratedPassword;
+    window.copyGeneratedPassword = copyGeneratedPassword;
+    window.copyFieldValue = copyFieldValue;
 
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof applyTheme === 'function') applyTheme(localStorage.getItem('theme') || 'light');
-        document.querySelectorAll('.theme-option').forEach(o =>
-            o.addEventListener('click', e => {
-                e.stopPropagation();
-                if (typeof applyTheme === 'function') applyTheme(o.getAttribute('data-theme'));
-            })
-        );
+
+        refreshGeneratedPassword();
+        bindUserPhoneValidation('addPhoneInput');
+        bindUserPhoneValidation('editPhone');
 
         document.querySelectorAll('.flash-alert').forEach(el => {
             setTimeout(() => {
@@ -1597,25 +2002,6 @@ $inactiveCount = $inactiveCount ?? 0;
             }, 4000);
         });
     });
-
-    function clearSearch() {
-        var input = document.getElementById('umSearch');
-
-        if (!input) return;
-
-        if (window.clearSearchInput) {
-            window.clearSearchInput(input);
-        } else {
-            input.value = '';
-            input.dispatchEvent(new Event('input', {
-                bubbles: true
-            }));
-            input.dispatchEvent(new Event('change', {
-                bubbles: true
-            }));
-            input.focus();
-        }
-    }
 
     function umFetch(silent) {
         if (umController) umController.abort();
@@ -1661,6 +2047,40 @@ $inactiveCount = $inactiveCount ?? 0;
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    }
+
+    function normalizeUmRole(user) {
+        const rawName = String(
+            user.role_name ??
+            user.role?.display_name ??
+            user.role?.name ??
+            ''
+        ).trim();
+
+        const rawSlug = String(
+            user.role_slug ??
+            user.role?.slug ??
+            ''
+        ).trim().toLowerCase();
+
+        const invalidValues = [
+            '',
+            '-',
+            '—',
+            'null',
+            'undefined',
+            'none',
+            'no-role'
+        ];
+
+        const hasNoRole =
+            invalidValues.includes(rawName.toLowerCase()) ||
+            !user.role_id;
+
+        return {
+            label: hasNoRole ? 'Patient' : rawName,
+            slug: hasNoRole ? 'none' : rawSlug || 'none'
+        };
     }
 
     function umRenderRows(users) {
@@ -1718,8 +2138,14 @@ $inactiveCount = $inactiveCount ?? 0;
 
         users.forEach(function (user, index) {
             var rowNumber = startNumber + index;
-            var roleSlug = (user.role_slug || '').toLowerCase();
-            var roleLabel = user.role_name || 'No Role';
+            var normalizedRole =
+                normalizeUmRole(user);
+
+            var roleSlug =
+                normalizedRole.slug;
+
+            var roleLabel =
+                normalizedRole.label;
             var registeredDay = user.created_at_day || '—';
 
             var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
@@ -1768,46 +2194,60 @@ $inactiveCount = $inactiveCount ?? 0;
                     </td>
 
                     <td class="py-3.5 px-4">
-                        <div class="um-action-group flex items-center justify-center gap-1">
+                        <div class="ui-action-group um-action-group">
                             <button type="button"
-                                onclick="openEditModal(
-                                    'users',
-                                    ${user.id},
-                                    ${jsAttr(user.name)},
-                                    ${jsAttr(user.email)},
-                                    ${jsAttr(user.role_id)},
-                                    ${jsAttr(user.status)}
-                                )"
-                                class="action-btn btn-edit" title="Edit account">
+                                data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                phone_raw: '',
+                birthdate_raw: '',
+                gender_raw: ''
+            }))}"
+                                onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
+                                class="ui-action-btn ui-action-edit"
+data-tooltip="Edit account" data-tooltip-tone="edit"
+aria-label="Edit account">
                                 <i class="fa-solid fa-pen text-[11px]"></i>
                             </button>
 
                             <button type="button"
-                                onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
-                                class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
-                                title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
-                                <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
-                            </button>
+    onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
+    class="ui-action-btn ${user.status === 'active'
+                    ? 'ui-action-warning'
+                    : 'ui-action-success'}"
+    data-tooltip="${user.status === 'active'
+                    ? 'Deactivate account'
+                    : 'Activate account'}"
+    aria-label="${user.status === 'active'
+                    ? 'Deactivate account'
+                    : 'Activate account'}">
+    <i class="fa-solid ${user.status === 'active'
+                    ? 'fa-toggle-on'
+                    : 'fa-toggle-off'}"></i>
+</button>
 
                             <button type="button"
                                 onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                                class="action-btn btn-reset" title="Reset password">
+                                class="ui-action-btn ui-action-reset"
+                                data-tooltip="Reset password"
+                                aria-label="Reset password">
                                 <i class="fa-solid fa-key text-[11px]"></i>
                             </button>
 
                             <button type="button"
-                                onclick="openViewModal(
-                                    ${jsAttr(user.name)},
-                                    ${jsAttr(user.email)},
-                                    ${jsAttr(roleLabel)},
-                                    ${jsAttr(statusLabel)},
-                                    'Users',
-                                    ${jsAttr(createdFull)}
-                                )"
-                                class="action-btn btn-view-details"
-                                title="View details">
-                                <i class="fa-solid fa-eye text-[11px]"></i>
-                            </button>
+    data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: roleLabel,
+                        status: statusLabel,
+                        source: 'Users',
+                        created_at: createdFull
+                    }))}"
+    onclick="openViewModalFromButton(this)"
+    class="ui-action-btn ui-action-view"
+    data-tooltip="View details"
+    aria-label="View details">
+    <i class="fa-solid fa-eye"></i>
+</button>
                         </div>
                     </td>
                 </tr>
@@ -1834,32 +2274,46 @@ $inactiveCount = $inactiveCount ?? 0;
                     </div>
 
                     <div class="um-grid-meta">
-                        <div class="um-grid-field">
-                            <div class="um-grid-label">Role</div>
-                            <div class="um-grid-value">
-                                <span class="badge-role role-${roleSlug || 'none'}">
-    ${roleLabel}
-</span>
-                            </div>
-                        </div>
+    <div class="um-grid-field">
+        <div class="um-grid-label">
+            Role
+        </div>
 
-                        <div class="um-grid-field">
-                            <div class="um-grid-label">Registered</div>
-                            <div class="um-grid-value">${registeredDay}</div>
-                        </div>
-                    </div>
+        <div class="um-grid-value">
+            <span class="badge-role role-${roleSlug || 'none'}">
+                ${roleLabel}
+            </span>
+        </div>
+    </div>
 
-                    <div class="flex items-center justify-end gap-1 flex-wrap">
+    <div class="um-grid-field">
+        <div class="um-grid-label">
+            Registered
+        </div>
+
+        <div class="um-registered-date">
+            <span class="um-registered-icon">
+                <i class="fa-solid fa-calendar-day"></i>
+            </span>
+
+            <span class="um-registered-text">
+                ${registeredDay}
+            </span>
+        </div>
+    </div>
+</div>
+
+                    <div class="ui-action-group">
                         <button type="button"
-                            onclick="openEditModal(
-                                'users',
-                                ${user.id},
-                                ${jsAttr(user.name)},
-                                ${jsAttr(user.email)},
-                                ${jsAttr(user.role_id)},
-                                ${jsAttr(user.status)}
-                            )"
-                            class="action-btn btn-edit" title="Edit account">
+                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                phone_raw: '',
+                birthdate_raw: '',
+                gender_raw: ''
+            }))}"
+                            onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
+                            class="ui-action-btn ui-action-edit"
+data-tooltip="Edit account" data-tooltip-tone="edit"
+aria-label="Edit account">
                             <i class="fa-solid fa-pen text-[11px]"></i>
                         </button>
 
@@ -1872,21 +2326,26 @@ $inactiveCount = $inactiveCount ?? 0;
 
                         <button type="button"
                             onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                            class="action-btn btn-reset" title="Reset password">
+                            class="ui-action-btn ui-action-reset"
+data-tooltip="Reset password"
+aria-label="Reset password">
                             <i class="fa-solid fa-key text-[11px]"></i>
                         </button>
 
                         <button type="button"
-                            onclick="openViewModal(
-                                ${jsAttr(user.name)},
-                                ${jsAttr(user.email)},
-                                ${jsAttr(roleLabel)},
-                                ${jsAttr(statusLabel)},
-                                'Users',
-                                ${jsAttr(createdFull)}
-                            )"
-                            class="action-btn btn-view-details"
-                            title="View details">
+                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: roleLabel,
+                status: statusLabel,
+                source: 'Users',
+                created_at: createdFull
+            }))}"
+                            onclick="openViewModalFromButton(this)"
+                            class="ui-action-btn ui-action-view"
+data-tooltip="View details"
+aria-label="View details">
                             <i class="fa-solid fa-eye text-[11px]"></i>
                         </button>
                     </div>
@@ -1896,7 +2355,6 @@ $inactiveCount = $inactiveCount ?? 0;
 
         tbody.innerHTML = tableHtml;
         gridBody.innerHTML = gridHtml;
-        applyUmView(getPreferredUmView(), false);
     }
 
     function umGoPage(page) {
@@ -1907,13 +2365,17 @@ $inactiveCount = $inactiveCount ?? 0;
     function umRenderPagebar(p) {
         if (!p) return;
 
-        document.querySelectorAll('.um-pagebar-info').forEach(function (el) {
+        document.querySelectorAll(
+            '.user-management-page .global-pagebar-info'
+        ).forEach(function (el) {
             el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total +
                 '</strong> users';
         });
 
         var html = umBuildPagination(p);
-        document.querySelectorAll('.um-pagination-wrap').forEach(function (el) {
+        document.querySelectorAll(
+            '.user-management-page .global-pagination-wrap'
+        ).forEach(function (el) {
             el.innerHTML = html;
         });
 
@@ -1939,45 +2401,129 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function umBuildPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) return '';
-
-        var current = Number(p.current_page || 1);
-        var last = Number(p.last_page || 1);
-        var winSize = 5;
-        var half = Math.floor(winSize / 2);
-
-        var start = Math.max(1, current - half);
-        var end = Math.min(last, start + winSize - 1);
-
-        if (end - start + 1 < winSize) {
-            start = Math.max(1, end - winSize + 1);
+        if (!p) {
+            return '';
         }
 
-        var html = '<nav class="sl-pagination" aria-label="User pagination">';
+        const current = Number(p.current_page || 1);
+        const last = Math.max(
+            1,
+            Number(p.last_page || 1)
+        );
+        const windowSize = 5;
+        const half = Math.floor(windowSize / 2);
 
-        html += current <= 1
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
-            : '<button type="button" onclick="umGoPage(' + (current - 1) + ')" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>';
+        let start = Math.max(1, current - half);
+        let end = Math.min(last, start + windowSize - 1);
+
+        if (end - start + 1 < windowSize) {
+            start = Math.max(1, end - windowSize + 1);
+        }
+
+        let html = `
+        <nav class="global-pagination" aria-label="User pagination">
+    `;
+
+        html += current <= 1 ?
+            `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Previous page"
+                disabled>
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        ` :
+            `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${current - 1})"
+                aria-label="Previous page">
+                <i class="fa-solid fa-chevron-left global-page-icon"></i>
+            </button>
+        `;
 
         if (start > 1) {
-            html += '<button type="button" onclick="umGoPage(1)" class="sl-page-btn">1</button>';
-            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(1)">
+                1
+            </button>
+        `;
+
+            if (start > 2) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
         }
 
-        for (var i = start; i <= end; i++) {
-            html += i === current
-                ? '<span class="sl-page-current" aria-current="page">' + i + '</span>'
-                : '<button type="button" onclick="umGoPage(' + i + ')" class="sl-page-btn">' + i + '</button>';
+        for (let page = start; page <= end; page++) {
+            html += page === current ?
+                `
+                <span
+                    class="global-page-current"
+                    aria-current="page">
+                    ${page}
+                </span>
+            ` :
+                `
+                <button
+                    type="button"
+                    class="global-page-btn"
+                    onclick="umGoPage(${page})">
+                    ${page}
+                </button>
+            `;
         }
 
         if (end < last) {
-            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += '<button type="button" onclick="umGoPage(' + last + ')" class="sl-page-btn">' + last + '</button>';
+            if (end < last - 1) {
+                html += `
+                <span
+                    class="global-page-ellipsis"
+                    aria-hidden="true">
+                    &hellip;
+                </span>
+            `;
+            }
+
+            html += `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${last})">
+                ${last}
+            </button>
+        `;
         }
 
-        html += current >= last
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
-            : '<button type="button" onclick="umGoPage(' + (current + 1) + ')" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>';
+        html += current >= last ?
+            `
+            <button
+                type="button"
+                class="global-page-disabled"
+                aria-label="Next page"
+                disabled>
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        ` :
+            `
+            <button
+                type="button"
+                class="global-page-btn"
+                onclick="umGoPage(${current + 1})"
+                aria-label="Next page">
+                <i class="fa-solid fa-chevron-right global-page-icon"></i>
+            </button>
+        `;
 
         html += '</nav>';
 
@@ -2023,26 +2569,8 @@ $inactiveCount = $inactiveCount ?? 0;
         showUserManagementToast('error', message);
     }
 
-    function setRoleFilter(el, role) {
-        document.querySelectorAll('#umFilterForm [data-role]').forEach(function (b) {
-            b.classList.remove('active');
-        });
-        el.classList.add('active');
-
-        umState.role = (role === 'all' || role === '') ? '' : role;
-        umState.page = 1;
-        umFetch();
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof applyTheme === 'function') applyTheme(localStorage.getItem('theme') || 'light');
-        initUmViewToggle();
-        document.querySelectorAll('.theme-option').forEach(function (o) {
-            o.addEventListener('click', function (e) {
-                e.stopPropagation();
-                if (typeof applyTheme === 'function') applyTheme(o.getAttribute('data-theme'));
-            });
-        });
 
         umRenderPagebar({
             total: {{ $users-> total() }},
@@ -2082,7 +2610,6 @@ $inactiveCount = $inactiveCount ?? 0;
         });
     }
 
-    var statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
         statusFilter.addEventListener('change', function () {
             umState.status = this.value;
@@ -2142,14 +2669,22 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     var editForm = document.getElementById('editForm');
+
     if (editForm) {
         editForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const validation = window.validateGlobalForm?.(this);
+
+            if (validation && !validation.valid) {
+                return;
+            }
 
             var form = this;
             var url = form.action;
             var submitBtn = form.querySelector('button[type="submit"]');
             var originalHtml = submitBtn.innerHTML;
+            var editPhoneInput = document.getElementById('editPhone');
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
@@ -2159,13 +2694,18 @@ $inactiveCount = $inactiveCount ?? 0;
             params.append('_method', 'PUT');
             params.append('name', document.getElementById('editName').value);
             params.append('email', document.getElementById('editEmail').value);
+            params.append('phone', getNormalizedUserPhoneValue(editPhoneInput));
+            params.append('birthdate', document.getElementById('editBirthdate').value);
+            params.append('gender', document.getElementById('editGender').value);
             params.append('role_id', document.getElementById('editRole').value);
             params.append('status', form.querySelector('input[name="status"]:checked')?.value ??
                 '');
 
-            if (String(document.getElementById('editRole').value || '') !== String(document.getElementById(
-                'editOriginalRole').value || '')) {
-                params.append('admin_current_password', document.getElementById('editAdminCurrentPassword')
+            if (String(document.getElementById('editRole').value || '') !== String(document
+                .getElementById(
+                    'editOriginalRole').value || '')) {
+                params.append('admin_current_password', document.getElementById(
+                    'editAdminCurrentPassword')
                     .value);
             }
 
@@ -2189,16 +2729,57 @@ $inactiveCount = $inactiveCount ?? 0;
                     });
                 })
                 .then(function (result) {
-                    if (result.status === 422 && result.data.errors) {
-                        var msgs = Object.values(result.data.errors).flat().join(' ');
-                        showErrorToast(msgs);
-                    } else if (result.ok && result.data.success) {
-                        closeAllModals();
-                        showSuccessToast(result.data.message || 'User updated successfully.');
-                        umFetch(true);
-                    } else {
-                        showErrorToast(result.data.message || 'Something went wrong.');
+                    if (
+                        result.status === 422 &&
+                        result.data?.errors
+                    ) {
+                        Object.entries(
+                            result.data.errors
+                        ).forEach(([name, messages]) => {
+                            const field =
+                                form.querySelector(
+                                    `[name="${CSS.escape(name)}"]`
+                                );
+
+                            const message =
+                                Array.isArray(messages) ?
+                                    messages[0] :
+                                    messages;
+
+                            if (field) {
+                                window
+                                    .showFormInputValidationMessage
+                                    ?.(field, message);
+                            }
+                        });
+
+                        showErrorToast(
+                            result.data.message ||
+                            'Please review the highlighted fields.'
+                        );
+
+                        return;
                     }
+
+                    if (
+                        result.ok &&
+                        result.data?.success
+                    ) {
+                        closeAllModals();
+
+                        showSuccessToast(
+                            result.data.message ||
+                            'User updated successfully.'
+                        );
+
+                        umFetch(true);
+                        return;
+                    }
+
+                    showErrorToast(
+                        result.data?.message ||
+                        'Something went wrong.'
+                    );
                 })
                 .catch(function () {
                     showErrorToast('Something went wrong. Please try again.');
@@ -2210,10 +2791,28 @@ $inactiveCount = $inactiveCount ?? 0;
         });
     }
 
+    var addUserForm = document.getElementById('addUserForm');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', function (e) {
+            var addPhoneInput = document.getElementById('addPhoneInput');
+            var addPhoneFeedback = document.getElementById('addPhoneInputFeedback');
+
+            if (addPhoneInput) {
+                addPhoneInput.value = getNormalizedUserPhoneValue(addPhoneInput);
+            }
+        });
+    }
+
     var resetForm = document.getElementById('resetForm');
     if (resetForm) {
         resetForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const validation = window.validateGlobalForm?.(this);
+
+            if (validation && !validation.valid) {
+                return;
+            }
 
             var form = this;
             var url = form.action;
@@ -2265,11 +2864,6 @@ $inactiveCount = $inactiveCount ?? 0;
                 });
         });
     }
-
         });
-
-    window.addEventListener('resize', function () {
-        applyUmView(getPreferredUmView(), false);
-    });
 </script>
 @endsection

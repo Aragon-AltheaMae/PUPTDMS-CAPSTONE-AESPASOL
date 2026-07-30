@@ -9,6 +9,7 @@
 @php
 $logs = $logs ?? collect([]);
 $perPage = $perPage ?? 10;
+$status = $status ?? 'active';
 @endphp
 
 <main id="mainContent" class="admin-page-shell system-logs-page page-enter mode-list">
@@ -112,19 +113,22 @@ $perPage = $perPage ?? 10;
                             <span>Filter</span>
                             <span id="slFilterBadge" class="filter-badge hidden"></span>
                         </button>
+
+                        <button type="button" id="slArchiveBtn" class="sl-toolbar-btn sl-toolbar-btn-archive"
+                            title="Archive old active logs">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Archive Old Logs</span>
+                        </button>
+
+                        <button type="button" id="slExportBtn" class="sl-toolbar-btn sl-toolbar-btn-export"
+                            title="Export current logs view to PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Export PDF</span>
+                        </button>
                     </div>
 
-                    <div class="view-toggle-container sl-view-toggle" id="slViewToggle" aria-label="View toggle">
-                        <div class="view-slider"></div>
-                        <button type="button" class="btn-view-mode active" id="slListViewBtn" title="List view"
-                            aria-label="List view">
-                            <i class="fa-solid fa-table-list"></i>
-                        </button>
-                        <button type="button" class="btn-view-mode" id="slGridViewBtn" title="Grid view"
-                            aria-label="Grid view">
-                            <i class="fa-solid fa-grip"></i>
-                        </button>
-                    </div>
+                    <x-view-toggle id="slViewToggle" class="sl-view-toggle" storage-key="systemLogsView"
+                        list-view="#slListView" grid-view="#slGridView" />
 
                     <button id="slClearFilterBtn" type="button" onclick="clearOnlySlFilters()"
                         class="global-filter-reset-btn hidden" title="Reset filters" aria-label="Reset filters">
@@ -134,30 +138,287 @@ $perPage = $perPage ?? 10;
             </div>
 
             @php $activeRole = $role ?? 'all'; @endphp
-            <div class="sl-role-tabs">
-                @foreach ([
-                ['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
-                ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount],
-                ['key' => 'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount],
-                ['key' => 'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount],
-                ['key' => 'login', 'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount],
-                ['key' => 'error', 'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ??
-                0],
-                ] as $tab)
-                <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
-                    onclick="slSetTab(this, '{{ $tab['key'] }}')">
-                    <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
-                    <span
-                        class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
-                        {{ $tab['count'] }}
-                    </span>
-                </button>
-                @endforeach
-            </div>
+            <div class="sl-status-tabs">
+                <div class="sl-status-tabs">
+                    @foreach ([
+                    ['key' => 'active', 'label' => 'Active', 'count' => $activeCount ?? 0, 'icon' => 'fa-wave-square'],
+                    ['key' => 'archived', 'label' => 'Archived', 'count' => $archivedCount ?? 0, 'icon' =>
+                    'fa-box-archive'],
+                    ['key' => 'all', 'label' => 'All Logs', 'count' => ($activeCount ?? 0) + ($archivedCount ?? 0),
+                    'icon' => 'fa-layer-group'],
+                    ] as $statusTab)
+                    <button type="button" class="sl-status-tab {{ $status === $statusTab['key'] ? 'active' : '' }}"
+                        onclick="slSetStatus(this, '{{ $statusTab['key'] }}')">
+                        <i class="fa-solid {{ $statusTab['icon'] }}"></i>
+                        <span>{{ $statusTab['label'] }}</span>
+                        <span class="sl-status-count">{{ $statusTab['count'] }}</span>
+                    </button>
+                    @endforeach
+                </div>
 
-            <div class="sl-pagebar sl-pagebar-top">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <span class="sl-pagebar-info">
+                <div class="sl-role-tabs">
+                    @foreach ([['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
+                    ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount], ['key' =>
+                    'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount], ['key' =>
+                    'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount], ['key' => 'login',
+                    'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount], ['key' => 'error',
+                    'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ?? 0]] as $tab)
+                    <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
+                        onclick="slSetTab(this, '{{ $tab['key'] }}')">
+                        <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
+                        <span
+                            class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                            {{ $tab['count'] }}
+                        </span>
+                    </button>
+                    @endforeach
+                </div>
+
+                <div class="global-pagebar global-pagebar-top">
+                    <div class="global-pagebar-left">
+                        <span class="global-pagebar-info">
+                            @if (method_exists($logs, 'total'))
+                            Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
+                            of <strong>{{ $logs->total() }}</strong> entries
+                            @else
+                            Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
+                            @endif
+                        </span>
+                        <div class="global-page-size-control">
+                            <label for="perPageSelect">Show</label>
+
+                            <div class="global-page-size-select" data-global-page-size
+                                data-page-size-input="#perPageSelect">
+                                <select id="perPageSelect" class="global-page-size-native" tabindex="-1"
+                                    aria-hidden="true">
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <option value="{{ $size }}" {{ (int) $perPage===$size ? 'selected' : '' }}>
+                                        {{ $size }}</option>
+                                    @endforeach
+                                </select>
+
+                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
+                                    aria-haspopup="listbox" aria-expanded="false">
+                                    <span data-page-size-value>{{ (int) $perPage }}</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+
+                                <div class="global-page-size-menu" role="listbox">
+                                    @foreach ([10, 20, 50, 100] as $size)
+                                    <button type="button"
+                                        class="global-page-size-option {{ (int) $perPage === $size ? 'is-selected' : '' }}"
+                                        data-page-size-option data-value="{{ $size }}" role="option"
+                                        aria-selected="{{ (int) $perPage === $size ? 'true' : 'false' }}">
+                                        <span>{{ $size }}</span>
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <span>per page</span>
+                        </div>
+                    </div>
+                    <div class="global-pagination-wrap"></div>
+                </div>
+
+                <div class="sl-view" id="slListView">
+                    <div class="sl-table-wrap">
+                        <table class="data-table" id="slTable">
+                            <thead>
+                                <tr>
+                                    <th class="sl-col-id">ID</th>
+                                    <th class="sl-col-timestamp">Timestamp</th>
+                                    <th class="sl-col-role">Role</th>
+                                    <th class="sl-col-user">User</th>
+                                    <th class="sl-col-action">Action</th>
+                                    <th class="sl-col-module">Module</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slTableBody">
+                                @forelse($logs as $log)
+                                @php
+                                $role = strtolower($log->actor_role ?? 'other');
+                                $action = strtolower($log->action ?? '');
+                                $actionClass = match (true) {
+                                str_contains($action, 'error') ||
+                                str_contains($action, 'failed') ||
+                                str_contains($action, 'exception')
+                                => 'error',
+                                str_contains($action, 'login') => 'login',
+                                str_contains($action, 'logout') => 'logout',
+                                str_contains($action, 'create') => 'create',
+                                str_contains($action, 'update') => 'update',
+                                str_contains($action, 'delete') => 'delete',
+                                default => 'default',
+                                };
+                                $actionIcon = match ($actionClass) {
+                                'login' => 'fa-right-to-bracket',
+                                'logout' => 'fa-right-from-bracket',
+                                'create' => 'fa-plus',
+                                'update' => 'fa-pen',
+                                'delete' => 'fa-trash',
+                                'error' => 'fa-triangle-exclamation',
+                                default => 'fa-bolt',
+                                };
+                                $roleIcon = match ($role) {
+                                'admin' => 'fa-user-tie',
+                                'dentist' => 'fa-user-doctor',
+                                'patient' => 'fa-user',
+                                default => 'fa-circle-user',
+                                };
+                                $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                                @endphp
+                                <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                                    <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
+                                        <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
+                                    </td>
+                                    <td><span class="sl-role {{ $role }}"><i class="fa-solid {{ $roleIcon }}"></i>{{
+                                            ucfirst($role) }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="sl-user">
+                                            <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
+                                            <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="sl-action {{ $actionClass }}">
+                                            <i
+                                                class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
+                                            {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                        </span>
+                                        @if($log->is_archived)
+                                        <span class="sl-archive-badge"
+                                            title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                            <i class="fa-solid fa-box-archive"></i> Archived
+                                        </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="sl-module">
+                                            <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ',
+                                            $log->module))
+                                            }}
+                                        </span>
+                                    </td>
+                                    <td><span class="sl-desc">{{ $log->description ?? 'No description provided.'
+                                            }}</span>
+                                    </td>
+                                </tr>
+                                @empty
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sl-view" id="slGridView" hidden>
+                    <div class="sl-grid" id="slGridBody">
+                        @forelse($logs as $log)
+                        @php
+                        $role = strtolower($log->actor_role ?? 'other');
+                        $action = strtolower($log->action ?? '');
+                        $actionClass = match (true) {
+                        str_contains($action, 'error') ||
+                        str_contains($action, 'failed') ||
+                        str_contains($action, 'exception')
+                        => 'error',
+                        str_contains($action, 'login') => 'login',
+                        str_contains($action, 'logout') => 'logout',
+                        str_contains($action, 'create') => 'create',
+                        str_contains($action, 'update') => 'update',
+                        str_contains($action, 'delete') => 'delete',
+                        default => 'default',
+                        };
+                        $actionIcon = match ($actionClass) {
+                        'login' => 'fa-right-to-bracket',
+                        'logout' => 'fa-right-from-bracket',
+                        'create' => 'fa-plus',
+                        'update' => 'fa-pen',
+                        'delete' => 'fa-trash',
+                        'error' => 'fa-triangle-exclamation',
+                        default => 'fa-bolt',
+                        };
+                        $roleIcon = match ($role) {
+                        'admin' => 'fa-user-tie',
+                        'dentist' => 'fa-user-doctor',
+                        'patient' => 'fa-user',
+                        default => 'fa-circle-user',
+                        };
+                        $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                        @endphp
+
+                        <div class="sl-grid-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                            <div class="sl-grid-top">
+                                <div class="sl-grid-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</div>
+                                <span class="sl-action {{ $actionClass }}">
+                                    <i
+                                        class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
+                                    {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                </span>
+                                @if($log->is_archived)
+                                <span class="sl-archive-badge"
+                                    title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                    <i class="fa-solid fa-box-archive"></i> Archived
+                                </span>
+                                @endif
+                            </div>
+
+                            <div class="sl-user">
+                                <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
+                                <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
+                            </div>
+
+                            <div class="sl-grid-meta">
+                                <div class="sl-grid-field">
+                                    <div class="sl-grid-label">Timestamp</div>
+                                    <div class="sl-grid-value">
+                                        {{ $log->created_at->format('M j, Y') }}<br>
+                                        {{ $log->created_at->format('h:i:s A') }}
+                                    </div>
+                                </div>
+
+                                <div class="sl-grid-field">
+                                    <div class="sl-grid-label">Role</div>
+                                    <div class="sl-grid-value">
+                                        <span class="sl-role {{ $role }}">
+                                            <i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="sl-grid-field">
+                                    <div class="sl-grid-label">Module</div>
+                                    <div class="sl-grid-value">
+                                        <span class="sl-module">
+                                            <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ',
+                                            $log->module))
+                                            }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="sl-grid-field">
+                                    <div class="sl-grid-label">Description</div>
+                                    <div class="sl-grid-value">{{ $log->description ?? 'No description provided.' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        @endforelse
+                    </div>
+                </div>
+
+                <div id="emptyState" class="empty-state-host"></div>
+
+                <div class="global-pagebar global-pagebar-bottom">
+                    <span class="global-pagebar-info">
                         @if (method_exists($logs, 'total'))
                         Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
                         of <strong>{{ $logs->total() }}</strong> entries
@@ -165,261 +426,46 @@ $perPage = $perPage ?? 10;
                         Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
                         @endif
                     </span>
-                    <div class="sl-page-size-control global-page-size-control">
-                        <label for="perPageSelect">Show</label>
-
-                        <div class="global-page-size-select" data-global-page-size
-                            data-page-size-input="#perPageSelect">
-                            <select id="perPageSelect" class="global-page-size-native" tabindex="-1" aria-hidden="true">
-                                @foreach ([10, 20, 50, 100] as $size)
-                                <option value="{{ $size }}" {{ (int) $perPage===$size ? 'selected' : '' }}>
-                                    {{ $size }}</option>
-                                @endforeach
-                            </select>
-
-                            <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                aria-haspopup="listbox" aria-expanded="false">
-                                <span data-page-size-value>{{ (int) $perPage }}</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </button>
-
-                            <div class="global-page-size-menu" role="listbox">
-                                @foreach ([10, 20, 50, 100] as $size)
-                                <button type="button"
-                                    class="global-page-size-option {{ (int) $perPage === $size ? 'is-selected' : '' }}"
-                                    data-page-size-option data-value="{{ $size }}" role="option"
-                                    aria-selected="{{ (int) $perPage === $size ? 'true' : 'false' }}">
-                                    <span>{{ $size }}</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <span>per page</span>
-                    </div>
-                </div>
-                <div class="sl-pagination-wrap"></div>
-            </div>
-
-            <div class="sl-view" id="slListView">
-                <div class="sl-table-wrap">
-                    <table class="data-table" id="slTable">
-                        <thead>
-                            <tr>
-                                <th class="sl-col-id">ID</th>
-                                <th class="sl-col-timestamp">Timestamp</th>
-                                <th class="sl-col-role">Role</th>
-                                <th class="sl-col-user">User</th>
-                                <th class="sl-col-action">Action</th>
-                                <th class="sl-col-module">Module</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody id="slTableBody">
-                            @forelse($logs as $log)
-                            @php
-                            $role = strtolower($log->actor_role ?? 'other');
-                            $action = strtolower($log->action ?? '');
-                            $actionClass = match (true) {
-                            str_contains($action, 'error') || str_contains($action, 'failed') || str_contains($action,
-                            'exception') => 'error',
-                            str_contains($action, 'login') => 'login',
-                            str_contains($action, 'logout') => 'logout',
-                            str_contains($action, 'create') => 'create',
-                            str_contains($action, 'update') => 'update',
-                            str_contains($action, 'delete') => 'delete',
-                            default => 'default',
-                            };
-                            $actionIcon = match ($actionClass) {
-                            'login' => 'fa-right-to-bracket',
-                            'logout' => 'fa-right-from-bracket',
-                            'create' => 'fa-plus',
-                            'update' => 'fa-pen',
-                            'delete' => 'fa-trash',
-                            'error' => 'fa-triangle-exclamation',
-                            default => 'fa-bolt',
-                            };
-                            $roleIcon = match ($role) {
-                            'admin' => 'fa-user-tie',
-                            'dentist' => 'fa-user-doctor',
-                            'patient' => 'fa-user',
-                            default => 'fa-circle-user',
-                            };
-                            $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
-                            @endphp
-                            <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                                <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
-                                </td>
-                                <td>
-                                    <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
-                                    <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
-                                </td>
-                                <td><span class="sl-role {{ $role }}"><i class="fa-solid {{ $roleIcon }}"></i>{{
-                                        ucfirst($role) }}</span>
-                                </td>
-                                <td>
-                                    <div class="sl-user">
-                                        <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                                        <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="sl-action {{ $actionClass }}">
-                                        <i
-                                            class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
-                                        {{ ucwords(str_replace('_', ' ', $log->action)) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="sl-module">
-                                        <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module))
-                                        }}
-                                    </span>
-                                </td>
-                                <td><span class="sl-desc">{{ $log->description ?? 'No description provided.' }}</span>
-                                </td>
-                            </tr>
-                            @empty
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <div class="global-pagination-wrap"></div>
                 </div>
             </div>
 
-            <div class="sl-view" id="slGridView" hidden>
-                <div class="sl-grid" id="slGridBody">
-                    @forelse($logs as $log)
-                    @php
-                    $role = strtolower($log->actor_role ?? 'other');
-                    $action = strtolower($log->action ?? '');
-                    $actionClass = match (true) {
-                    str_contains($action, 'error') || str_contains($action, 'failed') || str_contains($action,
-                    'exception') => 'error',
-                    str_contains($action, 'login') => 'login',
-                    str_contains($action, 'logout') => 'logout',
-                    str_contains($action, 'create') => 'create',
-                    str_contains($action, 'update') => 'update',
-                    str_contains($action, 'delete') => 'delete',
-                    default => 'default',
-                    };
-                    $actionIcon = match ($actionClass) {
-                    'login' => 'fa-right-to-bracket',
-                    'logout' => 'fa-right-from-bracket',
-                    'create' => 'fa-plus',
-                    'update' => 'fa-pen',
-                    'delete' => 'fa-trash',
-                    'error' => 'fa-triangle-exclamation',
-                    default => 'fa-bolt',
-                    };
-                    $roleIcon = match ($role) {
-                    'admin' => 'fa-user-tie',
-                    'dentist' => 'fa-user-doctor',
-                    'patient' => 'fa-user',
-                    default => 'fa-circle-user',
-                    };
-                    $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
-                    @endphp
-
-                    <div class="sl-grid-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                        <div class="sl-grid-top">
-                            <div class="sl-grid-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</div>
-                            <span class="sl-action {{ $actionClass }}">
-                                <i
-                                    class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
-                                {{ ucwords(str_replace('_', ' ', $log->action)) }}
-                            </span>
-                        </div>
-
-                        <div class="sl-user">
-                            <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                            <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
-                        </div>
-
-                        <div class="sl-grid-meta">
-                            <div class="sl-grid-field">
-                                <div class="sl-grid-label">Timestamp</div>
-                                <div class="sl-grid-value">
-                                    {{ $log->created_at->format('M j, Y') }}<br>
-                                    {{ $log->created_at->format('h:i:s A') }}
-                                </div>
-                            </div>
-
-                            <div class="sl-grid-field">
-                                <div class="sl-grid-label">Role</div>
-                                <div class="sl-grid-value">
-                                    <span class="sl-role {{ $role }}">
-                                        <i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="sl-grid-field">
-                                <div class="sl-grid-label">Module</div>
-                                <div class="sl-grid-value">
-                                    <span class="sl-module">
-                                        <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ', $log->module))
-                                        }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="sl-grid-field">
-                                <div class="sl-grid-label">Description</div>
-                                <div class="sl-grid-value">{{ $log->description ?? 'No description provided.' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    @endforelse
-                </div>
-            </div>
-
-            <div id="emptyState" class="empty-state-host"></div>
-
-            <div class="sl-pagebar">
-                <span class="sl-pagebar-info">
-                    @if (method_exists($logs, 'total'))
-                    Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
-                    of <strong>{{ $logs->total() }}</strong> entries
-                    @else
-                    Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
-                    @endif
-                </span>
-                <div class="sl-pagination-wrap"></div>
-            </div>
         </div>
-
-    </div>
 </main>
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="closeSlFilterPanel()"></div>
+    <div class="filter-drawer-overlay"></div>
 
     <div class="filter-drawer-panel" aria-label="Filter system logs">
-        <div class="filter-drawer-header px-6 py-5 flex items-center justify-between border-b border-gray-100">
-            <div class="filter-drawer-title flex items-center gap-2">
+        <div class="filter-drawer-header">
+            <div class="filter-drawer-title">
                 <i class="fa-solid fa-sliders text-xl"></i>
                 <h2 class="text-xl font-extrabold">Filters</h2>
             </div>
 
-            <button type="button" class="text-gray-400 hover:text-gray-700 transition-colors"
-                onclick="closeSlFilterPanel()" aria-label="Close filters">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <button type="button" class="filter-drawer-close" onclick="closeSlFilterPanel()" aria-label="Close filters">
+
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6">
-            <div id="slActiveFiltersSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
+        <div class="filter-drawer-body">
+            <div id="slActiveFiltersSection" class="filter-active-section hidden">
+
+                <div class="filter-active-header">
+                    <span class="filter-active-title">
+                        Active Filters
+                    </span>
+
                     <button id="slClearAllChipsBtn" type="button"
-                        class="text-xs font-bold text-[#8B0000] hover:underline">
-                        Clear All
+                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Clear All</span>
                     </button>
                 </div>
-                <div id="slActiveChipsContainer"
-                    class="active-filters-container flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+
+                <div id="slActiveChipsContainer" class="active-filters-container">
+                </div>
             </div>
 
             <div>
@@ -537,26 +583,121 @@ $perPage = $perPage ?? 10;
             </div>
         </div>
 
-        <div
-            class="filter-drawer-footer px-6 py-5 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 gap-4">
+        <div class="filter-drawer-footer">
             <button type="button" onclick="clearSlFilterPanelDraft()"
-                class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                <i class="fa-regular fa-trash-can text-lg"></i>
-                <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+                class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
+
+                <i class="fa-regular fa-trash-can"></i>
+                <span>Clear Filters</span>
             </button>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <button type="button" onclick="closeSlFilterPanel()"
-                    class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors">
-                    Cancel
+            <div class="filter-footer-actions">
+                <button type="button" id="filterCloseBtn" onclick="closeSlFilterPanel()"
+                    class="filter-cancel-btn ui-btn ui-btn-secondary">
+
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </button>
 
-                <button type="button" onclick="applySlFilters()"
-                    class="filter-show-results-btn filter-apply-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+                <button type="button" id="filterApplyBtn" onclick="applySlFilters()"
+                    class="filter-apply-btn ui-btn ui-btn-primary">
+
                     <i class="fa-solid fa-check"></i>
-                    <span id="slShowResultsText">Show 0 results</span>
+
+                    <span id="slShowResultsText" class="filter-results-text">
+                        Show 0 results
+                    </span>
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="slArchiveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
+
+    <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="slArchiveModalTitle">
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-box-archive"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 id="slArchiveModalTitle" class="modal-title">
+                        Archive System Logs
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Move older log records out of the active view.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="modal-x" onclick="closeSlArchiveModal()" aria-label="Close archive modal">
+
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="modal-form-grid">
+
+                <div class="global-confirm-alert">
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <p>
+                        Archive older active logs
+
+                        <span>
+                            Only active logs older than the selected
+                            number of days will be archived. Archived
+                            records remain accessible and are not deleted.
+                        </span>
+                    </p>
+                </div>
+
+                <div>
+                    <label for="slArchiveDaysInput" class="form-label">
+                        Archive logs older than
+                    </label>
+
+                    <div class="modal-inline-control">
+                        <div class="modal-inline-main">
+                            <input type="number" id="slArchiveDaysInput" class="form-input" min="1" max="3650" step="1"
+                                value="90" placeholder="Enter number of days">
+                        </div>
+
+                        <span class="modal-helper-text">
+                            days
+                        </span>
+                    </div>
+
+                    <div id="slArchiveError" class="modal-error-banner hidden mt-3">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <span>
+                            Please enter a valid number from 1 to 3650.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeSlArchiveModal()">
+
+                <i class="fa-solid fa-xmark"></i>
+                <span>Cancel</span>
+            </button>
+
+            <button type="button" id="slArchiveConfirmBtn" class="ui-btn ui-btn-warning"
+                onclick="submitSlArchiveModal()">
+
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Archive Logs</span>
+            </button>
         </div>
     </div>
 </div>
@@ -568,6 +709,7 @@ $perPage = $perPage ?? 10;
     var slState = {
         role: @json($role ?? 'all'),
         search: @json($search ?? ''),
+        status: @json($status ?? 'active'),
         perPage: {{ (int)($perPage ?? 10) }},
     page: @json((int) request('page', 1)),
     sort: @json($sort ?? 'desc'),
@@ -575,25 +717,21 @@ $perPage = $perPage ?? 10;
     dateTo: @json($dateTo ?? ''),
     actionType: @json($actionType ?? ''),
     module: @json($module ?? ''),
-    };
+        };
 
     var slOverallTotal = {{ (int)($totalCount ?? 0) }};
     var slSearchTimer = null;
     var slController = null;
     var slDraftCountController = null;
     var slDraftCountTimer = null;
+    var systemLogsRefreshWatcher = null;
 
     document.addEventListener('DOMContentLoaded', function () {
         syncSlFilterInputs();
         updateSlClearFilterButton();
-        initSlViewToggle();
 
         window.initSearchClearButtons?.();
         window.initGlobalVoiceInputs?.();
-
-        document.getElementById('slFilterPanel')?.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
 
         ['slDateFrom', 'slDateTo'].forEach(function (id) {
             var el = document.getElementById(id);
@@ -659,7 +797,7 @@ $perPage = $perPage ?? 10;
         current_page: {{ (int) $logs -> currentPage() }},
         last_page: {{ (int) $logs -> lastPage() }},
         per_page: {{ (int) $logs -> perPage() }},
-            });
+                });
     @else
     slRenderPagebar({
         total: {{ method_exists($logs, 'count') ? (int) $logs -> count() : 0 }},
@@ -668,7 +806,7 @@ $perPage = $perPage ?? 10;
         current_page: 1,
         last_page: 1,
         per_page: {{ (int)($perPage ?? 10) }},
-            });
+                });
     @endif
 
     @if (method_exists($logs, 'count') && $logs -> count() === 0)
@@ -676,6 +814,11 @@ $perPage = $perPage ?? 10;
     @endif
 
     var searchInput = document.getElementById('slSearch');
+    var slArchiveBtn = document.getElementById('slArchiveBtn');
+    var slExportBtn = document.getElementById('slExportBtn');
+    var slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
+    var slArchiveError = document.getElementById('slArchiveError');
+    var slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
     if (searchInput) {
         searchInput.addEventListener('keydown', function (event) {
             if (event.key !== 'Enter') return;
@@ -710,55 +853,113 @@ $perPage = $perPage ?? 10;
         window.initGlobalPageSizeSelects?.();
     }
 
-    @php $latestLogId = optional(($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs -> getCollection() : $logs) -> first()) -> id ?? 0; @endphp
+    if (slExportBtn) {
+        slExportBtn.addEventListener('click', function () {
+            var params = new URLSearchParams({
+                role: slState.role || 'all',
+                search: slState.search || '',
+                status: slState.status || 'active',
+                sort: slState.sort || 'desc',
+                date_from: slState.dateFrom || '',
+                date_to: slState.dateTo || '',
+                action_type: slState.actionType || '',
+                module: slState.module || '',
+            });
 
-    var lastKnownId = {{ (int) $latestLogId }};
-    var notifBanner = null;
-
-    function checkForNewLogs() {
-        fetch("{{ route('admin.system_logs.check') }}", {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                if (data.latest_id > lastKnownId) {
-                    lastKnownId = data.latest_id;
-                    showNewLogBanner();
-                }
-            }).catch(function () { });
+            window.location.href = '{{ route('admin.system_logs.export') }}?' + params.toString();
+        });
     }
 
-    function showNewLogBanner() {
-        if (notifBanner) notifBanner.remove();
+    if (slArchiveBtn) {
+        slArchiveBtn.addEventListener('click', function () {
+            if (slState.status === 'archived') {
+                window.showToast?.('Switch to active or all logs before archiving.', 'warning');
+                return;
+            }
+            openSlArchiveModal();
+        });
+    }
 
-        notifBanner = document.createElement('div');
-        notifBanner.className = 'sl-new-log-banner';
-        notifBanner.innerHTML =
-            '<i class="fa-solid fa-circle-check"></i>' +
-            '<span>New log entries detected.</span>' +
-            '<button type="button" class="sl-toast-refresh">Refresh to see</button>' +
-            '<button type="button" class="sl-toast-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>';
+    if (slArchiveDaysInput) {
+        slArchiveDaysInput.addEventListener('input', clearSlArchiveError);
+        slArchiveDaysInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitSlArchiveModal();
+            }
+        });
+    }
 
-        notifBanner.querySelector('.sl-toast-refresh')?.addEventListener('click', function () {
+    @php
+    $latestLogId = optional(
+        (
+            $logs instanceof \Illuminate\Pagination\LengthAwarePaginator
+        ? $logs -> getCollection()
+        : $logs
+    ) -> first()
+    ) -> id ?? 0;
+    @endphp
+
+    systemLogsRefreshWatcher = window.initGlobalRefreshWatcher?.({
+        key: 'system-logs',
+
+        url: @json(
+            route('admin.system_logs.check'). '?status=active'
+        ),
+
+        interval: 5000,
+
+        initialItems: @json(
+            $latestLogId
+                ? [['id' => (int) $latestLogId]]
+                : []
+        ),
+
+        anchorSelector:
+            '#mainContent.system-logs-page .card',
+
+        itemLabel: 'log entry',
+
+        getItems: function (payload) {
+            if (Array.isArray(payload)) {
+                return payload;
+            }
+
+            var latestId =
+                Number(payload?.latest_id || 0);
+
+            return latestId > 0
+                ? [{ id: latestId }]
+                : [];
+        },
+
+        getItemId: function (item) {
+            return item?.id;
+        },
+
+        title: function () {
+            return 'New log entries detected';
+        },
+
+        subtitle: function () {
+            return 'Refresh to see the latest system activity.';
+        },
+
+        onRefresh: function () {
             slState.page = 1;
             slFetch();
-            notifBanner.remove();
-        });
+        },
 
-        notifBanner.querySelector('.sl-toast-close')?.addEventListener('click', function () {
-            notifBanner.remove();
-        });
-
-        document.body.appendChild(notifBanner);
-    }
-
-    setInterval(checkForNewLogs, 5000);
+        toast: {
+            type: 'success',
+            title: 'System logs updated',
+            message: 'Latest log entries are now shown.'
+        }
     });
+
+    if (slState.status === 'archived') {
+        systemLogsRefreshWatcher?.stop();
+    }
 
     function escapeSlHtml(value) {
         return String(value ?? '')
@@ -767,73 +968,6 @@ $perPage = $perPage ?? 10;
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
-    }
-
-    function getPreferredSlView() {
-        if (window.innerWidth <= 767) return 'grid';
-        return localStorage.getItem('systemLogsView') || 'list';
-    }
-
-    function applySlView(view, save = true) {
-        var listView = document.getElementById('slListView');
-        var gridView = document.getElementById('slGridView');
-        var listBtn = document.getElementById('slListViewBtn');
-        var gridBtn = document.getElementById('slGridViewBtn');
-        var mainContent = document.getElementById('mainContent');
-
-        if (!listView || !gridView) return;
-
-        var finalView = window.innerWidth <= 767 ? 'grid' : view;
-
-        listView.hidden = finalView !== 'list';
-        gridView.hidden = finalView !== 'grid';
-
-        if (mainContent) {
-            mainContent.classList.toggle('mode-list', finalView === 'list');
-            mainContent.classList.toggle('mode-grid', finalView === 'grid');
-        }
-
-        if (listBtn) {
-            listBtn.classList.toggle('active', finalView === 'list');
-            listBtn.setAttribute('aria-pressed', finalView === 'list' ? 'true' : 'false');
-        }
-
-        if (gridBtn) {
-            gridBtn.classList.toggle('active', finalView === 'grid');
-            gridBtn.setAttribute('aria-pressed', finalView === 'grid' ? 'true' : 'false');
-        }
-
-        if (save && window.innerWidth > 767) {
-            localStorage.setItem('systemLogsView', finalView);
-        }
-    }
-
-    function initSlViewToggle() {
-        var listBtn = document.getElementById('slListViewBtn');
-        var gridBtn = document.getElementById('slGridViewBtn');
-
-        applySlView(getPreferredSlView(), false);
-
-        if (listBtn && !listBtn.dataset.bound) {
-            listBtn.dataset.bound = '1';
-            listBtn.addEventListener('click', function () {
-                applySlView('list', true);
-            });
-        }
-
-        if (gridBtn && !gridBtn.dataset.bound) {
-            gridBtn.dataset.bound = '1';
-            gridBtn.addEventListener('click', function () {
-                applySlView('grid', true);
-            });
-        }
-
-        if (!window.__systemLogsResizeBound) {
-            window.__systemLogsResizeBound = true;
-            window.addEventListener('resize', function () {
-                applySlView(getPreferredSlView(), false);
-            });
-        }
     }
 
     function clearSearch() {
@@ -845,7 +979,9 @@ $perPage = $perPage ?? 10;
             window.clearSearchInput(input);
         } else {
             input.value = '';
-            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('input', {
+                bubbles: true
+            }));
         }
 
         clearTimeout(slSearchTimer);
@@ -866,6 +1002,123 @@ $perPage = $perPage ?? 10;
 
         el?.classList.add('active');
         el?.querySelector('.tab-count')?.classList.add('active');
+
+        slFetch();
+    }
+
+    function openSlArchiveModal() {
+        clearSlArchiveError();
+
+        if (slArchiveDaysInput) {
+            slArchiveDaysInput.value = slArchiveDaysInput.value || '90';
+        }
+
+        if (typeof window.openModal === 'function') {
+            window.openModal('slArchiveModal');
+        } else {
+            document.getElementById('slArchiveModal')?.classList.add('open');
+        }
+
+        setTimeout(function () {
+            slArchiveDaysInput?.focus();
+            slArchiveDaysInput?.select();
+        }, 80);
+    }
+
+    function closeSlArchiveModal() {
+        clearSlArchiveError();
+
+        if (typeof window.closeModal === 'function') {
+            window.closeModal('slArchiveModal');
+        } else {
+            document.getElementById('slArchiveModal')?.classList.remove('open');
+        }
+    }
+
+    function clearSlArchiveError() {
+        slArchiveError?.classList.add('hidden');
+    }
+
+    function submitSlArchiveModal() {
+        var olderThanDays = Number(slArchiveDaysInput?.value || '');
+
+        if (!Number.isFinite(olderThanDays) || olderThanDays < 1 || olderThanDays > 3650) {
+            slArchiveError?.classList.remove('hidden');
+            slArchiveDaysInput?.focus();
+            return;
+        }
+
+        var body = new URLSearchParams({
+            older_than_days: String(Math.floor(olderThanDays)),
+            role: slState.role || 'all',
+            search: slState.search || '',
+            sort: slState.sort || 'desc',
+            date_from: slState.dateFrom || '',
+            date_to: slState.dateTo || '',
+            action_type: slState.actionType || '',
+            module: slState.module || '',
+        });
+
+        if (slArchiveConfirmBtn) {
+            slArchiveConfirmBtn.disabled = true;
+            slArchiveConfirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Archiving...</span>';
+        }
+
+        fetch('{{ route('admin.system_logs.archive') }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept': 'application/json'
+            },
+            body: body.toString()
+        })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                if (!result.ok) {
+                    throw new Error(result.data?.message || 'Archive request failed');
+                }
+
+                closeSlArchiveModal();
+                window.showToast?.(result.data?.message || 'Logs archived successfully.', 'success');
+                slState.page = 1;
+                slFetch();
+            })
+            .catch(function (error) {
+                window.showToast?.(error.message || 'Unable to archive logs right now.', 'error');
+            })
+            .finally(function () {
+                if (slArchiveConfirmBtn) {
+                    slArchiveConfirmBtn.disabled = false;
+                    slArchiveConfirmBtn.innerHTML = '<i class="fa-solid fa-box-archive"></i><span>Archive Logs</span>';
+                }
+            });
+    }
+
+    window.openSlArchiveModal = openSlArchiveModal;
+    window.closeSlArchiveModal = closeSlArchiveModal;
+    window.submitSlArchiveModal = submitSlArchiveModal;
+
+    function slSetStatus(el, status) {
+        slState.status = status || 'active';
+        slState.page = 1;
+
+        document.querySelectorAll('.sl-status-tab').forEach(function (button) {
+            button.classList.remove('active');
+        });
+
+        el?.classList.add('active');
+
+        if (slState.status === 'archived') {
+            systemLogsRefreshWatcher?.stop();
+        } else {
+            systemLogsRefreshWatcher?.start();
+        }
 
         slFetch();
     }
@@ -1016,7 +1269,8 @@ $perPage = $perPage ?? 10;
         var preset = document.getElementById('slDatePreset')?.value || '';
 
         document.querySelectorAll('#slDatePresetGroup .quick-date-chip').forEach(function (button) {
-            button.classList.toggle('active', String(button.dataset.slDatePreset || '') === String(preset || ''));
+            button.classList.toggle('active', String(button.dataset.slDatePreset || '') === String(preset ||
+                ''));
         });
     }
 
@@ -1028,7 +1282,8 @@ $perPage = $perPage ?? 10;
         var actionValue = actionEl ? actionEl.value || '' : slState.actionType || '';
 
         document.querySelectorAll('#slSortGroup [data-sl-sort]').forEach(function (button) {
-            button.classList.toggle('ftag-active', String(button.dataset.slSort || '') === String(sortValue || 'desc'));
+            button.classList.toggle('ftag-active', String(button.dataset.slSort || '') === String(sortValue ||
+                'desc'));
         });
 
         syncSlActionDropdownLabel(actionValue);
@@ -1277,6 +1532,7 @@ $perPage = $perPage ?? 10;
         return new URLSearchParams({
             role: slState.role || 'all',
             search: slState.search || '',
+            status: slState.status || 'active',
             per_page: 1,
             page: 1,
             sort: document.getElementById('slSortOrder')?.value || 'desc',
@@ -1351,6 +1607,7 @@ $perPage = $perPage ?? 10;
         var params = new URLSearchParams({
             role: slState.role || 'all',
             search: slState.search || '',
+            status: slState.status || 'active',
             per_page: slState.perPage || 10,
             page: slState.page || 1,
             sort: slState.sort || 'desc',
@@ -1375,8 +1632,6 @@ $perPage = $perPage ?? 10;
             emptyState.className = 'empty-state-host';
             emptyState.innerHTML = '';
         }
-
-        applySlView(getPreferredSlView(), false);
 
         fetch('{{ route('admin.system_logs') }}?' + params.toString(), {
             headers: {
@@ -1463,7 +1718,8 @@ $perPage = $perPage ?? 10;
         logs.forEach(function (log) {
             var role = (log.actor_role || 'other').toLowerCase();
             var action = (log.action || '').toLowerCase();
-            var actionClass = (action.includes('error') || action.includes('failed') || action.includes('exception')) ? 'error' :
+            var actionClass = (action.includes('error') || action.includes('failed') || action.includes(
+                'exception')) ? 'error' :
                 action.includes('login') ? 'login' :
                     action.includes('logout') ? 'logout' :
                         action.includes('create') ? 'create' :
@@ -1472,7 +1728,8 @@ $perPage = $perPage ?? 10;
                                     'default';
 
             var actionIcon = actionIcons[actionClass] || 'fa-bolt';
-            var actionIconHtml = '<i class="fa-solid ' + actionIcon + (actionClass === 'error' ? ' sl-action-alert' : '') + '"></i>';
+            var actionIconHtml = '<i class="fa-solid ' + actionIcon + (actionClass === 'error' ?
+                ' sl-action-alert' : '') + '"></i>';
             var roleIcon = roleIcons[role] || 'fa-circle-user';
             var letter = escapeSlHtml((log.actor_name || role).charAt(0).toUpperCase());
             var idPadded = '#' + String(log.id || '').padStart(3, '0');
@@ -1482,27 +1739,35 @@ $perPage = $perPage ?? 10;
             var moduleLabel = escapeSlHtml((log.module || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) {
                 return c.toUpperCase();
             }));
+            var archiveBadge = log.is_archived
+                ? '<span class="sl-archive-badge" title="' + escapeSlHtml(log.archived_at || 'Archived') + '"><i class="fa-solid fa-box-archive"></i> Archived</span>'
+                : '';
             var actorName = escapeSlHtml(log.actor_name ?? log.actor_identifier ?? 'Unknown User');
             var description = escapeSlHtml(log.description || 'No description provided.');
             var createdDay = escapeSlHtml(log.created_at_day || '');
             var createdTime = escapeSlHtml(log.created_at_time || '');
 
-            tableHtml += '<tr data-role="' + escapeSlHtml(role) + '" data-action="' + escapeSlHtml(actionClass) + '">';
+            tableHtml += '<tr data-role="' + escapeSlHtml(role) + '" data-action="' + escapeSlHtml(
+                actionClass) + '">';
             tableHtml += '<td><span class="sl-id">' + idPadded + '</span></td>';
             tableHtml += '<td><span class="sl-date-day">' + createdDay +
                 '</span><span class="sl-date-time">' + createdTime + '</span></td>';
-            tableHtml += '<td><span class="sl-role ' + escapeSlHtml(role) + '"><i class="fa-solid ' + roleIcon + '"></i>' +
+            tableHtml += '<td><span class="sl-role ' + escapeSlHtml(role) + '"><i class="fa-solid ' + roleIcon +
+                '"></i>' +
                 escapeSlHtml(role.charAt(0).toUpperCase() + role.slice(1)) + '</span></td>';
-            tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) + '">' + letter +
+            tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) + '">' +
+                letter +
                 '</div><span class="sl-username">' + actorName + '</span></div></td>';
-            tableHtml += '<td><span class="sl-action ' + escapeSlHtml(actionClass) + '">' + actionIconHtml + ' ' + actionLabel + '</span ></td > ';
+            tableHtml += '<td><span class="sl-action ' + escapeSlHtml(actionClass) + '">' + actionIconHtml +
+                ' ' + actionLabel + '</span ></td > ';
             tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' + moduleLabel +
                 '</span></td>';
             tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description +
                 '</span></td>';
             tableHtml += '</tr>';
 
-            gridHtml += '<div class="sl-grid-card" data-role="' + escapeSlHtml(role) + '" data-action="' + escapeSlHtml(actionClass) + '">';
+            gridHtml += '<div class="sl-grid-card" data-role="' + escapeSlHtml(role) + '" data-action="' +
+                escapeSlHtml(actionClass) + '">';
             gridHtml += '<div class="sl-grid-top">';
             gridHtml += '<div class="sl-grid-id">' + idPadded + '</div>';
             gridHtml += '<span class="sl-action ' + escapeSlHtml(actionClass) + '"> ' + actionIconHtml + ' ' + actionLabel + '</span > ';
@@ -1517,8 +1782,9 @@ $perPage = $perPage ?? 10;
                 createdDay + '<br>' + createdTime + '</div></div>';
             gridHtml +=
                 '<div class="sl-grid-field"><div class="sl-grid-label">Role</div><div class="sl-grid-value"><span class="sl-role ' +
-                escapeSlHtml(role) + '"><i class="fa-solid ' + roleIcon + '"></i>' + escapeSlHtml(role.charAt(0).toUpperCase() + role
-                    .slice(1)) + '</span></div></div>';
+                escapeSlHtml(role) + '"><i class="fa-solid ' + roleIcon + '"></i>' + escapeSlHtml(role.charAt(0)
+                    .toUpperCase() + role
+                        .slice(1)) + '</span></div></div>';
             gridHtml +=
                 '<div class="sl-grid-field"><div class="sl-grid-label">Module</div><div class="sl-grid-value"><span class="sl-module"><i class="fa-solid fa-cube"></i>' +
                 moduleLabel + '</span></div></div>';
@@ -1537,8 +1803,6 @@ $perPage = $perPage ?? 10;
             emptyState.className = 'empty-state-host';
             emptyState.innerHTML = '';
         }
-
-        applySlView(getPreferredSlView(), false);
     }
 
     function slRenderPagebar(p) {
@@ -1547,16 +1811,20 @@ $perPage = $perPage ?? 10;
         var from = Number(p.from || 0);
         var to = Number(p.to || 0);
         var total = Number(p.total || 0);
-        var infoHtml = total > 0
-            ? 'Showing <strong>' + from + '–' + to + '</strong> of <strong>' + total + '</strong> entries'
-            : 'Showing <strong>0</strong> entries';
+        var infoHtml = total > 0 ?
+            'Showing <strong>' + from + '–' + to + '</strong> of <strong>' + total + '</strong> entries' :
+            'Showing <strong>0</strong> entries';
 
-        document.querySelectorAll('.sl-pagebar-info').forEach(function (el) {
+        document.querySelectorAll(
+            '.system-logs-page .global-pagebar-info'
+        ).forEach(function (el) {
             el.innerHTML = infoHtml;
         });
 
         var navHtml = slBuildPagination(p);
-        document.querySelectorAll('.sl-pagination-wrap').forEach(function (el) {
+        document.querySelectorAll(
+            '.system-logs-page .global-pagination-wrap'
+        ).forEach(function (el) {
             el.innerHTML = navHtml;
         });
 
@@ -1582,31 +1850,34 @@ $perPage = $perPage ?? 10;
 
         if (end - start + 1 < winSize) start = Math.max(1, end - winSize + 1);
 
-        var html = '<nav class="sl-pagination" aria-label="System logs pagination">';
+        var html = '<nav class="global-pagination" aria-label="System logs pagination">';
 
-        html += current <= 1
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
-            : '<button type="button" onclick="slGoPage(' + (current - 1) + ')" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>';
+        html += current <= 1 ?
+            '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>' :
+            '<button type="button" onclick="slGoPage(' + (current - 1) +
+            ')" class="global-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>';
 
         if (start > 1) {
-            html += '<button type="button" onclick="slGoPage(1)" class="sl-page-btn">1</button>';
-            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += '<button type="button" onclick="slGoPage(1)" class="global-page-btn">1</button>';
+            if (start > 2) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
         }
 
         for (var i = start; i <= end; i++) {
-            html += i === current
-                ? '<span class="sl-page-current" aria-current="page">' + i + '</span>'
-                : '<button type="button" onclick="slGoPage(' + i + ')" class="sl-page-btn">' + i + '</button>';
+            html += i === current ?
+                '<span class="global-page-current" aria-current="page">' + i + '</span>' :
+                '<button type="button" onclick="slGoPage(' + i + ')" class="global-page-btn">' + i + '</button>';
         }
 
         if (end < last) {
-            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += '<button type="button" onclick="slGoPage(' + last + ')" class="sl-page-btn">' + last + '</button>';
+            if (end < last - 1) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += '<button type="button" onclick="slGoPage(' + last + ')" class="global-page-btn">' + last +
+                '</button>';
         }
 
-        html += current >= last
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
-            : '<button type="button" onclick="slGoPage(' + (current + 1) + ')" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>';
+        html += current >= last ?
+            '<button type="button" disabled class="global-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>' :
+            '<button type="button" onclick="slGoPage(' + (current + 1) +
+            ')" class="global-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>';
 
         html += '</nav>';
         return html;
@@ -1619,8 +1890,10 @@ $perPage = $perPage ?? 10;
 
         if (document.getElementById('statTotal')) document.getElementById('statTotal').textContent = counts.total ?? 0;
         if (document.getElementById('statAdmin')) document.getElementById('statAdmin').textContent = counts.admin ?? 0;
-        if (document.getElementById('statDentist')) document.getElementById('statDentist').textContent = counts.dentist ?? 0;
-        if (document.getElementById('statPatient')) document.getElementById('statPatient').textContent = counts.patient ?? 0;
+        if (document.getElementById('statDentist')) document.getElementById('statDentist').textContent = counts
+            .dentist ?? 0;
+        if (document.getElementById('statPatient')) document.getElementById('statPatient').textContent = counts
+            .patient ?? 0;
 
         var badge = document.getElementById('entryBadge');
         if (badge) badge.textContent = slOverallTotal + ' ' + (slOverallTotal === 1 ? 'entry' : 'entries');
@@ -1631,6 +1904,9 @@ $perPage = $perPage ?? 10;
         updateTabCount('patient', counts.patient);
         updateTabCount('login', counts.login);
         updateTabCount('error', counts.error);
+        updateStatusCount('active', counts.active);
+        updateStatusCount('archived', counts.archived);
+        updateStatusCount('all', Number(counts.active || 0) + Number(counts.archived || 0));
     }
 
     function updateTabCount(role, value) {
@@ -1640,6 +1916,17 @@ $perPage = $perPage ?? 10;
             if (!button.getAttribute('onclick')?.includes("'" + role + "'")) return;
 
             var count = button.querySelector('.tab-count');
+            if (count && value !== undefined && value !== null) {
+                count.textContent = value;
+            }
+        });
+    }
+
+    function updateStatusCount(status, value) {
+        document.querySelectorAll('.sl-status-tab').forEach(function (button) {
+            if (!button.getAttribute('onclick')?.includes("'" + status + "'")) return;
+
+            var count = button.querySelector('.sl-status-count');
             if (count && value !== undefined && value !== null) {
                 count.textContent = value;
             }
@@ -1662,6 +1949,12 @@ $perPage = $perPage ?? 10;
         var title = 'No system logs yet';
         var sub = 'Activity will appear here once users interact with the system.';
         var actionHtml = '';
+
+        if (slState.status === 'archived' && !query && !hasActiveSlFilters() && slState.role === 'all') {
+            icon = 'fa-box-archive';
+            title = 'No archived logs yet';
+            sub = 'Archive older records to keep the active log view easier to manage.';
+        }
 
         if (query) {
             icon = 'fa-magnifying-glass';
@@ -1718,6 +2011,5 @@ $perPage = $perPage ?? 10;
             slSetTab(document.querySelector('.sl-role-tabs .tab-btn'), 'all');
         });
     }
-
 </script>
 @endsection

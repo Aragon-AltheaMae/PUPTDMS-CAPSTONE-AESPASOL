@@ -1,164 +1,164 @@
 @php
-use Illuminate\Support\Facades\Route;
-$sidebarRole = $role ?? (request()->is('admin*') ? 'admin' : (request()->is('dentist*') ? 'dentist' : 'patient'));
+    use Illuminate\Support\Facades\Route;
+    $sidebarRole = $role ?? (request()->is('admin*') ? 'admin' : (request()->is('dentist*') ? 'dentist' : 'patient'));
 
-$authUser = auth()->user();
+    $authUser = auth()->user();
 
-$drawerDisplayName = $authUser?->name ?? ucwords(str_replace('_', ' ', $sidebarRole));
+    $drawerDisplayName = $authUser?->name ?? ucwords(str_replace('_', ' ', $sidebarRole));
 
-$drawerDisplayRole = match ($sidebarRole) {
-'admin' => 'Administrator',
-'dentist' => 'Dentist',
-default => ucwords(str_replace('_', ' ', $sidebarRole)),
-};
+    $drawerDisplayRole = match ($sidebarRole) {
+        'admin' => 'Administrator',
+        'dentist' => 'Dentist',
+        default => ucwords(str_replace('_', ' ', $sidebarRole)),
+    };
 
-$drawerAvatarUrl = !empty($authUser?->profile_image)
-? asset('storage/' . $authUser->profile_image)
-: 'https://ui-avatars.com/api/?name=' .
-urlencode($drawerDisplayName) .
-'&background=8B0000&color=ffffff&bold=true';
+    $drawerAvatarUrl = !empty($authUser?->profile_image)
+        ? asset('storage/' . $authUser->profile_image)
+        : 'https://ui-avatars.com/api/?name=' .
+            urlencode($drawerDisplayName) .
+            '&background=8B0000&color=ffffff&bold=true';
 
-$sidebarGroups = [
-'admin' => [
-[
-'section' => 'Clinic Management',
-'label' => 'Clinic',
-'sublabel' => 'Core clinical modules',
-'icon' => 'fa-hospital',
-'items' => [
-[
-'route' => 'admin.admin.dashboard',
-'active' => ['admin.admin.dashboard'],
-'icon' => 'fa-chart-line',
-'label' => 'Dashboard',
-],
-[
-'route' => 'admin.patient_directory',
-'active' => ['admin.patient_directory'],
-'icon' => 'fa-users',
-'label' => 'Patients',
-],
-[
-'route' => 'admin.dental-records.index',
-'active' => ['admin.dental-records*'],
-'icon' => 'fa-tooth',
-'label' => 'Dental Records',
-],
-[
-'route' => 'admin.admin.appointments',
-'active' => ['admin.admin.appointments'],
-'icon' => 'fa-calendar-check',
-'label' => 'Appointments',
-],
-[
-'route' => 'admin.document-requests.index',
-'active' => ['admin.document-requests*'],
-'icon' => 'fa-file-circle-check',
-'label' => 'Document Request',
-],
-[
-'route' => 'admin.reports',
-'active' => ['admin.reports'],
-'icon' => 'fa-file',
-'label' => 'Reports',
-],
-],
-],
-[
-'section' => 'Maintenance',
-'label' => 'Configuration',
-'sublabel' => 'Settings & scheduling',
-'icon' => 'fa-screwdriver-wrench',
-'items' => [
-[
-'route' => 'admin.user_management',
-'active' => ['admin.user_management*'],
-'icon' => 'fa-user-gear',
-'label' => 'User Management',
-],
-[
-'route' => 'admin.dentist-transitions.index',
-'active' => ['admin.dentist-transitions*'],
-'icon' => 'fa-people-arrows',
-'label' => 'Dentist Continuity',
-],
-[
-'route' => 'admin.role_permissions',
-'active' => ['admin.role_permissions'],
-'icon' => 'fa-user-shield',
-'label' => 'Roles & Permissions',
-],
-[
-'route' => 'admin.service-types',
-'active' => ['admin.service-types*'],
-'icon' => 'fa-list-check',
-'label' => 'Service Types',
-],
-[
-'route' => 'admin.clinic_schedule',
-'active' => ['admin.clinic_schedule*'],
-'icon' => 'fa-calendar-days',
-'label' => 'Clinic Schedule',
-],
-[
-'route' => 'admin.academic_periods',
-'active' => ['admin.academic_periods*'],
-'icon' => 'fa-school',
-'label' => 'Academic Periods',
-],
-[
-'route' => 'admin.inventory',
-'active' => ['admin.inventory*'],
-'icon' => 'fa-boxes-stacked',
-'label' => 'Inventory',
-],
-[
-'route' => 'admin.document-template',
-'active' => ['admin.document-template*'],
-'icon' => 'fa-file-pen',
-'label' => 'Document Templates',
-],
-],
-],
-[
-'section' => 'System',
-'label' => 'System',
-'sublabel' => 'Admin & configuration',
-'icon' => 'fa-server',
-'items' => [
-[
-'route' => 'admin.system_settings',
-'active' => ['admin.system_settings*'],
-'icon' => 'fa-sliders',
-'label' => 'System Settings',
-],
-[
-'route' => 'admin.assign-cms-access',
-'active' => ['admin.assign-cms-access'],
-'icon' => 'fa-user-shield',
-'label' => 'Assign CMS Access',
-],
-[
-'route' => 'admin.faculty.integration',
-'active' => ['admin.faculty.integration'],
-'icon' => 'fa-user-plus',
-'label' => 'Faculty Integration',
-],
-[
-'route' => 'admin.system_logs',
-'active' => ['admin.system_logs'],
-'icon' => 'fa-clipboard-list',
-'label' => 'System Logs',
-],
-[
-'route' => 'admin.session_management.index',
-'active' => ['admin.session_management.*'],
-'icon' => 'fa-shield-halved',
-'label' => 'Session Dashboard',
-],
-],
-],
-],
+    $sidebarGroups = [
+        'admin' => [
+            [
+                'section' => 'Clinic Management',
+                'label' => 'Clinic',
+                'sublabel' => 'Core clinical modules',
+                'icon' => 'fa-hospital',
+                'items' => [
+                    [
+                        'route' => 'admin.admin.dashboard',
+                        'active' => ['admin.admin.dashboard'],
+                        'icon' => 'fa-chart-line',
+                        'label' => 'Dashboard',
+                    ],
+                    [
+                        'route' => 'admin.patient_directory',
+                        'active' => ['admin.patient_directory'],
+                        'icon' => 'fa-users',
+                        'label' => 'Patients',
+                    ],
+                    [
+                        'route' => 'admin.dental-records.index',
+                        'active' => ['admin.dental-records*'],
+                        'icon' => 'fa-tooth',
+                        'label' => 'Dental Records',
+                    ],
+                    [
+                        'route' => 'admin.admin.appointments',
+                        'active' => ['admin.admin.appointments'],
+                        'icon' => 'fa-calendar-check',
+                        'label' => 'Appointments',
+                    ],
+                    [
+                        'route' => 'admin.document-requests.index',
+                        'active' => ['admin.document-requests*'],
+                        'icon' => 'fa-file-circle-check',
+                        'label' => 'Document Request',
+                    ],
+                    [
+                        'route' => 'admin.reports',
+                        'active' => ['admin.reports'],
+                        'icon' => 'fa-file',
+                        'label' => 'Reports',
+                    ],
+                ],
+            ],
+            [
+                'section' => 'Maintenance',
+                'label' => 'Configuration',
+                'sublabel' => 'Settings & scheduling',
+                'icon' => 'fa-screwdriver-wrench',
+                'items' => [
+                    [
+                        'route' => 'admin.user_management',
+                        'active' => ['admin.user_management*'],
+                        'icon' => 'fa-user-gear',
+                        'label' => 'User Management',
+                    ],
+                    [
+                        'route' => 'admin.dentist-transitions.index',
+                        'active' => ['admin.dentist-transitions*'],
+                        'icon' => 'fa-people-arrows',
+                        'label' => 'Dentist Continuity',
+                    ],
+                    [
+                        'route' => 'admin.role_permissions',
+                        'active' => ['admin.role_permissions'],
+                        'icon' => 'fa-user-shield',
+                        'label' => 'Roles & Permissions',
+                    ],
+                    [
+                        'route' => 'admin.service-types',
+                        'active' => ['admin.service-types*'],
+                        'icon' => 'fa-list-check',
+                        'label' => 'Service Types',
+                    ],
+                    [
+                        'route' => 'admin.clinic_schedule',
+                        'active' => ['admin.clinic_schedule*'],
+                        'icon' => 'fa-calendar-days',
+                        'label' => 'Clinic Schedule',
+                    ],
+                    [
+                        'route' => 'admin.academic_periods',
+                        'active' => ['admin.academic_periods*'],
+                        'icon' => 'fa-school',
+                        'label' => 'Academic Periods',
+                    ],
+                    [
+                        'route' => 'admin.inventory',
+                        'active' => ['admin.inventory*'],
+                        'icon' => 'fa-boxes-stacked',
+                        'label' => 'Inventory',
+                    ],
+                    [
+                        'route' => 'admin.document-template',
+                        'active' => ['admin.document-template*'],
+                        'icon' => 'fa-file-pen',
+                        'label' => 'Document Templates',
+                    ],
+                ],
+            ],
+            [
+                'section' => 'System',
+                'label' => 'System',
+                'sublabel' => 'Admin & configuration',
+                'icon' => 'fa-server',
+                'items' => [
+                    [
+                        'route' => 'admin.system_settings',
+                        'active' => ['admin.system_settings*'],
+                        'icon' => 'fa-sliders',
+                        'label' => 'System Settings',
+                    ],
+                    [
+                        'route' => 'admin.assign-cms-access',
+                        'active' => ['admin.assign-cms-access'],
+                        'icon' => 'fa-user-shield',
+                        'label' => 'Assign CMS Access',
+                    ],
+                    [
+                        'route' => 'admin.faculty.integration',
+                        'active' => ['admin.faculty.integration'],
+                        'icon' => 'fa-user-plus',
+                        'label' => 'Faculty Integration',
+                    ],
+                    [
+                        'route' => 'admin.system_logs',
+                        'active' => ['admin.system_logs'],
+                        'icon' => 'fa-clipboard-list',
+                        'label' => 'System Logs',
+                    ],
+                    [
+                        'route' => 'admin.session_management.index',
+                        'active' => ['admin.session_management.*'],
+                        'icon' => 'fa-shield-halved',
+                        'label' => 'Session Dashboard',
+                    ],
+                ],
+            ],
+        ],
 
 'dentist' => [
 [
@@ -179,14 +179,20 @@ $sidebarGroups = [
 'icon' => 'fa-users',
 'label' => 'Patients',
 ],
-[
-'route' => 'dentist.walk-in.index',
-'active' => ['dentist.walk-in.*'],
-'icon' => 'fa-person-walking',
-'label' => 'Walk-in',
-],
-[
-'route' => 'dentist.dentist.appointments',
+      [
+      'route' => 'dentist.walk-in.index',
+      'active' => ['dentist.walk-in.*'],
+      'icon' => 'fa-person-walking',
+      'label' => 'Walk-in',
+    ],
+    [
+      'route' => 'dentist.existing-record.index',
+      'active' => ['dentist.existing-record.*'],
+      'icon' => 'fa-folder-open',
+      'label' => 'Add Existing Record',
+    ],
+    [
+      'route' => 'dentist.dentist.appointments',
 'active' => ['dentist.dentist.appointments'],
 'icon' => 'fa-calendar-check',
 'label' => 'Appointments',
@@ -219,91 +225,91 @@ $sidebarGroups = [
 ],
 ],
 
-'patient' => [
-[
-'section' => 'Navigation',
-'label' => 'Patient',
-'sublabel' => 'Self-service tools',
-'icon' => 'fa-user',
-'items' => [
-[
-'route' => 'homepage',
-'active' => ['homepage'],
-'paths' => ['patient/dashboard'],
-'icon' => 'fa-house',
-'label' => 'Home',
-],
-[
-'route' => 'patient.appointment.index',
-'active' => ['patient.appointment.*'],
-'paths' => ['patient/appointment*'],
-'icon' => 'fa-calendar-check',
-'label' => 'Appointments',
-],
-[
-'route' => 'patient.record',
-'active' => ['patient.record'],
-'paths' => ['patient/record*'],
-'icon' => 'fa-folder-open',
-'label' => 'Dental Records',
-],
-[
-'route' => 'patient.about.us',
-'active' => ['patient.about.us'],
-'paths' => ['patient/about*'],
-'icon' => 'fa-circle-info',
-'label' => 'About Us',
-],
-],
-],
-],
-];
+        'patient' => [
+            [
+                'section' => 'Navigation',
+                'label' => 'Patient',
+                'sublabel' => 'Self-service tools',
+                'icon' => 'fa-user',
+                'items' => [
+                    [
+                        'route' => 'homepage',
+                        'active' => ['homepage'],
+                        'paths' => ['patient/dashboard'],
+                        'icon' => 'fa-house',
+                        'label' => 'Home',
+                    ],
+                    [
+                        'route' => 'patient.appointment.index',
+                        'active' => ['patient.appointment.*'],
+                        'paths' => ['patient/appointment*'],
+                        'icon' => 'fa-calendar-check',
+                        'label' => 'Appointments',
+                    ],
+                    [
+                        'route' => 'patient.record',
+                        'active' => ['patient.record'],
+                        'paths' => ['patient/record*'],
+                        'icon' => 'fa-folder-open',
+                        'label' => 'Dental Records',
+                    ],
+                    [
+                        'route' => 'patient.about.us',
+                        'active' => ['patient.about.us'],
+                        'paths' => ['patient/about*'],
+                        'icon' => 'fa-circle-info',
+                        'label' => 'About Us',
+                    ],
+                ],
+            ],
+        ],
+    ];
 
-$groups = $sidebarGroups[$sidebarRole] ?? $sidebarGroups['patient'];
+    $groups = $sidebarGroups[$sidebarRole] ?? $sidebarGroups['patient'];
 
-$resolveItemUrl = function ($item) {
-try {
-if (!empty($item['url'])) {
-return $item['url'];
-}
+    $resolveItemUrl = function ($item) {
+        try {
+            if (!empty($item['url'])) {
+                return $item['url'];
+            }
 
-if (!empty($item['route']) && Route::has($item['route'])) {
-return route($item['route']);
-}
-} catch (\Throwable $e) {
-return null;
-}
+            if (!empty($item['route']) && Route::has($item['route'])) {
+                return route($item['route']);
+            }
+        } catch (\Throwable $e) {
+            return null;
+        }
 
-return null;
-};
+        return null;
+    };
 
-$isItemActive = function ($item) {
-foreach ($item['active'] ?? [$item['route']] as $pattern) {
-if (request()->routeIs($pattern)) {
-return true;
-}
-}
+    $isItemActive = function ($item) {
+        foreach ($item['active'] ?? [$item['route']] as $pattern) {
+            if (request()->routeIs($pattern)) {
+                return true;
+            }
+        }
 
-foreach ($item['paths'] ?? [] as $path) {
-if (request()->is($path)) {
-return true;
-}
-}
+        foreach ($item['paths'] ?? [] as $path) {
+            if (request()->is($path)) {
+                return true;
+            }
+        }
 
-return false;
-};
+        return false;
+    };
 
-$isGroupActive = function ($group) use ($isItemActive) {
-foreach ($group['items'] as $item) {
-if ($isItemActive($item)) {
-return true;
-}
-}
+    $isGroupActive = function ($group) use ($isItemActive) {
+        foreach ($group['items'] as $item) {
+            if ($isItemActive($item)) {
+                return true;
+            }
+        }
 
-return false;
-};
+        return false;
+    };
 
-$shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
+    $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
 @endphp
 
 <aside id="sidebar" class="global-sidebar sidebar-{{ $sidebarRole }}">
@@ -316,61 +322,64 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
         </div>
 
         @foreach ($groups as $group)
-        <div class="nav-section-label">{{ $group['section'] }}</div>
+            <div class="nav-section-label">{{ $group['section'] }}</div>
 
-        <div class="nav-group">
-            @if ($sidebarRole === 'admin')
-            <button type="button" class="group-trigger {{ $isGroupActive($group) ? 'active-group' : '' }}"
-                data-admin-group-toggle aria-expanded="false">
-                <div class="group-icon-wrap">
-                    <i class="fa-solid {{ $group['icon'] }}"></i>
-                </div>
+            <div class="nav-group">
+                @if ($sidebarRole === 'admin')
+                    <button type="button" class="group-trigger {{ $isGroupActive($group) ? 'active-group' : '' }}"
+                        data-admin-group-toggle aria-expanded="false">
+                        <div class="group-icon-wrap">
+                            <i class="fa-solid {{ $group['icon'] }}"></i>
+                        </div>
 
-                <div class="group-text">
-                    <span class="group-label">{{ $group['label'] }}</span>
-                    <span class="group-sublabel">{{ $group['sublabel'] }}</span>
-                </div>
-            </button>
-            @endif
+                        <div class="group-text">
+                            <span class="group-label">{{ $group['label'] }}</span>
+                            <span class="group-sublabel">{{ $group['sublabel'] }}</span>
+                        </div>
+                    </button>
+                @endif
 
-            <div class="group-body" @if ($sidebarRole==='admin' ) data-group-label="{{ $group['label'] }}"
+                <div class="group-body"
+                    @if ($sidebarRole === 'admin') data-group-label="{{ $group['label'] }}"
                 data-group-sublabel="{{ $group['sublabel'] }}" @endif>
-                @foreach ($group['items'] as $item)
-                @php($itemUrl = $resolveItemUrl($item))
+                    @foreach ($group['items'] as $item)
+                        @php($itemUrl = $resolveItemUrl($item))
 
-                @if ($itemUrl)
-                @if ($sidebarRole === 'dentist')
-                <a href="{{ $itemUrl }}" class="sidebar-nav-item {{ $isItemActive($item) ? 'active' : '' }}">
-                    <span class="sidebar-nav-icon">
-                        <i class="fa-solid {{ $item['icon'] }}"></i>
-                    </span>
+                        @if ($itemUrl)
+                            @if ($sidebarRole === 'dentist')
+                                <a href="{{ $itemUrl }}"
+                                    class="sidebar-nav-item {{ $isItemActive($item) ? 'active' : '' }}">
+                                    <span class="sidebar-nav-icon">
+                                        <i class="fa-solid {{ $item['icon'] }}"></i>
+                                    </span>
 
-                    <span class="sidebar-nav-text">{{ $item['label'] }}</span>
-                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
-                </a>
-                @else
-                <a href="{{ $itemUrl }}" class="nav-link {{ $isItemActive($item) ? 'active' : '' }}">
+                                    <span class="sidebar-nav-text">{{ $item['label'] }}</span>
+                                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
+                                </a>
+                            @else
+                                <a href="{{ $itemUrl }}"
+                                    class="nav-link {{ $isItemActive($item) ? 'active' : '' }}">
 
-                    @if ($sidebarRole === 'patient')
-                    <span class="nav-icon-wrap">
-                        <i class="fa-solid {{ $item['icon'] }}"></i>
-                    </span>
-                    @else
-                    <i class="fa-solid {{ $item['icon'] }}"></i>
-                    @endif
+                                    @if ($sidebarRole === 'patient')
+                                        <span class="nav-icon-wrap">
+                                            <i class="fa-solid {{ $item['icon'] }}"></i>
+                                        </span>
+                                    @else
+                                        <i class="fa-solid {{ $item['icon'] }}"></i>
+                                    @endif
 
-                    <span class="menu-text sidebar-nav-text">{{ $item['label'] }}</span>
-                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
-                </a>
-                @endif
-                @endif
-                @endforeach
+                                    <span class="menu-text sidebar-nav-text">{{ $item['label'] }}</span>
+                                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
+                                </a>
+                            @endif
+                        @endif
+                    @endforeach
+                </div>
             </div>
-        </div>
 
-        @if (!$loop->last)
-        <div class="nav-sep"></div>
-        @endif
+            @if (!$loop->last)
+                <div class="nav-sep"></div>
+            @endif
         @endforeach
     </div>
 
@@ -396,7 +405,8 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
                 </button>
 
                 <div class="sidebar-theme-popover">
-                    <button type="button" class="sidebar-theme-popover-option theme-option active" data-theme-choice="light">
+                    <button type="button" class="sidebar-theme-popover-option theme-option active"
+                        data-theme-choice="light">
                         <i class="fa-solid fa-sun"></i>
                         <span>Light</span>
                     </button>
@@ -409,7 +419,7 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
             </div>
         </div>
 
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST" class="js-logout-form">
             @csrf
 
             <button type="submit" class="logout-btn">
@@ -425,80 +435,88 @@ $shouldShowDrawer = in_array($sidebarRole, ['admin', 'dentist'], true);
 </aside>
 
 @if ($shouldShowDrawer)
-<div id="mobileDrawerOverlay" data-drawer-close></div>
+    <div id="mobileDrawerOverlay" data-drawer-close></div>
 
-<div id="mobileDrawer">
-    <div class="drawer-header">
-        <div class="drawer-header-left">
-            <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="drawer-logo" alt="DMS">
+    <div id="mobileDrawer">
+        <div class="drawer-header">
+            <div class="drawer-header-left">
+                <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" class="drawer-logo" alt="DMS">
+
+                <div>
+                    <div class="drawer-title">PUP TAGUIG</div>
+                    <div class="drawer-subtitle">Dental Clinic</div>
+                </div>
+            </div>
+
+            <button type="button" class="drawer-close" data-drawer-close aria-label="Close menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="drawer-user">
+            <img src="{{ $drawerAvatarUrl }}" class="drawer-avatar" alt="{{ $drawerDisplayName }}">
 
             <div>
-                <div class="drawer-title">PUP TAGUIG</div>
-                <div class="drawer-subtitle">Dental Clinic</div>
+                <div class="drawer-user-name">{{ $drawerDisplayName }}</div>
+                <div class="drawer-user-role">{{ $drawerDisplayRole }}</div>
             </div>
         </div>
 
-        <button type="button" class="drawer-close" data-drawer-close aria-label="Close menu">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-    </div>
+        <div class="drawer-inner">
+            @foreach ($groups as $group)
+                <div class="drawer-group">
+                    <div class="drawer-group-header">
+                        <i class="drawer-group-icon fa-solid {{ $group['icon'] }}"></i>
+                        <span class="drawer-group-label">{{ $group['section'] }}</span>
+                    </div>
 
-    <div class="drawer-user">
-        <img src="{{ $drawerAvatarUrl }}" class="drawer-avatar" alt="{{ $drawerDisplayName }}">
+                    @foreach ($group['items'] as $item)
+                        @php($itemUrl = $resolveItemUrl($item))
 
-        <div>
-            <div class="drawer-user-name">{{ $drawerDisplayName }}</div>
-            <div class="drawer-user-role">{{ $drawerDisplayRole }}</div>
-        </div>
-    </div>
+                        @if ($itemUrl)
+                            <a href="{{ $itemUrl }}"
+                                class="drawer-link {{ $isItemActive($item) ? 'active' : '' }}">
 
-    <div class="drawer-inner">
-        @foreach ($groups as $group)
-        <div class="drawer-group">
-            <div class="drawer-group-header">
-                <i class="drawer-group-icon fa-solid {{ $group['icon'] }}"></i>
-                <span class="drawer-group-label">{{ $group['section'] }}</span>
-            </div>
+                                <span class="drawer-link-icon" aria-hidden="true">
+                                    <i class="fa-solid {{ $item['icon'] }}"></i>
+                                </span>
 
-            @foreach ($group['items'] as $item)
-            @php($itemUrl = $resolveItemUrl($item))
+                                <span class="drawer-link-text">
+                                    {{ $item['label'] }}
+                                </span>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
 
-            @if ($itemUrl)
-            <a href="{{ $itemUrl }}" class="drawer-link {{ $isItemActive($item) ? 'active' : '' }}">
-                <i class="fa-solid {{ $item['icon'] }}"></i>
-                <span>{{ $item['label'] }}</span>
-            </a>
-            @endif
+                @if (!$loop->last)
+                    <div class="drawer-sep"></div>
+                @endif
             @endforeach
         </div>
 
-        @if (!$loop->last)
-        <div class="drawer-sep"></div>
-        @endif
-        @endforeach
-    </div>
+        <div class="drawer-bottom">
+            <div class="theme-toggle-container mb-2">
+                <button type="button" class="theme-option active" data-theme-choice="light"
+                    aria-label="Light mode">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
 
-    <div class="drawer-bottom">
-        <div class="theme-toggle-container mb-2">
-            <button type="button" class="theme-option active" data-theme-choice="light" aria-label="Light mode">
-                <i class="fa-solid fa-sun"></i>
-            </button>
+                <button type="button" class="theme-option" data-theme-choice="dark" aria-label="Dark mode">
+                    <i class="fa-regular fa-moon"></i>
+                </button>
 
-            <button type="button" class="theme-option" data-theme-choice="dark" aria-label="Dark mode">
-                <i class="fa-regular fa-moon"></i>
-            </button>
+                <div class="theme-indicator" aria-hidden="true"></div>
+            </div>
 
-            <div class="theme-indicator" aria-hidden="true"></div>
+            <form action="{{ route('logout') }}" method="POST" class="js-logout-form">
+                @csrf
+
+                <button type="submit" class="drawer-logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Log Out</span>
+                </button>
+            </form>
         </div>
-
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-
-            <button type="submit" class="drawer-logout-btn">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Log Out</span>
-            </button>
-        </form>
     </div>
-</div>
 @endif

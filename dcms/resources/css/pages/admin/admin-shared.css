@@ -640,7 +640,6 @@
     color: #1a1410;
     outline: none;
     transition: border-color .15s, box-shadow .15s;
-    font-family: 'Inter', sans-serif;
 }
 
 .form-ctrl:focus {

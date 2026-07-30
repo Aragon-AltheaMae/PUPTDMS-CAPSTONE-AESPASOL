@@ -32,7 +32,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
         <div class="main-grid">
 
-            <div>
+            <aside class="role-sidebar-sticky">
                 @php
                 function getRoleBadge($name, $slug)
                 {
@@ -156,377 +156,510 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         </div>
                     </div>
                 </div>
-            </div>
+            </aside>
 
-            <div>
-                <div class="card role-permission-card">
-                    <div class="card-header">
-                        <div class="perm-search-row voice-search-row relative flex-1 md:flex-none flex items-center gap-2"
-                            data-voice-field>
-                            <div class="search-wrap global-search flex-1" data-search-wrapper>
-                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <section class="card role-permission-card">
 
-                                <input type="text" id="permSearch" placeholder="Search permissions..."
-                                    class="search-input" data-search-input oninput="filterPerms(this.value)">
+                <div class="card-header">
+                    <div class="perm-search-row voice-search-row relative flex-1 md:flex-none flex items-center gap-2"
+                        data-voice-field>
+                        <div class="search-wrap global-search flex-1" data-search-wrapper>
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-                                <button type="button" id="permSearchClearBtn" class="search-clear" data-search-clear
-                                    title="Clear" aria-label="Clear search">
-                                    <i class="fa-solid fa-xmark text-xs"></i>
-                                </button>
-                            </div>
+                            <input type="text" id="permSearch" placeholder="Search permissions..." class="search-input"
+                                data-search-input oninput="filterPerms(this.value)">
 
-                            <div class="voice-input-toggle">
-                                <button type="button" id="permSearchMicBtn" class="voice-search-mic external"
-                                    data-voice-trigger data-voice-target="#permSearch"
-                                    data-voice-status="#permSearchVoiceStatus"
-                                    aria-label="Voice input for permission search">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-
-                                <span id="permSearchVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
+                            <button type="button" id="permSearchClearBtn" class="search-clear" data-search-clear
+                                title="Clear" aria-label="Clear search">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
                         </div>
 
-                        <div class="card-header-actions">
-                            <button type="button" class="btn-view-as" id="globalViewAsBtn" onclick="openViewAs()">
-                                <i class="fa-solid fa-eye"></i> View As
-                                <span class="va-count-badge" id="globalVaBadge">0</span>
+                        <div class="voice-input-toggle">
+                            <button type="button" id="permSearchMicBtn" class="voice-search-mic external"
+                                data-voice-trigger data-voice-target="#permSearch"
+                                data-voice-status="#permSearchVoiceStatus"
+                                aria-label="Voice input for permission search">
+                                <i class="fa-solid fa-microphone"></i>
                             </button>
-                            <button type="button" class="btn-collapse" id="collapseBtn"
-                                onclick="toggleAllGroups()">Collapse All</button>
-                            <button type="button" class="btn-reset" id="resetDefaultsBtn" onclick="ajaxResetDefaults()">
-                                <i class="fa-solid fa-rotate-left"></i> Reset Defaults
-                            </button>
+
+                            <span id="permSearchVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite"></span>
                         </div>
                     </div>
 
-                    <div class="role-permission-card-body">
-                        <div class="protected-banner" id="protectedBanner" style="display:none;">
-                            <i class="fa-solid fa-shield-halved" style="font-size:24px; color:#d97706;"></i>
-                            <div>
-                                <div style="font-weight:800; font-size:13px; color:#92400e;">Protected Role</div>
-                                <div style="font-size:12px; color:#b45309;">Admin has unrestricted access and
-                                    cannot be modified.</div>
-                            </div>
-                        </div>
-
-                        @foreach ($roles as $ri => $role)
-                        @php
-                        $isSuperRole =
-                        in_array(strtolower($role->slug), [
-                        'super_admin',
-                        'super-admin',
-                        'superadmin',
-                        ]) || str_contains(strtolower($role->name), 'super');
-                        $isActiveRole = isset($highlightRoleId)
-                        ? (int) $highlightRoleId === (int) $role->id
-                        : $ri === 0;
-                        $micons = [
-                        'Dental Records' => ['fa-notes-medical', '#8B0000'],
-                        'Patients' => ['fa-user-group', '#d97706'],
-                        'Appointments' => ['fa-calendar-days', '#059669'],
-                        'Document Requests' => ['fa-envelope-open-text', '#2563eb'],
-                        'Document Templates' => ['fa-file-lines', '#7c3aed'],
-                        'Reports' => ['fa-chart-pie', '#7c3aed'],
-                        'General Access' => ['fa-user-shield', '#059669'],
-                        'Inventory' => ['fa-boxes-stacked', '#ea580c'],
-                        'User Management' => ['fa-user-cog', '#dc2626'],
-                        'System Settings' => ['fa-screwdriver-wrench', '#4b5563'],
-                        ];
-                        @endphp
-
-                        <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}"
-                            style="display:{{ $isActiveRole ? 'block' : 'none' }}; height: 100%;">
-                            @csrf
-                            <input type="hidden" name="role_id" value="{{ $role->id }}">
-
-                            <div class="groups-container">
-                                @forelse($groupedPermissions as $module => $permissions)
-                                @php
-                                [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#4b5563'];
-                                $mSlug = Str::slug($module);
-                                $mTotal = $permissions->count();
-                                $roleGranted = 0;
-                                foreach ($permissions as $_p) {
-                                if ($role->permissions->contains('id', $_p->id)) {
-                                $roleGranted++;
-                                }
-                                }
-                                $allOn = $roleGranted === $mTotal;
-                                @endphp
-
-                                <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
-                                    <div class="perm-group-header" onclick="togglePermGroup(this)">
-                                        <div class="perm-group-icon" style="--module-color: {{ $icol }};">
-                                            <i class="fa-solid {{ $ico }}"></i>
-                                        </div>
-
-                                        <div class="perm-group-info">
-                                            <div class="perm-group-title">{{ $module }}</div>
-                                            <div class="group-count">
-                                                {{ $roleGranted }} of {{ $mTotal }} enabled
-                                            </div>
-                                        </div>
-
-                                        <div class="perm-group-actions">
-                                            <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
-                                                @for ($d = 0; $d < $mTotal; $d++) <div
-                                                    class="dot {{ $d < $roleGranted ? 'is-granted' : '' }}"
-                                                    style="--dot-color: {{ $icol }};">
-                                            </div>
-                                            @endfor
-                                        </div>
-
-                                        <div class="all-toggle-wrap"
-                                            onclick="event.stopPropagation(); toggleGroupPerms(this,'{{ $role->id }}','{{ $mSlug }}',{{ $allOn ? 'true' : 'false' }})">
-                                            <span>All</span>
-                                            <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
-                                                onclick="event.preventDefault();">
-                                                <input type="checkbox" class="group-master" data-role="{{ $role->id }}"
-                                                    data-module="{{ $mSlug }}" {{ $allOn ? 'checked' : '' }} {{
-                                                    $isSuperRole ? 'disabled' : '' }}>
-                                                <span class="toggle-track"></span>
-                                            </label>
-                                        </div>
-
-                                        <i class="fa-solid fa-chevron-up chevron"></i>
-                                    </div>
-                                </div>
-
-                                <div class="perm-group-body">
-                                    @foreach ($permissions as $permission)
-                                    @php $isGranted = $role->permissions->contains('id',$permission->id); @endphp
-
-                                    <div class="perm-row"
-                                        data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
-                                        <div class="perm-main">
-                                            <div class="perm-title-row">
-                                                <span class="perm-label">{{ $permission->name }}</span>
-                                            </div>
-                                            <div class="perm-slug">{{ $permission->slug }}</div>
-                                        </div>
-
-                                        <div class="perm-row-actions">
-                                            <span
-                                                class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}">
-                                                {{ $isGranted ? 'Granted' : 'Denied' }}
-                                            </span>
-
-                                            <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
-                                                <input type="checkbox" name="permissions[{{ $role->id }}][]"
-                                                    value="{{ $permission->id }}" class="perm-toggle"
-                                                    data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
-                                                    data-color="{{ $icol }}" data-perm-name="{{ $permission->name }}"
-                                                    data-perm-slug="{{ $permission->slug }}" {{ $isGranted ? 'checked'
-                                                    : '' }} {{ $isSuperRole ? 'disabled' : '' }}
-                                                    onchange="onPermChange(this)">
-                                                <span class="toggle-track"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @empty
-                            <div style="text-align:center; padding:60px 20px;">
-                                <i class="fa-solid fa-shield-halved"
-                                    style="font-size:40px; color:#e5e7eb; margin-bottom:12px;"></i>
-                                <p style="font-size:14px; font-weight:700; color:#6b7280;">No permissions
-                                    found.</p>
-                            </div>
-                            @endforelse
-                    </div>
-
-                    @if (!$isSuperRole)
-                    <div class="floating-save-bar" id="footer-bar-{{ $role->id }}">
-                        <div class="fsb-text">
-                            <span class="fsb-title">Unsaved changes</span>
-                            <span class="fsb-sub">0 changes</span>
-                        </div>
-                        <div class="fsb-actions">
-                            <button type="button" class="btn-view-as fsb-view-as" onclick="openViewAs()">
-                                <i class="fa-solid fa-eye"></i> View As
-                                <span class="va-count-badge">0</span>
-                            </button>
-                            <button type="button" class="btn-discard"
-                                onclick="discardChanges('{{ $role->id }}')">Discard</button>
-                            <button type="button" class="btn-save-float" id="save-btn-{{ $role->id }}"
-                                onclick="ajaxSaveRole('{{ $role->id }}')">
-                                <i class="fa-solid fa-floppy-disk"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                    @endif
-
-                    </form>
-                    @endforeach
-
-                    <div id="permSearchEmptyState" class="empty-state perm-search-empty-state" hidden>
-                        <div class="empty-state-icon">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                        <h3 class="empty-state-title">No permissions found</h3>
-                        <p class="empty-state-sub" id="permSearchEmptyText">Try a different permission name or
-                            slug.</p>
-                        <button type="button" class="empty-state-btn" id="permSearchEmptyClearBtn">
-                            <i class="fa-solid fa-xmark"></i>
-                            Clear search
+                    <div class="card-header-actions">
+                        <button type="button" class="btn-view-as" id="globalViewAsBtn" onclick="openViewAs()">
+                            <i class="fa-solid fa-eye"></i> View As
+                            <span class="va-count-badge" id="globalVaBadge">0</span>
+                        </button>
+                        <button type="button" class="btn-collapse" id="collapseBtn" onclick="toggleAllGroups()">Collapse
+                            All</button>
+                        <button type="button" class="btn-reset" id="resetDefaultsBtn" onclick="ajaxResetDefaults()">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Defaults
                         </button>
                     </div>
                 </div>
-            </div>
+
+                <div class="role-permission-card-body">
+                    <div class="protected-banner" id="protectedBanner" style="display:none;">
+                        <i class="fa-solid fa-shield-halved" style="font-size:24px; color:#d97706;"></i>
+                        <div>
+                            <div style="font-weight:800; font-size:13px; color:#92400e;">Protected Role</div>
+                            <div style="font-size:12px; color:#b45309;">Admin has unrestricted access and
+                                cannot be modified.</div>
+                        </div>
+                    </div>
+
+                    @foreach ($roles as $ri => $role)
+                    @php
+                    $isSuperRole =
+                    in_array(strtolower($role->slug), [
+                    'super_admin',
+                    'super-admin',
+                    'superadmin',
+                    ]) || str_contains(strtolower($role->name), 'super');
+                    $isActiveRole = isset($highlightRoleId)
+                    ? (int) $highlightRoleId === (int) $role->id
+                    : $ri === 0;
+                    $micons = [
+                    'Dental Records' => ['fa-notes-medical', '#8B0000'],
+                    'Patients' => ['fa-user-group', '#d97706'],
+                    'Appointments' => ['fa-calendar-days', '#059669'],
+                    'Document Requests' => ['fa-envelope-open-text', '#2563eb'],
+                    'Document Templates' => ['fa-file-lines', '#7c3aed'],
+                    'Reports' => ['fa-chart-pie', '#7c3aed'],
+                    'General Access' => ['fa-user-shield', '#059669'],
+                    'Inventory' => ['fa-boxes-stacked', '#ea580c'],
+                    'User Management' => ['fa-user-cog', '#dc2626'],
+                    'System Settings' => ['fa-screwdriver-wrench', '#4b5563'],
+                    ];
+                    @endphp
+
+                    <form id="form-role-{{ $role->id }}" class="role-form" data-role-id="{{ $role->id }}"
+                        data-discard-form data-discard-title="Discard permission changes?"
+                        data-discard-subtitle="You have unsaved changes for this role."
+                        data-discard-message="The permission changes for this role will be restored to their last saved state."
+                        style="display:{{ $isActiveRole ? 'block' : 'none' }}; height: 100%;">
+                        @csrf
+                        <input type="hidden" name="role_id" value="{{ $role->id }}">
+
+                        <div class="groups-container">
+                            @forelse($groupedPermissions as $module => $permissions)
+                            @php
+                            [$ico, $icol] = $micons[$module] ?? ['fa-shield-halved', '#4b5563'];
+                            $mSlug = Str::slug($module);
+                            $mTotal = $permissions->count();
+                            $roleGranted = 0;
+                            foreach ($permissions as $_p) {
+                            if ($role->permissions->contains('id', $_p->id)) {
+                            $roleGranted++;
+                            }
+                            }
+                            $allOn = $roleGranted === $mTotal;
+                            @endphp
+
+                            <div class="group-card perm-group" data-group="{{ strtolower($module) }}">
+                                <div class="perm-group-header" onclick="togglePermGroup(this)">
+                                    <div class="perm-group-icon" style="--module-color: {{ $icol }};">
+                                        <i class="fa-solid {{ $ico }}"></i>
+                                    </div>
+
+                                    <div class="perm-group-info">
+                                        <div class="perm-group-title">{{ $module }}</div>
+
+                                        <div class="group-count">
+                                            {{ $roleGranted }} of {{ $mTotal }} enabled
+                                        </div>
+                                    </div>
+
+                                    <div class="perm-group-actions">
+                                        <div class="dot-row" id="dots-{{ $role->id }}-{{ $mSlug }}">
+                                            @for ($d = 0; $d < $mTotal; $d++) <div
+                                                class="dot {{ $d < $roleGranted ? 'is-granted' : '' }}"
+                                                style="--dot-color: {{ $icol }};">
+                                        </div>
+                                        @endfor
+                                    </div>
+
+                                    <div class="all-toggle-wrap" onclick="event.stopPropagation(); toggleGroupPerms(
+                    this,
+                    '{{ $role->id }}',
+                    '{{ $mSlug }}',
+                    {{ $allOn ? 'true' : 'false' }}
+                )">
+
+                                        <span>All</span>
+
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}"
+                                            onclick="event.preventDefault();">
+
+                                            <input type="checkbox" class="group-master" data-role="{{ $role->id }}"
+                                                data-module="{{ $mSlug }}" {{ $allOn ? 'checked' : '' }} {{ $isSuperRole
+                                                ? 'disabled' : '' }}>
+
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                    </div>
+
+                                    <i class="fa-solid fa-chevron-up chevron"></i>
+                                </div>
+                            </div>
+
+                            <div class="perm-group-body">
+                                @foreach ($permissions as $permission)
+                                @php
+                                $isGranted = $role->permissions->contains('id', $permission->id);
+                                @endphp
+
+                                <div class="perm-row"
+                                    data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
+
+                                    <div class="perm-main">
+                                        <div class="perm-title-row">
+                                            <span class="perm-label">
+                                                {{ $permission->name }}
+                                            </span>
+                                        </div>
+
+                                        <div class="perm-slug">
+                                            {{ $permission->slug }}
+                                        </div>
+                                    </div>
+
+                                    <div class="perm-row-actions">
+                                        <span class="perm-status {{ $isGranted ? 'status-granted' : 'status-denied' }}">
+                                            {{ $isGranted ? 'Granted' : 'Denied' }}
+                                        </span>
+
+                                        <label class="toggle-switch {{ $isSuperRole ? 'disabled' : '' }}">
+                                            <input type="checkbox" name="permissions[{{ $role->id }}][]"
+                                                value="{{ $permission->id }}" class="perm-toggle"
+                                                data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
+                                                data-color="{{ $icol }}" data-perm-name="{{ $permission->name }}"
+                                                data-perm-slug="{{ $permission->slug }}" {{ $isGranted ? 'checked' : ''
+                                                }} {{ $isSuperRole ? 'disabled' : '' }} onchange="onPermChange(this)">
+
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        @empty
+
+                        <div style="text-align:center; padding:60px 20px;">
+                            <i class="fa-solid fa-shield-halved"
+                                style="font-size:40px; color:#e5e7eb; margin-bottom:12px;"></i>
+
+                            <p style="font-size:14px; font-weight:700; color:#6b7280;">
+                                No permissions found.
+                            </p>
+                        </div>
+
+                        @endforelse
+                </div>
+
+                @if (!$isSuperRole)
+                <div class="floating-save-bar" id="footer-bar-{{ $role->id }}">
+                    <div class="fsb-text">
+                        <span class="fsb-title">Unsaved changes</span>
+                        <span class="fsb-sub">0 changes</span>
+                    </div>
+
+                    <div class="fsb-actions">
+                        <button type="button" class="btn-view-as fsb-view-as" onclick="openViewAs()">
+                            <i class="fa-solid fa-eye"></i>
+                            View As
+                            <span class="va-count-badge">0</span>
+                        </button>
+
+                        <button type="button" class="btn-discard"
+                            onclick="requestDiscardRoleChanges('{{ $role->id }}')">
+                            Discard
+                        </button>
+
+                        <button type="button" class="btn-save-float" id="save-btn-{{ $role->id }}"
+                            onclick="ajaxSaveRole('{{ $role->id }}')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+                @endif
+                </form>
+                @endforeach
+
+                <div id="permSearchEmptyState" class="empty-state perm-search-empty-state" hidden>
+
+                    <div class="empty-state-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <h3 class="empty-state-title">No permissions found</h3>
+
+                    <p class="empty-state-sub" id="permSearchEmptyText">
+                        Try a different permission name or slug.
+                    </p>
+
+                    <button type="button" class="empty-state-btn" id="permSearchEmptyClearBtn">
+                        <i class="fa-solid fa-xmark"></i>
+                        Clear search
+                    </button>
+                </div>
         </div>
 
+        </section>
     </div>
     </div>
 </main>
 
-<dialog id="newRoleModal" class="modern-modal global-dialog role-modal role-modal-create">
-    <div class="modal-icon primary modal-icon-hoverable">
-        <i class="fa-solid fa-user-shield"></i>
+<div id="newRoleModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Create New Role
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Define a new role and assign permissions.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeNewRoleModal()" class="modal-x" aria-label="Close create role modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST"
+            class="modal-card-form" data-global-validation data-form-validation-rule="createRole" novalidate>
+
+            @csrf
+
+            <div class="modal-bd">
+                <div class="modal-form-grid">
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="newRoleName">
+                            Role Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-tag global-control-icon"></i>
+
+                            <input type="text" id="newRoleName" name="name"
+                                class="form-input-custom global-control-with-icon" placeholder="e.g. Dental Intern"
+                                data-field-label="Role Name" data-required-message="Please enter a role name." required
+                                autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="newRoleSlug">
+                            Role Slug
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-link global-control-icon"></i>
+
+                            <input type="text" id="newRoleSlug" name="slug"
+                                class="form-input-custom global-control-with-icon" placeholder="e.g. dental-intern"
+                                data-field-label="Role Slug" data-required-message="Please enter a role slug."
+                                data-pattern-message="Use lowercase letters, numbers, and hyphens only."
+                                pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="newRoleUserName">
+                            User Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-user global-control-icon"></i>
+
+                            <input type="text" id="newRoleUserName" name="user_name"
+                                class="form-input-custom global-control-with-icon" data-field-label="User Name"
+                                data-required-message="Please enter the user's name." required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="newRoleUserEmail">
+                            User Email
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-envelope global-control-icon"></i>
+
+                            <input type="email" id="newRoleUserEmail" name="user_email"
+                                class="form-input-custom global-control-with-icon" data-field-label="User Email"
+                                data-required-message="Please enter the user's email."
+                                data-type-message="Please enter a valid email address." required autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-ft">
+                <button type="button" onclick="closeNewRoleModal()" class="ui-btn ui-btn-secondary">
+                    Cancel
+                </button>
+
+                <button type="submit" id="btnSubmitNewRole" class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create Role</span>
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <h2 class="modal-title">Create New Role</h2>
-    <div class="modal-body">Define a new role and assign permissions to it right away.</div>
+<div id="deleteRoleModal" class="ui-modal modal-theme-danger" aria-hidden="true">
 
-    <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST">
-        @csrf
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">Role Name</label>
-            <div class="st-input-wrap">
-                <i class="fa-solid fa-tag st-input-icon"></i>
-                <input type="text" id="newRoleName" name="name" class="st-input" placeholder="e.g. Dental Intern"
-                    autocomplete="off">
+                <div class="modal-copy">
+                    <h3 class="modal-title">Delete Role</h3>
+                    <p class="modal-subtitle">
+                        Permanently remove the selected role.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeDeleteModal()" class="modal-x" aria-label="Close delete role modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <p>
+                    Delete
+                    <strong id="deleteRoleName"></strong>?
+
+                    <span id="deleteRoleFallbackNote">
+                        Affected users will be reassigned to a default role.
+                    </span>
+                </p>
             </div>
         </div>
 
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">Role Slug</label>
-            <div class="st-input-wrap">
-                <i class="fa-solid fa-link st-input-icon"></i>
-                <input type="text" id="newRoleSlug" name="slug" class="st-input" placeholder="e.g. dental-intern"
-                    autocomplete="off">
-            </div>
-        </div>
-
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">User Name</label>
-            <div class="st-input-wrap">
-                <i class="fa-solid fa-user st-input-icon"></i>
-                <input type="text" id="newRoleUserName" name="user_name" class="st-input"
-                    placeholder="e.g. Nelson P. Angeles" autocomplete="off">
-            </div>
-        </div>
-
-        <div class="modal-form-group st-form-group">
-            <label class="modal-label field-label">User Email</label>
-            <div class="st-input-wrap">
-                <i class="fa-solid fa-envelope st-input-icon"></i>
-                <input type="email" id="newRoleUserEmail" name="user_email" class="st-input"
-                    placeholder="e.g. user@example.com" autocomplete="off">
-            </div>
-        </div>
-
-        <div id="newRoleError" class="modal-inline-error" style="display:none;"></div>
-
-        <div class="modal-actions">
-            <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeNewRoleModal()">
+        <div class="modal-ft">
+            <button type="button" onclick="closeDeleteModal()" class="ui-btn ui-btn-secondary">
                 Cancel
             </button>
 
-            <button type="submit" class="modal-btn-confirm modal-btn-confirm-approve primary" id="btnSubmitNewRole">
-                <i class="fa-solid fa-plus"></i>
-                Create Role
-            </button>
-        </div>
-    </form>
-</dialog>
+            <form id="deleteRoleForm" method="POST">
+                @csrf
+                @method('DELETE')
 
-<dialog id="deleteRoleModal" class="modern-modal global-dialog role-modal role-modal-delete">
-    <div class="modal-icon danger modal-icon-hoverable">
-        <i class="fa-solid fa-trash-can"></i>
-    </div>
-
-    <h2 class="modal-title">Delete Role</h2>
-
-    <div class="modal-body">
-        Are you sure you want to permanently delete
-        <span class="modal-highlight" id="deleteRoleName"></span>?
-
-        <span class="modal-danger-note">
-            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-            <span>This action cannot be undone.</span>
-        </span>
-    </div>
-
-    <div class="modal-actions">
-        <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeDeleteModal()">
-            Cancel
-        </button>
-
-        <form id="deleteRoleForm" method="POST" style="margin:0;">
-            @csrf
-            @method('DELETE')
-
-            <button type="submit" class="modal-btn-confirm modal-btn-confirm-reject danger">
-                <i class="fa-solid fa-trash-can"></i>
-                Delete
-            </button>
-        </form>
-    </div>
-</dialog>
-
-<dialog id="resetConfirmModal" class="modern-modal global-dialog role-modal role-modal-reset">
-    <div class="modal-icon warning modal-icon-hoverable">
-        <i class="fa-solid fa-rotate-left"></i>
-    </div>
-
-    <h2 class="modal-title">Reset to Defaults?</h2>
-
-    <div class="modal-body reset-defaults-body">
-        <p class="reset-defaults-copy">
-            This restores original permissions for
-            <strong>Admin</strong>, <strong>Dentist</strong>, and <strong>Patient</strong>.
-        </p>
-
-        <div class="modal-warning-note">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span>Custom changes will be lost. This cannot be undone.</span>
+                <button type="submit" class="ui-btn ui-btn-danger">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Delete</span>
+                </button>
+            </form>
         </div>
     </div>
+</div>
 
-    <div class="modal-actions role-reset-modal-actions">
-        <button type="button" class="modal-btn-cancel modal-btn-ghost" onclick="closeResetConfirm()">
-            Cancel
-        </button>
+<div id="resetConfirmModal" class="ui-modal modal-theme-warning" aria-hidden="true">
 
-        <button type="button" id="resetConfirmBtn" class="modal-btn-confirm modal-btn-confirm-warning warning"
-            onclick="confirmResetDefaults()">
-            <i class="fa-solid fa-rotate-left"></i>
-            Yes, Reset
-        </button>
-    </div>
-</dialog>
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
 
-<div id="vaOverlay">
-    <div class="va-panel">
-        <div class="va-head">
-            <div
-                style="width:40px;height:40px;border-radius:10px;background:#eff6ff;color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
-                <i class="fa-solid fa-eye"></i>
-            </div>
-            <div style="flex:1;">
-                <div style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:2px;">View As Role</div>
-                <div style="font-size:.8rem;color:#6b7280;" id="vaSubtitle">Select a role to preview dashboard access
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Reset to Defaults?
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Restore the original role permissions.
+                    </p>
                 </div>
             </div>
-            <button onclick="closeViewAs()"
-                style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;border:none;cursor:pointer;color:#6b7280;"><i
-                    class="fa-solid fa-xmark"></i></button>
+
+            <button type="button" onclick="closeResetConfirm()" class="modal-x" aria-label="Close reset defaults modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
-        <div class="va-body">
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <p>
+                    Reset permissions for
+                    <strong>Admin, Dentist, and Patient</strong>?
+
+                    <span>
+                        Custom permission changes will be lost.
+                        This action cannot be undone.
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closeResetConfirm()" class="ui-btn ui-btn-secondary">
+                Cancel
+            </button>
+
+            <button type="button" id="resetConfirmBtn" onclick="confirmResetDefaults()" class="ui-btn ui-btn-warning">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Yes, Reset</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="vaOverlay" class="ui-modal modal-theme-view" aria-hidden="true">
+
+    <div class="ui-modal-card modal-lg">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">View As Role</h3>
+                    <p class="modal-subtitle" id="vaSubtitle">
+                        Select a role to preview dashboard access
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeViewAs()" class="modal-x" aria-label="Close role preview modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
             <div
                 style="background: linear-gradient(135deg, var(--crimson), var(--crimson-dark)); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 16px; color: #fff;">
                 <i class="fa-solid fa-shield-halved" style="font-size: 20px; opacity: .8;"></i>
@@ -540,26 +673,42 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             </div>
             <div id="vaRoleList"></div>
         </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closeViewAs()" class="ui-btn ui-btn-secondary">
+                Close
+            </button>
+        </div>
     </div>
 </div>
 
-<div id="patientPickerOverlay">
-    <div class="va-panel">
-        <div class="va-head">
-            <div
-                style="width:40px;height:40px;border-radius:10px;background:#f0fdf4;color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
-                <i class="fa-solid fa-user-injured"></i>
-            </div>
-            <div style="flex:1;">
-                <div style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:2px;">Select Patient Account
+<div id="patientPickerOverlay" class="ui-modal modal-theme-success" aria-hidden="true">
+
+    <div class="ui-modal-card modal-lg">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-user-injured"></i>
                 </div>
-                <div style="font-size:.8rem;color:#6b7280;">Choose which patient to impersonate</div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Select Patient Account
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Choose which patient to impersonate
+                    </p>
+                </div>
             </div>
-            <button onclick="closePatientPicker()"
-                style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;border:none;cursor:pointer;color:#6b7280;"><i
-                    class="fa-solid fa-xmark"></i></button>
+
+            <button type="button" onclick="closePatientPicker()" class="modal-x"
+                aria-label="Close patient picker modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
-        <div class="va-body">
+
+        <div class="modal-bd">
             <div class="search-wrap global-search patient-picker-search" data-search-wrapper
                 style="margin-bottom: 16px;">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -571,6 +720,12 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 </button>
             </div>
             <div id="patientPickerList"></div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" onclick="closePatientPicker()" class="ui-btn ui-btn-secondary">
+                Close
+            </button>
         </div>
     </div>
 </div>
@@ -632,83 +787,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     let savedGrants = {};
     let activeRoleId = null;
     let isModalActive = false;
-
-    function openRoleDialog(dialog) {
-        if (!dialog) return;
-
-        dialog.classList.remove('is-closing');
-
-        if (!dialog.open) {
-            dialog.showModal();
-        }
-
-        dialog.style.top = '50%';
-        dialog.style.left = '50%';
-        dialog.style.removeProperty('transform');
-
-        requestAnimationFrame(() => {
-            dialog.classList.add('is-open');
-        });
-    }
-
-    function closeRoleDialog(dialogId, afterClose = null) {
-        const dialog = document.getElementById(dialogId);
-        if (!dialog) return;
-
-        dialog.classList.remove('is-open');
-        dialog.classList.add('is-closing');
-
-        setTimeout(() => {
-            dialog.classList.remove('is-closing');
-
-            if (dialog.open) {
-                dialog.close();
-            }
-
-            if (typeof afterClose === 'function') {
-                afterClose();
-            }
-        }, 220);
-    }
-
-    function openRoleOverlay(overlay) {
-        if (!overlay) return;
-
-        overlay.classList.remove('is-closing');
-
-        if (overlay.parentElement !== document.body) {
-            document.body.appendChild(overlay);
-        }
-
-        overlay.classList.add('open');
-
-        requestAnimationFrame(() => {
-            overlay.classList.add('is-open');
-        });
-
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeRoleOverlay(overlayId, afterClose = null) {
-        const overlay = document.getElementById(overlayId);
-        if (!overlay || overlay.classList.contains('is-closing')) return;
-
-        overlay.classList.remove('is-open');
-        overlay.classList.add('is-closing');
-
-        requestAnimationFrame(() => {
-            overlay.classList.remove('open');
-        });
-
-        setTimeout(() => {
-            overlay.classList.remove('is-closing');
-            document.body.style.overflow = '';
-
-            if (typeof afterClose === 'function') {
-                afterClose();
-            }
-        }, 220);
-    }
 
     function syncScrollStateForSaveBar() {
         updateFABVisibility();
@@ -862,11 +940,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 showToast('Error', '{!! addslashes(session('error')) !!}', 'error');
             }
         @endif
-
-        document.getElementById('newRoleName')?.addEventListener('input', function () {
-            document.getElementById('newRoleSlug').value = this.value.toLowerCase().trim()
-                .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-        });
     });
 
     function selectRole(card) {
@@ -982,6 +1055,19 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         }
     }
 
+    function requestDiscardRoleChanges(roleId) {
+        const form = document.getElementById(
+            `form-role-${roleId}`
+        );
+
+        if (!form) return;
+
+        window.DiscardChanges?.confirmClose(
+            form,
+            () => discardChanges(roleId)
+        );
+    }
+
     function discardChanges(roleId) {
         const form = document.getElementById('form-role-' + roleId);
         if (!form) return;
@@ -1004,6 +1090,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         });
 
         updateAccentCard(roleId);
+        window.DiscardChanges?.captureForm(form);
         updateFABVisibility();
     }
 
@@ -1172,6 +1259,8 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                     initialStates[roleId][input.value] = input.checked;
                 });
 
+                window.DiscardChanges?.captureForm(form);
+
                 savedGrants[roleId] = [];
                 form.querySelectorAll('.perm-toggle:checked').forEach(input => {
                     savedGrants[roleId].push({
@@ -1241,124 +1330,209 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         isModalActive = true;
         updateFABVisibility();
 
-        document.getElementById('newRoleName').value = '';
-        document.getElementById('newRoleSlug').value = '';
-        document.getElementById('newRoleUserName').value = '';
-        document.getElementById('newRoleUserEmail').value = '';
-        document.getElementById('newRoleError').style.display = 'none';
+        const form =
+            document.getElementById('createRoleForm');
 
-        const modal = document.getElementById('newRoleModal');
-        openRoleDialog(modal);
+        const modal =
+            document.getElementById('newRoleModal');
 
-        document.dispatchEvent(new CustomEvent('voice:refresh', {
-            detail: { root: modal }
-        }));
-    }
-
-    function closeNewRoleModal() {
-        closeRoleDialog('newRoleModal', () => {
+        if (!form || !modal) {
             isModalActive = false;
             updateFABVisibility();
-        });
+            return;
+        }
+
+        form.reset();
+
+        form
+            .querySelectorAll('.global-field-error')
+            .forEach(error => {
+                error.innerHTML = '';
+                error.classList.remove('show');
+                error.setAttribute('aria-hidden', 'true');
+            });
+
+        form
+            .querySelectorAll('.is-invalid')
+            .forEach(field => {
+                field.classList.remove('is-invalid');
+                field.removeAttribute('aria-invalid');
+                field.removeAttribute('aria-describedby');
+            });
+
+        window.openModal?.('newRoleModal');
+
+        document.dispatchEvent(
+            new CustomEvent('voice:refresh', {
+                detail: {
+                    root: modal
+                }
+            })
+        );
     }
 
-    document.getElementById('createRoleForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = document.getElementById('newRoleName').value.trim();
-        const slug = document.getElementById('newRoleSlug').value.trim();
-        const userName = document.getElementById('newRoleUserName').value.trim();
-        const userEmail = document.getElementById('newRoleUserEmail').value.trim();
-        const errEl = document.getElementById('newRoleError');
+    const roleNameField =
+        document.getElementById('newRoleName');
 
-        if (!name || !slug) {
-            errEl.textContent = 'Please fill out all fields.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if ((userName && !userEmail) || (!userName && userEmail)) {
-            errEl.textContent = 'Please enter both user name and user email.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if (userEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
-            errEl.textContent = 'Please enter a valid user email.';
-            errEl.style.display = 'block';
-            return;
-        }
-        if (document.querySelector(`.role-card[data-slug="${slug}"]`)) {
-            errEl.textContent = 'A role with this slug already exists.';
-            errEl.style.display = 'block';
-            return;
-        }
+    const roleSlugField =
+        document.getElementById('newRoleSlug');
 
-        const form = this;
-        const btn = document.getElementById('btnSubmitNewRole');
+    roleNameField?.addEventListener('input', function () {
+        if (!roleSlugField) return;
 
-        btn.disabled = true;
-        btn.innerHTML = 'Creating...';
+        roleSlugField.value = this.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
 
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-            .then(async res => {
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    let errorMsg = 'Could not create role.';
-                    if (data.errors) errorMsg = Object.values(data.errors).flat().join(' ');
-                    else if (data.message) errorMsg = data.message;
-                    throw new Error(errorMsg);
-                }
-                return data;
+        roleSlugField.dispatchEvent(
+            new Event('input', {
+                bubbles: true
             })
-            .then(data => {
-                closeNewRoleModal();
-                if (typeof showToast === 'function') {
-                    showToast('Success', data.message || 'Role created successfully.', 'success');
-                }
-
-                fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const doc = new DOMParser().parseFromString(html, 'text/html');
-                        const newGrid = doc.querySelector('.main-grid');
-
-                        if (newGrid) {
-                            const currentGrid = document.querySelector('.main-grid');
-
-                            if (currentGrid) {
-                                currentGrid.innerHTML = newGrid.innerHTML;
-
-                                document.dispatchEvent(new CustomEvent('voice:refresh', {
-                                    detail: { root: currentGrid }
-                                }));
-                            }
-                            initRoleForms();
-                            keepRoleListLayout();
-                            syncScrollStateForSaveBar();
-
-                            const newRoleCard = document.querySelector(
-                                `.role-card[data-slug="${slug}"]`) || document.querySelector(
-                                    '.role-card');
-                            if (newRoleCard) selectRole(newRoleCard);
-                        }
-                        btn.disabled = false;
-                        btn.innerHTML = 'Create Role';
-                    });
-            })
-            .catch(err => {
-                errEl.textContent = err.message;
-                errEl.style.display = 'block';
-                btn.disabled = false;
-                btn.innerHTML = 'Create Role';
-            });
+        );
     });
 
+    function closeNewRoleModal() {
+        window.closeModal?.('newRoleModal');
+
+        window.setTimeout(() => {
+            isModalActive = false;
+            updateFABVisibility();
+        }, 180);
+    }
+
+    document
+        .getElementById('createRoleForm')
+        ?.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const validation =
+                window.validateGlobalForm?.(this);
+
+            if (!validation || !validation.valid) {
+                return;
+            }
+
+            const form = this;
+
+            const slug = String(
+                form.querySelector('[name="slug"]')
+                    ?.value || ''
+            ).trim();
+
+            const btn =
+                document.getElementById(
+                    'btnSubmitNewRole'
+                );
+
+            btn.disabled = true;
+
+            btn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Creating...
+        `;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With':
+                        'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        let errorMsg = 'Could not create role.';
+                        if (data.errors) errorMsg = Object.values(data.errors).flat().join(' ');
+                        else if (data.message) errorMsg = data.message;
+                        throw new Error(errorMsg);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    closeNewRoleModal();
+                    if (typeof showToast === 'function') {
+                        showToast('Success', data.message || 'Role created successfully.', 'success');
+                    }
+
+                    fetch(window.location.href)
+                        .then(r => r.text())
+                        .then(html => {
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            const newGrid = doc.querySelector('.main-grid');
+
+                            if (newGrid) {
+                                const currentGrid = document.querySelector('.main-grid');
+
+                                if (currentGrid) {
+                                    currentGrid.innerHTML = newGrid.innerHTML;
+
+                                    document.dispatchEvent(new CustomEvent('voice:refresh', {
+                                        detail: { root: currentGrid }
+                                    }));
+                                }
+                                initRoleForms();
+                                keepRoleListLayout();
+                                syncScrollStateForSaveBar();
+
+                                const newRoleCard = document.querySelector(
+                                    `.role-card[data-slug="${slug}"]`) || document.querySelector(
+                                        '.role-card');
+                                if (newRoleCard) selectRole(newRoleCard);
+                            }
+                            btn.disabled = false;
+                            btn.innerHTML = `
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Create Role</span>
+                            `;
+                        });
+                })
+                .catch(err => {
+                    if (typeof showToast === 'function') {
+                        showToast(
+                            'Create Role Failed',
+                            err.message || 'Could not create the role.',
+                            'error'
+                        );
+                    }
+
+                    btn.disabled = false;
+
+                    btn.innerHTML = `
+        <i class="fa-solid fa-plus"></i>
+        <span>Create Role</span>
+    `;
+                });
+        });
+
     const PROTECTED_ROLE_SLUGS = ['admin', 'patient', 'dentist', 'super_admin', 'super-admin', 'superadmin'];
+
+    function getFallbackRoleName(roleName, roleSlug) {
+        const normalizedName = String(roleName || '').toLowerCase();
+        const normalizedSlug = String(roleSlug || '').toLowerCase();
+
+        if (normalizedSlug.includes('dentist') || normalizedName.includes('dentist')) {
+            return 'Dentist';
+        }
+
+        if (
+            normalizedSlug.includes('admin') ||
+            normalizedName.includes('admin') ||
+            normalizedSlug.includes('staff') ||
+            normalizedName.includes('staff') ||
+            normalizedSlug.includes('clinic') ||
+            normalizedName.includes('clinic')
+        ) {
+            return 'Admin';
+        }
+
+        return 'Patient';
+    }
 
     function openDeleteModal(roleId, roleName) {
         const card = document.querySelector(`.role-card[data-role-id="${roleId}"]`);
@@ -1374,22 +1548,25 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
 
         document.getElementById('deleteRoleName').textContent = roleName;
+        document.getElementById('deleteRoleFallbackNote').textContent =
+            `Affected users will be reassigned to the default ${getFallbackRoleName(roleName, slug)} role.`;
         document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
-        const deleteModal = document.getElementById('deleteRoleModal');
-        openRoleDialog(deleteModal);
+        window.openModal?.('deleteRoleModal');
     }
 
     function closeDeleteModal() {
-        closeRoleDialog('deleteRoleModal', () => {
+        window.closeModal?.('deleteRoleModal');
+
+        window.setTimeout(() => {
             isModalActive = false;
             updateFABVisibility();
-        });
+        }, 180);
     }
 
     document.getElementById('deleteRoleForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const form = this;
-        const btn = form.querySelector('.modal-btn-confirm');
+        const btn = form.querySelector('.ui-btn-danger');
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
 
@@ -1397,20 +1574,21 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             method: 'POST',
             body: new FormData(form),
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         })
             .then(async res => {
+                const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
-                    const data = await res.json().catch(() => ({}));
                     throw new Error(data.message || 'Could not delete role.');
                 }
-                return res;
+                return data;
             })
-            .then(() => {
+            .then((data) => {
                 closeDeleteModal();
                 if (typeof showToast === 'function') {
-                    showToast('Success', 'Role deleted successfully.', 'success');
+                    showToast('Success', data.message || 'Role deleted successfully.', 'success');
                 }
 
                 fetch(window.location.href)
@@ -1446,14 +1624,15 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
 
         const resetModal = document.getElementById('resetConfirmModal');
-        openRoleDialog(resetModal);
+        window.openModal?.('resetConfirmModal');
     }
 
     function closeResetConfirm() {
-        closeRoleDialog('resetConfirmModal', () => {
+        window.closeModal?.('resetConfirmModal');
+        window.setTimeout(() => {
             isModalActive = false;
             updateFABVisibility();
-        });
+        }, 180);
     }
 
     function confirmResetDefaults() {
@@ -1515,6 +1694,91 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 confirmBtn.innerHTML = 'Yes, Reset';
             });
     }
+
+    function registerCreateRoleValidation() {
+        if (
+            typeof window.registerGlobalFormValidationRule !==
+            'function'
+        ) {
+            return false;
+        }
+
+        window.registerGlobalFormValidationRule(
+            'createRole',
+            form => {
+                const nameField =
+                    form.querySelector('[name="name"]');
+
+                const slugField =
+                    form.querySelector('[name="slug"]');
+
+                const name =
+                    String(nameField?.value || '').trim();
+
+                const slug =
+                    String(slugField?.value || '')
+                        .trim()
+                        .toLowerCase();
+
+                let valid = true;
+                let firstInvalid = null;
+
+                const duplicateName = Array.from(
+                    document.querySelectorAll('.role-card')
+                ).some(card => {
+                    return String(
+                        card.dataset.roleName || ''
+                    ).trim().toLowerCase() ===
+                        name.toLowerCase();
+                });
+
+                if (name && duplicateName) {
+                    window.showFormInputValidationMessage?.(
+                        nameField,
+                        'A role with this name already exists.'
+                    );
+
+                    valid = false;
+                    firstInvalid ||= nameField;
+                }
+
+                const duplicateSlug = Array.from(
+                    document.querySelectorAll('.role-card')
+                ).some(card => {
+                    return String(
+                        card.dataset.slug || ''
+                    ).trim().toLowerCase() === slug;
+                });
+
+                if (slug && duplicateSlug) {
+                    window.showFormInputValidationMessage?.(
+                        slugField,
+                        'A role with this slug already exists.'
+                    );
+
+                    valid = false;
+                    firstInvalid ||= slugField;
+                }
+
+                return {
+                    valid,
+                    firstInvalid
+                };
+            }
+        );
+
+        return true;
+    }
+
+    window.addEventListener(
+        'global-validation-ready',
+        registerCreateRoleValidation
+    );
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        registerCreateRoleValidation
+    );
 
     function openViewAs() {
         isModalActive = true;
@@ -1582,14 +1846,16 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
         document.getElementById('vaTotalPerms').textContent = totalPerms;
         document.getElementById('vaTotalRoles').textContent = totalRoles;
-        openRoleOverlay(overlay);
+        window.openModal?.('vaOverlay');
     }
 
     function closeViewAs() {
-        closeRoleOverlay('vaOverlay', () => {
+        window.closeModal?.('vaOverlay');
+
+        window.setTimeout(() => {
             isModalActive = false;
             updateFABVisibility();
-        });
+        }, 180);
     }
 
     let patientAccountsCache = [];
@@ -1600,10 +1866,12 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     }
 
     function closePatientPicker() {
-        closeRoleOverlay('patientPickerOverlay', () => {
+        window.closeModal?.('patientPickerOverlay');
+
+        window.setTimeout(() => {
             isModalActive = false;
             updateFABVisibility();
-        });
+        }, 180);
     }
 
     function redirectToRole(roleId, roleName, roleSlug, color) {
@@ -1639,7 +1907,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 if (patientOverlay && patientOverlay.parentElement !== document.body) {
                     document.body.appendChild(patientOverlay);
                 }
-                openRoleOverlay(patientOverlay);
+                window.openModal?.('patientPickerOverlay');
             })
             .catch(err => {
                 if (typeof showToast === 'function') {

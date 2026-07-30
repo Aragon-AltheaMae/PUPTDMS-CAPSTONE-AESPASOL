@@ -1,18 +1,49 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole)
 
 @section('title', 'Inventory')
 
 @section('content')
 
-<main id="mainContent" class="admin-page-shell page-enter inventory-page">
-    <div class="full">
+<main id="mainContent" class="{{ $pageShellClass }}
+        {{ $isDentistView ? 'dentist-inventory-page' : 'admin-inventory-page' }}
+        page-enter
+        inventory-page
+        mode-list">
 
+    <div class="{{ $isDentistView ? 'w-full' : 'full' }}">
+
+        @if ($isDentistView)
+        <div class="inventory-header-wrap">
+            <div class="dentist-hero">
+                <div class="dentist-hero-content">
+                    <div class="inventory-title-left">
+                        <div class="dentist-hero-icon">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+
+                        <div class="min-w-0">
+                            <div class="dentist-hero-eyebrow">
+                                <i class="fa-solid fa-tooth"></i>
+                                Inventory Management
+                            </div>
+
+                            <h2 class="dentist-hero-title">
+                                Inventory
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @else
         <div class="page-banner inventory-admin-banner">
             <div class="page-banner-inner">
                 <div class="min-w-0">
-                    <h1 class="page-banner-title">Admin Inventory</h1>
+                    <h1 class="page-banner-title">
+                        Admin Inventory
+                    </h1>
                 </div>
 
                 <div class="page-banner-actions">
@@ -23,11 +54,12 @@
                 </div>
             </div>
         </div>
+        @endif
 
-        <div class="relative z-10 mt-4 sm:px-6 lg:px-7 pb-8">
+        <div class="relative z-10 mt-4 pb-8">
 
             <div class="stat-grid inventory-stat-grid" id="statCards">
-                <div class="stat-card s-total">
+                <div class="stat-card s-crimson">
                     <div class="stat-card-info">
                         <div class="stat-label">Total Items</div>
                         <div class="stat-value" id="statTotal">—</div>
@@ -35,7 +67,7 @@
                     </div>
                     <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
                 </div>
-                <div class="stat-card s-medicine">
+                <div class="stat-card s-blue">
                     <div class="stat-card-info">
                         <div class="stat-label">Medicines</div>
                         <div class="stat-value" id="statMedicine">—</div>
@@ -43,7 +75,7 @@
                     </div>
                     <div class="stat-icon"><i class="fa-solid fa-pills"></i></div>
                 </div>
-                <div class="stat-card s-supplies">
+                <div class="stat-card s-green">
                     <div class="stat-card-info">
                         <div class="stat-label">Supplies</div>
                         <div class="stat-value" id="statSupplies">—</div>
@@ -51,7 +83,7 @@
                     </div>
                     <div class="stat-icon"><i class="fa-solid fa-syringe"></i></div>
                 </div>
-                <div class="stat-card s-low">
+                <div class="stat-card s-amber">
                     <div class="stat-card-info">
                         <div class="stat-label">Low Stock</div>
                         <div class="stat-value" id="statLow">—</div>
@@ -61,10 +93,11 @@
                 </div>
             </div>
 
-            <div class="inventory-table-card bg-white rounded-xl shadow-sm border border-[#EDE9E4] overflow-hidden">
+            <div class="table-card inventory-table-card">
 
-                <div class="px-4 sm:px-5 py-4 border-b border-[#EDE9E4] flex flex-col gap-4">
-                    <div class="inventory-toolbar-shell flex flex-col lg:flex-row lg:items-center justify-between">
+                <div class="table-toolbar inventory-table-toolbar">
+                    <div
+                        class="inventory-toolbar-shell flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
 
                         <div
                             class="inventory-category-row flex items-center justify-between sm:justify-start gap-3 w-full lg:w-auto">
@@ -84,9 +117,11 @@
                             <span class="row-count row-count-desktop js-row-count" aria-live="polite"></span>
                         </div>
 
-                        <div class="toolbar-actions w-full lg:w-auto">
+                        <div
+                            class="toolbar-actions flex flex-col lg:flex-row lg:items-center lg:justify-end gap-3 w-full lg:w-auto lg:flex-1">
 
-                            <div class="inventory-search-row voice-search-row">
+                            <div
+                                class="inventory-search-row voice-search-row flex items-center gap-3 w-full lg:w-[340px] lg:flex-none">
                                 <div class="search-wrap global-search flex-1" data-search-wrapper>
                                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
@@ -110,7 +145,7 @@
                                 </div>
                             </div>
 
-                            <div class="inventory-mobile-actions">
+                            <div class="inventory-mobile-actions flex items-center gap-2 flex-nowrap lg:flex-none">
 
                                 <button id="filterBtn" type="button" onclick="openFilterPanel()"
                                     class="global-filter-btn">
@@ -119,20 +154,8 @@
                                     <span id="filterBadge" class="filter-badge"></span>
                                 </button>
 
-                                <div class="view-toggle-container" data-global-view-toggle data-view-root="#mainContent"
-                                    data-storage-key="ViewToggleMode" aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" title="List view"
-                                        aria-label="List view" aria-pressed="true" data-view-mode="list">
-                                        <i class="fa-solid fa-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                                        aria-pressed="false" data-view-mode="grid">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="inventoryViewToggle" root="#mainContent"
+                                    storage-key="inventoryViewMode" />
 
                                 <button id="externalClearFilterBtn" type="button" onclick="clearFilterPanel()"
                                     class="global-filter-reset-btn hidden" title="Reset filters">
@@ -145,14 +168,13 @@
                                     <span>Add Item</span>
                                 </button>
 
-                                <span class="row-count row-count-mobile js-row-count" aria-live="polite"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="tableWrapper" class="overflow-x-auto">
-                    <table class="d-inv-table">
+                <div id="tableWrapper" class="inventory-table-wrap">
+                    <table class="data-table inventory-data-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -178,31 +200,41 @@
                 </div>
             </div>
         </div>
+    </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper">
+<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
     <div class="filter-drawer-overlay" onclick="closeFilterDrawer('filterModal')"></div>
     <div class="filter-drawer-panel">
-        <div class="filter-drawer-header px-6 py-5 flex items-center justify-between border-b border-gray-100">
-            <div class="filter-drawer-title flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-xl"></i>
-                <h2 class="text-xl font-extrabold">Filters</h2>
+        <div class="filter-drawer-header">
+            <div class="filter-drawer-title">
+                <i class="fa-solid fa-sliders"></i>
+                <h2>Filters</h2>
             </div>
-            <button type="button" class="text-gray-400 hover:text-gray-700 transition-colors"
-                onclick="closeFilterDrawer('filterModal')" aria-label="Close filters">
+            <button type="button" class="filter-drawer-close" onclick="closeFilterDrawer('filterModal')"
+                aria-label="Close filters">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
 
-        <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6">
-            <div id="activeFiltersSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
+        <div class="filter-drawer-body">
+            <div id="activeFiltersSection" class="filter-active-section hidden">
+
+                <div class="filter-active-header">
+                    <span class="filter-active-title">
+                        Active Filters
+                    </span>
+
                     <button id="clearAllChipsBtn" type="button"
-                        class="text-xs font-bold text-[#8B0000] hover:underline">Clear All</button>
+                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Clear All</span>
+                    </button>
                 </div>
-                <div id="activeChipsContainer"
-                    class="active-filters-container flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+
+                <div id="activeChipsContainer" class="active-filters-container">
+                </div>
             </div>
 
             <div>
@@ -257,493 +289,610 @@
             </div>
         </div>
 
-        <div
-            class="filter-drawer-footer px-6 py-5 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 gap-4">
+        <div class="filter-drawer-footer">
             <button id="clearFilterPanelBtn" type="button" onclick="clearFilterPanelModal()"
-                class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                <i class="fa-regular fa-trash-can text-lg"></i>
-                <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+                class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
+
+                <i class="fa-regular fa-trash-can"></i>
+                <span>Clear Filters</span>
             </button>
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+
+            <div class="filter-footer-actions">
                 <button type="button" onclick="closeFilterDrawer('filterModal')"
-                    class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors">
-                    Cancel
+                    class="filter-cancel-btn ui-btn ui-btn-secondary">
+
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </button>
+
                 <button id="saveFilterPanelBtn" type="button" onclick="saveFilterPanel()"
-                    class="filter-show-results-btn filter-apply-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+                    class="filter-apply-btn ui-btn ui-btn-primary">
+
                     <i class="fa-solid fa-check"></i>
-                    <span id="showResultsText">Show 0 results</span>
+
+                    <span id="showResultsText" class="filter-results-text">
+                        Show 0 results
+                    </span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="addModal" class="ui-modal inventory-form-modal" onclick="closeModalOnBackdrop(event, 'addModal')">
-    <div class="ui-modal-card modal-box-custom">
-        <form id="addInventoryForm" class="modal-box-split" data-discard-form
-            data-discard-title="Discard new inventory item?" data-discard-subtitle="You have unsaved item details."
-            data-discard-message="Closing this modal will remove the inventory draft you entered. Do you want to discard your changes?"
-            onsubmit="return false;">
-            <div class="modal-header-custom modal-sticky-header">
-                <div class="inventory-modal-head-left">
-                    <div class="modal-icon-custom"><i class="fa-solid fa-plus"></i></div>
-                    <div>
-                        <div class="modal-title-custom">Add Inventory Item</div>
-                        <div class="modal-sub-custom">A new row will be appended every time you save</div>
-                    </div>
+<div id="addModal" class="ui-modal modal-theme-primary inventory-form-modal" aria-hidden="true">
+
+    <form id="addInventoryForm" class="ui-modal-card modal-xl modal-card-form" data-global-validation
+        data-form-validation-rule="inventoryAdd" data-discard-form data-discard-title="Discard new inventory item?"
+        data-discard-subtitle="You have unsaved item details."
+        data-discard-message="Closing this modal will remove the inventory draft you entered. Do you want to discard your changes?"
+        novalidate>
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-plus"></i>
                 </div>
 
-                <button type="button" class="inventory-modal-x" data-discard-close="addModal"
-                    aria-label="Close add inventory modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Add Inventory Item
+                    </h3>
 
-            <div class="modal-scroll-body">
-                <div class="form-grid-2">
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Category <span style="color:#C0392B">*</span></div>
-                        <select id="addCategory" class="inv-native-hidden-select"
-                            onchange="validateAddField('addCategory')">
-                            <option selected value="">Select...</option>
-                            <option value="Medicine">Medicine</option>
-                            <option value="Supplies">Supplies</option>
-                        </select>
-
-                        <div class="inv-custom-select" data-inv-select data-target="#addCategory">
-                            <button type="button" class="inv-custom-select-btn">
-                                <span data-inv-select-label>Select...</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </button>
-
-                            <div class="inv-custom-select-menu">
-                                <button type="button" class="inv-custom-select-option active" data-value="">
-                                    <span>Select...</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-
-                                <button type="button" class="inv-custom-select-option" data-value="Medicine">
-                                    <span>Medicine</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-
-                                <button type="button" class="inv-custom-select-option" data-value="Supplies">
-                                    <span>Supplies</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addCategory"></div>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Date Received <span style="color:#C0392B">*</span></div>
-                        <div class="fp-date-input-wrap">
-                            <input id="addDate" type="text" class="form-input-custom js-flatpickr-date"
-                                placeholder="Select date" onchange="validateAddField('addDate')" readonly>
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-                        </div>
-                        <div class="field-error" id="err-addDate"></div>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Stock Number <span style="color:#C0392B">*</span></div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="addStock" class="form-input-custom" placeholder="00-000" maxlength="6"
-                                oninput="formatStockNo(this); validateAddField('addStock')"
-                                style="letter-spacing:0.15em">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#addStock" data-voice-status="#addStockVoiceStatus"
-                                    aria-label="Voice input for stock number">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="addStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addStock"></div>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Unit <span style="color:#C0392B">*</span></div>
-                        <div class="st-voice-row inv-combo" data-voice-field data-inv-combo data-target="#addUnit">
-                            <div class="voice-input-wrap inv-combo-input-wrap">
-                                <input id="addUnit" class="form-input-custom" placeholder="Type or select unit"
-                                    maxlength="50" autocomplete="off" oninput="validateAddField('addUnit')">
-
-                                <button type="button" class="inv-combo-toggle" aria-label="Show unit options">
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-                            </div>
-
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#addUnit" data-voice-status="#addUnitVoiceStatus"
-                                    aria-label="Voice input for unit">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="addUnitVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-
-                            <div class="inv-combo-menu">
-                                <button type="button" class="inv-combo-option" data-value="Box">Box</button>
-                                <button type="button" class="inv-combo-option" data-value="Pack">Pack</button>
-                                <button type="button" class="inv-combo-option" data-value="Bottle">Bottle</button>
-                                <button type="button" class="inv-combo-option" data-value="Piece">Piece</button>
-                                <button type="button" class="inv-combo-option" data-value="Set">Set</button>
-                                <button type="button" class="inv-combo-option" data-value="Tube">Tube</button>
-                                <button type="button" class="inv-combo-option" data-value="Vial">Vial</button>
-                                <button type="button" class="inv-combo-option" data-value="Roll">Roll</button>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addUnit"></div>
-                    </div>
-
-                    <div class="form-group-custom full">
-                        <div class="flex justify-between items-center">
-                            <div class="form-label-custom">Supply / Medicine Name <span style="color:#C0392B">*</span>
-                            </div>
-                            <div class="char-counter" id="charCounter-addName">0 / 100</div>
-                        </div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="addName" class="form-input-custom" placeholder="e.g. Nitrile Gloves Large"
-                                maxlength="100" oninput="updateCharCounter('addName',100); validateAddField('addName')">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#addName" data-voice-status="#addNameVoiceStatus"
-                                    aria-label="Voice input for item name">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addName"></div>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Quantity <span style="color:#C0392B">*</span></div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="addQty" type="number" class="form-input-custom" placeholder="0" min="0"
-                                max="99999"
-                                oninput="computeAddBalance(); validateAddField('addQty'); validateAddField('addUsed')">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#addQty" data-voice-status="#addQtyVoiceStatus"
-                                    aria-label="Voice input for quantity">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="addQtyVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addQty"></div>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Consumed</div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="addUsed" type="number" class="form-input-custom" placeholder="0" min="0"
-                                max="99999" oninput="computeAddBalance(); validateAddField('addUsed')">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#addUsed" data-voice-status="#addUsedVoiceStatus"
-                                    aria-label="Voice input for consumed quantity">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="addUsedVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                        <div class="field-error" id="err-addUsed"></div>
-                    </div>
-
-                    <div class="form-group-custom full">
-                        <div class="form-label-custom">Balance (auto-calculated)</div>
-                        <input id="addBalance" class="form-input-custom" readonly placeholder="—">
-                    </div>
+                    <p class="modal-subtitle">
+                        A new row will be appended every time you save
+                    </p>
                 </div>
             </div>
 
-            <div class="modal-footer-custom modal-sticky-footer">
-                <button type="button" class="ui-btn ui-btn-secondary btn-modal-cancel"
-                    data-discard-close="addModal">Cancel</button>
-                <button type="button" id="btnSaveAdd" class="ui-btn ui-btn-primary btn-modal-save" onclick="addItem()">
-                    <i class="fa-solid fa-floppy-disk"></i> Save Item
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="editModal" class="ui-modal inventory-form-modal" onclick="closeModalOnBackdrop(event, 'editModal')">
-    <div class="ui-modal-card modal-box-custom">
-        <form id="editInventoryForm" class="modal-box-split" data-discard-form
-            data-discard-title="Discard inventory changes?"
-            data-discard-subtitle="You have unsaved edits for this item."
-            data-discard-message="Closing this modal will remove the edits you entered. Do you want to discard your changes?"
-            onsubmit="return false;">
-            <div class="modal-header-custom modal-sticky-header">
-                <div class="inventory-modal-head-left">
-                    <div class="modal-icon-custom modal-icon-edit">
-                        <i class="fa-solid fa-pen"></i>
-                    </div>
-                    <div>
-                        <div class="modal-title-custom">Edit Inventory Item</div>
-                        <div class="modal-sub-custom">Update the details for this item</div>
-                    </div>
-                </div>
-
-                <button type="button" class="inventory-modal-x" data-discard-close="editModal"
-                    aria-label="Close edit inventory modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="modal-scroll-body">
-                <div class="form-grid-2">
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Category</div>
-                        <select id="editCategory" class="inv-native-hidden-select">
-                            <option value="Medicine">Medicine</option>
-                            <option value="Supplies">Supplies</option>
-                        </select>
-
-                        <div class="inv-custom-select" data-inv-select data-target="#editCategory">
-                            <button type="button" class="inv-custom-select-btn">
-                                <span data-inv-select-label>Medicine</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </button>
-
-                            <div class="inv-custom-select-menu">
-                                <button type="button" class="inv-custom-select-option active" data-value="Medicine">
-                                    <span>Medicine</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-
-                                <button type="button" class="inv-custom-select-option" data-value="Supplies">
-                                    <span>Supplies</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Date Received</div>
-                        <div class="fp-date-input-wrap">
-                            <input id="editDate" type="text" class="form-input-custom js-flatpickr-date"
-                                placeholder="Select date" readonly>
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-                        </div>
-                    </div>
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Stock Number</div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="editStock" class="form-input-custom" maxlength="6" oninput="formatStockNo(this)">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#editStock" data-voice-status="#editStockVoiceStatus"
-                                    aria-label="Voice input for stock number">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="editStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Unit</div>
-                        <div class="st-voice-row inv-combo" data-voice-field data-inv-combo data-target="#editUnit">
-                            <div class="voice-input-wrap inv-combo-input-wrap">
-                                <input id="editUnit" class="form-input-custom" placeholder="Type or select unit"
-                                    maxlength="50" autocomplete="off">
-
-                                <button type="button" class="inv-combo-toggle" aria-label="Show unit options">
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-                            </div>
-
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#editUnit" data-voice-status="#editUnitVoiceStatus"
-                                    aria-label="Voice input for unit">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="editUnitVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-
-                            <div class="inv-combo-menu">
-                                <button type="button" class="inv-combo-option" data-value="Box">Box</button>
-                                <button type="button" class="inv-combo-option" data-value="Pack">Pack</button>
-                                <button type="button" class="inv-combo-option" data-value="Bottle">Bottle</button>
-                                <button type="button" class="inv-combo-option" data-value="Piece">Piece</button>
-                                <button type="button" class="inv-combo-option" data-value="Set">Set</button>
-                                <button type="button" class="inv-combo-option" data-value="Tube">Tube</button>
-                                <button type="button" class="inv-combo-option" data-value="Vial">Vial</button>
-                                <button type="button" class="inv-combo-option" data-value="Roll">Roll</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom full">
-                        <div class="form-label-custom">Supply / Medicine Name</div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="editName" class="form-input-custom">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
-                                    aria-label="Voice input for item name">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Quantity</div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="editQty" type="number" class="form-input-custom" oninput="computeEditBalance()">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#editQty" data-voice-status="#editQtyVoiceStatus"
-                                    aria-label="Voice input for quantity">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="editQtyVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom">
-                        <div class="form-label-custom">Consumed</div>
-                        <div class="st-voice-row" data-voice-field>
-                            <input id="editUsed" type="number" class="form-input-custom" oninput="computeEditBalance()">
-                            <div class="voice-input-toggle">
-                                <button type="button" class="voice-search-mic external" data-voice-trigger
-                                    data-voice-target="#editUsed" data-voice-status="#editUsedVoiceStatus"
-                                    aria-label="Voice input for consumed quantity">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                                <span id="editUsedVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group-custom full">
-                        <div class="form-label-custom">Balance (auto-calculated)</div>
-                        <input id="editBalance" class="form-input-custom" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer-custom modal-sticky-footer">
-                <button type="button" class="ui-btn ui-btn-secondary btn-modal-cancel"
-                    data-discard-close="editModal">Cancel</button>
-                <button type="button" class="ui-btn ui-btn-primary btn-modal-save" onclick="saveEdit()">
-                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="deleteModal" class="ui-modal modal-overlay inv-delete-modal" aria-hidden="true">
-    <div class="modal-box-inner inv-delete-modal-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true"
-        aria-labelledby="inventoryDeleteTitle">
-
-        <div class="inv-delete-head">
-            <div class="inv-delete-head-left">
-                <div class="inv-delete-icon">
-                    <i class="fa-solid fa-trash"></i>
-                </div>
-
-                <div>
-                    <h3 id="inventoryDeleteTitle">Delete Inventory Item</h3>
-                    <p>This action requires confirmation</p>
-                </div>
-            </div>
-
-            <button type="button" class="inv-delete-x" onclick="forceCloseModal('deleteModal')"
-                aria-label="Close delete modal">
+            <button type="button" class="modal-x" data-discard-close="addModal" aria-label="Close add inventory modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="inv-delete-body">
-            <div class="inv-delete-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+        <div class="modal-bd">
+            <div class="modal-form-grid-2">
 
-                <div>
-                    <p>
-                        Are you sure you want to delete
-                        <strong id="inventoryDeleteName"></strong>?
+                <div class="inventory-field" data-global-field>
+                    <label for="addCategory" class="inventory-field-label">
+                        Category <span class="required-mark">*</span>
+                    </label>
+                    <select id="addCategory" name="category" class="js-custom-select" data-placeholder="Select category"
+                        data-field-label="Category" data-required-message="Please select a category." required>
+
+                        <option value="">Select category</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Supplies">Supplies</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addDate" class="inventory-field-label">
+                        Date Received <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="inventory-date-control">
+                        <input id="addDate" name="date_received" type="text"
+                            class="field-input form-input-custom js-flatpickr-date-max-today"
+                            data-field-label="Date Received" data-required-message="Please select a date."
+                            data-validation-rule="notFutureDate" placeholder="Select date" required readonly>
+
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addStock" class="inventory-field-label">
+                        Stock Number
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+                        <div class="global-voice-control">
+                            <input id="addStock" name="stock_no"
+                                class="field-input form-input-custom inventory-stock-input" placeholder="00-000"
+                                maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
+                                data-required-message="Please enter a stock number."
+                                data-pattern-message="Stock number must use the format 00-000."
+                                oninput="formatStockNo(this)" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addStock" data-voice-status="#addStockVoiceStatus"
+                                aria-label="Voice input for stock number">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="addStockVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addUnit" class="inventory-field-label">
+                        Unit <span class="required-mark">*</span>
+                    </label>
+
+                    <select id="addUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
+                        data-field-label="Unit" data-required-message="Please select a unit." required>
+
+                        <option value="">Select unit</option>
+                        <option value="Box">Box</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Bottle">Bottle</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Set">Set</option>
+                        <option value="Tube">Tube</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Roll">Roll</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field inventory-field-full" data-global-field>
+
+                    <div class="global-label-row">
+                        <label for="addName" class="inventory-field-label">
+
+                            Supply / Medicine Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <span class="char-counter" id="charCounter-addName">
+                            0 / 100 characters
+                        </span>
+                    </div>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="addName" name="name" class="form-input-custom"
+                                placeholder="e.g. Nitrile Gloves Large" minlength="2" maxlength="100"
+                                data-field-label="Supply / Medicine Name"
+                                data-required-message="Please enter an item name." data-char-limit="100"
+                                data-char-counter="#charCounter-addName" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addName" data-voice-status="#addNameVoiceStatus"
+                                aria-label="Voice input for item name">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="addQty" class="inventory-field-label">
+
+                        Quantity
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="addQty" name="qty" type="number" class="global-number-stepper-input" value="0"
+                                min="0" max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Quantity" data-required-message="Please enter a quantity."
+                                data-validation-rule="wholeNumber" oninput="computeAddBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addQty" data-voice-status="#addQtyVoiceStatus"
+                                aria-label="Voice input for quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="addQtyVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="addUsed" class="inventory-field-label">
+
+                        Consumed
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease consumed quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="addUsed" name="used" type="number" class="global-number-stepper-input" value="0"
+                                min="0" max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Consumed" data-required-message="Please enter the consumed quantity."
+                                data-validation-rule="inventoryConsumed" oninput="computeAddBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase consumed quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#addUsed" data-voice-status="#addUsedVoiceStatus"
+                                aria-label="Voice input for consumed quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="addUsedVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field inventory-field-full" data-global-field>
+                    <label for="addBalance" class="inventory-field-label">
+                        Balance (auto-calculated)
+                    </label>
+                    <input id="addBalance" class="form-input-custom" readonly placeholder="—">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="addModal">
+                Cancel
+            </button>
+
+            <button type="submit" id="btnSaveAdd" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Item</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div id="editModal" class="ui-modal modal-theme-edit inventory-form-modal" aria-hidden="true">
+
+    <form id="editInventoryForm" class="ui-modal-card modal-xl modal-card-form" data-global-validation
+        data-form-validation-rule="inventoryEdit" data-discard-form data-discard-title="Discard inventory changes?"
+        data-discard-subtitle="You have unsaved edits for this item."
+        data-discard-message="Closing this modal will remove the edits you entered. Do you want to discard your changes?"
+        novalidate>
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-pen"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 class="modal-title">
+                        Edit Inventory Item
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Update the details for this item
                     </p>
-                    <span>This inventory item will be permanently removed.</span>
                 </div>
             </div>
 
-            <div class="inv-delete-actions">
-                <button type="button" class="modal-btn-ghost" onclick="forceCloseModal('deleteModal')">
-                    Cancel
-                </button>
+            <button type="button" class="modal-x" data-discard-close="editModal"
+                aria-label="Close edit inventory modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
 
-                <button type="button" id="confirmDeleteBtn" class="inv-delete-confirm">
-                    <i class="fa-solid fa-trash"></i>
-                    Delete
-                </button>
+        <div class="modal-bd">
+            <div class="modal-form-grid-2">
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editCategory" class="inventory-field-label">
+                        Category <span class="required-mark">*</span>
+                    </label>
+
+                    <select id="editCategory" name="category" class="js-custom-select"
+                        data-placeholder="Select category" data-field-label="Category"
+                        data-required-message="Please select a category." required>
+
+                        <option value="">Select category</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Supplies">Supplies</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editDate" class="inventory-field-label">
+                        Date Received <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="inventory-date-control">
+                        <input id="editDate" name="date_received" type="text"
+                            class="field-input form-input-custom js-flatpickr-date" data-field-label="Date Received"
+                            data-required-message="Please select a date." data-validation-rule="notFutureDate" required
+                            readonly>
+
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editStock" class="inventory-field-label">
+
+                        Stock Number
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="editStock" name="stock_no"
+                                class="field-input form-input-custom inventory-stock-input" placeholder="00-000"
+                                maxlength="6" pattern="\d{2}-\d{3}" data-field-label="Stock Number"
+                                data-required-message="Please enter a stock number."
+                                data-pattern-message="Stock number must use the format 00-000."
+                                oninput="formatStockNo(this)" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editStock" data-voice-status="#editStockVoiceStatus"
+                                aria-label="Voice input for stock number">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editStockVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editUnit" class="inventory-field-label">
+                        Unit <span class="required-mark">*</span>
+                    </label>
+
+                    <select id="editUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
+                        data-field-label="Unit" data-required-message="Please select a unit." required>
+
+                        <option value="">Select unit</option>
+                        <option value="Box">Box</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Bottle">Bottle</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Set">Set</option>
+                        <option value="Tube">Tube</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Roll">Roll</option>
+                    </select>
+                </div>
+
+                <div class="inventory-field inventory-field-full" data-global-field>
+
+                    <div class="global-label-row">
+                        <label for="editName" class="inventory-field-label">
+
+                            Supply / Medicine Name
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <span class="char-counter" id="charCounter-editName">
+                            0 / 100 characters
+                        </span>
+                    </div>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <input id="editName" name="name" class="form-input-custom" minlength="2" maxlength="100"
+                                data-field-label="Supply / Medicine Name"
+                                data-required-message="Please enter an item name." data-char-limit="100"
+                                data-char-counter="#charCounter-editName" required>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
+                                aria-label="Voice input for item name">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editQty" class="inventory-field-label">
+
+                        Quantity
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="editQty" name="qty" type="number" class="global-number-stepper-input" min="0"
+                                max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Quantity" data-required-message="Please enter a quantity."
+                                data-validation-rule="wholeNumber" oninput="computeEditBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editQty" data-voice-status="#editQtyVoiceStatus"
+                                aria-label="Voice input for quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editQtyVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+
+                    <label for="editUsed" class="inventory-field-label">
+
+                        Consumed
+                        <span class="required-mark">*</span>
+                    </label>
+
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-number-stepper" data-global-number-stepper>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                aria-label="Decrease consumed quantity">
+
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <input id="editUsed" name="used" type="number" class="global-number-stepper-input" min="0"
+                                max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                                data-field-label="Consumed" data-required-message="Please enter the consumed quantity."
+                                data-validation-rule="inventoryConsumed" oninput="computeEditBalance()" required>
+
+                            <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                aria-label="Increase consumed quantity">
+
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div class="voice-input-toggle">
+                            <button type="button" class="voice-search-mic external" data-voice-trigger
+                                data-voice-target="#editUsed" data-voice-status="#editUsedVoiceStatus"
+                                aria-label="Voice input for consumed quantity">
+
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <span id="editUsedVoiceStatus" class="voice-status hidden" data-voice-status
+                                aria-live="polite">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editBalance" class="inventory-field-label">
+                        Balance (auto-calculated)
+                    </label>
+                    <input id="editBalance" class="form-input-custom" readonly>
+                </div>
             </div>
         </div>
-    </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="editModal">
+                Cancel
+            </button>
+
+            <button type="submit" class="ui-btn ui-btn-edit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Changes</span>
+            </button>
+        </div>
+    </form>
 </div>
+
+<x-delete-confirm-modal id="deleteModal" form-id="inventoryDeleteForm" name-id="inventoryDeleteName"
+    title="Delete Inventory Item" helper="This inventory item will be permanently removed." />
 
 @endsection
 
 @section('scripts')
+
+@php
+$inventoryDataUrl = route($inventoryRouteNames['data']);
+
+$inventoryStoreUrl = route($inventoryRouteNames['store']);
+
+$inventoryUpdateUrlTemplate = route($inventoryRouteNames['update'], ['inventory' => '__ID__']);
+
+$inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventory' => '__ID__']);
+@endphp
+
 <script>
-    var currentViewMode = localStorage.getItem('ViewToggleMode') === 'grid' ? 'grid' : 'list';
+    var currentViewMode = 'list';
 
     function bindInventoryGlobalViewToggle() {
-        const toggle = document.querySelector('#mainContent.inventory-page [data-global-view-toggle]');
+        const toggle =
+            document.getElementById('inventoryViewToggle');
+
+        if (!toggle) return;
 
         window.initGlobalViewToggles?.(document);
 
-        currentViewMode = window.getGlobalViewMode?.(toggle)
-            || localStorage.getItem('ViewToggleMode')
-            || currentViewMode;
+        currentViewMode =
+            window.getGlobalViewMode?.(toggle) || 'list';
 
-        currentViewMode = currentViewMode === 'grid' ? 'grid' : 'list';
+        toggle.addEventListener(
+            'global-view-change',
+            function (event) {
+                currentViewMode =
+                    event.detail?.mode === 'grid'
+                        ? 'grid'
+                        : 'list';
 
-        window.setGlobalViewMode?.(toggle, currentViewMode, {
-            persist: false
-        });
-
-        toggle?.addEventListener('global-view-change', function (event) {
-            currentViewMode = event.detail?.mode === 'grid' ? 'grid' : 'list';
-            renderTable();
-        });
-    }
-
-    function setViewMode(mode) {
-        const toggle = document.querySelector('#mainContent.inventory-page [data-global-view-toggle]');
-        currentViewMode = mode === 'grid' ? 'grid' : 'list';
-
-        if (window.setGlobalViewMode && toggle) {
-            window.setGlobalViewMode(toggle, currentViewMode);
-        } else {
-            const mainContent = document.getElementById('mainContent');
-
-            if (mainContent) {
-                mainContent.classList.toggle('mode-list', currentViewMode === 'list');
-                mainContent.classList.toggle('mode-grid', currentViewMode === 'grid');
+                renderTable();
             }
-
-            localStorage.setItem('ViewToggleMode', currentViewMode);
-            renderTable();
-        }
+        );
     }
 
     var inventory = [];
@@ -751,7 +900,7 @@
 
     let inventoryRefreshWatcher = null;
 
-    const INVENTORY_DATA_URL = @json(route('admin.inventory.data'));
+    const INVENTORY_DATA_URL = @json($inventoryDataUrl);
 
     function applyInventorySnapshot(payload) {
         inventory = Array.isArray(payload) ? payload : [];
@@ -762,7 +911,7 @@
         if (!window.initGlobalRefreshWatcher) return;
 
         inventoryRefreshWatcher = window.initGlobalRefreshWatcher({
-            key: 'admin-inventory',
+            key: @json($inventoryWatcherKey),
             url: INVENTORY_DATA_URL,
             initialItems: inventory,
             anchorSelector: '#mainContent.inventory-page .inventory-table-card',
@@ -781,26 +930,34 @@
     }
 
     const inventoryUrlTemplates = {
-        update: @json(url('/admin/inventory/__ID__')),
-        destroy: @json(url('/admin/inventory/__ID__')),
+        update: @json($inventoryUpdateUrlTemplate),
+        destroy: @json($inventoryDestroyUrlTemplate),
     };
 
     function inventoryUrl(type, id) {
         return inventoryUrlTemplates[type].replace('__ID__', encodeURIComponent(id));
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        bindInventoryGlobalViewToggle();
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+            bindInventoryGlobalViewToggle();
 
-        applyDashboardStockFilterFromQuery();
-        syncInventoryFilterGroups();
-        updateFilterButtonState();
-        initInventoryChoiceControls();
+            applyDashboardStockFilterFromQuery();
+            syncInventoryFilterGroups();
+            updateFilterButtonState();
 
-        if (window.initGlobalVoiceInputs) {
-            window.initGlobalVoiceInputs(document);
+            window.initCustomSelects?.(
+                document.getElementById('addModal')
+            );
+
+            window.initCustomSelects?.(
+                document.getElementById('editModal')
+            );
+
+            window.initGlobalVoiceInputs?.(document);
         }
-    });
+    );
 
     async function loadInventory() {
         var res = await fetch(INVENTORY_DATA_URL, {
@@ -930,178 +1087,30 @@
         }
     }
 
-    function captureDiscardForModal(id) {
-        window.setTimeout(function () {
-            var modal = document.getElementById(id);
-            if (window.DiscardChanges && modal) {
-                window.DiscardChanges.captureModal(modal);
-            }
-        }, 0);
-    }
-
-    var baseInventoryCloseModal = window.closeModal ? window.closeModal.bind(window) : null;
-
-    function forceCloseModal(id) {
-        if (baseInventoryCloseModal) {
-            baseInventoryCloseModal(id);
-            return;
-        }
-
-        var modal = document.getElementById(id);
-        if (!modal) return;
-        modal.classList.remove('open', 'closing');
-        document.body.classList.remove('modal-lock');
-    }
-
-    window.forceCloseModal = forceCloseModal;
-
-    function requestCloseInventoryModal(id) {
-        var modal = document.getElementById(id);
-
-        if (window.DiscardChanges && modal) {
-            window.DiscardChanges.confirmClose(modal, function () {
-                forceCloseModal(id);
-            });
-            return;
-        }
-
-        forceCloseModal(id);
-    }
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key !== 'Escape') return;
-
-        var openInventoryModal = document.querySelector('#addModal.open, #editModal.open');
-        if (!openInventoryModal) return;
-
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        requestCloseInventoryModal(openInventoryModal.id);
-    }, true);
-
-    function closeInventoryChoiceMenus(except) {
-        document.querySelectorAll('.inv-custom-select.is-open, .inv-combo.is-open').forEach(function (wrapper) {
-            if (wrapper !== except) {
-                wrapper.classList.remove('is-open');
-            }
-        });
-    }
-
-    function setInventoryCustomSelectValue(selectId, value, shouldValidate = true) {
-        const select = document.getElementById(selectId);
-        const wrapper = document.querySelector('[data-inv-select][data-target="#' + selectId + '"]');
-
-        if (!select || !wrapper) return;
-
-        select.value = value || '';
-
-        const options = wrapper.querySelectorAll('.inv-custom-select-option');
-        const label = wrapper.querySelector('[data-inv-select-label]');
-
-        let selectedText = 'Select...';
-
-        options.forEach(function (option) {
-            const isActive = String(option.dataset.value || '') === String(select.value || '');
-            option.classList.toggle('active', isActive);
-
-            if (isActive) {
-                selectedText = option.querySelector('span')?.textContent.trim() || selectedText;
-            }
-        });
-
-        if (label) label.textContent = selectedText;
-
-        if (shouldValidate) {
-            select.dispatchEvent(new Event('change', {
-                bubbles: true
-            }));
-        }
-    }
-
-    function initInventoryChoiceControls() {
-        document.querySelectorAll('[data-inv-select]').forEach(function (wrapper) {
-            const targetSelector = wrapper.dataset.target;
-            const target = document.querySelector(targetSelector);
-            const trigger = wrapper.querySelector('.inv-custom-select-btn');
-
-            if (!target || !trigger || wrapper.dataset.bound === 'true') return;
-            wrapper.dataset.bound = 'true';
-
-            trigger.addEventListener('click', function () {
-                const willOpen = !wrapper.classList.contains('is-open');
-                closeInventoryChoiceMenus(wrapper);
-                wrapper.classList.toggle('is-open', willOpen);
-            });
-
-            wrapper.querySelectorAll('.inv-custom-select-option').forEach(function (option) {
-                option.addEventListener('click', function () {
-                    setInventoryCustomSelectValue(target.id, option.dataset.value || '');
-                    closeInventoryChoiceMenus();
-                });
-            });
-        });
-
-        document.querySelectorAll('[data-inv-combo]').forEach(function (wrapper) {
-            const target = document.querySelector(wrapper.dataset.target);
-            const toggle = wrapper.querySelector('.inv-combo-toggle');
-
-            if (!target || !toggle || wrapper.dataset.bound === 'true') return;
-            wrapper.dataset.bound = 'true';
-
-            toggle.addEventListener('click', function () {
-                const willOpen = !wrapper.classList.contains('is-open');
-                closeInventoryChoiceMenus(wrapper);
-                wrapper.classList.toggle('is-open', willOpen);
-            });
-
-            target.addEventListener('focus', function () {
-                closeInventoryChoiceMenus(wrapper);
-                wrapper.classList.add('is-open');
-            });
-
-            target.addEventListener('input', function () {
-                const query = target.value.trim().toLowerCase();
-
-                wrapper.querySelectorAll('.inv-combo-option').forEach(function (option) {
-                    const match = option.dataset.value.toLowerCase().includes(query);
-                    option.hidden = query && !match;
-                });
-            });
-
-            wrapper.querySelectorAll('.inv-combo-option').forEach(function (option) {
-                option.addEventListener('click', function () {
-                    target.value = option.dataset.value || '';
-                    target.dispatchEvent(new Event('input', {
-                        bubbles: true
-                    }));
-                    closeInventoryChoiceMenus();
-                });
-            });
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!event.target.closest('.inv-custom-select') && !event.target.closest('.inv-combo')) {
-                closeInventoryChoiceMenus();
-            }
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeInventoryChoiceMenus();
-            }
-        });
-    }
-
     function openAddModal() {
         resetAddForm();
-        openModal('addModal');
-        if (window.initGlobalVoiceInputs) window.initGlobalVoiceInputs(document.getElementById('addModal'));
-        document.dispatchEvent(new CustomEvent('voice:refresh', {
-            detail: {
-                root: document.getElementById('addModal')
-            }
-        }));
-        captureDiscardForModal('addModal');
+
+        const modal =
+            document.getElementById('addModal');
+
+        window.initCustomSelects?.(modal);
+
+        modal?.querySelectorAll('.custom-select')
+            .forEach(function (wrapper) {
+                window.syncCustomSelect?.(wrapper);
+            });
+
+        window.openModal?.('addModal');
+
+        window.initGlobalVoiceInputs?.(modal);
+
+        document.dispatchEvent(
+            new CustomEvent('voice:refresh', {
+                detail: {
+                    root: modal
+                }
+            })
+        );
     }
 
     function openFilterPanel() {
@@ -1408,6 +1417,65 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        [
+            ['addQty', 'addUsed'],
+            ['editQty', 'editUsed']
+        ].forEach(function ([qtyId, usedId]) {
+            const qtyField =
+                document.getElementById(qtyId);
+
+            const usedField =
+                document.getElementById(usedId);
+
+            qtyField?.addEventListener(
+                'input',
+                function () {
+                    if (usedField?.value) {
+                        window.validateFormInputField?.(
+                            usedField
+                        );
+                    }
+                }
+            );
+        });
+
+        const editInventoryForm =
+            document.getElementById('editInventoryForm');
+
+        editInventoryForm?.addEventListener(
+            'submit',
+            function (event) {
+                event.preventDefault();
+
+                const result = window.validateGlobalForm?.(
+                    editInventoryForm
+                );
+
+                if (result && !result.valid) {
+                    return;
+                }
+
+                saveEdit();
+            }
+        );
+
+        const addInventoryForm =
+            document.getElementById('addInventoryForm');
+
+        addInventoryForm?.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const result = window.validateGlobalForm?.(
+                addInventoryForm
+            );
+
+            if (result && !result.valid) {
+                return;
+            }
+
+            addItem();
+        });
+
         document.querySelectorAll('#inventorySortGroup .ftag, #inventoryStockGroup .ftag')
             .forEach(function (btn) {
                 btn.addEventListener('click', function () {
@@ -1531,17 +1599,17 @@
     function inventoryActionButtons(id) {
         return `
         <button type="button"
-            class="action-btn btn-edit"
-            title="Edit"
-            aria-label="Edit item"
+            class="ui-action-btn ui-action-edit"
+            data-tooltip="Edit"
+            aria-label="Edit inventory item"
             onclick="openEdit(${id})">
             <i class="fa-solid fa-pen"></i>
         </button>
 
         <button type="button"
-            class="action-btn btn-delete"
-            title="Delete"
-            aria-label="Delete item"
+            class="ui-action-btn ui-action-delete"
+            data-tooltip="Delete"
+            aria-label="Delete inventory item"
             onclick="deleteItem(${id})">
             <i class="fa-solid fa-trash"></i>
         </button>
@@ -1629,8 +1697,8 @@
         }
 
         updateStats();
-        const totalInventoryItems = inventory.length;
-        const countText = totalInventoryItems + ' item' + (totalInventoryItems !== 1 ? 's' : '');
+        const visibleInventoryItems = data.length;
+        const countText = visibleInventoryItems + ' item' + (visibleInventoryItems !== 1 ? 's' : '');
 
         document.querySelectorAll('.js-row-count').forEach(function (el) {
             el.textContent = countText;
@@ -1717,7 +1785,7 @@
             if (currentViewMode === 'grid') {
                 grid.innerHTML += `
     <div class="inventory-card ${cardStockClass} ${catClass}">
-        <div class="inventory-card-head">
+        <div class="inventory-card-top">
             <div class="min-w-0">
                 <div class="inventory-card-name">${item.name || ''}</div>
 
@@ -1752,27 +1820,62 @@
             </div>
         </div>
 
-        <div class="inventory-card-actions">
+        <div class="ui-action-group inventory-card-actions">
     ${inventoryActionButtons(item.id)}
 </div>
     </div>
 `;
             } else {
-                tbody.innerHTML +=
-                    '<tr>' +
-                    '<td style="color:#9A9490;font-size:12px;white-space:nowrap;">' + (item.formatted_date ||
-                        '') + '</td>' +
-                    '<td><span class="stock-no">' + (item.stock_no || '') + '</span></td>' +
-                    '<td><div class="supply-name">' + (item.name || '') + '</div><span class="supply-cat ' +
-                    catClass + '">' + (item.category || '') + '</span></td>' +
-                    '<td style="color:#9A9490;">' + (item.unit || '') + '</td>' +
-                    '<td style="font-weight:700;">' + (item.qty || 0) + '</td>' +
-                    '<td style="color:#9A9490;">' + (item.used || 0) + '</td>' +
-                    '<td><span class="bal-chip ' + balClass + '">' + balance +
-                    ' <span style="font-weight:400;font-size:10px;">' + balLabel + '</span></span></td>' +
-                    '<td><div class="inventory-row-actions">' + inventoryActionButtons(item.id) +
-                    '</div></td>' +
-                    '</tr>';
+                tbody.innerHTML += `
+    <tr>
+        <td class="inventory-date-cell">
+            ${item.formatted_date || ''}
+        </td>
+
+        <td>
+            <span class="stock-no">
+                ${item.stock_no || ''}
+            </span>
+        </td>
+
+        <td>
+            <div class="supply-name">
+                ${item.name || ''}
+            </div>
+
+            <span class="supply-cat ${catClass}">
+                ${item.category || ''}
+            </span>
+        </td>
+
+        <td class="inventory-muted-cell">
+            ${item.unit || ''}
+        </td>
+
+        <td class="inventory-strong-cell">
+            ${item.qty || 0}
+        </td>
+
+        <td class="inventory-muted-cell">
+            ${item.used || 0}
+        </td>
+
+        <td>
+            <span class="bal-chip ${balClass}">
+                ${balance}
+                <span class="inventory-balance-label">
+                    ${balLabel}
+                </span>
+            </span>
+        </td>
+
+        <td>
+            <div class="ui-action-group inventory-row-actions">
+                ${inventoryActionButtons(item.id)}
+            </div>
+        </td>
+    </tr>
+`;
             }
         });
     }
@@ -1806,120 +1909,58 @@
     `;
     }
 
-    function validateAddField(id) {
-        var el = document.getElementById(id);
-        if (!el) return true;
-        var val = el.value.trim();
-        var today = new Date();
-        today.setHours(23, 59, 59, 999);
-        switch (id) {
-            case 'addCategory':
-                if (!val) {
-                    setFieldState(id, 'Please select a category');
-                    return false;
-                }
-                break;
-            case 'addDate': {
-                if (!val) {
-                    setFieldState(id, 'Date is required');
-                    return false;
-                }
-                var picked = new Date(val);
-                if (isNaN(picked.getTime())) {
-                    setFieldState(id, 'Invalid date');
-                    return false;
-                }
-                if (picked > today) {
-                    setFieldState(id, 'Date cannot be in the future');
-                    return false;
-                }
-                break;
-            }
-            case 'addStock':
-                if (!val) {
-                    setFieldState(id, 'Stock number is required');
-                    return false;
-                }
-                if (!/^\d{2}-\d{3}$/.test(val)) {
-                    setFieldState(id, 'Must be in format 00-000');
-                    return false;
-                }
-                break;
-            case 'addUnit':
-                if (!val) {
-                    setFieldState(id, 'Unit is required');
-                    return false;
-                }
-                break;
-            case 'addName':
-                if (!val) {
-                    setFieldState(id, 'Name is required');
-                    return false;
-                }
-                if (val.length < 2) {
-                    setFieldState(id, 'Minimum 2 characters');
-                    return false;
-                }
-                break;
-            case 'addQty': {
-                var raw = el.value;
-                if (raw === '' || raw === null) {
-                    setFieldState(id, 'Quantity is required');
-                    return false;
-                }
-                var qn = Number(raw);
-                if (!Number.isInteger(qn) || qn < 0) {
-                    setFieldState(id, 'Must be a whole number ≥ 0');
-                    return false;
-                }
-                if (qn > 99999) {
-                    setFieldState(id, 'Maximum quantity is 99,999');
-                    return false;
-                }
-                break;
-            }
-            case 'addUsed': {
-                var rawU = el.value;
-                var un = Number(rawU || 0);
-                var qnU = Number(document.getElementById('addQty').value || 0);
-                if (rawU !== '' && (!Number.isInteger(un) || un < 0)) {
-                    setFieldState(id, 'Must be a whole number ≥ 0');
-                    return false;
-                }
-                if (un > qnU) {
-                    setFieldState(id, 'Consumed cannot exceed quantity');
-                    return false;
-                }
-                break;
-            }
-        }
-        setFieldState(id, '');
-        return true;
-    }
-
-    function validateAllAddFields() {
-        return ['addCategory', 'addDate', 'addStock', 'addUnit', 'addName', 'addQty', 'addUsed'].map(function (id) {
-            return validateAddField(id);
-        }).every(Boolean);
-    }
-
     function resetAddForm() {
-        setInventoryCustomSelectValue('addCategory', '', false);
-        closeInventoryChoiceMenus();
-        ['addDate', 'addStock', 'addName', 'addUnit', 'addQty', 'addUsed', 'addBalance'].forEach(function (id) {
-            document.getElementById(id).value = '';
-        });
-        ['addCategory', 'addDate', 'addStock', 'addUnit', 'addName', 'addQty', 'addUsed'].forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.classList.remove('is-invalid', 'is-valid');
-            var err = document.getElementById('err-' + id);
-            if (err) err.innerHTML = '';
-        });
-        var counter = document.getElementById('charCounter-addName');
-        if (counter) {
-            counter.textContent = '0 / 100';
-            counter.className = 'char-counter';
+        const addCategory =
+            document.getElementById('addCategory');
+
+        if (addCategory) {
+            addCategory.value = '';
+            addCategory.dispatchEvent(
+                new Event('change', {
+                    bubbles: true
+                })
+            );
+
+            window.syncCustomSelect?.(
+                addCategory.closest('.custom-select')
+            );
         }
+        [
+            'addDate',
+            'addStock',
+            'addName',
+            'addUnit',
+            'addQty',
+            'addUsed',
+            'addBalance'
+        ].forEach(function (id) {
+            const field = document.getElementById(id);
+
+            if (field) {
+                field.value = '';
+                field.dispatchEvent(
+                    new Event('change', {
+                        bubbles: true
+                    })
+                );
+            }
+        });
+        const form =
+            document.getElementById('addInventoryForm');
+
+        form?.querySelectorAll(
+            'input, select, textarea'
+        ).forEach(function (field) {
+            field.classList.remove('is-invalid', 'is-valid');
+            field.removeAttribute('aria-invalid');
+            field.removeAttribute('aria-describedby');
+            field.setCustomValidity('');
+        });
+
+        form?.querySelectorAll('.global-field-error')
+            .forEach(function (error) {
+                error.remove();
+            });
 
         document.querySelectorAll('#addModal [data-voice-status]').forEach(function (status) {
             status.classList.add('hidden');
@@ -1928,18 +1969,12 @@
     }
 
     async function addItem() {
-        if (!validateAllAddFields()) {
-            var fi = document.querySelector('#addModal .is-invalid');
-            if (fi) fi.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-            return;
-        }
+
         var btnSave = document.getElementById('btnSaveAdd');
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
-        var res = await fetch('{{ route('admin.inventory.store') }}', {
+        var res = await fetch(
+            @json($inventoryStoreUrl), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1959,11 +1994,12 @@
         btnSave.disabled = false;
         btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Item';
         if (!res.ok) {
-            var err = await res.json().catch(function () {
+            const errorPayload = await res.json().catch(function () {
                 return {};
             });
-            if (err.errors) {
-                var map = {
+
+            if (errorPayload.errors) {
+                const fieldMap = {
                     category: 'addCategory',
                     date_received: 'addDate',
                     stock_no: 'addStock',
@@ -1972,95 +2008,203 @@
                     qty: 'addQty',
                     used: 'addUsed'
                 };
-                Object.entries(err.errors).forEach(function ([k, v]) {
-                    if (map[k]) setFieldState(map[k], Array.isArray(v) ? v[0] : v);
+
+                Object.entries(errorPayload.errors).forEach(function ([key, messages]) {
+                    const fieldId = fieldMap[key];
+
+                    if (!fieldId) return;
+
+                    const field = document.getElementById(fieldId);
+                    const message = Array.isArray(messages) ?
+                        messages[0] :
+                        messages;
+
+                    window.showFormInputValidationMessage?.(
+                        field,
+                        message
+                    );
                 });
             } else {
-                showToast('error', 'Could not save item. Please try again.');
+                showToast(
+                    'error',
+                    errorPayload.message ||
+                    'Could not save item. Please try again.'
+                );
             }
+
             return;
         }
-        forceCloseModal('addModal');
+
+        window.closeModal?.('addModal');
         resetAddForm();
         await loadInventory();
         showToast('success', 'Item added successfully!');
     }
 
-    var deleteId = null;
-
     function deleteItem(id) {
-        deleteId = id;
+        const item = inventory.find(row =>
+            Number(row.id) === Number(id)
+        );
 
-        const item = inventory.find(function (row) {
-            return Number(row.id) === Number(id);
+        window.openDeleteConfirmModal({
+            modalId: 'deleteModal',
+            formId: 'inventoryDeleteForm',
+            nameId: 'inventoryDeleteName',
+            action: inventoryUrl('destroy', id),
+            itemName: item?.name || item?.stock_no || 'this item',
+            recordId: id,
         });
-
-        const nameTarget = document.getElementById('inventoryDeleteName');
-        if (nameTarget) {
-            nameTarget.textContent = item?.name || item?.stock_no || 'this item';
-        }
-
-        openModal('deleteModal');
     }
 
-    document.getElementById('confirmDeleteBtn').onclick = async function () {
-        if (!deleteId) return;
+    document
+        .getElementById('inventoryDeleteForm')
+        ?.addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-        const res = await fetch(inventoryUrl('destroy', deleteId), {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                    'content'),
-                'Accept': 'application/json'
+            const id = this.dataset.recordId;
+
+            if (!id) return;
+
+            const response = await fetch(
+                inventoryUrl('destroy', id),
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                .content,
+                        Accept: 'application/json',
+                    },
+                }
+            );
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                showToast(
+                    'error',
+                    result.message || 'Delete failed.'
+                );
+                return;
             }
+
+            window.closeModal('deleteModal');
+
+            await loadInventory();
+
+            showToast('success', 'Item deleted.');
         });
-
-        const result = await res.json().catch(function () {
-            return {};
-        });
-
-        if (!res.ok) {
-            console.error('Inventory delete failed:', res.status, result);
-            showToast('error', result.message || 'Delete failed — please try again.');
-            return;
-        }
-
-        if (window.closeModal) {
-            closeModal('deleteModal');
-        } else {
-            document.getElementById('deleteModal')?.close();
-        }
-
-        deleteId = null;
-        await loadInventory();
-        showToast('success', 'Item deleted.');
-    };
 
     var editId = null;
 
     function openEdit(id) {
         editId = id;
-        var i = inventory.find(function (item) {
-            return item.id === id;
+
+        const item = inventory.find(function (entry) {
+            return Number(entry.id) === Number(id);
         });
-        if (!i) return;
-        setInventoryCustomSelectValue('editCategory', i.category, false);
-        closeInventoryChoiceMenus();
-        document.getElementById('editStock').value = i.stock_no;
-        document.getElementById('editName').value = i.name;
-        document.getElementById('editUnit').value = i.unit;
-        document.getElementById('editQty').value = i.qty;
-        document.getElementById('editUsed').value = i.used;
-        document.getElementById('editDate').value = i.date_received ? i.date_received.slice(0, 10) : '';
+
+        if (!item) return;
+
+        const editCategory =
+            document.getElementById('editCategory');
+
+        if (editCategory) {
+            editCategory.value = item.category || '';
+
+            editCategory.dispatchEvent(
+                new Event('change', {
+                    bubbles: true
+                })
+            );
+        }
+
+        const editUnit =
+            document.getElementById('editUnit');
+
+        if (editUnit) {
+            editUnit.value = item.unit || '';
+
+            editUnit.dispatchEvent(
+                new Event('change', {
+                    bubbles: true
+                })
+            );
+        }
+
+        document.getElementById('editStock').value =
+            item.stock_no || '';
+
+        const editName =
+            document.getElementById('editName');
+
+        if (editName) {
+            editName.value =
+                item.name || '';
+
+            window.initCharLimitFields?.(
+                document.getElementById('editModal')
+            );
+
+            editName.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
+
+        const editQty =
+            document.getElementById('editQty');
+
+        const editUsed =
+            document.getElementById('editUsed');
+
+        if (editQty) {
+            editQty.value = item.qty ?? 0;
+
+            editQty.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
+
+        if (editUsed) {
+            editUsed.value = item.used ?? 0;
+
+            editUsed.dispatchEvent(
+                new Event('input', {
+                    bubbles: true
+                })
+            );
+        }
+
+        document.getElementById('editDate').value =
+            item.date_received ?
+                String(item.date_received).slice(0, 10) :
+                '';
+
+        document.querySelectorAll(
+            '#editModal .custom-select'
+        ).forEach(function (wrapper) {
+            window.syncCustomSelect?.(wrapper);
+        });
+
         computeEditBalance();
-        openModal('editModal');
-        if (window.initGlobalVoiceInputs) window.initGlobalVoiceInputs(document.getElementById('editModal'));
-        document.dispatchEvent(new CustomEvent('voice:refresh', {
-            detail: {
-                root: document.getElementById('editModal')
-            }
-        }));
-        captureDiscardForModal('editModal');
+        window.openModal?.('editModal');
+
+        window.initGlobalVoiceInputs?.(
+            document.getElementById('editModal')
+        );
+
+        document.dispatchEvent(
+            new CustomEvent('voice:refresh', {
+                detail: {
+                    root: document.getElementById('editModal')
+                }
+            })
+        );
     }
 
     async function saveEdit() {

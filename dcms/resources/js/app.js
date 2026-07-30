@@ -1,4 +1,15 @@
 import './bootstrap';
+import './header';
+
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/inter/800.css';
+import '@fontsource/inter/900.css';
+
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import Chart from 'chart.js/auto';
 import JSVoice from 'jsvoice';
 
@@ -28,6 +39,139 @@ function normalizeDateOnly(value) {
     date.setHours(0, 0, 0, 0);
     return date;
 }
+
+function normalizeCalendarDays(days) {
+    if (Array.isArray(days)) return days;
+
+    if (typeof days === 'string') {
+        try {
+            const parsed = JSON.parse(days);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (_) {
+            return days.split(',').map(day => day.trim()).filter(Boolean);
+        }
+    }
+
+    return [];
+}
+
+function isCalendarRuleActive(rule) {
+    return (
+        rule?.is_active === true ||
+        rule?.is_active === 1 ||
+        rule?.is_active === '1'
+    );
+}
+
+function getCalendarDayAbbr(dateObj) {
+    return dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+    }).replace('.', '');
+}
+
+function toIsoDate(dateObj) {
+    const date = normalizeDateOnly(dateObj);
+
+    if (!date) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function createCalendarSource(config = {}) {
+    const blockedDates = Array.isArray(config.blockedDates) ? config.blockedDates : [];
+    const blockedDateSet = new Set(blockedDates.map(value => String(value).trim()).filter(Boolean));
+    const holidaysMap = config.holidaysMap && typeof config.holidaysMap === 'object'
+        ? config.holidaysMap
+        : {};
+    const scheduleRules = Array.isArray(config.scheduleRules) ? config.scheduleRules : [];
+    const useDynamicScheduleRules = config.useDynamicScheduleRules === true;
+
+    return {
+        blockedDates,
+        blockedDateSet,
+        holidaysMap,
+        scheduleRules,
+        useDynamicScheduleRules,
+        rawConfig: config,
+
+        toIsoDate(dateObj) {
+            return toIsoDate(dateObj);
+        },
+
+        getRuleForDate(dateObj) {
+            if (!useDynamicScheduleRules) return null;
+
+            const dayAbbr = getCalendarDayAbbr(dateObj);
+
+            return scheduleRules.find(rule => {
+                const days = normalizeCalendarDays(rule?.days);
+
+                return isCalendarRuleActive(rule) && days.includes(dayAbbr);
+            }) || null;
+        },
+
+        getMaxPerDay(dateObj) {
+            const rule = this.getRuleForDate(dateObj);
+            return Number(rule?.max_slots ?? 0) || 0;
+        },
+
+        isBlocked(iso) {
+            return this.blockedDateSet.has(String(iso || '').trim());
+        },
+
+        getHoliday(iso) {
+            return this.holidaysMap?.[iso] || null;
+        },
+
+        isDateSchedulable(dateObj, iso = this.toIsoDate(dateObj)) {
+            if (!iso) return false;
+
+            if (this.isBlocked(iso)) {
+                return false;
+            }
+
+            if (this.getHoliday(iso)) {
+                return false;
+            }
+
+            if (!useDynamicScheduleRules) {
+                return true;
+            }
+
+            const rule = this.getRuleForDate(dateObj);
+            const status = String(rule?.status || '').trim().toLowerCase();
+
+            if (!rule || !isCalendarRuleActive(rule) || status === 'closed') {
+                return false;
+            }
+
+            return true;
+        },
+
+        buildFlatpickrOptions(overrides = {}) {
+            const existingDisable = Array.isArray(overrides.disable)
+                ? overrides.disable
+                : [];
+
+            return {
+                ...overrides,
+                disable: [
+                    ...existingDisable,
+                    dateObj => !this.isDateSchedulable(dateObj),
+                ],
+            };
+        },
+    };
+}
+
+window.createCalendarSource = createCalendarSource;
+window.buildFlatpickrCalendarOptions = function buildFlatpickrCalendarOptions(config = {}, overrides = {}) {
+    return createCalendarSource(config).buildFlatpickrOptions(overrides);
+};
 
 function decorateFlatpickrDays(instance) {
     if (!instance?.calendarContainer) return;
@@ -60,11 +204,33 @@ function decorateFlatpickrDays(instance) {
 function syncFlatpickrHeader(instance) {
     if (!instance?.calendarContainer) return;
 
-    const monthSelect = instance.calendarContainer.querySelector('.custom-flatpickr-month');
-    const yearSelect = instance.calendarContainer.querySelector('.custom-flatpickr-year');
+    const monthSelect = instance.calendarContainer.querySelector(
+        '.custom-flatpickr-month'
+    );
 
-    if (monthSelect) monthSelect.value = String(instance.currentMonth);
-    if (yearSelect) yearSelect.value = String(instance.currentYear);
+    const yearSelect = instance.calendarContainer.querySelector(
+        '.custom-flatpickr-year'
+    );
+
+    if (monthSelect) {
+        monthSelect.value = String(instance.currentMonth);
+
+        const monthWrapper = monthSelect.closest('.custom-select');
+
+        if (monthWrapper) {
+            syncCustomSelect(monthWrapper);
+        }
+    }
+
+    if (yearSelect) {
+        yearSelect.value = String(instance.currentYear);
+
+        const yearWrapper = yearSelect.closest('.custom-select');
+
+        if (yearWrapper) {
+            syncCustomSelect(yearWrapper);
+        }
+    }
 }
 
 function updateMonthOnlyInput(instance, options = {}) {
@@ -89,10 +255,15 @@ function updateMonthOnlyInput(instance, options = {}) {
 function buildFlatpickrHeader(instance) {
     if (!instance?.calendarContainer) return;
 
-    const currentMonth = instance.calendarContainer.querySelector('.flatpickr-current-month');
+    const currentMonth = instance.calendarContainer.querySelector(
+        '.flatpickr-current-month'
+    );
+
     if (!currentMonth) return;
 
-    const existing = currentMonth.querySelector('.custom-flatpickr-selects');
+    const existing = currentMonth.querySelector(
+        '.custom-flatpickr-selects'
+    );
 
     if (existing) {
         syncFlatpickrHeader(instance);
@@ -100,46 +271,79 @@ function buildFlatpickrHeader(instance) {
     }
 
     const monthSelect = document.createElement('select');
-    monthSelect.className = 'custom-flatpickr-select custom-flatpickr-month';
+
+    monthSelect.className = [
+        'js-custom-select',
+        'custom-flatpickr-select',
+        'custom-flatpickr-month'
+    ].join(' ');
+
+    monthSelect.setAttribute('aria-label', 'Select month');
 
     instance.l10n.months.longhand.forEach((month, index) => {
         const option = document.createElement('option');
-        option.value = index;
+
+        option.value = String(index);
         option.textContent = month;
+
         monthSelect.appendChild(option);
     });
 
     const yearSelect = document.createElement('select');
-    yearSelect.className = 'custom-flatpickr-select custom-flatpickr-year';
 
-    const currentYear = instance.currentYear;
+    yearSelect.className = [
+        'js-custom-select',
+        'custom-flatpickr-select',
+        'custom-flatpickr-year'
+    ].join(' ');
 
-    for (let year = currentYear - 80; year <= currentYear + 10; year++) {
+    yearSelect.setAttribute('aria-label', 'Select year');
+
+    const minimumYear =
+        instance.config.minDate instanceof Date
+            ? instance.config.minDate.getFullYear()
+            : instance.currentYear - 80;
+
+    const maximumYear =
+        instance.config.maxDate instanceof Date
+            ? instance.config.maxDate.getFullYear()
+            : instance.currentYear + 10;
+
+    for (let year = minimumYear; year <= maximumYear; year++) {
         const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
+
+        option.value = String(year);
+        option.textContent = String(year);
+
         yearSelect.appendChild(option);
     }
 
     const wrapper = document.createElement('div');
     wrapper.className = 'custom-flatpickr-selects';
-    wrapper.appendChild(monthSelect);
-    wrapper.appendChild(yearSelect);
 
-    currentMonth.innerHTML = '';
-    currentMonth.appendChild(wrapper);
+    wrapper.append(monthSelect, yearSelect);
+
+    currentMonth.replaceChildren(wrapper);
 
     monthSelect.addEventListener('change', () => {
-        instance.changeMonth(Number(monthSelect.value) - instance.currentMonth);
+        const selectedMonth = Number(monthSelect.value);
+
+        instance.changeMonth(
+            selectedMonth - instance.currentMonth
+        );
+
         syncFlatpickrHeader(instance);
         updateMonthOnlyInput(instance);
     });
 
     yearSelect.addEventListener('change', () => {
         instance.changeYear(Number(yearSelect.value));
+
         syncFlatpickrHeader(instance);
         updateMonthOnlyInput(instance);
     });
+
+    initCustomSelects(currentMonth);
 
     syncFlatpickrHeader(instance);
 }
@@ -184,7 +388,9 @@ function initGlobalFlatpickr() {
     dateInputs.forEach(el => {
         let options = { ...baseOptions };
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
 
         options.appendTo = parentPopup || document.body;
 
@@ -220,7 +426,9 @@ function initGlobalFlatpickr() {
     timeInputs.forEach(el => {
         if (el._flatpickr) return;
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
 
         const options = {
             enableTime: true,
@@ -261,7 +469,9 @@ function initMonthOnlyFlatpickr(root = document) {
     scope.querySelectorAll('[data-month-only-picker]').forEach(el => {
         if (el._flatpickr) return;
 
-        const parentPopup = el.closest('dialog, .ui-modal');
+        const parentPopup = el.closest(
+            'dialog, .ui-modal, .modal-overlay'
+        );
         const rawDefault = el.value || el.dataset.defaultMonth || '';
         const defaultDate = /^\d{4}-\d{2}$/.test(rawDefault)
             ? `${rawDefault}-01`
@@ -580,103 +790,307 @@ function initAiHelpPopover() {
 function initAccessibilitySheetGesture() {
     let startY = 0;
     let currentY = 0;
+    let tracking = false;
     let dragging = false;
 
-    document.addEventListener('touchstart', (e) => {
-        const menu = document.querySelector('.asw-menu');
-        if (!menu || !menu.contains(e.target)) return;
+    document.addEventListener('touchstart', event => {
+        const menu = event.target.closest('.asw-menu');
 
-        startY = e.touches[0].clientY;
+        if (!menu) return;
+
+        const interactiveElement = event.target.closest(
+            'button, a, input, select, textarea, label'
+        );
+
+        if (interactiveElement) {
+            tracking = false;
+            dragging = false;
+            return;
+        }
+
+        startY = event.touches[0].clientY;
         currentY = startY;
+        tracking = true;
+        dragging = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', event => {
+        if (!tracking) return;
+
+        const menu = document.querySelector('.asw-menu');
+
+        if (!menu) {
+            tracking = false;
+            dragging = false;
+            return;
+        }
+
+        currentY = event.touches[0].clientY;
+
+        const difference = Math.max(
+            0,
+            currentY - startY
+        );
+
+        if (difference < 6) return;
+
         dragging = true;
 
         menu.classList.add('asw-dragging');
-    }, { passive: true });
 
-    document.addEventListener('touchmove', (e) => {
-        if (!dragging) return;
-
-        const menu = document.querySelector('.asw-menu');
-        if (!menu) return;
-
-        currentY = e.touches[0].clientY;
-        const diff = Math.max(0, currentY - startY);
-
-        menu.style.transform = `translateX(-50%) translateY(${diff}px)`;
+        menu.style.transform =
+            `translateX(-50%) translateY(${difference}px)`;
     }, { passive: true });
 
     document.addEventListener('touchend', () => {
-        if (!dragging) return;
+        if (!tracking) return;
 
         const menu = document.querySelector('.asw-menu');
-        if (!menu) return;
 
-        const diff = currentY - startY;
+        tracking = false;
+
+        if (!menu || !dragging) {
+            dragging = false;
+            return;
+        }
+
+        const difference = Math.max(
+            0,
+            currentY - startY
+        );
 
         menu.classList.remove('asw-dragging');
 
-        if (diff > 90) {
-            const closeBtn = menu.querySelector('.asw-menu-close');
-            if (closeBtn) closeBtn.click();
+        if (difference > 90) {
+            menu.querySelector('.asw-menu-close')?.click();
+        } else {
+            menu.style.transform =
+                'translateX(-50%) translateY(0)';
         }
 
-        menu.style.transform = 'translateX(-50%) translateY(0)';
         dragging = false;
+    });
+
+    document.addEventListener('touchcancel', () => {
+        const menu = document.querySelector('.asw-menu');
+
+        tracking = false;
+        dragging = false;
+
+        if (!menu) return;
+
+        menu.classList.remove('asw-dragging');
+        menu.style.removeProperty('transform');
     });
 }
 
-document.addEventListener('DOMContentLoaded', initAccessibilitySheetGesture);
+document.addEventListener(
+    'DOMContentLoaded',
+    initAccessibilitySheetGesture
+);
+
+function initAccessibilityCloseIsolation() {
+    const bindCloseButtons = () => {
+        document
+            .querySelectorAll('.asw-menu-close')
+            .forEach(closeButton => {
+                if (
+                    closeButton.dataset.closeIsolationInitialized ===
+                    'true'
+                ) {
+                    return;
+                }
+
+                closeButton.dataset.closeIsolationInitialized =
+                    'true';
+
+                closeButton.addEventListener('click', event => {
+                    const assistiveGroup =
+                        document.getElementById(
+                            'assistiveFabGroup'
+                        );
+
+                    const assistiveMainFab =
+                        document.getElementById(
+                            'assistiveMainFab'
+                        );
+
+                    const shouldKeepWandOpen =
+                        assistiveGroup?.classList.contains(
+                            'open'
+                        );
+
+                    event.stopPropagation();
+
+                    if (!shouldKeepWandOpen) return;
+
+                    setTimeout(() => {
+                        assistiveGroup.classList.add('open');
+
+                        document.body.classList.add(
+                            'assistive-menu-open'
+                        );
+
+                        assistiveMainFab?.setAttribute(
+                            'aria-expanded',
+                            'true'
+                        );
+                    }, 0);
+                });
+            });
+    };
+
+    bindCloseButtons();
+
+    const observer = new MutationObserver(() => {
+        bindCloseButtons();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    initAccessibilityCloseIsolation
+);
+
 
 function fixSiennaPosition() {
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
     const isPatient = document.body.classList.contains('role-patient');
 
-    const nav = document.querySelector(
-        '.patient-mobile-nav, .mobile-bottom-nav, .bottom-nav, nav[class*="mobile"], #mobileBottomNav'
+    const navCandidates = Array.from(
+        document.querySelectorAll(
+            [
+                '.patient-mobile-nav',
+                '.mobile-bottom-nav',
+                '.bottom-nav',
+                '#mobileBottomNav',
+                '[data-mobile-bottom-nav]'
+            ].join(',')
+        )
     );
 
-    let navHeight = 0;
+    const visibleBottomNav = navCandidates
+        .map(nav => {
+            const rect = nav.getBoundingClientRect();
+            const style = window.getComputedStyle(nav);
 
-    if (isPatient && isMobile && nav) {
-        navHeight = Math.ceil(nav.getBoundingClientRect().height);
-    }
-
-    if (isPatient && isMobile && navHeight < 70) {
-        navHeight = 92;
-    }
+            return {
+                rect,
+                visible:
+                    style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    rect.width > 0 &&
+                    rect.height > 0 &&
+                    rect.bottom > window.innerHeight * 0.7
+            };
+        })
+        .filter(item => item.visible)
+        .sort((first, second) => second.rect.top - first.rect.top)[0];
 
     const right = isMobile ? 18 : 22;
     const fabSize = isMobile ? 48 : 46;
     const gap = 14;
 
-    const accessibilityBottom = isPatient && isMobile
-        ? navHeight + 16
+    let navClearance = 0;
+
+    if (isPatient && isMobile) {
+        navClearance = visibleBottomNav
+            ? Math.max(0, window.innerHeight - visibleBottomNav.rect.top)
+            : 92;
+    }
+
+    const assistiveGroupBottom = isPatient && isMobile
+        ? navClearance + 10
         : 24;
 
-    const chatbotBottom = accessibilityBottom;
-    const backTopBottom = accessibilityBottom + fabSize + gap;
+    const backTopBottom =
+        assistiveGroupBottom + fabSize + gap;
 
-    document.documentElement.style.setProperty('--float-right', `${right}px`);
-    document.documentElement.style.setProperty('--float-right-final', `${right}px`);
-    document.documentElement.style.setProperty('--patient-nav-height', `${navHeight}px`);
-    document.documentElement.style.setProperty('--fab-final-size', `${fabSize}px`);
-    document.documentElement.style.setProperty('--accessibility-bottom', `${accessibilityBottom}px`);
-    document.documentElement.style.setProperty('--accessibility-bottom-final', `${accessibilityBottom}px`);
-    document.documentElement.style.setProperty('--chatbot-bottom-final', `${chatbotBottom}px`);
-    document.documentElement.style.setProperty('--back-top-bottom', `${backTopBottom}px`);
-    document.documentElement.style.setProperty('--back-top-bottom-final', `${backTopBottom}px`);
+    const root = document.documentElement;
 
-    document.querySelectorAll('.asw-widget, .asw-menu-btn').forEach((el) => {
-        el.style.setProperty('--asw-off-x', `${right}px`);
-        el.style.setProperty('--asw-off-y', `${accessibilityBottom}px`);
-        el.style.setProperty('--asw-right', `${right}px`);
-        el.style.setProperty('--asw-bottom', `${accessibilityBottom}px`);
-        el.style.right = `${right}px`;
-        el.style.bottom = `${accessibilityBottom}px`;
-    });
+    root.style.setProperty('--float-right', `${right}px`, 'important');
+    root.style.setProperty('--float-right-final', `${right}px`, 'important');
+    root.style.setProperty('--patient-nav-height', `${navClearance}px`, 'important');
+    root.style.setProperty('--fab-final-size', `${fabSize}px`, 'important');
+    root.style.setProperty('--accessibility-bottom', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--accessibility-bottom-final', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--chatbot-bottom-final', `${assistiveGroupBottom}px`, 'important');
+    root.style.setProperty('--back-top-bottom', `${backTopBottom}px`, 'important');
+    root.style.setProperty('--back-top-bottom-final', `${backTopBottom}px`, 'important');
+
+    const assistiveGroup =
+        document.getElementById('assistiveFabGroup');
+
+    if (assistiveGroup) {
+        assistiveGroup.style.setProperty(
+            'right',
+            `${right}px`,
+            'important'
+        );
+
+        assistiveGroup.style.setProperty(
+            'bottom',
+            `${assistiveGroupBottom}px`,
+            'important'
+        );
+    }
+
+    document
+        .querySelectorAll('.asw-widget, .asw-menu-btn')
+        .forEach(element => {
+            element.style.setProperty(
+                '--asw-off-x',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-off-y',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-right',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                '--asw-bottom',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                'right',
+                `${right}px`,
+                'important'
+            );
+
+            element.style.setProperty(
+                'bottom',
+                `${assistiveGroupBottom}px`,
+                'important'
+            );
+        });
 }
 
-document.addEventListener('DOMContentLoaded', fixSiennaPosition);
+document.addEventListener('DOMContentLoaded', () => {
+    fixSiennaPosition();
+
+    requestAnimationFrame(() => {
+        fixSiennaPosition();
+    });
+
+    setTimeout(fixSiennaPosition, 250);
+});
+
 window.addEventListener('load', fixSiennaPosition);
 window.addEventListener('resize', fixSiennaPosition);
 window.addEventListener('orientationchange', fixSiennaPosition);
@@ -720,32 +1134,430 @@ function clearSearchInput(input, options = {}) {
     }
 }
 
-function initSearchClearButtons() {
-    document.querySelectorAll('[data-search-input]').forEach((input) => {
-        if (input.dataset.searchClearInitialized === 'true') return;
+function getInputClearButton(input) {
+    if (!input) return null;
 
-        const wrapper = input.closest('[data-search-wrapper]');
-        const clearButton = wrapper?.querySelector('[data-search-clear]');
+    if (input.matches('[data-search-input]')) {
+        return input
+            .closest('[data-search-wrapper]')
+            ?.querySelector(
+                '[data-search-clear]'
+            ) || null;
+    }
 
-        if (!wrapper || !clearButton) return;
-
-        input.dataset.searchClearInitialized = 'true';
-
-        const updateClearButton = () => {
-            clearButton.classList.toggle('show', input.value.trim() !== '');
-        };
-
-        clearButton.addEventListener('click', () => {
-            clearSearchInput(input);
-            updateClearButton();
-        });
-
-        input.addEventListener('input', updateClearButton);
-        input.addEventListener('change', updateClearButton);
-
-        updateClearButton();
-    });
+    return input
+        .closest('[data-clearable-field]')
+        ?.querySelector(
+            '[data-field-clear]'
+        ) || null;
 }
+
+function syncInputClearButton(input) {
+    const clearButton =
+        getInputClearButton(input);
+
+    if (!input || !clearButton) return;
+
+    clearButton.classList.toggle(
+        'show',
+        String(input.value || '')
+            .trim()
+            .length > 0
+    );
+}
+
+function bindInputClearButton(input) {
+    if (
+        !input ||
+        input.dataset.clearButtonInitialized ===
+        'true'
+    ) {
+        return;
+    }
+
+    const clearButton =
+        getInputClearButton(input);
+
+    if (!clearButton) return;
+
+    input.dataset.clearButtonInitialized =
+        'true';
+
+    const sync = () => {
+        syncInputClearButton(input);
+    };
+
+    input.addEventListener('input', sync);
+    input.addEventListener('change', sync);
+
+    clearButton.addEventListener(
+        'click',
+        event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            clearSearchInput(input);
+            sync();
+        }
+    );
+
+    sync();
+}
+
+function initSearchClearButtons(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll(
+            [
+                '[data-search-input]',
+                '[data-clearable-input]'
+            ].join(',')
+        )
+        .forEach(bindInputClearButton);
+}
+
+function initGlobalActionTooltips() {
+    const tooltip = document.getElementById('globalActionTooltip');
+
+    if (!tooltip || tooltip.dataset.initialized === 'true') {
+        return;
+    }
+
+    tooltip.dataset.initialized = 'true';
+
+    const toneClasses = [
+        'tooltip-view',
+        'tooltip-start',
+        'tooltip-reschedule',
+        'tooltip-cancel',
+        'tooltip-delete',
+        'tooltip-edit',
+        'tooltip-reset',
+        'tooltip-locked',
+        'tooltip-neutral'
+    ];
+
+    let activeTarget = null;
+
+    function hideTooltip() {
+        tooltip.classList.remove('show', ...toneClasses);
+        tooltip.setAttribute('aria-hidden', 'true');
+        tooltip.textContent = '';
+        activeTarget = null;
+    }
+
+    function positionTooltip(target) {
+        const targetRect = target.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+
+        const viewportPadding = 12;
+        const gap = 10;
+
+        let left =
+            targetRect.left +
+            targetRect.width / 2 -
+            tooltipRect.width / 2;
+
+        let top =
+            targetRect.top -
+            tooltipRect.height -
+            gap;
+
+        if (top < viewportPadding) {
+            top = targetRect.bottom + gap;
+        }
+
+        const maximumLeft =
+            window.innerWidth -
+            tooltipRect.width -
+            viewportPadding;
+
+        const maximumTop =
+            window.innerHeight -
+            tooltipRect.height -
+            viewportPadding;
+
+        left = Math.min(
+            Math.max(viewportPadding, left),
+            Math.max(viewportPadding, maximumLeft)
+        );
+
+        top = Math.min(
+            Math.max(viewportPadding, top),
+            Math.max(viewportPadding, maximumTop)
+        );
+
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+    }
+
+    function showTooltip(target) {
+        const message = target.dataset.tooltip?.trim();
+
+        if (!message) {
+            return;
+        }
+
+        activeTarget = target;
+
+        const tone =
+            target.dataset.tooltipTone ||
+            (target.classList.contains('ui-action-view')
+                ? 'view'
+                : target.classList.contains('ui-action-success')
+                    ? 'start'
+                    : target.classList.contains('ui-action-warning')
+                        ? 'reschedule'
+                        : target.classList.contains('ui-action-delete')
+                            ? 'delete'
+                            : target.classList.contains('ui-action-edit')
+                                ? 'edit'
+                                : target.classList.contains('ui-action-reset')
+                                    ? 'reset'
+                                    : 'neutral');
+
+        tooltip.classList.remove(...toneClasses);
+        tooltip.classList.add(`tooltip-${tone}`);
+
+        tooltip.textContent = message;
+        tooltip.setAttribute('aria-hidden', 'false');
+        tooltip.classList.add('show');
+
+        requestAnimationFrame(() => {
+            if (activeTarget === target) {
+                positionTooltip(target);
+            }
+        });
+    }
+
+    document.addEventListener('pointerover', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (!target) {
+            return;
+        }
+
+        showTooltip(target);
+    });
+
+    document.addEventListener('pointerout', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (!target) {
+            return;
+        }
+
+        if (target.contains(event.relatedTarget)) {
+            return;
+        }
+
+        hideTooltip();
+    });
+
+    document.addEventListener('focusin', event => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (target) {
+            showTooltip(target);
+        }
+    });
+
+    document.addEventListener('focusout', event => {
+        if (event.target.closest('[data-tooltip]')) {
+            hideTooltip();
+        }
+    });
+
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('resize', hideTooltip);
+}
+
+document.addEventListener('DOMContentLoaded', initGlobalActionTooltips);
+
+function renderGlobalChartTooltip(context) {
+    const {
+        chart,
+        tooltip
+    } = context;
+
+    const element =
+        document.getElementById(
+            'globalActionTooltip'
+        );
+
+    if (!element) return;
+
+    const toneClasses = [
+        'tooltip-view',
+        'tooltip-start',
+        'tooltip-reschedule',
+        'tooltip-cancel',
+        'tooltip-delete',
+        'tooltip-edit',
+        'tooltip-reset',
+        'tooltip-locked',
+        'tooltip-neutral'
+    ];
+
+    if (
+        !tooltip ||
+        tooltip.opacity === 0
+    ) {
+        element.classList.remove(
+            'show',
+            ...toneClasses
+        );
+
+        element.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        element.replaceChildren();
+        return;
+    }
+
+    element.replaceChildren();
+
+    const titleText =
+        tooltip.title
+            ?.filter(Boolean)
+            .join(' · ') || '';
+
+    if (titleText) {
+        const title =
+            document.createElement('strong');
+
+        title.textContent = titleText;
+        element.appendChild(title);
+    }
+
+    const lines =
+        tooltip.body
+            ?.flatMap(
+                item => item.lines || []
+            ) || [];
+
+    lines.forEach(line => {
+        const row =
+            document.createElement('span');
+
+        row.textContent = line;
+        element.appendChild(row);
+    });
+
+    element.classList.remove(
+        ...toneClasses
+    );
+
+    element.classList.add(
+        'show',
+        'tooltip-neutral'
+    );
+
+    element.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    const canvasRect =
+        chart.canvas.getBoundingClientRect();
+
+    const tooltipRect =
+        element.getBoundingClientRect();
+
+    const viewportPadding = 12;
+    const gap = 10;
+
+    let left =
+        canvasRect.left +
+        tooltip.caretX -
+        tooltipRect.width / 2;
+
+    let top =
+        canvasRect.top +
+        tooltip.caretY -
+        tooltipRect.height -
+        gap;
+
+    left = Math.min(
+        Math.max(viewportPadding, left),
+        window.innerWidth -
+        tooltipRect.width -
+        viewportPadding
+    );
+
+    if (top < viewportPadding) {
+        top =
+            canvasRect.top +
+            tooltip.caretY +
+            gap;
+    }
+
+    element.style.left = `${left}px`;
+    element.style.top = `${top}px`;
+}
+
+function getGlobalChartTooltipOptions(
+    callbacks = {}
+) {
+    return {
+        enabled: false,
+        external: renderGlobalChartTooltip,
+        callbacks
+    };
+}
+
+window.renderGlobalChartTooltip = renderGlobalChartTooltip;
+
+window.getGlobalChartTooltipOptions = getGlobalChartTooltipOptions;
+
+document.addEventListener(
+    'reset',
+    event => {
+        requestAnimationFrame(() => {
+            event.target
+                ?.querySelectorAll?.(
+                    [
+                        '[data-search-input]',
+                        '[data-clearable-input]'
+                    ].join(',')
+                )
+                .forEach(
+                    syncInputClearButton
+                );
+        });
+    }
+);
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initSearchClearButtons();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    function (event) {
+        const modal = event.detail?.modal || document;
+
+        initCharLimitFields(modal);
+        initSearchClearButtons(modal);
+        initGlobalVoiceInputs(modal);
+    }
+);
+
+window.syncInputClearButton =
+    syncInputClearButton;
 
 document.addEventListener('click', function (event) {
     const clearButton = event.target.closest('[data-clear-search]');
@@ -758,8 +1570,6 @@ document.addEventListener('click', function (event) {
 
     clearSearchInput(input);
 });
-
-document.addEventListener('DOMContentLoaded', initSearchClearButtons);
 
 window.clearSearchInput = clearSearchInput;
 window.initSearchClearButtons = initSearchClearButtons;
@@ -1148,34 +1958,115 @@ function initSidebarScrollMemory() {
 }
 
 function applyGlobalTheme(theme = 'light') {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    const nextTheme =
+        theme === 'dark'
+            ? 'dark'
+            : 'light';
 
-    document.documentElement.setAttribute('data-theme', nextTheme);
-    document.documentElement.style.backgroundColor = nextTheme === 'dark' ? '#000D1A' : '#F4F4F4';
+    const isDark =
+        nextTheme === 'dark';
 
-    localStorage.setItem('theme', nextTheme);
+    const root =
+        document.documentElement;
 
-    document.querySelectorAll('.theme-option[data-theme-choice]').forEach(option => {
-        option.classList.toggle('active', option.dataset.themeChoice === nextTheme);
-    });
+    root.setAttribute(
+        'data-theme',
+        nextTheme
+    );
 
-    document.querySelectorAll('.theme-indicator').forEach(indicator => {
-        indicator.classList.toggle('dark-mode', nextTheme === 'dark');
-    });
+    root.classList.toggle(
+        'dark',
+        isDark
+    );
 
-    document.querySelectorAll('#themeSwitchCheckbox').forEach(checkbox => {
-        checkbox.checked = nextTheme === 'dark';
-    });
+    root.style.colorScheme =
+        isDark
+            ? 'dark'
+            : 'light';
 
-    document.querySelectorAll('#themeIcon').forEach(icon => {
-        icon.className = nextTheme === 'dark'
-            ? 'fa-regular fa-moon text-gray-400 text-base'
-            : 'fa-regular fa-sun text-gray-400 text-base';
-    });
+    root.style.backgroundColor =
+        isDark
+            ? '#101111'
+            : '#F4F4F4';
 
-    window.dispatchEvent(new CustomEvent('global-theme-change', {
-        detail: { theme: nextTheme }
-    }));
+    localStorage.setItem(
+        'theme',
+        nextTheme
+    );
+
+    document
+        .querySelectorAll(
+            '.theme-option[data-theme-choice]'
+        )
+        .forEach(option => {
+            option.classList.toggle(
+                'active',
+                option.dataset.themeChoice ===
+                nextTheme
+            );
+
+            option.setAttribute(
+                'aria-pressed',
+                option.dataset.themeChoice ===
+                    nextTheme
+                    ? 'true'
+                    : 'false'
+            );
+        });
+
+    document
+        .querySelectorAll(
+            '.theme-indicator'
+        )
+        .forEach(indicator => {
+            indicator.classList.toggle(
+                'dark-mode',
+                isDark
+            );
+        });
+
+    document
+        .querySelectorAll(
+            '#themeSwitchCheckbox'
+        )
+        .forEach(checkbox => {
+            checkbox.checked =
+                isDark;
+        });
+
+    document
+        .querySelectorAll(
+            '#themeIcon'
+        )
+        .forEach(icon => {
+            icon.className =
+                isDark
+                    ? 'fa-solid fa-moon text-gray-400 text-base'
+                    : 'fa-regular fa-sun text-gray-400 text-base';
+        });
+
+    document
+        .querySelectorAll(
+            '[data-sidebar-theme-icon]'
+        )
+        .forEach(icon => {
+            icon.className =
+                isDark
+                    ? 'fa-regular fa-moon'
+                    : 'fa-solid fa-sun';
+        });
+
+    window.dispatchEvent(
+        new CustomEvent(
+            'global-theme-change',
+            {
+                detail: {
+                    theme: nextTheme,
+                    isDark
+                }
+            }
+        )
+    );
 }
 
 function initGlobalThemeControls(root = document) {
@@ -1426,42 +2317,71 @@ function initGlobalSidebar() {
             'sidebar-preload',
             'sidebar-collapsed-init'
         );
+
         return;
     }
 
     const storageKey = getSidebarStorageKey();
-    const storedValue = localStorage.getItem(storageKey);
-    const savedState = storedValue === '1';
-
-    document.documentElement.classList.remove('sidebar-collapsed-init');
+    const savedState =
+        localStorage.getItem(storageKey) === '1';
 
     applySidebarState(savedState);
 
     document.querySelectorAll(
         '#sidebarToggleBtn, #desktopSidebarToggle, [data-sidebar-toggle]'
     ).forEach(button => {
-        if (button.dataset.sidebarInitialized === 'true') return;
+        if (
+            button.dataset.sidebarInitialized ===
+            'true'
+        ) {
+            return;
+        }
 
         button.dataset.sidebarInitialized = 'true';
 
         if (!button.getAttribute('onclick')) {
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-                toggleSidebar();
-            });
+            button.addEventListener(
+                'click',
+                event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    toggleSidebar();
+                }
+            );
         }
     });
 
     requestAnimationFrame(() => {
-        document.documentElement.classList.remove(
-            'sidebar-preload',
-            'sidebar-collapsed-init'
-        );
-
         applySidebarState(savedState);
+
+        requestAnimationFrame(() => {
+            document.documentElement.classList.remove(
+                'sidebar-preload',
+                'sidebar-collapsed-init'
+            );
+        });
     });
 }
+
+window.addEventListener('pageshow', () => {
+    const sidebar =
+        document.getElementById('sidebar');
+
+    if (!sidebar) return;
+
+    const savedState =
+        localStorage.getItem(
+            getSidebarStorageKey()
+        ) === '1';
+
+    applySidebarState(savedState);
+
+    document.documentElement.classList.remove(
+        'sidebar-preload',
+        'sidebar-collapsed-init'
+    );
+});
 
 function initAdminSidebarGroupClick() {
     const sidebar = document.querySelector('#sidebar.sidebar-admin');
@@ -1692,7 +2612,6 @@ function initSessionStorageToasts() {
                 duration: toast.duration || 4000,
             });
         } catch (_) {
-            // Ignore invalid toast payloads
         }
 
         sessionStorage.removeItem(key);
@@ -1770,6 +2689,277 @@ function initFlashToasts() {
     });
 }
 
+function initSessionTimeoutModal() {
+    const modal = document.querySelector(
+        '[data-session-timeout-modal]'
+    );
+
+    if (
+        !modal?.id ||
+        modal.dataset.sessionTimeoutInitialized ===
+        'true'
+    ) {
+        return;
+    }
+
+    modal.dataset.sessionTimeoutInitialized =
+        'true';
+
+    const primaryButton = modal.querySelector(
+        '[data-session-timeout-primary]'
+    );
+
+    const timeoutSeconds = Math.max(
+        60,
+        Number(
+            modal.dataset.sessionTimeoutSeconds
+        ) || 600
+    );
+
+    const timeoutMilliseconds =
+        timeoutSeconds * 1000;
+
+    const activityUrl =
+        modal.dataset.sessionActivityUrl;
+
+    const expireUrl =
+        modal.dataset.sessionExpireUrl;
+
+    const redirectUrl =
+        modal.dataset.sessionRedirectUrl ||
+        '/';
+
+    const activitySyncInterval = 60000;
+
+    let idleTimer = null;
+    let sessionExpired = false;
+    let redirectStarted = false;
+    let activityRequestRunning = false;
+
+    let lastActivityAt = Date.now();
+    let lastHandledActivityAt = 0;
+    let lastServerSyncAt = 0;
+
+    const requestHeaders = () => ({
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': getCsrfToken(),
+    });
+
+    const showSessionTimeoutModal = () => {
+        if (sessionExpired) return;
+
+        sessionExpired = true;
+        window.__SESSION_EXPIRED__ = true;
+
+        window.clearTimeout(idleTimer);
+
+        document.documentElement.classList.add(
+            'session-expired'
+        );
+
+        document.body.classList.add(
+            'session-expired'
+        );
+
+        openModal(modal.id);
+
+        requestAnimationFrame(() => {
+            primaryButton?.focus({
+                preventScroll: true,
+            });
+        });
+
+        document.dispatchEvent(
+            new CustomEvent(
+                'session:expired'
+            )
+        );
+    };
+
+    const scheduleIdleTimeout = () => {
+        if (sessionExpired) return;
+
+        window.clearTimeout(idleTimer);
+
+        const elapsed =
+            Date.now() - lastActivityAt;
+
+        const remaining =
+            timeoutMilliseconds - elapsed;
+
+        if (remaining <= 0) {
+            showSessionTimeoutModal();
+            return;
+        }
+
+        idleTimer = window.setTimeout(
+            showSessionTimeoutModal,
+            remaining
+        );
+    };
+
+    const syncActivityWithServer = async () => {
+        if (
+            sessionExpired ||
+            activityRequestRunning ||
+            !activityUrl
+        ) {
+            return;
+        }
+
+        activityRequestRunning = true;
+        lastServerSyncAt = Date.now();
+
+        try {
+            const response = await fetch(
+                activityUrl,
+                {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: requestHeaders(),
+                    cache: 'no-store',
+                }
+            );
+
+            if (
+                response.status === 401 ||
+                response.status === 419
+            ) {
+                showSessionTimeoutModal();
+            }
+        } catch (_) {
+            /*
+             * Huwag mag-redirect dahil lamang sa
+             * temporary network error.
+             */
+        } finally {
+            activityRequestRunning = false;
+        }
+    };
+
+    const registerUserActivity = () => {
+        if (sessionExpired) return;
+
+        const now = Date.now();
+
+        if (
+            now - lastHandledActivityAt <
+            800
+        ) {
+            return;
+        }
+
+        lastHandledActivityAt = now;
+        lastActivityAt = now;
+
+        scheduleIdleTimeout();
+
+        if (
+            now - lastServerSyncAt >=
+            activitySyncInterval
+        ) {
+            syncActivityWithServer();
+        }
+    };
+
+    [
+        'pointerdown',
+        'pointermove',
+        'keydown',
+        'scroll',
+        'touchstart',
+    ].forEach(eventName => {
+        document.addEventListener(
+            eventName,
+            registerUserActivity,
+            {
+                capture: true,
+                passive: true,
+            }
+        );
+    });
+
+    window.addEventListener(
+        'focus',
+        registerUserActivity
+    );
+
+    document.addEventListener(
+        'visibilitychange',
+        () => {
+            if (
+                document.visibilityState !==
+                'visible' ||
+                sessionExpired
+            ) {
+                return;
+            }
+
+            const idleDuration =
+                Date.now() - lastActivityAt;
+
+            if (
+                idleDuration >=
+                timeoutMilliseconds
+            ) {
+                showSessionTimeoutModal();
+                return;
+            }
+
+            registerUserActivity();
+        }
+    );
+
+    document.addEventListener(
+        'submit',
+        event => {
+            if (!sessionExpired) return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        },
+        true
+    );
+
+    primaryButton?.addEventListener(
+        'click',
+        async () => {
+            if (redirectStarted) return;
+
+            redirectStarted = true;
+            primaryButton.disabled = true;
+
+            primaryButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Opening Sign In...</span>
+            `;
+
+            try {
+                if (expireUrl) {
+                    await fetch(
+                        expireUrl,
+                        {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: requestHeaders(),
+                            cache: 'no-store',
+                        }
+                    );
+                }
+            } catch (_) {
+            } finally {
+                window.location.assign(
+                    redirectUrl
+                );
+            }
+        }
+    );
+
+    syncActivityWithServer();
+    scheduleIdleTimeout();
+}
+
 function acceptTerms() {
     const modal = document.getElementById('termsModal');
 
@@ -1808,16 +2998,20 @@ function initTermsModal() {
 document.addEventListener('DOMContentLoaded', () => {
     initFlashToasts();
     initTermsModal();
+    initSessionTimeoutModal();
 });
 
 window.acceptTerms = acceptTerms;
 window.initTermsModal = initTermsModal;
 window.initFlashToasts = initFlashToasts;
+window.initSessionTimeoutModal = initSessionTimeoutModal;
 
 const modalTimers = {};
 
 function openModal(id) {
-    const modal = document.getElementById(id);
+    const modal =
+        document.getElementById(id);
+
     if (!modal) return;
 
     if (modalTimers[id]) {
@@ -1827,26 +3021,76 @@ function openModal(id) {
 
     modal.classList.remove('closing');
     modal.classList.add('open');
-    document.body.classList.add('modal-lock');
+    modal.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    document.body.classList.add(
+        'modal-lock'
+    );
+
+    document.dispatchEvent(
+        new CustomEvent(
+            'ui-modal:opened',
+            {
+                detail: {
+                    modal
+                }
+            }
+        )
+    );
 }
 
 function closeModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal || (!modal.classList.contains('open') && !modal.classList.contains('closing'))) return;
+    const modal =
+        document.getElementById(id);
+
+    if (
+        !modal ||
+        (
+            !modal.classList.contains('open') &&
+            !modal.classList.contains('closing')
+        )
+    ) {
+        return;
+    }
 
     modal.classList.remove('open');
     modal.classList.add('closing');
+    modal.setAttribute(
+        'aria-hidden',
+        'true'
+    );
 
-    if (modalTimers[id]) clearTimeout(modalTimers[id]);
+    if (modalTimers[id]) {
+        clearTimeout(modalTimers[id]);
+    }
 
-    modalTimers[id] = setTimeout(() => {
-        modal.classList.remove('closing');
-        modalTimers[id] = null;
+    modalTimers[id] =
+        setTimeout(() => {
+            modal.classList.remove(
+                'closing'
+            );
 
-        if (!document.querySelector('.ui-modal.open, .ui-modal.closing')) {
-            document.body.classList.remove('modal-lock');
-        }
-    }, 180);
+            modalTimers[id] = null;
+
+            const activeModal =
+                document.querySelector(
+                    [
+                        '.ui-modal.open',
+                        '.ui-modal.closing',
+                        '.modal-overlay.open',
+                        '.modal-overlay.closing'
+                    ].join(',')
+                );
+
+            if (!activeModal) {
+                document.body.classList.remove(
+                    'modal-lock'
+                );
+            }
+        }, 180);
 }
 
 function closeModalOnBackdrop(event, id) {
@@ -1856,62 +3100,754 @@ function closeModalOnBackdrop(event, id) {
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
 
-    const openModalEl = document.querySelector('.ui-modal.open');
-    if (openModalEl && openModalEl.id) {
-        closeModal(openModalEl.id);
+    const openModalEl =
+        document.querySelector(
+            [
+                '.ui-modal.open',
+                '.modal-overlay.open'
+            ].join(',')
+        );
+
+    if (!openModalEl?.id) return;
+
+    if (
+        openModalEl.hasAttribute(
+            'data-modal-static'
+        )
+    ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
     }
+
+    const hasDiscardForm =
+        Boolean(
+            openModalEl.querySelector(
+                'form[data-discard-form]'
+            )
+        );
+
+    if (
+        hasDiscardForm &&
+        window.DiscardChanges
+    ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        window.DiscardChanges.confirmClose(
+            openModalEl,
+            function () {
+                closeModal(openModalEl.id);
+            }
+        );
+
+        return;
+    }
+
+    closeModal(openModalEl.id);
 });
 
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.closeModalOnBackdrop = closeModalOnBackdrop;
 
+const globalPreviewZoomStates = new WeakMap();
+
+function resolveGlobalPreviewZoomRoot(source = document) {
+    let element = source;
+
+    if (typeof source === 'string') {
+        element = document.querySelector(source);
+    }
+
+    if (!element) return null;
+
+    if (
+        element.matches?.(
+            '[data-global-preview-zoom]'
+        )
+    ) {
+        return element;
+    }
+
+    return element.querySelector?.(
+        '[data-global-preview-zoom]'
+    ) || null;
+}
+
+function getGlobalPreviewZoomNumber(
+    root,
+    key,
+    fallback
+) {
+    const value = Number(root.dataset[key]);
+
+    return Number.isFinite(value)
+        ? value
+        : fallback;
+}
+
+function applyGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (
+        !previewRoot ||
+        !state ||
+        !state.baseWidth ||
+        !state.baseHeight
+    ) {
+        return;
+    }
+
+    const scaledWidth = Math.ceil(
+        state.baseWidth * state.scale
+    );
+
+    const scaledHeight = Math.ceil(
+        state.baseHeight * state.scale
+    );
+
+    state.content.style.transformOrigin =
+        'top left';
+
+    state.content.style.transform =
+        `scale(${state.scale})`;
+
+    state.canvas.style.width =
+        `${scaledWidth}px`;
+
+    state.canvas.style.height =
+        `${scaledHeight}px`;
+
+    if (state.value) {
+        state.value.textContent =
+            `${Math.round(
+                state.scale * 100
+            )}%`;
+    }
+
+    if (state.zoomOut) {
+        state.zoomOut.disabled =
+            state.scale <= state.min;
+    }
+
+    if (state.zoomIn) {
+        state.zoomIn.disabled =
+            state.scale >= state.max;
+    }
+
+    previewRoot.dataset.previewScale =
+        String(state.scale);
+}
+
+function measureGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    const {
+        stage,
+        canvas,
+        content
+    } = state;
+
+    const isIframe =
+        content.tagName.toLowerCase() ===
+        'iframe';
+
+    content.style.transform = 'none';
+    content.style.transformOrigin =
+        'top left';
+
+    canvas.style.width = '';
+    canvas.style.height = '';
+
+    let baseWidth = 0;
+    let baseHeight = 0;
+
+    if (isIframe) {
+        content.style.position = 'absolute';
+        content.style.top = '0';
+        content.style.left = '0';
+
+        const frameDocument =
+            content.contentDocument ||
+            content.contentWindow?.document;
+
+        if (!frameDocument) return;
+
+        const html =
+            frameDocument.documentElement;
+
+        const body =
+            frameDocument.body;
+
+        if (!html || !body) return;
+
+        html.style.overflow = 'hidden';
+        body.style.overflow = 'hidden';
+
+        const availableWidth = Math.max(
+            320,
+            stage.clientWidth - 32
+        );
+
+        const contentWidth = Math.max(
+            html.scrollWidth || 0,
+            body.scrollWidth || 0,
+            320
+        );
+
+        baseWidth = Math.min(
+            availableWidth,
+            contentWidth
+        );
+
+        content.style.width =
+            `${baseWidth}px`;
+
+        baseHeight = Math.max(
+            680,
+            html.scrollHeight || 0,
+            body.scrollHeight || 0
+        );
+
+        content.style.height =
+            `${baseHeight}px`;
+    } else {
+        content.style.position = 'relative';
+        content.style.top = '';
+        content.style.left = '';
+        content.style.removeProperty('width');
+        content.style.removeProperty('height');
+
+        const rect =
+            content.getBoundingClientRect();
+
+        baseWidth = Math.max(
+            Math.ceil(rect.width || 0),
+            1
+        );
+
+        baseHeight = Math.max(
+            Math.ceil(rect.height || 0),
+            content.scrollHeight || 0,
+            1
+        );
+
+        content.style.width =
+            `${baseWidth}px`;
+
+        content.style.height =
+            `${baseHeight}px`;
+
+        content.style.position = 'absolute';
+        content.style.top = '0';
+        content.style.left = '0';
+    }
+
+    state.baseWidth =
+        Math.ceil(baseWidth);
+
+    state.baseHeight =
+        Math.ceil(baseHeight);
+
+    applyGlobalPreviewZoom(
+        previewRoot
+    );
+}
+
+function setGlobalPreviewZoom(
+    root,
+    scale
+) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    const nextScale = Math.min(
+        state.max,
+        Math.max(
+            state.min,
+            Number(scale) || 1
+        )
+    );
+
+    state.scale =
+        Math.round(nextScale * 100) / 100;
+
+    applyGlobalPreviewZoom(previewRoot);
+}
+
+function resetGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    const state =
+        globalPreviewZoomStates.get(
+            previewRoot
+        );
+
+    if (!previewRoot || !state) return;
+
+    state.scale = 1;
+
+    applyGlobalPreviewZoom(previewRoot);
+
+    state.stage.scrollTop = 0;
+    state.stage.scrollLeft = 0;
+}
+
+function refreshGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    if (!previewRoot) return;
+
+    if (
+        !globalPreviewZoomStates.has(
+            previewRoot
+        )
+    ) {
+        initGlobalPreviewZoom(previewRoot);
+    }
+
+    requestAnimationFrame(() => {
+        measureGlobalPreviewZoom(
+            previewRoot
+        );
+    });
+}
+
+function getGlobalPreviewZoom(root) {
+    const previewRoot =
+        resolveGlobalPreviewZoomRoot(root);
+
+    return (
+        globalPreviewZoomStates.get(
+            previewRoot
+        )?.scale || 1
+    );
+}
+
+function initGlobalPreviewZoom(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const previews = [];
+
+    if (
+        scope.matches?.(
+            '[data-global-preview-zoom]'
+        )
+    ) {
+        previews.push(scope);
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-global-preview-zoom]'
+        )
+        .forEach(preview => {
+            previews.push(preview);
+        });
+
+    previews.forEach(preview => {
+        if (
+            globalPreviewZoomStates.has(
+                preview
+            )
+        ) {
+            return;
+        }
+
+        const stage =
+            preview.querySelector(
+                '[data-preview-stage]'
+            );
+
+        const canvas =
+            preview.querySelector(
+                '[data-preview-canvas]'
+            );
+
+        const content =
+            preview.querySelector(
+                '[data-preview-content]'
+            );
+
+        if (
+            !stage ||
+            !canvas ||
+            !content
+        ) {
+            return;
+        }
+
+        const state = {
+            stage,
+            canvas,
+            content,
+
+            zoomOut:
+                preview.querySelector(
+                    '[data-preview-zoom-out]'
+                ),
+
+            zoomIn:
+                preview.querySelector(
+                    '[data-preview-zoom-in]'
+                ),
+
+            zoomReset:
+                preview.querySelector(
+                    '[data-preview-zoom-reset]'
+                ),
+
+            value:
+                preview.querySelector(
+                    '[data-preview-zoom-value]'
+                ),
+
+            min:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewMin',
+                    0.5
+                ),
+
+            max:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewMax',
+                    2
+                ),
+
+            step:
+                getGlobalPreviewZoomNumber(
+                    preview,
+                    'previewStep',
+                    0.1
+                ),
+
+            scale: 1,
+            baseWidth: 0,
+            baseHeight: 0
+        };
+
+        globalPreviewZoomStates.set(
+            preview,
+            state
+        );
+
+        content.style.transition =
+            'transform 180ms ease';
+
+        state.zoomOut?.addEventListener(
+            'click',
+            () => {
+                setGlobalPreviewZoom(
+                    preview,
+                    state.scale -
+                    state.step
+                );
+            }
+        );
+
+        state.zoomIn?.addEventListener(
+            'click',
+            () => {
+                setGlobalPreviewZoom(
+                    preview,
+                    state.scale +
+                    state.step
+                );
+            }
+        );
+
+        state.zoomReset?.addEventListener(
+            'click',
+            () => {
+                resetGlobalPreviewZoom(
+                    preview
+                );
+            }
+        );
+
+        if (
+            content.tagName.toLowerCase() ===
+            'iframe'
+        ) {
+            content.addEventListener(
+                'load',
+                () => {
+                    refreshGlobalPreviewZoom(
+                        preview
+                    );
+                }
+            );
+        }
+
+        requestAnimationFrame(() => {
+            measureGlobalPreviewZoom(
+                preview
+            );
+        });
+    });
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalPreviewZoom();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        const modal =
+            event.detail?.modal ||
+            document;
+
+        initGlobalPreviewZoom(modal);
+
+        requestAnimationFrame(() => {
+            refreshGlobalPreviewZoom(
+                modal
+            );
+        });
+    }
+);
+
+document.addEventListener(
+    'keydown',
+    event => {
+        if (
+            !event.ctrlKey &&
+            !event.metaKey
+        ) {
+            return;
+        }
+
+        const openModal =
+            document.querySelector(
+                '.ui-modal.open'
+            );
+
+        const previewRoot =
+            openModal?.querySelector(
+                '[data-global-preview-zoom]'
+            );
+
+        if (!previewRoot) return;
+
+        const state =
+            globalPreviewZoomStates.get(
+                previewRoot
+            );
+
+        if (!state) return;
+
+        if (
+            event.key === '+' ||
+            event.key === '='
+        ) {
+            event.preventDefault();
+
+            setGlobalPreviewZoom(
+                previewRoot,
+                state.scale + state.step
+            );
+        }
+
+        if (event.key === '-') {
+            event.preventDefault();
+
+            setGlobalPreviewZoom(
+                previewRoot,
+                state.scale - state.step
+            );
+        }
+
+        if (event.key === '0') {
+            event.preventDefault();
+
+            resetGlobalPreviewZoom(
+                previewRoot
+            );
+        }
+    }
+);
+
+let globalPreviewResizeFrame = null;
+
+window.addEventListener(
+    'resize',
+    () => {
+        window.cancelAnimationFrame(
+            globalPreviewResizeFrame
+        );
+
+        globalPreviewResizeFrame =
+            window.requestAnimationFrame(
+                () => {
+                    document
+                        .querySelectorAll(
+                            [
+                                '.ui-modal.open ',
+                                '[data-global-preview-zoom]'
+                            ].join('')
+                        )
+                        .forEach(preview => {
+                            refreshGlobalPreviewZoom(
+                                preview
+                            );
+                        });
+                }
+            );
+    }
+);
+
+window.initGlobalPreviewZoom =
+    initGlobalPreviewZoom;
+
+window.refreshGlobalPreviewZoom =
+    refreshGlobalPreviewZoom;
+
+window.setGlobalPreviewZoom =
+    setGlobalPreviewZoom;
+
+window.resetGlobalPreviewZoom =
+    resetGlobalPreviewZoom;
+
+window.getGlobalPreviewZoom =
+    getGlobalPreviewZoom;
+
 window.openInventoryModal = openModal;
 window.closeInventoryModal = closeModal;
 window.closeOnBackdrop = closeModalOnBackdrop;
 
-function openFilterDrawer(panelId = 'filterPanel', overlayId = 'filterOverlay') {
+function openDeleteConfirmModal({
+    modalId,
+    formId,
+    nameId,
+    action,
+    itemName,
+    recordId = null,
+} = {}) {
+    const modal =
+        document.getElementById(modalId);
+
+    const form =
+        document.getElementById(formId);
+
+    const name =
+        document.getElementById(nameId);
+
+    if (!modal || !form || !name) {
+        console.error(
+            'Global delete modal elements not found.',
+            {
+                modalId,
+                formId,
+                nameId,
+            }
+        );
+
+        return null;
+    }
+
+    form.action =
+        String(action || '');
+
+    name.textContent =
+        String(itemName || '');
+
+    if (recordId !== null) {
+        form.dataset.recordId =
+            String(recordId);
+    }
+
+    openModal(modalId);
+
+    return form;
+}
+
+window.openDeleteConfirmModal = openDeleteConfirmModal;
+
+function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
-    const overlay = document.getElementById(overlayId);
+
+    if (!panel) return;
+
+    const overlay = overlayId
+        ? document.getElementById(overlayId)
+        : panel.querySelector('.filter-drawer-overlay');
 
     document.documentElement.classList.add('filter-lock');
     document.body.classList.add('filter-lock');
 
-    if (panel) {
-        panel.classList.remove('closing');
-        panel.classList.add('open');
-        panel.setAttribute('aria-hidden', 'false');
-    }
+    panel.classList.remove('closing');
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
 
     overlay?.classList.add('open');
 }
 
-function closeFilterDrawer(panelId = 'filterPanel', overlayId = 'filterOverlay') {
+function closeFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
-    const overlay = document.getElementById(overlayId);
+
+    if (!panel) return;
+
+    const overlay = overlayId
+        ? document.getElementById(overlayId)
+        : panel.querySelector('.filter-drawer-overlay');
 
     overlay?.classList.remove('open');
 
-    if (panel) {
-        panel.classList.remove('open');
-        panel.classList.add('closing');
-        panel.setAttribute('aria-hidden', 'true');
+    panel.classList.remove('open');
+    panel.classList.add('closing');
+    panel.setAttribute('aria-hidden', 'true');
 
-        window.clearTimeout(panel.__filterCloseTimer);
-        panel.__filterCloseTimer = window.setTimeout(() => {
-            panel.classList.remove('closing');
+    window.clearTimeout(panel.__filterCloseTimer);
 
-            if (!document.querySelector('.filter-drawer-wrapper.open, .filter-drawer-wrapper.closing')) {
-                document.documentElement.classList.remove('filter-lock');
-                document.body.classList.remove('filter-lock');
-            }
-        }, 300);
+    panel.__filterCloseTimer = window.setTimeout(() => {
+        panel.classList.remove('closing');
 
-        return;
-    }
+        const anotherDrawerIsActive = document.querySelector(
+            '.filter-drawer-wrapper.open, .filter-drawer-wrapper.closing'
+        );
 
-    document.documentElement.classList.remove('filter-lock');
-    document.body.classList.remove('filter-lock');
+        if (!anotherDrawerIsActive) {
+            document.documentElement.classList.remove('filter-lock');
+            document.body.classList.remove('filter-lock');
+        }
+    }, 300);
 }
 
 window.openFilterDrawer = openFilterDrawer;
@@ -2019,79 +3955,558 @@ function isContactInput(field) {
     return /(^|[\s._-])(phone|mobile|contact[-_]?number|contact[-_]?no|emergency[-_]?number|emergency[-_]?contact[-_]?no)($|[\s._-])/.test(key);
 }
 
+function getGlobalFieldLabel(field) {
+    if (!field) return 'This field';
+
+    const explicitLabel = field.id
+        ? document.querySelector(`label[for="${CSS.escape(field.id)}"]`)
+        : null;
+
+    const friendlyNames = {
+        name: 'Full Name',
+        email: 'Email Address',
+        password: 'Password',
+        password_confirmation: 'Confirm Password',
+        role_id: 'Role',
+        status: 'Status',
+    };
+
+    const fallbackName =
+        friendlyNames[field.name] ||
+        field.name ||
+        'This field';
+
+    const labelText =
+        explicitLabel?.textContent ||
+        field.closest('[data-global-field]')
+            ?.querySelector('label')
+            ?.textContent ||
+        field.closest(
+            '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
+        )?.querySelector('label')?.textContent ||
+        field.closest(
+            '.field-group, .form-group, .st-form-group'
+        )?.querySelector('label')?.textContent ||
+        field.dataset.fieldLabel ||
+        fallbackName;
+
+    return String(labelText)
+        .replace(/\*/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function getFormInputValidationMessage(field) {
-    if (!field || field.disabled || field.readOnly) return '';
+    if (!field || field.disabled) return '';
+
+    if (
+        field.readOnly &&
+        !field.required &&
+        !field.hasAttribute('data-validation-rule')
+    ) {
+        return '';
+    }
 
     const type = String(field.type || '').toLowerCase();
-    const ignoredTypes = ['hidden', 'password', 'file', 'submit', 'button', 'reset', 'checkbox', 'radio'];
-
-    if (ignoredTypes.includes(type)) return '';
-
     const value = String(field.value || '').trim();
+    const label = getGlobalFieldLabel(field);
+
+    if (type === 'radio') {
+        if (!field.required) return '';
+
+        const form = field.form || document;
+        const radioGroup = form.querySelectorAll(
+            `input[type="radio"][name="${CSS.escape(field.name)}"]`
+        );
+
+        const hasChecked = Array.from(radioGroup)
+            .some(radio => radio.checked);
+
+        return hasChecked
+            ? ''
+            : `Please select a ${label.toLowerCase()}.`;
+    }
+
+    if (type === 'checkbox') {
+        return field.required && !field.checked
+            ? `Please check ${label.toLowerCase()}.`
+            : '';
+    }
+
+    if (field.required && !value) {
+        if (field.dataset.requiredMessage) {
+            return field.dataset.requiredMessage;
+        }
+
+        if (field instanceof HTMLSelectElement) {
+            return `Please select a ${label.toLowerCase()}.`;
+        }
+
+        if (type === 'email') {
+            return 'Please enter an email address.';
+        }
+
+        if (type === 'password') {
+            if (field.name === 'password_confirmation') {
+                return 'Please confirm the password.';
+            }
+
+            return 'Please enter a password.';
+        }
+
+        return `Please enter ${label.toLowerCase()}.`;
+    }
 
     if (!value) return '';
 
-    if (isContactInput(field) && !/^\d{11}$/.test(value)) {
-        return 'Contact number must be exactly 11 digits.';
+    if (type === 'email' && !field.validity.valid) {
+        return 'Please enter a valid email address.';
+    }
+
+    if (
+        field.hasAttribute('minlength') &&
+        value.length < Number(field.getAttribute('minlength'))
+    ) {
+        return `${label} must contain at least ${field.getAttribute('minlength')} characters.`;
+    }
+    if (
+        field.name === 'password_confirmation' &&
+        field.form
+    ) {
+        const passwordField =
+            field.form.querySelector('[name="password"]');
+
+        if (
+            passwordField &&
+            value !== String(passwordField.value || '')
+        ) {
+            return 'Passwords do not match.';
+        }
+    }
+    if (
+        field.hasAttribute('maxlength') &&
+        value.length > Number(field.getAttribute('maxlength'))
+    ) {
+        return `${label} must not exceed ${field.getAttribute('maxlength')} characters.`;
+    }
+
+    if (field.validity.patternMismatch) {
+        return field.dataset.patternMessage ||
+            `Please enter a valid ${label.toLowerCase()}.`;
+    }
+
+    if (isContactInput(field)) {
+        const digits = value.replace(/\D/g, '');
+
+        if (digits && !digits.startsWith('09')) {
+            return 'Contact number must start with 09.';
+        }
+
+        if (digits && digits.length !== 11) {
+            return 'Contact number must contain exactly 11 digits.';
+        }
     }
 
     if (isUnsafeFormText(value)) {
         return 'Please enter readable text only. Scripts and SQL-like input are not allowed.';
     }
+    const customRuleMessage = runGlobalValidationRule(field);
 
+    if (customRuleMessage) {
+        return customRuleMessage;
+    }
     return '';
 }
 
-function showFormInputValidationMessage(field, message) {
-    field.setCustomValidity(message);
-    field.classList.toggle('is-invalid', Boolean(message));
+const globalValidationRules = new Map();
 
-    const errorId = field.dataset.errorTarget || field.dataset.charError || `err-${field.id || field.name}`;
-    const error = errorId ? document.getElementById(String(errorId).replace('#', '')) : null;
+function registerGlobalValidationRule(name, validator) {
+    if (!name || typeof validator !== 'function') return;
+
+    globalValidationRules.set(name, validator);
+}
+
+function runGlobalValidationRule(field) {
+    const ruleName = field?.dataset?.validationRule;
+
+    if (!ruleName) return '';
+
+    const validator = globalValidationRules.get(ruleName);
+
+    if (typeof validator !== 'function') return '';
+
+    return validator(field) || '';
+}
+
+window.registerGlobalValidationRule = registerGlobalValidationRule;
+
+registerGlobalValidationRule(
+    'notFutureDate',
+    function (field) {
+        if (!field.value) return '';
+
+        const picked = new Date(
+            `${field.value}T00:00:00`
+        );
+
+        if (Number.isNaN(picked.getTime())) {
+            return 'Please enter a valid date.';
+        }
+
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+
+        return picked > today
+            ? 'Date cannot be in the future.'
+            : '';
+    }
+);
+
+registerGlobalValidationRule(
+    'wholeNumber',
+    function (field) {
+        if (!field.value) return '';
+
+        const value = Number(field.value);
+
+        if (
+            !Number.isInteger(value) ||
+            value < 0
+        ) {
+            return 'Please enter a whole number greater than or equal to 0.';
+        }
+
+        return '';
+    }
+);
+
+registerGlobalValidationRule(
+    'inventoryConsumed',
+    function (field) {
+        if (!field.value) return '';
+
+        const consumed = Number(field.value);
+
+        if (
+            !Number.isInteger(consumed) ||
+            consumed < 0
+        ) {
+            return 'Consumed must be a whole number greater than or equal to 0.';
+        }
+
+        const form = field.form;
+
+        const quantityField =
+            form?.querySelector(
+                '[name="qty"]'
+            );
+
+        const quantity = Number(
+            quantityField?.value || 0
+        );
+
+        return consumed > quantity
+            ? 'Consumed cannot exceed quantity.'
+            : '';
+    }
+);
+
+const globalFormValidationRules = new Map();
+
+function registerGlobalFormValidationRule(name, validator) {
+    if (!name || typeof validator !== 'function') return;
+
+    globalFormValidationRules.set(name, validator);
+}
+
+function runGlobalFormValidationRule(form) {
+    const ruleName = form?.dataset?.formValidationRule;
+
+    if (!ruleName) {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    const validator = globalFormValidationRules.get(ruleName);
+
+    if (typeof validator !== 'function') {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    return validator(form) || {
+        valid: true,
+        firstInvalid: null
+    };
+}
+
+function ensureGlobalGroupError(group, key) {
+    if (!group) return null;
+
+    const container =
+        group.closest('[data-global-field]') ||
+        group.parentElement;
+
+    if (!container) return null;
+
+    let error = container.querySelector(
+        `.global-field-error[data-error-for="${CSS.escape(key)}"]`
+    );
+
+    if (!error) {
+        error = document.createElement('div');
+        error.className = 'global-field-error';
+        error.dataset.errorFor = key;
+        container.appendChild(error);
+    }
+
+    return error;
+}
+
+function showGlobalGroupError(group, key, message) {
+    if (!group) return;
+
+    const error = ensureGlobalGroupError(group, key);
+
+    group.classList.toggle('is-invalid', Boolean(message));
+
+    if (!error) return;
+
+    error.innerHTML = message
+        ? `
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>${escapeHtml(message)}</span>
+          `
+        : '';
+
+    error.classList.toggle('show', Boolean(message));
+}
+
+function clearGlobalGroupError(group, key) {
+    showGlobalGroupError(group, key, '');
+}
+
+window.showGlobalGroupError = showGlobalGroupError;
+window.clearGlobalGroupError = clearGlobalGroupError;
+
+window.registerGlobalFormValidationRule = registerGlobalFormValidationRule;
+
+window.dispatchEvent(
+    new CustomEvent('global-validation-ready')
+);
+
+function getGlobalFieldContainer(field) {
+    if (!field) return null;
+
+    const explicitContainer = field.closest('[data-global-field]');
+
+    if (explicitContainer) {
+        return explicitContainer;
+    }
+
+    const userManagementContainer = field.closest(
+        '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
+    );
+
+    if (userManagementContainer) {
+        return userManagementContainer;
+    }
+
+    return field.closest(
+        '.field-group, .form-group, .st-form-group, [data-field-wrapper]'
+    ) || field.parentElement;
+}
+
+function getGlobalFieldControlHost(field) {
+    if (!field) return null;
+
+    if (field instanceof HTMLSelectElement) {
+        return field.closest('.custom-select') || field;
+    }
+
+    if (field.type === 'radio' || field.type === 'checkbox') {
+        return field.closest(
+            '.global-choice-group, .um-status-grid, .radio-group, .checkbox-group'
+        ) || field;
+    }
+
+    return field;
+}
+
+function ensureGlobalFieldError(field) {
+    const container = getGlobalFieldContainer(field);
+
+    if (!container) return null;
+
+    const fieldKey = field.id || field.name;
+
+    if (!fieldKey) return null;
+
+    let error = container.querySelector(
+        `.global-field-error[data-error-for="${CSS.escape(fieldKey)}"]`
+    );
 
     if (error) {
-        error.innerHTML = message
-            ? `<i class="fa-solid fa-circle-exclamation" style="font-size:9px;"></i> ${escapeHtml(message)}`
+        return error;
+    }
+
+    error = document.createElement('div');
+    error.className = 'global-field-error';
+    error.dataset.errorFor = fieldKey;
+
+    container.appendChild(error);
+
+    return error;
+}
+
+function showFormInputValidationMessage(field, message) {
+    if (!field) return;
+
+    field.setCustomValidity('');
+
+    const hasError = Boolean(message);
+    const controlHost = getGlobalFieldControlHost(field);
+    const customSelect = field.closest?.('.custom-select');
+
+    field.classList.toggle('is-invalid', hasError);
+
+    if (
+        controlHost &&
+        controlHost !== field &&
+        !customSelect
+    ) {
+        controlHost.classList.toggle('is-invalid', hasError);
+    }
+
+    customSelect?.classList.toggle('is-invalid', hasError);
+
+    const error = ensureGlobalFieldError(field);
+
+    if (error) {
+        error.innerHTML = hasError
+            ? `
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${escapeHtml(message)}</span>
+              `
             : '';
+
+        error.classList.toggle('show', hasError);
+        error.setAttribute(
+            'aria-hidden',
+            hasError ? 'false' : 'true'
+        );
+    }
+
+    if (field.id && error) {
+        error.id = `${field.id}-global-error`;
+
+        if (hasError) {
+            field.setAttribute('aria-invalid', 'true');
+            field.setAttribute(
+                'aria-describedby',
+                error.id
+            );
+        } else {
+            field.removeAttribute('aria-invalid');
+
+            if (
+                field.getAttribute('aria-describedby') === error.id
+            ) {
+                field.removeAttribute('aria-describedby');
+            }
+        }
     }
 }
 
 function validateFormInputField(field) {
     const message = getFormInputValidationMessage(field);
+
     showFormInputValidationMessage(field, message);
 
     return !message;
 }
 
-function bindFormInputValidation(root = document) {
-    root.querySelectorAll('form').forEach(form => {
-        if (form.dataset.formInputValidationInitialized === 'true') return;
+function focusGlobalInvalidField(field) {
+    if (!field) return;
 
-        form.dataset.formInputValidationInitialized = 'true';
+    const customSelect = field.closest?.('.custom-select');
 
-        form.addEventListener('input', event => {
-            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-                validateFormInputField(event.target);
-            }
-        });
+    const target =
+        customSelect?.querySelector('.custom-select-button') ||
+        field;
 
-        form.addEventListener('change', event => {
-            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-                validateFormInputField(event.target);
-            }
-        });
-
-        form.addEventListener('submit', event => {
-            const fields = Array.from(form.querySelectorAll('input, textarea'));
-            const invalidField = fields.find(field => !validateFormInputField(field));
-
-            if (!invalidField) return;
-
-            event.preventDefault();
-            invalidField.reportValidity();
-            invalidField.focus({ preventScroll: false });
-        });
+    target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
     });
+
+    window.setTimeout(() => {
+        target.focus({
+            preventScroll: true
+        });
+    }, 280);
+}
+
+function bindFormInputValidation(root = document) {
+    const scope =
+        root && typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll('form[data-global-validation]')
+        .forEach(form => {
+            if (
+                form.dataset.formInputValidationInitialized === 'true'
+            ) {
+                return;
+            }
+
+            form.dataset.formInputValidationInitialized = 'true';
+
+            form.setAttribute('novalidate', '');
+
+            const validateEventField = event => {
+                const field = event.target;
+
+                if (
+                    field instanceof HTMLInputElement ||
+                    field instanceof HTMLTextAreaElement ||
+                    field instanceof HTMLSelectElement
+                ) {
+                    validateFormInputField(field);
+                }
+            };
+
+            form.addEventListener('input', validateEventField);
+            form.addEventListener('change', validateEventField);
+            form.addEventListener('blur', validateEventField, true);
+
+            form.addEventListener('submit', event => {
+                const result = validateGlobalForm(form);
+
+                if (result.valid) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
+            const passwordField =
+                form.querySelector('[name="password"]');
+
+            const confirmationField =
+                form.querySelector('[name="password_confirmation"]');
+
+            passwordField?.addEventListener('input', () => {
+                if (confirmationField?.value) {
+                    validateFormInputField(confirmationField);
+                }
+            });
+        });
 }
 
 function bindCharLimitField(field) {
@@ -2134,10 +4549,352 @@ document.addEventListener('DOMContentLoaded', () => {
     bindFormInputValidation();
 });
 
+function getGlobalNumberStepperConfig(
+    stepper,
+    input
+) {
+    const readNumber = (
+        value,
+        fallback
+    ) => {
+        const parsed = Number(value);
+
+        return Number.isFinite(parsed)
+            ? parsed
+            : fallback;
+    };
+
+    return {
+        min: readNumber(
+            input.min ||
+            stepper.dataset.min,
+            Number.NEGATIVE_INFINITY
+        ),
+
+        max: readNumber(
+            input.max ||
+            stepper.dataset.max,
+            Number.POSITIVE_INFINITY
+        ),
+
+        step: Math.abs(
+            readNumber(
+                input.step ||
+                stepper.dataset.step,
+                1
+            )
+        ) || 1
+    };
+}
+
+function syncGlobalNumberStepper(
+    stepper
+) {
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    const {
+        min,
+        max
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
+
+    const value =
+        Number(input.value);
+
+    const hasValue =
+        input.value !== '' &&
+        Number.isFinite(value);
+
+    stepper
+        .querySelectorAll(
+            '[data-number-step]'
+        )
+        .forEach(button => {
+            const direction =
+                Number(
+                    button.dataset.numberStep
+                );
+
+            button.disabled =
+                hasValue &&
+                (
+                    direction < 0 &&
+                    value <= min ||
+                    direction > 0 &&
+                    value >= max
+                );
+        });
+}
+
+function setGlobalNumberStepperValue(
+    stepper,
+    nextValue
+) {
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    const {
+        min,
+        max
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
+
+    const value = Math.max(
+        min,
+        Math.min(
+            max,
+            Number(nextValue)
+        )
+    );
+
+    input.value =
+        Number.isFinite(value)
+            ? String(value)
+            : '';
+
+    input.dispatchEvent(
+        new Event('input', {
+            bubbles: true
+        })
+    );
+
+    input.dispatchEvent(
+        new Event('change', {
+            bubbles: true
+        })
+    );
+
+    syncGlobalNumberStepper(stepper);
+}
+
+function bindGlobalNumberStepper(
+    stepper
+) {
+    if (
+        !stepper ||
+        stepper.dataset.numberStepperInitialized ===
+        'true'
+    ) {
+        return;
+    }
+
+    const input =
+        stepper.querySelector(
+            '[data-number-stepper-input]'
+        );
+
+    if (!input) return;
+
+    stepper.dataset.numberStepperInitialized =
+        'true';
+
+    stepper.addEventListener(
+        'click',
+        event => {
+            const button =
+                event.target.closest(
+                    '[data-number-step]'
+                );
+
+            if (
+                !button ||
+                !stepper.contains(button)
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const {
+                min,
+                step
+            } = getGlobalNumberStepperConfig(
+                stepper,
+                input
+            );
+
+            const current =
+                input.value === ''
+                    ? Number.isFinite(min)
+                        ? min
+                        : 0
+                    : Number(input.value);
+
+            const direction =
+                Number(
+                    button.dataset.numberStep
+                );
+
+            setGlobalNumberStepperValue(
+                stepper,
+                current +
+                direction * step
+            );
+        }
+    );
+
+    input.addEventListener(
+        'input',
+        () => {
+            syncGlobalNumberStepper(
+                stepper
+            );
+        }
+    );
+
+    input.addEventListener(
+        'blur',
+        () => {
+            if (input.value === '') return;
+
+            setGlobalNumberStepperValue(
+                stepper,
+                Number(input.value)
+            );
+        }
+    );
+
+    input.addEventListener(
+        'keydown',
+        event => {
+            if (
+                event.key !== 'ArrowUp' &&
+                event.key !== 'ArrowDown'
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const button =
+                stepper.querySelector(
+                    event.key === 'ArrowUp'
+                        ? '[data-number-step="1"]'
+                        : '[data-number-step="-1"]'
+                );
+
+            button?.click();
+        }
+    );
+
+    syncGlobalNumberStepper(stepper);
+}
+
+function initGlobalNumberSteppers(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    scope
+        .querySelectorAll(
+            '[data-global-number-stepper]'
+        )
+        .forEach(
+            bindGlobalNumberStepper
+        );
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalNumberSteppers();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        initGlobalNumberSteppers(
+            event.detail?.modal ||
+            document
+        );
+    }
+);
+
+window.initGlobalNumberSteppers =
+    initGlobalNumberSteppers;
+
+function validateGlobalForm(form, options = {}) {
+    if (!form) {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    const fields = Array.from(
+        form.querySelectorAll(
+            'input:not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select'
+        )
+    );
+
+    const processedRadioGroups = new Set();
+    let firstInvalid = null;
+
+    fields.forEach(field => {
+        if (
+            field.type === 'radio' &&
+            processedRadioGroups.has(field.name)
+        ) {
+            return;
+        }
+
+        if (field.type === 'radio') {
+            processedRadioGroups.add(field.name);
+        }
+
+        const valid = validateFormInputField(field);
+
+        if (!valid && !firstInvalid) {
+            firstInvalid = field;
+        }
+    });
+
+    if (
+        firstInvalid &&
+        options.focus !== false
+    ) {
+        focusGlobalInvalidField(firstInvalid);
+    }
+
+    const customResult = runGlobalFormValidationRule(form);
+
+    if (!customResult.valid && !firstInvalid) {
+        firstInvalid = customResult.firstInvalid || null;
+    }
+
+    return {
+        valid: !firstInvalid && customResult.valid,
+        firstInvalid: firstInvalid || customResult.firstInvalid || null
+    };
+}
+
+window.validateGlobalForm = validateGlobalForm;
+
 window.validateCharLimit = validateCharLimit;
 window.initCharLimitFields = initCharLimitFields;
 window.bindFormInputValidation = bindFormInputValidation;
 window.validateFormInputField = validateFormInputField;
+window.focusGlobalInvalidField = focusGlobalInvalidField;
+window.showFormInputValidationMessage = showFormInputValidationMessage;
 
 function formatStockNo(input) {
     if (!input) return;
@@ -2563,323 +5320,223 @@ window.syncGlobalRefreshWatcher = syncGlobalRefreshWatcher;
 window.removeGlobalRefreshNotice = removeGlobalRefreshNotice;
 
 function initGlobalViewToggles(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-    const toggles = scope.querySelectorAll('[data-global-view-toggle]');
+    const scope =
+        root &&
+            typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
 
-    const closeAllViewMenus = (except = null) => {
-        document.querySelectorAll('[data-global-view-toggle].open').forEach(toggle => {
-            if (toggle === except) return;
-
-            toggle.classList.remove('open');
-            toggle.querySelector('[data-view-mobile-trigger]')?.setAttribute('aria-expanded', 'false');
-        });
-    };
-
-    const getModeLabel = (mode, buttons) => {
-        const button = buttons.find(btn => btn.dataset.viewMode === mode);
-
-        return button?.querySelector('.view-mode-label')?.textContent?.trim()
-            || button?.getAttribute('title')
-            || (mode === 'grid' ? 'Grid View' : 'List View');
-    };
-
-    const getModeIcon = (mode) => {
-        return mode === 'grid' ? 'fa-solid fa-grip' : 'fa-solid fa-list';
-    };
-
-    const setMobileTriggerContent = (trigger, mode, buttons) => {
-        if (!trigger) return;
-
-        trigger.innerHTML = `
-            <span class="global-view-mobile-main">
-                <i class="${getModeIcon(mode)}"></i>
-                <span class="global-view-mobile-label">${getModeLabel(mode, buttons)}</span>
-            </span>
-            <i class="fa-solid fa-chevron-down global-view-mobile-chevron"></i>
-        `;
-
-        trigger.setAttribute('aria-label', `Current view: ${getModeLabel(mode, buttons)}`);
-        trigger.setAttribute('title', getModeLabel(mode, buttons));
-    };
-
-    const ensureMobileDropdown = (toggle, buttons) => {
-        if (toggle.querySelector('[data-view-mobile-trigger]')) return;
-
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'global-view-mobile-trigger';
-        trigger.dataset.viewMobileTrigger = 'true';
-        trigger.setAttribute('aria-label', 'Change view');
-        trigger.setAttribute('aria-expanded', 'false');
-
-        const menu = document.createElement('div');
-        menu.className = 'global-view-mobile-menu';
-        menu.dataset.viewMobileMenu = 'true';
-
-        buttons.forEach(button => {
-            const mode = button.dataset.viewMode;
-            const option = document.createElement('button');
-
-            option.type = 'button';
-            option.className = 'global-view-mobile-option';
-            option.dataset.viewMobileOption = mode;
-
-            option.innerHTML = `
-                <i class="${getModeIcon(mode)}"></i>
-                <span>${getModeLabel(mode, buttons)}</span>
-            `;
-
-            menu.appendChild(option);
-        });
-
-        toggle.appendChild(trigger);
-        toggle.appendChild(menu);
-
-        trigger.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const willOpen = !toggle.classList.contains('open');
-
-            closeAllViewMenus(toggle);
-
-            toggle.classList.toggle('open', willOpen);
-            trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
-    };
-
-    toggles.forEach((toggle) => {
-        if (toggle.dataset.globalViewInitialized === 'true') return;
-
-        toggle.dataset.globalViewInitialized = 'true';
-
-        const rootSelector = toggle.dataset.viewRoot || '#mainContent';
-        const listSelector = toggle.dataset.listView;
-        const gridSelector = toggle.dataset.gridView;
-        const storageKey = toggle.dataset.storageKey || 'ViewToggleMode';
-
-        const pageRoot = document.querySelector(rootSelector);
-        const listView = listSelector ? document.querySelector(listSelector) : null;
-        const gridView = gridSelector ? document.querySelector(gridSelector) : null;
-        const buttons = Array.from(toggle.querySelectorAll('[data-view-mode]'));
-
-        if (!buttons.length) return;
-
-        ensureMobileDropdown(toggle, buttons);
-
-        const mobileTrigger = toggle.querySelector('[data-view-mobile-trigger]');
-        const mobileOptions = Array.from(toggle.querySelectorAll('[data-view-mobile-option]'));
-
-        const setMode = (mode, options = {}) => {
-            const nextMode = mode === 'grid' ? 'grid' : 'list';
-            const isGrid = nextMode === 'grid';
-
-            if (listView) listView.hidden = isGrid;
-            if (gridView) gridView.hidden = !isGrid;
-
-            pageRoot?.classList.toggle('mode-grid', isGrid);
-            pageRoot?.classList.toggle('mode-list', !isGrid);
-
-            buttons.forEach((button) => {
-                const active = button.dataset.viewMode === nextMode;
-
-                button.classList.toggle('active', active);
-                button.classList.toggle('is-active', active);
-                button.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-
-            mobileOptions.forEach((option) => {
-                const active = option.dataset.viewMobileOption === nextMode;
-
-                option.classList.toggle('active', active);
-                option.classList.toggle('is-active', active);
-                option.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-
-            setMobileTriggerContent(mobileTrigger, nextMode, buttons);
-
-            toggle.dataset.currentView = nextMode;
-
-            if (options.persist !== false) {
-                localStorage.setItem(storageKey, nextMode);
+    scope
+        .querySelectorAll('[data-global-view-toggle]')
+        .forEach(toggle => {
+            if (
+                toggle.dataset.globalViewInitialized ===
+                'true'
+            ) {
+                return;
             }
 
-            toggle.dispatchEvent(new CustomEvent('global-view-change', {
-                bubbles: true,
-                detail: { mode: nextMode }
-            }));
-        };
+            const buttons = Array.from(
+                toggle.querySelectorAll(
+                    '[data-view-mode]'
+                )
+            );
 
-        toggle.__setGlobalViewMode = setMode;
-        toggle.__getGlobalViewMode = () => toggle.dataset.currentView || localStorage.getItem(storageKey) || 'list';
+            if (!buttons.length) return;
 
-        buttons.forEach((button) => {
-            button.addEventListener('click', () => {
-                setMode(button.dataset.viewMode);
+            toggle.dataset.globalViewInitialized =
+                'true';
+
+            const pageRoot =
+                document.querySelector(
+                    toggle.dataset.viewRoot ||
+                    '#mainContent'
+                );
+
+            const listView =
+                toggle.dataset.listView
+                    ? document.querySelector(
+                        toggle.dataset.listView
+                    )
+                    : null;
+
+            const gridView =
+                toggle.dataset.gridView
+                    ? document.querySelector(
+                        toggle.dataset.gridView
+                    )
+                    : null;
+
+            const storageKey =
+                toggle.dataset.storageKey ||
+                'ViewToggleMode';
+
+            const setMode = (
+                mode,
+                options = {}
+            ) => {
+                const nextMode =
+                    mode === 'grid'
+                        ? 'grid'
+                        : 'list';
+
+                const isGrid =
+                    nextMode === 'grid';
+
+                if (listView) {
+                    listView.hidden = isGrid;
+                }
+
+                if (gridView) {
+                    gridView.hidden = !isGrid;
+                }
+
+                pageRoot?.classList.toggle(
+                    'mode-grid',
+                    isGrid
+                );
+
+                pageRoot?.classList.toggle(
+                    'mode-list',
+                    !isGrid
+                );
+
+                buttons.forEach(button => {
+                    const active =
+                        button.dataset.viewMode ===
+                        nextMode;
+
+                    button.classList.toggle(
+                        'active',
+                        active
+                    );
+
+                    button.classList.toggle(
+                        'is-active',
+                        active
+                    );
+
+                    button.setAttribute(
+                        'aria-pressed',
+                        active ? 'true' : 'false'
+                    );
+                });
+
+                toggle.dataset.currentView =
+                    nextMode;
+
+                if (
+                    options.persist !== false
+                ) {
+                    localStorage.setItem(
+                        storageKey,
+                        nextMode
+                    );
+                }
+
+                toggle.dispatchEvent(
+                    new CustomEvent(
+                        'global-view-change',
+                        {
+                            bubbles: true,
+                            detail: {
+                                mode: nextMode
+                            }
+                        }
+                    )
+                );
+            };
+
+            toggle.__setGlobalViewMode =
+                setMode;
+
+            toggle.__getGlobalViewMode =
+                () =>
+                    toggle.dataset.currentView ||
+                    localStorage.getItem(
+                        storageKey
+                    ) ||
+                    'list';
+
+            buttons.forEach(button => {
+                button.addEventListener(
+                    'click',
+                    () => {
+                        setMode(
+                            button.dataset.viewMode
+                        );
+                    }
+                );
             });
+
+            const savedMode =
+                localStorage.getItem(
+                    storageKey
+                );
+
+            setMode(
+                savedMode || 'list',
+                {
+                    persist: false
+                }
+            );
         });
-
-        mobileOptions.forEach((option) => {
-            option.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                setMode(option.dataset.viewMobileOption);
-
-                toggle.classList.remove('open');
-                mobileTrigger?.setAttribute('aria-expanded', 'false');
-            });
-        });
-
-        const savedMode = localStorage.getItem(storageKey);
-        setMode(savedMode || 'list', { persist: false });
-    });
-
-    if (document.documentElement.dataset.globalViewCloseBound !== 'true') {
-        document.documentElement.dataset.globalViewCloseBound = 'true';
-
-        document.addEventListener('click', () => closeAllViewMenus());
-
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-                closeAllViewMenus();
-            }
-        });
-    }
 }
 
-function setGlobalViewMode(toggleOrId, mode, options = {}) {
-    const toggle = typeof toggleOrId === 'string'
-        ? document.getElementById(toggleOrId) || document.querySelector(toggleOrId)
-        : toggleOrId;
+function setGlobalViewMode(
+    toggleOrId,
+    mode,
+    options = {}
+) {
+    const toggle =
+        typeof toggleOrId === 'string'
+            ? document.getElementById(
+                toggleOrId
+            ) ||
+            document.querySelector(
+                toggleOrId
+            )
+            : toggleOrId;
 
     if (!toggle) return;
 
-    if (typeof toggle.__setGlobalViewMode !== 'function') {
+    if (
+        typeof toggle.__setGlobalViewMode !==
+        'function'
+    ) {
         initGlobalViewToggles(document);
     }
 
-    toggle.__setGlobalViewMode?.(mode, options);
+    toggle.__setGlobalViewMode?.(
+        mode,
+        options
+    );
 }
 
 function getGlobalViewMode(toggleOrId) {
-    const toggle = typeof toggleOrId === 'string'
-        ? document.getElementById(toggleOrId) || document.querySelector(toggleOrId)
-        : toggleOrId;
+    const toggle =
+        typeof toggleOrId === 'string'
+            ? document.getElementById(
+                toggleOrId
+            ) ||
+            document.querySelector(
+                toggleOrId
+            )
+            : toggleOrId;
 
-    if (!toggle) return 'list';
-
-    return toggle.__getGlobalViewMode?.() || toggle.dataset.currentView || 'list';
+    return (
+        toggle?.__getGlobalViewMode?.() ||
+        toggle?.dataset.currentView ||
+        'list'
+    );
 }
 
-function initGlobalViewMobileDropdowns(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-    const toggles = scope.querySelectorAll('[data-global-view-toggle]');
-
-    const getButtonLabel = (button) => {
-        return button?.querySelector('.view-mode-label')?.textContent?.trim()
-            || button?.getAttribute('aria-label')
-            || (button?.dataset.viewMode === 'grid' ? 'Grid View' : 'List View');
-    };
-
-    const getButtonIcon = (mode) => {
-        return mode === 'grid' ? 'fa-solid fa-grip' : 'fa-solid fa-list';
-    };
-
-    const closeAllMenus = (except = null) => {
-        document.querySelectorAll('[data-global-view-toggle].open').forEach(toggle => {
-            if (toggle === except) return;
-
-            toggle.classList.remove('open');
-            toggle.querySelector('[data-view-mobile-trigger]')?.setAttribute('aria-expanded', 'false');
-        });
-    };
-
-    toggles.forEach(toggle => {
-        if (toggle.dataset.mobileDropdownInitialized === 'true') return;
-
-        toggle.dataset.mobileDropdownInitialized = 'true';
-
-        const buttons = Array.from(toggle.querySelectorAll('[data-view-mode]'));
-        if (!buttons.length) return;
-
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'global-view-mobile-trigger';
-        trigger.dataset.viewMobileTrigger = 'true';
-        trigger.setAttribute('aria-expanded', 'false');
-
-        const menu = document.createElement('div');
-        menu.className = 'global-view-mobile-menu';
-
-        buttons.forEach(button => {
-            const mode = button.dataset.viewMode;
-            const option = document.createElement('button');
-
-            option.type = 'button';
-            option.className = 'global-view-mobile-option';
-            option.dataset.viewMobileOption = mode;
-
-            option.innerHTML = `
-                <i class="${getButtonIcon(mode)}"></i>
-                <span>${getButtonLabel(button)}</span>
-            `;
-
-            option.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                button.click();
-                closeAllMenus();
-            });
-
-            menu.appendChild(option);
-        });
-
-        const syncMobileTrigger = () => {
-            const current = toggle.dataset.currentView || 'list';
-            const activeButton = buttons.find(button => button.dataset.viewMode === current) || buttons[0];
-
-            trigger.innerHTML = `
-                <span class="global-view-mobile-main">
-                    <i class="${getButtonIcon(current)}"></i>
-                    <span class="global-view-mobile-label">${getButtonLabel(activeButton)}</span>
-                </span>
-                <i class="fa-solid fa-chevron-down global-view-mobile-chevron"></i>
-            `;
-
-            menu.querySelectorAll('[data-view-mobile-option]').forEach(option => {
-                option.classList.toggle('active', option.dataset.viewMobileOption === current);
-            });
-        };
-
-        trigger.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const willOpen = !toggle.classList.contains('open');
-
-            closeAllMenus(toggle);
-
-            toggle.classList.toggle('open', willOpen);
-            trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
-
-        toggle.addEventListener('global-view-change', syncMobileTrigger);
-
-        toggle.appendChild(trigger);
-        toggle.appendChild(menu);
-
-        syncMobileTrigger();
-    });
-
-    document.addEventListener('click', () => closeAllMenus());
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initGlobalViewToggles();
-    initGlobalViewMobileDropdowns();
-});
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalViewToggles();
+    }
+);
 
 window.initGlobalViewToggles = initGlobalViewToggles;
 window.setGlobalViewMode = setGlobalViewMode;
@@ -3275,47 +5932,6 @@ window.initGlobalPageSizeSelects = initGlobalPageSizeSelects;
 window.syncGlobalPageSizeSelect = syncGlobalPageSizeSelect;
 window.setGlobalPageSizeValue = setGlobalPageSizeValue;
 
-function initDashboardLogsViewToggle() {
-    const root = document.getElementById('mainContent');
-    const toggle = document.getElementById('dashboardLogsViewToggle');
-    const listView = document.getElementById('dashboardLogsListView');
-    const gridView = document.getElementById('dashboardLogsGridView');
-    const buttons = document.querySelectorAll('[data-dashboard-logs-view]');
-
-    if (!toggle || !listView || !gridView || !buttons.length) return;
-
-    const setMode = (mode) => {
-        const nextMode = mode === 'grid' ? 'grid' : 'list';
-        const isGrid = nextMode === 'grid';
-
-        listView.hidden = isGrid;
-        gridView.hidden = !isGrid;
-
-        root?.classList.toggle('mode-grid', isGrid);
-        root?.classList.toggle('mode-list', !isGrid);
-
-        buttons.forEach((button) => {
-            const active = button.dataset.dashboardLogsView === nextMode;
-
-            button.classList.toggle('active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-
-        localStorage.setItem('admin_dashboard_logs_view', nextMode);
-    };
-
-    buttons.forEach((button) => {
-        button.addEventListener('click', () => {
-            setMode(button.dataset.dashboardLogsView);
-        });
-    });
-
-    const mobile = window.matchMedia('(max-width: 767px)').matches;
-    const savedMode = localStorage.getItem('admin_dashboard_logs_view');
-
-    setMode(mobile ? 'grid' : savedMode || 'list');
-}
-
 const activeVoiceControllers = new Map();
 
 function getSpeechRecognitionConstructor() {
@@ -3538,5 +6154,280 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.initGlobalVoiceInputs = initGlobalVoiceInputs;
 
-document.addEventListener('DOMContentLoaded', initDashboardLogsViewToggle);
-window.initDashboardLogsViewToggle = initDashboardLogsViewToggle;
+function closeCustomSelects(except = null) {
+    document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {
+        if (wrapper === except) return;
+
+        wrapper.classList.remove('is-open', 'drop-up');
+
+        wrapper
+            .querySelector('.custom-select-button')
+            ?.setAttribute('aria-expanded', 'false');
+    });
+}
+
+function syncCustomSelect(wrapper) {
+    const select = wrapper.querySelector('select');
+    const valueText = wrapper.querySelector('[data-custom-select-value]');
+    const button = wrapper.querySelector('.custom-select-button');
+
+    if (!select || !valueText || !button) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    valueText.textContent =
+        selectedOption?.textContent?.trim() ||
+        select.dataset.placeholder ||
+        'Select option';
+
+    wrapper.classList.toggle('is-disabled', select.disabled);
+    wrapper.classList.toggle('has-value', Boolean(select.value));
+
+    button.disabled = select.disabled;
+
+    wrapper
+        .querySelectorAll('.custom-select-option')
+        .forEach(option => {
+            const isActive =
+                Number(option.dataset.index) === select.selectedIndex;
+
+            option.classList.toggle('is-active', isActive);
+            option.setAttribute(
+                'aria-selected',
+                isActive ? 'true' : 'false'
+            );
+        });
+}
+
+function positionCustomSelectMenu(wrapper) {
+    if (!wrapper) return;
+
+    const button = wrapper.querySelector('.custom-select-button');
+    const menu = wrapper.querySelector('.custom-select-menu');
+
+    if (!button || !menu) return;
+
+    wrapper.classList.remove('drop-up');
+
+    menu.style.removeProperty('--custom-select-max-height');
+
+    if (wrapper.closest('.flatpickr-calendar')) {
+        const isYearSelect = Boolean(
+            wrapper.querySelector('.custom-flatpickr-year')
+        );
+
+        menu.style.setProperty(
+            '--custom-select-max-height',
+            isYearSelect ? '220px' : '210px'
+        );
+
+        return;
+    }
+
+    const buttonRect = button.getBoundingClientRect();
+
+    const scrollContainer = wrapper.closest(
+        '.um-user-modal-body, .modal-body, [data-modal-scroll], dialog'
+    );
+
+    const boundaryRect = scrollContainer?.getBoundingClientRect();
+
+    const boundaryTop = boundaryRect
+        ? Math.max(boundaryRect.top, 8)
+        : 8;
+
+    const boundaryBottom = boundaryRect
+        ? Math.min(boundaryRect.bottom, window.innerHeight - 8)
+        : window.innerHeight - 8;
+
+    const spaceBelow = boundaryBottom - buttonRect.bottom - 10;
+    const spaceAbove = buttonRect.top - boundaryTop - 10;
+
+    const previousDisplay = menu.style.display;
+    const previousVisibility = menu.style.visibility;
+    const previousPointerEvents = menu.style.pointerEvents;
+
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    menu.style.pointerEvents = 'none';
+
+    const preferredHeight = Math.min(
+        Math.max(menu.scrollHeight, 96),
+        260
+    );
+
+    menu.style.display = previousDisplay;
+    menu.style.visibility = previousVisibility;
+    menu.style.pointerEvents = previousPointerEvents;
+
+    const shouldOpenUp =
+        spaceBelow < preferredHeight &&
+        spaceAbove > spaceBelow;
+
+    wrapper.classList.toggle('drop-up', shouldOpenUp);
+
+    const availableSpace = shouldOpenUp
+        ? spaceAbove
+        : spaceBelow;
+
+    const maxHeight = Math.max(
+        96,
+        Math.min(260, availableSpace)
+    );
+
+    menu.style.setProperty(
+        '--custom-select-max-height',
+        `${maxHeight}px`
+    );
+}
+
+function initCustomSelects(root = document) {
+    const scope =
+        root && typeof root.querySelectorAll === 'function'
+            ? root
+            : document;
+
+    const customSelectSelector = [
+        'select.js-custom-select',
+
+        '[data-global-selects] select:not([data-native-select])' +
+        ':not(.global-page-size-native)' +
+        ':not(.flatpickr-monthDropdown-months)'
+    ].join(',');
+
+    scope.querySelectorAll(customSelectSelector).forEach(select => {
+        if (select.dataset.customSelectReady === 'true') return;
+
+        select.dataset.customSelectReady = 'true';
+        select.classList.add('custom-select-native');
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'custom-select-button';
+        button.setAttribute('aria-haspopup', 'listbox');
+        button.setAttribute('aria-expanded', 'false');
+
+        const value = document.createElement('span');
+        value.dataset.customSelectValue = '';
+
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-chevron-down';
+        icon.setAttribute('aria-hidden', 'true');
+
+        button.append(value, icon);
+
+        const menu = document.createElement('div');
+        menu.className = 'custom-select-menu';
+        menu.setAttribute('role', 'listbox');
+
+        Array.from(select.options).forEach(option => {
+            if (option.hidden || option.disabled) return;
+
+            const item = document.createElement('button');
+
+            item.type = 'button';
+            item.className = 'custom-select-option';
+            item.dataset.index = String(option.index);
+            item.dataset.value = option.value;
+            item.setAttribute('role', 'option');
+
+            const label = document.createElement('span');
+            label.textContent = option.textContent.trim();
+
+            const check = document.createElement('i');
+            check.className =
+                'fa-solid fa-check custom-select-check';
+            check.setAttribute('aria-hidden', 'true');
+
+            item.append(label, check);
+
+            item.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (select.disabled) return;
+
+                select.selectedIndex = option.index;
+
+                select.dispatchEvent(
+                    new Event('input', { bubbles: true })
+                );
+
+                select.dispatchEvent(
+                    new Event('change', { bubbles: true })
+                );
+
+                wrapper.classList.remove('is-open', 'drop-up');
+                button.setAttribute('aria-expanded', 'false');
+
+                syncCustomSelect(wrapper);
+            });
+
+            menu.appendChild(item);
+        });
+
+        select.parentNode.insertBefore(wrapper, select);
+
+        wrapper.append(select, button, menu);
+
+        button.addEventListener('pointerdown', event => {
+            event.stopPropagation();
+        });
+
+        menu.addEventListener('pointerdown', event => {
+            event.stopPropagation();
+        });
+
+        button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (select.disabled) return;
+
+            const willOpen =
+                !wrapper.classList.contains('is-open');
+
+            closeCustomSelects(wrapper);
+
+            if (willOpen) {
+                positionCustomSelectMenu(wrapper);
+                wrapper.classList.add('is-open');
+            } else {
+                wrapper.classList.remove('is-open', 'drop-up');
+            }
+
+            button.setAttribute(
+                'aria-expanded',
+                willOpen ? 'true' : 'false'
+            );
+        });
+
+        select.addEventListener('change', () => {
+            syncCustomSelect(wrapper);
+        });
+
+        syncCustomSelect(wrapper);
+    });
+}
+
+document.addEventListener('click', event => {
+    if (event.target.closest('.custom-select')) return;
+
+    closeCustomSelects();
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        closeCustomSelects();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCustomSelects();
+});
+
+window.initCustomSelects = initCustomSelects;
+window.syncCustomSelect = syncCustomSelect;

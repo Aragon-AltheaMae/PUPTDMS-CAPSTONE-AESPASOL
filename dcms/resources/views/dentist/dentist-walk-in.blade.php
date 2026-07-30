@@ -547,10 +547,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
                                 </div>
                             </div>
-                    </div>
+                        
 
                     <div class="step-content hidden">
-                        <div class="booking-step-shell">
                             <div class="booking-step-header">
                                 <p class="booking-step-eyebrow">Step 4 of 5</p>
                                 <h2 class="booking-step-title">Medical History</h2>
@@ -1572,9 +1571,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
     }
 
+    let patientSearchRequestId = 0;
+
     async function loadPatients(query = "", showAll = false) {
         if (!patientResults) return;
 
+        const requestId = ++patientSearchRequestId;
         renderPatientMessage("Loading patient records...");
 
         try {
@@ -1602,8 +1604,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
 
             const patients = await response.json();
+            if (requestId !== patientSearchRequestId) return;
             renderPatients(Array.isArray(patients) ? patients : []);
         } catch (error) {
+            if (requestId !== patientSearchRequestId) return;
             renderPatientMessage("Unable to load patient records. Please try again.");
         }
     }

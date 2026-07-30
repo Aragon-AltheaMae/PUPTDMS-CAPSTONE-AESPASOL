@@ -1,18 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
-use App\Models\User;
-use App\Notifications\AppointmentCompletedNotification;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 
 class AdminAppointmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $today = Carbon::today()->toDateString();
 
@@ -59,77 +55,56 @@ class AdminAppointmentController extends Controller
                 || in_array($status, ['completed', 'cancelled'], true);
         });
 
-        return view('admin.admin-appointments', compact(
-            'appointments',
-            'upcomingAppointments',
-            'pastAppointments',
-            'todayCount',
-            'upcomingCount',
-            'rescheduledCount',
-            'cancelledCount',
-            'completedCount',
-            'allCount'
-        ));
-    }
+        if ($request->expectsJson()) {
+            $appointments = $upcomingAppointments
+                ->merge($pastAppointments)
+                ->map(fn($appointment) => [
+                    'id' => $appointment->id,
+                    'updated_at' => optional($appointment->updated_at)->toISOString(),
+                ])
+                ->values();
 
-    public function show($id)
-    {
-        $appointment = Appointment::with(['patient'])->findOrFail($id);
-
-        return view('admin.admin-appointment-show', compact('appointment'));
-    }
-
-    public function reschedule($id)
-    {
-        $appointment = Appointment::with(['patient'])->findOrFail($id);
-
-        return view('admin.admin-appointment-reschedule', compact('appointment'));
-    }
-
-    public function start($id)
-    {
-        $appointment = Appointment::with('patient.user')->findOrFail($id);
-
-        $appointment->status = 'completed';
-        $appointment->save();
-
-        $patientUser = optional($appointment->patient)->user;
-
-        if (!$patientUser && !empty(optional($appointment->patient)->email)) {
-            $patientUser = User::where('email', $appointment->patient->email)->first();
+            return response()->json([
+                'appointments' => $appointments,
+            ]);
         }
 
-        if ($patientUser) {
-            $patientUser->notify(new AppointmentCompletedNotification($appointment));
-        }
+        return view('shared.appointments', [
+            'layoutRole' => 'admin',
+            'pageTitle' => 'Appointment Management',
+            'pageShellClass' => 'admin-page-shell',
 
-        return redirect()
-            ->route('admin.admin.appointments')
-            ->with('success', 'Appointment marked as completed.');
-    }
+            'isDentistView' => false,
 
-    public function cancel(Request $request, $id)
-    {
-        $request->validate([
-            'reason' => ['required', 'string', 'max:255'],
-        ]);
+            'canStartProcedure' => false,
+            'canRescheduleAppointment' => false,
+            'canCancelAppointment' => false,
+            'canViewTreatmentRecord' => false,
+            'canScheduleFollowUp' => false,
 
-        $appointment = Appointment::findOrFail($id);
-        $appointment->status = 'cancelled';
+            'patientProfileRouteName' => 'admin.admin.patient.profile',
 
-        if (isset($appointment->cancellation_reason)) {
-            $appointment->cancellation_reason = $request->reason;
-        }
+            'appointments' => $appointments,
+            'upcomingAppointments' => $upcomingAppointments,
+            'pastAppointments' => $pastAppointments,
 
-        if (isset($appointment->cancelled_at)) {
-            $appointment->cancelled_at = now();
-        }
+            'today' => $today,
 
-        $appointment->save();
+            'todayCount' => $todayCount,
+            'upcomingCount' => $upcomingCount,
+            'rescheduledCount' => $rescheduledCount,
+            'cancelledCount' => $cancelledCount,
+            'completedCount' => $completedCount,
+            'allCount' => $allCount,
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Appointment cancelled successfully.',
+            'appointmentCountsPerDay' => [],
+            'appointmentCountsPerSlot' => [],
+            'calendarAppointmentDetails' => [],
+            'schedules' => collect(),
+            'blockedDates' => [],
+            'philippineHolidays' => [],
+            'defaultServiceTypes' => collect(),
+            'notifications' => collect(),
         ]);
     }
 }

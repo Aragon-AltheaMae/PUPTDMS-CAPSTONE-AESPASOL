@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AuditLogger;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -25,7 +26,20 @@ class ValidateFormInput
         }
 
         $errors = new MessageBag();
-        $this->validatePayload($request->except(array_keys($request->allFiles())), $errors);
+        $suspiciousFields = [];
+        $this->validatePayload($request->except(array_keys($request->allFiles())), $errors, $suspiciousFields);
+
+        if ($suspiciousFields !== []) {
+            AuditLogger::log(
+                'tampering_detected',
+                'security',
+                sprintf(
+                    'Suspicious payload blocked on %s for field(s): %s',
+                    $request->path(),
+                    implode(', ', array_unique($suspiciousFields))
+                )
+            );
+        }
 
         if ($errors->count() > 0) {
             throw ValidationException::withMessages($errors->toArray());
@@ -39,7 +53,7 @@ class ValidateFormInput
         return in_array($request->method(), ['POST', 'PUT', 'PATCH'], true);
     }
 
-    private function validatePayload(array $payload, MessageBag $errors, string $prefix = ''): void
+    private function validatePayload(array $payload, MessageBag $errors, array &$suspiciousFields, string $prefix = ''): void
     {
         foreach ($payload as $key => $value) {
             $field = $prefix === '' ? (string) $key : $prefix . '.' . $key;
@@ -49,7 +63,7 @@ class ValidateFormInput
             }
 
             if (is_array($value)) {
-                $this->validatePayload($value, $errors, $field);
+                $this->validatePayload($value, $errors, $suspiciousFields, $field);
                 continue;
             }
 
@@ -73,6 +87,7 @@ class ValidateFormInput
 
             if ($this->containsUnsafeText($trimmed)) {
                 $errors->add($field, 'Please enter readable text only. Scripts and SQL-like input are not allowed.');
+                $suspiciousFields[] = $field;
             }
         }
     }

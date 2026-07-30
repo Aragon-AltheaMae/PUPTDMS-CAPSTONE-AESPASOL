@@ -61,7 +61,8 @@ class HomepageController extends Controller
 
         $philippineHolidays = PhilippineHolidays::range(0, 4);
 
-        $records = Appointment::where('patient_id', $patient->id)
+        $records = Appointment::with(['procedure', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
