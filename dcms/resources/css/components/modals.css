@@ -553,8 +553,8 @@
 }
 
 .ui-modal .ui-modal-card.modal-sm {
-    width: min(94vw, 420px) !important;
-    max-width: 420px !important;
+    width: min(94vw, 460px) !important;
+    max-width: 460px !important;
 }
 
 .ui-modal .ui-modal-card.modal-md {
@@ -3622,75 +3622,187 @@ body.doc-modal-lock .floating-action {
 }
 
 .global-delete-alert {
-    display: flex;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
     align-items: flex-start;
-    gap: .85rem;
+    gap: 14px;
 
-    padding: 1rem;
+    padding: 16px;
 
-    border: 1px solid #fca5a5;
+    border: 1px solid #FCA5A5;
     border-radius: 18px;
 
     background:
         radial-gradient(circle at top left,
             rgba(239, 68, 68, .10),
-            transparent 45%),
-        #fff1f2;
-
-    color: #dc2626;
+            transparent 46%),
+        #FFF1F2;
 }
 
-.global-delete-alert>i {
-    margin-top: .18rem;
-    flex: 0 0 auto;
-    font-size: 17px;
+.global-delete-alert-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #FECACA;
+    border-radius: 13px;
+
+    background: #FFFFFF;
+    color: #DC2626;
+
+    box-shadow:
+        0 8px 18px rgba(220, 38, 38, .10);
 }
 
-.global-delete-alert p {
+.global-delete-alert-icon i {
+    color: currentColor;
+    font-size: 15px;
+}
+
+.global-delete-alert-content {
+    min-width: 0;
+}
+
+.global-delete-question {
     margin: 0;
 
-    color: #991b1b;
-    font-size: 15px;
+    color: #991B1B;
+    font-size: .92rem;
     font-weight: 850;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
-.global-delete-alert strong {
-    display: inline-block;
+.global-delete-target {
+    width: 100%;
+    min-width: 0;
+    margin-top: 10px;
+    padding: 10px 12px;
 
-    padding: 1px 7px;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 
-    background: #ffffff;
-    color: #1f2937;
+    border: 1px solid rgba(220, 38, 38, .14);
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .82);
 }
 
-.global-delete-alert span {
+.global-delete-target-label {
+    flex: 0 0 auto;
+
+    color: #9CA3AF;
+    font-size: .62rem !important;
+    font-weight: 850 !important;
+    line-height: 1;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.global-delete-target strong {
+    min-width: 0;
+    max-width: 68%;
+
     display: block;
-    margin-top: .35rem;
+    padding: 0;
 
-    color: #dc2626;
-    font-size: 12px;
-    font-weight: 750;
+    background: transparent;
+    color: #7F1D1D;
+
+    font-size: .82rem;
+    font-weight: 900;
+    line-height: 1.3;
+    text-align: right;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.global-delete-helper {
+    display: block;
+    margin-top: 10px;
+
+    color: #B91C1C;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.45;
 }
 
 [data-theme="dark"] .global-delete-alert,
 .dark .global-delete-alert {
-    background: rgba(220, 38, 38, .13);
-    border-color: rgba(252, 165, 165, .28);
+    background:
+        radial-gradient(circle at top left,
+            rgba(220, 38, 38, .17),
+            transparent 46%),
+        rgba(127, 29, 29, .12);
+
+    border-color:
+        rgba(252, 165, 165, .24);
 }
 
-[data-theme="dark"] .global-delete-alert p,
-[data-theme="dark"] .global-delete-alert span,
-.dark .global-delete-alert p,
-.dark .global-delete-alert span {
-    color: #fca5a5;
+[data-theme="dark"] .global-delete-alert-icon,
+.dark .global-delete-alert-icon {
+    background: rgba(220, 38, 38, .16);
+    border-color: rgba(252, 165, 165, .22);
+    color: #FCA5A5;
+    box-shadow: none;
 }
 
-[data-theme="dark"] .global-delete-alert strong,
-.dark .global-delete-alert strong {
-    background: #161b22;
-    color: #f8fafc;
+[data-theme="dark"] .global-delete-question,
+.dark .global-delete-question {
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .global-delete-target,
+.dark .global-delete-target {
+    background: rgba(13, 17, 23, .68);
+    border-color: rgba(252, 165, 165, .16);
+}
+
+[data-theme="dark"] .global-delete-target-label,
+.dark .global-delete-target-label {
+    color: #8B949E;
+}
+
+[data-theme="dark"] .global-delete-target strong,
+.dark .global-delete-target strong {
+    background: transparent;
+    color: #F8FAFC;
+}
+
+[data-theme="dark"] .global-delete-helper,
+.dark .global-delete-helper {
+    color: #FCA5A5;
+}
+
+@media (max-width: 480px) {
+    .global-delete-alert {
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 11px;
+        padding: 14px;
+    }
+
+    .global-delete-alert-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .global-delete-target {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .global-delete-target strong {
+        max-width: 100%;
+        text-align: left;
+    }
 }
 
 .modal-split-card {
@@ -4386,7 +4498,39 @@ body.session-expired {
 
 [data-theme="dark"] .ui-modal .modal-section-icon,
 .dark .ui-modal .modal-section-icon {
-    background: rgba(139, 0, 0, .18);
-    border-color: rgba(252, 165, 165, .20);
-    color: #fca5a5;
+    background:
+        color-mix(in srgb,
+            var(--modal-accent) 16%,
+            transparent) !important;
+
+    border-color:
+        color-mix(in srgb,
+            var(--modal-accent) 30%,
+            transparent) !important;
+
+    color: var(--modal-accent) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .05) !important;
+}
+
+[data-theme="dark"] .ui-modal .modal-section-icon i,
+.dark .ui-modal .modal-section-icon i {
+    color: currentColor !important;
+}
+
+.global-confirm-alert .global-confirm-value {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--modal-accent-dark);
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+[data-theme="dark"] .global-confirm-alert .global-confirm-value,
+.dark .global-confirm-alert .global-confirm-value {
+    background: transparent;
+    color: var(--modal-accent-dark);
 }

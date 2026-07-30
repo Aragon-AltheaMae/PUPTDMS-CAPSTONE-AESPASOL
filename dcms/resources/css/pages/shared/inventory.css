@@ -309,13 +309,6 @@
     box-shadow: none !important;
 }
 
-#mainContent.inventory-page #statCards .stat-card.active,
-#mainContent.inventory-page #statCards .stat-card.stat-active {
-    transform: none !important;
-    outline: none !important;
-    box-shadow: inherit !important;
-}
-
 #mainContent.inventory-page .inventory-row-actions {
     display: inline-flex !important;
     align-items: center !important;
@@ -347,15 +340,6 @@
         overflow-x: hidden !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-    }
-
-    #mainContent.inventory-page #statCards {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .75rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-card {
-        min-width: 0 !important;
     }
 
     #mainContent.inventory-page .inventory-toolbar-shell {
@@ -635,55 +619,6 @@
     }
 }
 
-@media only screen and (max-width: 380px) {
-
-    #mainContent.inventory-page #statCards,
-    #mainContent.inventory-page .inventory-stat-grid {
-        gap: 0.62rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-card,
-    #mainContent.inventory-page .inventory-stat-grid .stat-card {
-        min-height: 122px !important;
-        padding: 0.55rem 0.68rem !important;
-        border-radius: 14px !important;
-        gap: 0.5rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-label,
-    #mainContent.inventory-page .inventory-stat-grid .stat-label {
-        font-size: 0.46rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-value,
-    #mainContent.inventory-page .inventory-stat-grid .stat-value,
-    #mainContent.inventory-page #statCards .stat-num,
-    #mainContent.inventory-page .inventory-stat-grid .stat-num,
-    #mainContent.inventory-page #statCards .stat-count,
-    #mainContent.inventory-page .inventory-stat-grid .stat-count {
-        font-size: 1.55rem !important;
-        margin-top: 0.35rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-footer,
-    #mainContent.inventory-page .inventory-stat-grid .stat-footer {
-        font-size: 0.56rem !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-icon,
-    #mainContent.inventory-page .inventory-stat-grid .stat-icon {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        border-radius: 11px !important;
-    }
-
-    #mainContent.inventory-page #statCards .stat-icon i,
-    #mainContent.inventory-page .inventory-stat-grid .stat-icon i {
-        font-size: 0.78rem !important;
-    }
-}
-
 #mainContent.inventory-page .inventory-grid {
     display: grid !important;
     gap: 1rem !important;
@@ -694,13 +629,20 @@
 
 #mainContent.inventory-page.mode-grid .inventory-grid {
     grid-template-columns:
-        repeat(auto-fit, minmax(260px, 1fr)) !important;
+        repeat(3, minmax(0, 1fr)) !important;
 }
 
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
     #mainContent.inventory-page.mode-grid .inventory-grid {
         grid-template-columns:
-            repeat(auto-fit, minmax(280px, 1fr)) !important;
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    #mainContent.inventory-page.mode-grid .inventory-grid {
+        grid-template-columns:
+            1fr !important;
     }
 }
 

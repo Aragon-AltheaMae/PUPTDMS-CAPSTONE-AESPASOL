@@ -796,7 +796,7 @@
 }
 
 .global-action-tooltip.tooltip-reset {
-    background: #6d28d9;
+    --tooltip-bg: #6d28d9;
 }
 
 .global-action-tooltip.tooltip-locked,

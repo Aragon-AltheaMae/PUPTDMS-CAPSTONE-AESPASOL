@@ -223,8 +223,8 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                         <td class="py-3.5 px-2 sm:px-4">
                                             <div class="flex items-center gap-2 sm:gap-3">
-                                                <div
-                                                    class="w-9 h-9 rounded-full bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
+                                                    style="background: linear-gradient(135deg, #8B0000, #b00000);">
                                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                                 </div>
                                                 <div>
@@ -248,7 +248,8 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                         <td class="py-3.5 px-4 text-center">
                                             <span
-                                                class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                                class="status-pill {{ $user->status === 'active' ? 'status-active' : 'status-inactive' }}">
+                                                <span class="status-dot"></span>
                                                 {{ ucfirst($user->status) }}
                                             </span>
                                         </td>
@@ -324,6 +325,7 @@ $inactiveCount = $inactiveCount ?? 0;
         @js($user->name)
     )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
                                                     data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
+                                                    data-tooltip-tone="{{ $user->status === 'active' ? 'reschedule' : 'start' }}"
                                                     aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
 
                                                     <i
@@ -386,14 +388,15 @@ $inactiveCount = $inactiveCount ?? 0;
                                         <div class="um-grid-number">#{{ $users->firstItem() + $loop->index }}
                                         </div>
                                         <span
-                                            class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $user->status === 'active' ? 'badge-active' : 'badge-inactive' }}">
+                                            class="status-pill {{ $user->status === 'active' ? 'status-active' : 'status-inactive' }}">
+                                            <span class="status-dot"></span>
                                             {{ ucfirst($user->status) }}
                                         </span>
                                     </div>
 
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
+                                            style="background: linear-gradient(135deg, #8B0000, #b00000);">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
                                         <div class="min-w-0">
@@ -821,12 +824,10 @@ $inactiveCount = $inactiveCount ?? 0;
                             </div>
                         </div>
 
-                        <div class="global-confirm-alert">
+                        <div class="global-confirm-alert modal-theme-warning">
                             <i class="fa-solid fa-circle-info"></i>
-
                             <p>
                                 Temporary password
-
                                 <span>
                                     The generated password shown here is the exact password
                                     that will be saved for the account.
@@ -930,147 +931,185 @@ $inactiveCount = $inactiveCount ?? 0;
             @csrf
             @method('PUT')
             <input type="hidden" id="editOriginalRole" value="">
-            <div class="modal-bd modal-scroll-body space-y-4">
-                <div class="global-form-group" data-global-field>
-                    <label class="global-form-label" for="editName">
-                        Full Name
-                        <span class="required-mark">*</span>
-                    </label>
+            <div class="modal-bd modal-scroll-body">
+                <div class="modal-form-grid">
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="editName">
+                            Full Name
+                            <span class="required-mark">*</span>
+                        </label>
 
-                    <div class="modal-inline-control" data-voice-field>
-                        <div class="modal-inline-main">
-                            <input type="text" name="name" id="editName" class="form-input-custom"
-                                placeholder="Full name" autocomplete="name" data-field-label="Full Name"
-                                data-required-message="Please enter the user's full name." required>
+                        <div class="modal-inline-control" data-voice-field>
+                            <div class="modal-inline-main">
+                                <input type="text" name="name" id="editName" class="form-input-custom"
+                                    placeholder="Full name" autocomplete="name" data-field-label="Full Name"
+                                    data-required-message="Please enter the user's full name." required>
+                            </div>
+
+                            <div class="voice-input-toggle">
+                                <button type="button" id="editNameMicBtn" class="voice-search-mic external"
+                                    data-voice-trigger data-voice-target="#editName"
+                                    data-voice-status="#editNameVoiceStatus"
+                                    aria-label="Voice input for edit full name">
+
+                                    <i class="fa-solid fa-microphone"></i>
+                                </button>
+
+                                <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
+                                    aria-live="polite">
+                                </span>
+                            </div>
                         </div>
-
-                        <div class="voice-input-toggle">
-                            <button type="button" id="editNameMicBtn" class="voice-search-mic external"
-                                data-voice-trigger data-voice-target="#editName"
-                                data-voice-status="#editNameVoiceStatus" aria-label="Voice input for edit full name">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="global-form-group" data-global-field>
-
-                    <label class="global-form-label" for="editEmail">
-                        Email Address
-                        <span class="required-mark">*</span>
-                    </label>
-
-                    <div class="global-control-wrap">
-                        <i class="fa-solid fa-envelope global-control-icon"></i>
-
-                        <input type="email" name="email" id="editEmail"
-                            class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
-                            autocomplete="email" data-field-label="Email Address"
-                            data-required-message="Please enter an email address."
-                            data-type-message="Please enter a valid email address." required>
-                    </div>
-                </div>
-
-                <div class="global-form-group" data-global-field>
-                    <label for="editRole" class="global-form-label">
-                        Role
-                    </label>
-
-                    <select name="role_id" id="editRole" class="js-custom-select" data-placeholder="Patient"
-                        data-field-label="Role">
-                        @if ($patientRole)
-                        <option value="{{ $patientRole->id }}">
-                            {{ $patientRole->display_name }}
-                        </option>
-                        @endif
-
-                        @foreach ($roles as $role)
-                        @continue(
-                        $patientRole &&
-                        (int) $role->id === (int) $patientRole->id
-                        )
-
-                        <option value="{{ $role->id }}">
-                            {{ $role->display_name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div id="editRoleConfirmPanel" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                    <label class="block text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-1.5">
-                        Confirm Role Change
-                    </label>
-                    <p class="text-[12px] text-amber-700 mb-2">
-                        Enter your current admin password to continue changing this user's role.
-                    </p>
-                    <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
-                        placeholder="Current admin password"
-                        class="field-input w-full border border-amber-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-                        autocomplete="current-password">
-                </div>
-
-                <div class="rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-4 space-y-4">
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-800">Backup Information</h4>
                     </div>
 
                     <div class="global-form-group" data-global-field>
-                        <label class="global-form-label" for="editPhone">
-                            Phone Number
+
+                        <label class="global-form-label" for="editEmail">
+                            Email Address
+                            <span class="required-mark">*</span>
                         </label>
 
                         <div class="global-control-wrap">
-                            <i class="fa-solid fa-phone global-control-icon"></i>
+                            <i class="fa-solid fa-envelope global-control-icon"></i>
 
-                            <input type="tel" name="phone" id="editPhone"
-                                class="form-input-custom global-control-with-icon" placeholder="09XX XXX XXXX"
-                                inputmode="numeric" autocomplete="tel" maxlength="13" data-field-label="Phone Number"
-                                data-pattern-message="Enter a valid 11-digit Philippine mobile number.">
-                        </div>
-
-                        <p id="editPhoneFeedback" class="modal-helper-text">
-                            Format: 09XX XXX XXXX
-                        </p>
-                    </div>
-
-                    <div class="global-form-group" data-global-field>
-
-                        <label class="global-form-label" for="editBirthdate">
-                            Birthdate
-                        </label>
-
-                        <div class="global-control-wrap">
-                            <i class="fa-regular fa-calendar global-control-icon"></i>
-
-                            <input type="text" id="editBirthdate" name="birthdate"
-                                class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
-                                data-validation-rule="notFutureDate">
+                            <input type="email" name="email" id="editEmail"
+                                class="form-input-custom global-control-with-icon" placeholder="user@pup.edu.ph"
+                                autocomplete="email" data-field-label="Email Address"
+                                data-required-message="Please enter an email address."
+                                data-type-message="Please enter a valid email address." required>
                         </div>
                     </div>
 
                     <div class="global-form-group" data-global-field>
-                        <label class="global-form-label" for="editGender">
-                            Gender
+                        <label for="editRole" class="global-form-label">
+                            Role
                         </label>
 
-                        <select name="gender" id="editGender" class="js-custom-select" data-placeholder="Select gender"
-                            data-field-label="Gender">
+                        <select name="role_id" id="editRole" class="js-custom-select" data-placeholder="Patient"
+                            data-field-label="Role">
+                            @if ($patientRole)
+                            <option value="{{ $patientRole->id }}">
+                                {{ $patientRole->display_name }}
+                            </option>
+                            @endif
 
-                            <option value="" disabled>Select gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
+                            @foreach ($roles as $role)
+                            @continue(
+                            $patientRole &&
+                            (int) $role->id === (int) $patientRole->id
+                            )
+
+                            <option value="{{ $role->id }}">
+                                {{ $role->display_name }}
+                            </option>
+                            @endforeach
                         </select>
                     </div>
-                </div>
 
+                    <div id="editRoleConfirmPanel" class="global-confirm-panel hidden">
+
+                        <div class="global-confirm-alert">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <p>
+                                Confirm Role Change
+                                <span>
+                                    Enter your current admin password before changing this user's role.
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="global-form-group" data-global-field>
+                            <label class="global-form-label" for="editAdminCurrentPassword">
+                                Current Admin Password
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <div class="global-control-wrap">
+                                <i class="fa-solid fa-lock global-control-icon"></i>
+
+                                <input type="password" name="admin_current_password" id="editAdminCurrentPassword"
+                                    class="form-input-custom global-control-with-icon global-control-with-action"
+                                    placeholder="Enter current admin password" autocomplete="current-password"
+                                    data-field-label="Current Admin Password"
+                                    data-required-message="Enter your current admin password.">
+
+                                <button type="button" class="global-input-action" onclick="togglePassVis(
+                    'editAdminCurrentPassword',
+                    'editAdminPasswordEye'
+                )" aria-label="Show or hide current admin password">
+
+                                    <i class="fa-regular fa-eye" id="editAdminPasswordEye">
+                                    </i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-form-section">
+                        <div class="modal-section-heading">
+                            <div class="modal-section-icon">
+                                <i class="fa-solid fa-address-card"></i>
+                            </div>
+
+                            <div>
+                                <h4>Backup Information</h4>
+                                <p>
+                                    Optional contact and personal information.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="global-form-group" data-global-field>
+                            <label class="global-form-label" for="editPhone">
+                                Phone Number
+                            </label>
+
+                            <div class="global-control-wrap">
+                                <i class="fa-solid fa-phone global-control-icon"></i>
+
+                                <input type="tel" name="phone" id="editPhone"
+                                    class="form-input-custom global-control-with-icon" placeholder="09XX XXX XXXX"
+                                    inputmode="numeric" autocomplete="tel" maxlength="13"
+                                    data-field-label="Phone Number"
+                                    data-pattern-message="Enter a valid 11-digit Philippine mobile number.">
+                            </div>
+
+                            <p id="editPhoneFeedback" class="modal-helper-text">
+                                Format: 09XX XXX XXXX
+                            </p>
+                        </div>
+
+                        <div class="global-form-group" data-global-field>
+
+                            <label class="global-form-label" for="editBirthdate">
+                                Birthdate
+                            </label>
+
+                            <div class="global-control-wrap">
+                                <i class="fa-regular fa-calendar global-control-icon"></i>
+
+                                <input type="text" id="editBirthdate" name="birthdate"
+                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
+                                    placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
+                                    data-validation-rule="notFutureDate">
+                            </div>
+                        </div>
+
+                        <div class="global-form-group" data-global-field>
+                            <label class="global-form-label" for="editGender">
+                                Gender
+                            </label>
+
+                            <select name="gender" id="editGender" class="js-custom-select"
+                                data-placeholder="Select gender" data-field-label="Gender">
+
+                                <option value="" disabled>Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="global-form-group" data-global-field>
                     <label class="global-form-label">
                         Status
@@ -1408,26 +1447,34 @@ $inactiveCount = $inactiveCount ?? 0;
 
             <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-x"
                 aria-label="Close confirm action modal">
+
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <div class="modal-bd">
             <div id="toggleModalBody" class="global-confirm-alert">
+                <i id="toggleModalBodyIcon" class="fa-solid fa-triangle-exclamation"></i>
+                <p>
+                    <span id="toggleModalUserName" class="global-confirm-value">
+                    </span>
+                    <span id="toggleModalMessage"></span>
+                </p>
             </div>
+        </div>
 
-            <div class="modal-ft">
-                <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
-                    Cancel
+        <div class="modal-ft">
+            <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
+
+                Cancel
+            </button>
+
+            <form id="toggleConfirmForm" method="POST">
+                @csrf
+
+                <button type="submit" id="toggleConfirmBtn" class="ui-btn ui-btn-warning">
                 </button>
-
-                <form id="toggleConfirmForm" method="POST">
-                    @csrf
-
-                    <button type="submit" id="toggleConfirmBtn" class="ui-btn ui-btn-primary">
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -1462,56 +1509,151 @@ $inactiveCount = $inactiveCount ?? 0;
         document.addEventListener('DOMContentLoaded', () => openModal('addModal'));
     @endif
 
-    function openToggleConfirm(userId, currentStatus, userName) {
-        var isActive = currentStatus === 'active';
-        var icon = document.getElementById('toggleModalIcon');
-        var title = document.getElementById('toggleModalTitle');
-        var subtitle = document.getElementById('toggleModalSubtitle');
-        var body = document.getElementById('toggleModalBody');
-        var btn = document.getElementById('toggleConfirmBtn');
-        var form = document.getElementById('toggleConfirmForm');
+    function openToggleConfirm(
+        userId,
+        currentStatus,
+        userName
+    ) {
+        const isActive =
+            currentStatus === 'active';
 
-        var modal = document.getElementById('toggleConfirmModal');
+        const modal =
+            document.getElementById(
+                'toggleConfirmModal'
+            );
 
-        modal.classList.remove('is-activate', 'is-deactivate');
-        modal.classList.add(isActive ? 'is-deactivate' : 'is-activate');
-        form.dataset.userId = userId;
-        form.dataset.currentStatus = currentStatus;
-        form.dataset.userName = userName;
-        form.action = '/admin/user-management/' + userId + '/toggle-status';
+        const icon =
+            document.getElementById(
+                'toggleModalIcon'
+            );
 
-        btn.disabled = false;
+        const title =
+            document.getElementById(
+                'toggleModalTitle'
+            );
 
-        if (isActive) {
-            icon.className =
-                'w-10 h-10 rounded-xl flex items-center justify-center shadow bg-gradient-to-br from-amber-400 to-orange-500';
-            icon.innerHTML = '<i class="fa-solid fa-user-slash text-white text-sm"></i>';
-            title.textContent = 'Deactivate User';
-            subtitle.textContent = 'This will restrict their access';
-            body.className = 'rounded-xl p-4 mb-5 flex items-start gap-3 text-sm bg-amber-50 border border-amber-100';
-            body.innerHTML =
-                '<i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-amber-800">' +
-                userName +
-                '</strong><span class="text-amber-700"> will be <strong>deactivated</strong>. They will no longer be able to log in until reactivated.</span></div>';
-            btn.className = 'ui-btn ui-btn-warning';
-            btn.innerHTML = '<i class="fa-solid fa-user-slash"></i> Deactivate';
-        } else {
-            icon.className =
-                'w-10 h-10 rounded-xl flex items-center justify-center shadow bg-gradient-to-br from-emerald-500 to-green-600';
-            icon.innerHTML = '<i class="fa-solid fa-user-check text-white text-sm"></i>';
-            title.textContent = 'Activate User';
-            subtitle.textContent = 'This will restore their access';
-            body.className =
-                'rounded-xl p-4 mb-5 flex items-start gap-3 text-sm bg-emerald-50 border border-emerald-100';
-            body.innerHTML =
-                '<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 flex-shrink-0"></i><div><strong class="text-emerald-800">' +
-                userName +
-                '</strong><span class="text-emerald-700"> will be <strong>activated</strong>. They will regain full access to the system.</span></div>';
-            btn.className = 'ui-btn ui-btn-success';
-            btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Activate';
+        const subtitle =
+            document.getElementById(
+                'toggleModalSubtitle'
+            );
+
+        const bodyIcon =
+            document.getElementById(
+                'toggleModalBodyIcon'
+            );
+
+        const name =
+            document.getElementById(
+                'toggleModalUserName'
+            );
+
+        const message =
+            document.getElementById(
+                'toggleModalMessage'
+            );
+
+        const button =
+            document.getElementById(
+                'toggleConfirmBtn'
+            );
+
+        const form =
+            document.getElementById(
+                'toggleConfirmForm'
+            );
+
+        if (
+            !modal ||
+            !icon ||
+            !title ||
+            !subtitle ||
+            !bodyIcon ||
+            !name ||
+            !message ||
+            !button ||
+            !form
+        ) {
+            return;
         }
 
-        btn.dataset.originalHtml = btn.innerHTML;
+        modal.classList.remove(
+            'modal-theme-warning',
+            'modal-theme-success',
+            'is-activate',
+            'is-deactivate'
+        );
+
+        form.dataset.userId =
+            String(userId);
+
+        form.dataset.currentStatus =
+            String(currentStatus);
+
+        form.dataset.userName =
+            String(userName);
+
+        form.action =
+            `/admin/user-management/${userId}/toggle-status`;
+
+        button.disabled = false;
+        name.textContent = userName;
+
+        if (isActive) {
+            modal.classList.add(
+                'modal-theme-warning',
+                'is-deactivate'
+            );
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-user-slash"></i>';
+
+            bodyIcon.className =
+                'fa-solid fa-triangle-exclamation';
+
+            title.textContent =
+                'Deactivate User';
+
+            subtitle.textContent =
+                'This will restrict their access';
+
+            message.textContent =
+                'will be deactivated. They will no longer be able to log in until reactivated.';
+
+            button.className =
+                'ui-btn ui-btn-warning';
+
+            button.innerHTML =
+                '<i class="fa-solid fa-user-slash"></i><span>Deactivate</span>';
+        } else {
+            modal.classList.add(
+                'modal-theme-success',
+                'is-activate'
+            );
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-user-check"></i>';
+
+            bodyIcon.className =
+                'fa-solid fa-circle-check';
+
+            title.textContent =
+                'Activate User';
+
+            subtitle.textContent =
+                'This will restore their access';
+
+            message.textContent =
+                'will be activated. They will regain access to the system.';
+
+            button.className =
+                'ui-btn ui-btn-success';
+
+            button.innerHTML =
+                '<i class="fa-solid fa-user-check"></i><span>Activate</span>';
+        }
+
+        button.dataset.originalHtml =
+            button.innerHTML;
 
         openModal('toggleConfirmModal');
     }
@@ -2069,276 +2211,426 @@ $inactiveCount = $inactiveCount ?? 0;
 
     function umRenderRows(users) {
         function jsAttr(value) {
-            return JSON.stringify(value ?? '').replace(/"/g, '&quot;');
+            return JSON
+                .stringify(value ?? '')
+                .replace(/"/g, '&quot;');
         }
 
-        var tbody = document.getElementById('umTableBody');
-        var gridBody = document.getElementById('umGridBody');
+        function buildDetails(user, roleLabel, statusLabel, createdFull) {
+            return user.details || {
+                id: user.id,
+                name: user.name || '',
+                email: user.email || '',
+                role: roleLabel || 'Patient',
+                status: statusLabel || 'Unknown',
+                source: 'Users',
+                created_at: createdFull || 'N/A',
+                updated_at: 'N/A',
+                phone: 'N/A',
+                birthdate: 'N/A',
+                gender: 'N/A',
+                phone_raw: '',
+                birthdate_raw: '',
+                gender_raw: '',
+                patient_profile: 'Not linked',
+                last_login_at: 'Never'
+            };
+        }
 
-        if (!tbody || !gridBody) return;
+        function buildActionButtons(user, detailsPayload) {
+            const isActive =
+                String(user.status || '').toLowerCase() === 'active';
 
-        if (!users || users.length === 0) {
-            var searchVal = umState.search || '';
-            var hasSearch = searchVal.trim() !== '';
-            var escapedSearch = escapeHtml(searchVal);
-            var emptyTitle = hasSearch ?
-                'No results for “' + escapedSearch + '”' :
-                'No users found';
-            var emptySub = hasSearch ?
-                'Try a different name or email.' :
-                'Try adjusting your filters.';
-            var clearBtn = hasSearch ?
-                '<button type="button" class="empty-state-btn" data-clear-search data-search-target="#umSearch"><i class="fa-solid fa-xmark"></i> Clear search</button>' :
-                '';
+            const toggleClass =
+                isActive
+                    ? 'ui-action-warning'
+                    : 'ui-action-success';
 
-            var emptyInner = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid ${hasSearch ? 'fa-magnifying-glass' : 'fa-users'}"></i>
-                    </div>
-                    <h3 class="empty-state-title">${emptyTitle}</h3>
-                    <p class="empty-state-sub">${emptySub}</p>
-                    ${clearBtn}
-                </div>
-            `;
+            const toggleIcon =
+                isActive
+                    ? 'fa-toggle-on'
+                    : 'fa-toggle-off';
 
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="p-0">
-                        ${emptyInner}
-                    </td>
-                </tr>
-            `;
+            const toggleTooltip =
+                isActive
+                    ? 'Deactivate account'
+                    : 'Activate account';
 
-            gridBody.innerHTML = emptyInner;
-            window.initSearchClearButtons?.();
-            window.initGlobalVoiceInputs?.(document.getElementById('addModal') || document);
+            const toggleTone =
+                isActive
+                    ? 'reschedule'
+                    : 'start';
+
+            return `
+            <div class="ui-action-group um-action-group">
+                <button
+                    type="button"
+                    data-user-details="${detailsPayload}"
+                    onclick="openEditModalFromButton(
+                        this,
+                        'users',
+                        ${Number(user.id)},
+                        ${jsAttr(user.name)},
+                        ${jsAttr(user.email)},
+                        ${jsAttr(user.role_id)},
+                        ${jsAttr(user.status)}
+                    )"
+                    class="ui-action-btn ui-action-edit"
+                    data-tooltip="Edit account"
+                    data-tooltip-tone="edit"
+                    aria-label="Edit account">
+
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+                <button
+                    type="button"
+                    onclick="openToggleConfirm(
+                        ${Number(user.id)},
+                        ${jsAttr(user.status)},
+                        ${jsAttr(user.name)}
+                    )"
+                    class="ui-action-btn ${toggleClass}"
+                    data-tooltip="${toggleTooltip}"
+                    data-tooltip-tone="${toggleTone}"
+                    aria-label="${toggleTooltip}">
+
+                    <i class="fa-solid ${toggleIcon}"></i>
+                </button>
+
+                <button
+                    type="button"
+                    onclick="openResetModal(
+                        'users',
+                        ${Number(user.id)},
+                        ${jsAttr(user.name)}
+                    )"
+                    class="ui-action-btn ui-action-reset"
+                    data-tooltip="Reset password"
+                    data-tooltip-tone="reset"
+                    aria-label="Reset password">
+
+                    <i class="fa-solid fa-key"></i>
+                </button>
+
+                <button
+                    type="button"
+                    data-user-details="${detailsPayload}"
+                    onclick="openViewModalFromButton(this)"
+                    class="ui-action-btn ui-action-view"
+                    data-tooltip="View details"
+                    data-tooltip-tone="view"
+                    aria-label="View details">
+
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </div>
+        `;
+        }
+
+        const tbody =
+            document.getElementById('umTableBody');
+
+        const gridBody =
+            document.getElementById('umGridBody');
+
+        if (!tbody || !gridBody) {
             return;
         }
 
-        var startNumber = ((umState.page - 1) * umState.perPage) + 1;
-        var tableHtml = '';
-        var gridHtml = '';
+        if (!Array.isArray(users) || users.length === 0) {
+            const searchValue =
+                String(umState.search || '');
+
+            const hasSearch =
+                searchValue.trim() !== '';
+
+            const escapedSearch =
+                escapeHtml(searchValue);
+
+            const emptyTitle =
+                hasSearch
+                    ? `No results for “${escapedSearch}”`
+                    : 'No users found';
+
+            const emptySubtitle =
+                hasSearch
+                    ? 'Try a different name or email.'
+                    : 'Try adjusting your filters.';
+
+            const clearButton =
+                hasSearch
+                    ? `
+                    <button
+                        type="button"
+                        class="empty-state-btn"
+                        data-clear-search
+                        data-search-target="#umSearch">
+
+                        <i class="fa-solid fa-xmark"></i>
+                        Clear search
+                    </button>
+                `
+                    : '';
+
+            const emptyInner = `
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fa-solid ${hasSearch
+                    ? 'fa-magnifying-glass'
+                    : 'fa-users'
+                }"></i>
+                </div>
+
+                <h3 class="empty-state-title">
+                    ${emptyTitle}
+                </h3>
+
+                <p class="empty-state-sub">
+                    ${emptySubtitle}
+                </p>
+
+                ${clearButton}
+            </div>
+        `;
+
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="p-0">
+                    ${emptyInner}
+                </td>
+            </tr>
+        `;
+
+            gridBody.innerHTML =
+                emptyInner;
+
+            window.initSearchClearButtons?.();
+
+            return;
+        }
+
+        const startNumber =
+            ((Number(umState.page || 1) - 1) *
+                Number(umState.perPage || 10)) + 1;
+
+        let tableHtml = '';
+        let gridHtml = '';
 
         users.forEach(function (user, index) {
-            var rowNumber = startNumber + index;
-            var normalizedRole =
+            const rowNumber =
+                startNumber + index;
+
+            const normalizedRole =
                 normalizeUmRole(user);
 
-            var roleSlug =
-                normalizedRole.slug;
+            const roleSlug =
+                normalizedRole.slug || 'none';
 
-            var roleLabel =
-                normalizedRole.label;
-            var registeredDay = user.created_at_day || '—';
+            const roleLabel =
+                normalizedRole.label || 'Patient';
 
-            var statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
-            var initial = (user.name || 'U').charAt(0).toUpperCase();
-            var statusLabel = (user.status || '').charAt(0).toUpperCase() + (user.status || '').slice(1);
-            var createdFull = (user.created_at_day || '—') + (user.created_at_time ? ' ' + user
-                .created_at_time : '');
+            const normalizedStatus =
+                String(user.status || '')
+                    .trim()
+                    .toLowerCase();
+
+            const isActive =
+                normalizedStatus === 'active';
+
+            const statusClass =
+                isActive
+                    ? 'status-active'
+                    : 'status-inactive';
+
+            const statusLabel =
+                normalizedStatus
+                    ? normalizedStatus.charAt(0).toUpperCase() +
+                    normalizedStatus.slice(1)
+                    : 'Unknown';
+
+            const initial =
+                String(user.name || 'U')
+                    .trim()
+                    .charAt(0)
+                    .toUpperCase() || 'U';
+
+            const registeredDay =
+                user.created_at_day || '—';
+
+            const createdFull =
+                registeredDay +
+                (
+                    user.created_at_time
+                        ? ` ${user.created_at_time}`
+                        : ''
+                );
+
+            const safeName =
+                escapeHtml(user.name || '');
+
+            const safeEmail =
+                escapeHtml(user.email || '');
+
+            const safeRoleLabel =
+                escapeHtml(roleLabel);
+
+            const safeRoleSlug =
+                escapeHtml(roleSlug);
+
+            const safeRegisteredDay =
+                escapeHtml(registeredDay);
+
+            const details =
+                buildDetails(
+                    user,
+                    roleLabel,
+                    statusLabel,
+                    createdFull
+                );
+
+            const detailsPayload =
+                escapeHtml(
+                    JSON.stringify(details)
+                );
+
+            const actionButtons =
+                buildActionButtons(
+                    user,
+                    detailsPayload
+                );
 
             tableHtml += `
-                <tr class="user-table-row border-b border-gray-50 last:border-0">
-                    <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
-                        <span class="text-xs text-gray-400 font-medium">${rowNumber}</span>
-                    </td>
+            <tr
+                class="user-table-row border-b border-gray-50 last:border-0"
+                data-name="${safeName.toLowerCase()}"
+                data-email="${safeEmail.toLowerCase()}"
+                data-role="${safeRoleLabel.toLowerCase()}">
 
-                    <td class="py-3.5 px-2 sm:px-4">
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <div
-                                class="w-9 h-9 rounded-full bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                                ${initial}
-                            </div>
-                            <div>
-                                <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                    ${user.name}
-                                </div>
-                                <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
-                                    ${user.email}
-                                </div>
-                            </div>
-                        </div>
-                    </td>
+                <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
+                    <span class="text-xs text-gray-400 font-medium">
+                        ${rowNumber}
+                    </span>
+                </td>
 
-                    <td class="py-3.5 px-4">
-                        <span class="badge-role role-${roleSlug || 'none'}">
-    ${roleLabel}
-</span>
-                    </td>
-
-                    <td class="py-3.5 px-4 text-center">
-                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
-                            ${statusLabel}
-                        </span>
-                    </td>
-
-                    <td class="py-3.5 px-4 hidden lg:table-cell">
-                        <span class="text-xs text-gray-600">${registeredDay}</span>
-                    </td>
-
-                    <td class="py-3.5 px-4">
-                        <div class="ui-action-group um-action-group">
-                            <button type="button"
-                                data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                phone_raw: '',
-                birthdate_raw: '',
-                gender_raw: ''
-            }))}"
-                                onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                                class="ui-action-btn ui-action-edit"
-data-tooltip="Edit account" data-tooltip-tone="edit"
-aria-label="Edit account">
-                                <i class="fa-solid fa-pen text-[11px]"></i>
-                            </button>
-
-                            <button type="button"
-    onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
-    class="ui-action-btn ${user.status === 'active'
-                    ? 'ui-action-warning'
-                    : 'ui-action-success'}"
-    data-tooltip="${user.status === 'active'
-                    ? 'Deactivate account'
-                    : 'Activate account'}"
-    aria-label="${user.status === 'active'
-                    ? 'Deactivate account'
-                    : 'Activate account'}">
-    <i class="fa-solid ${user.status === 'active'
-                    ? 'fa-toggle-on'
-                    : 'fa-toggle-off'}"></i>
-</button>
-
-                            <button type="button"
-                                onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                                class="ui-action-btn ui-action-reset"
-                                data-tooltip="Reset password"
-                                aria-label="Reset password">
-                                <i class="fa-solid fa-key text-[11px]"></i>
-                            </button>
-
-                            <button type="button"
-    data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        role: roleLabel,
-                        status: statusLabel,
-                        source: 'Users',
-                        created_at: createdFull
-                    }))}"
-    onclick="openViewModalFromButton(this)"
-    class="ui-action-btn ui-action-view"
-    data-tooltip="View details"
-    aria-label="View details">
-    <i class="fa-solid fa-eye"></i>
-</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            gridHtml += `
-                <div class="um-grid-card">
-                    <div class="um-grid-top">
-                        <div class="um-grid-number">#${rowNumber}</div>
-                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">
-                            ${statusLabel}
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-3">
+                <td class="py-3.5 px-2 sm:px-4">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#b00000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                            class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
+                            style="background: linear-gradient(135deg, #8B0000, #b00000);">
+
                             ${initial}
                         </div>
+
                         <div class="min-w-0">
-                            <div class="font-semibold text-gray-800 text-sm leading-tight">${user.name}</div>
-                            <div class="text-[11px] text-gray-400 mt-0.5">${user.email}</div>
+                            <div class="font-semibold text-gray-800 text-sm leading-tight">
+                                ${safeName}
+                            </div>
+
+                            <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
+                                ${safeEmail}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    <span class="badge-role role-${safeRoleSlug}">
+                        ${safeRoleLabel}
+                    </span>
+                </td>
+
+                <td class="py-3.5 px-4 text-center">
+                    <span class="status-pill ${statusClass}">
+                        <span class="status-dot"></span>
+                        ${statusLabel}
+                    </span>
+                </td>
+
+                <td class="py-3.5 px-4 hidden lg:table-cell">
+                    <span class="text-xs text-gray-600">
+                        ${safeRegisteredDay}
+                    </span>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    ${actionButtons}
+                </td>
+            </tr>
+        `;
+
+            gridHtml += `
+            <div class="um-grid-card">
+                <div class="um-grid-top">
+                    <div class="um-grid-number">
+                        #${rowNumber}
+                    </div>
+
+                    <span class="status-pill ${statusClass}">
+                        <span class="status-dot"></span>
+                        ${statusLabel}
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
+                        style="background: linear-gradient(135deg, #8B0000, #b00000);">
+
+                        ${initial}
+                    </div>
+
+                    <div class="min-w-0">
+                        <div class="font-semibold text-gray-800 text-sm leading-tight">
+                            ${safeName}
+                        </div>
+
+                        <div class="text-[11px] text-gray-400 mt-0.5">
+                            ${safeEmail}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="um-grid-meta">
+                    <div class="um-grid-field">
+                        <div class="um-grid-label">
+                            Role
+                        </div>
+
+                        <div class="um-grid-value">
+                            <span class="badge-role role-${safeRoleSlug}">
+                                ${safeRoleLabel}
+                            </span>
                         </div>
                     </div>
 
-                    <div class="um-grid-meta">
-    <div class="um-grid-field">
-        <div class="um-grid-label">
-            Role
-        </div>
+                    <div class="um-grid-field">
+                        <div class="um-grid-label">
+                            Registered
+                        </div>
 
-        <div class="um-grid-value">
-            <span class="badge-role role-${roleSlug || 'none'}">
-                ${roleLabel}
-            </span>
-        </div>
-    </div>
+                        <div class="um-registered-date">
+                            <span class="um-registered-icon">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </span>
 
-    <div class="um-grid-field">
-        <div class="um-grid-label">
-            Registered
-        </div>
-
-        <div class="um-registered-date">
-            <span class="um-registered-icon">
-                <i class="fa-solid fa-calendar-day"></i>
-            </span>
-
-            <span class="um-registered-text">
-                ${registeredDay}
-            </span>
-        </div>
-    </div>
-</div>
-
-                    <div class="ui-action-group">
-                        <button type="button"
-                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                phone_raw: '',
-                birthdate_raw: '',
-                gender_raw: ''
-            }))}"
-                            onclick="openEditModalFromButton(this, 'users', ${user.id}, ${jsAttr(user.name)}, ${jsAttr(user.email)}, ${jsAttr(user.role_id)}, ${jsAttr(user.status)})"
-                            class="ui-action-btn ui-action-edit"
-data-tooltip="Edit account" data-tooltip-tone="edit"
-aria-label="Edit account">
-                            <i class="fa-solid fa-pen text-[11px]"></i>
-                        </button>
-
-                        <button type="button"
-                            onclick="openToggleConfirm(${user.id}, ${jsAttr(user.status)}, ${jsAttr(user.name)})"
-                            class="action-btn ${user.status === 'active' ? 'btn-toggle-on' : 'btn-toggle-off'}"
-                            title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
-                            <i class="fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-[11px]"></i>
-                        </button>
-
-                        <button type="button"
-                            onclick="openResetModal('users', ${user.id}, ${jsAttr(user.name)})"
-                            class="ui-action-btn ui-action-reset"
-data-tooltip="Reset password"
-aria-label="Reset password">
-                            <i class="fa-solid fa-key text-[11px]"></i>
-                        </button>
-
-                        <button type="button"
-                            data-user-details="${escapeHtml(JSON.stringify(user.details || {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: roleLabel,
-                status: statusLabel,
-                source: 'Users',
-                created_at: createdFull
-            }))}"
-                            onclick="openViewModalFromButton(this)"
-                            class="ui-action-btn ui-action-view"
-data-tooltip="View details"
-aria-label="View details">
-                            <i class="fa-solid fa-eye text-[11px]"></i>
-                        </button>
+                            <span class="um-registered-text">
+                                ${safeRegisteredDay}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            `;
+
+                ${actionButtons}
+            </div>
+        `;
         });
 
-        tbody.innerHTML = tableHtml;
-        gridBody.innerHTML = gridHtml;
+        tbody.innerHTML =
+            tableHtml;
+
+        gridBody.innerHTML =
+            gridHtml;
     }
 
     function umGoPage(page) {
