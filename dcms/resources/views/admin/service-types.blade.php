@@ -161,97 +161,98 @@
                             </div>
                         </div>
 
-                        <div class="service-type-view" id="serviceTypeListView">
-                            <div class="admin-scroll-x">
+                        <div id="serviceTypeListView" class="service-type-view table-list-view">
+                            <div class="table-scroll">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th class="service-col-id">ID</th>
-                                            <th class="service-col-name">Service Name</th>
-                                            <th>Description</th>
-                                            <th class="service-col-visibility">Booking Visibility</th>
-                                            <th class="service-col-action">Action</th>
+                                            <th>ID</th>
+                                            <th>Service Name</th>
+                                            <th class="table-cell-center">
+                                                Booking Visibility
+                                            </th>
+                                            <th class="table-cell-center">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
+
                                     <tbody id="serviceTypeTableBody">
-                                        @forelse($services as $service)
-                                        <tr>
-                                            <td><span class="service-badge">#{{ $service->id }}</span></td>
+                                        @forelse ($services as $service)
+                                        <tr data-service-id="{{ $service->id }}">
                                             <td>
-                                                <div class="service-name-cell">
-                                                    <div class="service-name-icon">
+                                                <span class="table-tag table-tag-neutral">
+                                                    #{{ $service->id }}
+                                                </span>
+                                            </td>
+
+                                            <td class="table-cell-main">
+                                                <div class="table-primary">
+                                                    <span class="table-tag table-tag-danger" aria-hidden="true">
                                                         <i class="fa-solid fa-tooth"></i>
-                                                    </div>
-                                                    <span class="service-name-text">
+                                                    </span>
+
+                                                    <strong>
                                                         {{ $service->name }}
-                                                    </span>
+                                                    </strong>
                                                 </div>
                                             </td>
-                                            <td class="service-desc-cell">
-                                                {{ $service->description ?: '—' }}
-                                            </td>
-                                            <td class="service-center-cell">
-                                                <div class="service-visibility-actions">
-                                                    @if ($service->is_active_for_booking)
-                                                    <span class="service-visibility-badge is-visible">
-                                                        <i class="fa-solid fa-thumbtack"></i> Visible
-                                                    </span>
-                                                    @else
-                                                    <span class="service-visibility-badge is-hidden">
-                                                        <i class="fa-solid fa-eye-slash"></i> Hidden
-                                                    </span>
-                                                    @endif
 
-                                                    @if ($service->is_default)
-                                                    <span class="service-badge service-badge-bookable">
-                                                        Default
-                                                    </span>
-                                                    @endif
-                                                </div>
+                                            <td class="table-cell-center">
+                                                @if ($service->is_active_for_booking)
+                                                <span class="table-status table-status-success">
+                                                    Visible
+                                                </span>
+                                                @else
+                                                <span class="table-status table-status-neutral">
+                                                    Hidden
+                                                </span>
+                                                @endif
                                             </td>
-                                            <td class="service-center-cell">
-                                                <div class="service-inline-actions ui-action-group">
+
+                                            <td class="table-cell-center table-action-cell">
+                                                <div class="ui-action-group">
                                                     <button type="button" class="ui-action-btn ui-action-edit"
-                                                        data-tooltip="Manage service" aria-label="Manage service"
-                                                        onclick="openManageServiceModal(
-        '{{ route('admin.service-types.update', $service->id) }}',
-        @js($service->name),
-        @js($service->description),
-        {{ $service->is_active_for_booking ? 'true' : 'false' }},
-        {{ $service->is_default ? 'true' : 'false' }}
-    )">
-
+                                                        data-tooltip="Manage service" data-tooltip-tone="edit"
+                                                        aria-label="Manage {{ $service->name }}"
+                                                        data-service-action="edit" data-service-id="{{ $service->id }}">
                                                         <i class="fa-solid fa-pen"></i>
                                                     </button>
 
-                                                    @if (!$service->is_default)
+                                                    @unless ($service->is_default)
                                                     <button type="button" class="ui-action-btn ui-action-delete"
-                                                        data-tooltip="Delete service" aria-label="Delete service"
-                                                        onclick="openDeleteModal(
-        '{{ route('admin.service-types.destroy', $service->id) }}',
-        '{{ addslashes($service->name) }}'
-    )">
-
+                                                        data-tooltip="Delete service"
+                                                        aria-label="Delete {{ $service->name }}"
+                                                        data-service-action="delete"
+                                                        data-service-id="{{ $service->id }}">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
-                                                    @endif
+                                                    @endunless
+
+                                                    <button type="button" class="ui-action-btn ui-action-view"
+                                                        data-tooltip="View details"
+                                                        aria-label="View {{ $service->name }} details"
+                                                        data-service-action="view" data-service-id="{{ $service->id }}">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="4" class="table-empty-state-cell">
                                                 <div class="empty-state">
-                                                    <div class="empty-icon"><i class="fa-solid fa-folder-open"></i>
+                                                    <div class="empty-icon">
+                                                        <i class="fa-solid fa-folder-open"></i>
                                                     </div>
+
                                                     <p class="service-empty-title">
                                                         No services found
                                                     </p>
+
                                                     <p class="service-empty-subtitle">
-                                                        Your clinic doesn't have any service types yet. Use the form
-                                                        to
-                                                        add
-                                                        one.
+                                                        Your clinic doesn't have any service types yet.
+                                                        Use the form to add one.
                                                     </p>
                                                 </div>
                                             </td>
@@ -262,84 +263,94 @@
                             </div>
                         </div>
 
-                        <div class="service-type-view" id="serviceTypeGridView" hidden>
+                        <div id="serviceTypeGridView" class="service-type-view table-grid-view" hidden>
                             @if ($services->count())
-                            <div class="service-types-grid" id="serviceTypeGridContainer">
+                            <div id="serviceTypeGridContainer" class="table-record-grid">
                                 @foreach ($services as $service)
-                                <div class="service-type-card">
-                                    <div class="service-type-card-top">
-                                        <span class="service-badge service-type-card-id">#{{ $service->id }}</span>
-
-                                        @if ($service->is_default)
-                                        <span class="service-badge service-badge-bookable">
-                                            Default
+                                <article class="table-record-card" data-service-id="{{ $service->id }}">
+                                    <div class="service-grid-card">
+                                        <span class="table-tag table-tag-neutral service-grid-id">
+                                            #{{ $service->id }}
                                         </span>
-                                        @endif
-                                    </div>
 
-                                    <div class="service-type-card-name-wrap">
-                                        <div class="service-type-card-icon">
-                                            <i class="fa-solid fa-tooth"></i>
+                                        <div class="service-grid-main">
+                                            <div class="table-tag table-tag-danger service-grid-icon"
+                                                aria-hidden="true">
+                                                <i class="fa-solid fa-tooth"></i>
+                                            </div>
+
+                                            <div class="service-grid-copy">
+                                                <h3 class="table-record-title">
+                                                    {{ $service->name }}
+                                                </h3>
+
+                                                <div class="service-grid-statuses">
+                                                    @if ($service->is_active_for_booking)
+                                                    <span class="table-status table-status-success">
+                                                        Visible
+                                                    </span>
+                                                    @else
+                                                    <span class="table-status table-status-neutral">
+                                                        Hidden
+                                                    </span>
+                                                    @endif
+
+                                                    @if ($service->is_default)
+                                                    <span class="table-tag table-tag-info">
+                                                        Default
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="service-type-card-name">{{ $service->name }}</div>
-                                    </div>
 
-                                    <div class="service-type-card-desc-wrap">
-                                        <div class="service-type-card-label">Description</div>
-                                        <div class="service-type-card-desc">
-                                            {{ $service->description ?: '—' }}
-                                        </div>
-                                    </div>
+                                        <p class="service-type-card-desc">
+                                            {{ $service->description ?: 'No description provided.' }}
+                                        </p>
 
-                                    <div class="service-type-card-footer">
-                                        <div class="service-card-actions">
-                                            @if ($service->is_active_for_booking)
-                                            <span class="service-visibility-badge is-visible">
-                                                <i class="fa-solid fa-thumbtack"></i> Visible
-                                            </span>
-                                            @else
-                                            <span class="service-visibility-badge is-hidden">
-                                                <i class="fa-solid fa-eye-slash"></i> Hidden
-                                            </span>
-                                            @endif
-                                        </div>
+                                        <div class="service-grid-footer">
+                                            <div class="ui-action-group">
+                                                <button type="button" class="ui-action-btn ui-action-edit"
+                                                    data-tooltip="Manage service" data-tooltip-tone="edit"
+                                                    aria-label="Manage {{ $service->name }}" data-service-action="edit"
+                                                    data-service-id="{{ $service->id }}">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
 
-                                        <div class="service-type-card-actions ui-action-group">
-                                            <button type="button" class="ui-action-btn ui-action-edit"
-                                                data-tooltip="Manage service" aria-label="Manage service" onclick="openManageServiceModal(
-            '{{ route('admin.service-types.update', $service->id) }}',
-            @js($service->name),
-            @js($service->description),
-            {{ $service->is_active_for_booking ? 'true' : 'false' }},
-            {{ $service->is_default ? 'true' : 'false' }}
-        )">
+                                                @unless ($service->is_default)
+                                                <button type="button" class="ui-action-btn ui-action-delete"
+                                                    data-tooltip="Delete service"
+                                                    aria-label="Delete {{ $service->name }}"
+                                                    data-service-action="delete" data-service-id="{{ $service->id }}">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                                @endunless
+                                            </div>
 
-                                                <i class="fa-solid fa-pen"></i>
+                                            <button type="button" class="ui-action-btn ui-action-view"
+                                                data-tooltip="View details"
+                                                aria-label="View {{ $service->name }} details"
+                                                data-service-action="view" data-service-id="{{ $service->id }}">
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
-
-                                            @if (!$service->is_default)
-                                            <button type="button" class="ui-action-btn ui-action-delete"
-                                                data-tooltip="Delete service" aria-label="Delete service" onclick="openDeleteModal(
-        '{{ route('admin.service-types.destroy', $service->id) }}',
-        '{{ addslashes($service->name) }}'
-    )">
-
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                            @endif
                                         </div>
                                     </div>
-                                </div>
+                                </article>
                                 @endforeach
                             </div>
                             @else
-                            <div class="empty-state">
-                                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                            <div class="empty-state table-grid-empty">
+                                <div class="empty-icon">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </div>
+
                                 <p class="service-empty-title">
                                     No services found
                                 </p>
+
                                 <p class="service-empty-subtitle">
-                                    Your clinic doesn't have any service types yet. Use the form to add one.
+                                    Your clinic doesn't have any service types yet.
+                                    Use the form to add one.
                                 </p>
                             </div>
                             @endif
@@ -348,7 +359,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </main>
 
 <x-delete-confirm-modal id="deleteServiceModal" form-id="deleteServiceForm" name-id="deleteServiceName"
@@ -510,6 +520,136 @@
         </div>
     </form>
 </div>
+
+<div id="serviceDetailsModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+    <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="serviceDetailsTitle"
+        onclick="event.stopPropagation()">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 id="serviceDetailsTitle" class="modal-title">
+                        Service Details
+                    </h3>
+
+                    <p class="modal-subtitle">
+                        Complete service type information
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="modal-x" onclick="closeModal('serviceDetailsModal')"
+                aria-label="Close service details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="modal-profile-card modal-profile-card-single">
+                <div class="modal-profile-main">
+                    <div class="modal-profile-avatar">
+                        <i class="fa-solid fa-tooth"></i>
+                    </div>
+
+                    <div class="modal-profile-main-copy">
+                        <span class="modal-profile-eyebrow">
+                            Service Type
+                        </span>
+
+                        <strong id="serviceDetailsName" class="modal-profile-name">
+                            —
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="modal-profile-details modal-profile-details-single">
+                    <div class="modal-profile-detail">
+                        <div class="modal-profile-detail-icon">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+
+                        <div>
+                            <span class="modal-profile-label">
+                                Service ID
+                            </span>
+
+                            <strong id="serviceDetailsId" class="modal-profile-value">
+                                —
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-form-grid-2">
+                <div class="modal-form-section">
+                    <div class="modal-section-heading">
+                        <div class="modal-section-icon">
+                            <i class="fa-solid fa-align-left"></i>
+                        </div>
+
+                        <div>
+                            <h4>Description</h4>
+                            <p>
+                                Information shown for this service.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="global-readonly-field service-details-description">
+                        <i class="fa-solid fa-file-lines"></i>
+
+                        <span id="serviceDetailsDescription">
+                            No description provided.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="modal-form-section">
+                    <div class="modal-section-heading">
+                        <div class="modal-section-icon">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+
+                        <div>
+                            <h4>Service Status</h4>
+                            <p>
+                                Booking and system classification.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="service-details-status-list">
+                        <div class="global-readonly-field">
+                            <i class="fa-solid fa-calendar-check"></i>
+
+                            <span id="serviceDetailsVisibility">
+                                —
+                            </span>
+                        </div>
+
+                        <div class="global-readonly-field">
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            <span id="serviceDetailsDefault">
+                                —
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeModal('serviceDetailsModal')">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @php
@@ -629,12 +769,80 @@ $serviceTypeRoutes = [
                         'Unable to copy bullet.'
                     );
 
+                    console.error('Copy failed:', error);
                 }
             });
         });
     }
 
     document.addEventListener('DOMContentLoaded', initServiceBulletCopy);
+
+    window.openServiceDetailsModal = function (
+        name,
+        description,
+        isActiveForBooking,
+        isDefault,
+        id
+    ) {
+        const nameElement =
+            document.getElementById(
+                'serviceDetailsName'
+            );
+
+        const descriptionElement =
+            document.getElementById(
+                'serviceDetailsDescription'
+            );
+
+        const idElement =
+            document.getElementById(
+                'serviceDetailsId'
+            );
+
+        const visibilityElement =
+            document.getElementById(
+                'serviceDetailsVisibility'
+            );
+
+        const defaultElement =
+            document.getElementById(
+                'serviceDetailsDefault'
+            );
+
+        if (
+            !nameElement ||
+            !descriptionElement ||
+            !idElement ||
+            !visibilityElement ||
+            !defaultElement
+        ) {
+            return;
+        }
+
+        nameElement.textContent =
+            name || 'Unnamed service';
+
+        descriptionElement.textContent =
+            description ||
+            'No description provided.';
+
+        idElement.textContent =
+            `#${id}`;
+
+        visibilityElement.textContent =
+            isActiveForBooking
+                ? 'Visible in appointment booking'
+                : 'Hidden from appointment booking';
+
+        defaultElement.textContent =
+            isDefault
+                ? 'Default system service'
+                : 'Custom clinic service';
+
+        window.openModal(
+            'serviceDetailsModal'
+        );
+    };
 
     (() => {
         const initialServices = @json($serviceTypePayload);
@@ -700,30 +908,47 @@ $serviceTypeRoutes = [
         }
 
         function actionButtons(service) {
-            const deleteButton = service.is_default ? '' : `
-        <button type="button"
-            class="ui-action-btn ui-action-delete"
-            data-tooltip="Delete service"
-            aria-label="Delete service"
-            data-service-action="delete"
-            data-service-id="${service.id}">
-
-            <i class="fa-solid fa-trash"></i>
-        </button>
-    `;
+            const deleteButton =
+                service.is_default
+                    ? ''
+                    : `
+                <button
+                    type="button"
+                    class="ui-action-btn ui-action-delete"
+                    data-tooltip="Delete service"
+                    aria-label="Delete ${escapeHtml(service.name)}"
+                    data-service-action="delete"
+                    data-service-id="${service.id}"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
 
             return `
-        <button type="button"
+        <button
+            type="button"
             class="ui-action-btn ui-action-edit"
             data-tooltip="Manage service"
-            aria-label="Manage service"
+            data-tooltip-tone="edit"
+            aria-label="Manage ${escapeHtml(service.name)}"
             data-service-action="edit"
-            data-service-id="${service.id}">
-
+            data-service-id="${service.id}"
+        >
             <i class="fa-solid fa-pen"></i>
         </button>
 
         ${deleteButton}
+
+        <button
+            type="button"
+            class="ui-action-btn ui-action-view"
+            data-tooltip="View details"
+            aria-label="View ${escapeHtml(service.name)} details"
+            data-service-action="view"
+            data-service-id="${service.id}"
+        >
+            <i class="fa-solid fa-eye"></i>
+        </button>
     `;
         }
 
@@ -739,85 +964,238 @@ $serviceTypeRoutes = [
         }
 
         function renderServiceTable() {
-            const tbody = document.getElementById('serviceTypeTableBody');
+            const tbody =
+                document.getElementById(
+                    'serviceTypeTableBody'
+                );
+
             if (!tbody) return;
 
             if (!serviceTypeServices.length) {
-                tbody.innerHTML = `<tr><td colspan="5">${emptyStateHtml()}</td></tr>`;
+                tbody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    class="table-empty-state-cell"
+                >
+                    ${emptyStateHtml()}
+                </td>
+            </tr>
+        `;
+
                 return;
             }
 
-            tbody.innerHTML = serviceTypeServices.map((service) => `
-            <tr data-service-id="${service.id}">
-                <td><span class="service-badge">#${service.id}</span></td>
-                <td>
-                    <div class="service-name-cell">
-                        <div class="service-name-icon">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
-                        <span class="service-name-text">${escapeHtml(service.name)}</span>
-                    </div>
-                </td>
-                <td class="service-desc-cell">${service.description ? escapeHtml(service.description) : '—'}</td>
-                <td class="service-center-cell">
-                    <div class="service-visibility-actions">
-                        ${visibilityBadge(service)}
-                        ${defaultBadge(service)}
-                    </div>
-                </td>
-                <td class="service-center-cell">
-                    <div class="service-inline-actions ui-action-group">
-    ${actionButtons(service)}
-</div>
-                </td>
-            </tr>
-        `).join('');
+            tbody.innerHTML =
+                serviceTypeServices
+                    .map(function (service) {
+                        const visibility =
+                            service.is_active_for_booking
+                                ? `
+                            <span class="table-status table-status-success">
+                                Visible
+                            </span>
+                        `
+                                : `
+                            <span class="table-status table-status-neutral">
+                                Hidden
+                            </span>
+                        `;
+
+                        return `
+                    <tr data-service-id="${service.id}">
+                        <td>
+                            <span class="table-tag table-tag-neutral">
+                                #${service.id}
+                            </span>
+                        </td>
+
+                        <td class="table-cell-main">
+                            <div class="table-primary">
+                                <span
+                                    class="table-tag table-tag-danger"
+                                    aria-hidden="true">
+                                    <i class="fa-solid fa-tooth"></i>
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(service.name)}
+                                </strong>
+                            </div>
+                        </td>
+
+                        <td class="table-cell-center">
+                            ${visibility}
+                        </td>
+
+                        <td class="table-cell-center table-action-cell">
+                            <div class="ui-action-group">
+                                ${actionButtons(service)}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                    })
+                    .join('');
         }
 
         function renderServiceGrid() {
-            const gridView = document.getElementById('serviceTypeGridView');
+            const gridView =
+                document.getElementById(
+                    'serviceTypeGridView'
+                );
+
             if (!gridView) return;
 
             if (!serviceTypeServices.length) {
-                gridView.innerHTML = emptyStateHtml();
+                gridView.innerHTML = `
+            <div class="empty-state table-grid-empty">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+
+                <p class="service-empty-title">
+                    No services found
+                </p>
+
+                <p class="service-empty-subtitle">
+                    Your clinic doesn't have any service types yet.
+                    Use the form to add one.
+                </p>
+            </div>
+        `;
+
                 return;
             }
 
+            const cards =
+                serviceTypeServices
+                    .map(function (service) {
+                        const visibility =
+                            service.is_active_for_booking
+                                ? `
+                            <span class="table-status table-status-success">
+                                Visible
+                            </span>
+                        `
+                                : `
+                            <span class="table-status table-status-neutral">
+                                Hidden
+                            </span>
+                        `;
+
+                        const defaultBadge =
+                            service.is_default
+                                ? `
+                            <span class="table-tag table-tag-info">
+                                Default
+                            </span>
+                        `
+                                : '';
+
+                        const deleteButton =
+                            service.is_default
+                                ? ''
+                                : `
+                            <button
+                                type="button"
+                                class="ui-action-btn ui-action-delete"
+                                data-tooltip="Delete service"
+                                aria-label="Delete ${escapeHtml(service.name)}"
+                                data-service-action="delete"
+                                data-service-id="${service.id}"
+                            >
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        `;
+
+                        const description =
+                            service.description
+                                ? escapeHtml(service.description)
+                                : 'No description provided.';
+
+                        return `
+                    <article
+                        class="table-record-card"
+                        data-service-id="${service.id}"
+                    >
+                        <div class="service-grid-card">
+                            <span
+                                class="
+                                    table-tag
+                                    table-tag-neutral
+                                    service-grid-id
+                                "
+                            >
+                                #${service.id}
+                            </span>
+
+                            <div class="service-grid-main">
+                                <div
+    class="table-tag table-tag-danger service-grid-icon"
+    aria-hidden="true"
+>
+    <i class="fa-solid fa-tooth"></i>
+</div>
+
+                                <div class="service-grid-copy">
+                                    <h3 class="table-record-title">
+                                        ${escapeHtml(service.name)}
+                                    </h3>
+
+                                    <div class="service-grid-statuses">
+                                        ${visibility}
+                                        ${defaultBadge}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="service-type-card-desc">
+                                ${description}
+                            </p>
+
+                            <div class="service-grid-footer">
+                                <div class="ui-action-group">
+                                    <button
+                                        type="button"
+                                        class="ui-action-btn ui-action-edit"
+                                        data-tooltip="Manage service"
+                                        data-tooltip-tone="edit"
+                                        aria-label="Manage ${escapeHtml(service.name)}"
+                                        data-service-action="edit"
+                                        data-service-id="${service.id}"
+                                    >
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+
+                                    ${deleteButton}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="ui-action-btn ui-action-view"
+                                    data-tooltip="View details"
+                                    aria-label="View ${escapeHtml(service.name)} details"
+                                    data-service-action="view"
+                                    data-service-id="${service.id}"
+                                >
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+                    })
+                    .join('');
+
             gridView.innerHTML = `
-            <div class="service-types-grid" id="serviceTypeGridContainer">
-                ${serviceTypeServices.map((service) => `
-                                                        <div class="service-type-card" data-service-id="${service.id}">
-                                                            <div class="service-type-card-top">
-                                                                <span class="service-badge service-type-card-id">#${service.id}</span>
-                                                                ${defaultBadge(service)}
-                                                            </div>
-
-                                                            <div class="service-type-card-name-wrap">
-                                                                <div class="service-type-card-icon">
-                                                                    <i class="fa-solid fa-tooth"></i>
-                                                                </div>
-                                                                <div class="service-type-card-name">${escapeHtml(service.name)}</div>
-                                                            </div>
-
-                                                            <div class="service-type-card-desc-wrap">
-                                                                <div class="service-type-card-label">Description</div>
-                                                                <div class="service-type-card-desc">
-                                                                    ${service.description ? escapeHtml(service.description) : '—'}
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="service-type-card-footer">
-                                                                <div class="service-card-actions">
-                                                                    ${visibilityBadge(service)}
-                                                                </div>
-
-                                                                <div class="service-type-card-actions ui-action-group">
-                                                                    ${actionButtons(service)}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    `).join('')}
-            </div>`;
+        <div
+            id="serviceTypeGridContainer"
+            class="table-record-grid"
+        >
+            ${cards}
+        </div>
+    `;
         }
 
         function renderServices() {
@@ -1213,6 +1591,29 @@ $serviceTypeRoutes = [
             if (button.dataset.serviceAction === 'delete') {
                 window.openDeleteServiceById(id);
             }
+
+            if (
+                button.dataset.serviceAction ===
+                'view'
+            ) {
+                const service =
+                    serviceTypeServices.find(
+                        item =>
+                            Number(item.id) ===
+                            Number(id)
+                    );
+
+                if (!service) return;
+
+                window.openServiceDetailsModal(
+                    service.name,
+                    service.description,
+                    service.is_active_for_booking,
+                    service.is_default,
+                    service.id
+                );
+            }
+
         });
 
         function initServiceTypesPage() {
