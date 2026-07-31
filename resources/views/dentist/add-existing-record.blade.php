@@ -4,8 +4,6 @@
 
 @section('title', 'Add Existing Record')
 
-@vite('resources/css/app.css')
-
 @section('content')
 <main id="mainContent" class="dentist-page-shell existing-record-page">
     <div class="w-full animate-fade-up pt-6">
